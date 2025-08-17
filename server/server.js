@@ -13,8 +13,10 @@ const app = express();
 
 app.use(cookieParser());
 app.use(cors({
-  origin: true, // Allow all origins temporarily for testing
-  credentials: true,
+  origin: '*', // Allow all origins
+  credentials: false, // Disable credentials temporarily
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
