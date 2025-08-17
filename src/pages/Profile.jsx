@@ -61,6 +61,7 @@ export default function Profile() {
     const navigate = useNavigate(); // ✅ call first
     const { username, email, createdAt, setUser, loading } = useUser();
     const { setLoading, isLoading } = useLoading();
+    const { showMessage } = useMessage();
 
     const handleCopyLink = async () => {
         const url = `${window.location.origin}/u/${encodeURIComponent(username)}`;
@@ -119,7 +120,6 @@ export default function Profile() {
     const [pokemonSlotIndex, setPokemonSlotIndex] = useState(null);
     const [bio, setBio] = useState("");
     const [showTrainerModal, setShowTrainerModal] = useState(false);
-    const { showMessage } = useMessage();
     const formBeforeEditRef = useRef(null);
     const [stats, setStats] = useState({
         shinies: 0,
@@ -138,7 +138,7 @@ export default function Profile() {
         favoritePokemonShiny: [false, false, false, false, false],
         switchFriendCode: ""
     });
-    const [likeCount, setLikeCount] = useState(0);
+        const [likeCount, setLikeCount] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
 
@@ -189,35 +189,35 @@ export default function Profile() {
 
 
 
-            useEffect(() => {
-            setLoading('profile-data', true);
-            profileAPI.getProfile()
-                .then(data => {
-                    setForm(prev => ({
-                        ...prev,
-                        bio: data.bio && data.bio.length > 150 ? data.bio.substring(0, 150) : (data.bio ?? prev.bio),
-                        location: data.location ?? prev.location,
-                        gender: data.gender ?? prev.gender,
-                        profileTrainer: data.profileTrainer ?? prev.profileTrainer,
-                        favoriteGames: Array.isArray(data.favoriteGames) ? [...data.favoriteGames] : prev.favoriteGames,
-                        favoritePokemon: Array.isArray(data.favoritePokemon) ? [...data.favoritePokemon] : prev.favoritePokemon,
-                        favoritePokemonShiny: Array.isArray(data.favoritePokemonShiny) ? [...data.favoritePokemonShiny] : prev.favoritePokemonShiny,
-                        switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode
-                    }));
+    useEffect(() => {
+        setLoading('profile-data', true);
+        profileAPI.getProfile()
+            .then(data => {
+                setForm(prev => ({
+                    ...prev,
+                    bio: data.bio && data.bio.length > 150 ? data.bio.substring(0, 150) : (data.bio ?? prev.bio),
+                    location: data.location ?? prev.location,
+                    gender: data.gender ?? prev.gender,
+                    profileTrainer: data.profileTrainer ?? prev.profileTrainer,
+                    favoriteGames: Array.isArray(data.favoriteGames) ? [...data.favoriteGames] : prev.favoriteGames,
+                    favoritePokemon: Array.isArray(data.favoritePokemon) ? [...data.favoritePokemon] : prev.favoritePokemon,
+                    favoritePokemonShiny: Array.isArray(data.favoritePokemonShiny) ? [...data.favoritePokemonShiny] : prev.favoritePokemonShiny,
+                    switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode
+                }));
 
-                    // Also update user context so header updates
-                    setUser(prev => ({
-                        ...prev,
-                        profileTrainer: data.profileTrainer ?? prev.profileTrainer,
-                    }));
-                })
-                .catch(err => {
-                    console.error("Failed to fetch profile:", err);
-                })
-                .finally(() => {
-                    setLoading('profile-data', false);
-                });
-        }, [setLoading]);
+                // Also update user context so header updates
+                setUser(prev => ({
+                    ...prev,
+                    profileTrainer: data.profileTrainer ?? prev.profileTrainer,
+                }));
+            })
+            .catch(err => {
+                console.error("Failed to fetch profile:", err);
+            })
+            .finally(() => {
+                setLoading('profile-data', false);
+            });
+    }, [setLoading]);
 
     useEffect(() => {
         let ignore = false;
