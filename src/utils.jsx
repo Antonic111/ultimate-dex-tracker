@@ -1,0 +1,200 @@
+import { genderForms, specialCases, specialFormLabels } from "./Constants";
+import formsData from './data/forms.json';
+import pokemonData from './data/pokemon.json';
+
+
+// utils.js or at the top of App.jsx for now:
+export function chunkArray(arr, chunkSize) {
+  const chunks = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    chunks.push(arr.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
+
+export function getCaughtInfo(pokemonId) {
+  const info = localStorage.getItem(`caughtInfo_${pokemonId}`);
+  return info ? JSON.parse(info) : null;
+}
+export function setCaughtInfo(pokemonId, info) {
+  localStorage.setItem(`caughtInfo_${pokemonId}`, JSON.stringify(info));
+}
+
+export function formatFormType(type) {
+  if (!type) return "Normal";
+  switch (type) {
+    case "gmax": return "G-Max";
+    case "alolan": return "Alolan";
+    case "galarian": return "Galarian";
+    case "hisuian": return "Hisuian";
+    case "paldean": return "Paldean";
+    case "alpha": return "Alpha";
+    default: return type.charAt(0).toUpperCase() + type.slice(1);
+  }
+}
+
+const allSources = [pokemonData, formsData]; // Add more arrays here if you have them separately
+
+export function findPokemon(id, name = null) {
+  // First try exact id + name in all sources
+  for (const arr of allSources) {
+    const found = arr.find(p => p.id === id && (!name || p.name === name));
+    if (found) return found;
+  }
+  // Fallback: try just id in all sources
+  for (const arr of allSources) {
+    const found = arr.find(p => p.id === id);
+    if (found) return found;
+  }
+  return null;
+}
+
+export function renderTypeBadge(type) {
+  const typeClass = "type-badge type-" + type.toLowerCase();
+  return (
+    <span className={typeClass} key={type}>
+      <img
+        src={`/type-icons/${type.toLowerCase()}.png`}
+        alt={type}
+        className="type-badge-icon"
+        draggable={false}
+      />
+      <span className="type-badge-label">
+        {type.charAt(0).toUpperCase() + type.slice(1)}
+      </span>
+    </span>
+  );
+}
+
+export function getLevenshteinDistance(a, b) {
+  const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i])
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1]
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitute
+          matrix[i][j - 1] + 1,     // insert
+          matrix[i - 1][j] + 1      // delete
+        )
+      }
+    }
+  }
+
+  return matrix[b.length][a.length]
+}
+
+export function formatPokemonName(name) {
+
+  if (specialCases[name]) return specialCases[name];
+
+  if (name?.startsWith("alcremie")) return "Alcremie";
+
+  if (!name) return "";
+
+  // Remove common regional form keywords from fallback names
+  name = name
+    .replace(/-alola(n)?/i, "")
+    .replace(/-galar(i(a)n)?/i, "")
+    .replace(/-gmax/i, "")
+    .replace(/-hisui(a)?/i, "")
+    .replace(/-paldea(n)?/i, "")
+    .replace(/-alpha/i, "");
+
+  return name
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+export function formatTrainerName(filename) {
+  const name = filename.replace(".png", "");
+  let parts = name.split("-");
+
+  // Remove trailing 'gen1' to 'gen9' if present
+  const last = parts[parts.length - 1].toLowerCase();
+  if (/^gen[1-9]$/.test(last)) {
+    parts.pop(); // Remove the 'genX' part
+  }
+
+  // Handle gender suffix
+  let suffix = "";
+  const newLast = parts[parts.length - 1];
+  if (newLast === "f" || newLast === "m") {
+    suffix = ` (${newLast.toUpperCase()})`;
+    parts.pop();
+  }
+
+  const label = parts
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+  return label + suffix;
+}
+
+
+export function getFormDisplayName(pokemon) {
+  const name = pokemon?.name;
+
+  // ✅ Alcremie: Gigantamax or Cream/Sweet
+  if (name?.startsWith("alcremie")) {
+    if (name === "alcremie-gmax") {
+      return "Gigantamax";
+    }
+
+    const parts = name.split("alcremie-")[1]?.split("-") || [];
+    const flavor = parts[0] || "";
+    const sweet = parts[2] || "";
+    const flavorLabel = flavor.charAt(0).toUpperCase() + flavor.slice(1);
+    const sweetLabel = sweet.charAt(0).toUpperCase() + sweet.slice(1);
+    return `${flavorLabel} / ${sweetLabel}`;
+  }
+
+
+  // ✅ Unown form display
+  if (pokemon.formType === "unown" || name === "unown") {
+    let suffix = "";
+    if (name.startsWith("unown-")) {
+      suffix = name.split("unown-")[1];
+    } else if (name === "unown") {
+      const letterIndex = (pokemon.id || 201) - 201;
+      suffix = String.fromCharCode(65 + letterIndex); // A-Z
+    }
+
+    if (suffix === "!") return "Unown Form (!)";
+    if (suffix === "?") return "Unown Form (?)";
+    if (/^[a-z]$/i.test(suffix)) return `Unown Form (${suffix.toUpperCase()})`;
+    return "Unown Form";
+  }
+
+  // ✅ Gender forms
+  if (pokemon.formType === "gender") return "Female";
+
+  // ✅ Paldean Tauros
+  if (name === "tauros-paldea-aqua-breed") return "Paldean Aqua Form";
+  if (name === "tauros-paldea-blaze-breed") return "Paldean Blaze Form";
+
+  // ✅ Special cases like Lycanroc, Tatsugiri, etc.
+  if (specialFormLabels[name]) return specialFormLabels[name];
+
+  // ✅ Male form if baseSpecies is a gendered form
+  if (!pokemon.formType && genderForms.includes(name)) {
+    return "Male";
+  }
+
+  const formLabels = {
+    alolan: "Alolan Form",
+    galarian: "Galarian Form",
+    gmax: "Gigantamax",
+    hisuian: "Hisuian Form",
+    paldean: "Paldean Form",
+    other: "Alt Form",
+    alcremie: "Alcremie Variant",
+    alpha: "Alpha Pokémon"
+  };
+
+  return formLabels[pokemon.formType] || "";
+}

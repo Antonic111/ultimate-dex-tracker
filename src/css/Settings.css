@@ -1,0 +1,393 @@
+/* --------------------------------------------
+   Base Layout
+--------------------------------------------- */
+.settings-page {
+  padding: 10px;
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+  margin-bottom: 100px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 50px;
+  background-color: var(--settings-bg);
+  transition: background-color var(--transition-speed );
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 3px 20px #000c;
+}
+
+.settings-column {
+  flex: 1;
+  min-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  color: var(--text);
+  transition: color var(--transition-speed );
+}
+
+/* --------------------------------------------
+   Headings & Titles
+--------------------------------------------- */
+.settings-page .page-title {
+  margin: 40px 0 30px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  position: relative;
+  color: var(--text-color);
+}
+
+.setting-block h3 {
+  font-size: 1.5rem;
+  color: var(--accent);
+  margin-bottom: 4px;
+  margin-top: 4px;
+}
+
+.setting-block p {
+  font-size: 1rem;
+  color: var(--text);
+  transition: color var(--transition-speed );
+  margin-top: -8px;
+}
+
+/* --------------------------------------------
+   Blocks & Dividers
+--------------------------------------------- */
+.setting-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.setting-divider {
+  height: 2px;
+  background-color: var(--dividers);
+  transition: background-color var(--transition-speed );
+  margin: 8px 0;
+  width: 100%;
+}
+
+/* --------------------------------------------
+   Inputs & Buttons
+--------------------------------------------- */
+.setting-block input[type="text"],
+.setting-block input[type="password"] {
+  background-color: var(--settings-input);
+  transition: background-color var(--transition-speed );
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 1rem;
+}
+
+.setting-block button {
+  background: var(--accent);
+  color: #1a1a1a;
+  font-weight: 700;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.setting-block button:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* --------------------------------------------
+   Accent Color Picker
+--------------------------------------------- */
+.accent-color-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.accent-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.accent-circle.selected {
+  border-color: var(--accent);
+  transform: scale(1.3);
+}
+
+/* Color examples */
+.accent-circle.red { background-color: #ef4444; }
+.accent-circle.orange { background-color: #f97316; }
+.accent-circle.green { background-color: #22c55e; }
+.accent-circle.blue { background-color: #3b82f6; }
+.accent-circle.cyan { background-color: #06b6d4; }
+.accent-circle.purple { background-color: #a855f7; }
+.accent-circle.pink { background-color: #ec4899; }
+.accent-circle.brown { background-color: #8f4d00; }
+.accent-circle.yellow { background-color: #facc15; }
+
+/* --------------------------------------------
+   Theme Toggle (Light / Dark)
+--------------------------------------------- */
+.theme-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.theme-option {
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: #333;
+  color: #ccc;
+  cursor: pointer;
+  font-weight: 500;
+  border: 1px solid #444;
+  transition: all 0.2s;
+}
+
+.theme-option.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+}
+
+.theme-option:hover {
+  background: #555;
+}
+
+/* --------------------------------------------
+   Delete Account Button
+--------------------------------------------- */
+.delete-btn {
+  background: var(--accent) !important;
+  color: #1a1a1a !important;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+.delete-btn:hover {
+  background: var(--accent) !important;
+  color: white !important;
+}
+
+/* --------------------------------------------
+   Misc
+--------------------------------------------- */
+.coming-soon-note {
+  font-size: 0.9rem;
+  color: #aaa;
+  font-style: italic;
+}
+
+/* --------------------------------------------
+   SVG WRAPPERS
+--------------------------------------------- */
+
+.input-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--settings-input);
+  transition: background-color var(--transition-speed );
+  border: 2px solid #444;
+  border-radius: 8px;
+  gap: 0px;
+  height: 50px;
+}
+
+.input-icon-wrapper input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  transition: color var(--transition-speed );
+  font-size: 1rem;
+  outline: none;
+  padding: 10px 12px;
+}
+
+.input-icon-wrapper .auth-icon {
+  color: #888;
+}
+
+/* Fix ContentFilterInput alignment in settings */
+.input-icon-wrapper .content-filter-wrapper {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon-wrapper .content-filter-input {
+  height: 100%;
+  border: none;
+  background: transparent;
+  padding: 10px 12px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.show-password-toggle {
+  all: unset;
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  font-size: 1.25rem !important;
+}
+
+.show-password-toggle:hover {
+  color: #fff;
+}
+
+
+/* Switch label text next to the toggle */
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.switch-state {
+  font-weight: 600;
+  color: var(--text);
+  min-width: 64px;  /* keeps the row from jumping when text changes */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Theme cards */
+.theme-choice-grid{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(140px, 1fr));
+  gap:12px;
+}
+
+.theme-card{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  padding:10px;
+  border:1px solid var(--dividers);
+  border-radius:14px;
+  background: linear-gradient(135deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+  cursor:pointer;
+  user-select:none;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.theme-card input{ position:absolute; inset:0; opacity:0; pointer-events:none; }
+.theme-card.active{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(0,0,0,.2) inset, 0 0 0 1px var(--accent);
+}
+
+.theme-label{
+  font-weight:700;
+  padding:6px 10px;
+  border-radius:999px;
+  background: rgba(255,255,255,.06);
+}
+
+/* Mini preview */
+.theme-preview{
+  width:100%;
+  height:110px;
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid var(--dividers);
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+}
+
+/* Light / Dark / System canvases */
+.theme-preview.light{
+  background:#f3f4f7;
+}
+.theme-preview.dark{
+  background:#0f0f10;
+}
+.theme-preview.system{
+  position:relative;
+  background: linear-gradient(90deg, #f3f4f7 0 50%, #0f0f10 50% 100%);
+}
+.theme-preview.system::after{
+  content:"";
+  position:absolute; inset:0;
+  border-left:1px solid var(--dividers);
+}
+
+/* Header bar & avatar dot */
+.preview-header{
+  height:28px;
+  padding:6px 8px;
+  display:flex; align-items:center;
+  gap:8px;
+  border-bottom:1px solid var(--dividers);
+  background: rgba(0,0,0,.04);
+}
+.theme-preview.dark .preview-header{ background: rgba(255,255,255,.04); }
+.theme-preview.system .preview-header{ background: transparent; }
+
+.avatar-dot{
+  width:16px; height:16px; border-radius:50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px rgba(0,0,0,.15);
+}
+
+/* Content lines */
+.preview-lines{ padding:8px; display:flex; flex-direction:column; gap:6px; }
+.preview-lines span{
+  height:10px; border-radius:6px;
+  background: rgba(0,0,0,.15);
+}
+.theme-preview.dark .preview-lines span{ background: rgba(255,255,255,.12); }
+.theme-preview.light .preview-lines span:first-child{ background: rgba(0,0,0,.25); }
+.theme-preview.dark  .preview-lines span:first-child{ background: rgba(255,255,255,.25); }

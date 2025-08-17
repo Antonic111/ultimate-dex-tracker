@@ -1,0 +1,503 @@
+/* --------------------------------------------- GLOBAL RESET ------------------------------------ */
+
+/* GLOBAL BG */
+html { background-color: var(--main-bg); }
+
+body {
+  /* put the gradient here */
+  background: radial-gradient(circle at center, var(--main-bg) 65%, var(--main-bg2));
+  background-attachment: fixed;
+  transition: background var(--transition-speed);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* let the body's gradient show through */
+#root { 
+  background: transparent;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.box {
+  background: #181818;
+}
+
+html:not(.modal-open) {
+  overflow-y: scroll;
+}
+
+body.modal-open,
+html.modal-open {
+  overflow: hidden;
+}
+
+
+/* --------------------------------------------- SITE HEADER ------------------------------------- */
+
+.site-header {
+  background-color: var(--header);
+  transition: background-color var(--transition-speed );
+  border-bottom: 8px solid var(--accent)
+}
+
+/* Header: show full trainer sprite (not circular) */
+.site-header .profile-icon {
+  border-radius: 0;
+  object-fit: contain;
+  background: transparent;
+  image-rendering: pixelated; /* nice for sprites; remove if you don't want it */
+}
+
+.site-header-content {
+  max-width: 1300px;
+  height: 130px;
+  max-height: 130px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* was center */
+  padding: 0 16px;
+}
+
+.site-logo:hover,
+.site-logo:focus,
+.site-logo:active {
+  text-decoration: none;
+  color: var(--accent);
+  outline: none;
+}
+
+.name-line {
+  color: var(--text);
+  transition: color var(--transition-speed );
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.hello-line {
+  font-size: 0.9rem;
+  color: var(--text);
+  transition: color var(--transition-speed );
+}
+
+.Logo-img {
+  height: auto;
+  width: 300px;
+}
+
+/* --------------------------------------------- MAIN BACKGROUND --------------------------------- */
+
+.main-bg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  flex: 1;
+  min-height: 0;
+}
+
+
+/* --------------------------------------------- PROFILE VIEWING HEADER ---------------------- */
+
+.profile-viewing-header {
+  text-align: center;
+  margin: 40px 0 20px 0;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.profile-viewing-header h1 {
+  color: var(--text);
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.profile-viewing-header .username {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* --------------------------------------------- SECTION HEADER (DEX TITLE) ---------------------- */
+
+.main-header {
+  display: flex;
+  margin: 10px auto 10px auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 0.5em;
+  position: relative;
+  transition: padding 0.2s, margin 0.2s;
+  box-sizing: border-box;
+  width: 100%;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.main-header.collapsed {
+  margin: 0;
+  padding-top: 0em;
+  padding-bottom: 0em;
+  font-size: 0.5rem;
+  font-size: 0.3rem !important;
+}
+
+.main-divider.collapsed {
+  margin: 0;
+  border-radius: 2px;
+}
+
+.dex-section.collapsed {
+  margin-bottom: 0px;
+}
+
+.main-header.collapsed .main-desc {
+  display: none;
+}
+
+
+.main-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--grid-headers);
+  transition: color var(--transition-speed );
+}
+
+.main-desc {
+  color: var(--grid-desc);
+  transition: color var(--transition-speed );
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.main-divider {
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--dividers) 30%, var(--accent) 100%);
+  border-radius: 2px;
+  margin: 0.5em auto 2.5em auto;
+}
+
+/* --------------------------------------------- GRIDS ------------------------------------------- */
+
+.boxes-row {
+  display: flex;
+  flex-wrap: wrap;                /* ✅ Proper value */
+  justify-content: center;
+  gap: 40px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* --------------------------------------------- POKEMON BOX (PC BOX) ---------------------------- */
+
+.box {
+  width: 100%;
+  max-width: 630px;
+  border-radius: 10px;
+  box-shadow: 0 3px 18px #000b;
+  padding: 18px 10px 0px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+  box-sizing: border-box;
+  background-color: var(--pokemon-box-bg);
+  transition: background-color var(--transition-speed );
+  position: relative;
+}
+
+
+/* --------------------------------------------- BOX HEADER -------------------------------------- */
+
+.box-header-overlap {
+  width: 105%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--pokemon-box-bg2);
+  transition: background-color var(--transition-speed );
+  color: var(--accent);
+  font-weight: bold;
+  font-size: 1.3rem;
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border-color);
+  box-shadow: 0 2px 16px #0009;
+  position: relative;
+  margin-bottom: 16px;
+}
+
+/* --------------------------------------------- MARK ALL BUTTON --------------------------------- */
+
+.mark-all-btn {
+  background-color: var(--accent);
+  color: #1a1a1a;
+  border: none;
+  border-radius: 15px;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 6px 21px;
+  transition: background-color 0.2s ease;
+  box-shadow: 0 2px 9px #0004;
+}
+
+.mark-all-btn:hover {
+  background-color: var(--accent);
+  color: white;
+}
+
+/* --------------------------------------------- BOX GRID (SLOTS) --------------------------------- */
+
+.box-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  padding: 10px 10px 10px 10px;
+  background-color: var(--pokemon-box-bg);
+  transition: background-color var(--transition-speed );
+  border-radius: 8px;
+  width: 100%;
+  justify-items: center;
+  align-items: center;
+}
+
+/* --------------------------------------------- POKEMON SLOT & INFO BUTTON ------------------------------------ */
+
+.poke-slot {
+  background-color: var(--pokeslot);
+  transition: background-color var(--transition-speed );
+  border: 2px solid #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 90px;
+  border-radius: 8px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.poke-slot:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 0 10px var(--accent), 0 2px 4px #0007;
+  border-color: var(--accent);
+}
+
+.poke-slot.caught {
+  background: linear-gradient(180deg, #158038 20%, #174a1a 100%);
+  border-color: #50ff9a;
+  box-shadow: 0 0 6px #34f86655, 0 1px 2px #0006;
+}
+
+.info-button {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  display: flex;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  outline: none;
+}
+
+.poke-slot:hover .info-button {
+  opacity: 1;
+}
+
+.info-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+}
+
+.info-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+
+/* --------------------------------------------- POKEMON SPRITE ---------------------------------- */
+
+.poke-slot img {
+  width: 55px;
+  height: 55px;
+}
+
+/* --------------------------------------------- POKEMON NAME ------------------------------------ */
+
+.poke-name {
+  color: var(--pokename);
+  transition: background-color var(--transition-speed );
+  font-size: 0.8em;
+  font-weight: 600;
+  max-width: 85px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --------------------------------------------- DEX NUMBER -------------------------------------- */
+
+.poke-num {
+  color: var(--accent);
+  font-size: 0.8em;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px #0007;
+  line-height: 1.1;
+}
+
+/* --------------------------------------------- DEX SECTION SPACING ----------------------------- */
+
+.dex-section {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto 60px auto;
+  box-sizing: border-box;
+  /* Remove horizontal padding here */
+}
+
+/* --------------------------------------------- COLLAPSE BUTTON ----------------------------- */
+
+.collapse-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  background-color: var(--collapse-btn);
+  transition: background-color var(--transition-speed );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+}
+
+.collapse-btn:hover,
+.collapse-btn:focus {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+.collapse-icon {
+  color: var(--collapse-icon);
+  transition: background-color var(--transition-speed );
+}
+
+
+/* --------------------------------------------- LOADING ----------------------------- */
+
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 100px;
+  font-size: 1.5rem;
+  color: #666;
+  width: 100%;
+}
+
+/* ----------------- NO SEARCH RESULTS DETECTIVE PIKACHU-----------------*/
+
+
+.no-results-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  margin-top: 3em;
+  text-align: center;
+  width: 100%;
+}
+
+.no-results-img {
+  width: 140px;
+  height: auto;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 6px #0008);
+}
+
+.no-results-text {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.no-results-term {
+  color: var(--text);
+  transition: color var(--transition-speed );
+}
+
+.no-results-suggestion {
+  font-size: 1.1rem;
+  margin-top: 4px;
+}
+
+.no-results-button {
+  color: var(--text);
+  transition: color var(--transition-speed );
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: bold;
+  padding: 0;
+  font-size: 1.1rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+.main-nav{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width: 100%;
+}
+.nav-link{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border:1px solid var(--dividers);
+  border-radius:8px;
+  background:transparent;
+  color:var(--profile-text);
+  text-decoration:none;
+  cursor:pointer;
+}
+.nav-link:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+}
+.nav-icon{
+  background:transparent;
+}
+.hide-sm{
+  display:inline;
+}
+@media (max-width:640px){
+  .hide-sm{
+    display:none;
+  }
+}

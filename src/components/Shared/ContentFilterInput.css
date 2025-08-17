@@ -1,0 +1,179 @@
+.content-filter-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.content-filter-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background-color: var(--input-bg, #ffffff);
+  color: var(--input-text, #333333);
+}
+
+.content-filter-input:focus {
+  outline: none;
+  border-color: var(--accent-color, #4aaaff);
+  box-shadow: 0 0 0 3px rgba(74, 170, 255, 0.1);
+}
+
+.content-filter-input:disabled {
+  background-color: var(--input-disabled-bg, #f5f5f5);
+  color: var(--input-disabled-text, #999999);
+  cursor: not-allowed;
+}
+
+/* Textarea specific styles */
+.content-filter-input[type="textarea"],
+.content-filter-input:is(textarea) {
+  min-height: 120px;
+  resize: none;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+/* Special styling for notes textarea to make it bigger */
+.content-filter-input[type="textarea"][name="notes"],
+.content-filter-input:is(textarea)[name="notes"] {
+  min-height: 180px;
+}
+
+/* Validation states - DISABLED to preserve user's custom CSS */
+/*
+.content-filter-wrapper.has-error .content-filter-input {
+  border-color: #ff4444;
+  background-color: rgba(255, 68, 68, 0.05);
+}
+
+.content-filter-wrapper.has-error .content-filter-input:focus {
+  border-color: #ff4444;
+  box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.1);
+}
+
+.content-filter-wrapper.has-warning .content-filter-input {
+  border-color: #ffaa00;
+  background-color: rgba(255, 170, 0, 0.05);
+}
+
+.content-filter-wrapper.has-warning .content-filter-input:focus {
+  border-color: #ffaa00;
+  box-shadow: 0 0 0 3px rgba(255, 170, 0, 0.1);
+}
+
+.content-filter-wrapper.is-valid .content-filter-input {
+  border-color: #44aa44;
+  background-color: rgba(68, 170, 68, 0.05);
+}
+
+.content-filter-wrapper.is-valid .content-filter-input:focus {
+  border-color: #44aa44;
+  box-shadow: 0 0 0 3px rgba(68, 170, 68, 0.1);
+}
+*/
+
+.content-filter-wrapper.is-focused .content-filter-input {
+  border-color: var(--accent-color, #4aaaff);
+}
+
+/* Validation messages */
+.validation-messages {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.validation-error {
+  color: #ff4444;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease;
+}
+
+.validation-warning {
+  color: #ffaa00;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Character count */
+.character-count {
+  position: absolute;
+  bottom: -20px;
+  right: 0;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.1);
+  color: var(--text-secondary, #666666);
+  transition: all 0.2s ease;
+}
+
+.character-count.normal {
+  color: var(--text-secondary, #666666);
+}
+
+.character-count.info {
+  color: #4aaaff;
+  background-color: rgba(74, 170, 255, 0.1);
+}
+
+.character-count.warning {
+  color: #ffaa00;
+  background-color: rgba(255, 170, 0, 0.1);
+}
+
+.character-count.error {
+  color: #ff4444;
+  background-color: rgba(255, 68, 68, 0.1);
+}
+
+.character-count .remaining {
+  opacity: 0.8;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .content-filter-input {
+    background-color: var(--input-bg-dark, #2a2a2a);
+    color: var(--input-text-dark, #ffffff);
+    border-color: var(--input-border-dark, #444444);
+  }
+  
+  .content-filter-input:disabled {
+    background-color: var(--input-disabled-bg-dark, #1a1a1a);
+    color: var(--input-disabled-text-dark, #666666);
+  }
+  
+  .character-count {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .content-filter-input {
+    padding: 10px 14px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .character-count {
+    position: static;
+    margin-top: 8px;
+    text-align: right;
+  }
+}

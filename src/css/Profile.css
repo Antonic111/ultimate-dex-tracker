@@ -1,0 +1,748 @@
+/* ================================
+   GENERAL WRAPPER + BACKGROUND
+================================== */
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.profile-wrapper {
+  background: radial-gradient(circle at center, var(--main-bg) 65%, var(--main-bg2));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 16px;
+  margin-bottom: 0;
+  flex: 1;
+  width: 100%;
+}
+
+.profile-two-column {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 48px;
+  max-width: 1300px;
+  width: 100%;
+  background: var(--profile-card-bg);
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px #0008;
+  color: #eee;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.profile-two-column::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(140deg, transparent 30%, var(--accent), transparent 70%);
+  z-index: -1;
+  opacity: 10%;
+  pointer-events: none;
+}
+
+.profile-divider {
+  background: var(--dividers);
+  width: 2px;
+  height: auto;
+  border-radius: 999px;
+}
+
+
+/* ================================
+   HEADER BAR
+================================== */
+
+.profile-header-bar {
+  width: 100%;
+  max-width: 1300px;
+  background-color: var(--profile-top-bg);
+  transition: background-color var(--transition-speed );
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 12px #0008;
+}
+
+.profile-header-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.profile-header-left .profile-username {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--profile-text);
+  transition: color var(--transition-speed );
+}
+
+
+
+.profile-header-left .profile-date {
+  font-size: 0.95rem;
+  color: #aaa;
+  margin: 0;
+}
+
+.profile-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-links {
+  display: flex;
+  gap: 12px;
+}
+
+.profile-links a {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-links a:hover {
+  color: var(--accent-hover);
+}
+
+.profile-edit-btn,
+.profile-cancel-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* space between icon and text */
+  padding: 8px 14px;
+  background-color: var(--accent);
+  color: black;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.profile-edit-btn:hover,
+.profile-cancel-btn:hover {
+  background-color: var(--accent-hover);
+  color: var(--text);
+}
+
+/* Buttons row */
+.profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+/* ================================
+   LEFT SIDE
+================================== */
+
+.profile-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-header-row {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  flex-wrap: nowrap;
+}
+
+.profile-avatar-block {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-avatar {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 4px solid #555;
+  background: radial-gradient(circle at center, #3b3b3f 0%, #1e1e20 100%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-avatar-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: pixelated; /* nice for sprites; remove if you don't want it */
+}
+
+
+.profile-bio-block {
+  flex-grow: 1;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-top: 11px;
+  overflow: hidden;
+}
+
+.profile-row-split {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.profile-row-split .profile-field {
+  flex: 1;
+  min-width: 180px;
+  margin-bottom: 0px;
+}
+
+.profile-field.full-span {
+  grid-column: 1 / -1;
+  margin-top: 12px;
+}
+
+
+/* ================================
+   RIGHT SIDE
+================================== */
+
+.profile-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 26px;
+}
+
+.profile-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.profile-stats-grid .full-span {
+  grid-column: span 2;
+}
+
+
+/* ================================
+   FAVORITES (Games & Pokémon)
+================================== */
+
+.profile-ranking-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.profile-ranking-group h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--accent);
+  padding-bottom: 18px;
+}
+
+.profile-rank-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.profile-rank-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 70px;
+}
+
+.square-image {
+  width: 64px;
+  height: 64px;
+  border-radius: 15px; /* square with slight rounding */
+  overflow: hidden;
+  background-color: #222;
+  font-size: 0;
+}
+
+
+.square-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  font-size: 0;
+}
+
+.rank-label {
+  margin-top: 6px;
+  font-size: 0.7rem;
+  color: var(--text-color);
+  transition: color var(--transition-speed );
+  line-height: 1.2;
+  text-align: center;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+
+.trophy-icon {
+  position: absolute;
+  top: -23px; /* reduce from -14px */
+  background: transparent;
+}
+
+
+.trophy-1 svg {
+  color: gold;
+}
+
+.trophy-2 svg {
+  color: silver;
+}
+
+.trophy-3 svg {
+  color: #cd7f32;
+}
+
+
+/* ================================
+   FIELD STYLING
+================================== */
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.profile-field label {
+  font-size: 0.9rem;
+  color: var(--profile-labels);
+  transition: color var(--transition-speed );
+  margin-bottom: 4px;
+}
+
+.profile-field input,
+.profile-field select,
+.profile-field textarea {
+  background: var(--profile-fields);
+  transition: background var(--transition-speed );
+  color: var(--profile-text);
+  transition: color var(--transition-speed );
+  font-size: 0.95rem;
+  font-family: inherit;
+  font-weight: 400;
+  line-height: 1.4;
+  padding: 12px 16px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Field display styling for view mode - transparent effect */
+.field-display {
+  background: rgba(27, 27, 27, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(68, 68, 68, 0.5);
+  transition: background var(--transition-speed );
+  color: var(--profile-text);
+  transition: color var(--transition-speed );
+  font-size: 0.95rem;
+  font-family: inherit;
+  font-weight: 400;
+  line-height: 1.4;
+  padding: 12px 16px;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+.profile-two-column.editing-mode .profile-field input,
+.profile-two-column.editing-mode .profile-field select,
+.profile-two-column.editing-mode .profile-field textarea {
+  background: #1b1b1b;
+  color: #eee;
+  font-weight: normal;
+  border: 1px solid #444;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  height: 44px;
+  box-sizing: border-box;
+}
+
+
+.profile-two-column.editing-mode .profile-bio-block textarea {
+  color: #e6e6e6;
+}
+
+/* Bio-specific height & alignment */
+.profile-bio-block .field-display {
+  min-height: 140px;
+  display: block;
+  align-items: flex-start;
+  line-height: 1.5;
+  padding: 12px 16px;
+  background: rgba(27, 27, 27, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(68, 68, 68, 0.5);
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  overflow: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
+  width: 100%;
+  position: relative;
+}
+
+/* Field display styling for icon + text layout */
+.field-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  box-sizing: border-box;
+  background: rgba(27, 27, 27, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(68, 68, 68, 0.5);
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.profile-field textarea {
+  resize: none;
+  /* disables the resize handle */
+  min-height: 140px;
+  line-height: 1.4;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+/* Override flex properties for textarea inputs in edit mode */
+.profile-two-column.editing-mode .profile-field textarea {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 140px;
+}
+
+/* Bio field validation message positioning */
+.profile-bio-block .profile-field {
+  position: relative;
+}
+
+.profile-bio-block .profile-field label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-bio-block .profile-field .validation-messages {
+  position: absolute;
+  top: -30px;
+  right: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.profile-bio-block .profile-field .validation-error {
+  color: #ff4444;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Remove validation colors from bio field */
+.profile-bio-block .content-filter-wrapper .content-filter-input,
+.profile-bio-block .content-filter-wrapper.has-error .content-filter-input,
+.profile-bio-block .content-filter-wrapper.has-warning .content-filter-input,
+.profile-bio-block .content-filter-wrapper.is-valid .content-filter-input {
+  border-color: #444 !important;
+  background-color: #1b1b1b !important;
+  box-shadow: none !important;
+}
+
+.profile-bio-block .content-filter-wrapper .content-filter-input:focus {
+  border-color: #444 !important;
+  box-shadow: none !important;
+}
+
+/* ================================
+   FULL DEX BUTTON
+================================== */
+
+.profile-full-dex-button {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
+.profile-full-dex-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--accent);
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+  min-width: 160px;
+}
+
+.profile-full-dex-link:hover {
+  background-color: var(--accent-hover);
+  color: var(--text);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Pokémon */
+.empty-pokemon-slot {
+  width: 96px;
+  height: 96px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #444;
+  background: transparent;
+  cursor: pointer;
+}
+
+.empty-pokemon-slot .edit-icon {
+  color: #888;
+  stroke-width: 1.75;
+}
+
+.profile-pokemon-box {
+  width: 96px;
+  height: 96px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pokemon-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+
+/* Games (mirrored) */
+.empty-game-slot {
+  width: 96px;
+  height: 96px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #444;
+  background: transparent;
+  cursor: pointer;
+}
+
+.empty-game-slot .edit-icon {
+  color: #888;
+  stroke-width: 1.75;
+}
+
+.profile-game-box {
+  width: 96px;
+  height: 96px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 14px;
+  object-fit: contain;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.favorite-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.clear-btn {
+  background-color: #dd5a5a;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.clear-btn:hover {
+  background-color: #fd3333;
+}
+
+.save-btn {
+  background-color: #f2c94c;
+  color: #232323;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.save-btn:hover {
+  background-color: #ddb945;
+}
+
+
+/* COPY LINK BUTTON ------------------------------------------------------------- */
+
+/* Copy link button next to the username */
+.profile-top-line { display: flex; align-items: center; gap: 8px; }
+
+.profile-copy-link{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:0; margin:0;
+  border:0; background:transparent;
+  color:var(--profile-text);
+  cursor:pointer; line-height:1;
+  transition:none;               /* no animation */
+}
+
+.profile-copy-link:hover,
+.profile-copy-link:active{
+  color:var(--profile-text);     /* no color change */
+  border:0; outline:0; transform:none;
+}
+
+.profile-copy-link:focus{ outline:0; }
+.profile-copy-link:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; } /* optional a11y */
+
+/* LIKE BUTTON ------------------------------------------------------------- */
+
+.profile-like-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 8px;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    color: var(--profile-text);
+    cursor: pointer;
+    line-height: 1;
+    border-radius: 20px;
+    transition: all 0.15s ease;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.profile-like-button:hover {
+    background-color: var(--hover-bg);
+    transform: scale(1.05);
+}
+
+.profile-like-button.liked {
+    color: #ff4757;
+}
+
+.profile-like-button.liked:hover {
+    background-color: rgba(255, 71, 87, 0.1);
+}
+
+.profile-like-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.like-count {
+    font-weight: 600;
+    min-width: 16px;
+    text-align: center;
+}

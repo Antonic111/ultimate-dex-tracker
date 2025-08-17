@@ -1,0 +1,669 @@
+/* ================================
+   GLOBAL RESETS + FONT
+==================================*/
+
+button:focus {
+  outline: none;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+
+/* ================================
+   PROGRESS BAR DISPLAY SECTION
+==================================*/
+
+.progress-bar-wrapper {
+  margin: 0px auto 15px auto;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: var(--progressbar-bg);
+  transition: background-color var(--transition-speed );
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+}
+
+.progress-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.progress-bar-title {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.progress-bar-summary {
+  font-size: 0.95rem;
+  color: var(--progressbar-info);
+  transition: color var(--transition-speed );
+  text-align: right;
+}
+
+
+.progress-bar-count {
+  opacity: 0.75;
+  font-style: italic;
+}
+
+.progress-bar-track {
+  height: 18px;
+  width: 100%;
+  background-color: var(--progressbar-track);
+  transition: background-color var(--transition-speed );
+  border-radius: 999px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+  transition: width 0.3s ease-in-out;
+  border-radius: 999px;
+}
+
+.progress-bar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 0px 20px;
+}
+
+.progress-bar-grid-item {
+  width: 100%;
+}
+
+.progress-bar-grid.odd-count .progress-bar-grid-item:last-child {
+  grid-column: span 2;
+}
+
+/* ================================
+   PROGRESS MANAGER: WRAPPER + MODAL
+==================================*/
+
+.progress-manager-wrapper {
+  margin: 32px auto;
+  max-width: 1300px;
+  width: 100%;
+  padding: 0px 16px 16px 16px;
+  background-color: var(--progress-bg);
+  transition: background-color var(--transition-speed );
+  border-radius: 8px;
+  box-shadow: 0 4px 12px #0006;
+}
+
+.progress-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+
+.progress-title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 15px 0px;
+  color: var(--text);
+  transition: color var(--transition-speed );
+}
+
+.progress-settings-btn {
+  background: none;
+  border: none;
+  color: var(--progress-icons);
+  transition: color var(--transition-speed );
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.progress-settings-btn:hover {
+  background: none;
+}
+.progress-settings-btn svg {
+  vertical-align: middle;
+}
+
+.progress-settings-btn svg {
+  transition: transform 0.3s ease, filter 0.2s ease;
+}
+
+.progress-settings-btn:hover svg,
+.progress-settings-btn:focus svg {
+  transform: rotate(20deg);
+}
+
+.progress-settings-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+
+/* ================================
+   MODAL PANEL STYLES
+==================================*/
+
+.progress-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 999;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.progress-modal-overlay.closing {
+  animation: fadeOut 0.3s ease-in forwards;
+  pointer-events: none;
+}
+
+.progress-modal-panel {
+  max-width: 800px;
+  margin: 140px auto;
+  background-color: var(--progress-bg);
+  transition: background-color var(--transition-speed );
+  padding: 0px 25px 25px 25px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px #0006;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease-out;
+}
+
+.progress-modal-panel.closing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-save-btn,
+.modal-cancel-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background-color: var(--accent);
+  color: black;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 0.9rem;
+}
+
+.modal-save-btn:hover:not(:disabled),
+.modal-cancel-btn:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+  color: var(--text);
+}
+
+.modal-save-btn:disabled,
+.modal-cancel-btn:disabled {
+  background-color: #666;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ================================
+   EACH PROGRESS BAR CONFIG BLOCK
+==================================*/
+
+.bar-settings-group {
+  background-color: var(--progressbar-bg);
+  transition: background-color var(--transition-speed );
+  border: none;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 12px;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.6);
+}
+
+.bar-settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-block: 2px;
+}
+
+.bar-name-input {
+  flex: 1;
+  padding: 8px 12px;
+  background-color: var(--progressbar-input);
+  transition: background-color var(--transition-speed );
+  color: white;
+  border: 2px solid #444;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+
+/* ================================
+   ICON BUTTONS (EYE, SETTINGS, TRASH, CLOSE)
+==================================*/
+
+.bar-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Tighter spacing between icons */
+  margin-left: 4px; /* Optional: align better with input */
+}
+
+
+.bar-controls button svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.bar-controls button,
+.eye-toggle-btn,
+.filter-toggle-btn {
+  background-color: var(--modal-buttons);
+  transition: background-color var(--transition-speed );
+  color: var(--progress-icons);
+  border: 2px solid #444;
+  border-radius: 8px;
+  padding: 5px 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.bar-controls button:hover,
+.eye-toggle-btn:hover,
+.filter-toggle-btn:hover {
+  background-color: var(--modal-buttons-hover);
+  color: var(--modal-buttons-hover-text);
+  border: 2px solid #444;
+}
+
+.bar-controls button:focus,
+.bar-controls button:active,
+.eye-toggle-btn:focus,
+.eye-toggle-btn:active {
+  outline: none;
+  box-shadow: none;
+}
+
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.modal-close-btn .sidebar-close-icon svg {
+  display: block;
+  transition: transform 0.18s, filter 0.18s;
+}
+
+.modal-close-btn:hover .sidebar-close-icon svg,
+.modal-close-btn:focus .sidebar-close-icon svg {
+  transform: scale(1.13) rotate(-17deg);
+  filter: drop-shadow(0 0 6px #ffffff77);
+}
+
+.modal-close-btn:focus,
+.modal-close-btn:active {
+  outline: none;
+  box-shadow: none;
+}
+
+/* ================================
+   DRAG HANDLE ICON
+==================================*/
+
+.drag-handle {
+  cursor: grab;
+  font-size: 1.2rem;
+  color: var(--progress-icons);
+  transition: color var(--transition-speed );
+  user-select: none;
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+
+/* ================================
+   FILTER EXPANSION AREA
+==================================*/
+
+.bar-settings-filters {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scaleY(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+
+/* ================================
+   CHIP FILTER SYSTEM (MULTISELECT)
+==================================*/
+
+.bar-filter-editor {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  font-size: 0.85rem;
+  margin-top: 12px;
+}
+
+.chip-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+.chip-filter-label {
+  font-size: 0.85rem;
+  color: var(--text);
+  transition: color var(--transition-speed );
+  margin-left: 2px;
+}
+
+.chip-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  color: var(--text);
+  transition: color var(--transition-speed );
+  border: 2px solid #444;
+  border-radius: 8px;
+  padding: 6px 8px;
+  min-height: 38px;
+  transition: border 0.2s;
+}
+
+.chip {
+  background: #3a3a3a;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+
+.chip:hover {
+  background: #4a4a4a;
+}
+
+.chip-remove {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.chip-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #444;
+  color: white;
+  border-radius: 999px;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: background 0.2s ease;
+  margin-left: 8px;
+  font-weight: bold;
+}
+
+.chip-add-btn:hover {
+  background: #555;
+}
+
+.chip-filter-dropdown {
+  position: absolute;
+  top: 100%;
+  margin-top: 6px;
+  background-color: var(--modal-dropdown);
+  transition: background-color var(--transition-speed );
+  border: 1px solid #444;
+  border-radius: 8px;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  z-index: 99999;
+}
+
+.chip-option {
+  width: 100%;
+  padding: 10px 12px;
+  background: none;
+  color: var(--text);
+  transition: color var(--transition-speed );
+  text-align: left;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.chip-option:hover {
+  background: #3a3a3a;
+  color: var(--modal-buttons-hover-text);
+}
+.chip-option.selected {
+  background: #555;
+}
+
+
+/* ================================
+   ADD BAR BUTTON
+==================================*/
+
+.add-bar-row {
+  margin-top: 16px;
+}
+
+.add-bar-row button {
+  width: 100%;
+  background-color: var(--add-progress-btn);
+  transition: background-color var(--transition-speed );
+  border: 2px dashed #444;
+  color: var(--text);
+  transition: color var(--transition-speed );
+  padding: 18px;
+  font-size: 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s, border 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.add-bar-row button:hover {
+  background: #181818;
+  border-color: #666;
+  color: var(--modal-buttons-hover-text);
+}
+
+/* ================================
+   SPECIAL CHECKS FOR BALL & MARK
+==================================*/
+
+.special-tally-dropdown {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.special-tally-dropdown label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.special-tally-dropdown select {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+}
+
+/* ================================
+   SPECIAL CHECKS BUTTONS
+==================================*/
+
+.bar-template-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.template-bar-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding-bottom: 12px;
+}
+
+.template-bar-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background-color: var(--template-buttons);
+  transition: background-color var(--transition-speed );
+  color: var(--text);
+  transition: color var(--transition-speed );
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: background-color 0.2s ease, border 0.2s ease;
+}
+
+.template-bar-buttons button:hover:not(:disabled) {
+  background-color: #3a3a3a;
+  border-color: #4a4a4a;
+  color: var(--modal-buttons-hover-text);
+}
+
+.template-bar-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+
+/* ================================
+   MODAL SCROLL BAR
+==================================*/
+
+.progress-modal-panel {
+  scrollbar-gutter: stable;
+}
+
+/* WebKit scrollbar customization */
+.progress-modal-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.progress-modal-panel::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  /* Here's the trick: these create shorter thumb illusion */
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.progress-modal-panel:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
+}
+
+.progress-modal-panel::-webkit-scrollbar-track {
+  background: transparent;
+}

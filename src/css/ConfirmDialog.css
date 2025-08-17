@@ -1,0 +1,123 @@
+.confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.confirm-overlay.closing {
+  animation: fadeOut 0.3s ease-in forwards;
+  pointer-events: none;
+}
+
+.confirm-panel {
+  background-color: var(--confirm-panel);
+  transition: background-color var(--transition-speed );
+  padding: 24px 32px;
+  border-radius: 18px;
+  max-width: 400px;
+  text-align: center;
+  color: var(--confirm-panel-text);
+  transition: color var(--transition-speed );
+  box-shadow: 0 4px 12px #000;
+  border: 2px solid #525252;
+  animation: slideIn 0.3s ease-out;
+}
+
+.confirm-panel.closing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+.confirm-message {
+  font-size: 18px;
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.confirm-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.confirm-btn {
+  padding: 10px 18px;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-weight: 700;
+}
+
+.confirm-btn.confirm {
+  background-color: var(--accent);
+  color: #1a1a1a;
+  border-radius: 999px;
+}
+
+.confirm-btn.cancel {
+  background-color: var(--accent);
+  color: #1a1a1a;
+  border-radius: 999px;
+}
+
+.confirm-btn.confirm:hover {
+  background-color: var(--accent);
+  color: white;
+}
+
+.confirm-btn.cancel:hover {
+  background-color: var(--accent);
+  color: white;
+}

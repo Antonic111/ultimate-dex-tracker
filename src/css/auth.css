@@ -1,0 +1,550 @@
+/* =========================
+   Login / Register Styles
+========================= */
+
+.auth-form {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 0px 32px 20px 32px;
+  background-color: var(--auth-boxes);
+  transition: background-color var(--transition-speed );
+  border-radius: 8px;
+  box-shadow: 0 0 12px #00000066;
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  width: 100%;
+}
+
+.auth-form h2 {
+  text-align: center;
+  font-size: 2.6rem;
+  color: var(--accent);
+  padding: 35px 0px;
+  margin: 0;
+  font-weight: 1000;
+}
+
+.auth-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-form input {
+  padding: 5px;
+  border: 2px solid #333;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.auth-form input::placeholder {
+  color: #888;
+}
+
+.auth-form button:not(.show-password-toggle) {
+  padding: 12px;
+  background-color: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-form button:hover:not(.show-password-toggle:hover):not(:disabled) {
+  background-color: var(--accent-hover);
+  color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.auth-form .error,
+.auth-form .success {
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.auth-form .error {
+  color: #ff5e5e;
+}
+
+.auth-form .success {
+  color: #5eff8e;
+}
+
+/* Form Footer & Redirect Links */
+.auth-redirect,
+.auth-form .form-footer {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  text-align: center;
+  color: #ccc;
+}
+
+.auth-redirect a,
+.auth-form .form-footer a {
+  color: #4eaaff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Input Field Wrappers with Icons */
+.auth-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-icon-wrapper {
+  display: flex;
+  align-items: center;
+  background: #141414;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+/* AUTOFILL FIELD COLOR ------------------------------- */
+input {
+  background-color: #141414;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-internal-autofill-selected {
+  background-color: transparent !important;
+  color: #fff !important;
+  transition: background-color 9999s ease-in-out 0s;
+  -webkit-text-fill-color: #fff !important;
+  box-shadow: 0 0 0px 1000px var(--settings-input) inset !important;
+}
+
+.remember-me-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--remember-me-text);
+  transition: color var(--transition-speed );
+  gap: 8px;
+  position: relative;
+  padding-left: 28px;
+}
+
+.remember-me-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Checkbox container */
+.remember-me-checkbox .checkbox-svg {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  height: 18px;
+  width: 18px;
+  border: 2px solid var(--accent); /* yellow border */
+  border-radius: 4px;
+  background-color: #181818;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* SVG tick styling */
+.remember-me-checkbox .checkbox-check {
+  width: 14px;
+  height: 14px;
+  stroke: black;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.remember-me-checkbox input:checked ~ .checkbox-svg {
+  background-color: var(--accent); /* yellow fill when checked */
+  border-color: var(--accent);
+}
+
+.remember-me-checkbox input:checked ~ .checkbox-svg .checkbox-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+
+/* Header Login/Register Buttons (Site-wide) */
+.auth-header-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+.auth-header-links a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.auth-header-links a:hover,
+.auth-header-links a:focus {
+  opacity: 0.7;
+  outline: none;
+}
+
+/* Main Navigation Styling */
+.main-nav {
+  display: flex;
+  align-items: center;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--nav-link-text);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background: var(--nav-link-bg);
+  border: 1px solid var(--nav-link-border);
+}
+
+.nav-link:hover {
+  background: var(--nav-link-hover-bg);
+  color: var(--nav-link-hover-text);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--nav-link-shadow);
+}
+
+.nav-link:active {
+  transform: translateY(0);
+}
+
+.auth-divider {
+  width: 60%;
+  height: 1px;
+  background: var(--dividers);
+  transition: background var(--transition-speed );
+}
+
+.auth-subtext {
+  color: var(--text-color);
+  transition: color var(--transition-speed );
+}
+
+/* TOAST NOTIFICATIONS FOR ERRORS --------------------------------------------------*/
+
+.toast-wrapper {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  z-index: 9999;
+}
+
+.toast-message {
+  cursor: pointer;
+  background: #222;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-shadow: 0 0 8px #0009;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 0.3s ease forwards;
+  transition: background-color 0.2s;
+}
+
+.toast-message:hover {
+  filter: brightness(1.1);
+}
+
+.toast-message.success { background-color: #28a745; }
+.toast-message.error { background-color: #dc3545; }
+.toast-message.info { background-color: #007bff; }
+
+
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 0.95;
+  }
+}
+
+.toast-exit {
+  animation: fadeOutDown 0.3s ease forwards !important;
+}
+
+@keyframes fadeOutDown {
+  from {
+    opacity: 0.95;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+
+/* EMAIL SENT PAGE --------------------------------------------------*/
+
+.email-sent-message {
+  text-align: center;
+  margin-top: -12px;
+  margin-bottom: 16px;
+  color: #ccc;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.email-sent-message strong {
+  font-weight: 600;
+  color: #fff;
+}
+
+.input-icon {
+  display: flex;
+  align-items: center;
+  background: #141414;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.input-icon input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.auth-form {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* SVG ICONS --------------------------------------------------*/
+
+.password-wrapper {
+  position: relative;
+}
+
+.show-password-toggle {
+  all: unset;
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--svg-icons) !important;
+  transition: color var(--transition-speed );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.auth-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 12px;
+  stroke: var(--svg-icons);
+  transition: color var(--transition-speed );
+}
+
+.show-password-toggle:hover {
+  color: var(--svg-icons) !important;
+}
+
+.auth-input-group {
+  color: #fff;
+  background: #fff;
+}
+
+
+
+
+
+
+
+
+
+
+/* Header Layout */
+.site-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.site-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.user-menu-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.user-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.user-text {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  line-height: 1.2;
+  color: var(--text-color);
+}
+
+.profile-icon {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  margin-left: 0px;
+  transform: translateY(15px);
+  border-radius: 50%;
+  background: none;
+  box-shadow: none;
+}
+
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 20px);
+  right: 0;
+  background: var(--dropdown-bg);
+  border: 1px solid var(--dropdown-border);
+  border-radius: 12px;
+  padding: 8px 0;
+  box-shadow: var(--dropdown-shadow), var(--dropdown-inset-shadow);
+  z-index: 10;
+  min-width: 140px;
+  backdrop-filter: blur(10px);
+  animation: dropdownOpen 0.2s ease-out;
+}
+
+@keyframes dropdownOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+.dropdown-item {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  padding: 12px 18px;
+  color: var(--dropdown-item-text);
+  font-size: 0.95rem;
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdown-item:hover {
+  background: var(--dropdown-item-hover-bg);
+  color: var(--dropdown-item-hover-text);
+  transform: translateX(2px);
+}
+
+.dropdown-item:active {
+  transform: translateX(1px);
+}
+
+.dropdown-icon {
+  flex-shrink: 0;
+  color: var(--dropdown-icon);
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover .dropdown-icon {
+  color: var(--accent);
+  transform: scale(1.05);
+}
+
+/* DONT HAVE AN ACCOUNT BULLSHIT */
+
+.auth-redirect.double {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  font-size: 0.95rem;
+}
+
+.auth-redirect.double a {
+  color: #1e90ff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-redirect.double a:hover {
+  text-decoration: underline;
+}

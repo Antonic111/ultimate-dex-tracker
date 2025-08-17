@@ -1,0 +1,253 @@
+:root {
+  --transition-speed: 0.3s;
+}
+
+[data-theme="dark"] {
+
+    /* GLOBALS*/
+  --accent: #ffe76a;
+  --accent-hover: #e6cd55;
+  --dividers: #3f3f3f;
+  --main-bg: #111;
+  --main-bg2: #0a0a0a;
+  --text: #ffffff;
+  --header-hello: #aaa;
+
+    /* APP.CSS */
+  --header: #0a0a0a;
+  --grid-headers: #ffffff;
+  --grid-desc: #d5d5d5;
+  --divider1: #fff2;
+  --divider2: #ffe76a;
+  --pokemon-box-bg: #181818;
+  --pokemon-box-bg2: #242424;
+  --border-color: #333;
+  --pokeslot: #242424;
+  --pokename: #fff;
+  --collapse-btn: #fff;
+  --collapse-icon: #000000;
+
+  /* AUTH.CSS */
+  --auth-boxes: #181818;
+  --text-color: #ffffff;
+  --remember-me-text: #ccc;
+  --svg-icons: #888;
+  --user-dropdown: #222;
+  --nav-link-bg: rgba(255, 255, 255, 0.05);
+  --nav-link-border: rgba(255, 255, 255, 0.1);
+  --nav-link-hover-bg: rgba(255, 255, 255, 0.1);
+  --nav-link-text: #e0e0e0;
+  --nav-link-hover-text: #ffffff;
+  --nav-link-shadow: rgba(0, 0, 0, 0.2);
+  --dropdown-bg: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  --dropdown-border: rgba(255, 255, 255, 0.1);
+  --dropdown-item-text: #e0e0e0;
+  --dropdown-item-hover-bg: rgba(255, 255, 255, 0.08);
+  --dropdown-item-hover-text: #ffffff;
+  --dropdown-icon: #e0e0e0;
+  --dropdown-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3);
+  --dropdown-inset-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  /* CONFIRMDIALOG.CSS */
+  --confirm-panel: #181818;
+  --confirm-panel-text: #ffffff;
+
+  /* SIDEBAR.CSS */
+  --sidebar-bg: #232323;
+  --sidebar-pokemon-bg: #181818;
+  --sidebar-text: #ffffff;
+  --sidebar-edit-inputs: #191919;
+  --sidebar-display: #181818;
+
+  /* EVOLUTIONCHAIN.CSS */
+  --evo-arrow: #ffffff;
+  --evo-bg: #181818;
+  --evo-text: #ffffff;
+
+  /* PROFILE.CSS */
+  --profile-card-bg: #181818;
+  --profile-top-bg: #181818;
+  --profile-text: #ffffff;
+  --profile-labels: #999;
+  --profile-fields: #1b1b1b;
+
+  /* FAVORITESELECTIONMODAL.CSS */
+  --profile-modal-bg: #181818;
+  --profile-modal-boxes: #242424;
+  --profile-modal-search-bg: #191919;
+
+  /* SEARCHBAR.CSS */
+  --searchbar-bg: #181818;
+  --searchbar-inputs: #242424;
+  --searchbar-dropdown: #181818;
+  --searchbar-dropdown-selected: #3f3f3f;
+  --searchbar-placeholder-text: #aaa;
+
+  /* PROGRESSBARS.CSS */
+  --progressbar-info: #aaa;
+  --progressbar-bg: #242424;
+  --progressbar-track: #3f3f3f;
+  --progress-bg: #181818;
+  --progress-icons: #ffffff;
+  --progressbar-input: #3f3f3f;
+  --modal-buttons: #2f2f2f;
+  --modal-buttons-hover: #3a3a3a;
+  --modal-buttons-hover-text: #e0e0e0;
+  --modal-inputs: #242424;
+  --modal-dropdown: #2e2e2e;
+  --add-progress-bar-btn: #111;
+  --template-buttons: #2a2a2a;
+
+  /* WELCOMEPAGE.CSS */
+  --welcome-text: #ffffff;
+
+  /* SETTINGS.CSS */
+  --settings-bg: #181818;
+  --settings-input: #242424;
+
+  /* TRAINERS.CSS */
+  --trainer-search-bg: #141414;
+  --trainer-search-border: #333333;
+  --trainer-search-text: #ffffff;
+  --trainer-search-placeholder: #8a8a8a;
+  --trainer-card-bg: linear-gradient(135deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+  --trainer-card-border: #333333;
+  --trainer-card-shadow: 0 10px 28px rgba(0,0,0,.35);
+  --trainer-card-hover-shadow: 0 10px 28px rgba(0,0,0,.45);
+  --trainer-avatar-border: #555555;
+  --trainer-avatar-bg: radial-gradient(circle at center, #3b3b3f 0%, #1e1e20 100%);
+
+  --skeleton-bg: linear-gradient(90deg,#141414 25%,#1b1b1b 37%,#141414 63%);
+}
+
+
+
+
+
+
+
+
+
+
+
+[data-theme="light"] {
+
+    /* GLOBALS */
+  --accent: #ffe76a;
+  --accent-hover: #e6cd55;
+  --dividers: #3f3f3f;
+  --main-bg: #ffff;
+  --main-bg2: #f6f6f6;
+  --text: #000000;
+  --header-hello: #000000;
+
+    /* APP.CSS */
+  --header: #e1e1e1;
+  --grid-headers: #000000;
+  --grid-desc: #000000;
+  --main-grid-divider: #000000;
+  --pokemon-box-bg: #ffffff;
+  --pokemon-box-bg2: #ffffff;
+  --border-color: #ffffff;
+  --pokeslot: #e1e1e1;
+  --pokename: #000000;
+  --collapse-btn: #000000;
+  --collapse-icon: #ffffff;
+
+  /* AUTH.CSS */
+  --auth-boxes: #ffffff;
+  --text-color: #000000;
+  --remember-me-text: #000000;
+  --svg-icons: #000000;
+  --user-dropdown: #ffffff;
+  --nav-link-bg: rgba(0, 0, 0, 0.05);
+  --nav-link-border: rgba(0, 0, 0, 0.1);
+  --nav-link-hover-bg: rgba(0, 0, 0, 0.1);
+  --nav-link-text: #333333;
+  --nav-link-hover-text: #000000;
+  --nav-link-shadow: rgba(0, 0, 0, 0.1);
+  --dropdown-bg: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+  --dropdown-border: rgba(0, 0, 0, 0.1);
+  --dropdown-item-text: #333333;
+  --dropdown-item-hover-bg: rgba(0, 0, 0, 0.08);
+  --dropdown-item-hover-text: #000000;
+  --dropdown-icon: #333333;
+  --dropdown-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.1);
+  --dropdown-inset-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.1);
+
+  /* CONFIRMDIALOG.CSS */
+  --confirm-panel: #ffffff;
+  --confirm-panel-text: #000000;
+
+  /* SIDEBAR.CSS */
+  --sidebar-bg: #e1e1e1;
+  --sidebar-pokemon-bg: #ffffff;
+  --sidebar-text: #000000;
+  --sidebar-edit-inputs: #ffffff;
+  --sidebar-display: #ffffff;
+
+  /* EVOLUTIONCHAIN.CSS */
+  --evo-arrow: #000000;
+  --evo-bg: #ffffff;
+  --evo-text: #000000;
+
+  /* PROFILE.CSS */
+  --profile-card-bg: #ffffff;
+  --profile-top-bg: #ffffff;
+  --profile-text: #000000;
+  --profile-labels: #000000;
+  --profile-fields: #ffffff;
+
+  /* FAVORITESELECTIONMODAL.CSS */
+  --profile-modal-bg: #ffffff;
+  --profile-modal-boxes: #ffffff;
+  --profile-modal-search-bg: #ffffff;
+
+  /* SEARCHBAR.CSS */
+  --searchbar-bg: #ffffff;
+  --searchbar-inputs: #ececec;
+  --searchbar-dropdown: #e1e1e1;
+  --searchbar-dropdown-selected: #999;
+  --searchbar-placeholder-text: #000000;
+
+  /* PROGRESSBARS.CSS */
+  --progressbar-info: #000000;
+  --progressbar-bg: #f6f6f6;
+  --progressbar-track: #e1e1e1;
+  --progress-bg: #ffffff;
+  --progress-icons: #000000;
+  --progressbar-input: #ffffff;
+  --modal-buttons: #ffffff;
+  --modal-buttons-hover: #e8e8e8;
+  --modal-buttons-hover-text: #333333;
+  --modal-inputs: #313131;
+  --modal-dropdown: #ffffff;
+  --template-buttons: #ffffff;
+
+  /* WELCOMEPAGE.CSS */
+  --welcome-text: #2d2d2d;
+
+    /* SETTINGS.CSS */
+  --settings-bg: #ffffff;
+  --settings-input: #f0f0f0;
+
+  /* TRAINERS.CSS */
+  --trainer-search-bg: #f0f0f0;
+  --trainer-search-border: #d0d0d0;
+  --trainer-search-text: #333333;
+  --trainer-search-placeholder: #666666;
+  --trainer-card-bg: linear-gradient(135deg, rgba(0,0,0,.03), rgba(0,0,0,.01));
+  --trainer-card-border: #d0d0d0;
+  --trainer-card-shadow: 0 10px 28px rgba(0,0,0,.15);
+  --trainer-card-hover-shadow: 0 10px 28px rgba(0,0,0,.25);
+  --trainer-avatar-border: #999999;
+  --trainer-avatar-bg: radial-gradient(circle at center, #3b3b3f 0%, #1e1e20 100%);
+
+  --skeleton-bg: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 37%,#f0f0f0 63%);
+}
+
+
+
+/*
+  background-color: var(--header);
+  transition: background-color var(--transition-speed );

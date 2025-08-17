@@ -1,0 +1,583 @@
+/* ===== Page frame ===== */
+.trainers-page {
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 12px 16px 32px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Title */
+.trainers-page .page-title {
+  margin: 40px 0 25px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  position: relative;
+  color: var(--text-color);
+}
+
+/* ===== Search ===== */
+.trainers-page .search-row {
+  display: flex;
+  gap: 10px;
+  margin: 0 0 16px;
+  align-items: center;
+}
+.trainers-page .trainer-search {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  background: var(--trainer-search-bg);
+  border: 1px solid var(--trainer-search-border);
+  color: var(--trainer-search-text);
+  outline: none;
+  border-radius: 12px;
+  padding: 15px;
+}
+
+.trainers-page .trainer-search::placeholder { color: var(--trainer-search-placeholder); }
+
+/* ===== Hide Zero Shinies Toggle ===== */
+.trainers-page .hide-zero-shinies-toggle {
+  flex-shrink: 0;
+}
+
+.trainers-page .toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.trainers-page .toggle-label:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.trainers-page .toggle-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.trainers-page .toggle-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--trainer-search-text);
+  white-space: nowrap;
+}
+
+/* ===== Sort Button ===== */
+.trainers-page .sort-button-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.trainers-page .sort-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  width: 180px;
+  padding: 0 16px;
+  background: var(--trainer-search-bg);
+  border: 1px solid var(--trainer-search-border);
+  color: var(--trainer-search-text);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  justify-content: center;
+}
+
+.trainers-page .sort-button:hover {
+  border-color: var(--accent);
+  background: var(--trainer-search-bg);
+}
+
+.trainers-page .sort-button svg {
+  color: var(--accent);
+}
+
+.trainers-page .sort-arrow {
+  font-size: 10px;
+  color: var(--trainer-search-placeholder);
+  transition: transform 0.2s ease;
+}
+
+.trainers-page .sort-button-wrap.open .sort-arrow {
+  transform: rotate(180deg);
+}
+
+/* ===== Sort Dropdown ===== */
+.trainers-page .sort-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: var(--trainer-search-bg);
+  border: 1px solid var(--trainer-search-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 180px;
+  overflow: hidden;
+}
+
+.trainers-page .sort-section {
+  border-bottom: 1px solid var(--trainer-search-border);
+}
+
+.trainers-page .sort-section:last-child {
+  border-bottom: none;
+}
+
+.trainers-page .sort-section-title {
+  padding: 8px 16px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--trainer-search-placeholder);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trainers-page .sort-section-title svg {
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+.trainers-page .sort-option {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  color: var(--trainer-search-text);
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.trainers-page .sort-option:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.trainers-page .sort-option.active {
+  background: var(--accent);
+  color: #000;
+  font-weight: 600;
+}
+
+/* ===== Direction Toggle Button ===== */
+.trainers-page .direction-toggle-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--trainer-search-bg);
+  border: 1px solid var(--trainer-search-border);
+  color: var(--trainer-search-text);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.trainers-page .direction-toggle-button svg {
+  width: 24px;
+  height: 24px;
+  color: inherit;
+}
+
+/* More specific selector to override any conflicting styles */
+.trainers-page .direction-toggle-button svg[data-lucide] {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+}
+
+/* Rotating animation for refresh icon */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.trainers-page .direction-toggle-button .refresh-icon.rotate {
+  animation: rotate 0.6s ease-out;
+}
+
+/* Removed the border between sort options for cleaner look */
+
+/* ===== Grid ===== */
+.trainers-page .trainer-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  align-items: stretch;
+}
+
+/* ===== Cards ===== */
+.trainers-page .trainer-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--trainer-card-border);
+  background: var(--trainer-card-bg);
+  box-shadow: var(--trainer-card-shadow);
+  transition: border-color .15s ease, box-shadow .15s ease;
+  height: 140px; /* Fixed height for consistency */
+  min-height: 140px; /* Ensure minimum height */
+}
+.trainers-page .trainer-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--trainer-card-hover-shadow), 0 0 0 1px var(--accent) inset;
+}
+
+/* Card head */
+.trainers-page .trainer-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+.trainers-page .trainer-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--trainer-avatar-border);
+  background: var(--trainer-avatar-bg);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  image-rendering: pixelated;
+}
+.trainers-page .trainer-meta { display: flex; flex-direction: column; gap: 2px; }
+.trainers-page .trainer-name { 
+  font-weight: 800; 
+  line-height: 1.1; 
+  color: var(--text-color);
+}
+.trainers-page .trainer-sub { 
+  opacity: .75; 
+  font-size: 12px; 
+  color: var(--text-color);
+}
+
+/* Bio preview */
+.trainers-page .trainer-bio {
+  font-size: 14px;
+  line-height: 1.35;
+  opacity: .95;
+  margin-top: 6px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--text-color);
+  flex: 1; /* Take up remaining space */
+  -webkit-line-clamp: 3; /* Limit to 3 lines */
+  -webkit-box-orient: vertical;
+  word-break: break-word; /* Handle long words */
+}
+.trainers-page .trainer-bio.muted, .trainers-page .muted { 
+  opacity: .6; 
+  flex: 1; /* Ensure muted bio also takes remaining space */
+}
+
+/* Skeletons */
+.trainers-page .skeleton {
+  height: 140px; /* Match the fixed card height */
+  border-radius: 14px;
+  border: 1px solid var(--trainer-card-border);
+  background: var(--skeleton-bg);
+  background-size: 400% 100%;
+  animation: sheen 1.2s ease-in-out infinite;
+}
+@keyframes sheen { 0%{background-position:100% 0} 100%{background-position:0 0} }
+
+/* Small screens */
+@media (max-width: 640px) {
+  .trainers-page { padding: 8px 12px 24px; }
+  .trainers-page .trainer-grid { grid-template-columns: 1fr; }
+}
+
+/* position badge in card corner */
+.trainers-page .trainer-card { position: relative; }
+
+.trainers-page .trainer-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px;
+  border: 1px solid var(--dividers);
+  border-radius: 6px;
+  font-size: 12px;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+}
+
+.trainers-page .trainer-badge svg {
+  color: #ffd700; /* Always golden yellow for sparkles */
+}
+
+.trainers-page .trainer-likes {
+  top: 40px;
+  background: rgba(255, 71, 87, 0.8);
+  border-color: rgba(255, 71, 87, 0.9);
+}
+
+.trainers-page .trainer-likes svg {
+  color: #ffffff; /* White heart for better contrast against red background */
+}
+
+/* FLAG AND GENDER EMOJIS ------------------------------------------------------------ */
+
+.trainers-page .trainer-sub-icons{
+  display:inline-flex; align-items:center; gap:6px;
+}
+.trainers-page .trainer-sub-icons .fi{
+  width:16px; height:12px; border-radius:2px;
+}
+.trainers-page .trainer-sub-icons .dot-sep{
+  width:4px; height:4px; border-radius:50%;
+  background: var(--dividers); display:inline-block;
+}
+.trainers-page .trainer-sub-icons svg{
+  width:14px; height:14px; opacity:.9;
+}
+
+
+/* DIVIDER ------------------------------------------------------------ */
+
+.app-divider {
+  height: 3px;
+  width: 100%;
+  margin: 30px 0 30px;
+  background: linear-gradient(90deg, var(--dividers) 30%, var(--accent) 100%);
+  border-radius: 2px;
+}
+
+/* SEARCH EMOJI ------------------------------------------------------------ */
+
+.trainers-page .search-input-wrap{
+  position: relative;
+  width: 100%;
+}
+.trainers-page .search-icon{
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent);              /* site blue */
+  pointer-events: none;
+}
+.trainers-page .trainer-search.has-icon{
+  padding-left: 38px;                /* room for the icon */
+}
+
+/* PAGINATION ------------------------------------------------------------ */
+
+.trainers-page .pagination {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin: 16px 0 8px;
+  width: 100%;
+}
+
+.trainers-page .pagination-info {
+  color: var(--text-color);
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.trainers-page .pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 400px;
+  justify-content: space-between;
+  position: relative;
+}
+
+.trainers-page .pagination-btn {
+  background: var(--accent);
+  color: #1a1a1a;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  min-width: 80px;
+  text-align: center;
+}
+
+.trainers-page .pagination-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: white;
+}
+
+.trainers-page .pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.trainers-page .page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.trainers-page .page-btn {
+  background: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--dividers);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  min-width: 36px;
+}
+
+.trainers-page .page-btn:hover {
+  background: var(--dividers);
+  color: var(--text-color);
+}
+
+.trainers-page .page-btn.active {
+  background: var(--accent);
+  color: #1a1a1a;
+  border-color: var(--accent);
+}
+
+.trainers-page .page-ellipsis {
+  color: var(--text-color);
+  opacity: 0.6;
+  padding: 0 8px;
+  font-size: 14px;
+}
+
+/* Specific styling for prev/next buttons to ensure stability */
+.trainers-page .prev-btn,
+.trainers-page .next-btn {
+  flex-shrink: 0;
+  width: 80px;
+}
+
+/* Custom skeleton cards for trainers */
+.skeleton-card {
+  background: var(--trainer-card-bg);
+  border: 1px solid var(--trainer-card-border);
+  border-radius: 14px;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--trainer-card-shadow);
+  height: 100px; /* Further reduce height to match real cards exactly */
+  pointer-events: none; /* Disable hover effects on skeleton cards */
+}
+
+.skeleton-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px; /* Further reduce bottom margin */
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--skeleton-bg);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  flex-shrink: 0;
+  margin: 0; /* Remove any default margins */
+}
+
+.skeleton-meta-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* Reduce gap between name and meta */
+  flex: 1;
+}
+
+.skeleton-name {
+  height: 16px; /* Reduce name height */
+  width: 70%;
+  background: var(--skeleton-bg);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.skeleton-meta {
+  height: 12px; /* Reduce meta height */
+  width: 50%;
+  background: var(--skeleton-bg);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.skeleton-bio {
+  height: 16px; /* Further reduce bio height */
+  width: 100%;
+  background: var(--skeleton-bg);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  animation: skeleton-loading 1.5s infinite;
+  margin-top: 1px; /* Minimal top margin */
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.trainers-page .direction-toggle-button:hover {
+  border-color: var(--accent);
+  background: var(--trainer-search-bg);
+}
+
+.trainers-page .direction-toggle-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
