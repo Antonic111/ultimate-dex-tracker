@@ -63,20 +63,20 @@ export const debugAPI = {
       const apiTest = await testAPI();
       console.log('API Test Result:', apiTest);
       
-      // Test auth endpoints
-      const authTest = await testEndpoint('/auth/status');
-      console.log('Auth Status Test:', authTest);
+      // Test auth endpoints (use actual existing endpoints)
+      const authTest = await testEndpoint('/auth/check-verified?email=test@example.com');
+      console.log('Auth Check Test:', authTest);
       
-      // Test profile endpoints
-      const profileTest = await testEndpoint('/profiles/status');
-      console.log('Profile Status Test:', profileTest);
+      // Test health endpoint (this exists)
+      const healthTest = await testEndpoint('/health');
+      console.log('Health Test:', healthTest);
       
       return {
         success: true,
         tests: {
           api: apiTest,
           auth: authTest,
-          profile: profileTest
+          health: healthTest
         }
       };
     } catch (error) {

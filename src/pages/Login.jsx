@@ -35,30 +35,46 @@ export default function Login({ onLogin }) {
     setLoading(true);
 
     try {
-      const data = await authAPI.login({
+      const loginData = await authAPI.login({
         ...form,
         rememberMe: form.rememberMe || false,
       });
 
-      const meData = await authAPI.getCurrentUser();
+      console.log('✅ Login successful:', loginData);
 
-      if (!meData.verified) {
+      // Check if the user is verified from the login response
+      if (!loginData.user.verified) {
         showMessage("📧 Please verify your email before logging in.", "error");
-        navigate(`/email-sent?email=${encodeURIComponent(meData.email)}`);
+        navigate(`/email-sent?email=${encodeURIComponent(loginData.user.email)}`);
         return;
       }
 
+      // Use the user data from the login response
       onLogin({
-        username: meData.username,
-        email: meData.email,
-        createdAt: meData.createdAt,
-        profileTrainer: meData.profileTrainer,
-        verified: meData.verified,
-        progressBars: meData.progressBars || [],
+        username: loginData.user.username,
+        email: loginData.user.email,
+        createdAt: loginData.user.createdAt,
+        profileTrainer: loginData.user.profileTrainer,
+        verified: loginData.user.verified,
+        progressBars: loginData.user.progressBars || [],
       });
       navigate("/");
     } catch (err) {
-      showMessage(`❌ ${err.message}`, "error");
+      console.error('❌ Login failed:', err);
+      
+      // Handle specific verification error
+      if (err.message.includes('Account not verified')) {
+        showMessage("📧 Account not verified. Please check your email and verify your account first.", "error");
+        // Extract email from the error message or form
+        const email = form.usernameOrEmail.includes('@') ? form.usernameOrEmail : '';
+        if (email) {
+          navigate(`/email-sent?email=${encodeURIComponent(email)}`);
+        } else {
+          showMessage("❌ Please use your email address to login if your account needs verification.", "error");
+        }
+      } else {
+        showMessage(`❌ ${err.message}`, "error");
+      }
     } finally {
       setLoading(false);
       setTimeout(() => {
@@ -71,6 +87,21 @@ export default function Login({ onLogin }) {
   return (
     <div className={`auth-form ${loading ? "loading" : ""}`}>
       <h2>LOGIN</h2>
+      
+      {/* Helpful message about verification */}
+      <div style={{ 
+        marginBottom: '20px', 
+        padding: '15px', 
+        backgroundColor: '#e3f2fd', 
+        borderRadius: '8px', 
+        fontSize: '14px',
+        color: '#1976d2'
+      }}>
+        <strong>💡 Need to verify your account?</strong><br />
+        If you registered but can't login, check your email for a verification code. 
+        New accounts require email verification before first login.
+      </div>
+      
       <form onSubmit={handleSubmit} className="auth-form-fields">
         <div className="input-icon-wrapper">
           <User className="auth-icon" size={20} />

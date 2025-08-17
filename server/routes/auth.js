@@ -84,27 +84,32 @@ router.post("/account/delete/send", authenticateUser, async (req, res) => {
 router.post("/register", authLimiter, async (req, res) => {
   const { username, email, password, profileTrainer = "ash.png" } = req.body;
 
-
+  console.log('🔥 Registration attempt:', { username, email, profileTrainer });
 
   const usernameValidation = validateContent(username, 'username');
   if (!usernameValidation.isValid) {
+    console.log('❌ Username validation failed:', usernameValidation.error);
     return res.status(400).json({ error: usernameValidation.error });
   }
 
   if (!username || !email || !password) {
+    console.log('❌ Missing required fields');
     return res.status(400).json({ error: "Missing username, email, or password" });
   }
 
   if (password.length < 8) {
+    console.log('❌ Password too short');
     return res.status(400).json({ error: "Password must be at least 8 characters" });
   }
 
   try {
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
+      console.log('❌ User already exists:', existingUser.username);
       return res.status(400).json({ error: "Username or email already taken" });
     }
 
+    console.log('✅ Creating new user...');
     const user = await User.create({
       username,
       email,
@@ -118,11 +123,13 @@ router.post("/register", authLimiter, async (req, res) => {
     user.verificationCodeExpires = Date.now() + 1000 * 60 * 10; // 10 minutes
     await user.save();
 
+    console.log('✅ User created, sending verification email...');
     await sendCodeEmail(user, "Verify Your Account", code, "email verification");
+    console.log('✅ Verification email sent successfully');
 
     res.json({ message: "Account created. Please check your email to verify your account." });
   } catch (err) {
-    console.error("Registration error:", err);
+    console.error("❌ Registration error:", err);
     res.status(500).json({ error: "Registration failed" });
   }
 });
