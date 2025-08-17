@@ -1,4 +1,5 @@
 // caughtStorage.js
+import { caughtAPI } from './utils/api.js';
 
 export function getCaughtKey(pokeOrId, fallbackFormType) {
   if (typeof pokeOrId === "object") {
@@ -13,11 +14,7 @@ export function getCaughtKey(pokeOrId, fallbackFormType) {
 // Get the entire caughtMap from the backend
 export async function loadCaughtMap() {
   try {
-    const res = await fetch("/api/caught", {
-      credentials: "include",
-    });
-    if (!res.ok) throw new Error("Failed to load caughtMap");
-    return await res.json();
+    return await caughtAPI.getCaughtData();
   } catch (err) {
     console.error("Failed to fetch caughtMap:", err);
     return {};
@@ -27,13 +24,7 @@ export async function loadCaughtMap() {
 // Save a full caughtMap (overwrite)
 export async function saveCaughtMap(caughtMap) {
   try {
-    const res = await fetch("/api/caught", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ caughtMap }),
-    });
-    if (!res.ok) throw new Error("Failed to save caughtMap");
+    await caughtAPI.updateCaughtData(null, caughtMap);
   } catch (err) {
     console.error("Failed to save caughtMap:", err);
   }

@@ -47,13 +47,13 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use(session({
-  secret: "yourStrongSecretHere", // use a strong random string in production
+  secret: process.env.SESSION_SECRET || "yourStrongSecretHere", // use a strong random string in production
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false, // true only in HTTPS
-    sameSite: "lax",
+    secure: true, // true for HTTPS (both Vercel and Render use HTTPS)
+    sameSite: "none", // required for cross-origin requests
   },
 }));
 

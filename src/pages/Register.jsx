@@ -4,7 +4,7 @@ import "../css/auth.css";
 import { useMessage } from "../components/Shared/MessageContext";
 import { Eye, EyeOff, User, Mail, Lock } from "lucide-react";
 import { validateContent } from "../../server/contentFilter.js";
-import { buildApiUrl } from "../config/api.js";
+import { authAPI } from "../utils/api.js";
 
 
 export default function Register() {
@@ -51,25 +51,12 @@ export default function Register() {
     }
 
     try {
-      const res = await fetch(buildApiUrl("/register"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: form.username,
-          email: form.email,
-          password: form.password,
-          profileTrainer: "ash.png",
-        }),
+      await authAPI.register({
+        username: form.username,
+        email: form.email,
+        password: form.password,
+        profileTrainer: "ash.png",
       });
-
-      const data = await res.json();
-
-      if (res.status === 429) {
-        showMessage(`❌ ${data.message}`, "error");
-        return;
-      }
-
-      if (!res.ok) throw new Error(data.error || "Registration failed");
 
       showMessage("✅ Account created! Please verify your email.", "success");
       setTimeout(() => navigate(`/email-sent?email=${encodeURIComponent(form.email)}`), 1000);

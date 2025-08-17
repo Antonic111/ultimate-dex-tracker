@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import "../css/auth.css";
 import { useMessage } from "../components/Shared/MessageContext";
 import { Eye, EyeOff, User, Lock } from "lucide-react";
-import { buildApiUrl } from "../config/api.js";
+import { authAPI } from "../utils/api.js";
 
 export default function Login({ onLogin }) {
   const [form, setForm] = useState({ usernameOrEmail: "", password: "" });
@@ -35,32 +35,12 @@ export default function Login({ onLogin }) {
     setLoading(true);
 
     try {
-      const res = await fetch(buildApiUrl("/login"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          ...form,
-          rememberMe: form.rememberMe || false,
-        }),
+      const data = await authAPI.login({
+        ...form,
+        rememberMe: form.rememberMe || false,
       });
 
-      const data = await res.json();
-
-      if (res.status === 429) {
-        showMessage(`❌ ${data.message}`, "error");
-        return;
-      }
-
-      if (!res.ok) throw new Error(data.error || "Login failed");
-
-      const meRes = await fetch(buildApiUrl("/me"), {
-        method: "GET",
-        credentials: "include",
-      });
-
-      const meData = await meRes.json();
-      if (!meRes.ok) throw new Error(meData.error || "Failed to fetch user");
+      const meData = await authAPI.getCurrentUser();
 
       if (!meData.verified) {
         showMessage("📧 Please verify your email before logging in.", "error");

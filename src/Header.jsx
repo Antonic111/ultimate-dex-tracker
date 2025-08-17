@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { LogOut, User, Settings, Users } from "lucide-react";
+import { authAPI } from './utils/api';
 import { useTheme } from "./components/Shared/ThemeContext";
 
 export default function HeaderWithConditionalAuth({ user, setUser, showMenu, setShowMenu, userMenuRef }) {
@@ -106,10 +107,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                     className="dropdown-item"
                     onClick={async () => {
                       try {
-                        await fetch("/api/logout", {
-                          method: "POST",
-                          credentials: "include",
-                        });
+                        await authAPI.logout();
                         setUser({
                           username: null,
                           email: null,

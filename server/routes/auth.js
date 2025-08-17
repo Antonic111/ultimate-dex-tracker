@@ -134,12 +134,12 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
       });
 
       return res
-        .cookie("token", token, {
-          httpOnly: true,
-          secure: false,
-          sameSite: "Lax",
-          maxAge: rememberMe ? 1000 * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 2,
-        })
+              .cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        maxAge: rememberMe ? 1000 * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 2,
+      })
         .json({
           message: "Login successful, but not verified",
           user: {
@@ -164,8 +164,8 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
     res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false,        // change to true when hosted on HTTPS
-        sameSite: "Lax",      // allows cross-origin requests for dev
+        secure: true,        // true for HTTPS (both Vercel and Render use HTTPS)
+        sameSite: "none",    // required for cross-origin requests
         maxAge: rememberMe ? 1000 * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 2, // 30 days vs 2 hours
       })
       .json({
@@ -256,8 +256,8 @@ router.post("/verify-code", async (req, res) => {
     res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false,
-        sameSite: "Lax",
+        secure: true,
+        sameSite: "none",
         maxAge: 1000 * 60 * 60 * 24 * 7,
       })
       .json({
@@ -357,8 +357,8 @@ router.post("/reset-password", async (req, res) => {
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    sameSite: "Lax",   // match how you set it on login/verify
-    secure: false,     // set to true in production (HTTPS)
+    sameSite: "none",   // required for cross-origin requests
+    secure: true,       // true for HTTPS (both Vercel and Render use HTTPS)
     path: "/",         // be explicit
   });
   return res.status(204).end(); // no body, prevents caching weirdness
@@ -680,8 +680,8 @@ router.delete("/account", authenticateUser, async (req, res) => {
     // kill auth cookie
     res.clearCookie("token", {
       httpOnly: true,
-      sameSite: "Lax",  // match your login cookie
-      secure: false,    // true in production (HTTPS)
+      sameSite: "none",  // required for cross-origin requests
+      secure: true,      // true for HTTPS (both Vercel and Render use HTTPS)
       path: "/",
     });
 
@@ -716,7 +716,7 @@ router.post("/account/delete/confirm", authenticateUser, async (req, res) => {
     if (!ok) return res.status(400).json({ error: "Wrong code." });
 
     await User.findByIdAndDelete(req.userId);
-    res.clearCookie("token", { httpOnly: true, sameSite: "Lax", secure: false, path: "/" });
+    res.clearCookie("token", { httpOnly: true, sameSite: "none", secure: true, path: "/" });
     return res.status(204).end();
   } catch (e) {
     console.error("delete/confirm", e);

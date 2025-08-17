@@ -25,6 +25,7 @@ import { SortableItem } from "../Shared/SortableItem";
 import { UserContext, useUser } from "../Shared/UserContext";
 import { useMessage } from "../Shared/MessageContext";
 import { validateContent } from "../../../shared/contentFilter";
+import { progressAPI } from '../../utils/api';
 
 const DEFAULT_BARS = [
     {
@@ -160,18 +161,9 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
         }));
 
         try {
-            const res = await fetch("/api/progressBars", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({
-                    progressBars: updatedBars.map(({ __locked, __showFilters, ...bar }) => bar)
-                }),
+            await progressAPI.updateProgressBars({
+                progressBars: updatedBars.map(({ __locked, __showFilters, ...bar }) => bar)
             });
-
-
-            if (!res.ok) throw new Error("Failed to save progress bars");
-            const data = await res.json();
         } catch (err) {
             console.error("❌ Error saving bars:", err);
         }

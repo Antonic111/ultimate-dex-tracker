@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { getCaughtKey } from './caughtStorage';
 import { fetchCaughtData, updateCaughtData } from './api/caught';
+import { authAPI } from './utils/api';
 import { showConfirm } from "./components/Shared/ConfirmDialog";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS } from "./Constants";
 import "./css/App.css";
@@ -170,9 +171,7 @@ export default function App() {
   const checkAuth = async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const res = await fetch("/api/me", { credentials: "include" });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const data = await authAPI.getCurrentUser();
       setUser({
         username: data.username,
         email: data.email ?? null,
