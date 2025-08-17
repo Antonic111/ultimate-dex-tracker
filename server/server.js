@@ -14,6 +14,25 @@ const app = express();
 console.log('🔥 SERVER STARTING WITH LATEST CODE! 🔥');
 console.log('🔥 CORS middleware removed from global scope 🔥');
 
+// Handle CORS at the Express level - BEFORE any middleware
+app.use((req, res, next) => {
+  console.log('🔥 EXPRESS CORS HANDLER CALLED! 🔥');
+  console.log('🔥 Method:', req.method);
+  console.log('🔥 URL:', req.url);
+  console.log('🔥 Origin:', req.headers.origin);
+  
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    console.log('🔥 EXPRESS HANDLING OPTIONS REQUEST 🔥');
+    res.status(200).end();
+    return;
+  }
+  next();
+});
+
 app.use(cookieParser());
 
 // Remove the cors middleware completely - use only manual headers
