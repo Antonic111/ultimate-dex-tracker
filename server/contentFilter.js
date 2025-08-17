@@ -1,7 +1,7 @@
 import { bannedWords } from "./bannedTerms.js";
 
 // Temporary fix: disable similarity checking until import issue is resolved
-const distance = (a, b) => {
+const calculateDistance = (a, b) => {
   // Simple fallback distance calculation
   if (a === b) return 0;
   if (a.length === 0) return b.length;
@@ -179,10 +179,10 @@ export function validateContent(text, fieldType = 'general') {
         }
         
         // Check for similarity using Levenshtein distance
-        const distance = distance(normalizedText, variation);
+        const actualDistance = calculateDistance(normalizedText, variation);
         const maxDistance = Math.floor(variation.length * config.similarityThreshold);
         
-        if (distance <= maxDistance) {
+        if (actualDistance <= maxDistance) {
           return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
         }
       }

@@ -1,7 +1,7 @@
 import { bannedWords } from "./bannedTerms.js";
 
 // Temporary fix: disable similarity checking until import issue is resolved
-const distance = (a, b) => {
+const calculateDistance = (a, b) => {
   // Simple fallback distance calculation
   if (a === b) return 0;
   if (a.length === 0) return b.length;
@@ -191,7 +191,7 @@ function containsBannedWords(text, similarityThreshold = 0.2) {
     
     // 5. Similarity check using Levenshtein distance (as fallback, but more conservative)
     const maxDistance = Math.max(1, Math.floor(bannedWord.length * similarityThreshold));
-    const actualDistance = distance(normalized, bannedWord);
+    const actualDistance = calculateDistance(normalized, bannedWord);
     
     // Make the Levenshtein check more conservative to avoid false positives
     // Only block if the distance is very small (1) and the words are very similar in length
