@@ -206,7 +206,7 @@ export const progressAPI = {
 
   // Update progress bars
   async updateProgressBars(progressBars) {
-    return api.put('/progressBars', { progressBars });
+    return api.put('/progressBars', progressBars);
   },
 };
 

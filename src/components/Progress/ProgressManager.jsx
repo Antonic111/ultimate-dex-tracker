@@ -161,9 +161,9 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
         }));
 
         try {
-            await progressAPI.updateProgressBars({
-                progressBars: updatedBars.map(({ __locked, __showFilters, ...bar }) => bar)
-            });
+            await progressAPI.updateProgressBars(
+                updatedBars.map(({ __locked, __showFilters, ...bar }) => bar)
+            );
         } catch (err) {
             console.error("❌ Error saving bars:", err);
         }

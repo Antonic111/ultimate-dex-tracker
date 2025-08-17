@@ -627,9 +627,18 @@ router.post("/progressBars", authenticateUser, async (req, res) => {
 
 // PUT /progressBars - update progress bars (alternative to POST)
 router.put("/progressBars", authenticateUser, async (req, res) => {
+  console.log('🔥 PUT /progressBars - Request received');
+  console.log('🔥 Request body:', req.body);
+  console.log('🔥 Request body type:', typeof req.body);
+  console.log('🔥 Request body keys:', Object.keys(req.body));
+  
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   const { progressBars } = req.body;
+  console.log('🔥 Extracted progressBars:', progressBars);
+  console.log('🔥 progressBars type:', typeof progressBars);
+  console.log('🔥 progressBars isArray:', Array.isArray(progressBars));
+  
   if (
     !Array.isArray(progressBars) ||
     !progressBars.every(bar =>
@@ -640,19 +649,34 @@ router.put("/progressBars", authenticateUser, async (req, res) => {
       typeof bar.filters === "object"
     )
   ) {
+    console.log('🔥 Validation failed - progressBars structure:', progressBars);
     return res.status(400).json({ error: "Invalid progress bar structure" });
   }
 
-  const user = await User.findById(req.userId);
-  if (!user) return res.status(404).json({ error: "User not found" });
+  console.log('🔥 Validation passed - processing progress bars');
+  
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-  user.progressBars = progressBars.map(({ __showFilters, ...rest }) => ({
-    ...rest,
-    filters: rest.filters || {}, // ✅ ensure filters are always saved
-  }));
-  await user.save();
+    console.log('🔥 User found:', user.username);
+    console.log('🔥 Current progressBars count:', user.progressBars?.length || 0);
 
-  res.json({ success: true });
+    user.progressBars = progressBars.map(({ __showFilters, ...rest }) => ({
+      ...rest,
+      filters: rest.filters || {}, // ✅ ensure filters are always saved
+    }));
+    
+    console.log('🔥 Updated progressBars count:', user.progressBars.length);
+    console.log('🔥 Sample progress bar:', user.progressBars[0]);
+    
+    await user.save();
+    console.log('🔥 Progress bars saved successfully');
+    res.json({ success: true });
+  } catch (error) {
+    console.error('🔥 Error saving progress bars:', error);
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
 });
 
 // PUT /api/update-username
