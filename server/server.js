@@ -51,7 +51,19 @@ app.use(session({
 
 // Health check endpoint for Railway
 app.get("/api/health", (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
+// Super simple CORS test - bypass all middleware
+app.get("/api/simple-test", (req, res) => {
+  console.log('Simple test endpoint hit!');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.json({ message: "Simple test works", timestamp: new Date().toISOString() });
 });
 
 // Simple CORS test endpoint
