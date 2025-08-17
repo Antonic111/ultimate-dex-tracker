@@ -1,7 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import cors from "cors";
+// import cors from "cors"; // Not needed anymore
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.js";
 import profileRoutes from "./routes/profiles.js";
@@ -12,6 +12,19 @@ dotenv.config();
 const app = express();
 
 app.use(cookieParser());
+// Manual CORS headers FIRST (before cors middleware)
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return;
+  }
+  next();
+});
+
 // CORS debugging
 app.use((req, res, next) => {
   console.log('CORS Debug:', {
@@ -22,25 +35,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors({
-  origin: '*', // Allow all origins
-  credentials: false, // Disable credentials temporarily
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-// Manual CORS headers as backup
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
-  if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-  } else {
-    next();
-  }
-});
+// Remove the cors middleware completely - use only manual headers
 app.use(express.json());
 
 app.use(session({
