@@ -79,6 +79,10 @@ app.use("/api/profiles", profileRoutes);
 
 const PORT = process.env.PORT || 5000;
 
+console.log('🔥 PORT CONFIGURATION:');
+console.log('🔥 process.env.PORT:', process.env.PORT);
+console.log('🔥 Final PORT:', PORT);
+
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
