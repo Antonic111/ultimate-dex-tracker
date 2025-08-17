@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
       date: String,
       notes: String,
     }, { _id: false }),
-    default: {},
+    default: new Map(),
   },
   progressBars: {
     type: [ProgressBarSchema],

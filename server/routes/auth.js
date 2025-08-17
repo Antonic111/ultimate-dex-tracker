@@ -365,13 +365,11 @@ router.post("/logout", (req, res) => {
 });
 
 // Add this after your existing routes (e.g., in auth.js)
-router.put("/profile", async (req, res) => {
-  const token = req.cookies.token;
-  if (!token) return res.status(401).json({ error: "Missing token" });
+router.put("/profile", authenticateUser, async (req, res) => {
+  if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId);
+    const user = await User.findById(req.userId);
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -407,14 +405,12 @@ if ("isProfilePublic" in req.body) {
 });
 
 // GET /api/profile
-router.get("/profile", async (req, res) => {
+router.get("/profile", authenticateUser, async (req, res) => {
   res.set("Cache-Control", "no-store");
-  const token = req.cookies.token;
-  if (!token) return res.status(401).json({ error: "Missing token" });
+  if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes");
+    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes");
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -436,56 +432,126 @@ router.get("/profile", async (req, res) => {
 });
 
 // GET /caught - fetch caught Pokémon data for logged-in user
-router.get("/caught", async (req, res) => {
-  const token = req.cookies.token;
-  if (!token) return res.status(401).json({ error: "Missing token" });
+router.get("/caught", authenticateUser, async (req, res) => {
+  if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
+
+  console.log('🔥 GET /caught - User ID:', req.userId);
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select("caughtPokemon");
+    const user = await User.findById(req.userId).select("caughtPokemon");
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    res.json(user.caughtPokemon || {});
+    console.log('🔥 GET /caught - User found:', user.username);
+    console.log('🔥 GET /caught - caughtPokemon type:', typeof user.caughtPokemon);
+    console.log('🔥 GET /caught - caughtPokemon instanceof Map:', user.caughtPokemon instanceof Map);
+
+    // Convert Map to object for JSON response
+    const caughtData = user.caughtPokemon instanceof Map 
+      ? Object.fromEntries(user.caughtPokemon.entries())
+      : user.caughtPokemon || {};
+
+    console.log('🔥 GET /caught - Sending data:', caughtData);
+    res.json(caughtData);
   } catch (err) {
-    console.error("Failed to fetch caught data:", err);
+    console.error("🔥 GET /caught - Failed to fetch caught data:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
 // POST /caught - update a single Pokémon's caught data
-
-// ↓ Apply middleware here
 router.post("/caught", authenticateUser, async (req, res) => {
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
+  console.log('🔥 POST /caught - Request body:', req.body);
+  console.log('🔥 POST /caught - User ID:', req.userId);
+
   const { caughtMap } = req.body;
   if (!caughtMap || typeof caughtMap !== "object") {
+    console.log('🔥 POST /caught - Invalid input:', { caughtMap, type: typeof caughtMap });
     return res.status(400).json({ error: "Invalid input" });
+  }
+
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    console.log('🔥 POST /caught - User found:', user.username);
+    console.log('🔥 POST /caught - Current caughtPokemon type:', typeof user.caughtPokemon);
+    console.log('🔥 POST /caught - Current caughtPokemon instanceof Map:', user.caughtPokemon instanceof Map);
+
+    // Ensure caughtPokemon is a Map
+    if (!(user.caughtPokemon instanceof Map)) {
+      user.caughtPokemon = new Map();
+    }
+
+    // Remove nulls and update
+    for (const [key, value] of Object.entries(caughtMap)) {
+      if (value === null) {
+        user.caughtPokemon.delete(key); // remove from the MongoDB Map
+        console.log('🔥 POST /caught - Deleted key:', key);
+      } else {
+        user.caughtPokemon.set(key, value); // update or create
+        console.log('🔥 POST /caught - Set key:', key, 'value:', value);
+      }
+    }
+
+    await user.save();
+    console.log('🔥 POST /caught - Successfully saved user');
+    res.json({ success: true });
+  } catch (error) {
+    console.error('🔥 POST /caught - Error:', error);
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
+});
+
+// GET /progressBars - fetch progress bars for logged-in user
+router.get("/progressBars", authenticateUser, async (req, res) => {
+  if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const user = await User.findById(req.userId).select("progressBars");
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    res.json(user.progressBars || []);
+  } catch (err) {
+    console.error("Failed to fetch progress bars:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// POST /progressBars - update progress bars
+router.post("/progressBars", authenticateUser, async (req, res) => {
+  if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
+
+  const { progressBars } = req.body;
+  if (
+    !Array.isArray(progressBars) ||
+    !progressBars.every(bar =>
+      typeof bar === "object" &&
+      typeof bar.id === "string" &&
+      typeof bar.name === "string" &&
+      typeof bar.visible === "boolean" &&
+      typeof bar.filters === "object"
+    )
+  ) {
+    return res.status(400).json({ error: "Invalid progress bar structure" });
   }
 
   const user = await User.findById(req.userId);
   if (!user) return res.status(404).json({ error: "User not found" });
 
-  const existingMap = user.caughtPokemon instanceof Map
-    ? Object.fromEntries(user.caughtPokemon.entries())
-    : {};
-
-  // Remove nulls
-  for (const [key, value] of Object.entries(caughtMap)) {
-    if (value === null) {
-      user.caughtPokemon.delete(key); // remove from the MongoDB Map
-    } else {
-      user.caughtPokemon.set(key, value); // update or create
-    }
-  }
-
+  user.progressBars = progressBars.map(({ __showFilters, ...rest }) => ({
+    ...rest,
+    filters: rest.filters || {}, // ✅ ensure filters are always saved
+  }));
   await user.save();
+
   res.json({ success: true });
 });
 
-// POST /progressBars
-router.post("/progressBars", authenticateUser, async (req, res) => {
+// PUT /progressBars - update progress bars (alternative to POST)
+router.put("/progressBars", authenticateUser, async (req, res) => {
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   const { progressBars } = req.body;

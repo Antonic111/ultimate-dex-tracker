@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { getCaughtKey } from './caughtStorage';
 import { fetchCaughtData, updateCaughtData } from './api/caught';
 import { authAPI } from './utils/api';
+import { debugAPI } from './utils/debug';
 import { showConfirm } from "./components/Shared/ConfirmDialog";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS } from "./Constants";
 import "./css/App.css";

@@ -176,7 +176,7 @@ export const caughtAPI = {
 
   // Update caught data
   async updateCaughtData(key, infoMap) {
-    const body = key ? { [key]: infoMap } : infoMap;
+    const body = { caughtMap: key ? { [key]: infoMap } : infoMap };
     return api.post('/caught', body);
   },
 
