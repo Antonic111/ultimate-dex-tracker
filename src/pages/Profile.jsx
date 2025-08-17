@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useContext } from "react";
-import { useUser, UserContext } from "../components/Shared/UserContext";
+import { useState, useEffect, useRef } from "react";
+import { useUser } from "../components/Shared/UserContext";
 import "../css/Profile.css";
 import { NotebookPen, Trophy, Mars, Venus, VenusAndMars, PencilLine, SquareX, Link as LinkIcon, Heart } from "lucide-react";
 import { IconDropdown } from "../components/Shared/IconDropdown";
@@ -23,7 +23,7 @@ const POKEMON_OPTIONS = pokemonData.map((p) => ({
     name: formatPokemonName(p.name),
     value: p.name,
     image: p.sprites.front_default,
-    shinyImage: p.sprites.front_shiny, // ✅ add this
+    shinyImage: p.sprites.front_shiny,
 }));
 
 function getTimeAgo(dateString) {
@@ -49,145 +49,54 @@ function getTimeAgo(dateString) {
 const SWITCH_FC_RE = /^SW-\d{4}-\d{4}-\d{4}$/;
 
 function formatSwitchFCInput(value) {
-    // keep digits only, max 12
     const digits = (value || "").replace(/\D/g, "").slice(0, 12);
-    if (!digits) return ""; // allow empty
+    if (!digits) return "";
     const parts = digits.match(/.{1,4}/g) || [];
     return "SW-" + parts.join("-");
 }
 
-
 export default function Profile() {
-    const navigate = useNavigate(); // ✅ call first
+    const navigate = useNavigate();
     const { username, email, createdAt, setUser, loading } = useUser();
     const { setLoading, isLoading } = useLoading();
     const { showMessage } = useMessage();
 
-    const handleCopyLink = async () => {
-        const url = `${window.location.origin}/u/${encodeURIComponent(username)}`;
-        try {
-            await navigator.clipboard.writeText(url);
-            showMessage("🔗 Share link copied", "success");
-        } catch {
-            showMessage("❌ Couldn't copy link", "error");
-        }
-    };
-
-    const handleLike = async () => {
-        if (likeLoading) return;
-        setLikeLoading(true);
-        
-        // Optimistically update the UI immediately for better user experience
-        const wasLiked = hasLiked;
-        const previousCount = likeCount;
-        
-        setHasLiked(!wasLiked);
-        setLikeCount(wasLiked ? previousCount - 1 : previousCount + 1);
-        
-        try {
-            const response = await fetch(`/api/profiles/${encodeURIComponent(username)}/like`, {
-                method: 'POST',
-                credentials: 'include'
-            });
-            
-            if (response.ok) {
-                const { liked, newCount } = await response.json();
-                // Update with the actual server response
-                setHasLiked(liked);
-                setLikeCount(newCount);
-                showMessage(liked ? "❤️ Profile liked!" : "💔 Like removed", "success");
-            } else {
-                // Revert optimistic update on error
-                setHasLiked(wasLiked);
-                setLikeCount(previousCount);
-                showMessage("❌ Failed to update like", "error");
-            }
-        } catch (error) {
-            // Revert optimistic update on error
-            setHasLiked(wasLiked);
-            setLikeCount(previousCount);
-            showMessage("❌ Failed to update like", "error");
-        } finally {
-            setLikeLoading(false);
-        }
-    };
-
-    // Define all hooks first
     const [isEditing, setIsEditing] = useState(false);
     const [showGameModal, setShowGameModal] = useState(false);
     const [gameSlotIndex, setGameSlotIndex] = useState(null);
     const [showPokemonModal, setShowPokemonModal] = useState(false);
     const [pokemonSlotIndex, setPokemonSlotIndex] = useState(null);
-    const [bio, setBio] = useState("");
     const [showTrainerModal, setShowTrainerModal] = useState(false);
     const formBeforeEditRef = useRef(null);
+    const [likeCount, setLikeCount] = useState(0);
+    const [hasLiked, setHasLiked] = useState(false);
+    const [likeLoading, setLikeLoading] = useState(false);
+
     const [stats, setStats] = useState({
         shinies: 0,
         completion: 0,
         gamesPlayed: 0,
         topBall: null,
         topMark: null,
+        topGame: null,
     });
+
     const [form, setForm] = useState({
         bio: "",
         location: "",
         gender: "",
         profileTrainer: "",
-        favoriteGames: [],
-        favoritePokemon: [],
+        favoriteGames: ["", "", "", "", ""],
+        favoritePokemon: ["", "", "", "", ""],
         favoritePokemonShiny: [false, false, false, false, false],
         switchFriendCode: ""
     });
-        const [likeCount, setLikeCount] = useState(0);
-    const [hasLiked, setHasLiked] = useState(false);
-    const [likeLoading, setLikeLoading] = useState(false);
 
     useEffect(() => {
         if (!loading && (!username || !email)) {
             navigate("/");
         }
     }, [loading, username, email, navigate]);
-
-
-    const reorderToFront = (arr, fill = null) => {
-        const cleaned = arr.filter((v) => v !== null && v !== undefined); // keeps false
-        return [...cleaned, ...Array(5 - cleaned.length).fill(fill)];
-    };
-
-    const reorderGames = (arr) => {
-        const valid = arr.filter(v => v !== "" && v !== null && v !== undefined);
-        const padded = [...valid, ...Array(5 - valid.length).fill("")];
-        return padded.slice(0, 5);
-    };
-
-
-
-    const openPokemonModal = (index) => {
-        setPokemonSlotIndex(index);
-        setShowPokemonModal(true);
-    };
-
-    const updatePokemonAtIndex = (value, isShiny) => {
-        const updatedPokemon = [...form.favoritePokemon];
-        const updatedShiny = [...form.favoritePokemonShiny];
-
-        // Ensure both arrays are always 5 elements
-        while (updatedPokemon.length < 5) updatedPokemon.push("");
-        while (updatedShiny.length < 5) updatedShiny.push(false);
-
-        updatedPokemon[pokemonSlotIndex] = value;
-        updatedShiny[pokemonSlotIndex] = isShiny;
-
-        setForm({
-            ...form,
-            favoritePokemon: updatedPokemon,
-            favoritePokemonShiny: updatedShiny,
-        });
-
-        setShowPokemonModal(false);
-    };
-
-
 
     useEffect(() => {
         setLoading('profile-data', true);
@@ -205,7 +114,6 @@ export default function Profile() {
                     switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode
                 }));
 
-                // Also update user context so header updates
                 setUser(prev => ({
                     ...prev,
                     profileTrainer: data.profileTrainer ?? prev.profileTrainer,
@@ -217,7 +125,7 @@ export default function Profile() {
             .finally(() => {
                 setLoading('profile-data', false);
             });
-    }, [setLoading]);
+    }, [setLoading, setUser]);
 
     useEffect(() => {
         let ignore = false;
@@ -225,7 +133,7 @@ export default function Profile() {
 
         async function loadStats() {
             try {
-                const map = await caughtAPI.getCaughtData(); // { [key]: infoObject | null }
+                const map = await caughtAPI.getCaughtData();
 
                 const allKeys = [
                     ...pokemonData.map(p => getCaughtKey(p)),
@@ -233,7 +141,7 @@ export default function Profile() {
                 ];
                 const total = allKeys.length;
 
-                const caughtInfos = Object.values(map).filter(Boolean); // only ones with info saved
+                const caughtInfos = Object.values(map).filter(Boolean);
                 const shinies = caughtInfos.length;
                 const completion = total ? Math.round((shinies / total) * 100) : 0;
                 const gamesPlayed = new Set(caughtInfos.map(i => i.game).filter(Boolean)).size;
@@ -253,14 +161,11 @@ export default function Profile() {
                     );
                     if (hit) return hit.label ?? hit.name ?? hit.value;
                     const t = toTitle(k);
-                    // If the label doesn't already end with the suffix, add it
                     return suffixIfMissing && !new RegExp(`${suffixIfMissing}$`, "i").test(t)
                         ? t + suffixIfMissing
                         : t;
                 };
 
-
-                // --- new: most-used ball/mark ---
                 const countTop = (list, key) => {
                     const counts = {};
                     for (const it of list) {
@@ -272,21 +177,22 @@ export default function Profile() {
                     for (const [k, c] of Object.entries(counts)) {
                         if (c > topCount) { top = k; topCount = c; }
                     }
-                    return top; // e.g., "ultra-ball", "uncommon-mark"
+                    return top;
                 };
 
                 const topBallKey = countTop(caughtInfos, "ball");
                 const topMarkKey = countTop(caughtInfos, "mark");
                 const topGameKey = countTop(caughtInfos, "game");
 
-                // pretty labels
                 const topBall = fromOptionsOrTitle(BALL_OPTIONS, topBallKey, " Ball");
                 const topMark = fromOptionsOrTitle(MARK_OPTIONS, topMarkKey, " Mark");
                 const topGame = fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) ? "Pokemon " + fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) : null;
 
                 if (!ignore) setStats({ shinies, completion, gamesPlayed, topBall, topMark, topGame });
 
-            } catch { }
+            } catch (error) {
+                console.error("Failed to load stats:", error);
+            }
         }
 
         loadStats();
@@ -296,7 +202,6 @@ export default function Profile() {
         };
     }, [setLoading]);
 
-    // Load like data
     useEffect(() => {
         if (!username) return;
         let ignore = false;
@@ -310,12 +215,13 @@ export default function Profile() {
                         setHasLiked(userHasLiked);
                     }
                 }
-            } catch { }
+            } catch (error) {
+                console.error("Failed to load likes:", error);
+            }
         })();
         return () => { ignore = true; };
     }, [username]);
 
-    // Poll for like updates every 2 seconds to keep like count real-time
     useEffect(() => {
         if (!username) return;
         
@@ -327,7 +233,6 @@ export default function Profile() {
                 if (r.ok) {
                     const { count, hasLiked: userHasLiked } = await r.json();
                     setLikeCount(prevCount => {
-                        // Only update if the count actually changed
                         if (prevCount !== count) {
                             return count;
                         }
@@ -338,13 +243,90 @@ export default function Profile() {
             } catch (error) {
                 // Silently handle errors to avoid spam
             }
-        }, 2000); // Check every 2 seconds
+        }, 2000);
 
         return () => clearInterval(interval);
     }, [username]);
 
+    const handleCopyLink = async () => {
+        const url = `${window.location.origin}/u/${encodeURIComponent(username)}`;
+        try {
+            await navigator.clipboard.writeText(url);
+            showMessage("🔗 Share link copied", "success");
+        } catch {
+            showMessage("❌ Couldn't copy link", "error");
+        }
+    };
 
+    const handleLike = async () => {
+        if (likeLoading) return;
+        setLikeLoading(true);
+        
+        const wasLiked = hasLiked;
+        const previousCount = likeCount;
+        
+        setHasLiked(!wasLiked);
+        setLikeCount(wasLiked ? previousCount - 1 : previousCount + 1);
+        
+        try {
+            const response = await fetch(`/api/profiles/${encodeURIComponent(username)}/like`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const { liked, newCount } = await response.json();
+                setHasLiked(liked);
+                setLikeCount(newCount);
+                showMessage(liked ? "❤️ Profile liked!" : "💔 Like removed", "success");
+            } else {
+                setHasLiked(wasLiked);
+                setLikeCount(previousCount);
+                showMessage("❌ Failed to update like", "error");
+            }
+        } catch (error) {
+            setHasLiked(wasLiked);
+            setLikeCount(previousCount);
+            showMessage("❌ Failed to update like", "error");
+        } finally {
+            setLikeLoading(false);
+        }
+    };
 
+    const reorderToFront = (arr, fill = null) => {
+        const cleaned = arr.filter((v) => v !== null && v !== undefined);
+        return [...cleaned, ...Array(5 - cleaned.length).fill(fill)];
+    };
+
+    const reorderGames = (arr) => {
+        const valid = arr.filter(v => v !== "" && v !== null && v !== undefined);
+        const padded = [...valid, ...Array(5 - valid.length).fill("")];
+        return padded.slice(0, 5);
+    };
+
+    const openPokemonModal = (index) => {
+        setPokemonSlotIndex(index);
+        setShowPokemonModal(true);
+    };
+
+    const updatePokemonAtIndex = (value, isShiny) => {
+        const updatedPokemon = [...form.favoritePokemon];
+        const updatedShiny = [...form.favoritePokemonShiny];
+
+        while (updatedPokemon.length < 5) updatedPokemon.push("");
+        while (updatedShiny.length < 5) updatedShiny.push(false);
+
+        updatedPokemon[pokemonSlotIndex] = value;
+        updatedShiny[pokemonSlotIndex] = isShiny;
+
+        setForm({
+            ...form,
+            favoritePokemon: updatedPokemon,
+            favoritePokemonShiny: updatedShiny,
+        });
+
+        setShowPokemonModal(false);
+    };
 
     const openGameModal = (index) => {
         setGameSlotIndex(index);
@@ -396,7 +378,6 @@ export default function Profile() {
                             <Heart size={16} fill={hasLiked ? "currentColor" : "none"} />
                             <span className="like-count">{likeCount}</span>
                         </button>
-
                     </div>
                     <p className="profile-date">
                         {createdAt
@@ -410,21 +391,12 @@ export default function Profile() {
                 </div>
 
                 <div className="profile-header-right">
-                    {/* <div className="profile-links">
-                        <a href="https://twitch.tv/yourchannel" target="_blank" rel="noopener noreferrer">
-                            <Twitch size={16} /> Twitch
-                        </a>
-                        <a href="https://youtube.com/@yourchannel" target="_blank" rel="noopener noreferrer">
-                            <Youtube size={16} /> YouTube
-                        </a>
-                    </div> */}
                     <div className="profile-actions">
                         <button
                             className={`profile-edit-btn ${isEditing ? "active" : ""}`}
                             disabled={isLoading('save-profile')}
                             onClick={async () => {
                                 if (isEditing) {
-                                    const SWITCH_FC_RE = /^SW-\d{4}-\d{4}-\d{4}$/;
                                     const fc = (form.switchFriendCode || "").toUpperCase().trim();
 
                                     if (fc && !SWITCH_FC_RE.test(fc)) {
@@ -464,21 +436,19 @@ export default function Profile() {
                                             profileTrainer: form.profileTrainer || prev.profileTrainer,
                                         }));
 
-                                        setIsEditing(false); // only leave edit mode on success
+                                        setIsEditing(false);
                                     } catch (err) {
                                         showMessage("❌ Failed to update profile", "error");
                                     } finally {
                                         setLoading('save-profile', false);
                                     }
 
-                                    return; // don't fall through
+                                    return;
                                 }
 
-                                // entering edit mode
                                 formBeforeEditRef.current = JSON.parse(JSON.stringify(form));
                                 setIsEditing(true);
                             }}
-
                         >
                             <NotebookPen size={16} className="edit-icon" />
                             <span>{isEditing ? "Save" : "Edit"}</span>
@@ -496,10 +466,8 @@ export default function Profile() {
                                 <SquareX size={16} />
                                 Cancel
                             </button>
-
                         )}
                     </div>
-
                 </div>
             </div>
 
@@ -534,7 +502,6 @@ export default function Profile() {
                             </div>
                         </div>
 
-
                         <div className="profile-bio-block">
                             <div className="profile-field">
                                 <label>Bio</label>
@@ -561,7 +528,6 @@ export default function Profile() {
                     </div>
 
                     <div className="profile-row-split">
-
                         <div className="profile-field">
                             <label>Location</label>
                             {isEditing ? (
@@ -588,7 +554,6 @@ export default function Profile() {
                                         );
                                     })()}
                                 </div>
-
                             )}
                         </div>
 
@@ -635,7 +600,6 @@ export default function Profile() {
                                     pattern="^SW-\d{4}-\d{4}-\d{4}$"
                                     title="Format: SW-1234-5678-9012"
                                 />
-
                             ) : (
                                 <div className="field-display">{form.switchFriendCode || "N/A"}</div>
                             )}
@@ -651,7 +615,6 @@ export default function Profile() {
                                         const game = form.favoriteGames[index];
                                         const gameData = GAME_OPTIONS_TWO.find(g => g.value === game);
                                         const isEmpty = !gameData;
-
 
                                         return (
                                             <div
@@ -687,7 +650,6 @@ export default function Profile() {
                             </>
                         ) : null}
 
-
                         {isEditing || form.favoritePokemon.some(p => p) ? (
                             <>
                                 <h3>Favorite Pokémon</h3>
@@ -703,7 +665,6 @@ export default function Profile() {
                                                 className="profile-rank-item"
                                                 onClick={() => isEditing && openPokemonModal(index)}
                                             >
-                                                {/* Trophies only if filled */}
                                                 {index < 3 && !isEmpty && (
                                                     <div className={`trophy-icon trophy-${index + 1}`}>
                                                         <Trophy size={16} />
@@ -729,24 +690,18 @@ export default function Profile() {
                                                             alt={data.name}
                                                             className="pokemon-img"
                                                         />
-
                                                     </div>
                                                 )}
 
                                                 <div className="rank-label">
                                                     {data?.name ? formatPokemonName(data.value) : null}
                                                 </div>
-
                                             </div>
                                         );
                                     })}
                                 </div>
                             </>
                         ) : null}
-
-
-
-
                     </div>
                 </div>
 
@@ -807,7 +762,7 @@ export default function Profile() {
                 options={trainerOptions.map(t => ({
                     name: t.name,
                     value: t.filename,
-                    image: `/data/trainer_sprites/${t.filename}`, // ✅ important
+                    image: `/data/trainer_sprites/${t.filename}`,
                 }))}
                 selected={form.profileTrainer ? [form.profileTrainer] : []}
                 onChange={(val) => {
@@ -816,8 +771,6 @@ export default function Profile() {
                 }}
                 max={1}
             />
-
-
         </div>
     );
 }
