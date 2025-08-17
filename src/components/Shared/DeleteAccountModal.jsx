@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMessage } from "./MessageContext";
+import { userAPI } from "../../utils/api";
 import "../../css/DeleteAccountModal.css";
 
 export default function DeleteAccountModal({ isOpen, email, username, onClose, onDeleted }) {
@@ -25,11 +26,7 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
   const sendCode = async () => {
     try {
       setSending(true);
-      const r = await fetch("/api/account/delete/send", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (!r.ok) throw new Error("Failed to send code");
+      await userAPI.sendDeleteCode();
       showMessage("Verification code sent to your email.", "success");
     } catch (e) {
       showMessage(e.message || "Couldn't send code", "error");
@@ -46,16 +43,7 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
     }
     try {
       setDeleting(true);
-      const r = await fetch("/api/account/delete/confirm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ code }),
-      });
-      if (!r.ok) {
-        const j = await r.json().catch(() => ({}));
-        throw new Error(j.error || "Deletion failed");
-      }
+      await userAPI.confirmDeleteAccount(code, username);
       showMessage("🗑️ Account deleted", "success");
       onDeleted?.();
     } catch (e) {

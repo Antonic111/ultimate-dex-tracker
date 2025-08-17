@@ -52,29 +52,47 @@ const gen6 = () => Math.floor(100000 + Math.random() * 900000).toString(); // "1
 // auth.js
 async function issueDeleteCode(user) {
   const code = Math.floor(100000 + Math.random() * 900000).toString();
-  user.deleteCodeHash = await bcrypt.hash(code, 10);
-  user.deleteCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
-  await user.save();
+  const deleteCodeHash = await bcrypt.hash(code, 10);
+  const deleteCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
+  
+  // Update directly to avoid pre-save middleware issues
+  await User.findByIdAndUpdate(user._id, {
+    deleteCodeHash,
+    deleteCodeExpires
+  });
+  
   await sendCodeEmail(user, "Delete account code", code, "deletion");
 }
 
 // throttle: allow resends every 60s
 router.post("/account/delete/send", authenticateUser, async (req, res) => {
+  console.log('🔥 POST /account/delete/send - Request received');
+  
   try {
     const user = await User.findById(req.userId).select("email deleteCodeExpires");
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-    if (!user.email) return res.status(400).json({ error: "Add an email to your account first." });
+    if (!user) {
+      console.log('❌ User not found for delete code request');
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    
+    if (!user.email) {
+      console.log('❌ User has no email for delete code request');
+      return res.status(400).json({ error: "Add an email to your account first." });
+    }
 
     const now = Date.now();
     // if previous code exists and was sent within ~60s (≈ >9m left of the 10m window), block
     if (user.deleteCodeExpires && user.deleteCodeExpires.getTime() - now > 9 * 60 * 1000) {
+      console.log('❌ Delete code request too soon for user:', user.email);
       return res.status(429).json({ error: "Please wait before requesting another code." });
     }
 
+    console.log('✅ Sending delete code to user:', user.email);
     await issueDeleteCode(user);
+    console.log('✅ Delete code sent successfully to:', user.email);
     return res.status(204).end();
   } catch (e) {
-    console.error("delete/send", e);
+    console.error("❌ delete/send error:", e);
     return res.status(500).json({ error: "Failed to send code" });
   }
 });
@@ -913,32 +931,49 @@ router.delete("/account", authenticateUser, async (req, res) => {
 
 // Confirm code and delete the account
 router.post("/account/delete/confirm", authenticateUser, async (req, res) => {
+  console.log('🔥 POST /account/delete/confirm - Request received');
+  console.log('🔥 Request body:', { code: req.body?.code ? '***' : 'MISSING', confirm: req.body?.confirm || 'MISSING' });
+  
   try {
     const code = String(req.body?.code || "").trim();
     const typed = String(req.body?.confirm || "").trim();
 
-    if (!/^\d{6}$/.test(code)) return res.status(400).json({ error: "Invalid code." });
+    if (!/^\d{6}$/.test(code)) {
+      console.log('❌ Invalid code format:', code);
+      return res.status(400).json({ error: "Invalid code." });
+    }
 
     const user = await User.findById(req.userId).select("username deleteCodeHash deleteCodeExpires");
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
+    if (!user) {
+      console.log('❌ User not found for delete confirmation');
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    console.log('🔍 Confirming delete for user:', user.username);
 
     // Optional: enforce username match server-side (case-insensitive)
     if (typed && typed.toLowerCase() !== user.username.toLowerCase()) {
+      console.log('❌ Username mismatch:', { typed, expected: user.username });
       return res.status(400).json({ error: "Type your account name exactly to continue." });
     }
 
     if (!user.deleteCodeHash || !user.deleteCodeExpires || user.deleteCodeExpires < new Date()) {
+      console.log('❌ Code expired or missing for user:', user.username);
       return res.status(400).json({ error: "Code expired. Send a new one." });
     }
 
     const ok = await bcrypt.compare(code, user.deleteCodeHash);
+    console.log('🔐 Code verification result:', ok);
+    
     if (!ok) return res.status(400).json({ error: "Wrong code." });
 
+    console.log('✅ Deleting account for user:', user.username);
     await User.findByIdAndDelete(req.userId);
     res.clearCookie("token", { httpOnly: true, sameSite: "none", secure: true, path: "/" });
+    console.log('✅ Account deleted successfully for user:', user.username);
     return res.status(204).end();
   } catch (e) {
-    console.error("delete/confirm", e);
+    console.error("❌ delete/confirm error:", e);
     return res.status(500).json({ error: "Failed to delete account" });
   }
 });

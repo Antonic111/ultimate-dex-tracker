@@ -245,12 +245,12 @@ export const userAPI = {
 
   // Send delete account code
   async sendDeleteCode() {
-    return api.post('/account/delete/send-code');
+    return api.post('/account/delete/send');
   },
 
   // Confirm delete account
-  async confirmDeleteAccount(code) {
-    return api.post('/account/delete/confirm', { code });
+  async confirmDeleteAccount(code, username) {
+    return api.post('/account/delete/confirm', { code, confirm: username });
   },
 
   // Delete account
