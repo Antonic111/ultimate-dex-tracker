@@ -6,6 +6,7 @@ import { useMessage } from "../components/Shared/MessageContext";
 import { useTheme } from "../components/Shared/ThemeContext";
 import DeleteAccountModal from "../components/Shared/DeleteAccountModal";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
+import { profileAPI, userAPI } from "../utils/api";
 
 
 export default function Settings() {
@@ -28,21 +29,14 @@ export default function Settings() {
         setIsPrivate(!nextPublic);
         setSavingPrivacy(true);
         try {
-            const r = await fetch("/api/profile", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ isProfilePublic: nextPublic }),
-            });
-            if (!r.ok) throw new Error();
+            await profileAPI.updateProfile({ isProfilePublic: nextPublic });
 
             // re-fetch to lock UI to what’s saved
-            const r2 = await fetch("/api/profile", { credentials: "include" });
-            if (!r2.ok) throw new Error();
-            const data = await r2.json();
+            const data = await profileAPI.getProfile();
             setIsPrivate(data?.isProfilePublic === false);
             showMessage(data?.isProfilePublic === false ? "🔒 Profile set to private" : "🌐 Profile set to public", "success");
-        } catch {
+        } catch (error) {
+            console.error('Failed to update privacy:', error);
             // revert UI on error
             setIsPrivate(prev => prev); // no-op (you can also refetch)
             showMessage("❌ Couldn't update privacy", "error");
@@ -59,27 +53,18 @@ export default function Settings() {
     useEffect(() => {
         (async () => {
             try {
-                const r = await fetch("/api/profile", { credentials: "include" });
-                if (!r.ok) return;
-                const data = await r.json();
+                const data = await profileAPI.getProfile();
                 setIsPrivate(data?.isProfilePublic === false); // default is public
-            } catch { }
+            } catch (error) {
+                console.error('Failed to fetch profile:', error);
+            }
         })();
     }, []);
 
 
     async function handleUsernameSave() {
         try {
-            const res = await fetch("/api/update-username", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ newUsername }),
-            });
-
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Failed to update username");
-
+            const data = await userAPI.updateUsername(newUsername);
             setUser(prev => ({ ...prev, username: data.username }));
             showMessage("✅ Username updated successfully!", "success");
         } catch (err) {
@@ -89,16 +74,7 @@ export default function Settings() {
 
     async function handlePasswordChange() {
         try {
-            const res = await fetch("/api/change-password", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
-            });
-
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Failed to change password");
-
+            await userAPI.changePassword(currentPassword, newPassword, confirmPassword);
             showMessage("🔒 Password updated!", "success");
             setCurrentPassword("");
             setNewPassword("");

@@ -5,6 +5,7 @@ import "../css/Trainers.css";
 import { COUNTRY_OPTIONS } from "../data/countries";
 import { Mars, Venus, VenusAndMars, Sparkles, Search, Heart, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, RefreshCcw, MoveUp, MoveDown } from "lucide-react";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
+import { profileAPI } from "../utils/api";
 
 const PAGE_SIZE = 20;
 
@@ -135,13 +136,8 @@ export default function Trainers() {
     const run = async () => {
       setLoading(true);
       try {
-        const base = `/api/users/public`;
-        const url = !query
-          ? `${base}?page=1&pageSize=${PAGE_SIZE}`                                 // default list (20)
-          : `${base}?query=${encodeURIComponent(query)}&page=1&pageSize=${PAGE_SIZE}`; // search results
-        const res = await fetch(url, { credentials: "include" });
-        const data = res.ok ? await res.json() : { items: [] };
-
+        const data = await profileAPI.getPublicUsers(query, 1, PAGE_SIZE, false);
+        
         // Use real API data
         const filteredData = data.items || [];
 
@@ -152,7 +148,8 @@ export default function Trainers() {
           setPage(1);
           // Track if pagination is needed
         }
-      } catch {
+      } catch (error) {
+        console.error('Failed to fetch trainers:', error);
         if (!ignore) {
           // Handle error silently
         }

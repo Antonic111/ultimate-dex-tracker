@@ -368,6 +368,8 @@ router.post("/logout", (req, res) => {
 router.put("/profile", authenticateUser, async (req, res) => {
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
+  console.log('🔥 PUT /profile - Request body:', req.body);
+
   try {
     const user = await User.findById(req.userId);
 
@@ -381,25 +383,37 @@ router.put("/profile", authenticateUser, async (req, res) => {
       }
       user.bio = req.body.bio;
     }
-    user.location = req.body.location ?? user.location;
-    user.gender = req.body.gender ?? user.gender;
-    user.favoriteGames = req.body.favoriteGames ?? user.favoriteGames;
-    user.favoritePokemon = req.body.favoritePokemon ?? user.favoritePokemon;
-    user.favoritePokemonShiny = req.body.favoritePokemonShiny ?? user.favoritePokemonShiny;
-    user.switchFriendCode = req.body.switchFriendCode ?? user.switchFriendCode;
-    user.profileTrainer = req.body.profileTrainer ?? user.profileTrainer;
+    
+    if (req.body.location !== undefined) user.location = req.body.location;
+    if (req.body.gender !== undefined) user.gender = req.body.gender;
+    if (req.body.favoriteGames !== undefined) user.favoriteGames = req.body.favoriteGames;
+    if (req.body.favoritePokemon !== undefined) user.favoritePokemon = req.body.favoritePokemon;
+    if (req.body.favoritePokemonShiny !== undefined) user.favoritePokemonShiny = req.body.favoritePokemonShiny;
+    if (req.body.switchFriendCode !== undefined) user.switchFriendCode = req.body.switchFriendCode;
+    if (req.body.profileTrainer !== undefined) user.profileTrainer = req.body.profileTrainer;
 
-// GOOD: saves both true and false
-if ("isProfilePublic" in req.body) {
-  user.isProfilePublic = !!req.body.isProfilePublic;
-}
-
+    // Handle profile visibility - saves both true and false
+    if ("isProfilePublic" in req.body) {
+      user.isProfilePublic = !!req.body.isProfilePublic;
+      console.log('🔥 PUT /profile - Updated isProfilePublic to:', user.isProfilePublic);
+    }
 
     await user.save();
+    console.log('🔥 PUT /profile - Successfully saved user profile');
 
-    res.json({ message: "Profile updated" });
+    res.json({ message: "Profile updated", user: {
+      bio: user.bio,
+      location: user.location,
+      gender: user.gender,
+      favoriteGames: user.favoriteGames,
+      favoritePokemon: user.favoritePokemon,
+      favoritePokemonShiny: user.favoritePokemonShiny,
+      profileTrainer: user.profileTrainer,
+      switchFriendCode: user.switchFriendCode,
+      isProfilePublic: user.isProfilePublic
+    }});
   } catch (err) {
-    console.error(err);
+    console.error('🔥 PUT /profile - Error:', err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -614,6 +628,8 @@ router.put("/update-username", authenticateUser, async (req, res) => {
 router.put("/change-password", authenticateUser, async (req, res) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
 
+  console.log('🔥 PUT /change-password - Request received');
+
   if (!currentPassword || !newPassword || !confirmPassword) {
     return res.status(400).json({ error: "All fields are required" });
   }
@@ -633,12 +649,15 @@ router.put("/change-password", authenticateUser, async (req, res) => {
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) return res.status(400).json({ error: "Current password is incorrect" });
 
-    user.password = newPassword;
+    // Hash the new password before saving
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
 
+    console.log('🔥 PUT /change-password - Password changed successfully');
     res.json({ success: true, message: "Password changed successfully" });
   } catch (err) {
-    console.error("Change password error:", err);
+    console.error("🔥 PUT /change-password - Error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -680,58 +699,74 @@ router.get("/users/public", async (req, res) => {
   const match = { isProfilePublic: { $ne: false } };
   if (q) match.username = { $regex: q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" };
 
-  const base = [
-    { $match: match },
-    ...(random && !q ? [{ $sample: { size: pageSize } }] : [
-      { $sort: q ? { username: 1 } : { createdAt: -1 } },
-      { $skip: (page - 1) * pageSize },
-      { $limit: pageSize },
-    ]),
-    {
-      $project: {
-        username: 1,
-        profileTrainer: 1,
-        bio: 1,
-        location: 1,
-        gender: 1,
-        createdAt: 1,
-        // count non-null entries in caughtPokemon
-        shinies: {
-          $size: {
-            $filter: {
-              input: { $objectToArray: { $ifNull: ["$caughtPokemon", {}] } },
-              as: "c",
-              cond: { $ne: ["$$c.v", null] }
+  try {
+    const base = [
+      { $match: match },
+      ...(random && !q ? [{ $sample: { size: pageSize } }] : [
+        { $sort: q ? { username: 1 } : { createdAt: -1 } },
+        { $skip: (page - 1) * pageSize },
+        { $limit: pageSize },
+      ]),
+      {
+        $project: {
+          username: 1,
+          profileTrainer: 1,
+          bio: 1,
+          location: 1,
+          gender: 1,
+          createdAt: 1,
+          // count non-null entries in caughtPokemon
+          shinies: {
+            $size: {
+              $filter: {
+                input: { $objectToArray: { $ifNull: ["$caughtPokemon", {}] } },
+                as: "c",
+                cond: { $ne: ["$$c.v", null] }
+              }
             }
-          }
-        },
-        // count likes
-        likes: { $size: { $ifNull: ["$likes", []] } }
+          },
+          // count likes
+          likes: { $size: { $ifNull: ["$likes", []] } }
+        }
       }
-    }
-  ];
+    ];
 
-  const items = await User.aggregate(base);
-  // total is optional for random; keep it simple
-  const total = q ? await User.countDocuments(match) : items.length;
+    const items = await User.aggregate(base);
+    // total is optional for random; keep it simple
+    const total = q ? await User.countDocuments(match) : items.length;
 
-  res.json({ items, total, page, pageSize });
+    console.log('🔥 GET /users/public - Found items:', items.length, 'Total:', total);
+    res.json({ items, total, page, pageSize });
+  } catch (error) {
+    console.error('🔥 GET /users/public - Error:', error);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // GET /api/users/:username/public
 router.get("/users/:username/public", async (req, res) => {
   res.set("Cache-Control", "no-store");
-  const u = await User.findOne({
-    username: req.params.username,
-    isProfilePublic: { $ne: false }
-  })
-    .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars")
-    .lean();
-  if (!u) return res.status(404).json({ error: "User not found or private" });
   
-  // Add like count
-  const likeCount = u.likes ? u.likes.length : 0;
-  res.json({ ...u, likeCount });
+  console.log('🔥 GET /users/:username/public - Username:', req.params.username);
+  
+  try {
+    const u = await User.findOne({
+      username: req.params.username,
+      isProfilePublic: { $ne: false }
+    })
+      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars")
+      .lean();
+      
+    if (!u) return res.status(404).json({ error: "User not found or private" });
+    
+    // Add like count
+    const likeCount = u.likes ? u.likes.length : 0;
+    console.log('🔥 GET /users/:username/public - User found, like count:', likeCount);
+    res.json({ ...u, likeCount });
+  } catch (error) {
+    console.error('🔥 GET /users/:username/public - Error:', error);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // DELETE /api/account  — permanently delete the current user

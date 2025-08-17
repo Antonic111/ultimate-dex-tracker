@@ -17,6 +17,7 @@ import { getCaughtKey } from "../caughtStorage";
 import { useLoading } from "../components/Shared/LoadingContext";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
+import { profileAPI } from "../utils/api";
 
 const POKEMON_OPTIONS = pokemonData.map((p) => ({
     name: formatPokemonName(p.name),

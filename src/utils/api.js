@@ -157,6 +157,17 @@ export const profileAPI = {
     return api.get(`/users/${encodeURIComponent(username)}/public`);
   },
 
+  // Get all public users (for trainers page)
+  async getPublicUsers(query = '', page = 1, pageSize = 24, random = false) {
+    const params = new URLSearchParams();
+    if (query) params.append('query', query);
+    if (page) params.append('page', page.toString());
+    if (pageSize) params.append('pageSize', pageSize.toString());
+    if (random) params.append('random', '1');
+    
+    return api.get(`/users/public?${params.toString()}`);
+  },
+
   // Like profile
   async likeProfile(username) {
     return api.post(`/profiles/${encodeURIComponent(username)}/like`);
@@ -195,5 +206,32 @@ export const progressAPI = {
   // Update progress bars
   async updateProgressBars(progressData) {
     return api.put('/progressBars', progressData);
+  },
+};
+
+export const userAPI = {
+  // Update username
+  async updateUsername(newUsername) {
+    return api.put('/update-username', { newUsername });
+  },
+
+  // Change password
+  async changePassword(currentPassword, newPassword, confirmPassword) {
+    return api.put('/change-password', { currentPassword, newPassword, confirmPassword });
+  },
+
+  // Send delete account code
+  async sendDeleteCode() {
+    return api.post('/account/delete/send');
+  },
+
+  // Confirm delete account
+  async confirmDeleteAccount(code, confirm) {
+    return api.post('/account/delete/confirm', { code, confirm });
+  },
+
+  // Delete account
+  async deleteAccount() {
+    return api.delete('/account');
   },
 };
