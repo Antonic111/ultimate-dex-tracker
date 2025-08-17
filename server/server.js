@@ -12,28 +12,6 @@ dotenv.config();
 const app = express();
 
 app.use(cookieParser());
-// Simple CORS headers
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', '*');
-  res.header('Access-Control-Allow-Headers', '*');
-  
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-  next();
-});
-
-// CORS debugging
-app.use((req, res, next) => {
-  console.log('CORS Debug:', {
-    method: req.method,
-    origin: req.headers.origin,
-    url: req.url
-  });
-  next();
-});
 
 // Remove the cors middleware completely - use only manual headers
 app.use(express.json());
