@@ -104,6 +104,7 @@ export default function Register() {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             onChange={handleChange}
+            autoComplete="new-password"
             required
           />
           <button
@@ -124,6 +125,7 @@ export default function Register() {
             type={showConfirmPassword ? "text" : "password"}
             placeholder="Confirm Password"
             onChange={handleChange}
+            autoComplete="new-password"
             required
           />
           <button
