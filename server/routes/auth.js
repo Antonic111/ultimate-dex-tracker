@@ -138,29 +138,38 @@ router.post("/register", authLimiter, async (req, res) => {
 router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
   const { usernameOrEmail, password, rememberMe } = req.body;
 
+  console.log('🔥 POST /login - Request received');
+  console.log('🔥 Login attempt for:', usernameOrEmail);
+
   try {
     const user = await User.findOne({
       $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
     });
 
     if (!user) {
+      console.log('❌ User not found:', usernameOrEmail);
       return res.status(400).json({ error: "User not found" });
     }
     
     if (!user.verified) {
+      console.log('❌ User not verified:', usernameOrEmail);
       return res.status(403).json({ 
         error: "Account not verified. Please check your email and verify your account before logging in.",
         needsVerification: true 
       });
     }
 
+    console.log('🔐 Comparing passwords for user:', user.username);
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('🔐 Password comparison result:', isMatch);
+    
     if (!isMatch) return res.status(400).json({ error: "Invalid password" });
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
 
+    console.log('✅ Login successful for user:', user.username);
     res
       .cookie("token", token, {
         httpOnly: true,
@@ -180,7 +189,7 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
         },
       });
   } catch (err) {
-    console.error(err);
+    console.error('🔥 POST /login - Error:', err);
     res.status(500).json({ error: "Login failed" });
   }
 });
@@ -709,14 +718,47 @@ router.put("/change-password", authenticateUser, async (req, res) => {
 
     // Hash the new password before saving
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
-    await user.save();
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    
+    // Update the password directly in the database to bypass pre-save middleware
+    await User.findByIdAndUpdate(req.userId, { password: hashedPassword });
 
     console.log('✅ PUT /change-password - Password changed successfully');
     res.json({ success: true, message: "Password changed successfully" });
   } catch (err) {
     console.error("🔥 PUT /change-password - Error:", err);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Emergency password reset (for development/testing - remove in production)
+router.post("/emergency-reset-password", async (req, res) => {
+  const { email, newPassword } = req.body;
+  
+  if (!email || !newPassword) {
+    return res.status(400).json({ error: "Email and new password are required" });
+  }
+
+  if (newPassword.length < 8) {
+    return res.status(400).json({ error: "Password must be at least 8 characters" });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    
+    // Update password directly to avoid double-hashing
+    await User.findByIdAndUpdate(user._id, { password: hashedPassword });
+
+    console.log('✅ Emergency password reset successful for:', email);
+    res.json({ message: "Password reset successfully" });
+  } catch (err) {
+    console.error('Emergency password reset error:', err);
+    res.status(500).json({ error: "Password reset failed" });
   }
 });
 
@@ -740,6 +782,24 @@ router.get("/caught/:username/public", async (req, res) => {
   const full = await User.findById(u._id).select("caughtPokemon").lean();
   console.log("Full user data:", full);
   return res.json(full?.caughtPokemon || {});
+});
+
+// Debug endpoint to check password hash (remove in production)
+router.get("/debug/password-hash", authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('username password');
+    if (!user) return res.status(404).json({ error: "User not found" });
+    
+    res.json({
+      username: user.username,
+      passwordHash: user.password,
+      hashLength: user.password.length,
+      isHashed: user.password.startsWith('$2b$') || user.password.startsWith('$2a$')
+    });
+  } catch (err) {
+    console.error('Debug password hash error:', err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 
