@@ -120,13 +120,20 @@ router.post("/register", authLimiter, async (req, res) => {
 // Login
 router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
   const { usernameOrEmail, password, rememberMe } = req.body;
+  
+  console.log('🔥 POST /login - Attempting login for:', usernameOrEmail);
 
   try {
     const user = await User.findOne({
       $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
     });
 
-    if (!user) return res.status(400).json({ error: "User not found" });
+    if (!user) {
+      console.log('🔥 POST /login - User not found');
+      return res.status(400).json({ error: "User not found" });
+    }
+    
+    console.log('🔥 POST /login - User found:', user.username, 'Verified:', user.verified);
     if (!user.verified) {
       // still generate token and login, but include verified=false in the response
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
@@ -154,7 +161,9 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
     }
 
 
+    console.log('🔥 POST /login - Comparing passwords...');
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('🔥 POST /login - Password match:', isMatch);
     if (!isMatch) return res.status(400).json({ error: "Invalid password" });
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
@@ -176,8 +185,8 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
           email: user.email,
           createdAt: user.createdAt,
           profileTrainer: user.profileTrainer,
+          verified: true,
         },
-
       });
   } catch (err) {
     console.error(err);
@@ -186,16 +195,15 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
 });
 
 // Me
-router.get("/me", async (req, res) => {
+router.get("/me", authenticateUser, async (req, res) => {
   res.set("Cache-Control", "no-store");
-  const token = req.cookies.token;
-  if (!token) return res.status(401).json({ error: "unauthenticated" });
-
+  
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select("-password -__v")
+    console.log('🔥 GET /me - User ID:', req.userId);
+    const user = await User.findById(req.userId).select("-password -__v")
     if (!user) return res.status(404).json({ error: "User not found" });
 
+    console.log('🔥 GET /me - User found:', user.username);
     res.json({
       username: user.username,
       email: user.email,
@@ -206,7 +214,8 @@ router.get("/me", async (req, res) => {
     });
 
   } catch (err) {
-    res.status(401).json({ error: "Invalid or expired token" });
+    console.error('🔥 GET /me - Error:', err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -596,33 +605,45 @@ router.put("/progressBars", authenticateUser, async (req, res) => {
 
 // PUT /api/update-username
 router.put("/update-username", authenticateUser, async (req, res) => {
-  const { newUsername } = req.body;
+  console.log('🔥 PUT /update-username - Request received:', req.body);
+  
+  try {
+    const { newUsername } = req.body;
 
-  if (!newUsername || newUsername.length < 3) {
-    return res.status(400).json({ error: "Username must be at least 3 characters" });
+    if (!newUsername || newUsername.length < 3) {
+      return res.status(400).json({ error: "Username must be at least 3 characters" });
+    }
+
+    if (!/^[a-zA-Z0-9]+$/.test(newUsername)) {
+      return res.status(400).json({ error: "Usernames can only contain letters and numbers." });
+    }
+
+    console.log('🔥 PUT /update-username - About to validate username:', newUsername);
+    const usernameValidation = validateContent(newUsername, 'username');
+    console.log('🔥 PUT /update-username - Validation result:', usernameValidation);
+    if (!usernameValidation.isValid) {
+      return res.status(400).json({ error: usernameValidation.error });
+    }
+
+    const existing = await User.findOne({ username: newUsername });
+    if (existing) {
+      return res.status(400).json({ error: "Username is already taken." });
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    console.log('🔥 PUT /update-username - Updating username from', user.username, 'to', newUsername);
+    
+    user.username = newUsername;
+    await user.save();
+
+    console.log('🔥 PUT /update-username - Username updated successfully');
+    res.json({ success: true, username: user.username });
+  } catch (error) {
+    console.error('🔥 PUT /update-username - Error:', error);
+    res.status(500).json({ error: "Server error", details: error.message });
   }
-
-  if (!/^[a-zA-Z0-9]+$/.test(newUsername)) {
-    return res.status(400).json({ error: "Usernames can only contain letters and numbers." });
-  }
-
-  const usernameValidation = validateContent(newUsername, 'username');
-  if (!usernameValidation.isValid) {
-    return res.status(400).json({ error: usernameValidation.error });
-  }
-
-  const existing = await User.findOne({ username: newUsername });
-  if (existing) {
-    return res.status(400).json({ error: "Username is already taken." });
-  }
-
-  const user = await User.findById(req.userId);
-  if (!user) return res.status(404).json({ error: "User not found" });
-
-  user.username = newUsername;
-  await user.save();
-
-  res.json({ success: true, username: user.username });
 });
 
 router.put("/change-password", authenticateUser, async (req, res) => {

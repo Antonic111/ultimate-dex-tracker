@@ -17,7 +17,7 @@ import { getCaughtKey } from "../caughtStorage";
 import { useLoading } from "../components/Shared/LoadingContext";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
-import { profileAPI } from "../utils/api";
+import { profileAPI, caughtAPI } from "../utils/api";
 
 const POKEMON_OPTIONS = pokemonData.map((p) => ({
     name: formatPokemonName(p.name),
@@ -189,41 +189,35 @@ export default function Profile() {
 
 
 
-    useEffect(() => {
-        setLoading('profile-data', true);
-        fetch("/api/profile", {
-            credentials: "include"
-        })
-            .then(res => {
-                if (!res.ok) throw new Error("Failed to fetch profile");
-                return res.json();
-            })
-            .then(data => {
-                setForm(prev => ({
-                    ...prev,
-                    bio: data.bio && data.bio.length > 150 ? data.bio.substring(0, 150) : (data.bio ?? prev.bio),
-                    location: data.location ?? prev.location,
-                    gender: data.gender ?? prev.gender,
-                    profileTrainer: data.profileTrainer ?? prev.profileTrainer,
-                    favoriteGames: Array.isArray(data.favoriteGames) ? [...data.favoriteGames] : prev.favoriteGames,
-                    favoritePokemon: Array.isArray(data.favoritePokemon) ? [...data.favoritePokemon] : prev.favoritePokemon,
-                    favoritePokemonShiny: Array.isArray(data.favoritePokemonShiny) ? [...data.favoritePokemonShiny] : prev.favoritePokemonShiny,
-                    switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode
-                }));
+            useEffect(() => {
+            setLoading('profile-data', true);
+            profileAPI.getProfile()
+                .then(data => {
+                    setForm(prev => ({
+                        ...prev,
+                        bio: data.bio && data.bio.length > 150 ? data.bio.substring(0, 150) : (data.bio ?? prev.bio),
+                        location: data.location ?? prev.location,
+                        gender: data.gender ?? prev.gender,
+                        profileTrainer: data.profileTrainer ?? prev.profileTrainer,
+                        favoriteGames: Array.isArray(data.favoriteGames) ? [...data.favoriteGames] : prev.favoriteGames,
+                        favoritePokemon: Array.isArray(data.favoritePokemon) ? [...data.favoritePokemon] : prev.favoritePokemon,
+                        favoritePokemonShiny: Array.isArray(data.favoritePokemonShiny) ? [...data.favoritePokemonShiny] : prev.favoritePokemonShiny,
+                        switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode
+                    }));
 
-                // Also update user context so header updates
-                setUser(prev => ({
-                    ...prev,
-                    profileTrainer: data.profileTrainer ?? prev.profileTrainer,
-                }));
-            })
-            .catch(err => {
-                console.error("Failed to fetch profile:", err);
-            })
-            .finally(() => {
-                setLoading('profile-data', false);
-            });
-    }, [setLoading]);
+                    // Also update user context so header updates
+                    setUser(prev => ({
+                        ...prev,
+                        profileTrainer: data.profileTrainer ?? prev.profileTrainer,
+                    }));
+                })
+                .catch(err => {
+                    console.error("Failed to fetch profile:", err);
+                })
+                .finally(() => {
+                    setLoading('profile-data', false);
+                });
+        }, [setLoading]);
 
     useEffect(() => {
         let ignore = false;
@@ -231,9 +225,7 @@ export default function Profile() {
 
         async function loadStats() {
             try {
-                const res = await fetch("/api/caught", { credentials: "include" });
-                if (!res.ok) return;
-                const map = await res.json(); // { [key]: infoObject | null }
+                const map = await caughtAPI.getCaughtData(); // { [key]: infoObject | null }
 
                 const allKeys = [
                     ...pokemonData.map(p => getCaughtKey(p)),
@@ -446,23 +438,16 @@ export default function Profile() {
 
                                     try {
                                         setLoading('save-profile', true);
-                                        const res = await fetch("/api/profile", {
-                                            method: "PUT",
-                                            headers: { "Content-Type": "application/json" },
-                                            credentials: "include",
-                                            body: JSON.stringify({
-                                                bio: form.bio,
-                                                location: form.location,
-                                                gender: form.gender,
-                                                profileTrainer: form.profileTrainer,
-                                                favoriteGames: reorderedGames,
-                                                favoritePokemon: reorderedPokemon,
-                                                favoritePokemonShiny: reorderedShiny,
-                                                switchFriendCode: fc,
-                                            }),
+                                        await profileAPI.updateProfile({
+                                            bio: form.bio,
+                                            location: form.location,
+                                            gender: form.gender,
+                                            profileTrainer: form.profileTrainer,
+                                            favoriteGames: reorderedGames,
+                                            favoritePokemon: reorderedPokemon,
+                                            favoritePokemonShiny: reorderedShiny,
+                                            switchFriendCode: fc,
                                         });
-
-                                        if (!res.ok) throw new Error("Failed to save profile");
 
                                         showMessage("✅ Profile changes saved", "success");
 
