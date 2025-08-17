@@ -120,8 +120,6 @@ router.post("/register", authLimiter, async (req, res) => {
 // Login
 router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
   const { usernameOrEmail, password, rememberMe } = req.body;
-  
-  console.log('🔥 POST /login - Attempting login for:', usernameOrEmail);
 
   try {
     const user = await User.findOne({
@@ -129,23 +127,17 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
     });
 
     if (!user) {
-      console.log('🔥 POST /login - User not found');
       return res.status(400).json({ error: "User not found" });
     }
     
-    console.log('🔥 POST /login - User found:', user.username, 'Verified:', user.verified);
     if (!user.verified) {
-      console.log('🔥 POST /login - User not verified, denying login');
       return res.status(403).json({ 
         error: "Account not verified. Please check your email and verify your account before logging in.",
         needsVerification: true 
       });
     }
 
-
-    console.log('🔥 POST /login - Comparing passwords...');
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('🔥 POST /login - Password match:', isMatch);
     if (!isMatch) return res.status(400).json({ error: "Invalid password" });
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
@@ -219,35 +211,17 @@ router.get("/check-verified", async (req, res) => {
 
 // Verify signup code
 router.post("/verify-code", async (req, res) => {
-  console.log('🔥 POST /verify-code - Request body:', req.body);
   const { email, code } = req.body;
-  console.log('🔥 POST /verify-code - Email:', email, 'Code:', code);
   
   if (!email || !code) {
-    console.log('🔥 POST /verify-code - Missing email or code');
     return res.status(400).json({ error: "Email and code are required" });
   }
 
-  try {
+    try {
     const user = await User.findOne({ email });
-    console.log('🔥 POST /verify-code - User found:', user ? user.username : 'NOT FOUND');
     
     if (!user) return res.status(404).json({ error: "User not found" });
     if (user.verified) return res.json({ message: "Already verified" });
-    
-    console.log('🔥 POST /verify-code - Stored code:', user.verificationCode, 'Expires:', user.verificationCodeExpires);
-    console.log('🔥 POST /verify-code - Current time:', Date.now());
-
-    console.log('🔥 POST /verify-code - Code comparison:', {
-      received: code,
-      stored: user.verificationCode,
-      receivedType: typeof code,
-      storedType: typeof user.verificationCode,
-      codesMatch: user.verificationCode === code,
-      expiresAt: new Date(user.verificationCodeExpires).toISOString(),
-      currentTime: new Date().toISOString(),
-      isExpired: user.verificationCodeExpires < Date.now()
-    });
     
     if (
       user.verificationCode !== code ||
@@ -295,13 +269,11 @@ router.post("/verify-code", async (req, res) => {
 // Resend verification code
 router.post("/resend-code", async (req, res) => {
   const { email } = req.body;
-  console.log('🔥 POST /resend-code - Request for email:', email);
   
   if (!email) return res.status(400).json({ error: "Email is required" });
 
   try {
     const user = await User.findOne({ email });
-    console.log('🔥 POST /resend-code - User found:', user ? user.username : 'NOT FOUND');
     
     if (!user) return res.status(404).json({ error: "User not found" });
     if (user.verified) return res.json({ message: "Already verified" });
@@ -310,16 +282,13 @@ router.post("/resend-code", async (req, res) => {
     user.verificationCode = code;
     user.verificationCodeExpires = Date.now() + 1000 * 60 * 10; // 10 minutes
     
-    console.log('🔥 POST /resend-code - New code generated:', code);
-    console.log('🔥 POST /resend-code - Expires at:', new Date(user.verificationCodeExpires).toISOString());
-    
     await user.save();
 
     await sendCodeEmail(user, "Verify Your Account", code, "email verification");
 
     res.json({ message: "Verification code resent" });
   } catch (err) {
-    console.error('🔥 POST /resend-code - Error:', err);
+    console.error('Resend code error:', err);
     res.status(500).json({ error: "Failed to resend code" });
   }
 });

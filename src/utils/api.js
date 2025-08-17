@@ -12,7 +12,8 @@ export const api = {
     });
     
     if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
     }
     
     return response.json();
@@ -33,7 +34,8 @@ export const api = {
     });
     
     if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
     }
     
     // Handle responses that might not have JSON content
@@ -60,7 +62,8 @@ export const api = {
     });
     
     if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
     }
     
     const contentType = response.headers.get('content-type');
@@ -81,7 +84,8 @@ export const api = {
     });
     
     if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
     }
     
     const contentType = response.headers.get('content-type');
@@ -141,59 +145,15 @@ export const authAPI = {
   },
 };
 
-export const profileAPI = {
-  // Get profile
-  async getProfile() {
-    return api.get('/profile');
-  },
-
-  // Update profile
-  async updateProfile(profileData) {
-    return api.put('/profile', profileData);
-  },
-
-  // Get public profile
-  async getPublicProfile(username) {
-    return api.get(`/users/${encodeURIComponent(username)}/public`);
-  },
-
-  // Get all public users (for trainers page)
-  async getPublicUsers(query = '', page = 1, pageSize = 24, random = false) {
-    const params = new URLSearchParams();
-    if (query) params.append('query', query);
-    if (page) params.append('page', page.toString());
-    if (pageSize) params.append('pageSize', pageSize.toString());
-    if (random) params.append('random', '1');
-    
-    return api.get(`/users/public?${params.toString()}`);
-  },
-
-  // Like profile
-  async likeProfile(username) {
-    return api.post(`/profiles/${encodeURIComponent(username)}/like`);
-  },
-
-  // Get profile likes
-  async getProfileLikes(username) {
-    return api.get(`/profiles/${encodeURIComponent(username)}/likes`);
-  },
-};
-
 export const caughtAPI = {
-  // Get caught data
+  // Get caught Pokemon data
   async getCaughtData() {
     return api.get('/caught');
   },
 
-  // Update caught data
-  async updateCaughtData(key, infoMap) {
-    const body = { caughtMap: key ? { [key]: infoMap } : infoMap };
-    return api.post('/caught', body);
-  },
-
-  // Get public caught data
-  async getPublicCaughtData(username) {
-    return api.get(`/caught/${encodeURIComponent(username)}/public`);
+  // Update caught Pokemon data
+  async updateCaughtData(caughtMap) {
+    return api.put('/caught', { caughtMap });
   },
 };
 
@@ -204,8 +164,30 @@ export const progressAPI = {
   },
 
   // Update progress bars
-  async updateProgressBars(progressData) {
-    return api.put('/progressBars', progressData);
+  async updateProgressBars(progressBars) {
+    return api.put('/progressBars', { progressBars });
+  },
+};
+
+export const profileAPI = {
+  // Get user profile
+  async getProfile() {
+    return api.get('/profile');
+  },
+
+  // Update user profile
+  async updateProfile(profileData) {
+    return api.put('/profile', profileData);
+  },
+
+  // Get public users for trainers page
+  async getPublicUsers() {
+    return api.get('/users/public');
+  },
+
+  // Get public profile by username
+  async getPublicProfile(username) {
+    return api.get(`/users/${username}/public`);
   },
 };
 
@@ -216,22 +198,40 @@ export const userAPI = {
   },
 
   // Change password
-  async changePassword(currentPassword, newPassword, confirmPassword) {
-    return api.put('/change-password', { currentPassword, newPassword, confirmPassword });
+  async changePassword(currentPassword, newPassword) {
+    return api.put('/change-password', { currentPassword, newPassword });
   },
 
   // Send delete account code
   async sendDeleteCode() {
-    return api.post('/account/delete/send');
+    return api.post('/account/delete/send-code');
   },
 
   // Confirm delete account
-  async confirmDeleteAccount(code, confirm) {
-    return api.post('/account/delete/confirm', { code, confirm });
+  async confirmDeleteAccount(code) {
+    return api.post('/account/delete/confirm', { code });
   },
 
   // Delete account
   async deleteAccount() {
     return api.delete('/account');
+  },
+};
+
+// Debug API utility
+export const debugAPI = {
+  // Test CORS
+  async testCors() {
+    return api.get('/cors-test');
+  },
+
+  // Test simple endpoint
+  async testSimple() {
+    return api.get('/simple-test');
+  },
+
+  // Test health
+  async testHealth() {
+    return api.get('/health');
   },
 };
