@@ -634,7 +634,8 @@ router.put("/progressBars", authenticateUser, async (req, res) => {
   
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
-  const { progressBars } = req.body;
+  // Handle both wrapped and unwrapped data structures
+  let progressBars = req.body.progressBars || req.body;
   console.log('🔥 Extracted progressBars:', progressBars);
   console.log('🔥 progressBars type:', typeof progressBars);
   console.log('🔥 progressBars isArray:', Array.isArray(progressBars));
@@ -650,6 +651,12 @@ router.put("/progressBars", authenticateUser, async (req, res) => {
     )
   ) {
     console.log('🔥 Validation failed - progressBars structure:', progressBars);
+    console.log('🔥 Validation details:', {
+      isArray: Array.isArray(progressBars),
+      length: progressBars?.length,
+      sampleBar: progressBars?.[0],
+      sampleBarKeys: progressBars?.[0] ? Object.keys(progressBars[0]) : null
+    });
     return res.status(400).json({ error: "Invalid progress bar structure" });
   }
 
