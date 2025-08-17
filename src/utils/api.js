@@ -194,7 +194,7 @@ export const caughtAPI = {
 
   // Update caught Pokemon data
   async updateCaughtData(caughtMap) {
-    return api.put('/caught', { caughtMap });
+    return api.post('/caught', { caughtMap });
   },
 };
 
