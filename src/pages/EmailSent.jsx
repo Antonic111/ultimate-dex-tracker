@@ -4,6 +4,7 @@ import { useMessage } from "../components/Shared/MessageContext";
 import { useUser } from "../components/Shared/UserContext";
 import { KeyRound } from "lucide-react";
 import { authAPI } from "../utils/api";
+import { authAPI as authAPIUtil } from "../utils/api";
 
 const EmailSent = () => {
   const [searchParams] = useSearchParams();
@@ -44,14 +45,19 @@ const EmailSent = () => {
 
     setLoading(true);
     try {
+      const data = await authAPI.verifyCode(email, code);
       showMessage("✅ Email verified! Welcome!", "success");
+      
+      // Set user data and navigate to home
       setUser({
         username: data.user.username,
         email: data.user.email,
         createdAt: data.user.createdAt,
         profileTrainer: data.user.profileTrainer
       });
-      navigate("/");
+      
+      // Navigate to home page - App.jsx will handle authentication check
+      navigate("/", { replace: true });
     } catch (err) {
       showMessage("❌ Server error", "error");
     } finally {
