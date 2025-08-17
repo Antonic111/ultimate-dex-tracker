@@ -56,7 +56,11 @@ app.use(session({
 
 // Health check endpoint for Railway
 app.get("/api/health", (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
@@ -65,7 +69,11 @@ app.get("/api/health", (req, res) => {
 // Super simple CORS test - bypass all middleware
 app.get("/api/simple-test", (req, res) => {
   console.log('Simple test endpoint hit!');
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.json({ message: "Simple test works", timestamp: new Date().toISOString() });
@@ -73,7 +81,11 @@ app.get("/api/simple-test", (req, res) => {
 
 // Simple CORS test endpoint
 app.get("/api/cors-test", (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (origin) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.json({ message: "CORS test successful", timestamp: new Date().toISOString() });
