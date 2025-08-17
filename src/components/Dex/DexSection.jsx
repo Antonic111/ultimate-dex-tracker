@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { getCaughtKey } from "../../caughtStorage";
 import { formatPokemonName } from "../../utils";
 import { Plus, Minus } from "lucide-react";
-import '../../css/app.css';
+import '../../css/App.css';
 
 function formatDexNumber(num) {
   const n = Number(num);

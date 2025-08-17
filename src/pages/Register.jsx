@@ -4,6 +4,7 @@ import "../css/auth.css";
 import { useMessage } from "../components/Shared/MessageContext";
 import { Eye, EyeOff, User, Mail, Lock } from "lucide-react";
 import { validateContent } from "../../server/contentFilter.js";
+import { buildApiUrl } from "../config/api.js";
 
 
 export default function Register() {
@@ -50,7 +51,7 @@ export default function Register() {
     }
 
     try {
-      const res = await fetch("/api/register", {
+      const res = await fetch(buildApiUrl("/register"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

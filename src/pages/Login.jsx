@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import "../css/auth.css";
 import { useMessage } from "../components/Shared/MessageContext";
 import { Eye, EyeOff, User, Lock } from "lucide-react";
+import { buildApiUrl } from "../config/api.js";
 
 export default function Login({ onLogin }) {
   const [form, setForm] = useState({ usernameOrEmail: "", password: "" });
@@ -34,7 +35,7 @@ export default function Login({ onLogin }) {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/login", {
+      const res = await fetch(buildApiUrl("/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -53,7 +54,7 @@ export default function Login({ onLogin }) {
 
       if (!res.ok) throw new Error(data.error || "Login failed");
 
-      const meRes = await fetch("/api/me", {
+      const meRes = await fetch(buildApiUrl("/me"), {
         method: "GET",
         credentials: "include",
       });
