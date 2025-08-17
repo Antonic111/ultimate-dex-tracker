@@ -207,13 +207,10 @@ export default function Profile() {
         let ignore = false;
         (async () => {
             try {
-                const r = await fetch(`/api/profiles/${encodeURIComponent(username)}/likes`, { credentials: "include" });
-                if (r.ok) {
-                    const { count, hasLiked: userHasLiked } = await r.json();
-                    if (!ignore) {
-                        setLikeCount(count);
-                        setHasLiked(userHasLiked);
-                    }
+                const { count, hasLiked: userHasLiked } = await profileAPI.getProfileLikes(username);
+                if (!ignore) {
+                    setLikeCount(count);
+                    setHasLiked(userHasLiked);
                 }
             } catch (error) {
                 console.error("Failed to load likes:", error);
@@ -227,19 +224,14 @@ export default function Profile() {
         
         const interval = setInterval(async () => {
             try {
-                const r = await fetch(`/api/profiles/${encodeURIComponent(username)}/likes`, { 
-                    credentials: "include" 
+                const { count, hasLiked: userHasLiked } = await profileAPI.getProfileLikes(username);
+                setLikeCount(prevCount => {
+                    if (prevCount !== count) {
+                        return count;
+                    }
+                    return prevCount;
                 });
-                if (r.ok) {
-                    const { count, hasLiked: userHasLiked } = await r.json();
-                    setLikeCount(prevCount => {
-                        if (prevCount !== count) {
-                            return count;
-                        }
-                        return prevCount;
-                    });
-                    setHasLiked(userHasLiked);
-                }
+                setHasLiked(userHasLiked);
             } catch (error) {
                 // Silently handle errors to avoid spam
             }
@@ -269,21 +261,10 @@ export default function Profile() {
         setLikeCount(wasLiked ? previousCount - 1 : previousCount + 1);
         
         try {
-            const response = await fetch(`/api/profiles/${encodeURIComponent(username)}/like`, {
-                method: 'POST',
-                credentials: 'include'
-            });
-            
-            if (response.ok) {
-                const { liked, newCount } = await response.json();
-                setHasLiked(liked);
-                setLikeCount(newCount);
-                showMessage(liked ? "❤️ Profile liked!" : "💔 Like removed", "success");
-            } else {
-                setHasLiked(wasLiked);
-                setLikeCount(previousCount);
-                showMessage("❌ Failed to update like", "error");
-            }
+            const { liked, newCount } = await profileAPI.toggleProfileLike(username);
+            setHasLiked(liked);
+            setLikeCount(newCount);
+            showMessage(liked ? "❤️ Profile liked!" : "💔 Like removed", "success");
         } catch (error) {
             setHasLiked(wasLiked);
             setLikeCount(previousCount);

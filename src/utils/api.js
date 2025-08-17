@@ -230,6 +230,16 @@ export const profileAPI = {
   async getPublicProfile(username) {
     return api.get(`/users/${username}/public`);
   },
+
+  // Get profile likes
+  async getProfileLikes(username) {
+    return api.get(`/profiles/${encodeURIComponent(username)}/likes`);
+  },
+
+  // Toggle profile like
+  async toggleProfileLike(username) {
+    return api.post(`/profiles/${encodeURIComponent(username)}/like`);
+  },
 };
 
 export const userAPI = {
