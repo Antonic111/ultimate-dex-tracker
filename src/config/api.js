@@ -4,7 +4,7 @@ const API_CONFIG = {
     baseURL: 'http://localhost:5000'
   },
   production: {
-    baseURL: import.meta.env.VITE_API_URL || 'https://your-railway-app-url.railway.app'
+    baseURL: import.meta.env.VITE_API_URL || 'https://ultimate-dex-tracker-backend.onrender.com'
   }
 };
 

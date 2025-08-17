@@ -77,7 +77,7 @@ app.get("/api/cors-test", (req, res) => {
 app.use("/api", authRoutes); // Don't rate-limit entire /api here
 app.use("/api/profiles", profileRoutes);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 
 console.log('🔥 PORT CONFIGURATION:');
 console.log('🔥 process.env.PORT:', process.env.PORT);
