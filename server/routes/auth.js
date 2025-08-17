@@ -675,16 +675,28 @@ router.put("/change-password", authenticateUser, async (req, res) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
 
   console.log('🔥 PUT /change-password - Request received');
+  console.log('🔥 Request body:', { 
+    currentPassword: currentPassword ? '***' : 'MISSING', 
+    newPassword: newPassword ? '***' : 'MISSING', 
+    confirmPassword: confirmPassword ? '***' : 'MISSING' 
+  });
 
   if (!currentPassword || !newPassword || !confirmPassword) {
+    console.log('❌ Missing required fields:', { 
+      currentPassword: !!currentPassword, 
+      newPassword: !!newPassword, 
+      confirmPassword: !!confirmPassword 
+    });
     return res.status(400).json({ error: "All fields are required" });
   }
 
   if (newPassword !== confirmPassword) {
+    console.log('❌ Passwords do not match');
     return res.status(400).json({ error: "New passwords do not match" });
   }
 
   if (newPassword.length < 8) {
+    console.log('❌ Password too short:', newPassword.length);
     return res.status(400).json({ error: "New password must be at least 8 characters" });
   }
 
@@ -700,7 +712,7 @@ router.put("/change-password", authenticateUser, async (req, res) => {
     user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
 
-    console.log('🔥 PUT /change-password - Password changed successfully');
+    console.log('✅ PUT /change-password - Password changed successfully');
     res.json({ success: true, message: "Password changed successfully" });
   } catch (err) {
     console.error("🔥 PUT /change-password - Error:", err);

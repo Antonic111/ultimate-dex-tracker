@@ -79,28 +79,40 @@ export const api = {
   // PUT request
   async put(endpoint, data = null, options = {}) {
     const url = buildApiUrl(endpoint);
-    const response = await fetch(url, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      body: data ? JSON.stringify(data) : undefined,
-      ...options,
-    });
+    console.log(`🔗 API PUT: ${url}`, data);
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+        body: data ? JSON.stringify(data) : undefined,
+        ...options,
+      });
+      
+      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`❌ API Error ${response.status}:`, errorText);
+        throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const result = await response.json();
+        console.log(`✅ API Response:`, result);
+        return result;
+      }
+      
+      return { message: 'Success' };
+    } catch (error) {
+      console.error(`❌ API PUT failed for ${endpoint}:`, error);
+      throw error;
     }
-    
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/json')) {
-      return response.json();
-    }
-    
-    return { message: 'Success' };
   },
 
   // DELETE request
@@ -227,8 +239,8 @@ export const userAPI = {
   },
 
   // Change password
-  async changePassword(currentPassword, newPassword) {
-    return api.put('/change-password', { currentPassword, newPassword });
+  async changePassword(currentPassword, newPassword, confirmPassword) {
+    return api.put('/change-password', { currentPassword, newPassword, confirmPassword });
   },
 
   // Send delete account code

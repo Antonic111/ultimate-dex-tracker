@@ -73,6 +73,22 @@ export default function Settings() {
     }
 
     async function handlePasswordChange() {
+        // Frontend validation
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            showMessage("❌ All fields are required", "error");
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showMessage("❌ New passwords do not match", "error");
+            return;
+        }
+
+        if (newPassword.length < 8) {
+            showMessage("❌ New password must be at least 8 characters", "error");
+            return;
+        }
+
         try {
             await userAPI.changePassword(currentPassword, newPassword, confirmPassword);
             showMessage("🔒 Password updated!", "success");
