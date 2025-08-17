@@ -4,7 +4,6 @@ import { useMessage } from "../components/Shared/MessageContext";
 import { useUser } from "../components/Shared/UserContext";
 import { KeyRound } from "lucide-react";
 import { authAPI } from "../utils/api";
-import { authAPI as authAPIUtil } from "../utils/api";
 
 const EmailSent = () => {
   const [searchParams] = useSearchParams();
@@ -44,6 +43,7 @@ const EmailSent = () => {
     }
 
     setLoading(true);
+    console.log('🔥 Frontend - Sending verification:', { email, code });
     try {
       const data = await authAPI.verifyCode(email, code);
       showMessage("✅ Email verified! Welcome!", "success");

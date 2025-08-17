@@ -237,14 +237,24 @@ router.get("/check-verified", async (req, res) => {
 
 // Verify signup code
 router.post("/verify-code", async (req, res) => {
+  console.log('🔥 POST /verify-code - Request body:', req.body);
   const { email, code } = req.body;
-  if (!email || !code)
+  console.log('🔥 POST /verify-code - Email:', email, 'Code:', code);
+  
+  if (!email || !code) {
+    console.log('🔥 POST /verify-code - Missing email or code');
     return res.status(400).json({ error: "Email and code are required" });
+  }
 
   try {
     const user = await User.findOne({ email });
+    console.log('🔥 POST /verify-code - User found:', user ? user.username : 'NOT FOUND');
+    
     if (!user) return res.status(404).json({ error: "User not found" });
     if (user.verified) return res.json({ message: "Already verified" });
+    
+    console.log('🔥 POST /verify-code - Stored code:', user.verificationCode, 'Expires:', user.verificationCodeExpires);
+    console.log('🔥 POST /verify-code - Current time:', Date.now());
 
     if (
       user.verificationCode !== code ||
