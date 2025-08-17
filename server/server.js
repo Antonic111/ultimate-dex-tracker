@@ -11,6 +11,9 @@ dotenv.config();
 
 const app = express();
 
+console.log('🔥 SERVER STARTING WITH LATEST CODE! 🔥');
+console.log('🔥 CORS middleware removed from global scope 🔥');
+
 app.use(cookieParser());
 
 // Remove the cors middleware completely - use only manual headers
@@ -65,5 +68,14 @@ mongoose
   .then(() => {
     console.log("✅ MongoDB connected");
     app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+// Add error handling
+process.on('uncaughtException', (err) => {
+  console.error('🔥 UNCAUGHT EXCEPTION:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🔥 UNHANDLED REJECTION:', reason);
+});
   })
   .catch((err) => console.error("MongoDB connection error:", err));
