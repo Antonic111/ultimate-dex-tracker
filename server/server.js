@@ -12,14 +12,14 @@ dotenv.config();
 const app = express();
 
 app.use(cookieParser());
-// Manual CORS headers FIRST (before cors middleware)
+// Simple CORS headers
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Methods', '*');
+  res.header('Access-Control-Allow-Headers', '*');
   
   if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
+    res.status(200).end();
     return;
   }
   next();
@@ -52,6 +52,14 @@ app.use(session({
 // Health check endpoint for Railway
 app.get("/api/health", (req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
+// Simple CORS test endpoint
+app.get("/api/cors-test", (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.json({ message: "CORS test successful", timestamp: new Date().toISOString() });
 });
 
 app.use("/api", authRoutes); // Don't rate-limit entire /api here
