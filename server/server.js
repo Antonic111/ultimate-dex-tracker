@@ -91,10 +91,20 @@ mongoose
 // Add error handling
 process.on('uncaughtException', (err) => {
   console.error('🔥 UNCAUGHT EXCEPTION:', err);
+  console.error('🔥 Stack trace:', err.stack);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('🔥 UNHANDLED REJECTION:', reason);
+  console.error('🔥 Promise:', promise);
+});
+
+process.on('SIGTERM', (signal) => {
+  console.error('🔥 SIGTERM RECEIVED:', signal);
+});
+
+process.on('SIGINT', (signal) => {
+  console.error('🔥 SIGINT RECEIVED:', signal);
 });
   })
   .catch((err) => console.error("MongoDB connection error:", err));
