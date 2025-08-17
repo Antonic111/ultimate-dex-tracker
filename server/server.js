@@ -11,6 +11,9 @@ dotenv.config();
 
 const app = express();
 
+// Add this line to fix rate limiter
+app.set('trust proxy', 1);
+
 console.log('🔥 SERVER STARTING WITH LATEST CODE! 🔥');
 console.log('🔥 CORS middleware removed from global scope 🔥');
 
