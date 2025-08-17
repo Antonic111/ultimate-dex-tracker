@@ -172,7 +172,9 @@ export default function App() {
   const checkAuth = async (silent = false) => {
     if (!silent) setLoading(true);
     try {
+      console.log('🔐 Checking authentication...');
       const data = await authAPI.getCurrentUser();
+      console.log('✅ Authentication successful:', data);
       setUser({
         username: data.username,
         email: data.email ?? null,
@@ -181,12 +183,16 @@ export default function App() {
         verified: data.verified,
         progressBars: data.progressBars || [],
       });
-    } catch {
+    } catch (error) {
+      console.log('❌ Authentication failed:', error.message);
+      // Clear user data on authentication failure
       setUser({
         username: null,
         email: null,
         createdAt: null,
         profileTrainer: null,
+        verified: false,
+        progressBars: [],
       });
     } finally {
       if (!silent) setLoading(false);

@@ -1,10 +1,12 @@
 // API configuration for different environments
+import { currentConfig } from './environment.js';
+
 const API_CONFIG = {
   development: {
     baseURL: 'http://localhost:5000'
   },
   production: {
-    baseURL: import.meta.env.VITE_API_URL || 'https://ultimate-dex-tracker-backend.onrender.com'
+    baseURL: currentConfig.API_BASE_URL
   }
 };
 
@@ -15,3 +17,9 @@ export const API_BASE_URL = API_CONFIG[environment].baseURL;
 export const buildApiUrl = (endpoint) => {
   return `${API_BASE_URL}/api${endpoint}`;
 };
+
+// Log API configuration for debugging
+console.log('🔗 API Configuration:');
+console.log('  Environment:', environment);
+console.log('  Base URL:', API_BASE_URL);
+console.log('  Sample endpoint:', buildApiUrl('/health'));

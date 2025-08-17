@@ -17,12 +17,22 @@ const corsMiddleware = (req, res, next) => {
   console.log('🔥 Request origin:', req.headers.origin);
   
   const origin = req.headers.origin;
-  if (origin) {
+  
+  // Allow specific origins
+  const allowedOrigins = [
+    'https://ultimate-dex-tracker-pr5vf4mcr-antonics-projects.vercel.app',
+    'https://ultimate-dex-tracker.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ];
+  
+  if (origin && allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   }
+  
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   
   if (req.method === 'OPTIONS') {
     console.log('🔥 Handling OPTIONS request');

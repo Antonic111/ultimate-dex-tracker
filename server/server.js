@@ -13,22 +13,34 @@ const app = express();
 // Add this line to fix rate limiter
 app.set('trust proxy', 1);
 
-console.log('🔥 SERVER STARTING WITH SIMPLIFIED CORS! 🔥');
+console.log('🔥 SERVER STARTING WITH IMPROVED CORS! 🔥');
 
-// Simple CORS handling
+// Improved CORS handling for production
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin) {
+  
+  // Allow specific origins
+  const allowedOrigins = [
+    'https://ultimate-dex-tracker-pr5vf4mcr-antonics-projects.vercel.app',
+    'https://ultimate-dex-tracker.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ];
+  
+  if (origin && allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   }
+  
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
+  
   next();
 });
 
@@ -43,6 +55,8 @@ app.use(session({
     httpOnly: true,
     secure: true,
     sameSite: "none",
+    domain: process.env.NODE_ENV === 'production' ? undefined : undefined, // Let browser handle domain
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
   },
 }));
 
@@ -61,9 +75,18 @@ app.use("/api/profiles", profileRoutes);
 
 const PORT = process.env.PORT || 10000;
 
-console.log('🔥 PORT CONFIGURATION:');
+console.log('🔥 SERVER CONFIGURATION:');
 console.log('🔥 process.env.PORT:', process.env.PORT);
+console.log('🔥 process.env.NODE_ENV:', process.env.NODE_ENV);
+console.log('🔥 process.env.MONGO_URI:', process.env.MONGO_URI ? '✅ Set' : '❌ Not set');
+console.log('🔥 process.env.JWT_SECRET:', process.env.JWT_SECRET ? '✅ Set' : '❌ Not set');
 console.log('🔥 Final PORT:', PORT);
+console.log('🔥 CORS Origins:', [
+  'https://ultimate-dex-tracker-pr5vf4mcr-antonics-projects.vercel.app',
+  'https://ultimate-dex-tracker.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5173'
+]);
 
 mongoose
   .connect(process.env.MONGO_URI, {

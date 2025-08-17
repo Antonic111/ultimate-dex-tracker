@@ -5,46 +5,75 @@ export const api = {
   // GET request
   async get(endpoint, options = {}) {
     const url = buildApiUrl(endpoint);
-    const response = await fetch(url, {
-      method: 'GET',
-      credentials: 'include',
-      ...options,
-    });
+    console.log(`🔗 API GET: ${url}`);
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+        ...options,
+      });
+      
+      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`❌ API Error ${response.status}:`, errorText);
+        throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        console.log(`✅ API Response:`, data);
+        return data;
+      }
+      
+      return { message: 'Success' };
+    } catch (error) {
+      console.error(`❌ API GET failed for ${endpoint}:`, error);
+      throw error;
     }
-    
-    return response.json();
   },
 
   // POST request
   async post(endpoint, data = null, options = {}) {
     const url = buildApiUrl(endpoint);
-    const response = await fetch(url, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      body: data ? JSON.stringify(data) : undefined,
-      ...options,
-    });
+    console.log(`🔗 API POST: ${url}`, data);
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+        body: data ? JSON.stringify(data) : undefined,
+        ...options,
+      });
+      
+      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`❌ API Error ${response.status}:`, errorText);
+        throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+      
+      // Handle responses that might not have JSON content
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const result = await response.json();
+        console.log(`✅ API Response:`, result);
+        return result;
+      }
+      
+      return { message: 'Success' };
+    } catch (error) {
+      console.error(`❌ API POST failed for ${endpoint}:`, error);
+      throw error;
     }
-    
-    // Handle responses that might not have JSON content
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/json')) {
-      return response.json();
-    }
-    
-    return { message: 'Success' };
   },
 
   // PUT request

@@ -52,3 +52,39 @@ export const testEndpoint = async (endpoint, method = 'GET', data = null) => {
     return { success: false, error: error.message };
   }
 };
+
+// Main debug API object that Header.jsx expects
+export const debugAPI = {
+  async runAllTests() {
+    console.log('🧪 Running all debug tests...');
+    
+    try {
+      // Test basic API connectivity
+      const apiTest = await testAPI();
+      console.log('API Test Result:', apiTest);
+      
+      // Test auth endpoints
+      const authTest = await testEndpoint('/auth/status');
+      console.log('Auth Status Test:', authTest);
+      
+      // Test profile endpoints
+      const profileTest = await testEndpoint('/profiles/status');
+      console.log('Profile Status Test:', profileTest);
+      
+      return {
+        success: true,
+        tests: {
+          api: apiTest,
+          auth: authTest,
+          profile: profileTest
+        }
+      };
+    } catch (error) {
+      console.error('❌ Debug tests failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+};
