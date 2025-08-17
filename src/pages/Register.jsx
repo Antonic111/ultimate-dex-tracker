@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../css/auth.css";
 import { useMessage } from "../components/Shared/MessageContext";
 import { Eye, EyeOff, User, Mail, Lock } from "lucide-react";
-import { validateContent } from "../../server/contentFilter.js";
+import { validateContent } from "../../shared/contentFilter.js";
 import { authAPI } from "../utils/api.js";
 
 
