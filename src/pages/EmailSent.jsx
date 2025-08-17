@@ -9,6 +9,11 @@ const EmailSent = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || sessionStorage.getItem("verifyEmail");
   const [code, setCode] = useState("");
+  
+  console.log('🔥 EmailSent - searchParams:', searchParams.toString());
+  console.log('🔥 EmailSent - email from URL:', searchParams.get("email"));
+  console.log('🔥 EmailSent - email from sessionStorage:', sessionStorage.getItem("verifyEmail"));
+  console.log('🔥 EmailSent - final email value:', email);
   const [loading, setLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const cooldownRef = useRef(null);
@@ -43,7 +48,10 @@ const EmailSent = () => {
     }
 
     setLoading(true);
-    console.log('🔥 Frontend - Sending verification:', { email, code });
+    console.log('🔥 Frontend - Email:', email);
+    console.log('🔥 Frontend - Code:', code);
+    console.log('🔥 Frontend - Code type:', typeof code);
+    console.log('🔥 Frontend - Code length:', code ? code.length : 'undefined');
     try {
       const data = await authAPI.verifyCode(email, code);
       showMessage("✅ Email verified! Welcome!", "success");

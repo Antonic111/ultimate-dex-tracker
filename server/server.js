@@ -84,6 +84,9 @@ app.get("/api/simple-test", (req, res) => {
 
 // Simple CORS test endpoint
 app.get("/api/cors-test", (req, res) => {
+  console.log('🔥 CORS test endpoint hit!');
+  console.log('🔥 Origin header:', req.headers.origin);
+  
   const origin = req.headers.origin;
   if (origin) {
     res.header('Access-Control-Allow-Origin', origin);
