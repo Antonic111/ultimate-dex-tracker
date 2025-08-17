@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMessage } from "../components/Shared/MessageContext";
 import { useUser } from "../components/Shared/UserContext";
 import { KeyRound } from "lucide-react";
+import { authAPI } from "../utils/api";
 
 const EmailSent = () => {
   const [searchParams] = useSearchParams();
@@ -43,26 +44,14 @@ const EmailSent = () => {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/verify-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, code }),
+      showMessage("✅ Email verified! Welcome!", "success");
+      setUser({
+        username: data.user.username,
+        email: data.user.email,
+        createdAt: data.user.createdAt,
+        profileTrainer: data.user.profileTrainer
       });
-
-      const data = await res.json();
-      if (res.ok) {
-        showMessage("✅ Email verified! Welcome!", "success");
-        setUser({
-          username: data.user.username,
-          email: data.user.email,
-          createdAt: data.user.createdAt,
-          profileTrainer: data.user.profileTrainer
-        });
-        navigate("/");
-      } else {
-        showMessage(`❌ ${data.error || "Verification failed"}`, "error");
-      }
+      navigate("/");
     } catch (err) {
       showMessage("❌ Server error", "error");
     } finally {
@@ -74,20 +63,9 @@ const EmailSent = () => {
     if (resendCooldown > 0) return;
 
     try {
-      const res = await fetch("/api/resend-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        showMessage("📨 Verification email resent!", "success");
-        setResendCooldown(30); // Start 30-second cooldown
-      } else {
-        showMessage(`❌ ${data.error || "Failed to resend code"}`, "error");
-      }
+      await authAPI.resendCode(email);
+      showMessage("📨 Verification email resent!", "success");
+      setResendCooldown(30); // Start 30-second cooldown
     } catch {
       showMessage("❌ Failed to resend email", "error");
     }
