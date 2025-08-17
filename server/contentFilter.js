@@ -1,0 +1,164 @@
+import { distance } from "fastest-levenshtein";
+import { bannedWords } from "./bannedTerms.js";
+
+// Content filter configuration for different field types
+export const FILTER_CONFIGS = {
+  username: {
+    minLength: 3,
+    maxLength: 20,
+    allowedChars: /^[a-zA-Z0-9 _\-.,~\*]+$/,
+    charDescription: "Letters, numbers, spaces, and _ - . , ~ * allowed",
+    checkBadWords: true,
+    similarityThreshold: 0.15, // Tighter threshold for usernames
+    fieldName: "Username"
+  },
+  bio: {
+    minLength: 0,
+    maxLength: 150,
+    allowedChars: null, // No character restrictions for bio
+    charDescription: null,
+    checkBadWords: true,
+    similarityThreshold: 0.2, // Tighter threshold for bio
+    fieldName: "Bio"
+  },
+  notes: {
+    minLength: 0,
+    maxLength: 200,
+    allowedChars: null, // No character restrictions for notes
+    charDescription: null,
+    checkBadWords: true,
+    similarityThreshold: 0.2, // Tighter threshold for notes
+    fieldName: "Notes"
+  },
+  progressBar: {
+    minLength: 1,
+    maxLength: 30,
+    allowedChars: null, // No character restrictions for progress bar names
+    charDescription: null,
+    checkBadWords: true,
+    similarityThreshold: 0.2, // Standard threshold for progress bar names
+    fieldName: "Progress Bar Name"
+  },
+  general: {
+    minLength: 0,
+    maxLength: 1000,
+    allowedChars: null,
+    charDescription: null,
+    checkBadWords: true,
+    similarityThreshold: 0.2, // Tighter threshold for general text
+    fieldName: "Text"
+  }
+};
+
+// Advanced text normalization to catch sophisticated obfuscation
+function normalizeText(text) {
+  return text
+    .toLowerCase()
+    // Common character substitutions (only actual obfuscation, not legitimate letters)
+    .replace(/[@4]/g, "a")
+    .replace(/[!1]/g, "i")
+    .replace(/[3]/g, "e")
+    .replace(/[5\$]/g, "s")
+    .replace(/[7]/g, "t")
+    .replace(/[0]/g, "o")
+    .replace(/[8]/g, "b")
+    .replace(/[6]/g, "g")
+    .replace(/[2]/g, "z")
+    .replace(/[9]/g, "g")
+    // Remove only obvious obfuscation characters, not legitimate letters
+    .replace(/[^ a-z0-9]/g, "")
+    // Normalize multiple spaces to single space
+    .replace(/\s+/g, " ")
+    // Normalize repeated characters if they appear 3+ times (like fuuuuck -> fuck, gggggggggggggggg -> g)
+    .replace(/(.)\1{2,}/g, "$1")
+    .trim();
+}
+
+// Generate targeted variations of a word for detection (less aggressive)
+function generateWordVariations(word) {
+  const variations = new Set();
+  
+  // Original word
+  variations.add(word);
+  
+  // Add spaces between every character (for obvious bypass attempts)
+  const spaced = word.split('').join(' ');
+  variations.add(spaced);
+  
+  // Mixed case variations
+  variations.add(word.toUpperCase());
+  variations.add(word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+  
+  // Common character substitutions (only the most obvious ones)
+  const substitutions = {
+    'a': ['@', '4'],
+    'i': ['!', '1'],
+    'e': ['3'],
+    's': ['5', '$'],
+    't': ['7'],
+    'o': ['0']
+  };
+  
+  // Apply substitutions
+  for (const [char, replacements] of Object.entries(substitutions)) {
+    if (word.includes(char)) {
+      for (const replacement of replacements) {
+        variations.add(word.replace(new RegExp(char, 'g'), replacement));
+      }
+    }
+  }
+  
+  return Array.from(variations);
+}
+
+// Check if text contains banned words or similar variations
+export function validateContent(text, fieldType = 'general') {
+  if (!text || typeof text !== 'string') {
+    return { isValid: false, error: `${FILTER_CONFIGS[fieldType]?.fieldName || 'Text'} is required` };
+  }
+
+  const config = FILTER_CONFIGS[fieldType] || FILTER_CONFIGS.general;
+  
+  // Length validation
+  if (text.length < config.minLength) {
+    return { isValid: false, error: `${config.fieldName} must be at least ${config.minLength} characters long` };
+  }
+  
+  if (text.length > config.maxLength) {
+    return { isValid: false, error: `${config.fieldName} must be no more than ${config.maxLength} characters long` };
+  }
+
+  // Character validation
+  if (config.allowedChars && !config.allowedChars.test(text)) {
+    return { isValid: false, error: `${config.fieldName} contains invalid characters. ${config.charDescription}` };
+  }
+
+  // Bad word check
+  if (config.checkBadWords) {
+    const normalizedText = normalizeText(text);
+    
+    for (const bannedWord of bannedWords) {
+      const normalizedBanned = normalizeText(bannedWord);
+      
+      // Check for exact matches and similar variations
+      const variations = generateWordVariations(normalizedBanned);
+      
+      for (const variation of variations) {
+        if (normalizedText.includes(variation)) {
+          return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
+        }
+        
+        // Check for similarity using Levenshtein distance
+        const distance = distance(normalizedText, variation);
+        const maxDistance = Math.floor(variation.length * config.similarityThreshold);
+        
+        if (distance <= maxDistance) {
+          return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
+        }
+      }
+    }
+  }
+
+  return { isValid: true };
+}
+

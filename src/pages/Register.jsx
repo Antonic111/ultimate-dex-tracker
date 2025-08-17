@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../css/auth.css";
 import { useMessage } from "../components/Shared/MessageContext";
 import { Eye, EyeOff, User, Mail, Lock } from "lucide-react";
-import { validateContent } from "../../shared/contentFilter";
+import { validateContent } from "../../server/contentFilter.js";
 
 
 export default function Register() {

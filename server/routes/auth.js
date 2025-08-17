@@ -6,7 +6,7 @@ import { Resend } from "resend";
 import dotenv from "dotenv";
 import { sendCodeEmail } from "../utils/sendCodeEmail.js";
 import { authLimiter } from "../middleware/rateLimit.js";
-import { validateContent } from "../../shared/contentFilter.js";
+import { validateContent } from "../contentFilter.js";
 import { authenticateUser } from "../middleware/authenticateUser.js";
 
 const router = express.Router();
