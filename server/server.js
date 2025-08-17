@@ -13,11 +13,7 @@ const app = express();
 
 app.use(cookieParser());
 app.use(cors({
-  origin: [
-    'https://ultimate-dex-tracker.vercel.app',
-    'https://your-project.vercel.app',
-    'http://localhost:5173'
-  ],
+  origin: true, // Allow all origins temporarily for testing
   credentials: true,
 }));
 app.use(express.json());
