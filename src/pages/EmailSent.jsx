@@ -23,13 +23,14 @@ const EmailSent = () => {
   const { setUser } = useUser();
 
   useEffect(() => {
+    // Only run once when component mounts
     if (!email) {
       showMessage("❌ Missing email", "error");
       navigate("/register");
     } else {
       sessionStorage.setItem("verifyEmail", email);
     }
-  }, [email, navigate, showMessage]);
+  }, []); // Empty dependency array to run only once
 
   useEffect(() => {
     if (resendCooldown > 0) {

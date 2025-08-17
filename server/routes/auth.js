@@ -135,29 +135,11 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
     
     console.log('🔥 POST /login - User found:', user.username, 'Verified:', user.verified);
     if (!user.verified) {
-      // still generate token and login, but include verified=false in the response
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "7d",
+      console.log('🔥 POST /login - User not verified, denying login');
+      return res.status(403).json({ 
+        error: "Account not verified. Please check your email and verify your account before logging in.",
+        needsVerification: true 
       });
-
-      return res
-              .cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        maxAge: rememberMe ? 1000 * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 2,
-      })
-        .json({
-          message: "Login successful, but not verified",
-          user: {
-            id: user._id,
-            username: user.username,
-            email: user.email,
-            createdAt: user.createdAt,
-            profileTrainer: user.profileTrainer,
-            verified: false, // 🚨 NEW: send this to frontend
-          },
-        });
     }
 
 
@@ -256,11 +238,26 @@ router.post("/verify-code", async (req, res) => {
     console.log('🔥 POST /verify-code - Stored code:', user.verificationCode, 'Expires:', user.verificationCodeExpires);
     console.log('🔥 POST /verify-code - Current time:', Date.now());
 
+    console.log('🔥 POST /verify-code - Code comparison:', {
+      received: code,
+      stored: user.verificationCode,
+      receivedType: typeof code,
+      storedType: typeof user.verificationCode,
+      codesMatch: user.verificationCode === code,
+      expiresAt: new Date(user.verificationCodeExpires).toISOString(),
+      currentTime: new Date().toISOString(),
+      isExpired: user.verificationCodeExpires < Date.now()
+    });
+    
     if (
       user.verificationCode !== code ||
       user.verificationCodeExpires < Date.now()
     ) {
-      return res.status(400).json({ error: "Invalid or expired code" });
+      if (user.verificationCode !== code) {
+        return res.status(400).json({ error: "Invalid verification code" });
+      } else {
+        return res.status(400).json({ error: "Verification code has expired. Please request a new one." });
+      }
     }
 
     user.verified = true;
@@ -292,6 +289,38 @@ router.post("/verify-code", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Resend verification code
+router.post("/resend-code", async (req, res) => {
+  const { email } = req.body;
+  console.log('🔥 POST /resend-code - Request for email:', email);
+  
+  if (!email) return res.status(400).json({ error: "Email is required" });
+
+  try {
+    const user = await User.findOne({ email });
+    console.log('🔥 POST /resend-code - User found:', user ? user.username : 'NOT FOUND');
+    
+    if (!user) return res.status(404).json({ error: "User not found" });
+    if (user.verified) return res.json({ message: "Already verified" });
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    user.verificationCode = code;
+    user.verificationCodeExpires = Date.now() + 1000 * 60 * 10; // 10 minutes
+    
+    console.log('🔥 POST /resend-code - New code generated:', code);
+    console.log('🔥 POST /resend-code - Expires at:', new Date(user.verificationCodeExpires).toISOString());
+    
+    await user.save();
+
+    await sendCodeEmail(user, "Verify Your Account", code, "email verification");
+
+    res.json({ message: "Verification code resent" });
+  } catch (err) {
+    console.error('🔥 POST /resend-code - Error:', err);
+    res.status(500).json({ error: "Failed to resend code" });
   }
 });
 
