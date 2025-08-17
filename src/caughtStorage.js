@@ -24,7 +24,7 @@ export async function loadCaughtMap() {
 // Save a full caughtMap (overwrite)
 export async function saveCaughtMap(caughtMap) {
   try {
-    await caughtAPI.updateCaughtData(null, caughtMap);
+    await caughtAPI.updateCaughtData(caughtMap);
   } catch (err) {
     console.error("Failed to save caughtMap:", err);
   }
