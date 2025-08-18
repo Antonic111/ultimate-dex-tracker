@@ -8,7 +8,7 @@ export const ENV_CONFIG = {
   
   // Production environment (Vercel)
   production: {
-    API_BASE_URL: 'https://ultimate-dex-tracker-backend.onrender.com',
+    API_BASE_URL: 'https://ultimatedextracker.com',
     NODE_ENV: 'production'
   }
 };

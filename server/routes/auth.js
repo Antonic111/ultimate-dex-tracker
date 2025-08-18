@@ -15,6 +15,7 @@ const corsMiddleware = (req, res, next) => {
   
   // Allow specific origins
   const allowedOrigins = [
+    'https://ultimatedextracker.com',
     'https://ultimate-dex-tracker-pr5vf4mcr-antonics-projects.vercel.app',
     'https://ultimate-dex-tracker.vercel.app',
     'http://localhost:3000',
@@ -230,10 +231,7 @@ router.get("/check-verified", async (req, res) => {
 router.post("/verify-code", corsMiddleware, async (req, res) => {
   const { email, code } = req.body;
   
-  console.log('Verification attempt:', { email, code, body: req.body });
-  
   if (!email || !code) {
-    console.log('Missing email or code:', { email, code });
     return res.status(400).json({ error: "Email and code are required" });
   }
 
@@ -241,16 +239,8 @@ router.post("/verify-code", corsMiddleware, async (req, res) => {
     const user = await User.findOne({ email });
     
     if (!user) {
-      console.log('User not found for email:', email);
       return res.status(404).json({ error: "User not found" });
     }
-    
-    console.log('User found:', { 
-      verified: user.verified, 
-      verificationCode: user.verificationCode, 
-      verificationCodeExpires: user.verificationCodeExpires,
-      currentTime: Date.now()
-    });
     
     if (user.verified) return res.json({ message: "Already verified" });
     
@@ -259,10 +249,8 @@ router.post("/verify-code", corsMiddleware, async (req, res) => {
       user.verificationCodeExpires < Date.now()
     ) {
       if (user.verificationCode !== code) {
-        console.log('Code mismatch:', { expected: user.verificationCode, received: code });
         return res.status(400).json({ error: "Invalid verification code" });
       } else {
-        console.log('Code expired:', { expires: user.verificationCodeExpires, current: Date.now() });
         return res.status(400).json({ error: "Verification code has expired. Please request a new one." });
       }
     }
@@ -303,28 +291,22 @@ router.post("/verify-code", corsMiddleware, async (req, res) => {
 router.post("/resend-code", corsMiddleware, async (req, res) => {
   const { email } = req.body;
   
-  console.log('Resend code attempt for email:', email);
-  
   if (!email) return res.status(400).json({ error: "Email is required" });
 
   try {
     const user = await User.findOne({ email });
     
     if (!user) {
-      console.log('User not found for resend:', email);
       return res.status(404).json({ error: "User not found" });
     }
     
     if (user.verified) {
-      console.log('User already verified:', email);
       return res.json({ message: "Already verified" });
     }
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     user.verificationCode = code;
     user.verificationCodeExpires = Date.now() + 1000 * 60 * 10; // 10 minutes
-    
-    console.log('Setting new verification code:', { email, code, expires: user.verificationCodeExpires });
     
     await user.save();
 
