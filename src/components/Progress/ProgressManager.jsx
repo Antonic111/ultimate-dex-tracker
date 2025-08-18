@@ -160,10 +160,6 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             filters: bar.filters || {}, // ✅ ENSURE FILTERS IS INCLUDED
         }));
 
-        console.log('🔥 Frontend - Raw updatedBars:', updatedBars);
-        console.log('🔥 Frontend - Cleaned bars:', cleanBars);
-        console.log('🔥 Frontend - Sample clean bar:', cleanBars[0]);
-
         try {
             await progressAPI.updateProgressBars(cleanBars);
         } catch (err) {

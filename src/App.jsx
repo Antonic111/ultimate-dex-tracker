@@ -169,22 +169,19 @@ export default function App() {
   const [authReady, setAuthReady] = useState(false);
 
   // Helper to check if user is still logged in
-  const checkAuth = async (silent = false) => {
-    if (!silent) setLoading(true);
+  const checkAuth = async () => {
+    setLoading(true);
     try {
-      console.log('🔐 Checking authentication...');
-      const data = await authAPI.getCurrentUser();
-      console.log('✅ Authentication successful:', data);
+      const userData = await authAPI.getCurrentUser();
       setUser({
-        username: data.username,
-        email: data.email ?? null,
-        createdAt: data.createdAt ?? null,
-        profileTrainer: data.profileTrainer ?? "ash.png",
-        verified: data.verified,
-        progressBars: data.progressBars || [],
+        username: userData.username,
+        email: userData.email,
+        createdAt: userData.createdAt,
+        profileTrainer: userData.profileTrainer,
+        verified: userData.verified,
+        progressBars: userData.progressBars || [],
       });
     } catch (error) {
-      console.log('❌ Authentication failed:', error.message);
       // Clear user data on authentication failure
       setUser({
         username: null,
@@ -195,7 +192,7 @@ export default function App() {
         progressBars: [],
       });
     } finally {
-      if (!silent) setLoading(false);
+      setLoading(false);
       setAuthReady(true);
     }
   };

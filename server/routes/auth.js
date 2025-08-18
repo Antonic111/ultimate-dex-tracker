@@ -66,34 +66,25 @@ async function issueDeleteCode(user) {
 
 // throttle: allow resends every 60s
 router.post("/account/delete/send", authenticateUser, async (req, res) => {
-  console.log('🔥 POST /account/delete/send - Request received');
-  
   try {
-    const user = await User.findById(req.userId).select("email deleteCodeExpires");
-    if (!user) {
-      console.log('❌ User not found for delete code request');
-      return res.status(401).json({ error: "Unauthorized" });
-    }
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
     
-    if (!user.email) {
-      console.log('❌ User has no email for delete code request');
-      return res.status(400).json({ error: "Add an email to your account first." });
-    }
-
-    const now = Date.now();
-    // if previous code exists and was sent within ~60s (≈ >9m left of the 10m window), block
-    if (user.deleteCodeExpires && user.deleteCodeExpires.getTime() - now > 9 * 60 * 1000) {
-      console.log('❌ Delete code request too soon for user:', user.email);
-      return res.status(429).json({ error: "Please wait before requesting another code." });
-    }
-
-    console.log('✅ Sending delete code to user:', user.email);
-    await issueDeleteCode(user);
-    console.log('✅ Delete code sent successfully to:', user.email);
-    return res.status(204).end();
-  } catch (e) {
-    console.error("❌ delete/send error:", e);
-    return res.status(500).json({ error: "Failed to send code" });
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const salt = await bcrypt.genSalt(10);
+    const deleteCodeHash = await bcrypt.hash(code, salt);
+    
+    await User.findByIdAndUpdate(req.userId, {
+      deleteCodeHash,
+      deleteCodeExpires: Date.now() + 1000 * 60 * 10 // 10 minutes
+    });
+    
+    await sendCodeEmail(user, "Delete Your Account", code, "account deletion");
+    
+    res.json({ success: true, message: "Delete code sent" });
+  } catch (err) {
+    console.error('Error sending delete code:', err);
+    res.status(500).json({ error: "Failed to send delete code" });
   }
 });
 
@@ -506,139 +497,57 @@ router.get("/profile", authenticateUser, async (req, res) => {
   }
 });
 
-// GET /caught - fetch caught Pokémon data for logged-in user
+// GET /api/caught
 router.get("/caught", authenticateUser, async (req, res) => {
-  if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
-
-  console.log('🔥 GET /caught - User ID:', req.userId);
-
-  try {
-    const user = await User.findById(req.userId).select("caughtPokemon");
-
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    console.log('🔥 GET /caught - User found:', user.username);
-    console.log('🔥 GET /caught - caughtPokemon type:', typeof user.caughtPokemon);
-    console.log('🔥 GET /caught - caughtPokemon instanceof Map:', user.caughtPokemon instanceof Map);
-
-    // Convert Map to object for JSON response
-    const caughtData = user.caughtPokemon instanceof Map 
-      ? Object.fromEntries(user.caughtPokemon.entries())
-      : user.caughtPokemon || {};
-
-    console.log('🔥 GET /caught - Sending data:', caughtData);
-    res.json(caughtData);
-  } catch (err) {
-    console.error("🔥 GET /caught - Failed to fetch caught data:", err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// POST /caught - update a single Pokémon's caught data
-router.post("/caught", authenticateUser, async (req, res) => {
-  if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
-
-  console.log('🔥 POST /caught - Request body:', req.body);
-  console.log('🔥 POST /caught - User ID:', req.userId);
-
-  const { caughtMap } = req.body;
-  if (!caughtMap || typeof caughtMap !== "object") {
-    console.log('🔥 POST /caught - Invalid input:', { caughtMap, type: typeof caughtMap });
-    return res.status(400).json({ error: "Invalid input" });
-  }
-
   try {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: "User not found" });
-
-    console.log('🔥 POST /caught - User found:', user.username);
-    console.log('🔥 POST /caught - Current caughtPokemon type:', typeof user.caughtPokemon);
-    console.log('🔥 POST /caught - Current caughtPokemon instanceof Map:', user.caughtPokemon instanceof Map);
-
-    // Ensure caughtPokemon is a Map
-    if (!(user.caughtPokemon instanceof Map)) {
-      user.caughtPokemon = new Map();
-    }
-
-    // Remove nulls and update
-    for (const [key, value] of Object.entries(caughtMap)) {
-      if (value === null) {
-        user.caughtPokemon.delete(key); // remove from the MongoDB Map
-        console.log('🔥 POST /caught - Deleted key:', key);
-      } else {
-        user.caughtPokemon.set(key, value); // update or create
-        console.log('🔥 POST /caught - Set key:', key, 'value:', value);
-      }
-    }
-
-    await user.save();
-    console.log('🔥 POST /caught - Successfully saved user');
-    res.json({ success: true });
-  } catch (error) {
-    console.error('🔥 POST /caught - Error:', error);
-    res.status(500).json({ error: "Server error", details: error.message });
-  }
-});
-
-// GET /progressBars - fetch progress bars for logged-in user
-router.get("/progressBars", authenticateUser, async (req, res) => {
-  if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
-
-  try {
-    const user = await User.findById(req.userId).select("progressBars");
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    res.json(user.progressBars || []);
+    
+    res.json(user.caughtPokemon || {});
   } catch (err) {
-    console.error("Failed to fetch progress bars:", err);
+    console.error('Error getting caught data:', err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// POST /progressBars - update progress bars
-router.post("/progressBars", authenticateUser, async (req, res) => {
-  if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
-
-  const { progressBars } = req.body;
-  if (
-    !Array.isArray(progressBars) ||
-    !progressBars.every(bar =>
-      typeof bar === "object" &&
-      typeof bar.id === "string" &&
-      typeof bar.name === "string" &&
-      typeof bar.visible === "boolean" &&
-      typeof bar.filters === "object"
-    )
-  ) {
-    return res.status(400).json({ error: "Invalid progress bar structure" });
+// POST /api/caught
+router.post("/caught", authenticateUser, async (req, res) => {
+  try {
+    const { caughtMap } = req.body;
+    if (!caughtMap) return res.status(400).json({ error: "Caught map is required" });
+    
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    
+    user.caughtPokemon = caughtMap;
+    await user.save();
+    
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error updating caught data:', err);
+    res.status(500).json({ error: "Server error" });
   }
-
-  const user = await User.findById(req.userId);
-  if (!user) return res.status(404).json({ error: "User not found" });
-
-  user.progressBars = progressBars.map(({ __showFilters, ...rest }) => ({
-    ...rest,
-    filters: rest.filters || {}, // ✅ ensure filters are always saved
-  }));
-  await user.save();
-
-  res.json({ success: true });
 });
 
-// PUT /progressBars - update progress bars (alternative to POST)
+// GET /api/progressBars
+router.get("/progressBars", authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    
+    res.json(user.progressBars || []);
+  } catch (err) {
+    console.error('Error getting progress bars:', err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// PUT /api/progressBars
 router.put("/progressBars", authenticateUser, async (req, res) => {
-  console.log('🔥 PUT /progressBars - Request received');
-  console.log('🔥 Request body:', req.body);
-  console.log('🔥 Request body type:', typeof req.body);
-  console.log('🔥 Request body keys:', Object.keys(req.body));
-  
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   // Handle both wrapped and unwrapped data structures
   let progressBars = req.body.progressBars || req.body;
-  console.log('🔥 Extracted progressBars:', progressBars);
-  console.log('🔥 progressBars type:', typeof progressBars);
-  console.log('🔥 progressBars isArray:', Array.isArray(progressBars));
   
   if (
     !Array.isArray(progressBars) ||
@@ -650,38 +559,22 @@ router.put("/progressBars", authenticateUser, async (req, res) => {
       typeof bar.filters === "object"
     )
   ) {
-    console.log('🔥 Validation failed - progressBars structure:', progressBars);
-    console.log('🔥 Validation details:', {
-      isArray: Array.isArray(progressBars),
-      length: progressBars?.length,
-      sampleBar: progressBars?.[0],
-      sampleBarKeys: progressBars?.[0] ? Object.keys(progressBars[0]) : null
-    });
     return res.status(400).json({ error: "Invalid progress bar structure" });
   }
-
-  console.log('🔥 Validation passed - processing progress bars');
   
   try {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: "User not found" });
-
-    console.log('🔥 User found:', user.username);
-    console.log('🔥 Current progressBars count:', user.progressBars?.length || 0);
 
     user.progressBars = progressBars.map(({ __showFilters, ...rest }) => ({
       ...rest,
       filters: rest.filters || {}, // ✅ ensure filters are always saved
     }));
     
-    console.log('🔥 Updated progressBars count:', user.progressBars.length);
-    console.log('🔥 Sample progress bar:', user.progressBars[0]);
-    
     await user.save();
-    console.log('🔥 Progress bars saved successfully');
     res.json({ success: true });
   } catch (error) {
-    console.error('🔥 Error saving progress bars:', error);
+    console.error('Error saving progress bars:', error);
     res.status(500).json({ error: "Server error", details: error.message });
   }
 });
@@ -731,51 +624,33 @@ router.put("/update-username", authenticateUser, async (req, res) => {
 
 router.put("/change-password", authenticateUser, async (req, res) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
-
-  console.log('🔥 PUT /change-password - Request received');
-  console.log('🔥 Request body:', { 
-    currentPassword: currentPassword ? '***' : 'MISSING', 
-    newPassword: newPassword ? '***' : 'MISSING', 
-    confirmPassword: confirmPassword ? '***' : 'MISSING' 
-  });
-
+  
   if (!currentPassword || !newPassword || !confirmPassword) {
-    console.log('❌ Missing required fields:', { 
-      currentPassword: !!currentPassword, 
-      newPassword: !!newPassword, 
-      confirmPassword: !!confirmPassword 
-    });
     return res.status(400).json({ error: "All fields are required" });
   }
-
+  
   if (newPassword !== confirmPassword) {
-    console.log('❌ Passwords do not match');
     return res.status(400).json({ error: "New passwords do not match" });
   }
-
+  
   if (newPassword.length < 8) {
-    console.log('❌ Password too short:', newPassword.length);
     return res.status(400).json({ error: "New password must be at least 8 characters" });
   }
-
+  
   try {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: "User not found" });
-
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) return res.status(400).json({ error: "Current password is incorrect" });
-
-    // Hash the new password before saving
+    
+    const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+    if (!isValidPassword) return res.status(400).json({ error: "Current password is incorrect" });
+    
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
+    await User.findByIdAndUpdate(req.userId, { password: hashedPassword }); // Fix: Bypass pre-save middleware
     
-    // Update the password directly in the database to bypass pre-save middleware
-    await User.findByIdAndUpdate(req.userId, { password: hashedPassword });
-
-    console.log('✅ PUT /change-password - Password changed successfully');
     res.json({ success: true, message: "Password changed successfully" });
   } catch (err) {
-    console.error("🔥 PUT /change-password - Error:", err);
+    console.error('Error changing password:', err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -831,6 +706,156 @@ router.get("/caught/:username/public", async (req, res) => {
   const full = await User.findById(u._id).select("caughtPokemon").lean();
   console.log("Full user data:", full);
   return res.json(full?.caughtPokemon || {});
+});
+
+// GET /api/users/public?query=&page=1&pageSize=24&random=1
+router.get("/users/public", async (req, res) => {
+  res.set("Cache-Control", "no-store");
+
+  const q = (req.query.query || "").trim();
+  const page = Math.max(1, parseInt(req.query.page || "1", 10));
+  const pageSize = Math.min(50, Math.max(1, parseInt(req.query.pageSize || "24", 10)));
+  const random = req.query.random === "1";
+
+  const match = { isProfilePublic: { $ne: false } };
+  if (q) match.username = { $regex: q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" };
+
+  try {
+    const base = [
+      { $match: match },
+      ...(random && !q ? [{ $sample: { size: pageSize } }] : [
+        { $sort: q ? { username: 1 } : { createdAt: -1 } },
+        { $skip: (page - 1) * pageSize },
+        { $limit: pageSize },
+      ]),
+      {
+        $project: {
+          username: 1,
+          profileTrainer: 1,
+          bio: 1,
+          location: 1,
+          gender: 1,
+          createdAt: 1,
+          // count non-null entries in caughtPokemon
+          shinies: {
+            $size: {
+              $filter: {
+                input: { $objectToArray: { $ifNull: ["$caughtPokemon", {}] } },
+                as: "c",
+                cond: { $ne: ["$$c.v", null] }
+              }
+            }
+          },
+          // count likes
+          likes: { $size: { $ifNull: ["$likes", []] } }
+        }
+      }
+    ];
+
+    const items = await User.aggregate(base);
+    // total is optional for random; keep it simple
+    const total = q ? await User.countDocuments(match) : items.length;
+
+    res.json({ items, total, page, pageSize });
+  } catch (error) {
+    console.error('Error getting public users:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// GET /api/users/:username/public
+router.get("/users/:username/public", async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  
+  try {
+    const u = await User.findOne({
+      username: req.params.username,
+      isProfilePublic: { $ne: false }
+    })
+      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars")
+      .lean();
+      
+    if (!u) return res.status(404).json({ error: "User not found or private" });
+    
+    // Add like count
+    const likeCount = u.likes ? u.likes.length : 0;
+    res.json({ ...u, likeCount });
+  } catch (error) {
+    console.error('Error getting public profile:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// DELETE /api/account  — permanently delete the current user
+router.delete("/account", authenticateUser, async (req, res) => {
+  try {
+    // if you already have auth middleware that sets req.user._id, use that:
+    const userId = req.userId;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+    await User.findByIdAndDelete(userId);
+
+    // kill auth cookie
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "none",  // required for cross-origin requests
+      secure: true,      // true for HTTPS (both Vercel and Render use HTTPS)
+      path: "/",
+    });
+
+    return res.status(204).end();
+  } catch (e) {
+    console.error("Delete account failed:", e);
+    return res.status(500).json({ error: "Failed to delete account" });
+  }
+});
+
+// Confirm code and delete the account
+router.post("/account/delete/confirm", authenticateUser, async (req, res) => {
+  try {
+    const code = String(req.body?.code || "").trim();
+    const typed = String(req.body?.confirm || "").trim();
+
+    if (!/^\d{6}$/.test(code)) {
+      return res.status(400).json({ error: "Invalid code." });
+    }
+
+    const user = await User.findById(req.userId).select("username deleteCodeHash deleteCodeExpires");
+    if (!user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Optional: enforce username match server-side (case-insensitive)
+    if (typed && typed.toLowerCase() !== user.username.toLowerCase()) {
+      return res.status(400).json({ error: "Type your account name exactly to continue." });
+    }
+
+    if (!user.deleteCodeHash || !user.deleteCodeExpires || user.deleteCodeExpires < new Date()) {
+      return res.status(400).json({ error: "Code expired. Send a new one." });
+    }
+
+    const ok = await bcrypt.compare(code, user.deleteCodeHash);
+    if (!ok) return res.status(400).json({ error: "Wrong code." });
+
+    await User.findByIdAndDelete(req.userId);
+    res.clearCookie("token", { httpOnly: true, sameSite: "none", secure: true, path: "/" });
+    return res.status(204).end();
+  } catch (e) {
+    console.error("Delete account confirmation error:", e);
+    return res.status(500).json({ error: "Failed to delete account" });
+  }
+});
+
+// server/routes (auth.js or a new public router)
+router.get("/public/dex/:username", async (req, res) => {
+  const user = await User.findOne({ username: req.params.username }).lean();
+  if (!user) return res.status(404).json({ error: "User not found" });
+  if (user.profilePrivate) return res.status(403).json({ error: "This dex is private." });
+
+  // Build the same caughtInfoMap shape you use in the app
+  const caughtInfoMap = user.caughtInfoMap || {}; // adapt to your schema/source
+
+  res.json({ username: user.username, caughtInfoMap });
 });
 
 

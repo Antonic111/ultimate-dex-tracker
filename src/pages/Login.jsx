@@ -40,8 +40,6 @@ export default function Login({ onLogin }) {
         rememberMe: form.rememberMe || false,
       });
 
-      console.log('✅ Login successful:', loginData);
-
       // Check if the user is verified from the login response
       if (!loginData.user.verified) {
         showMessage("📧 Please verify your email before logging in.", "error");
@@ -60,8 +58,6 @@ export default function Login({ onLogin }) {
       });
       navigate("/");
     } catch (err) {
-      console.error('❌ Login failed:', err);
-      
       // Handle specific verification error
       if (err.message.includes('Account not verified')) {
         showMessage("📧 Account not verified. Please check your email and verify your account first.", "error");
