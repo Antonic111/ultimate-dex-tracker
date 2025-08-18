@@ -172,39 +172,8 @@ export default function DexView({
     
     // Show no results when there's a search term and no results found
     // Use the showNoResults prop if provided (from App.jsx), otherwise use local logic
-    const shouldShowNoResults = (showNoResults !== undefined) 
-        ? showNoResults 
-        : (!!filters.searchTerm?.trim() && (
-            shouldUseCustomList 
-                ? pokemonList.length === 0 
-                : dexSections.every(section => {
-                    const filteredMons = customFilterMons 
-                        ? customFilterMons(section.getList(), showForms)
-                        : section.getList().filter(mon => {
-                            if (!showForms && mon.formType) return false;
-                            return true;
-                        });
-                    return filteredMons.length === 0;
-                })
-        ));
-    
-    // Check if we actually have no results to show
-    // This should work for both owner and viewer modes
-    const hasNoResults = !!filters.searchTerm?.trim() && (
-        shouldUseCustomList 
-            ? pokemonList.length === 0  // Viewer mode: no Pokémon in the list
-            : shouldShowNoResults       // Owner mode: use the showNoResults logic
-    );
-
-    // Debug logging to see what's happening
-    console.log('DexView Debug:', {
-        searchTerm: filters.searchTerm,
-        shouldUseCustomList,
-        pokemonListLength: pokemonList?.length || 0,
-        shouldShowNoResults,
-        hasNoResults,
-        finalSuggestion
-    });
+    const shouldShowNoResults = pokemonList.length === 0 && filters.searchTerm?.trim();
+    const hasNoResults = pokemonList.length === 0 && filters.searchTerm?.trim();
 
     return (
         <>

@@ -63,12 +63,7 @@ router.post('/:username/like', authenticateUser, async (req, res) => {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    // Prevent self-liking
-    if (profileOwner._id.equals(currentUserId)) {
-      return res.status(400).json({ error: 'Cannot like your own profile' });
-    }
-
-    // Toggle like
+    // Toggle like (now allows self-liking)
     const hasLiked = profileOwner.likes && profileOwner.likes.includes(currentUserId);
     
     if (hasLiked) {

@@ -688,7 +688,6 @@ router.post("/emergency-reset-password", async (req, res) => {
 
 // GET /api/caught/:username/public  -> return that user's caught map if profile is public
 router.get("/caught/:username/public", async (req, res) => {
-  console.log("Public caught data route hit for username:", req.params.username);
   res.set("Cache-Control", "no-store");
 
   const u = await User.findOne({
@@ -698,13 +697,10 @@ router.get("/caught/:username/public", async (req, res) => {
     .select("_id")
     .lean();
 
-  console.log("User found:", u);
-
   if (!u) return res.status(404).json({ error: "User not found or private" });
 
   // Adjust this select if your field name differs
   const full = await User.findById(u._id).select("caughtPokemon").lean();
-  console.log("Full user data:", full);
   return res.json(full?.caughtPokemon || {});
 });
 

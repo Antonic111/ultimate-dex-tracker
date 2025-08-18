@@ -12,9 +12,27 @@ export async function fetchCaughtData(username) {
 
 export async function updateCaughtData(username, key, infoMap) {
   try {
-    const caughtMap = key ? { [key]: infoMap } : infoMap;
+    // Get existing caught data first
+    const existingData = await caughtAPI.getCaughtData();
     
-    await caughtAPI.updateCaughtData(caughtMap);
+    let updatedCaughtMap;
+    
+    if (key) {
+      // Single Pokémon update - merge with existing data
+      if (infoMap === null) {
+        // Remove this Pokémon from caught data
+        const { [key]: removed, ...rest } = existingData;
+        updatedCaughtMap = rest;
+      } else {
+        // Add/update this Pokémon
+        updatedCaughtMap = { ...existingData, [key]: infoMap };
+      }
+    } else {
+      // Full map update (from mark all operations)
+      updatedCaughtMap = infoMap;
+    }
+    
+    await caughtAPI.updateCaughtData(updatedCaughtMap);
   } catch (err) {
     console.error("updateCaughtData error:", err);
   }

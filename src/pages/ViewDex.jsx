@@ -38,12 +38,9 @@ export default function ViewDex() {
     const showForms = toggles.showForms;
     
     // Debug logging for toggle state
-    console.log('ViewDex - Current toggle state:', { showShiny, showForms, toggles });
     
     const setShowShiny = useCallback(val => {
-        console.log('ViewDex - setShowShiny called with:', val);
         const updated = { ...togglesRef.current, showShiny: val };
-        console.log('ViewDex - Updated toggles:', updated);
         setToggles(updated);
         localStorage.setItem("dexToggles", JSON.stringify(updated));
         
@@ -52,9 +49,7 @@ export default function ViewDex() {
     }, []);
     
     const setShowForms = useCallback(val => {
-        console.log('ViewDex - setShowForms called with:', val);
         const updated = { ...togglesRef.current, showForms: val };
-        console.log('ViewDex - Updated toggles:', updated);
         setToggles(updated);
         localStorage.setItem("dexToggles", JSON.stringify(updated));
         
@@ -68,7 +63,6 @@ export default function ViewDex() {
             if (e.key === "dexToggles") {
                 try {
                     const newToggles = JSON.parse(e.newValue || "{}");
-                    console.log('ViewDex - Storage change detected:', newToggles);
                     setToggles(prev => ({ ...prev, ...newToggles }));
                 } catch (error) {
                     console.error('ViewDex - Error parsing storage change:', error);
@@ -77,7 +71,6 @@ export default function ViewDex() {
         };
         
         const handleToggleChange = (e) => {
-            console.log('ViewDex - Custom toggle change event:', e.detail);
             setToggles(prev => ({ ...prev, ...e.detail }));
         };
         
@@ -100,7 +93,7 @@ export default function ViewDex() {
                 const data = await profileAPI.getPublicCaughtData(username);
                 setCaughtInfoMap(data || {});
             } catch (error) {
-                console.error('Failed to fetch caught data:', error);
+                // Handle error silently
             } finally {
                 setLoading('view-dex-data', false);
             }
@@ -113,10 +106,11 @@ export default function ViewDex() {
         (async () => {
             try {
                 const user = await profileAPI.getPublicProfile(username);
-                console.log('ViewDex - Fetched user data:', user);
                 const bars = Array.isArray(user.progressBars) ? user.progressBars : [];
-                console.log('ViewDex - Setting progress bars:', bars);
-                setProgressBars(bars);
+                // Update progress bars when they change
+                if (bars && bars.length > 0) {
+                    setProgressBars(bars);
+                }
             } catch (error) {
                 console.log('ViewDex - Error fetching user data:', error);
                 setProgressBars([]);
