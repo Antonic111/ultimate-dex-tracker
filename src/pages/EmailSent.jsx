@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMessage } from "../components/Shared/MessageContext";
 import { useUser } from "../components/Shared/UserContext";
-import { KeyRound } from "lucide-react";
+import { KeyRound, Mail, Lightbulb, CheckCircle, Smartphone } from "lucide-react";
 import { authAPI } from "../utils/api";
 
 const EmailSent = () => {
@@ -82,12 +82,12 @@ const EmailSent = () => {
       <h2>VERIFY YOUR EMAIL</h2>
       <div className="email-sent-message">
         <p>
-          📧 A 6-digit verification code was sent to:
+          <Mail className="auth-icon" size={20} /> A 6-digit verification code was sent to:
           <br />
           <strong>{email}</strong>
           <br />
           <br />
-          💡 Check your email (including spam folder) and enter the code below.
+          <Lightbulb className="auth-icon" size={20} /> Check your email (including spam folder) and enter the code below.
         </p>
       </div>
       <form onSubmit={handleSubmit}>
@@ -120,8 +120,8 @@ const EmailSent = () => {
         </button>
 
         <div className="verification-info">
-          <p>✅ After verification, you can log in with your username or email.</p>
-          <p>📱 Can't find the email? Check your spam folder or try resending.</p>
+          <p><CheckCircle className="auth-icon" size={20} /> After verification, you can log in with your username or email.</p>
+          <p><Smartphone className="auth-icon" size={20} /> Can't find the email? Check your spam folder or try resending.</p>
         </div>
       </form>
     </div>

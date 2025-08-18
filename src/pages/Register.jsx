@@ -154,11 +154,6 @@ export default function Register() {
 
         <button type="submit" disabled={loading}>Create Account</button>
         
-        <div className="verification-info">
-          <p>📧 After creating your account, you'll receive a verification code via email.</p>
-          <p>✅ Verify your email to start using PokéTracker!</p>
-        </div>
-        
         <p className="auth-redirect">
           Already have an account? <a href="/login">Login here</a>.
         </p>

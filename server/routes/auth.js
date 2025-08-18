@@ -144,7 +144,8 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
     if (!user.verified) {
       return res.status(403).json({ 
         error: "Account not verified. Please check your email and verify your account before logging in.",
-        needsVerification: true 
+        needsVerification: true,
+        email: user.email
       });
     }
 

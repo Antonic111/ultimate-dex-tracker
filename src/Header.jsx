@@ -65,13 +65,16 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
         </Link>
 
         <nav className="main-nav">
-          <Link 
-            to="/trainers" 
-            className={`nav-link ${location.pathname === '/trainers' ? 'active' : ''}`}
-          >
-            <Users size={16} />
-            <span>Trainers</span>
-          </Link>
+          {/* Only show Trainers button when not on auth flow pages, but allow on public home page */}
+          {!['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
+            <Link 
+              to="/trainers" 
+              className={`nav-link ${location.pathname === '/trainers' ? 'active' : ''}`}
+            >
+              <Users size={16} />
+              <span>Trainers</span>
+            </Link>
+          )}
         </nav>
 
 

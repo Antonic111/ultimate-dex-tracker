@@ -60,14 +60,23 @@ export default function Login({ onLogin }) {
     } catch (err) {
       // Handle specific verification error
       if (err.message.includes('Account not verified')) {
-        const email = form.usernameOrEmail.includes('@') ? form.usernameOrEmail : '';
-        if (email) {
+        // Check if the backend provided the email in the error response
+        if (err.email) {
           showMessage("📧 Account not verified. Redirecting to verification page...", "info");
           setTimeout(() => {
-            navigate(`/email-sent?email=${encodeURIComponent(email)}`);
+            navigate(`/email-sent?email=${encodeURIComponent(err.email)}`);
           }, 1500);
         } else {
-          showMessage("📧 Account not verified. Please use your email address to login.", "error");
+          // Fallback: try to extract email from the input field
+          const email = form.usernameOrEmail.includes('@') ? form.usernameOrEmail : '';
+          if (email) {
+            showMessage("📧 Account not verified. Redirecting to verification page...", "info");
+            setTimeout(() => {
+              navigate(`/email-sent?email=${encodeURIComponent(email)}`);
+            }, 1500);
+          } else {
+            showMessage("📧 Account not verified. Please use your email address to login.", "error");
+          }
         }
       } else {
         showMessage(`❌ ${err.message}`, "error");
@@ -143,11 +152,6 @@ export default function Login({ onLogin }) {
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
-
-        <div className="verification-info">
-          <p>📧 New account? Check your email for a verification code after registration.</p>
-          <p>🔑 Use your email address if you need to verify your account.</p>
-        </div>
 
         <div className="auth-redirect double">
           <a href="/register">Don't have an account?</a>
