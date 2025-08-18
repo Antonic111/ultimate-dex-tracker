@@ -235,7 +235,7 @@ export default function Profile() {
             } catch (error) {
                 // Silently handle errors to avoid spam
             }
-        }, 2000);
+        }, 5000); // Reduced from 2 seconds to 5 seconds
 
         return () => clearInterval(interval);
     }, [username]);

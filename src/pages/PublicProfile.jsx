@@ -194,28 +194,41 @@ export default function PublicProfile() {
         }
     }, [data]);
 
-    // Poll for like updates every 2 seconds to keep like count real-time
+    // Initial load of likes
+    useEffect(() => {
+        if (!username) return;
+        
+        const loadInitialLikes = async () => {
+            try {
+                const { count } = await profileAPI.getPublicProfileLikes(username);
+                setLikeCount(count);
+            } catch (error) {
+                // Silently handle errors
+            }
+        };
+        
+        loadInitialLikes();
+    }, [username]);
+
+    // Poll for like updates every 5 seconds to keep like count real-time (reduced from 2 seconds)
     useEffect(() => {
         if (!username) return;
         
         const interval = setInterval(async () => {
             try {
-                console.log(`[${new Date().toLocaleTimeString()}] Polling for like updates for ${username}`);
                 // Use the public likes endpoint that doesn't require authentication
                 const { count } = await profileAPI.getPublicProfileLikes(username);
-                console.log(`[${new Date().toLocaleTimeString()}] Like data received: count=${count}`);
                 setLikeCount(prevCount => {
                     // Only update if the count actually changed
                     if (prevCount !== count) {
-                        console.log(`[${new Date().toLocaleTimeString()}] Like count updated: ${prevCount} -> ${count}`);
                         return count;
                     }
                     return prevCount;
                 });
             } catch (error) {
-                console.error('Error polling for likes:', error);
+                // Silently handle errors to avoid spam
             }
-        }, 2000); // Check every 2 seconds
+        }, 5000); // Check every 5 seconds instead of 2
 
         return () => clearInterval(interval);
     }, [username]);

@@ -11,11 +11,6 @@ import { authenticateUser } from "../middleware/authenticateUser.js";
 
 // CORS middleware for auth routes
 const corsMiddleware = (req, res, next) => {
-  console.log('🔥 CORS MIDDLEWARE IS RUNNING! 🔥');
-  console.log('🔥 Request method:', req.method);
-  console.log('🔥 Request URL:', req.url);
-  console.log('🔥 Request origin:', req.headers.origin);
-  
   const origin = req.headers.origin;
   
   // Allow specific origins
@@ -35,7 +30,6 @@ const corsMiddleware = (req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   
   if (req.method === 'OPTIONS') {
-    console.log('🔥 Handling OPTIONS request');
     res.status(200).end();
     return;
   }
@@ -93,32 +87,25 @@ router.post("/account/delete/send", authenticateUser, async (req, res) => {
 router.post("/register", authLimiter, async (req, res) => {
   const { username, email, password, profileTrainer = "ash.png" } = req.body;
 
-  console.log('🔥 Registration attempt:', { username, email, profileTrainer });
-
   const usernameValidation = validateContent(username, 'username');
   if (!usernameValidation.isValid) {
-    console.log('❌ Username validation failed:', usernameValidation.error);
     return res.status(400).json({ error: usernameValidation.error });
   }
 
   if (!username || !email || !password) {
-    console.log('❌ Missing required fields');
     return res.status(400).json({ error: "Missing username, email, or password" });
   }
 
   if (password.length < 8) {
-    console.log('❌ Password too short');
     return res.status(400).json({ error: "Password must be at least 8 characters" });
   }
 
   try {
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
-      console.log('❌ User already exists:', existingUser.username);
       return res.status(400).json({ error: "Username or email already taken" });
     }
 
-    console.log('✅ Creating new user...');
     const user = await User.create({
       username,
       email,
@@ -132,9 +119,7 @@ router.post("/register", authLimiter, async (req, res) => {
     user.verificationCodeExpires = Date.now() + 1000 * 60 * 10; // 10 minutes
     await user.save();
 
-    console.log('✅ User created, sending verification email...');
     await sendCodeEmail(user, "Verify Your Account", code, "email verification");
-    console.log('✅ Verification email sent successfully');
 
     res.json({ message: "Account created. Please check your email to verify your account." });
   } catch (err) {
@@ -147,30 +132,23 @@ router.post("/register", authLimiter, async (req, res) => {
 router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
   const { usernameOrEmail, password, rememberMe } = req.body;
 
-  console.log('🔥 POST /login - Request received');
-  console.log('🔥 Login attempt for:', usernameOrEmail);
-
   try {
     const user = await User.findOne({
       $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
     });
 
     if (!user) {
-      console.log('❌ User not found:', usernameOrEmail);
       return res.status(400).json({ error: "User not found" });
     }
     
     if (!user.verified) {
-      console.log('❌ User not verified:', usernameOrEmail);
       return res.status(403).json({ 
         error: "Account not verified. Please check your email and verify your account before logging in.",
         needsVerification: true 
       });
     }
 
-    console.log('🔐 Comparing passwords for user:', user.username);
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('🔐 Password comparison result:', isMatch);
     
     if (!isMatch) return res.status(400).json({ error: "Invalid password" });
 
@@ -178,7 +156,6 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
       expiresIn: "7d",
     });
 
-    console.log('✅ Login successful for user:', user.username);
     res
       .cookie("token", token, {
         httpOnly: true,
@@ -208,11 +185,9 @@ router.get("/me", authenticateUser, async (req, res) => {
   res.set("Cache-Control", "no-store");
   
   try {
-    console.log('🔥 GET /me - User ID:', req.userId);
     const user = await User.findById(req.userId).select("-password -__v")
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    console.log('🔥 GET /me - User found:', user.username);
     res.json({
       username: user.username,
       email: user.email,
@@ -420,8 +395,6 @@ router.post("/logout", (req, res) => {
 router.put("/profile", authenticateUser, async (req, res) => {
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
-  console.log('🔥 PUT /profile - Request body:', req.body);
-
   try {
     const user = await User.findById(req.userId);
 
@@ -447,11 +420,9 @@ router.put("/profile", authenticateUser, async (req, res) => {
     // Handle profile visibility - saves both true and false
     if ("isProfilePublic" in req.body) {
       user.isProfilePublic = !!req.body.isProfilePublic;
-      console.log('🔥 PUT /profile - Updated isProfilePublic to:', user.isProfilePublic);
     }
 
     await user.save();
-    console.log('🔥 PUT /profile - Successfully saved user profile');
 
     res.json({ message: "Profile updated", user: {
       bio: user.bio,
@@ -581,7 +552,6 @@ router.put("/progressBars", authenticateUser, async (req, res) => {
 
 // PUT /api/update-username
 router.put("/update-username", authenticateUser, async (req, res) => {
-  console.log('🔥 PUT /update-username - Request received:', req.body);
   
   try {
     const { newUsername } = req.body;
@@ -594,9 +564,7 @@ router.put("/update-username", authenticateUser, async (req, res) => {
       return res.status(400).json({ error: "Usernames can only contain letters and numbers." });
     }
 
-    console.log('🔥 PUT /update-username - About to validate username:', newUsername);
     const usernameValidation = validateContent(newUsername, 'username');
-    console.log('🔥 PUT /update-username - Validation result:', usernameValidation);
     if (!usernameValidation.isValid) {
       return res.status(400).json({ error: usernameValidation.error });
     }
@@ -609,12 +577,10 @@ router.put("/update-username", authenticateUser, async (req, res) => {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    console.log('🔥 PUT /update-username - Updating username from', user.username, 'to', newUsername);
     
     user.username = newUsername;
     await user.save();
 
-    console.log('🔥 PUT /update-username - Username updated successfully');
     res.json({ success: true, username: user.username });
   } catch (error) {
     console.error('🔥 PUT /update-username - Error:', error);
@@ -678,7 +644,6 @@ router.post("/emergency-reset-password", async (req, res) => {
     // Update password directly to avoid double-hashing
     await User.findByIdAndUpdate(user._id, { password: hashedPassword });
 
-    console.log('✅ Emergency password reset successful for:', email);
     res.json({ message: "Password reset successfully" });
   } catch (err) {
     console.error('Emergency password reset error:', err);
@@ -768,13 +733,13 @@ router.get("/users/:username/public", async (req, res) => {
       username: req.params.username,
       isProfilePublic: { $ne: false }
     })
-      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars")
+      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes")
       .lean();
       
     if (!u) return res.status(404).json({ error: "User not found or private" });
     
-    // Add like count
-    const likeCount = u.likes ? u.likes.length : 0;
+    // Add like count - safely handle undefined likes
+    const likeCount = Array.isArray(u.likes) ? u.likes.length : 0;
     res.json({ ...u, likeCount });
   } catch (error) {
     console.error('Error getting public profile:', error);

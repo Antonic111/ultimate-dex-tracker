@@ -65,7 +65,7 @@ export default function ViewDex() {
                     const newToggles = JSON.parse(e.newValue || "{}");
                     setToggles(prev => ({ ...prev, ...newToggles }));
                 } catch (error) {
-                    console.error('ViewDex - Error parsing storage change:', error);
+                    // Handle error silently
                 }
             }
         };
@@ -112,7 +112,7 @@ export default function ViewDex() {
                     setProgressBars(bars);
                 }
             } catch (error) {
-                console.log('ViewDex - Error fetching user data:', error);
+                // Handle error silently
                 setProgressBars([]);
             } finally {
                 setLoading('view-dex-profile', false);

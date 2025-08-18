@@ -86,7 +86,6 @@ export default function Trainers() {
       const startIndex = (page - 1) * PAGE_SIZE;
       const endIndex = startIndex + PAGE_SIZE;
       const result = sortedAndFilteredData.slice(startIndex, endIndex);
-      console.log(`Page ${page}: Showing ${result.length} items (${startIndex}-${endIndex} of ${sortedAndFilteredData.length})`);
       setSortedItems(result);
     } else {
       // Clear sorted items when no data
@@ -432,7 +431,6 @@ export default function Trainers() {
                   className="pagination-btn prev-btn" 
                   onClick={() => {
                     const newPage = Math.max(1, page - 1);
-                    console.log(`Changing to previous page: ${page} -> ${newPage}`);
                     setPage(newPage);
                   }}
                   disabled={page === 1}
@@ -452,7 +450,6 @@ export default function Trainers() {
                         key={1} 
                         className={`page-btn ${currentPage === 1 ? 'active' : ''}`}
                         onClick={() => {
-                          console.log(`Changing to page 1 from page ${page}`);
                           setPage(1);
                         }}
                       >
@@ -473,7 +470,6 @@ export default function Trainers() {
                             key={i} 
                             className={`page-btn ${i === currentPage ? 'active' : ''}`}
                             onClick={() => {
-                              console.log(`Changing to page ${i} from page ${page}`);
                               setPage(i);
                             }}
                           >
@@ -494,7 +490,6 @@ export default function Trainers() {
                         key={totalPages} 
                         className={`page-btn ${currentPage === totalPages ? 'active' : ''}`}
                         onClick={() => {
-                          console.log(`Changing to page ${totalPages} from page ${page}`);
                           setPage(totalPages);
                         }}
                       >
@@ -510,7 +505,6 @@ export default function Trainers() {
                   className="pagination-btn next-btn" 
                   onClick={() => {
                     const newPage = Math.min(Math.ceil(sortedAndFilteredData.length / PAGE_SIZE), page + 1);
-                    console.log(`Changing to next page: ${page} -> ${newPage}`);
                     setPage(newPage);
                   }}
                   disabled={page >= Math.ceil(sortedAndFilteredData.length / PAGE_SIZE)}

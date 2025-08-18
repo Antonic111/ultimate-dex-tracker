@@ -172,8 +172,8 @@ export default function DexView({
     
     // Show no results when there's a search term and no results found
     // Use the showNoResults prop if provided (from App.jsx), otherwise use local logic
-    const shouldShowNoResults = pokemonList.length === 0 && filters.searchTerm?.trim();
-    const hasNoResults = pokemonList.length === 0 && filters.searchTerm?.trim();
+    const shouldShowNoResults = (pokemonList && pokemonList.length === 0) && filters.searchTerm?.trim();
+    const hasNoResults = (pokemonList && pokemonList.length === 0) && filters.searchTerm?.trim();
 
     return (
         <>

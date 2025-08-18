@@ -252,17 +252,15 @@ useEffect(() => {
       if (e.key === "dexToggles") {
         try {
           const newToggles = JSON.parse(e.newValue || "{}");
-          console.log('App - Storage change detected:', newToggles);
           setToggles(prev => ({ ...prev, ...newToggles }));
         } catch (error) {
-          console.error('App - Error parsing storage change:', error);
+          // Handle error silently
         }
       }
     };
     
     // Listen for custom events from ViewDex
     const handleToggleChange = (e) => {
-      console.log('App - Custom toggle change event:', e.detail);
       setToggles(prev => ({ ...prev, ...e.detail }));
     };
     
