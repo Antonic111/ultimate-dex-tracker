@@ -3,7 +3,7 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export default async function sendCodeEmail(user, subject, code, action) {
+export async function sendCodeEmail(user, subject, code, action) {
   if (!process.env.RESEND_API_KEY) {
     console.error('RESEND_API_KEY not set');
     return;
