@@ -327,7 +327,7 @@ input:-internal-autofill-selected {
 .email-sent-message {
   text-align: center;
   margin-top: -8px;
-  margin-bottom: 0;
+  margin-bottom: 2px;
   color: #ccc;
   font-size: 1rem;
   line-height: 1.4;
@@ -339,6 +339,11 @@ input:-internal-autofill-selected {
   justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.email-sent-message .instruction {
+  display: block;
+  margin-top: 6px;
 }
 
 .email-sent-message .auth-icon {

@@ -85,8 +85,7 @@ const EmailSent = () => {
           <Mail className="auth-icon" size={20} /> A 6-digit verification code was sent to:
           <br />
           <strong>{email}</strong>
-          <br />
-          Enter the code below to verify your account.
+          <span className="instruction">Enter the code below to verify your account.</span>
         </p>
       </div>
       <form onSubmit={handleSubmit}>
