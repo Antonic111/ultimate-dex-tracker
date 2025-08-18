@@ -1,5 +1,11 @@
 import { bannedWords, bannedSubstrings } from "./bannedTerms.js";
 
+// Regexes for high-severity slurs with common obfuscations (symbols/spaces between letters)
+const bannedRegexes = [
+  /n[\W_]*i[\W_]*(?:g|9|@){2}[\W_]*e[\W_]*r/iu,   // n!@@er, n9 9er, etc.
+  /n[\W_]*i[\W_]*(?:g|9|@){2}[\W_]*a+/iu           // nigga variants
+];
+
 // Temporary fix: disable similarity checking until import issue is resolved
 const calculateDistance = (a, b) => {
   // Simple fallback distance calculation
@@ -159,6 +165,11 @@ function containsBannedWordAsCompleteWord(text, bannedWord) {
 // Advanced banned word detection (more intelligent)
 function containsBannedWords(text, similarityThreshold = 0.2) {
   const normalized = normalizeText(text);
+
+  // -1- Regex match for obfuscated high-severity slurs on raw text (case/Unicode-insensitive)
+  for (const rx of bannedRegexes) {
+    if (rx.test(String(text || ''))) return true;
+  }
   
   // 0. Block known high-severity substrings even when embedded
   for (const sub of (bannedSubstrings || [])) {
