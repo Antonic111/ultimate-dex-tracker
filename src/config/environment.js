@@ -8,7 +8,7 @@ export const ENV_CONFIG = {
   
   // Production environment (Vercel)
   production: {
-    API_BASE_URL: 'https://ultimatedextracker.com',
+    API_BASE_URL: 'https://www.ultimatedextracker.com',
     NODE_ENV: 'production'
   }
 };

@@ -16,6 +16,7 @@ const corsMiddleware = (req, res, next) => {
   // Allow specific origins
   const allowedOrigins = [
     'https://ultimatedextracker.com',
+    'https://www.ultimatedextracker.com',
     'https://ultimate-dex-tracker-pr5vf4mcr-antonics-projects.vercel.app',
     'https://ultimate-dex-tracker.vercel.app',
     'http://localhost:3000',
