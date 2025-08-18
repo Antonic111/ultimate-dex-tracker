@@ -84,7 +84,7 @@ router.post("/account/delete/send", authenticateUser, async (req, res) => {
 
 
 // Register
-router.post("/register", authLimiter, async (req, res) => {
+router.post("/register", corsMiddleware, authLimiter, async (req, res) => {
   const { username, email, password, profileTrainer = "ash.png" } = req.body;
 
   const usernameValidation = validateContent(username, 'username');
@@ -119,9 +119,15 @@ router.post("/register", authLimiter, async (req, res) => {
     user.verificationCodeExpires = Date.now() + 1000 * 60 * 10; // 10 minutes
     await user.save();
 
-    await sendCodeEmail(user, "Verify Your Account", code, "email verification");
-
+    // Send response first, then send email (so email errors don't crash registration)
     res.json({ message: "Account created. Please check your email to verify your account." });
+    
+    // Send verification email after response (don't await - let it run in background)
+    sendCodeEmail(user, "Verify Your Account", code, "email verification").catch(err => {
+      console.error("❌ Email sending failed (but account was created):", err);
+      // Don't throw error - account creation was successful
+    });
+    
   } catch (err) {
     console.error("❌ Registration error:", err);
     res.status(500).json({ error: "Registration failed" });
