@@ -517,6 +517,66 @@ router.post("/caught", authenticateUser, async (req, res) => {
   }
 });
 
+// PATCH /api/caught — apply partial changes: { changes: { key: info|null, ... } }
+router.patch("/caught", authenticateUser, async (req, res) => {
+  try {
+    const { changes } = req.body || {};
+    if (!changes || typeof changes !== 'object') {
+      return res.status(400).json({ error: "Invalid or missing changes" });
+    }
+
+    const setOps = {};
+    const unsetOps = {};
+    for (const [key, value] of Object.entries(changes)) {
+      if (value === null) {
+        unsetOps["caughtPokemon." + key] = "";
+      } else {
+        setOps["caughtPokemon." + key] = value;
+      }
+    }
+
+    const update = {};
+    if (Object.keys(setOps).length) update.$set = setOps;
+    if (Object.keys(unsetOps).length) update.$unset = unsetOps;
+
+    if (!Object.keys(update).length) {
+      return res.json({ success: true, noop: true });
+    }
+
+    const result = await User.updateOne({ _id: req.userId }, update);
+    if (result.matchedCount === 0) return res.status(404).json({ error: "User not found" });
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('Error patching caught data:', err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// PUT /api/caught/:key — atomically update a single entry
+router.put("/caught/:key", authenticateUser, async (req, res) => {
+  try {
+    const key = String(req.params.key || "");
+    if (!key) return res.status(400).json({ error: "Missing key" });
+
+    // info can be an object or null (to delete)
+    const info = Object.prototype.hasOwnProperty.call(req.body, 'info') ? req.body.info : undefined;
+    if (typeof info === 'undefined') return res.status(400).json({ error: "Missing info" });
+
+    const update = info === null
+      ? { $unset: { ["caughtPokemon." + key]: "" } }
+      : { $set: { ["caughtPokemon." + key]: info } };
+
+    const result = await User.updateOne({ _id: req.userId }, update);
+    if (result.matchedCount === 0) return res.status(404).json({ error: "User not found" });
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('Error updating caught entry:', err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
 // GET /api/progressBars
 router.get("/progressBars", authenticateUser, async (req, res) => {
   try {

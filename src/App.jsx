@@ -435,6 +435,7 @@ function updateCaughtInfo(poke, info) {
 
     const newCaughtMap = { ...caught };
     const newInfoMap = { ...caughtInfoMap };
+    const delta = {};
 
     box.forEach(p => {
       const key = getCaughtKey(p);
@@ -455,17 +456,30 @@ function updateCaughtInfo(poke, info) {
             notes: ""
           };
           newInfoMap[key] = freshInfo;
+          delta[key] = freshInfo;
         }
       } else {
         newInfoMap[key] = null; // explicitly mark as deleted
+        delta[key] = null;
       }
     });
 
     setCaught(newCaughtMap);
     setCaughtInfoMap(newInfoMap);
 
-    // ✅ Save full update to server
-    updateCaughtData(user.username, null, newInfoMap);
+    // ✅ Send only the changes to server and wait for completion to avoid overwrite on refresh
+    try {
+      // Prefer delta patch if available; fall back to full save if empty
+      if (Object.keys(delta).length > 0 && typeof window !== 'undefined') {
+        // Use API helper directly to avoid circular import
+        const { caughtAPI } = await import('./utils/api.js');
+        await caughtAPI.patchCaughtData({ changes: delta });
+      } else {
+        await updateCaughtData(user.username, null, newInfoMap);
+      }
+    } catch (e) {
+      // swallow; UI already updated optimistically
+    }
 
     if (selectedPokemon) {
       const affected = box.find(p => getCaughtKey(p) === getCaughtKey(selectedPokemon));

@@ -214,9 +214,19 @@ export const caughtAPI = {
     return api.get('/caught');
   },
 
-  // Update caught Pokemon data
+  // Update entire caught map (bulk)
   async updateCaughtData(caughtMap) {
     return api.post('/caught', { caughtMap });
+  },
+
+  // Atomically update a single entry
+  async updateCaughtEntry(key, info) {
+    return api.put(`/caught/${encodeURIComponent(key)}`, { info });
+  },
+
+  // Apply partial/delta updates: { key: info|null }
+  async patchCaughtData(changes) {
+    return api.put('/caught', changes, { method: 'PATCH' });
   },
 };
 
