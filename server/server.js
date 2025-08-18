@@ -17,6 +17,8 @@ app.set('trust proxy', 1);
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   const allowedOrigins = [
+    'https://ultimatedextracker.com',
+    'https://www.ultimatedextracker.com',
     'https://ultimate-dex-tracker-pr5vf4mcr-antonics-projects.vercel.app',
     'https://ultimate-dex-tracker.vercel.app',
     'http://localhost:3000',
