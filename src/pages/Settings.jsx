@@ -23,6 +23,8 @@ export default function Settings() {
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [savingPrivacy, setSavingPrivacy] = useState(false);
+    const [savingUsername, setSavingUsername] = useState(false);
+    const [savingPassword, setSavingPassword] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const togglePrivacy = async (nextPublic) => {
@@ -65,9 +67,11 @@ export default function Settings() {
 
     async function handleUsernameSave() {
         try {
+            setSavingUsername(true);
             const validation = validateContent(String(newUsername || ''), 'username');
             if (!validation.isValid) {
                 showMessage(`❌ ${validation.error}`, 'error');
+                setSavingUsername(false);
                 return;
             }
             const data = await userAPI.updateUsername(newUsername);
@@ -75,6 +79,8 @@ export default function Settings() {
             showMessage("✅ Username updated successfully!", "success");
         } catch (err) {
             showMessage("❌ " + err.message, "error");
+        } finally {
+            setSavingUsername(false);
         }
     }
 
@@ -96,6 +102,7 @@ export default function Settings() {
         }
 
         try {
+            setSavingPassword(true);
             await userAPI.changePassword(currentPassword, newPassword, confirmPassword);
             showMessage("🔒 Password updated!", "success");
             setCurrentPassword("");
@@ -103,6 +110,8 @@ export default function Settings() {
             setConfirmPassword("");
         } catch (err) {
             showMessage("❌ " + err.message, "error");
+        } finally {
+            setSavingPassword(false);
         }
     }
 
@@ -129,7 +138,7 @@ export default function Settings() {
                                 showRealTimeValidation={false}
                             />
                         </div>
-                        <button onClick={handleUsernameSave}>Save</button>
+                        <button onClick={handleUsernameSave} disabled={savingUsername}>{savingUsername ? "Saving..." : "Save"}</button>
                     </div>
 
                     <div className="setting-divider" />
@@ -210,6 +219,7 @@ export default function Settings() {
                                 type="button"
                                 className="show-password-toggle"
                                 onClick={() => setShowCurrentPassword(prev => !prev)}
+                                tabIndex={-1}
                             >
                                 {showCurrentPassword ? <EyeOff className="auth-icon" size={24} /> : <Eye className="auth-icon" size={24} />}
                             </button>
@@ -226,6 +236,7 @@ export default function Settings() {
                                 type="button"
                                 className="show-password-toggle"
                                 onClick={() => setShowNewPassword(prev => !prev)}
+                                tabIndex={-1}
                             >
                                 {showNewPassword ? <EyeOff className="auth-icon" size={24} /> : <Eye className="auth-icon" size={24} />}
                             </button>
@@ -242,11 +253,12 @@ export default function Settings() {
                                 type="button"
                                 className="show-password-toggle"
                                 onClick={() => setShowConfirmPassword(prev => !prev)}
+                                tabIndex={-1}
                             >
                                 {showConfirmPassword ? <EyeOff className="auth-icon" size={24} /> : <Eye className="auth-icon" size={24} />}
                             </button>
                         </div>
-                        <button onClick={handlePasswordChange}>Update Password</button>
+                        <button onClick={handlePasswordChange} disabled={savingPassword}>{savingPassword ? "Updating..." : "Update Password"}</button>
                     </div>
 
                     <div className="setting-divider" />

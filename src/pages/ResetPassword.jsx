@@ -80,6 +80,7 @@ const ResetPassword = () => {
             className="show-password-toggle"
             onClick={() => setShowNewPassword(prev => !prev)}
             aria-label="Toggle password visibility"
+            tabIndex={-1}
           >
             {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
@@ -99,6 +100,7 @@ const ResetPassword = () => {
             className="show-password-toggle"
             onClick={() => setShowConfirmPassword(prev => !prev)}
             aria-label="Toggle password visibility"
+            tabIndex={-1}
           >
             {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>

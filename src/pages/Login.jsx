@@ -120,6 +120,7 @@ export default function Login({ onLogin }) {
             className="show-password-toggle"
             onClick={() => setShowPassword(prev => !prev)}
             aria-label="Toggle password visibility"
+            tabIndex={-1}
           >
             {showPassword ? <EyeOff size={25} /> : <Eye size={25} />}
           </button>

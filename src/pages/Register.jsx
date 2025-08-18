@@ -125,6 +125,7 @@ export default function Register() {
             className="show-password-toggle"
             onClick={() => setShowPassword(prev => !prev)}
             aria-label="Toggle password visibility"
+            tabIndex={-1}
           >
             {showPassword ? <EyeOff size={25} /> : <Eye size={25} />}
           </button>
@@ -146,13 +147,14 @@ export default function Register() {
             className="show-password-toggle"
             onClick={() => setShowConfirmPassword(prev => !prev)}
             aria-label="Toggle password visibility"
+            tabIndex={-1}
           >
             {showConfirmPassword ? <EyeOff size={25} /> : <Eye size={25} />}
           </button>
         </div>
 
 
-        <button type="submit" disabled={loading}>Create Account</button>
+        <button type="submit" disabled={loading}>{loading ? "Creating account..." : "Create Account"}</button>
         
         <p className="auth-redirect">
           Already have an account? <a href="/login">Login here</a>.
