@@ -726,4 +726,12 @@ export const bannedWords = [
 "zipperhead",
 "knuckledragger",
 "porch monkey",
+"nigg",
+];
+
+// High-severity substrings that should be blocked even when embedded in larger words
+export const bannedSubstrings = [
+  "nigg",
+  "nigger",
+  "nigga"
 ];

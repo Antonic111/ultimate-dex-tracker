@@ -1,4 +1,4 @@
-import { bannedWords } from "./bannedTerms.js";
+import { bannedWords, bannedSubstrings } from "./bannedTerms.js";
 
 // Temporary fix: disable similarity checking until import issue is resolved
 const calculateDistance = (a, b) => {
@@ -143,29 +143,35 @@ function generateWordVariations(word) {
 
 // Check if text contains banned words or similar variations
 export function validateContent(text, fieldType = 'general') {
-  if (!text || typeof text !== 'string') {
-    return { isValid: false, error: `${FILTER_CONFIGS[fieldType]?.fieldName || 'Text'} is required` };
-  }
-
   const config = FILTER_CONFIGS[fieldType] || FILTER_CONFIGS.general;
-  
+  const input = (text === null || text === undefined) ? '' : String(text);
+
   // Length validation
-  if (text.length < config.minLength) {
+  if (input.length < config.minLength) {
     return { isValid: false, error: `${config.fieldName} must be at least ${config.minLength} characters long` };
   }
   
-  if (text.length > config.maxLength) {
+  if (input.length > config.maxLength) {
     return { isValid: false, error: `${config.fieldName} must be no more than ${config.maxLength} characters long` };
   }
 
   // Character validation
-  if (config.allowedChars && !config.allowedChars.test(text)) {
+  if (config.allowedChars && !config.allowedChars.test(input)) {
     return { isValid: false, error: `${config.fieldName} contains invalid characters. ${config.charDescription}` };
   }
 
   // Bad word check
   if (config.checkBadWords) {
-    const normalizedText = normalizeText(text);
+    const normalizedText = normalizeText(input);
+
+    // 0. Block known high-severity substrings even when embedded
+    for (const sub of (bannedSubstrings || [])) {
+      if (!sub) continue;
+      const normSub = normalizeText(sub);
+      if (normSub && normalizedText.includes(normSub)) {
+        return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
+      }
+    }
     
     for (const bannedWord of bannedWords) {
       const normalizedBanned = normalizeText(bannedWord);

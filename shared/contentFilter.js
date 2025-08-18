@@ -1,4 +1,4 @@
-import { bannedWords } from "./bannedTerms.js";
+import { bannedWords, bannedSubstrings } from "./bannedTerms.js";
 
 // Temporary fix: disable similarity checking until import issue is resolved
 const calculateDistance = (a, b) => {
@@ -160,6 +160,13 @@ function containsBannedWordAsCompleteWord(text, bannedWord) {
 function containsBannedWords(text, similarityThreshold = 0.2) {
   const normalized = normalizeText(text);
   
+  // 0. Block known high-severity substrings even when embedded
+  for (const sub of (bannedSubstrings || [])) {
+    if (!sub) continue;
+    const normSub = normalizeText(sub);
+    if (normSub && normalized.includes(normSub)) return true;
+  }
+
   // Check each banned word
   for (const bannedWord of bannedWords) {
     // Skip very short banned words that could cause false positives

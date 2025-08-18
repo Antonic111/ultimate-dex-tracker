@@ -97,5 +97,12 @@ export const bannedWords = [
 "bull shit",
 "bullshits",
 "bullshitted",
-"bullturds"
+"bullturds",
+"nigg"
+];
+
+export const bannedSubstrings = [
+  "nigg",
+  "nigger",
+  "nigga"
 ];
