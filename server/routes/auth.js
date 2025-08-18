@@ -654,16 +654,13 @@ router.put("/update-username", authenticateUser, async (req, res) => {
       return res.status(400).json({ error: "Username must be at least 3 characters" });
     }
 
-    if (!/^[a-zA-Z0-9]+$/.test(newUsername)) {
-      return res.status(400).json({ error: "Usernames can only contain letters and numbers." });
-    }
-
-    const usernameValidation = validateContent(newUsername, 'username');
+    const trimmed = String(newUsername).trim();
+    const usernameValidation = validateContent(trimmed, 'username');
     if (!usernameValidation.isValid) {
       return res.status(400).json({ error: usernameValidation.error });
     }
 
-    const existing = await User.findOne({ username: newUsername });
+    const existing = await User.findOne({ username: trimmed });
     if (existing) {
       return res.status(400).json({ error: "Username is already taken." });
     }
@@ -671,8 +668,7 @@ router.put("/update-username", authenticateUser, async (req, res) => {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    
-    user.username = newUsername;
+    user.username = trimmed;
     await user.save();
 
     res.json({ success: true, username: user.username });
