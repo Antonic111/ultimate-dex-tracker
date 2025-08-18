@@ -6,6 +6,7 @@ import formsData from "../data/forms.json";
 import { getCaughtKey } from "../caughtStorage";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { useLoading } from "../components/Shared/LoadingContext";
+import { profileAPI } from "../utils/api";
 
 // Helper function to load the viewer's own dex toggle preferences
 function loadDexToggles() {
@@ -96,8 +97,7 @@ export default function ViewDex() {
         setLoading('view-dex-data', true);
         (async () => {
             try {
-                const r = await fetch(`/api/caught/${encodeURIComponent(username)}/public`);
-                const data = r.ok ? await r.json() : {};
+                const data = await profileAPI.getPublicCaughtData(username);
                 setCaughtInfoMap(data || {});
             } catch (error) {
                 console.error('Failed to fetch caught data:', error);
@@ -112,17 +112,11 @@ export default function ViewDex() {
         setLoading('view-dex-profile', true);
         (async () => {
             try {
-                const res = await fetch(`/api/users/${encodeURIComponent(username)}/public`);
-                if (res.ok) {
-                    const user = await res.json();
-                    console.log('ViewDex - Fetched user data:', user);
-                    const bars = Array.isArray(user.progressBars) ? user.progressBars : [];
-                    console.log('ViewDex - Setting progress bars:', bars);
-                    setProgressBars(bars);
-                } else {
-                    console.log('ViewDex - Failed to fetch user data:', res.status);
-                    setProgressBars([]);
-                }
+                const user = await profileAPI.getPublicProfile(username);
+                console.log('ViewDex - Fetched user data:', user);
+                const bars = Array.isArray(user.progressBars) ? user.progressBars : [];
+                console.log('ViewDex - Setting progress bars:', bars);
+                setProgressBars(bars);
             } catch (error) {
                 console.log('ViewDex - Error fetching user data:', error);
                 setProgressBars([]);
