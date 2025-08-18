@@ -17,14 +17,18 @@ export const api = {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
-          // Create a custom error that preserves the JSON response
           const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
           error.status = response.status;
           error.data = errorData;
+          error.userMessage = errorData?.error || 'An error occurred';
           throw error;
         } else {
           const errorText = await response.text();
-          throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+          error.status = response.status;
+          error.data = { error: errorText };
+          error.userMessage = errorText || 'An error occurred';
+          throw error;
         }
       }
       
@@ -60,14 +64,18 @@ export const api = {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
-          // Create a custom error that preserves the JSON response
           const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
           error.status = response.status;
           error.data = errorData;
+          error.userMessage = errorData?.error || 'An error occurred';
           throw error;
         } else {
           const errorText = await response.text();
-          throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+          error.status = response.status;
+          error.data = { error: errorText };
+          error.userMessage = errorText || 'An error occurred';
+          throw error;
         }
       }
       
@@ -104,14 +112,18 @@ export const api = {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
-          // Create a custom error that preserves the JSON response
           const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
           error.status = response.status;
           error.data = errorData;
+          error.userMessage = errorData?.error || 'An error occurred';
           throw error;
         } else {
           const errorText = await response.text();
-          throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+          error.status = response.status;
+          error.data = { error: errorText };
+          error.userMessage = errorText || 'An error occurred';
+          throw error;
         }
       }
       
@@ -140,14 +152,18 @@ export const api = {
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const errorData = await response.json();
-        // Create a custom error that preserves the JSON response
         const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
         error.status = response.status;
         error.data = errorData;
+        error.userMessage = errorData?.error || 'An error occurred';
         throw error;
       } else {
         const errorText = await response.text();
-        throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+        const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+        error.status = response.status;
+        error.data = { error: errorText };
+        error.userMessage = errorText || 'An error occurred';
+        throw error;
       }
     }
     

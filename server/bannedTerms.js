@@ -104,5 +104,6 @@ export const bannedWords = [
 export const bannedSubstrings = [
   "nigg",
   "nigger",
-  "nigga"
+  "nigga",
+  "fuck"
 ];
