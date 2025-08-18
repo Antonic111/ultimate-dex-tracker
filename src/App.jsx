@@ -390,12 +390,16 @@ function updateCaughtInfo(poke, info) {
       return updated;
     }
 
-    // Clean checks safely
+    // Normalize data for backend schema (checks is Number or omitted)
     const checksStr = info.checks == null ? "" : String(info.checks).trim();
-    const cleanedInfo = {
-      ...info,
-      checks: checksStr === "0" ? "" : checksStr,
-    };
+    const cleanedInfo = { ...info };
+    if (checksStr === "" || checksStr === "0") {
+      delete cleanedInfo.checks;
+    } else if (!Number.isNaN(Number(checksStr))) {
+      cleanedInfo.checks = Number(checksStr);
+    } else {
+      delete cleanedInfo.checks;
+    }
 
     const updated = { ...prev, [key]: cleanedInfo };
     updateCaughtData(user.username, key, cleanedInfo); // persist update
@@ -452,7 +456,6 @@ function updateCaughtInfo(poke, info) {
             mark: MARK_OPTIONS[0].value,
             method: METHOD_OPTIONS[0],
             game: GAME_OPTIONS[0].value,
-            checks: "",
             notes: ""
           };
           newInfoMap[key] = freshInfo;
@@ -518,7 +521,6 @@ function updateCaughtInfo(poke, info) {
           mark: MARK_OPTIONS[0].value,
           method: METHOD_OPTIONS[0],
           game: GAME_OPTIONS[0].value,
-          checks: "",
           notes: ""
         };
 

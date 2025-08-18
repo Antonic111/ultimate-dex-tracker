@@ -28,7 +28,7 @@ const corsMiddleware = (req, res, next) => {
   }
   
   res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   
   if (req.method === 'OPTIONS') {
@@ -490,8 +490,11 @@ router.get("/caught", authenticateUser, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: "User not found" });
-    
-    res.json(user.caughtPokemon || {});
+    // Ensure we return a plain object regardless of Map serialization
+    const caught = user.caughtPokemon instanceof Map
+      ? Object.fromEntries(user.caughtPokemon)
+      : (user.caughtPokemon || {});
+    res.json(caught);
   } catch (err) {
     console.error('Error getting caught data:', err);
     res.status(500).json({ error: "Server error" });
@@ -506,8 +509,12 @@ router.post("/caught", authenticateUser, async (req, res) => {
     
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: "User not found" });
-    
-    user.caughtPokemon = caughtMap;
+    // Sanitize: remove nulls so Map doesn't store explicit null entries
+    const sanitized = {};
+    for (const [k, v] of Object.entries(caughtMap)) {
+      if (v !== null && typeof v === 'object') sanitized[k] = v;
+    }
+    user.caughtPokemon = sanitized;
     await user.save();
     
     res.json({ success: true });
