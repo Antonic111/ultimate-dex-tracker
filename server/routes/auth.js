@@ -339,23 +339,35 @@ router.post("/resend-code", async (req, res) => {
 
 // Forgot Password - Sends reset code
 router.post("/forgot-password", authLimiter, async (req, res) => {
+  console.log('🔥 POST /forgot-password - Request received');
+  console.log('🔥 Email:', req.body.email);
+  
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: "Email is required" });
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: "No account with that email" });
+    if (!user) {
+      console.log('❌ No user found with email:', email);
+      return res.status(400).json({ error: "No account with that email" });
+    }
 
+    console.log('✅ User found:', user.username);
+    
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     user.resetCode = code;
     user.resetCodeExpires = Date.now() + 1000 * 60 * 10;
     await user.save(); // ← this saves the code to MongoDB
 
+    console.log('✅ Reset code generated and saved:', code);
+    console.log('✅ Reset code expires:', new Date(user.resetCodeExpires));
+
     await sendCodeEmail(user, "Reset Your Password", code, "password reset");
 
-    res.json({ message: "Reset code sent" });
+    console.log('✅ Reset email sent successfully');
+    res.json({ success: true, message: "Reset code sent" });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Error in forgot password:', err);
     res.status(500).json({ error: "Failed to send reset code" });
   }
 });
@@ -379,7 +391,7 @@ router.post("/verify-reset-code", async (req, res) => {
     return res.status(400).json({ error: "Invalid or expired code" });
   }
 
-  res.json({ message: "Reset code verified. You may now reset your password." });
+  res.json({ success: true, message: "Reset code verified. You may now reset your password." });
 });
 
 
@@ -409,7 +421,7 @@ router.post("/reset-password", async (req, res) => {
     user.resetCodeExpires = undefined;
     await user.save();
 
-    res.json({ message: "Password reset successful" });
+    res.json({ success: true, message: "Password reset successful" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
