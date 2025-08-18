@@ -478,17 +478,28 @@ html.modal-open {
   display:flex;
   align-items:center;
   gap:6px;
-  padding:6px 10px;
-  border:1px solid var(--dividers);
-  border-radius:8px;
-  background:transparent;
-  color:var(--profile-text);
+  padding:8px 16px;
+  border:2px solid var(--accent);
+  border-bottom: none;
+  border-radius:8px 8px 0 0;
+  background:var(--header);
+  color:var(--accent);
   text-decoration:none;
   cursor:pointer;
+  font-weight:500;
+  position:relative;
+  top:2px;
+  transition:all 0.2s ease;
 }
 .nav-link:hover{
-  border-color:var(--accent);
-  color:var(--accent);
+  background:var(--accent);
+  color:var(--header);
+  transform:translateY(-2px);
+}
+.nav-link.active{
+  background:var(--accent);
+  color:var(--header);
+  transform:translateY(-2px);
 }
 .nav-icon{
   background:transparent;

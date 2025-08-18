@@ -65,7 +65,10 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
         </Link>
 
         <nav className="main-nav">
-          <Link to="/trainers" className="nav-link">
+          <Link 
+            to="/trainers" 
+            className={`nav-link ${location.pathname === '/trainers' ? 'active' : ''}`}
+          >
             <Users size={16} />
             <span>Trainers</span>
           </Link>
