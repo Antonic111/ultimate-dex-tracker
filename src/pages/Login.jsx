@@ -61,10 +61,10 @@ export default function Login({ onLogin }) {
       // Handle specific verification error
       if (err.message.includes('Account not verified')) {
         // Check if the backend provided the email in the error response
-        if (err.email) {
+        if (err.data && err.data.email) {
           showMessage("📧 Account not verified. Redirecting to verification page...", "info");
           setTimeout(() => {
-            navigate(`/email-sent?email=${encodeURIComponent(err.email)}`);
+            navigate(`/email-sent?email=${encodeURIComponent(err.data.email)}`);
           }, 1500);
         } else {
           // Fallback: try to extract email from the input field

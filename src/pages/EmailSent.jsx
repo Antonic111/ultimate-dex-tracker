@@ -87,7 +87,7 @@ const EmailSent = () => {
           <strong>{email}</strong>
           <br />
           <br />
-          <Lightbulb className="auth-icon" size={20} /> Check your email (including spam folder) and enter the code below.
+          Enter the code below to verify your account.
         </p>
       </div>
       <form onSubmit={handleSubmit}>

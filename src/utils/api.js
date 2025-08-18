@@ -14,8 +14,18 @@ export const api = {
       });
       
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          // Create a custom error that preserves the JSON response
+          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
+          error.status = response.status;
+          error.data = errorData;
+          throw error;
+        } else {
+          const errorText = await response.text();
+          throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+        }
       }
       
       const contentType = response.headers.get('content-type');
@@ -47,8 +57,18 @@ export const api = {
       });
       
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          // Create a custom error that preserves the JSON response
+          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
+          error.status = response.status;
+          error.data = errorData;
+          throw error;
+        } else {
+          const errorText = await response.text();
+          throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+        }
       }
       
       // Handle responses that might not have JSON content
@@ -81,8 +101,18 @@ export const api = {
       });
       
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          // Create a custom error that preserves the JSON response
+          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
+          error.status = response.status;
+          error.data = errorData;
+          throw error;
+        } else {
+          const errorText = await response.text();
+          throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+        }
       }
       
       const contentType = response.headers.get('content-type');
@@ -107,8 +137,18 @@ export const api = {
     });
     
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const errorData = await response.json();
+        // Create a custom error that preserves the JSON response
+        const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
+        error.status = response.status;
+        error.data = errorData;
+        throw error;
+      } else {
+        const errorText = await response.text();
+        throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+      }
     }
     
     const contentType = response.headers.get('content-type');
