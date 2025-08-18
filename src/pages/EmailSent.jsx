@@ -86,7 +86,6 @@ const EmailSent = () => {
           <br />
           <strong>{email}</strong>
           <br />
-          <br />
           Enter the code below to verify your account.
         </p>
       </div>

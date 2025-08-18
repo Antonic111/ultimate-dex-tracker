@@ -326,11 +326,11 @@ input:-internal-autofill-selected {
 
 .email-sent-message {
   text-align: center;
-  margin-top: -12px;
-  margin-bottom: 0px;
+  margin-top: -8px;
+  margin-bottom: 0;
   color: #ccc;
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.4;
 }
 
 .email-sent-message p {

@@ -8,7 +8,7 @@ import "flag-icons/css/flag-icons.min.css";
 import { COUNTRY_OPTIONS } from "../data/countries";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import pokemonData from "../data/pokemon.json";
-import { formatPokemonName } from "../utils";
+import { formatPokemonName, getFormDisplayName } from "../utils";
 import trainerOptions from "../trainers.json";
 import { useNavigate } from "react-router-dom";
 import { useMessage } from "../components/Shared/MessageContext";
@@ -20,12 +20,39 @@ import ContentFilterInput from "../components/Shared/ContentFilterInput";
 import { validateContent } from "../../shared/contentFilter";
 import { profileAPI, caughtAPI } from "../utils/api";
 
-const POKEMON_OPTIONS = pokemonData.map((p) => ({
+const FORM_TYPES_FOR_FAVORITES = [
+    "alolan",
+    "galarian",
+    "gmax",
+    "hisuian",
+    "paldean",
+    "unown",
+    "other",
+    "alcremie",
+];
+
+const BASE_POKEMON_OPTIONS = pokemonData.map((p) => ({
     name: formatPokemonName(p.name),
     value: p.name,
     image: p.sprites.front_default,
     shinyImage: p.sprites.front_shiny,
 }));
+
+const FORM_POKEMON_OPTIONS = formsData
+    .filter((p) => FORM_TYPES_FOR_FAVORITES.includes(p.formType))
+    .map((p) => {
+        const formLabel = getFormDisplayName(p);
+        const baseName = formatPokemonName(p.name);
+        const name = formLabel ? `${baseName} (${formLabel})` : baseName;
+        return {
+            name,
+            value: p.name,
+            image: p.sprites.front_default,
+            shinyImage: p.sprites.front_shiny,
+        };
+    });
+
+const POKEMON_OPTIONS = [...BASE_POKEMON_OPTIONS, ...FORM_POKEMON_OPTIONS];
 
 function getTimeAgo(dateString) {
     const now = new Date();
