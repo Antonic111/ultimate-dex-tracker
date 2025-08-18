@@ -741,6 +741,21 @@ button:focus {
     transform: none;
 }
 
+.profile-like-display {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 8px;
+    margin: 0;
+    color: var(--profile-text);
+    line-height: 1;
+    border-radius: 20px;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.7;
+}
+
 .like-count {
     font-weight: 600;
     min-width: 16px;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import "../css/Profile.css";
 import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart } from "lucide-react";
@@ -11,6 +11,7 @@ import { COUNTRY_OPTIONS } from "../data/countries";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { useMessage } from "../components/Shared";
 import { profileAPI } from "../utils/api";
+import { UserContext } from "../components/Shared/UserContext";
 
 const POKEMON_OPTIONS = pokemonData.map((p) => ({
     name: formatPokemonName(p.name),
@@ -85,6 +86,7 @@ export default function PublicProfile() {
     const [hasLiked, setHasLiked] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
     const { showMessage } = useMessage();
+    const { username: currentUsername } = useContext(UserContext);
 
     const handleCopyLink = async () => {
         const url = `${window.location.origin}/u/${encodeURIComponent(username)}`;
@@ -97,7 +99,7 @@ export default function PublicProfile() {
     };
 
     const handleLike = async () => {
-        if (likeLoading) return;
+        if (likeLoading || !currentUsername) return;
         setLikeLoading(true);
         
         // Optimistically update the UI immediately for better user experience
@@ -108,11 +110,12 @@ export default function PublicProfile() {
         setLikeCount(wasLiked ? previousCount - 1 : previousCount + 1);
         
         try {
-            const { liked, newCount } = await profileAPI.toggleProfileLike(username);
+            // Use the authenticated likes endpoint
+            const { hasLiked: newHasLiked, likeCount: newCount } = await profileAPI.toggleProfileLike(username);
             // Update with the actual server response
-            setHasLiked(liked);
+            setHasLiked(newHasLiked);
             setLikeCount(newCount);
-            showMessage(liked ? "❤️ Profile liked!" : "💔 Like removed", "success");
+            showMessage(newHasLiked ? "❤️ Profile liked!" : "💔 Like removed", "success");
         } catch (error) {
             // Revert optimistic update on error
             setHasLiked(wasLiked);
@@ -177,15 +180,25 @@ export default function PublicProfile() {
         let ignore = false;
         (async () => {
             try {
-                const { count, hasLiked: userHasLiked } = await profileAPI.getProfileLikes(username);
-                if (!ignore) {
-                    setLikeCount(count);
-                    setHasLiked(userHasLiked);
+                if (currentUsername) {
+                    // User is logged in - get their like status and count
+                    const { hasLiked: userHasLiked, likeCount: count } = await profileAPI.getProfileLikes(username);
+                    if (!ignore) {
+                        setLikeCount(count);
+                        setHasLiked(userHasLiked);
+                    }
+                } else {
+                    // User is not logged in - just get the count
+                    const { count } = await profileAPI.getPublicProfileLikes(username);
+                    if (!ignore) {
+                        setLikeCount(count);
+                        setHasLiked(false);
+                    }
                 }
             } catch { }
         })();
         return () => { ignore = true; };
-    }, [username]);
+    }, [username, currentUsername]);
 
     // Set initial like count from profile data
     useEffect(() => {
@@ -200,15 +213,24 @@ export default function PublicProfile() {
         
         const loadInitialLikes = async () => {
             try {
-                const { count } = await profileAPI.getPublicProfileLikes(username);
-                setLikeCount(count);
+                if (currentUsername) {
+                    // User is logged in - get their like status and count
+                    const { hasLiked: userHasLiked, likeCount: count } = await profileAPI.getProfileLikes(username);
+                    setLikeCount(count);
+                    setHasLiked(userHasLiked);
+                } else {
+                    // User is not logged in - just get the count
+                    const { count } = await profileAPI.getPublicProfileLikes(username);
+                    setLikeCount(count);
+                    setHasLiked(false);
+                }
             } catch (error) {
                 // Silently handle errors
             }
         };
         
         loadInitialLikes();
-    }, [username]);
+    }, [username, currentUsername]);
 
     // Poll for like updates every 5 seconds to keep like count real-time (reduced from 2 seconds)
     useEffect(() => {
@@ -216,22 +238,35 @@ export default function PublicProfile() {
         
         const interval = setInterval(async () => {
             try {
-                // Use the public likes endpoint that doesn't require authentication
-                const { count } = await profileAPI.getPublicProfileLikes(username);
-                setLikeCount(prevCount => {
-                    // Only update if the count actually changed
-                    if (prevCount !== count) {
-                        return count;
-                    }
-                    return prevCount;
-                });
+                if (currentUsername) {
+                    // User is logged in - get their like status and count
+                    const { hasLiked: userHasLiked, likeCount: count } = await profileAPI.getProfileLikes(username);
+                    setLikeCount(prevCount => {
+                        // Only update if the count actually changed
+                        if (prevCount !== count) {
+                            return count;
+                        }
+                        return prevCount;
+                    });
+                    setHasLiked(userHasLiked);
+                } else {
+                    // User is not logged in - just get the count
+                    const { count } = await profileAPI.getPublicProfileLikes(username);
+                    setLikeCount(prevCount => {
+                        // Only update if the count actually changed
+                        if (prevCount !== count) {
+                            return count;
+                        }
+                        return prevCount;
+                    });
+                }
             } catch (error) {
                 // Silently handle errors to avoid spam
             }
         }, 5000); // Check every 5 seconds instead of 2
 
         return () => clearInterval(interval);
-    }, [username]);
+    }, [username, currentUsername]);
 
 
 
@@ -311,16 +346,23 @@ export default function PublicProfile() {
                         >
                             <LinkIcon size={16} />
                         </button>
-                        <button
-                            className={`profile-like-button ${hasLiked ? 'liked' : ''}`}
-                            onClick={handleLike}
-                            disabled={likeLoading}
-                            title={hasLiked ? "Remove like" : "Like profile"}
-                            aria-label={hasLiked ? "Remove like" : "Like profile"}
-                        >
-                            <Heart size={16} fill={hasLiked ? "currentColor" : "none"} />
-                            <span className="like-count">{likeCount}</span>
-                        </button>
+                        {currentUsername ? (
+                            <button
+                                className={`profile-like-button ${hasLiked ? 'liked' : ''}`}
+                                onClick={handleLike}
+                                disabled={likeLoading}
+                                title={hasLiked ? "Remove like" : "Like profile"}
+                                aria-label={hasLiked ? "Remove like" : "Like profile"}
+                            >
+                                <Heart size={16} fill={hasLiked ? "currentColor" : "none"} />
+                                <span className="like-count">{likeCount}</span>
+                            </button>
+                        ) : (
+                            <div className="profile-like-display">
+                                <Heart size={16} fill="none" />
+                                <span className="like-count">{likeCount}</span>
+                            </div>
+                        )}
 
                     </div>
                     <p className="profile-date">
