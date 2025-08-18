@@ -120,7 +120,7 @@
   /* Exactly 6 columns, fixed size squares */
   grid-template-columns: repeat(6, var(--fav-size));
   gap: var(--fav-gap);
-  padding: 8px 14px 8px 8px; /* extra right padding so scrollbar doesn't overlap items */
+  padding: 8px 10px 8px 0px; /* remove left padding; slight right padding for scrollbar */
   overflow-y: auto;
   overflow-x: hidden;
   flex: 1;
@@ -131,15 +131,13 @@
   justify-content: start;
   /* Reserve space for scrollbar to avoid overlaying content (Chromium/Firefox) */
   scrollbar-gutter: stable both-edges;
-  scrollbar-width: thin;
+  scrollbar-width: auto;
   /* Consistent row height to keep square tracks */
   grid-auto-rows: var(--fav-size);
 }
 
 /* Clean, subtle scrollbar styling */
-.favorite-grid::-webkit-scrollbar {
-  width: 8px;
-}
+.favorite-grid::-webkit-scrollbar { width: 12px; }
 .favorite-grid::-webkit-scrollbar-track {
   background: #1b1b1b;
   border-radius: 8px;
@@ -204,8 +202,8 @@
   position: absolute;
   right: 10px;
   bottom: 10px;
-  background: rgba(0,0,0,0.6);
-  border: 1px solid #333;
+  background: var(--profile-modal-bg);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 10px 12px;
   display: flex;
@@ -213,15 +211,17 @@
   align-items: center;
   gap: 6px;
   pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
 }
 .favorite-hover-preview img {
   width: 120px;
   height: 120px;
+  image-rendering: pixelated;
   object-fit: contain;
 }
 .favorite-hover-caption {
   font-size: 0.8rem;
-  color: #ddd;
+  color: var(--profile-text);
   text-align: center;
   max-width: 160px;
 }
