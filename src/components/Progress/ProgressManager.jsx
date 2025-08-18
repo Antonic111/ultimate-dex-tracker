@@ -103,15 +103,6 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
     // Determine which saved bars to use: override (viewer) or context (owner)
     const savedBars = Array.isArray(progressBarsOverride) ? progressBarsOverride : contextSavedBars;
     
-    // Debug logging
-    console.log('ProgressManager Debug:', {
-        progressBarsOverride,
-        contextSavedBars,
-        savedBars,
-        readOnly,
-        bars: bars.length
-    });
-
     // Sync bars when saved bars updates
     useEffect(() => {
         // Only update if the actual data has changed

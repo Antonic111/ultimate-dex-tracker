@@ -192,55 +192,57 @@ export default function Settings() {
                     {/* Change Password */}
                     <div className="setting-block">
                         <h3>Change Password</h3>
-                        <div className="input-icon-wrapper">
-                            <Lock className="auth-icon" size={24} />
-                            <input
-                                type={showCurrentPassword ? "text" : "password"}
-                                placeholder="Current password"
-                                value={currentPassword}
-                                onChange={(e) => setCurrentPassword(e.target.value)}
-                            />
-                            <button
-                                type="button"
-                                className="show-password-toggle"
-                                onClick={() => setShowCurrentPassword(prev => !prev)}
-                            >
-                                {showCurrentPassword ? <EyeOff className="auth-icon" size={24} /> : <Eye className="auth-icon" size={24} />}
-                            </button>
-                        </div>
-                        <div className="input-icon-wrapper">
-                            <Lock className="auth-icon" size={24} />
-                            <input
-                                type={showNewPassword ? "text" : "password"}
-                                placeholder="New password"
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
-                            />
-                            <button
-                                type="button"
-                                className="show-password-toggle"
-                                onClick={() => setShowNewPassword(prev => !prev)}
-                            >
-                                {showNewPassword ? <EyeOff className="auth-icon" size={24} /> : <Eye className="auth-icon" size={24} />}
-                            </button>
-                        </div>
-                        <div className="input-icon-wrapper">
-                            <Lock className="auth-icon" size={24} />
-                            <input
-                                type={showConfirmPassword ? "text" : "password"}
-                                placeholder="Confirm new password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                            />
-                            <button
-                                type="button"
-                                className="show-password-toggle"
-                                onClick={() => setShowConfirmPassword(prev => !prev)}
-                            >
-                                {showConfirmPassword ? <EyeOff className="auth-icon" size={24} /> : <Eye className="auth-icon" size={24} />}
-                            </button>
-                        </div>
-                        <button onClick={handlePasswordChange}>Update Password</button>
+                        <form onSubmit={(e) => { e.preventDefault(); handlePasswordChange(); }}>
+                            <div className="input-icon-wrapper">
+                                <Lock className="auth-icon" size={24} />
+                                <input
+                                    type={showCurrentPassword ? "text" : "password"}
+                                    placeholder="Current password"
+                                    value={currentPassword}
+                                    onChange={(e) => setCurrentPassword(e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    className="show-password-toggle"
+                                    onClick={() => setShowCurrentPassword(prev => !prev)}
+                                >
+                                    {showCurrentPassword ? <EyeOff className="auth-icon" size={24} /> : <Eye className="auth-icon" size={24} />}
+                                </button>
+                            </div>
+                            <div className="input-icon-wrapper">
+                                <Lock className="auth-icon" size={24} />
+                                <input
+                                    type={showNewPassword ? "text" : "password"}
+                                    placeholder="New password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    className="show-password-toggle"
+                                    onClick={() => setShowNewPassword(prev => !prev)}
+                                >
+                                    {showNewPassword ? <EyeOff className="auth-icon" size={24} /> : <Eye className="auth-icon" size={24} />}
+                                </button>
+                            </div>
+                            <div className="input-icon-wrapper">
+                                <Lock className="auth-icon" size={24} />
+                                <input
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    placeholder="Confirm new password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    className="show-password-toggle"
+                                    onClick={() => setShowConfirmPassword(prev => !prev)}
+                                >
+                                    {showConfirmPassword ? <EyeOff className="auth-icon" size={24} /> : <Eye className="auth-icon" size={24} />}
+                                </button>
+                            </div>
+                            <button type="submit">Update Password</button>
+                        </form>
                     </div>
 
                     <div className="setting-divider" />

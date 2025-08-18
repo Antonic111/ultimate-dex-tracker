@@ -13,7 +13,6 @@ export async function fetchCaughtData(username) {
 export async function updateCaughtData(username, key, infoMap) {
   try {
     const caughtMap = key ? { [key]: infoMap } : infoMap;
-    console.log("Sending caught data:", { caughtMap });
     
     await caughtAPI.updateCaughtData(caughtMap);
   } catch (err) {

@@ -207,7 +207,7 @@ export default function Profile() {
         let ignore = false;
         (async () => {
             try {
-                const { count, hasLiked: userHasLiked } = await profileAPI.getProfileLikes(username);
+                const { hasLiked: userHasLiked, likeCount: count } = await profileAPI.getProfileLikes(username);
                 if (!ignore) {
                     setLikeCount(count);
                     setHasLiked(userHasLiked);
@@ -224,7 +224,7 @@ export default function Profile() {
         
         const interval = setInterval(async () => {
             try {
-                const { count, hasLiked: userHasLiked } = await profileAPI.getProfileLikes(username);
+                const { hasLiked: userHasLiked, likeCount: count } = await profileAPI.getProfileLikes(username);
                 setLikeCount(prevCount => {
                     if (prevCount !== count) {
                         return count;
@@ -261,7 +261,7 @@ export default function Profile() {
         setLikeCount(wasLiked ? previousCount - 1 : previousCount + 1);
         
         try {
-            const { liked, newCount } = await profileAPI.toggleProfileLike(username);
+            const { hasLiked: liked, likeCount: newCount } = await profileAPI.toggleProfileLike(username);
             setHasLiked(liked);
             setLikeCount(newCount);
             showMessage(liked ? "❤️ Profile liked!" : "💔 Like removed", "success");
