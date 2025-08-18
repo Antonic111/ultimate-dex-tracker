@@ -120,7 +120,8 @@
   /* Exactly 6 columns, fixed size squares */
   grid-template-columns: repeat(6, var(--fav-size));
   gap: var(--fav-gap);
-  padding: 8px 10px 8px 0px; /* remove left padding; slight right padding for scrollbar */
+  padding: 8px 16px 8px 0px; /* extra right padding for scrollbar */
+  margin-left: -8px; /* pull grid flush to the left edge */
   overflow-y: auto;
   overflow-x: hidden;
   flex: 1;
