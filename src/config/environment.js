@@ -17,9 +17,4 @@ export const ENV_CONFIG = {
 const currentEnv = import.meta.env.MODE || 'development';
 export const currentConfig = ENV_CONFIG[currentEnv];
 
-// Log configuration for debugging
-console.log('🌍 Environment:', currentEnv);
-console.log('🔗 API Base URL:', currentConfig.API_BASE_URL);
-console.log('⚙️  Node Environment:', currentConfig.NODE_ENV);
-
 export default currentConfig;

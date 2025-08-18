@@ -5,7 +5,6 @@ export const api = {
   // GET request
   async get(endpoint, options = {}) {
     const url = buildApiUrl(endpoint);
-    console.log(`🔗 API GET: ${url}`);
     
     try {
       const response = await fetch(url, {
@@ -14,24 +13,19 @@ export const api = {
         ...options,
       });
       
-      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
-      
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`❌ API Error ${response.status}:`, errorText);
         throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
       }
       
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const data = await response.json();
-        console.log(`✅ API Response:`, data);
         return data;
       }
       
       return { message: 'Success' };
     } catch (error) {
-      console.error(`❌ API GET failed for ${endpoint}:`, error);
       throw error;
     }
   },
@@ -39,7 +33,6 @@ export const api = {
   // POST request
   async post(endpoint, data = null, options = {}) {
     const url = buildApiUrl(endpoint);
-    console.log(`🔗 API POST: ${url}`, data);
     
     try {
       const response = await fetch(url, {
@@ -53,11 +46,8 @@ export const api = {
         ...options,
       });
       
-      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
-      
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`❌ API Error ${response.status}:`, errorText);
         throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
       }
       
@@ -65,13 +55,11 @@ export const api = {
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const result = await response.json();
-        console.log(`✅ API Response:`, result);
         return result;
       }
       
       return { message: 'Success' };
     } catch (error) {
-      console.error(`❌ API POST failed for ${endpoint}:`, error);
       throw error;
     }
   },
@@ -79,7 +67,6 @@ export const api = {
   // PUT request
   async put(endpoint, data = null, options = {}) {
     const url = buildApiUrl(endpoint);
-    console.log(`🔗 API PUT: ${url}`, data);
     
     try {
       const response = await fetch(url, {
@@ -93,24 +80,19 @@ export const api = {
         ...options,
       });
       
-      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
-      
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`❌ API Error ${response.status}:`, errorText);
         throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
       }
       
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const result = await response.json();
-        console.log(`✅ API Response:`, result);
         return result;
       }
       
       return { message: 'Success' };
     } catch (error) {
-      console.error(`❌ API PUT failed for ${endpoint}:`, error);
       throw error;
     }
   },

@@ -339,35 +339,23 @@ router.post("/resend-code", async (req, res) => {
 
 // Forgot Password - Sends reset code
 router.post("/forgot-password", authLimiter, async (req, res) => {
-  console.log('🔥 POST /forgot-password - Request received');
-  console.log('🔥 Email:', req.body.email);
-  
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: "Email is required" });
 
   try {
     const user = await User.findOne({ email });
-    if (!user) {
-      console.log('❌ No user found with email:', email);
-      return res.status(400).json({ error: "No account with that email" });
-    }
+    if (!user) return res.status(400).json({ error: "No account with that email" });
 
-    console.log('✅ User found:', user.username);
-    
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     user.resetCode = code;
     user.resetCodeExpires = Date.now() + 1000 * 60 * 10;
     await user.save(); // ← this saves the code to MongoDB
 
-    console.log('✅ Reset code generated and saved:', code);
-    console.log('✅ Reset code expires:', new Date(user.resetCodeExpires));
-
     await sendCodeEmail(user, "Reset Your Password", code, "password reset");
 
-    console.log('✅ Reset email sent successfully');
     res.json({ success: true, message: "Reset code sent" });
   } catch (err) {
-    console.error('❌ Error in forgot password:', err);
+    console.error('Error in forgot password:', err);
     res.status(500).json({ error: "Failed to send reset code" });
   }
 });
@@ -843,227 +831,6 @@ router.get("/caught/:username/public", async (req, res) => {
   const full = await User.findById(u._id).select("caughtPokemon").lean();
   console.log("Full user data:", full);
   return res.json(full?.caughtPokemon || {});
-});
-
-// Debug endpoint to check password hash (remove in production)
-router.get("/debug/password-hash", authenticateUser, async (req, res) => {
-  try {
-    const user = await User.findById(req.userId).select('username password');
-    if (!user) return res.status(404).json({ error: "User not found" });
-    
-    res.json({
-      username: user.username,
-      passwordHash: user.password,
-      hashLength: user.password.length,
-      isHashed: user.password.startsWith('$2b$') || user.password.startsWith('$2a$')
-    });
-  } catch (err) {
-    console.error('Debug password hash error:', err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// Debug endpoint to check user profile visibility
-router.get("/debug/profile-visibility/:username", async (req, res) => {
-  try {
-    const { username } = req.params;
-    console.log('🔍 Debug profile visibility for username:', username);
-    
-    const user = await User.findOne({ username }).select('username isProfilePublic createdAt');
-    if (!user) {
-      console.log('❌ User not found:', username);
-      return res.status(404).json({ error: "User not found" });
-    }
-    
-    console.log('✅ User found:', { username: user.username, isProfilePublic: user.isProfilePublic, createdAt: user.createdAt });
-    res.json({
-      username: user.username,
-      isProfilePublic: user.isProfilePublic,
-      createdAt: user.createdAt,
-      exists: true
-    });
-  } catch (err) {
-    console.error('Debug profile visibility error:', err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-
-
-
-// GET /api/users/public?query=&page=1&pageSize=24&random=1
-router.get("/users/public", async (req, res) => {
-  res.set("Cache-Control", "no-store");
-
-  const q = (req.query.query || "").trim();
-  const page = Math.max(1, parseInt(req.query.page || "1", 10));
-  const pageSize = Math.min(50, Math.max(1, parseInt(req.query.pageSize || "24", 10)));
-  const random = req.query.random === "1";
-
-  const match = { isProfilePublic: { $ne: false } };
-  if (q) match.username = { $regex: q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" };
-
-  try {
-    const base = [
-      { $match: match },
-      ...(random && !q ? [{ $sample: { size: pageSize } }] : [
-        { $sort: q ? { username: 1 } : { createdAt: -1 } },
-        { $skip: (page - 1) * pageSize },
-        { $limit: pageSize },
-      ]),
-      {
-        $project: {
-          username: 1,
-          profileTrainer: 1,
-          bio: 1,
-          location: 1,
-          gender: 1,
-          createdAt: 1,
-          // count non-null entries in caughtPokemon
-          shinies: {
-            $size: {
-              $filter: {
-                input: { $objectToArray: { $ifNull: ["$caughtPokemon", {}] } },
-                as: "c",
-                cond: { $ne: ["$$c.v", null] }
-              }
-            }
-          },
-          // count likes
-          likes: { $size: { $ifNull: ["$likes", []] } }
-        }
-      }
-    ];
-
-    const items = await User.aggregate(base);
-    // total is optional for random; keep it simple
-    const total = q ? await User.countDocuments(match) : items.length;
-
-    console.log('🔥 GET /users/public - Found items:', items.length, 'Total:', total);
-    res.json({ items, total, page, pageSize });
-  } catch (error) {
-    console.error('🔥 GET /users/public - Error:', error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// GET /api/users/:username/public
-router.get("/users/:username/public", async (req, res) => {
-  res.set("Cache-Control", "no-store");
-  
-  console.log('🔥 GET /users/:username/public - Request received');
-  console.log('🔥 Username:', req.params.username);
-  console.log('🔥 Request headers:', req.headers);
-  
-  try {
-    const u = await User.findOne({
-      username: req.params.username,
-      isProfilePublic: { $ne: false }
-    })
-      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars")
-      .lean();
-      
-    console.log('🔥 Database query result:', u);
-    console.log('🔥 isProfilePublic check:', { username: req.params.username, isProfilePublic: u?.isProfilePublic });
-    
-    if (!u) {
-      console.log('❌ User not found or private for username:', req.params.username);
-      return res.status(404).json({ error: "User not found or private" });
-    }
-    
-    // Add like count
-    const likeCount = u.likes ? u.likes.length : 0;
-    console.log('🔥 GET /users/:username/public - User found, like count:', likeCount);
-    res.json({ ...u, likeCount });
-  } catch (error) {
-    console.error('🔥 GET /users/:username/public - Error:', error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// DELETE /api/account  — permanently delete the current user
-router.delete("/account", authenticateUser, async (req, res) => {
-  try {
-    // if you already have auth middleware that sets req.user._id, use that:
-    const userId = req.userId;
-    if (!userId) return res.status(401).json({ error: "Unauthorized" });
-
-    await User.findByIdAndDelete(userId);
-
-    // kill auth cookie
-    res.clearCookie("token", {
-      httpOnly: true,
-      sameSite: "none",  // required for cross-origin requests
-      secure: true,      // true for HTTPS (both Vercel and Render use HTTPS)
-      path: "/",
-    });
-
-    return res.status(204).end();
-  } catch (e) {
-    console.error("Delete account failed:", e);
-    return res.status(500).json({ error: "Failed to delete account" });
-  }
-});
-
-// Confirm code and delete the account
-router.post("/account/delete/confirm", authenticateUser, async (req, res) => {
-  console.log('🔥 POST /account/delete/confirm - Request received');
-  console.log('🔥 Request body:', { code: req.body?.code ? '***' : 'MISSING', confirm: req.body?.confirm || 'MISSING' });
-  
-  try {
-    const code = String(req.body?.code || "").trim();
-    const typed = String(req.body?.confirm || "").trim();
-
-    if (!/^\d{6}$/.test(code)) {
-      console.log('❌ Invalid code format:', code);
-      return res.status(400).json({ error: "Invalid code." });
-    }
-
-    const user = await User.findById(req.userId).select("username deleteCodeHash deleteCodeExpires");
-    if (!user) {
-      console.log('❌ User not found for delete confirmation');
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    console.log('🔍 Confirming delete for user:', user.username);
-
-    // Optional: enforce username match server-side (case-insensitive)
-    if (typed && typed.toLowerCase() !== user.username.toLowerCase()) {
-      console.log('❌ Username mismatch:', { typed, expected: user.username });
-      return res.status(400).json({ error: "Type your account name exactly to continue." });
-    }
-
-    if (!user.deleteCodeHash || !user.deleteCodeExpires || user.deleteCodeExpires < new Date()) {
-      console.log('❌ Code expired or missing for user:', user.username);
-      return res.status(400).json({ error: "Code expired. Send a new one." });
-    }
-
-    const ok = await bcrypt.compare(code, user.deleteCodeHash);
-    console.log('🔐 Code verification result:', ok);
-    
-    if (!ok) return res.status(400).json({ error: "Wrong code." });
-
-    console.log('✅ Deleting account for user:', user.username);
-    await User.findByIdAndDelete(req.userId);
-    res.clearCookie("token", { httpOnly: true, sameSite: "none", secure: true, path: "/" });
-    console.log('✅ Account deleted successfully for user:', user.username);
-    return res.status(204).end();
-  } catch (e) {
-    console.error("❌ delete/confirm error:", e);
-    return res.status(500).json({ error: "Failed to delete account" });
-  }
-});
-
-// server/routes (auth.js or a new public router)
-router.get("/public/dex/:username", async (req, res) => {
-  const user = await User.findOne({ username: req.params.username }).lean();
-  if (!user) return res.status(404).json({ error: "User not found" });
-  if (user.profilePrivate) return res.status(403).json({ error: "This dex is private." });
-
-  // Build the same caughtInfoMap shape you use in the app
-  const caughtInfoMap = user.caughtInfoMap || {}; // adapt to your schema/source
-
-  res.json({ username: user.username, caughtInfoMap });
 });
 
 

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { LogOut, User, Settings, Users } from "lucide-react";
 import { authAPI } from './utils/api';
-import { debugAPI } from './utils/debug';
 import { useTheme } from "./components/Shared/ThemeContext";
 
 export default function HeaderWithConditionalAuth({ user, setUser, showMenu, setShowMenu, userMenuRef }) {
@@ -104,19 +103,6 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                     <Settings size={16} className="dropdown-icon" />
                     Settings
                   </Link>
-                  <button
-                    className="dropdown-item"
-                    onClick={async () => {
-                      try {
-                        await debugAPI.runAllTests();
-                      } catch (e) {
-                        console.warn("Debug test failed", e);
-                      }
-                    }}
-                  >
-                    <Settings size={16} className="dropdown-icon" />
-                    Debug API
-                  </button>
                   <button
                     className="dropdown-item"
                     onClick={async () => {

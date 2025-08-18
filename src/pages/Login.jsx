@@ -88,20 +88,6 @@ export default function Login({ onLogin }) {
     <div className={`auth-form ${loading ? "loading" : ""}`}>
       <h2>LOGIN</h2>
       
-      {/* Helpful message about verification */}
-      <div style={{ 
-        marginBottom: '20px', 
-        padding: '15px', 
-        backgroundColor: '#e3f2fd', 
-        borderRadius: '8px', 
-        fontSize: '14px',
-        color: '#1976d2'
-      }}>
-        <strong>💡 Need to verify your account?</strong><br />
-        If you registered but can't login, check your email for a verification code. 
-        New accounts require email verification before first login.
-      </div>
-      
       <form onSubmit={handleSubmit} className="auth-form-fields">
         <div className="input-icon-wrapper">
           <User className="auth-icon" size={20} />

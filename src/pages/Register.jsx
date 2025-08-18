@@ -75,22 +75,6 @@ export default function Register() {
     <div className="auth-form">
       <h2>SIGN UP</h2>
       
-      {/* Helpful message about verification */}
-      <div style={{ 
-        marginBottom: '20px', 
-        padding: '15px', 
-        backgroundColor: '#e8f5e8', 
-        borderRadius: '8px', 
-        fontSize: '14px',
-        color: '#2e7d32'
-      }}>
-        <strong>✅ Account Creation Process:</strong><br />
-        1. Fill out the form below<br />
-        2. Check your email for a 6-digit verification code<br />
-        3. Enter the code to verify your account<br />
-        4. Then you can login!
-      </div>
-      
       <form onSubmit={handleSubmit} className="auth-form-fields">
         <div className="input-icon-wrapper">
           <User className="auth-icon" size={20} />

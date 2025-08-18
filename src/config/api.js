@@ -17,9 +17,3 @@ export const API_BASE_URL = API_CONFIG[environment].baseURL;
 export const buildApiUrl = (endpoint) => {
   return `${API_BASE_URL}/api${endpoint}`;
 };
-
-// Log API configuration for debugging
-console.log('🔗 API Configuration:');
-console.log('  Environment:', environment);
-console.log('  Base URL:', API_BASE_URL);
-console.log('  Sample endpoint:', buildApiUrl('/health'));
