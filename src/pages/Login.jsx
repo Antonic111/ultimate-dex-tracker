@@ -60,13 +60,14 @@ export default function Login({ onLogin }) {
     } catch (err) {
       // Handle specific verification error
       if (err.message.includes('Account not verified')) {
-        showMessage("📧 Account not verified. Please check your email and verify your account first.", "error");
-        // Extract email from the error message or form
         const email = form.usernameOrEmail.includes('@') ? form.usernameOrEmail : '';
         if (email) {
-          navigate(`/email-sent?email=${encodeURIComponent(email)}`);
+          showMessage("📧 Account not verified. Redirecting to verification page...", "info");
+          setTimeout(() => {
+            navigate(`/email-sent?email=${encodeURIComponent(email)}`);
+          }, 1500);
         } else {
-          showMessage("❌ Please use your email address to login if your account needs verification.", "error");
+          showMessage("📧 Account not verified. Please use your email address to login.", "error");
         }
       } else {
         showMessage(`❌ ${err.message}`, "error");
@@ -143,8 +144,13 @@ export default function Login({ onLogin }) {
           {loading ? "Logging in..." : "Login"}
         </button>
 
+        <div className="verification-info">
+          <p>📧 New account? Check your email for a verification code after registration.</p>
+          <p>🔑 Use your email address if you need to verify your account.</p>
+        </div>
+
         <div className="auth-redirect double">
-          <a href="/register">Don’t have an account?</a>
+          <a href="/register">Don't have an account?</a>
           <span className="auth-divider" />
           <a href="/forgot-password">Forgot password?</a>
         </div>

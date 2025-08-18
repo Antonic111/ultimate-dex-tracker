@@ -82,11 +82,12 @@ const EmailSent = () => {
       <h2>VERIFY YOUR EMAIL</h2>
       <div className="email-sent-message">
         <p>
-          A 6-digit code was sent to:
+          📧 A 6-digit verification code was sent to:
           <br />
           <strong>{email}</strong>
           <br />
-          Enter that code below to verify your account.
+          <br />
+          💡 Check your email (including spam folder) and enter the code below.
         </p>
       </div>
       <form onSubmit={handleSubmit}>
@@ -117,6 +118,11 @@ const EmailSent = () => {
             ? `Resend Email (${resendCooldown}s)`
             : "Resend Email"}
         </button>
+
+        <div className="verification-info">
+          <p>✅ After verification, you can log in with your username or email.</p>
+          <p>📱 Can't find the email? Check your spam folder or try resending.</p>
+        </div>
       </form>
     </div>
   );

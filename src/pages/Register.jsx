@@ -62,7 +62,19 @@ export default function Register() {
       setTimeout(() => navigate(`/email-sent?email=${encodeURIComponent(form.email)}`), 1000);
 
     } catch (err) {
-      showMessage(`❌ ${err.message}`, "error");
+      let errorMessage = "Registration failed";
+      
+      if (err.message.includes("Username or email already taken")) {
+        errorMessage = "❌ Username or email is already taken. Please try a different one.";
+      } else if (err.message.includes("Password must be at least 8 characters")) {
+        errorMessage = "❌ Password must be at least 8 characters long.";
+      } else if (err.message.includes("Registration failed")) {
+        errorMessage = "❌ Registration failed. Please try again.";
+      } else {
+        errorMessage = `❌ ${err.message}`;
+      }
+      
+      showMessage(errorMessage, "error");
     } finally {
       setLoading(false);
       setTimeout(() => {
@@ -141,6 +153,12 @@ export default function Register() {
 
 
         <button type="submit" disabled={loading}>Create Account</button>
+        
+        <div className="verification-info">
+          <p>📧 After creating your account, you'll receive a verification code via email.</p>
+          <p>✅ Verify your email to start using PokéTracker!</p>
+        </div>
+        
         <p className="auth-redirect">
           Already have an account? <a href="/login">Login here</a>.
         </p>
