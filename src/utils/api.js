@@ -249,6 +249,11 @@ export const profileAPI = {
     return api.get(`/profiles/${encodeURIComponent(username)}/likes/public`);
   },
 
+  // Get public caught data for a username
+  async getPublicCaughtData(username) {
+    return api.get(`/caught/${encodeURIComponent(username)}/public`);
+  },
+
   // Toggle profile like
   async toggleProfileLike(username) {
     return api.post(`/profiles/${encodeURIComponent(username)}/like`);

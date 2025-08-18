@@ -108,23 +108,11 @@ export default function PublicProfile() {
         setLikeCount(wasLiked ? previousCount - 1 : previousCount + 1);
         
         try {
-            const response = await fetch(`/api/profiles/${encodeURIComponent(username)}/like`, {
-                method: 'POST',
-                credentials: 'include'
-            });
-            
-            if (response.ok) {
-                const { liked, newCount } = await response.json();
-                // Update with the actual server response
-                setHasLiked(liked);
-                setLikeCount(newCount);
-                showMessage(liked ? "❤️ Profile liked!" : "💔 Like removed", "success");
-            } else {
-                // Revert optimistic update on error
-                setHasLiked(wasLiked);
-                setLikeCount(previousCount);
-                showMessage("❌ Failed to update like", "error");
-            }
+            const { liked, newCount } = await profileAPI.toggleProfileLike(username);
+            // Update with the actual server response
+            setHasLiked(liked);
+            setLikeCount(newCount);
+            showMessage(liked ? "❤️ Profile liked!" : "💔 Like removed", "success");
         } catch (error) {
             // Revert optimistic update on error
             setHasLiked(wasLiked);
@@ -142,9 +130,7 @@ export default function PublicProfile() {
         let ignore = false;
         (async () => {
             try {
-                const r = await fetch(`/api/users/${encodeURIComponent(username)}/public`, { credentials: "include" });
-                if (!r.ok) throw new Error();
-                const j = await r.json();
+                const j = await profileAPI.getPublicProfile(username);
                 if (!ignore) {
                     setData(j);
                 }
@@ -161,9 +147,7 @@ export default function PublicProfile() {
         let ignore = false;
         (async () => {
             try {
-                const r = await fetch(`/api/caught/${encodeURIComponent(username)}/public`, { credentials: "include" });
-                if (!r.ok) return;
-                const map = await r.json(); // { [key]: info|null }
+                const map = await profileAPI.getPublicCaughtData(username); // { [key]: info|null }
                 const allKeys = [
                     ...pokemonData.map(p => getCaughtKey(p)),
                     ...formsData.map(p => getCaughtKey(p)),
@@ -193,13 +177,10 @@ export default function PublicProfile() {
         let ignore = false;
         (async () => {
             try {
-                const r = await fetch(`/api/profiles/${encodeURIComponent(username)}/likes`, { credentials: "include" });
-                if (r.ok) {
-                    const { count, hasLiked: userHasLiked } = await r.json();
-                    if (!ignore) {
-                        setLikeCount(count);
-                        setHasLiked(userHasLiked);
-                    }
+                const { count, hasLiked: userHasLiked } = await profileAPI.getProfileLikes(username);
+                if (!ignore) {
+                    setLikeCount(count);
+                    setHasLiked(userHasLiked);
                 }
             } catch { }
         })();

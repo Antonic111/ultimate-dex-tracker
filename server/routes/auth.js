@@ -851,6 +851,31 @@ router.get("/debug/password-hash", authenticateUser, async (req, res) => {
   }
 });
 
+// Debug endpoint to check user profile visibility
+router.get("/debug/profile-visibility/:username", async (req, res) => {
+  try {
+    const { username } = req.params;
+    console.log('🔍 Debug profile visibility for username:', username);
+    
+    const user = await User.findOne({ username }).select('username isProfilePublic createdAt');
+    if (!user) {
+      console.log('❌ User not found:', username);
+      return res.status(404).json({ error: "User not found" });
+    }
+    
+    console.log('✅ User found:', { username: user.username, isProfilePublic: user.isProfilePublic, createdAt: user.createdAt });
+    res.json({
+      username: user.username,
+      isProfilePublic: user.isProfilePublic,
+      createdAt: user.createdAt,
+      exists: true
+    });
+  } catch (err) {
+    console.error('Debug profile visibility error:', err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 
 
@@ -914,7 +939,9 @@ router.get("/users/public", async (req, res) => {
 router.get("/users/:username/public", async (req, res) => {
   res.set("Cache-Control", "no-store");
   
-  console.log('🔥 GET /users/:username/public - Username:', req.params.username);
+  console.log('🔥 GET /users/:username/public - Request received');
+  console.log('🔥 Username:', req.params.username);
+  console.log('🔥 Request headers:', req.headers);
   
   try {
     const u = await User.findOne({
@@ -924,7 +951,13 @@ router.get("/users/:username/public", async (req, res) => {
       .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars")
       .lean();
       
-    if (!u) return res.status(404).json({ error: "User not found or private" });
+    console.log('🔥 Database query result:', u);
+    console.log('🔥 isProfilePublic check:', { username: req.params.username, isProfilePublic: u?.isProfilePublic });
+    
+    if (!u) {
+      console.log('❌ User not found or private for username:', req.params.username);
+      return res.status(404).json({ error: "User not found or private" });
+    }
     
     // Add like count
     const likeCount = u.likes ? u.likes.length : 0;
