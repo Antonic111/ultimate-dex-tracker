@@ -9,9 +9,14 @@ export async function sendCodeEmail(user, subject, code, action) {
     return;
   }
 
+  if (!process.env.EMAIL_FROM) {
+    console.error('EMAIL_FROM not set');
+    return;
+  }
+
   try {
     const { data, error } = await resend.emails.send({
-      from: 'PokéTracker <noreply@poketracker.com>',
+      from: `Ultimate Dex Tracker <${process.env.EMAIL_FROM}>`,
       to: [user.email],
       subject: subject,
       html: `
