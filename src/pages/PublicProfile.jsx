@@ -10,6 +10,7 @@ import { getCaughtKey } from "../caughtStorage";
 import { COUNTRY_OPTIONS } from "../data/countries";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { useMessage } from "../components/Shared";
+import { profileAPI } from "../utils/api";
 
 const POKEMON_OPTIONS = pokemonData.map((p) => ({
     name: formatPokemonName(p.name),
@@ -219,22 +220,17 @@ export default function PublicProfile() {
         const interval = setInterval(async () => {
             try {
                 console.log(`[${new Date().toLocaleTimeString()}] Polling for like updates for ${username}`);
-                const r = await fetch(`/api/profiles/${encodeURIComponent(username)}/likes`, { 
-                    credentials: "include" 
+                // Use the public likes endpoint that doesn't require authentication
+                const { count } = await profileAPI.getPublicProfileLikes(username);
+                console.log(`[${new Date().toLocaleTimeString()}] Like data received: count=${count}`);
+                setLikeCount(prevCount => {
+                    // Only update if the count actually changed
+                    if (prevCount !== count) {
+                        console.log(`[${new Date().toLocaleTimeString()}] Like count updated: ${prevCount} -> ${count}`);
+                        return count;
+                    }
+                    return prevCount;
                 });
-                if (r.ok) {
-                    const { count, hasLiked: userHasLiked } = await r.json();
-                    console.log(`[${new Date().toLocaleTimeString()}] Like data received: count=${count}, hasLiked=${userHasLiked}`);
-                    setLikeCount(prevCount => {
-                        // Only update if the count actually changed
-                        if (prevCount !== count) {
-                            console.log(`[${new Date().toLocaleTimeString()}] Like count updated: ${prevCount} -> ${count}`);
-                            return count;
-                        }
-                        return prevCount;
-                    });
-                    setHasLiked(userHasLiked);
-                }
             } catch (error) {
                 console.error('Error polling for likes:', error);
             }

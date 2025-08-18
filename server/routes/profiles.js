@@ -36,6 +36,32 @@ router.get('/:username/likes', authenticateUser, async (req, res) => {
     }
 });
 
+// Get public like count for a profile (no authentication required)
+router.get('/:username/likes/public', async (req, res) => {
+    console.log('🔥 GET /profiles/:username/likes/public - Request received');
+    console.log('🔥 Username:', req.params.username);
+    
+    try {
+        const { username } = req.params;
+
+        // Find the profile owner
+        const profileOwner = await User.findOne({ username });
+        if (!profileOwner) {
+            console.log('❌ Profile not found:', username);
+            return res.status(404).json({ error: 'Profile not found' });
+        }
+
+        // Get like count only
+        const likeCount = profileOwner.likes ? profileOwner.likes.length : 0;
+
+        console.log('✅ Public profile likes retrieved:', { username, likeCount });
+        res.json({ count: likeCount });
+    } catch (error) {
+        console.error('❌ Error getting public profile likes:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // Toggle like on a profile
 router.post('/:username/like', authenticateUser, async (req, res) => {
     console.log('🔥 POST /profiles/:username/like - Request received');

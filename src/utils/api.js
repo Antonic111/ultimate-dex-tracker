@@ -222,8 +222,16 @@ export const profileAPI = {
   },
 
   // Get public users for trainers page
-  async getPublicUsers() {
-    return api.get('/users/public');
+  async getPublicUsers(query = '', page = 1, pageSize = 24, random = false) {
+    const params = new URLSearchParams();
+    if (query) params.append('query', query);
+    if (page) params.append('page', page.toString());
+    if (pageSize) params.append('pageSize', pageSize.toString());
+    if (random) params.append('random', '1');
+    
+    const queryString = params.toString();
+    const endpoint = queryString ? `/users/public?${queryString}` : '/users/public';
+    return api.get(endpoint);
   },
 
   // Get public profile by username
@@ -234,6 +242,11 @@ export const profileAPI = {
   // Get profile likes
   async getProfileLikes(username) {
     return api.get(`/profiles/${encodeURIComponent(username)}/likes`);
+  },
+
+  // Get public profile likes (no authentication required)
+  async getPublicProfileLikes(username) {
+    return api.get(`/profiles/${encodeURIComponent(username)}/likes/public`);
   },
 
   // Toggle profile like
