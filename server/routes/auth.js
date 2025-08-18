@@ -419,7 +419,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
 
     // Update fields
     if (req.body.bio !== undefined) {
-      const bioValidation = validateContent(req.body.bio, 'bio');
+      const bioValidation = validateContent(String(req.body.bio || ''), 'bio');
       if (!bioValidation.isValid) {
         return res.status(400).json({ error: bioValidation.error });
       }
@@ -538,6 +538,11 @@ router.patch("/caught", authenticateUser, async (req, res) => {
       if (value === null) {
         unsetOps["caughtPokemon." + key] = "";
       } else {
+        // Validate notes if present per entry
+        if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, 'notes')) {
+          const notesValidation = validateContent(String(value.notes || ''), 'notes');
+          if (!notesValidation.isValid) return res.status(400).json({ error: notesValidation.error });
+        }
         setOps["caughtPokemon." + key] = value;
       }
     }
@@ -569,6 +574,11 @@ router.put("/caught/:key", authenticateUser, async (req, res) => {
     // info can be an object or null (to delete)
     const info = Object.prototype.hasOwnProperty.call(req.body, 'info') ? req.body.info : undefined;
     if (typeof info === 'undefined') return res.status(400).json({ error: "Missing info" });
+
+    if (info && typeof info === 'object' && Object.prototype.hasOwnProperty.call(info, 'notes')) {
+      const notesValidation = validateContent(String(info.notes || ''), 'notes');
+      if (!notesValidation.isValid) return res.status(400).json({ error: notesValidation.error });
+    }
 
     const update = info === null
       ? { $unset: { ["caughtPokemon." + key]: "" } }

@@ -71,21 +71,11 @@ const ContentFilterInput = ({
     setDebounceTimer(timer);
   }, [debounceTimer, debounceMs, showRealTimeValidation, configType, onValidationChange]);
 
-  // Handle input change
+  // Handle input change (do not block typing; validation handled on save)
   const handleChange = (e) => {
     const newValue = e.target.value;
-    
-    // Always validate content to prevent invalid input, regardless of UI settings
-    const validation = validateContent(newValue, configType);
-    
-    // If content is invalid, prevent the change
-    if (!validation.isValid) {
-      return; // Don't update the input
-    }
-    
     setLocalValue(newValue);
-    
-    // Immediate validation for character limits (only for UI display)
+
     if (showRealTimeValidation) {
       const charInfo = getCharacterInfo(newValue, configType);
       const immediateValidation = {
@@ -95,11 +85,8 @@ const ContentFilterInput = ({
       setValidation(immediateValidation);
       onValidationChange?.(immediateValidation);
     }
-    
-    // Debounced full validation (only for UI display)
+
     debouncedValidation(newValue);
-    
-    // Call parent onChange
     onChange?.(e);
   };
 

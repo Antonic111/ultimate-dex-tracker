@@ -5,6 +5,8 @@ import { formatPokemonName, getFormDisplayName, renderTypeBadge } from "../../ut
 import { showConfirm } from "../Shared/ConfirmDialog";
 import { IconDropdown } from "../Shared/IconDropdown";
 import ContentFilterInput from "../Shared/ContentFilterInput";
+import { useMessage } from "../Shared/MessageContext";
+import { validateContent } from "../../../shared/contentFilter";
 import "../../css/EvolutionChain.css";
 import "../../css/Sidebar.css";
 
@@ -12,6 +14,7 @@ import "../../css/Sidebar.css";
 export default function PokemonSidebar({ open = false, readOnly = false, pokemon, onClose, caughtInfo, updateCaughtInfo, showShiny, viewingUsername = null }) {
   const [closing, setClosing] = useState(false);
   const [editing, setEditing] = useState(false);
+  const { showMessage } = useMessage();
 
   // Always use .value, never the full object, in editData
   const defaultEditData = {
@@ -62,6 +65,12 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   }
 
   function handleSaveEdit() {
+    // Save-time validation for notes
+    const validation = validateContent(String(editData.notes || ''), 'notes');
+    if (!validation.isValid) {
+      showMessage(`❌ ${validation.error}`, 'error');
+      return;
+    }
     const cleaned = {
       ...editData,
       ball: editData.ball,

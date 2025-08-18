@@ -6,6 +6,7 @@ import { useMessage } from "../components/Shared/MessageContext";
 import { useTheme } from "../components/Shared/ThemeContext";
 import DeleteAccountModal from "../components/Shared/DeleteAccountModal";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
+import { validateContent } from "../../shared/contentFilter";
 import { profileAPI, userAPI } from "../utils/api";
 
 
@@ -64,6 +65,11 @@ export default function Settings() {
 
     async function handleUsernameSave() {
         try {
+            const validation = validateContent(String(newUsername || ''), 'username');
+            if (!validation.isValid) {
+                showMessage(`❌ ${validation.error}`, 'error');
+                return;
+            }
             const data = await userAPI.updateUsername(newUsername);
             setUser(prev => ({ ...prev, username: data.username }));
             showMessage("✅ Username updated successfully!", "success");

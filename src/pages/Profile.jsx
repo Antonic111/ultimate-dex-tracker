@@ -17,6 +17,7 @@ import { getCaughtKey } from "../caughtStorage";
 import { useLoading } from "../components/Shared/LoadingContext";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
+import { validateContent } from "../../shared/contentFilter";
 import { profileAPI, caughtAPI } from "../utils/api";
 
 const POKEMON_OPTIONS = pokemonData.map((p) => ({
@@ -390,6 +391,12 @@ export default function Profile() {
                                     const reorderedShiny = reorderToFront(form.favoritePokemonShiny, false);
 
                                     try {
+                                        // Validate bio at save-time
+                                        const bioValidation = validateContent(String(form.bio || ''), 'bio');
+                                        if (!bioValidation.isValid) {
+                                            showMessage(`❌ ${bioValidation.error}`, 'error');
+                                            return;
+                                        }
                                         setLoading('save-profile', true);
                                         await profileAPI.updateProfile({
                                             bio: form.bio,
