@@ -11,11 +11,13 @@ export default function FavoriteSelectionModal({
     selected = [],
     onChange,
     max = 5,
+    showHoverPreview = false,
 }) {
     const [tempSelection, setTempSelection] = useState([]);
     const [search, setSearch] = useState("");
     const [showShiny, setShowShiny] = useState(false);
     const [closing, setClosing] = useState(false);
+    const [hovered, setHovered] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -143,6 +145,8 @@ export default function FavoriteSelectionModal({
                                 key={item.value}
                                 className={`favorite-item ${tempSelection.includes(item.value) ? "selected" : ""}`}
                                 onClick={() => toggleSelect(item.value)}
+                                onMouseEnter={() => showHoverPreview ? setHovered(item) : null}
+                                onMouseLeave={() => showHoverPreview ? setHovered(null) : null}
                             >
                                 {item.image && (
                                     <img
@@ -159,6 +163,13 @@ export default function FavoriteSelectionModal({
                             </div>
                         ))}
                     </div>
+
+                    {showHoverPreview && hovered?.image && (
+                        <div className="favorite-hover-preview" aria-hidden>
+                            <img src={hovered.image} alt={hovered.name} />
+                            <div className="favorite-hover-caption">{hovered.name}</div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="favorite-modal-footer">

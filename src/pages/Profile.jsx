@@ -785,6 +785,7 @@ export default function Profile() {
                     setShowTrainerModal(false);
                 }}
                 max={1}
+                showHoverPreview
             />
         </div>
     );
