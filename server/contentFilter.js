@@ -2,8 +2,10 @@ import { bannedWords, bannedSubstrings } from "./bannedTerms.js";
 
 // Regexes for high-severity slurs with common obfuscations (symbols/spaces between letters)
 const bannedRegexes = [
-  /n[\W_]*i[\W_]*(?:g|9|@){2}[\W_]*e[\W_]*r/iu,   // n!@@er, n9 9er, etc.
-  /n[\W_]*i[\W_]*(?:g|9|@){2}[\W_]*a+/iu           // nigga variants
+  // nigger variants with obfuscation: i ~ i/!/1/l, g ~ g/9/@/6, e ~ e/3
+  /n[\W_]*(?:i|!|1|l)[\W_]*(?:g|9|@|6){2}[\W_]*(?:e|3)[\W_]*r/iu,
+  // nigga variants
+  /n[\W_]*(?:i|!|1|l)[\W_]*(?:g|9|@|6){2}[\W_]*a+/iu
 ];
 
 // Temporary fix: disable similarity checking until import issue is resolved
