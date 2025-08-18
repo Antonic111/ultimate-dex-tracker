@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { useMessage } from "../components/Shared/MessageContext";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { KeyRound } from "lucide-react";
+import { authAPI } from "../utils/api";
 
 const EnterResetCode = () => {
   const [code, setCode] = useState("");
@@ -47,20 +48,13 @@ const EnterResetCode = () => {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/verify-reset-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code }),
-      });
+      const data = await authAPI.verifyResetCode(email, code);
 
-      const data = await res.json();
-
-      if (res.status === 429 || data.message === "Too many requests, please try again later.") {
+      if (data.status === 429 || data.message === "Too many requests, please try again later.") {
         showMessage("❌ Too many requests, please try again later.", "error");
         return;
       }
-
-      if (res.ok) {
+      if (data.success) {
         showMessage("✅ Code verified! Reset your password.", "success");
         navigate(`/reset-password?email=${encodeURIComponent(email)}&code=${code}`);
       } else {
@@ -80,15 +74,9 @@ const EnterResetCode = () => {
     if (resendCooldown > 0) return;
 
     try {
-      const res = await fetch("/api/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const data = await authAPI.forgotPassword(email);
 
-      const data = await res.json();
-
-      if (res.ok) {
+      if (data.success) {
         showMessage("📧 Reset code resent!", "success");
         setResendCooldown(30); // Start 30-second cooldown
       } else {

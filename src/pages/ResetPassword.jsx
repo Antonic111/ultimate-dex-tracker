@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMessage } from "../components/Shared/MessageContext";
-import { Lock } from "lucide-react";
-import { Eye, EyeOff } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Lock, Eye, EyeOff } from "lucide-react";
+import { authAPI } from "../utils/api";
 
 
 const ResetPassword = () => {
@@ -40,25 +40,13 @@ const ResetPassword = () => {
         return;
       }
 
-      const res = await fetch("/api/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          email,
-          code,
-          newPassword, // ✅ correct var
-        }),
-      });
+      const data = await authAPI.resetPassword(email, code, newPassword);
 
-      const data = await res.json();
-
-      if (res.status === 429 || data.message === "Too many requests, please try again later.") {
+      if (data.status === 429 || data.message === "Too many requests, please try again later.") {
         showMessage("❌ Too many requests, please try again later.", "error");
         return;
       }
-
-      if (res.ok) {
+      if (data.success) {
         showMessage("✅ Password reset successful!", "success");
         navigate("/login");
       } else {

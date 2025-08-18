@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useMessage } from "../components/Shared/MessageContext";
 import { useNavigate } from "react-router-dom";
 import { Mail } from "lucide-react";
+import { authAPI } from "../utils/api";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -19,19 +20,13 @@ const handleSubmit = async (e) => {
 
   setLoading(true);
   try {
-    const res = await fetch("/api/forgot-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
+    const data = await authAPI.forgotPassword(email);
 
-    const data = await res.json();
-
-    if (res.status === 429) {
+    if (data.status === 429) {
       showMessage(`❌ ${data.message}`, "error");
       return;
     }
-    if (res.ok) {
+    if (data.success) {
       showMessage("📧 Password reset email sent!", "success");
       navigate(`/enter-reset-code?email=${encodeURIComponent(email)}`);
     } else {
