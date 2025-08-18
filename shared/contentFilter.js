@@ -2,6 +2,8 @@ import { bannedWords, bannedSubstrings } from "./bannedTerms.js";
 
 // Regexes for high-severity slurs with common obfuscations (symbols/spaces between letters)
 const bannedRegexes = [
+  // core 'nigg' with obfuscation (blocks prefixes like n!@@)
+  /n[\W_]*(?:i|!|1|l)[\W_]*(?:g|9|@|6){2}(?![a-z])/iu,
   // nigger variants with obfuscation: i ~ i/!/1/l, g ~ g/9/@/6, e ~ e/3
   /n[\W_]*(?:i|!|1|l)[\W_]*(?:g|9|@|6){2}[\W_]*(?:e|3)[\W_]*r/iu,
   // nigga variants
