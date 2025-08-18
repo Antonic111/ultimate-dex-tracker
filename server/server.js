@@ -38,7 +38,9 @@ app.use((req, res, next) => {
 });
 
 app.use(cookieParser());
-app.use(express.json());
+// Increase body size limits to handle larger payloads (e.g., caught maps, progress bars)
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
 app.use(session({
   secret: process.env.SESSION_SECRET || "yourStrongSecretHere",
@@ -65,6 +67,14 @@ app.get("/api/cors-test", (req, res) => {
 
 app.use("/api", authRoutes);
 app.use("/api/profiles", profileRoutes);
+
+// Global error handler for oversized payloads and other errors
+app.use((err, req, res, next) => {
+  if (err && (err.type === 'entity.too.large' || err.status === 413)) {
+    return res.status(413).json({ error: 'Payload too large' });
+  }
+  next(err);
+});
 
 // Start server
 const PORT = process.env.PORT || 5000;
