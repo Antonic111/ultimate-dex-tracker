@@ -176,7 +176,8 @@ function checkRepeatedCharacterBypass(text, bannedWords) {
     // Check for patterns like "coooon" where repeated characters are used to bypass
     // We'll check if removing repeated characters reveals the banned word
     const cleaned = lowerText.replace(/(.)\1+/g, "$1");
-    if (cleaned.includes(bannedWord)) {
+    const wordBoundaryRx = new RegExp(`\\b${bannedWord}\\b`);
+    if (wordBoundaryRx.test(cleaned)) {
       // Additional check: only block if this looks like a bypass attempt
       // Don't block legitimate words like "coonhound" that contain the banned word
       
@@ -185,56 +186,16 @@ function checkRepeatedCharacterBypass(text, bannedWords) {
         return true;
       }
       
-      // If the cleaned text starts with the banned word and has additional characters, 
-      // it might be a legitimate word (like "coonhound")
-      if (cleaned.startsWith(bannedWord) && cleaned.length > bannedWord.length) {
-        // Check if the additional characters form a legitimate word part
-        const remaining = cleaned.substring(bannedWord.length);
-        // If the remaining part is a common word ending, it's likely legitimate
-        const commonEndings = ['hound', 'cat', 'can', 'dog', 'bird', 'fish', 'man', 'woman', 'boy', 'girl'];
-        if (commonEndings.some(ending => remaining.includes(ending))) {
-          continue; // Skip this one, it's likely legitimate
-        }
-      }
-      
-      // If the cleaned text ends with the banned word and has additional characters,
-      // it might be a legitimate word
-      if (cleaned.endsWith(bannedWord) && cleaned.length > bannedWord.length) {
-        const remaining = cleaned.substring(0, cleaned.length - bannedWord.length);
-        // If the remaining part is a common word beginning, it's likely legitimate
-        const commonBeginnings = ['raccoon', 'racoon', 'coon'];
-        if (commonBeginnings.some(beginning => remaining.includes(beginning))) {
-          continue; // Skip this one, it's likely legitimate
-        }
-      }
-      
       // If we get here, it's likely a bypass attempt
       return true;
     }
     
     // Also check the original text for the banned word (catches cases where normalization works)
-    if (lowerText.includes(bannedWord)) {
+    if (wordBoundaryRx.test(lowerText)) {
       // Same logic as above for legitimate words
       if (lowerText === bannedWord) {
         return true;
       }
-      
-      if (lowerText.startsWith(bannedWord) && lowerText.length > bannedWord.length) {
-        const remaining = lowerText.substring(bannedWord.length);
-        const commonEndings = ['hound', 'cat', 'can', 'dog', 'bird', 'fish', 'man', 'woman', 'boy', 'girl'];
-        if (commonEndings.some(ending => remaining.includes(ending))) {
-          continue;
-        }
-      }
-      
-      if (lowerText.endsWith(bannedWord) && lowerText.length > bannedWord.length) {
-        const remaining = lowerText.substring(0, lowerText.length - bannedWord.length);
-        const commonBeginnings = ['raccoon', 'racoon', 'coon'];
-        if (commonBeginnings.some(beginning => remaining.includes(beginning))) {
-          continue;
-        }
-      }
-      
       return true;
     }
   }
@@ -245,9 +206,9 @@ function checkRepeatedCharacterBypass(text, bannedWords) {
 function checkConcatenatedBannedWords(normalized, bannedWords) {
   for (const bannedWord of bannedWords) {
     if (bannedWord.length < 3) continue; // Skip very short words
-    
-    // Check for the banned word embedded in longer text (like "faggotfaggot" containing "faggot")
-    if (normalized.includes(bannedWord)) {
+    // Only flag obvious concatenations like "wordword"
+    const repeated = bannedWord + bannedWord;
+    if (normalized.includes(repeated)) {
       return true;
     }
   }
@@ -261,6 +222,12 @@ function containsBannedWords(text, similarityThreshold = 0.2) {
   // -1- Regex match for obfuscated high-severity slurs on raw text (case/Unicode-insensitive)
   for (const rx of bannedRegexes) {
     if (rx.test(String(text || ''))) return true;
+  }
+
+  // Explicit phonetic bypass for n-word like "knee grow" variants
+  const lowerRaw = String(text || '').toLowerCase();
+  if (/\bknees?\s*grow\b/.test(lowerRaw) || /\bgrow\s*knees?\b/.test(lowerRaw)) {
+    return true;
   }
   
   // 0. Check for repeated character bypasses (like "coooon" containing "coon")
@@ -280,12 +247,8 @@ function containsBannedWords(text, similarityThreshold = 0.2) {
     return true;
   }
 
-  // 2. Check if the normalized text itself contains banned words (catches repeated characters like "cooon" -> "coon")
-  for (const bannedWord of bannedWords) {
-    if (normalized.includes(bannedWord)) {
-      return true;
-    }
-  }
+  // 2. Do NOT block just because a banned word appears as a substring inside another word
+  //    Only check complete word matches below
 
   // Check each banned word
   for (const bannedWord of bannedWords) {

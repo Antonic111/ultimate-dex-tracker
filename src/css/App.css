@@ -422,6 +422,7 @@ html.modal-open {
   margin-top: 3em;
   text-align: center;
   width: 100%;
+  margin-bottom: 4rem; /* extra breathing room above footer */
 }
 
 .no-results-img {

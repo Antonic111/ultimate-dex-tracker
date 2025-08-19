@@ -4,6 +4,7 @@
   top: 0;
   right: 0;
 }
+
 .sidebar-panel {
     display: flex;
   flex-direction: column;
@@ -20,6 +21,7 @@
   box-sizing: border-box;
   overflow-y: auto;
 }
+
 .sidebar-panel.slide-out {
   animation: slideOutSidebar 0.37s cubic-bezier(.65,0,.35,1) both;
 }

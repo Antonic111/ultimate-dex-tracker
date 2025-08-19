@@ -16,6 +16,7 @@ import {
 } from "@dnd-kit/sortable";
 import { Eye, EyeOff, Pencil, Plus, Settings, Trash2 } from "lucide-react";
 import { useEffect, useState, useContext, useRef } from "react";
+import { createPortal } from "react-dom";
 import { getCaughtKey } from "../../caughtStorage";
 import { showConfirm } from "../Shared/ConfirmDialog";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS } from "../../Constants";
@@ -176,8 +177,11 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             body.classList.add("modal-open");
             html.classList.add("modal-open");
         } else {
-            body.classList.remove("modal-open");
-            html.classList.remove("modal-open");
+            // Delay removing modal-open until after closing animation completes
+            setTimeout(() => {
+                body.classList.remove("modal-open");
+                html.classList.remove("modal-open");
+            }, closing ? 320 : 0);
         }
 
         return () => {
@@ -374,6 +378,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
 
             {!readOnly && showSettings && (
+                createPortal(
                 <div className={`progress-modal-overlay${closing ? " closing" : ""}`}>
                     <div className={`progress-modal-panel${closing ? " closing" : ""}`}>
                         <div className="modal-header">
@@ -647,7 +652,8 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body)
             )}
         </div>
     );

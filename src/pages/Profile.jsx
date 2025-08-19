@@ -85,7 +85,7 @@ function formatSwitchFCInput(value) {
 
 export default function Profile() {
     const navigate = useNavigate();
-    const { username, email, createdAt, setUser, loading } = useUser();
+    const { username, email, createdAt, loading } = useUser();
     const { setLoading, isLoading } = useLoading();
     const { showMessage } = useMessage();
 
@@ -99,6 +99,7 @@ export default function Profile() {
     const [likeCount, setLikeCount] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
+    const [likeBurst, setLikeBurst] = useState(0);
 
     const [stats, setStats] = useState({
         shinies: 0,
@@ -108,6 +109,7 @@ export default function Profile() {
         topMark: null,
         topGame: null,
     });
+    const [recentAdded, setRecentAdded] = useState([]);
 
     const [form, setForm] = useState({
         bio: "",
@@ -142,10 +144,8 @@ export default function Profile() {
                     switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode
                 }));
 
-                setUser(prev => ({
-                    ...prev,
-                    profileTrainer: data.profileTrainer ?? prev.profileTrainer,
-                }));
+                // Don't call setUser here - it causes infinite loops with App.jsx checkAuth
+                // The profileTrainer will be updated when the user actually edits their profile
             })
             .catch(err => {
                 console.error("Failed to fetch profile:", err);
@@ -153,7 +153,7 @@ export default function Profile() {
             .finally(() => {
                 setLoading('profile-data', false);
             });
-    }, [setLoading, setUser]);
+    }, [setLoading]);
 
     useEffect(() => {
         let ignore = false;
@@ -217,6 +217,26 @@ export default function Profile() {
                 const topGame = fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) ? "Pokemon " + fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) : null;
 
                 if (!ignore) setStats({ shinies, completion, gamesPlayed, topBall, topMark, topGame });
+
+                // Build recent 5 added list (newest by date first)
+                try {
+                    const allMonsList = [...pokemonData, ...formsData];
+                    const keyToMon = new Map(allMonsList.map(m => [getCaughtKey(m), m]));
+                    const recentList = Object.entries(map)
+                        .filter(([_, info]) => !!info)
+                        .map(([key, info]) => {
+                            const mon = keyToMon.get(key);
+                            const ts = info && info.date ? Date.parse(info.date) : Number.NEGATIVE_INFINITY;
+                            return { key, mon, info, ts };
+                        })
+                        .filter(item => !!item.mon)
+                        .sort((a, b) => b.ts - a.ts)
+                        .slice(0, 5)
+                        .map(({ mon, info }) => ({ mon, info }));
+                    if (!ignore) setRecentAdded(recentList);
+                } catch {
+                    if (!ignore) setRecentAdded([]);
+                }
 
             } catch (error) {
                 console.error("Failed to load stats:", error);
@@ -287,6 +307,9 @@ export default function Profile() {
         
         setHasLiked(!wasLiked);
         setLikeCount(wasLiked ? previousCount - 1 : previousCount + 1);
+        if (!wasLiked) {
+            setLikeBurst((n) => n + 1);
+        }
         
         try {
             const { hasLiked: liked, likeCount: newCount } = await profileAPI.toggleProfileLike(username);
@@ -364,7 +387,7 @@ export default function Profile() {
     }
 
     return (
-        <div className="profile-wrapper">
+        <div className="profile-wrapper page-container profile-page">
             <div className="profile-header-bar">
                 <div className="profile-header-left">
                     <div className="profile-top-line">
@@ -384,7 +407,16 @@ export default function Profile() {
                             title={hasLiked ? "Remove like" : "Like profile"}
                             aria-label={hasLiked ? "Remove like" : "Like profile"}
                         >
-                            <Heart size={16} fill={hasLiked ? "currentColor" : "none"} />
+                            <span className="like-heart-anchor">
+                                <Heart size={20} fill={hasLiked ? "currentColor" : "none"} />
+                                {likeBurst > 0 && (
+                                    <span key={likeBurst} aria-hidden="true">
+                                        <span className="like-heart">❤</span>
+                                        <span className="like-heart" style={{"--tx":"-26px","--ty":"-38px","--rot":"-18deg"}}>❤</span>
+                                        <span className="like-heart" style={{"--tx":"22px","--ty":"-44px","--rot":"14deg"}}>❤</span>
+                                    </span>
+                                )}
+                            </span>
                             <span className="like-count">{likeCount}</span>
                         </button>
                     </div>
@@ -446,10 +478,10 @@ export default function Profile() {
                                             profileTrainer: form.profileTrainer,
                                             switchFriendCode: fc,
                                         }));
-                                        setUser((prev) => ({
-                                            ...prev,
-                                            profileTrainer: form.profileTrainer || prev.profileTrainer,
-                                        }));
+                                        // setUser((prev) => ({ // This line was removed
+                                        //     ...prev,
+                                        //     profileTrainer: form.profileTrainer || prev.profileTrainer,
+                                        // }));
 
                                         setIsEditing(false);
                                     } catch (err) {
@@ -747,6 +779,29 @@ export default function Profile() {
                         <div className="profile-field">
                             <label>Top Game</label>
                             <div className="field-display">{stats.topGame ? stats.topGame : "—"}</div>
+                        </div>
+                        <div className="profile-field full-span recent-field">
+                            <label>Recent Pokémon</label>
+                            <div className="field-display recent-field-box">
+                                <div className="profile-rank-row">
+                                    {recentAdded && recentAdded.length > 0 ? (
+                                        recentAdded.map(({ mon, info }, idx) => (
+                                            <div key={idx} className="profile-rank-item">
+                                                <div className="profile-pokemon-box" style={{ marginBottom: "2px" }}>
+                                                    <img
+                                                        src={mon?.sprites?.front_default}
+                                                        alt={formatPokemonName(mon?.name)}
+                                                        className="pokemon-img"
+                                                    />
+                                                </div>
+                                                <div className="rank-label">{formatPokemonName(mon?.name)}</div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div style={{ opacity: 0.7 }}>No recent additions yet</div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

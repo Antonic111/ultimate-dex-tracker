@@ -153,8 +153,9 @@ body {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.8);
-  z-index: 999;
+  z-index: 10050; /* above search dropdowns and headers */
   animation: fadeIn 0.3s ease-out;
+  pointer-events: all;
 }
 
 .progress-modal-overlay.closing {
@@ -173,6 +174,8 @@ body {
   max-height: 80vh;
   overflow-y: auto;
   animation: slideIn 0.3s ease-out;
+  position: relative;
+  z-index: 10051;
 }
 
 .progress-modal-panel.closing {

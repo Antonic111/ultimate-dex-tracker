@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef, useContext } from "react";
 import { Link } from "react-router-dom";
 import "flag-icons/css/flag-icons.min.css";
 import "../css/Trainers.css";
 import { COUNTRY_OPTIONS } from "../data/countries";
-import { Mars, Venus, VenusAndMars, Sparkles, Search, Heart, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, RefreshCcw, MoveUp, MoveDown } from "lucide-react";
+import { Mars, Venus, VenusAndMars, Sparkles, Search, Heart, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, RefreshCcw, MoveUp, MoveDown, Check } from "lucide-react";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { profileAPI } from "../utils/api";
+import { UserContext } from "../components/Shared/UserContext";
 
 const PAGE_SIZE = 20;
 
@@ -32,6 +33,13 @@ export default function Trainers() {
   const [refreshRotating, setRefreshRotating] = useState(false);
   const [randomSeed, setRandomSeed] = useState(0);
   const sortButtonRef = useRef(null);
+  const [usingFallback, setUsingFallback] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
+  const isMakingApiCall = useRef(false);
+  const prevQueryRef = useRef('');
+
+  // Get current user context to filter out own profile
+  const { username } = useContext(UserContext);
 
   // paging for "no search" mode
   const [page, setPage] = useState(1);
@@ -124,7 +132,20 @@ export default function Trainers() {
     };
   }, [showSortDropdown]);
 
+  // Handle initial load when username becomes available
+  useEffect(() => {
+    if (username !== undefined) {
+      // Trigger the main data fetch when username is available
+      setPage(1);
+    }
+  }, [username]);
 
+  // Cleanup effect to reset API call ref
+  useEffect(() => {
+    return () => {
+      isMakingApiCall.current = false;
+    };
+  }, []);
 
   // initial load + react to query changes
   useEffect(() => {
@@ -133,19 +154,64 @@ export default function Trainers() {
     setPage(1);
 
     const run = async () => {
+      // Prevent running if username is still loading/undefined
+      if (username === undefined) {
+        return;
+      }
+      
+      // Prevent running if we're already making an API call
+      if (isMakingApiCall.current) {
+        return;
+      }
+      
+      // Only prevent running if we've already initialized and this is just a username change
+      // But allow running when query changes (including when it becomes empty)
+      if (hasInitialized && !query && prevQueryRef.current === '') {
+        // If we have no query and we're initialized, and the previous query was also empty,
+        // this is just a username change, so skip
+        return;
+      }
+      
+      isMakingApiCall.current = true;
       setLoading(true);
       try {
         const data = await profileAPI.getPublicUsers(query, 1, PAGE_SIZE, false);
         
-        // Use real API data
-        const filteredData = data.items || [];
+        // Use real API data and filter out current user's profile and unverified accounts
+        let filteredData = data.items || [];
+        
+        // Filter out current user's profile if logged in and unverified accounts
+        const originalCount = filteredData.length;
+        
+        // Filter out current user's profile if logged in
+        if (username) {
+          filteredData = filteredData.filter(trainer => trainer.username !== username);
+        }
+        
+        // Now we can properly filter verified accounts since the API includes the verified field
+        const verifiedUsers = filteredData.filter(trainer => {
+          const isVerified = trainer.verified === true;
+          return isVerified;
+        });
+        
+        // Use the verified users list
+        filteredData = verifiedUsers;
+        
+        const filteredCount = filteredData.length;
+        const unverifiedCount = originalCount - filteredCount;
+        
+        // Set fallback mode since we can't properly filter verified accounts
+        setUsingFallback(false); // Now we're properly filtering
 
         if (!ignore) {
           // Store all filtered data for pagination
           setAllFilteredData(filteredData);
           // Reset to first page when query changes
           setPage(1);
-          // Track if pagination is needed
+          // Mark as initialized
+          setHasInitialized(true);
+          // Update the previous query ref
+          prevQueryRef.current = query;
         }
       } catch (error) {
         console.error('Failed to fetch trainers:', error);
@@ -154,12 +220,13 @@ export default function Trainers() {
         }
       } finally {
         if (!ignore) setLoading(false);
+        isMakingApiCall.current = false;
       }
     };
 
     const t = setTimeout(run, 300); // debounce typing
     return () => { clearTimeout(t); ignore = true; };
-  }, [query]);
+  }, [query, username, hasInitialized]);
 
 
 
@@ -192,7 +259,7 @@ export default function Trainers() {
   };
 
   return (
-    <div className="container trainers-page">
+            <div className="container page-container trainers-page">
       <h1 className="page-title">Trainers</h1>
 
       <div className="search-row">
@@ -345,7 +412,21 @@ export default function Trainers() {
 
       <div className="app-divider" />
 
-             {loading ? (
+      {/* General notice about verified accounts only */}
+      <div className="verified-notice">
+        <Check size={16} />
+        <span>Only verified trainer accounts are shown in this list.</span>
+      </div>
+
+      {/* Fallback notice when filtering fails */}
+      {usingFallback && (
+        <div className="verified-notice" style={{ background: 'rgba(255, 193, 7, 0.1)', borderColor: '#ffc107' }}>
+          <span>⚠️ Verified filtering is temporarily disabled. The API is missing the 'verified' field. All trainers are shown until this is fixed on the backend.</span>
+        </div>
+      )}
+
+      {/* Show loading only when we have a username and are actually loading */}
+      {(loading && username !== undefined) ? (
          <div className="trainer-grid">
                        {Array.from({ length: 20 }).map((_, i) => (
               <div className="trainer-card skeleton-card" key={i}>

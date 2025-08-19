@@ -1,9 +1,31 @@
 // utils/sendCodeEmail.js
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Check if emails are disabled in development
+const forceDevMode = true; // Set to false when you want real emails
+const emailsDisabled = forceDevMode || (process.env.NODE_ENV === 'development' && process.env.DISABLE_EMAILS === 'true');
+
+// Debug logging
+// removed verbose environment logs
+
+// Only initialize Resend if emails are enabled
+const resend = emailsDisabled ? null : new Resend(process.env.RESEND_API_KEY);
 
 export async function sendCodeEmail(user, subject, code, action) {
+  // If emails are disabled in development, return mock success
+  if (emailsDisabled) {
+    // dev-mode email stub logs removed
+    return { 
+      success: true, 
+      message: 'Email would be sent in production',
+      devMode: true,
+      to: user.email,
+      subject: subject,
+      code: code,
+      action: action
+    };
+  }
+
   if (!process.env.RESEND_API_KEY) {
     console.error('RESEND_API_KEY not set');
     return;

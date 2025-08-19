@@ -1,6 +1,6 @@
 // Simple debug utility to test API connectivity
 export const testAPI = async () => {
-  console.log('🧪 Testing API connectivity...');
+  // removed console logs
   
   try {
     // Test basic CORS
@@ -8,14 +8,14 @@ export const testAPI = async () => {
       method: 'GET',
       credentials: 'include'
     });
-    console.log('✅ CORS test:', corsResponse.status, corsResponse.statusText);
+    
     
     // Test health endpoint
     const healthResponse = await fetch('https://ultimate-dex-tracker-backend.onrender.com/api/health', {
       method: 'GET',
       credentials: 'include'
     });
-    console.log('✅ Health test:', healthResponse.status, healthResponse.statusText);
+    
     
     return { success: true, cors: corsResponse.status, health: healthResponse.status };
   } catch (error) {
@@ -36,15 +36,15 @@ export const testEndpoint = async (endpoint, method = 'GET', data = null) => {
       body: data ? JSON.stringify(data) : undefined
     });
     
-    console.log(`🧪 ${method} ${endpoint}:`, response.status, response.statusText);
+    
     
     if (response.ok) {
       const result = await response.json();
-      console.log('✅ Response:', result);
+      
       return { success: true, data: result };
     } else {
       const errorText = await response.text();
-      console.log('❌ Error response:', errorText);
+      
       return { success: false, status: response.status, error: errorText };
     }
   } catch (error) {
@@ -56,20 +56,20 @@ export const testEndpoint = async (endpoint, method = 'GET', data = null) => {
 // Main debug API object that Header.jsx expects
 export const debugAPI = {
   async runAllTests() {
-    console.log('🧪 Running all debug tests...');
+    
     
     try {
       // Test basic API connectivity
       const apiTest = await testAPI();
-      console.log('API Test Result:', apiTest);
+      
       
       // Test auth endpoints (use actual existing endpoints)
       const authTest = await testEndpoint('/auth/check-verified?email=test@example.com');
-      console.log('Auth Check Test:', authTest);
+      
       
       // Test health endpoint (this exists)
       const healthTest = await testEndpoint('/health');
-      console.log('Health Test:', healthTest);
+      
       
       return {
         success: true,

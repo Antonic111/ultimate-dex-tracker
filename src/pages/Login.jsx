@@ -4,6 +4,8 @@ import "../css/auth.css";
 import { useMessage } from "../components/Shared/MessageContext";
 import { Eye, EyeOff, User, Lock } from "lucide-react";
 import { authAPI } from "../utils/api.js";
+import { progressAPI } from "../utils/api.js";
+import { profileAPI } from "../utils/api.js";
 
 export default function Login({ onLogin }) {
   const [form, setForm] = useState({ usernameOrEmail: "", password: "" });
@@ -48,8 +50,31 @@ export default function Login({ onLogin }) {
       }
 
       // Use the user data from the login response
-      console.log('Login response received:', loginData);
-      console.log('Progress bars from login:', loginData.user.progressBars);
+      
+      
+      // Since the login response doesn't include progress bars, we need to fetch them separately
+      let progressBars = [];
+      try {
+        const progressResponse = await progressAPI.getProgressBars();
+        progressBars = progressResponse || [];
+      } catch (error) {
+        // removed console.warn to reduce console noise
+        
+        // Fallback: try to get from profile endpoint
+        try {
+          const profileResponse = await profileAPI.getProfile();
+          if (profileResponse && profileResponse.progressBars) {
+            progressBars = profileResponse.progressBars;
+          } else {
+            progressBars = [];
+          }
+        } catch (profileError) {
+          // removed console.warn to reduce console noise
+          progressBars = [];
+        }
+      }
+      
+
       
       onLogin({
         username: loginData.user.username,
@@ -57,7 +82,7 @@ export default function Login({ onLogin }) {
         createdAt: loginData.user.createdAt,
         profileTrainer: loginData.user.profileTrainer,
         verified: loginData.user.verified,
-        progressBars: loginData.user.progressBars || [],
+        progressBars: progressBars,
       });
       navigate("/");
     } catch (err) {
@@ -94,7 +119,7 @@ export default function Login({ onLogin }) {
 
 
   return (
-    <div className={`auth-form ${loading ? "loading" : ""}`}>
+    <div className={`auth-form page-container auth-page ${loading ? "loading" : ""}`}>
       <h2>LOGIN</h2>
       
       <form onSubmit={handleSubmit} className="auth-form-fields">

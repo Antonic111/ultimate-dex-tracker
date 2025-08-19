@@ -111,6 +111,15 @@
   opacity: 0.8;
 }
 
+/* Inline poké ball icons for the footer tagline */
+.inline-ball {
+  width: 18px;
+  height: 18px;
+  vertical-align: -3px;
+  margin: 0 4px;
+  image-rendering: -webkit-optimize-contrast;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .footer-content {

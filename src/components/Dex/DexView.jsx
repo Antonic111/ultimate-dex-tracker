@@ -105,11 +105,11 @@ export default function DexView({
     
     // For ViewDex mode, create organized sections from the filtered list
     const getViewDexSections = () => {
-        if (!pokemonList) return [];
+        if (!actualPokemonList) return [];
         
         const sections = createDexSections();
         return sections.map(section => {
-            const sectionPokemon = pokemonList.filter(pokemon => {
+            const sectionPokemon = actualPokemonList.filter(pokemon => {
                 if (section.key === "main") {
                     return !pokemon.formType; // Main Pokémon have no formType
                 } else {
@@ -124,6 +124,27 @@ export default function DexView({
         }).filter(section => section.getList().length > 0); // Only show sections with Pokémon
     };
     
+    // For ViewDex mode with customFilterMons, create the filtered pokemonList
+    const getFilteredPokemonList = () => {
+        if (customFilterMons && !pokemonList) {
+            // Create filtered list from allMons using customFilterMons
+            return allMons.filter(pokemon => {
+                // Apply forms filter first
+                if (!showForms && pokemon.formType && pokemon.formType !== "main" && pokemon.formType !== "default") {
+                    return false;
+                }
+                return true;
+            });
+        }
+        return pokemonList;
+    };
+    
+    // Get the actual pokemon list to use (either provided or filtered)
+    const actualPokemonList = getFilteredPokemonList();
+    
+    // Update shouldUseCustomList to include customFilterMons case
+    const shouldUseCustomListUpdated = pokemonList !== null || customFilterMons !== null;
+    
     // Get suggestion for no results - using the EXACT same logic as App.jsx
     const getSuggestion = () => {
         if (!filters.searchTerm?.trim()) return "";
@@ -131,7 +152,7 @@ export default function DexView({
         const searchTerm = filters.searchTerm.toLowerCase();
         let allNames = [];
         
-        if (shouldUseCustomList) {
+        if (shouldUseCustomListUpdated) {
             // ViewDex mode: use allMons names for suggestions (not the filtered pokemonList)
             // This ensures we can suggest Pokémon even when the filtered list is empty
             // Filter out any Pokémon without names to prevent errors
@@ -171,9 +192,27 @@ export default function DexView({
     const finalSuggestion = suggestion || getSuggestion();
     
     // Show no results when there's a search term and no results found
-    // Use the showNoResults prop if provided (from App.jsx), otherwise use local logic
-    const shouldShowNoResults = (pokemonList && pokemonList.length === 0) && filters.searchTerm?.trim();
-    const hasNoResults = (pokemonList && pokemonList.length === 0) && filters.searchTerm?.trim();
+    // For ViewDex mode, check if all sections have no results using customFilterMons
+    // For main App mode, use the showNoResults prop if provided
+    let hasNoResults = false;
+    
+    if (shouldUseCustomListUpdated) {
+        // ViewDex mode: check if all sections have no results using customFilterMons
+        if (customFilterMons) {
+            const totalResults = dexSections.reduce((total, section) => {
+                const filteredMons = customFilterMons(section.getList(), showForms);
+                return total + filteredMons.length;
+            }, 0);
+            
+            hasNoResults = filters.searchTerm?.trim() && totalResults === 0;
+        } else {
+            // Fallback if no customFilterMons provided
+            hasNoResults = filters.searchTerm?.trim() && actualPokemonList && actualPokemonList.length === 0;
+        }
+    } else {
+        // Main App mode: use the showNoResults prop if provided, otherwise use local logic
+        hasNoResults = (pokemonList && pokemonList.length === 0) && filters.searchTerm?.trim();
+    }
 
     return (
         <>
@@ -221,26 +260,30 @@ export default function DexView({
 
             {/* Main Dex Section */}
             <div className="main-bg">
-                {shouldUseCustomList ? (
-                    // ViewDex mode - organized sections with custom list
-                    getViewDexSections().map(section => {
-                        const sectionPokemon = section.getList();
-                        if (!sectionPokemon.length) return null;
+                {shouldUseCustomListUpdated ? (
+                    // ViewDex mode - use customFilterMons to filter and display sections
+                    dexSections.map(section => {
+                        const filteredMons = customFilterMons 
+                            ? customFilterMons(section.getList(), showForms)
+                            : section.getList().filter(mon => {
+                                if (!showForms && mon.formType && mon.formType !== "main" && mon.formType !== "default") return false;
+                                return true;
+                            });
+                        
+                        if (!filteredMons.length) return null;
 
                         return (
                             <DexSection
                                 key={section.key}
-                                readOnly={true} // Keep Pokémon slots read-only
-                                allowCollapse={true} // Allow collapsing sections
+                                readOnly={true}
+                                allowCollapse={true}
                                 title={section.title}
-                                pokemonList={sectionPokemon}
+                                pokemonList={filteredMons}
                                 caughtInfoMapOverride={caughtInfoMap}
                                 onSelect={handlePokemonSelect}
                                 showShiny={showShiny}
                                 showForms={showForms}
-                                // Pass through the caught state for proper display
                                 caught={caught || {}}
-                                // Pass through update functions (will be no-ops in read-only mode)
                                 updateCaughtInfo={updateCaughtInfo || (() => {})}
                                 onToggleCaught={onToggleCaught || (() => {})}
                                 onMarkAll={onMarkAll || (() => {})}

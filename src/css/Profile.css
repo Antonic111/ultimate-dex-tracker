@@ -250,6 +250,15 @@ button:focus {
   grid-column: span 2;
 }
 
+/* Simple section heading to match favorites layout */
+.profile-simple-section { margin-top: 8px; }
+.profile-simple-section h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--accent);
+  padding-bottom: 18px;
+}
+
 
 /* ================================
    FAVORITES (Games & Pokémon)
@@ -265,14 +274,17 @@ button:focus {
 .profile-ranking-group h3 {
   margin: 0;
   font-size: 1.2rem;
-  color: var(--accent);
+  color: var(--profile-labels);
   padding-bottom: 18px;
 }
 
+/* Recent Pokémon label uses default .profile-field label styling to match Top Mark/Game */
+
 .profile-rank-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 12px;
+  width: 100%;
 }
 
 .profile-rank-item {
@@ -280,7 +292,7 @@ button:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 70px;
+  width: 96px;
 }
 
 .square-image {
@@ -309,6 +321,21 @@ button:focus {
   text-align: center;
   word-break: break-word;
   max-width: 100%;
+}
+
+/* date under name in recent section */
+.recent-date-label {
+  margin-top: 2px;
+  font-size: 0.7rem;
+  color: #aaa;
+  text-align: center;
+}
+
+/* ensure field-display container for recent section expands and matches other boxes */
+.recent-field-box {
+  display: block;
+  padding: 18px 16px;
+  min-height: 140px;
 }
 
 
@@ -708,7 +735,7 @@ button:focus {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 6px 8px;
+    padding: 8px 10px;
     margin: 0;
     border: 0;
     background: transparent;
@@ -717,9 +744,11 @@ button:focus {
     line-height: 1;
     border-radius: 20px;
     transition: all 0.15s ease;
-    gap: 6px;
-    font-size: 14px;
+    gap: 8px;
+    font-size: 16px;
     font-weight: 500;
+    position: relative; /* for heart burst positioning */
+    overflow: visible;
 }
 
 .profile-like-button:hover {
@@ -732,7 +761,7 @@ button:focus {
 }
 
 .profile-like-button.liked:hover {
-    background-color: rgba(255, 71, 87, 0.1);
+    background-color: transparent;
 }
 
 .profile-like-button:disabled {
@@ -757,7 +786,32 @@ button:focus {
 }
 
 .like-count {
-    font-weight: 600;
-    min-width: 16px;
+    font-weight: 700;
+    min-width: 18px;
     text-align: center;
+}
+
+/* Tiny flying hearts animation */
+.profile-like-button .like-heart-anchor {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-like-button .like-heart {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.6) rotate(var(--rot, 0deg));
+    color: #ff4757;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    animation: like-burst 600ms ease-out forwards;
+}
+
+@keyframes like-burst {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.6) rotate(var(--rot, 0deg)); }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, -60px))) scale(1.2) rotate(var(--rot, 0deg)); }
 }

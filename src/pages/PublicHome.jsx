@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
-import "../css/PublicHome.css"; // optional: create a matching CSS file for styling
+import "../css/PublicHome.css";
 
 export default function PublicHome() {
   return (
-    <div className="public-home">
+    <div className="public-home page-container scale-in">
       <div className="public-home-content">
-        <h1>Welcome to PokéTracker!</h1>
+        <h1>Welcome to Ultimate Dex Tracker!</h1>
         <p>Track your shiny Pokémon collection across all games with ease.</p>
         <div className="public-home-buttons">
           <Link to="/login" className="home-login-btn">Login</Link>

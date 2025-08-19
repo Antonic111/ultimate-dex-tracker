@@ -197,7 +197,7 @@ export default function ViewDex() {
         };
 
         return (
-            <div style={{ position: 'relative' }}>
+            <div className="page-container dex-page" style={{ position: 'relative' }}>
                 {(isLoading('view-dex-data') || isLoading('view-dex-profile')) && (
                     <LoadingSpinner 
                         overlay 

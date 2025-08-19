@@ -66,7 +66,7 @@ export default function Footer() {
         <div className="footer-section">
           <h3>Legal</h3>
           <ul>
-            <li>© {currentYear} Pokémon Tracker</li>
+            <li>© {currentYear} Ultimate Dex Tracker</li>
             <li>Not affiliated with Nintendo/Game Freak/The Pokémon Company</li>
             <li>Pokémon is a trademark of Nintendo</li>
           </ul>
@@ -74,7 +74,32 @@ export default function Footer() {
       </div>
       
       <div className="footer-bottom">
-        <p>Made with ❤️ for Pokemon trainers everywhere</p>
+        <p>
+          <img
+            src="/data/balls/cherish-ball.png"
+            alt="Cherish Ball"
+            className="inline-ball"
+          />
+          {" "}every entry,{' '}
+          <img
+            src="/data/balls/repeat-ball.png"
+            alt="Repeat Ball"
+            className="inline-ball"
+          />
+          {" "}the pursuit,{' '}
+          <img
+            src="/data/balls/master-ball.png"
+            alt="Master Ball"
+            className="inline-ball"
+          />
+          {" "}the dex,{' '}
+          <img
+            src="/data/balls/love-ball.png"
+            alt="Love Ball"
+            className="inline-ball"
+          />
+          {" "}the grind.
+        </p>
       </div>
     </footer>
   );

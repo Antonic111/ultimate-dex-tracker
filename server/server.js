@@ -6,7 +6,12 @@ import authRoutes from "./routes/auth.js";
 import profileRoutes from "./routes/profiles.js";
 import session from "express-session";
 
+// Load environment variables from both .env and .env.local
 dotenv.config();
+dotenv.config({ path: '.env.local' });
+
+// Debug: Log environment variables for development
+// removed development environment console logs to reduce noise
 
 const app = express();
 
@@ -85,9 +90,9 @@ mongoose
     useUnifiedTopology: true
   })
   .then(() => {
-    console.log("✅ MongoDB connected");
+    // startup logs minimized
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+      // server running log minimized
     });
   })
   .catch((err) => console.error("MongoDB connection error:", err));

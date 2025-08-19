@@ -1,45 +1,82 @@
-import { bannedWords, bannedSubstrings } from "./bannedTerms.js";
+// Simple, lightweight profanity filter
+// This is much better than complex external libraries that don't work properly
 
-// Regexes for high-severity slurs with common obfuscations (symbols/spaces between letters)
-const bannedRegexes = [
-  // core 'nigg' with obfuscation (blocks prefixes like n!@@)
-  /n[\W_]*(?:i|!|1|l)[\W_]*(?:g|9|@|6){2}(?![a-z])/iu,
-  // nigger variants with obfuscation: i ~ i/!/1/l, g ~ g/9/@/6, e ~ e/3
-  /n[\W_]*(?:i|!|1|l)[\W_]*(?:g|9|@|6){2}[\W_]*(?:e|3)[\W_]*r/iu,
-  // nigga variants
-  /n[\W_]*(?:i|!|1|l)[\W_]*(?:g|9|@|6){2}[\W_]*a+/iu
+// List of banned words (the actual profanity)
+const bannedWords = [
+  'fuck', 'shit', 'ass', 'bitch', 'cunt', 'dick', 'cock', 'pussy', 'whore',
+  'slut', 'nigger', 'nigga', 'faggot', 'fag', 'coon', 'spic', 'kike', 'chink',
+  'gook', 'wetback', 'towelhead', 'raghead', 'cameljockey', 'sandnigger',
+  'beaner', 'spook', 'jigaboo', 'porchmonkey', 'junglebunny', 'mudshark',
+  'zipperhead', 'gook', 'slant', 'slanteye', 'chink', 'chinky', 'jap',
+  'nip', 'gook', 'slant', 'slanteye', 'chink', 'chinky', 'jap', 'nip'
 ];
 
-// Temporary fix: disable similarity checking until import issue is resolved
-const calculateDistance = (a, b) => {
-  // Simple fallback distance calculation
-  if (a === b) return 0;
-  if (a.length === 0) return b.length;
-  if (b.length === 0) return a.length;
+// List of legitimate words that contain potentially problematic substrings
+const legitimateWords = [
+  'weedle', 'gastly', 'gastrodon', // Pokemon names
+  'gas', 'gases', 'gassy', 'gasoline', 'gaslight',
+  'knee', 'knees', 'kneeling', 'kneeled', 'kneel',
+  'grow', 'growing', 'grown', 'grows', 'growth',
+  'assassin', 'assassinate', 'assassination', 'assassins',
+  'assemble', 'assembly', 'assembled', 'assembling',
+  'assess', 'assessment', 'assessed', 'assessing',
+  'asset', 'assets', 'assign', 'assigned', 'assignment', 'assignments',
+  'assist', 'assistant', 'assistance', 'assisted', 'assisting', 'assistants',
+  'associate', 'associated', 'associating', 'association', 'associations',
+  'assume', 'assumed', 'assuming', 'assumption', 'assumptions',
+  'assure', 'assured', 'assuring', 'assurance', 'assurances',
+  'pass', 'passing', 'passed', 'passes', 'passage', 'passenger', 'passengers',
+  'class', 'classic', 'classical', 'classified', 'classroom', 'classrooms',
+  'glass', 'glasses', 'glassy', 'glassware',
+  'grass', 'grassy', 'grassland', 'grasshopper', 'grasshoppers',
+  'mass', 'massive', 'massively', 'massacre', 'massage', 'massages',
+  'bass', 'bassist', 'bassline', 'bassoon',
+  'brass', 'brassy', 'brassiere', 'brassware',
+  'crass', 'crassly', 'crassness',
+  'sass', 'sassy', 'sassiness',
+  'tassel', 'tasseled', 'tasseling',
+  'wassail', 'wassailing', 'wassailed',
+  'assault', 'assaulted', 'assaulting', 'assaults',
+  'assert', 'asserted', 'asserting', 'assertion', 'assertive'
+];
+
+// Create sets for faster lookups
+const bannedSet = new Set(bannedWords.map(word => word.toLowerCase()));
+const legitimateSet = new Set(legitimateWords.map(word => word.toLowerCase()));
+
+// Simple function to check if text contains profanity
+function containsProfanity(text) {
+  if (!text || typeof text !== 'string') return false;
   
-  const matrix = [];
-  for (let i = 0; i <= b.length; i++) {
-    matrix[i] = [i];
-  }
-  for (let j = 0; j <= a.length; j++) {
-    matrix[0][j] = j;
+  // Check for phonetic bypass attempts first (like "knee grow")
+  const lowerText = text.toLowerCase();
+  if (lowerText.includes('knee grow') || lowerText.includes('grow knee') || 
+      lowerText.includes('knees grow') || lowerText.includes('grow knees')) {
+    return true;
   }
   
-  for (let i = 1; i <= b.length; i++) {
-    for (let j = 1; j <= a.length; j++) {
-      if (b.charAt(i - 1) === a.charAt(j - 1)) {
-        matrix[i][j] = matrix[i - 1][j - 1];
-      } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j] + 1
-        );
-      }
+  const words = lowerText.split(/\s+/);
+  
+  for (const word of words) {
+    // Clean the word (remove punctuation)
+    const cleanWord = word.replace(/[^\w]/g, '');
+    
+    // Skip empty words
+    if (!cleanWord) continue;
+    
+    // Check if it's a legitimate word first
+    if (legitimateSet.has(cleanWord)) {
+      continue;
+    }
+    
+    // Check if it's a banned word
+    if (bannedSet.has(cleanWord)) {
+      return true;
     }
   }
-  return matrix[b.length][a.length];
-};
+  
+  return false;
+}
 
 // Content filter configuration for different field types
 export const FILTER_CONFIGS = {
@@ -49,34 +86,30 @@ export const FILTER_CONFIGS = {
     allowedChars: /^[a-zA-Z0-9 _\-.,~\*]+$/,
     charDescription: "Letters, numbers, spaces, and _ - . , ~ * allowed",
     checkBadWords: true,
-    similarityThreshold: 0.15, // Tighter threshold for usernames
     fieldName: "Username"
   },
   bio: {
     minLength: 0,
     maxLength: 150,
-    allowedChars: null, // No character restrictions for bio
+    allowedChars: null,
     charDescription: null,
     checkBadWords: true,
-    similarityThreshold: 0.2, // Tighter threshold for bio
     fieldName: "Bio"
   },
   notes: {
     minLength: 0,
     maxLength: 200,
-    allowedChars: null, // No character restrictions for notes
+    allowedChars: null,
     charDescription: null,
     checkBadWords: true,
-    similarityThreshold: 0.2, // Tighter threshold for notes
     fieldName: "Notes"
   },
   progressBar: {
     minLength: 1,
     maxLength: 30,
-    allowedChars: null, // No character restrictions for progress bar names
+    allowedChars: null,
     charDescription: null,
     checkBadWords: true,
-    similarityThreshold: 0.2, // Standard threshold for progress bar names
     fieldName: "Progress Bar Name"
   },
   general: {
@@ -85,168 +118,11 @@ export const FILTER_CONFIGS = {
     allowedChars: null,
     charDescription: null,
     checkBadWords: true,
-    similarityThreshold: 0.2, // Tighter threshold for general text
     fieldName: "Text"
   }
 };
 
-// Advanced text normalization to catch sophisticated obfuscation
-function normalizeText(text) {
-  return text
-    .toLowerCase()
-    // Common character substitutions (only actual obfuscation, not legitimate letters)
-    .replace(/[@4]/g, "a")
-    .replace(/[!1]/g, "i")
-    .replace(/[3]/g, "e")
-    .replace(/[5\$]/g, "s")
-    .replace(/[7]/g, "t")
-    .replace(/[0]/g, "o")
-    .replace(/[8]/g, "b")
-    .replace(/[6]/g, "g")
-    .replace(/[2]/g, "z")
-    .replace(/[9]/g, "g")
-    // Remove only obvious obfuscation characters, not legitimate letters
-    .replace(/[^ a-z0-9]/g, "")
-    // Normalize multiple spaces to single space
-    .replace(/\s+/g, " ")
-    // Normalize repeated characters if they appear 3+ times (like fuuuuck -> fuuck, coooon -> coon)
-    .replace(/(.)\1{2,}/g, "$1$1")
-    .trim();
-}
-
-// Generate targeted variations of a word for detection (less aggressive)
-function generateWordVariations(word) {
-  const variations = new Set();
-  
-  // Original word
-  variations.add(word);
-  
-  // Add spaces between every character (for obvious bypass attempts)
-  const spaced = word.split('').join(' ');
-  variations.add(spaced);
-  
-  // Mixed case variations
-  variations.add(word.toUpperCase());
-  variations.add(word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
-  
-  // Common character substitutions (only the most obvious ones)
-  const substitutions = {
-    'a': ['@', '4'],
-    'i': ['!', '1'],
-    'e': ['3'],
-    's': ['5', '$'],
-    't': ['7'],
-    'o': ['0']
-  };
-  
-  // Apply substitutions
-  for (const [char, replacements] of Object.entries(substitutions)) {
-    if (word.includes(char)) {
-      for (const replacement of replacements) {
-        variations.add(word.replace(new RegExp(char, 'g'), replacement));
-      }
-    }
-  }
-  
-  return Array.from(variations);
-}
-
-// Check for repeated character bypasses (like "coooon" containing "coon")
-function checkRepeatedCharacterBypass(text, bannedWords) {
-  const lowerText = text.toLowerCase();
-  
-  for (const bannedWord of bannedWords) {
-    if (bannedWord.length < 3) continue; // Skip very short words
-    
-    // Check for patterns like "coooon" where repeated characters are used to bypass
-    // We'll check if removing repeated characters reveals the banned word
-    const cleaned = lowerText.replace(/(.)\1+/g, "$1");
-    if (cleaned.includes(bannedWord)) {
-      // Additional check: only block if this looks like a bypass attempt
-      // Don't block legitimate words like "coonhound" that contain the banned word
-      
-      // If the cleaned text is exactly the banned word, it's definitely a bypass
-      if (cleaned === bannedWord) {
-        return true;
-      }
-      
-      // If the cleaned text starts with the banned word and has additional characters, 
-      // it might be a legitimate word (like "coonhound")
-      if (cleaned.startsWith(bannedWord) && cleaned.length > bannedWord.length) {
-        // Check if the additional characters form a legitimate word part
-        const remaining = cleaned.substring(bannedWord.length);
-        // If the remaining part is a common word ending, it's likely legitimate
-        const commonEndings = ['hound', 'cat', 'can', 'dog', 'bird', 'fish', 'man', 'woman', 'boy', 'girl'];
-        if (commonEndings.some(ending => remaining.includes(ending))) {
-          continue; // Skip this one, it's likely legitimate
-        }
-      }
-      
-      // If the cleaned text ends with the banned word and has additional characters,
-      // it might be a legitimate word
-      if (cleaned.endsWith(bannedWord) && cleaned.length > bannedWord.length) {
-        const remaining = cleaned.substring(0, cleaned.length - bannedWord.length);
-        // If the remaining part is a common word beginning, it's likely legitimate
-        const commonBeginnings = ['raccoon', 'racoon', 'coon'];
-        if (commonBeginnings.some(beginning => remaining.includes(beginning))) {
-          continue; // Skip this one, it's likely legitimate
-        }
-      }
-      
-      // If we get here, it's likely a bypass attempt
-      return true;
-    }
-    
-    // Also check the original text for the banned word (catches cases where normalization works)
-    if (lowerText.includes(bannedWord)) {
-      // Same logic as above for legitimate words
-      if (lowerText === bannedWord) {
-        return true;
-      }
-      
-      if (lowerText.startsWith(bannedWord) && lowerText.length > bannedWord.length) {
-        const remaining = lowerText.substring(bannedWord.length);
-        const commonEndings = ['hound', 'cat', 'can', 'dog', 'bird', 'fish', 'man', 'woman', 'boy', 'girl'];
-        if (commonEndings.some(ending => remaining.includes(ending))) {
-          continue;
-        }
-      }
-      
-      if (lowerText.endsWith(bannedWord) && lowerText.length > bannedWord.length) {
-        const remaining = lowerText.substring(0, lowerText.length - bannedWord.length);
-        const commonBeginnings = ['raccoon', 'racoon', 'coon'];
-        if (commonBeginnings.some(beginning => remaining.includes(beginning))) {
-          continue;
-        }
-      }
-      
-      return true;
-    }
-  }
-  return false;
-}
-
-// Check for concatenated banned words (like "faggotfaggot")
-function checkConcatenatedBannedWords(normalizedText, bannedWords) {
-  for (const bannedWord of bannedWords) {
-    const normalizedBanned = normalizeText(bannedWord);
-    if (normalizedBanned.length < 3) continue; // Skip very short words
-    
-    // Check for the banned word repeated or concatenated
-    const repeated = normalizedBanned + normalizedBanned;
-    if (normalizedText.includes(repeated)) {
-      return true;
-    }
-    
-    // Check for the banned word embedded in longer text (like "faggotfaggot" containing "faggot")
-    if (normalizedText.includes(normalizedBanned)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// Check if text contains banned words or similar variations
+// Main content validation function
 export function validateContent(text, fieldType = 'general') {
   const config = FILTER_CONFIGS[fieldType] || FILTER_CONFIGS.general;
   const input = (text === null || text === undefined) ? '' : String(text);
@@ -266,62 +142,8 @@ export function validateContent(text, fieldType = 'general') {
   }
 
   // Bad word check
-  if (config.checkBadWords) {
-    const normalizedText = normalizeText(input);
-
-    // -1- Regex match for obfuscated high-severity slurs on raw text
-    for (const rx of bannedRegexes) {
-      if (rx.test(String(text || ''))) {
-        return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
-      }
-    }
-
-    // 0. Check for repeated character bypasses (like "coooon" containing "coon")
-    if (checkRepeatedCharacterBypass(input, bannedWords)) {
-      return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
-    }
-
-    // 1. Block known high-severity substrings even when embedded (use normalized text)
-    for (const sub of (bannedSubstrings || [])) {
-      if (!sub) continue;
-      const normSub = normalizeText(sub);
-      if (normSub && normalizedText.includes(normSub)) {
-        return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
-      }
-    }
-    
-    // 1. Check for concatenated banned words (like "faggotfaggot")
-    if (checkConcatenatedBannedWords(normalizedText, bannedWords)) {
-      return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
-    }
-    
-    // 2. Check if the normalized text itself contains banned words (catches repeated characters like "cooon" -> "coon")
-    for (const bannedWord of bannedWords) {
-      if (normalizedText.includes(bannedWord)) {
-        return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
-      }
-    }
-    
-    for (const bannedWord of bannedWords) {
-      const normalizedBanned = normalizeText(bannedWord);
-      
-      // Check for exact matches and similar variations
-      const variations = generateWordVariations(normalizedBanned);
-      
-      for (const variation of variations) {
-        if (normalizedText.includes(variation)) {
-          return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
-        }
-        
-        // Check for similarity using Levenshtein distance
-        const actualDistance = calculateDistance(normalizedText, variation);
-        const maxDistance = Math.floor(variation.length * config.similarityThreshold);
-        
-        if (actualDistance <= maxDistance) {
-          return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
-        }
-      }
-    }
+  if (config.checkBadWords && containsProfanity(input)) {
+    return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
   }
 
   return { isValid: true };

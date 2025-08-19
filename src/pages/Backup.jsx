@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { Download, Upload, Database, FileText } from 'lucide-react';
+import { Download, Upload, Database, FileText, ArchiveRestore, Trash2 } from 'lucide-react';
 import { caughtAPI, profileAPI } from '../utils/api';
 import { useTheme } from '../components/Shared/ThemeContext';
 import { UserContext } from '../components/Shared/UserContext';
@@ -49,7 +49,7 @@ export default function Backup() {
           profileAPI.getProfile()
         ]);
         
-        console.log('API Results:', { caughtResult, profileResult });
+
         
         caught = caughtResult || {};
         profile = profileResult || {};
@@ -228,11 +228,19 @@ export default function Backup() {
 
       // Check if this backup would be identical to the last one
       if (lastBackupData && 
-          JSON.stringify(backupData.data) === JSON.stringify(lastBackupData.data) &&
           lastBackupData.user.username === backupData.user.username) {
-        showMessage('Backup data is identical to the last backup. No changes detected.', 'error');
-        setBackingUp(false);
-        return;
+        
+        // Compare the actual Pokemon data
+        const currentPokemonData = JSON.stringify(backupData.data.caught || {});
+        const lastPokemonData = JSON.stringify(lastBackupData.data?.caught || lastBackupData.data || {});
+        
+        /* removed debug log: duplicate check */
+        
+        if (currentPokemonData === lastPokemonData) {
+          showMessage('Backup data is identical to the last backup. No changes detected.', 'error');
+          setBackingUp(false);
+          return;
+        }
       }
 
       // Store backup in localStorage for now (could be enhanced to store on server)
@@ -373,13 +381,14 @@ export default function Backup() {
   useEffect(() => {
     const loadBackupHistory = () => {
       const history = [];
+      let mostRecentBackup = null;
+      
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith('pokemon-backup-')) {
           try {
             const backupData = JSON.parse(localStorage.getItem(key));
-            console.log('Processing backup:', key, backupData);
-            
+
             // Handle both old and new backup formats
             const caughtCount = Object.keys(backupData.data?.caught || backupData.data || {}).length;
             const backupItem = {
@@ -388,9 +397,15 @@ export default function Backup() {
               size: JSON.stringify(backupData).length,
               caughtCount: caughtCount
             };
-            
-            console.log('Created backup item:', backupItem);
+
             history.push(backupItem);
+            
+            // Track the most recent backup for duplicate detection
+            // Extract timestamp from the backup key to determine actual creation order
+            const keyTimestamp = parseInt(key.split('-').pop());
+            if (!mostRecentBackup || keyTimestamp > parseInt(mostRecentBackup.id.split('-').pop())) {
+              mostRecentBackup = { ...backupData, id: key };
+            }
           } catch (error) {
             // Skip invalid backups
             console.warn('Skipping invalid backup:', key, error);
@@ -398,13 +413,19 @@ export default function Backup() {
         }
       }
       
-      console.log('Final backup history:', history);
-      
       // Sort by date (newest first) and take last MAX_BACKUPS
       history.sort((a, b) => new Date(b.date) - new Date(a.date));
       const finalHistory = history.slice(0, MAX_BACKUPS);
-      console.log('Final sorted history:', finalHistory);
+
       setBackupHistory(finalHistory);
+      
+      // Restore the most recent backup data for duplicate detection
+      if (mostRecentBackup) {
+        /* removed debug log: restoring last backup */
+        setLastBackupData(mostRecentBackup);
+      } else {
+        /* removed debug log: no mostRecentBackup */
+      }
     };
 
     loadBackupHistory();
@@ -431,7 +452,7 @@ export default function Backup() {
   }
 
   return (
-    <div className="backup-page">
+    <div className="backup-page page-container slide-up">
       <div className="backup-container">
         <div className="backup-header">
           <h1>Backup & Import/Export</h1>
@@ -538,7 +559,7 @@ export default function Backup() {
                   </h3>
                   <div className="backup-list">
                     {backupHistory.map((backup) => {
-                      console.log('Rendering backup item:', backup);
+
                       return (
                         <div key={backup.id} className="backup-item">
                           <div className="backup-info">
@@ -555,14 +576,14 @@ export default function Backup() {
                               title="Restore this backup"
                               disabled={restoring}
                             >
-                              {restoring ? 'Restoring...' : 'Restore'}
+                              <ArchiveRestore size={16} />
                             </button>
                             <button 
                               className="delete-button"
                               onClick={() => deleteBackup(backup.id)}
                               title="Delete this backup"
                             >
-                              Delete
+                              <Trash2 size={16} />
                             </button>
                           </div>
                         </div>

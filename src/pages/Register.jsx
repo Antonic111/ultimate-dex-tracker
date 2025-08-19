@@ -84,7 +84,7 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-form">
+    <div className="auth-form page-container auth-page">
       <h2>SIGN UP</h2>
       
       <form onSubmit={handleSubmit} className="auth-form-fields">

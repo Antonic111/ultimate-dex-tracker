@@ -31,9 +31,14 @@ function ConfirmDialog({ message, root, container }) {
     const body = document.body;
     const html = document.documentElement;
 
-    // Add modal-open class to prevent scrolling
-    body.classList.add("modal-open");
-    html.classList.add("modal-open");
+    // Check if sidebar is open before adding modal-open class
+    const sidebarOpen = document.querySelector('.sidebar-overlay.open');
+    
+    if (!sidebarOpen) {
+      // Add modal-open class to prevent scrolling only if sidebar is not open
+      body.classList.add("modal-open");
+      html.classList.add("modal-open");
+    }
 
     return () => {
       // Cleanup function - remove modal-open class

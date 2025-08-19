@@ -43,7 +43,7 @@ const handleSubmit = async (e) => {
 };
 
   return (
-    <div className="auth-form">
+    <div className="auth-form page-container auth-page">
       <h2>FORGOT PASSWORD</h2>
       <form onSubmit={handleSubmit}>
         <div className="auth-form-fields">

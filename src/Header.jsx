@@ -78,7 +78,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
         </nav>
 
 
-        {user.username && (
+        {user?.username && (
           <nav style={{ marginLeft: "auto" }}>
             <div className="user-menu-wrapper" ref={userMenuRef}>
                              <div className="user-display" onClick={() => {
@@ -128,7 +128,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                         });
                         navigate("/login", { replace: true });
                       } catch (e) {
-                        console.warn("Logout failed", e);
+                        // removed console.warn to reduce console noise
                       }
                     }}
                   >

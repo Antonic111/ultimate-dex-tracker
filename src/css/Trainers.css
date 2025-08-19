@@ -81,6 +81,58 @@
   flex-shrink: 0;
 }
 
+/* ===== User Notice ===== */
+.trainers-page .user-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  background: var(--pokemon-box-bg2);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  flex-wrap: wrap;
+}
+
+/* ===== Verified Notice ===== */
+.trainers-page .verified-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  margin: 8px 0 28px 0;
+  background: var(--pokemon-box-bg2);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-color);
+  text-align: center;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.trainers-page .verified-notice svg {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.trainers-page .user-notice .profile-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.trainers-page .user-notice .profile-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
 .trainers-page .sort-button {
   display: flex;
   align-items: center;

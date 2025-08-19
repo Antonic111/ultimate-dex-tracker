@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useMessage } from "./MessageContext";
 import { userAPI } from "../../utils/api";
 import "../../css/DeleteAccountModal.css";
@@ -82,8 +83,10 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
       body.classList.add("modal-open");
       html.classList.add("modal-open");
     } else {
-      body.classList.remove("modal-open");
-      html.classList.remove("modal-open");
+      setTimeout(() => {
+        body.classList.remove("modal-open");
+        html.classList.remove("modal-open");
+      }, closing ? 320 : 0);
     }
 
     return () => {
@@ -92,7 +95,7 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
     };
   }, [isOpen]);
 
-  return (
+  return createPortal(
     <div className={`modal-backdrop${closing ? " closing" : ""}`}>
       <div className={`modal-card${closing ? " closing" : ""}`}>
         <h3 className="modal-title">Delete Account</h3>
@@ -140,6 +143,7 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

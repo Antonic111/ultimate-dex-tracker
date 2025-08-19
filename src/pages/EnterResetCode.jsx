@@ -88,7 +88,7 @@ const EnterResetCode = () => {
   };
 
   return (
-    <div className="auth-form">
+    <div className="auth-form page-container auth-page">
       <h2 className="auth-heading">ENTER RESET CODE</h2>
       <form onSubmit={handleSubmit}>
         <p className="auth-subtext">

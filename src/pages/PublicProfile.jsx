@@ -82,9 +82,11 @@ export default function PublicProfile() {
     const [data, setData] = useState(null);
     const [stats, setStats] = useState({ shinies: 0, completion: 0, gamesPlayed: 0, topBall: null, topMark: null, topGame: null });
     const [loading, setLoading] = useState(true);
+    const [recentAdded, setRecentAdded] = useState([]);
     const [likeCount, setLikeCount] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
+    const [likeBurst, setLikeBurst] = useState(0);
     const { showMessage } = useMessage();
     const { username: currentUsername } = useContext(UserContext);
 
@@ -108,6 +110,9 @@ export default function PublicProfile() {
         
         setHasLiked(!wasLiked);
         setLikeCount(wasLiked ? previousCount - 1 : previousCount + 1);
+        if (!wasLiked) {
+            setLikeBurst(n => n + 1);
+        }
         
         try {
             // Use the authenticated likes endpoint
@@ -169,6 +174,26 @@ export default function PublicProfile() {
                 const topGame = fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) ? "Pokemon " + fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) : null;
 
                 if (!ignore) setStats({ shinies, completion, gamesPlayed, topBall, topMark, topGame });
+
+                // Build recent 5 added list (newest by date first)
+                try {
+                    const allMonsList = [...pokemonData, ...formsData];
+                    const keyToMon = new Map(allMonsList.map(m => [getCaughtKey(m), m]));
+                    const recentList = Object.entries(map)
+                        .filter(([_, info]) => !!info)
+                        .map(([key, info]) => {
+                            const mon = keyToMon.get(key);
+                            const ts = info && info.date ? Date.parse(info.date) : Number.NEGATIVE_INFINITY;
+                            return { key, mon, info, ts };
+                        })
+                        .filter(item => !!item.mon)
+                        .sort((a, b) => b.ts - a.ts)
+                        .slice(0, 5)
+                        .map(({ mon, info }) => ({ mon, info }));
+                    if (!ignore) setRecentAdded(recentList);
+                } catch {
+                    if (!ignore) setRecentAdded([]);
+                }
             } catch { }
         })();
         return () => { ignore = true; };
@@ -332,7 +357,7 @@ export default function PublicProfile() {
     }
 
     return (
-        <div className="profile-wrapper">
+        <div className="profile-wrapper page-container profile-page">
             {/* ===== header bar (same layout, no edit buttons) ===== */}
             <div className="profile-header-bar">
                 <div className="profile-header-left">
@@ -354,7 +379,16 @@ export default function PublicProfile() {
                                 title={hasLiked ? "Remove like" : "Like profile"}
                                 aria-label={hasLiked ? "Remove like" : "Like profile"}
                             >
-                                <Heart size={16} fill={hasLiked ? "currentColor" : "none"} />
+                                <span className="like-heart-anchor">
+                                    <Heart size={20} fill={hasLiked ? "currentColor" : "none"} />
+                                    {likeBurst > 0 && (
+                                        <span key={likeBurst} aria-hidden="true">
+                                            <span className="like-heart">❤</span>
+                                            <span className="like-heart" style={{"--tx":"-26px","--ty":"-38px","--rot":"-18deg"}}>❤</span>
+                                            <span className="like-heart" style={{"--tx":"22px","--ty":"-44px","--rot":"14deg"}}>❤</span>
+                                        </span>
+                                    )}
+                                </span>
                                 <span className="like-count">{likeCount}</span>
                             </button>
                         ) : (
@@ -540,15 +574,38 @@ export default function PublicProfile() {
                             <label>Top Game</label>
                             <div className="field-display">{stats.topGame || "—"}</div>
                         </div>
-                        {/* Full Dex button - standalone, full width */}
-                        <div className="profile-full-dex-button">
-                            <Link
-                                to={`/u/${encodeURIComponent(username)}/dex`}
-                                className="profile-full-dex-link"
-                            >
-                                View Full Dex
-                            </Link>
+                        <div className="profile-field full-span recent-field">
+                            <label>Recent Pokémon</label>
+                            <div className="field-display recent-field-box">
+                                <div className="profile-rank-row">
+                                    {recentAdded && recentAdded.length > 0 ? (
+                                        recentAdded.map(({ mon, info }, idx) => (
+                                            <div key={idx} className="profile-rank-item">
+                                                <div className="profile-pokemon-box" style={{ marginBottom: "2px" }}>
+                                                    <img
+                                                        src={mon?.sprites?.front_default}
+                                                        alt={formatPokemonName(mon?.name)}
+                                                        className="pokemon-img"
+                                                    />
+                                                </div>
+                                                <div className="rank-label">{formatPokemonName(mon?.name)}</div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div style={{ opacity: 0.7 }}>No recent additions yet</div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                    {/* Full Dex button - place below the recent section */}
+                    <div className="profile-full-dex-button">
+                        <Link
+                            to={`/u/${encodeURIComponent(username)}/dex`}
+                            className="profile-full-dex-link"
+                        >
+                            View Full Dex
+                        </Link>
                     </div>
                 </div>
             </div>

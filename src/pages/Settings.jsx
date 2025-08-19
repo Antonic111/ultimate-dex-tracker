@@ -117,7 +117,7 @@ export default function Settings() {
 
 
     return (
-            <div className="settings-page">
+            <div className="settings-page page-container fade-in-up">
       <h1 className="page-title">Settings</h1>
       <div className="settings-container">
                 {/* Left Column */}

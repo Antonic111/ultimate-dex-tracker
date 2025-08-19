@@ -78,7 +78,7 @@ const EmailSent = () => {
   };
 
   return (
-    <div className="auth-form">
+    <div className="auth-form page-container auth-page">
       <h2>VERIFY YOUR EMAIL</h2>
       <div className="email-sent-message">
         <p>

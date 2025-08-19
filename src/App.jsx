@@ -31,6 +31,7 @@ import Settings from "./pages/Settings";
 import Backup from "./pages/Backup";
 import { ThemeProvider } from "./components/Shared/ThemeContext";
 import './css/theme.css';
+import './css/pageAnimations.css';
 import Trainers from "./pages/Trainers";
 import PublicProfile from "./pages/PublicProfile";
 import ViewDex from "./pages/ViewDex.jsx";
@@ -174,62 +175,49 @@ export default function App() {
 
   // Helper to check if user is still logged in
   const checkAuth = async (silent = false) => {
-    // Skip auth check if user just logged in to prevent overwriting progress bars
+    // Skip checkAuth if user just logged in
     if (justLoggedIn) {
-      console.log('Skipping checkAuth because user just logged in');
       return;
     }
-    
-    if (!silent) setLoading(true);
+
+    // Check if user is authenticated
     try {
       const userData = await authAPI.getCurrentUser();
-      console.log('checkAuth called, userData:', userData);
       
-      // Preserve existing progress bars if server response doesn't include them
-      const existingProgressBars = user.progressBars || [];
-      const newProgressBars = userData.progressBars || existingProgressBars;
-      
-      console.log('Progress bars preservation:', {
-        existing: existingProgressBars.length,
-        server: userData.progressBars?.length || 0,
-        final: newProgressBars.length,
-        serverResponse: userData,
-        existingUser: user
-      });
-      
-      setUser({
-        username: userData.username,
-        email: userData.email,
-        createdAt: userData.createdAt,
-        profileTrainer: userData.profileTrainer,
-        verified: userData.verified,
-        progressBars: newProgressBars,
-      });
+      if (userData && userData.username) {
+        // Preserve existing progress bars if the server response doesn't include them
+        const existingProgressBars = user.progressBars || [];
+        const serverProgressBars = userData.progressBars || [];
+        
+        const finalProgressBars = serverProgressBars.length > 0 
+          ? serverProgressBars 
+          : existingProgressBars;
+        
+        setUser({
+          ...userData,
+          progressBars: finalProgressBars
+        });
+      } else {
+        // Clear user data if not authenticated
+        setUser(null);
+      }
     } catch (error) {
-      console.log('checkAuth failed, clearing user data');
-      // Clear user data on authentication failure
-      setUser({
-        username: null,
-        email: null,
-        createdAt: null,
-        profileTrainer: null,
-        verified: false,
-        progressBars: [],
-      });
+      // Clear user data on error
+      setUser(null);
     } finally {
-      if (!silent) setLoading(false);
-      if (!silent) setAuthReady(true);
+      if (!silent) {
+        setLoading(false);
+      }
+      setAuthReady(true);
     }
   };
 
   // Custom setUser function that handles login properly
   const handleUserUpdate = (newUserData) => {
-    console.log('handleUserUpdate called with:', newUserData);
     
     // If this is a login (has username and progressBars), set the flag
     if (newUserData.username && newUserData.progressBars) {
       setJustLoggedIn(true);
-      console.log('Login detected, setting justLoggedIn flag');
     }
     
     setUser(newUserData);
@@ -238,7 +226,6 @@ export default function App() {
     if (newUserData.username && newUserData.progressBars) {
       setTimeout(() => {
         setJustLoggedIn(false);
-        console.log('Clearing justLoggedIn flag');
       }, 2000);
     }
   };
@@ -252,13 +239,8 @@ export default function App() {
 
   // Debug: Log user state changes
   useEffect(() => {
-    console.log('User state changed:', {
-      username: user.username,
-      progressBars: user.progressBars,
-      progressBarsLength: user.progressBars?.length,
-      justLoggedIn: justLoggedIn
-    });
-  }, [user.username, user.progressBars, justLoggedIn]);
+    
+  }, [user?.username, user?.progressBars, justLoggedIn]);
 
 useEffect(() => {
   // close sidebar on login/logout
@@ -270,13 +252,11 @@ useEffect(() => {
   const onPageShow = (e) => {
     // Skip auth refresh if user just logged in or if we have valid user data
     if (justLoggedIn) {
-      console.log('Skipping pageshow auth refresh because user just logged in');
       return;
     }
     
     // Only refresh auth if the page was restored from cache AND we don't have valid user data
     if ((e.persisted || document.wasDiscarded) && (!user?.username || !user?.verified)) {
-      console.log('Page restored from cache, refreshing auth');
       checkAuth(true); // silent refresh: does NOT set loading/authReady
     }
   };
@@ -450,7 +430,9 @@ function updateCaughtInfo(poke, info) {
     // If we're resetting/clearing data
     if (info == null) {
       const updated = { ...prev, [key]: null };
-      updateCaughtData(user.username, key, null); // persist delete
+      if (user?.username) {
+        updateCaughtData(user.username, key, null); // persist delete
+      }
       return updated;
     }
 
@@ -466,7 +448,9 @@ function updateCaughtInfo(poke, info) {
     }
 
     const updated = { ...prev, [key]: cleanedInfo };
-    updateCaughtData(user.username, key, cleanedInfo); // persist update
+    if (user?.username) {
+      updateCaughtData(user.username, key, cleanedInfo); // persist update
+    }
     return updated;
   });
 
@@ -541,7 +525,7 @@ function updateCaughtInfo(poke, info) {
         // Use API helper directly to avoid circular import
         const { caughtAPI } = await import('./utils/api.js');
         await caughtAPI.patchCaughtData({ changes: delta });
-      } else {
+      } else if (user?.username) {
         await updateCaughtData(user.username, null, newInfoMap);
       }
     } catch (e) {
@@ -592,14 +576,18 @@ function updateCaughtInfo(poke, info) {
           ...prevInfoMap,
           [key]: freshInfo
         }));
-        updateCaughtData(user.username, key, freshInfo);
+        if (user?.username) {
+          updateCaughtData(user.username, key, freshInfo);
+        }
       } else {
         setCaughtInfoMap(prevInfoMap => {
           const updated = { ...prevInfoMap };
           delete updated[key];
           return updated;
         });
-        updateCaughtData(user.username, key, null);
+        if (user?.username) {
+          updateCaughtData(user.username, key, null);
+        }
       }
 
       return newState;
@@ -683,24 +671,28 @@ function updateCaughtInfo(poke, info) {
                   ) : user?.username ? (
 
                     <>
-                      <ProgressManager
-                        allMons={[...pokemonData, ...formsData]}
-                        caughtInfoMap={caughtInfoMap}
-                        progressBarsOverride={user.progressBars}
-                      />
+                      <div className="progress-manager-container page-animate-1">
+                        <ProgressManager
+                          allMons={[...pokemonData, ...formsData]}
+                          caughtInfoMap={caughtInfoMap}
+                          progressBarsOverride={user.progressBars}
+                        />
+                      </div>
 
-                      <SearchBar
-                        filters={filters}
-                        setFilters={setFilters}
-                        typeOptions={typeOptions}
-                        genOptions={GEN_OPTIONS}
-                        showShiny={showShiny}
-                        setShowShiny={setShowShiny}
-                        showForms={showForms}
-                        setShowForms={setShowForms}
-                      />
+                      <div className="search-bar-container page-animate-2">
+                        <SearchBar
+                          filters={filters}
+                          setFilters={setFilters}
+                          typeOptions={typeOptions}
+                          genOptions={GEN_OPTIONS}
+                          showShiny={showShiny}
+                          setShowShiny={setShowShiny}
+                          showForms={showForms}
+                          setShowForms={setShowForms}
+                        />
+                      </div>
 
-                      <div className="main-bg">
+                      <div className="main-bg page-container fade-in-up">
                         {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
                           ? dexSections.map(section => {
                             const filteredMons = filterMons(section.getList(), showForms)
@@ -778,27 +770,27 @@ function updateCaughtInfo(poke, info) {
 
               <Route
                 path="/login"
-                element={user.username ? <Navigate to="/" /> : <Login onLogin={handleUserUpdate} />}
+                element={user?.username ? <Navigate to="/" /> : <Login onLogin={handleUserUpdate} />}
               />
               <Route
                 path="/register"
-                element={user.username ? <Navigate to="/" /> : <Register onRegister={handleUserUpdate} />}
+                element={user?.username ? <Navigate to="/" /> : <Register onRegister={handleUserUpdate} />}
               />
               <Route
                 path="/email-sent"
-                element={!user.username ? <EmailSent /> : <Navigate to="/" />}
+                element={!user?.username ? <EmailSent /> : <Navigate to="/" />}
               />
               <Route
                 path="/forgot-password"
-                element={!user.username ? <ForgotPassword /> : <Navigate to="/" />}
+                element={!user?.username ? <ForgotPassword /> : <Navigate to="/" />}
               />
               <Route
                 path="/reset-password"
-                element={!user.username ? <ResetPassword /> : <Navigate to="/" />}
+                element={!user?.username ? <ResetPassword /> : <Navigate to="/" />}
               />
               <Route
                 path="/enter-reset-code"
-                element={!user.username ? <EnterResetCode /> : <Navigate to="/" />}
+                element={!user?.username ? <EnterResetCode /> : <Navigate to="/" />}
               />
               <Route
                 path="/profile"

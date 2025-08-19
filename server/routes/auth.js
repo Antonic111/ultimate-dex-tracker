@@ -787,6 +787,7 @@ router.get("/users/public", async (req, res) => {
           location: 1,
           gender: 1,
           createdAt: 1,
+          verified: 1,
           // count non-null entries in caughtPokemon
           shinies: {
             $size: {
@@ -823,7 +824,7 @@ router.get("/users/:username/public", async (req, res) => {
       username: req.params.username,
       isProfilePublic: { $ne: false }
     })
-      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes")
+      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes verified")
       .lean();
       
     if (!u) return res.status(404).json({ error: "User not found or private" });

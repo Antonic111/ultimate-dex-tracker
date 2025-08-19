@@ -63,7 +63,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="auth-form">
+    <div className="auth-form page-container auth-page">
       <h2>RESET PASSWORD</h2>
       <form onSubmit={handleSubmit}>
         <div className="input-icon-wrapper password-wrapper">
