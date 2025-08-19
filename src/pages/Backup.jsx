@@ -66,16 +66,14 @@ export default function Backup() {
     try {
       setExporting(true);
       
-      // Ensure we have at least some data to export
-      if (!profileData.username) {
-        throw new Error('No user data available for export');
-      }
+      // Use username from context if profile data doesn't have it
+      const usernameToUse = profileData.username || username || 'User';
       
       const exportData = {
         version: '1.0',
         exportDate: new Date().toISOString(),
         user: {
-          username: profileData.username,
+          username: usernameToUse,
           email: profileData.email || 'unknown@example.com',
           createdAt: profileData.createdAt || new Date().toISOString(),
           profileTrainer: profileData.profileTrainer || null,
@@ -90,7 +88,7 @@ export default function Backup() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `pokemon-backup-${profileData.username}-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `pokemon-backup-${usernameToUse}-${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -157,16 +155,14 @@ export default function Backup() {
     try {
       setBackingUp(true);
       
-      // Ensure we have at least some data to backup
-      if (!profileData.username) {
-        throw new Error('No user data available for backup');
-      }
+      // Use username from context if profile data doesn't have it
+      const usernameToUse = profileData.username || username || 'User';
       
       const backupData = {
         version: '1.0',
         backupDate: new Date().toISOString(),
         user: {
-          username: profileData.username,
+          username: usernameToUse,
           email: profileData.email || 'unknown@example.com',
           createdAt: profileData.createdAt || new Date().toISOString(),
           profileTrainer: profileData.profileTrainer || null,
@@ -178,7 +174,7 @@ export default function Backup() {
       };
 
       // Store backup in localStorage for now (could be enhanced to store on server)
-      const backupKey = `pokemon-backup-${profileData.username}-${Date.now()}`;
+      const backupKey = `pokemon-backup-${usernameToUse}-${Date.now()}`;
       localStorage.setItem(backupKey, JSON.stringify(backupData));
       
       // Update backup history
@@ -329,7 +325,7 @@ export default function Backup() {
               </div>
               <div className="summary-item">
                 <span className="label">Username:</span>
-                <span className="value">{profileData.username}</span>
+                <span className="value">{profileData.username || username || 'User'}</span>
               </div>
             </div>
 
