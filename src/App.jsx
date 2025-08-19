@@ -163,6 +163,8 @@ export default function App() {
     email: null,
     createdAt: null,
     profileTrainer: null,
+    verified: false,
+    progressBars: [],
   });
   const [showMenu, setShowMenu] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -170,10 +172,11 @@ export default function App() {
   const [authReady, setAuthReady] = useState(false);
 
   // Helper to check if user is still logged in
-  const checkAuth = async () => {
-    setLoading(true);
+  const checkAuth = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const userData = await authAPI.getCurrentUser();
+      console.log('checkAuth called, userData:', userData);
       setUser({
         username: userData.username,
         email: userData.email,
@@ -183,6 +186,7 @@ export default function App() {
         progressBars: userData.progressBars || [],
       });
     } catch (error) {
+      console.log('checkAuth failed, clearing user data');
       // Clear user data on authentication failure
       setUser({
         username: null,
@@ -193,8 +197,8 @@ export default function App() {
         progressBars: [],
       });
     } finally {
-      setLoading(false);
-      setAuthReady(true);
+      if (!silent) setLoading(false);
+      if (!silent) setAuthReady(true);
     }
   };
 
@@ -205,7 +209,16 @@ export default function App() {
     checkAuth(false);
   }, []);
 
+  // Debug: Log user state changes
   useEffect(() => {
+    console.log('User state changed:', {
+      username: user.username,
+      progressBars: user.progressBars,
+      progressBarsLength: user.progressBars?.length
+    });
+  }, [user.username, user.progressBars]);
+
+useEffect(() => {
   // close sidebar on login/logout
   setSidebarOpen(false);
   setSelectedPokemon(null);
@@ -213,13 +226,15 @@ export default function App() {
 
 useEffect(() => {
   const onPageShow = (e) => {
-    if (e.persisted || document.wasDiscarded) {
+    // Only refresh auth if the page was restored from cache AND we don't have valid user data
+    if ((e.persisted || document.wasDiscarded) && (!user?.username || !user?.verified)) {
+      console.log('Page restored from cache, refreshing auth');
       checkAuth(true); // silent refresh: does NOT set loading/authReady
     }
   };
   window.addEventListener("pageshow", onPageShow);
   return () => window.removeEventListener("pageshow", onPageShow);
-}, []);
+}, [user?.username, user?.verified]);
 
 
   const [caught, setCaught] = useState({});
@@ -623,6 +638,7 @@ function updateCaughtInfo(poke, info) {
                       <ProgressManager
                         allMons={[...pokemonData, ...formsData]}
                         caughtInfoMap={caughtInfoMap}
+                        progressBarsOverride={user.progressBars}
                       />
 
                       <SearchBar
