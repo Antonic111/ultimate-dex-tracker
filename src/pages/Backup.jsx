@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Download, Upload, Database, FileText, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import { caughtAPI, profileAPI } from '../utils/api';
 import { useTheme } from '../components/Shared/ThemeContext';
+import { UserContext } from '../components/Shared/UserContext';
 import '../css/Backup.css';
 
 export default function Backup() {
@@ -15,6 +16,7 @@ export default function Backup() {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [backupHistory, setBackupHistory] = useState([]);
   const { theme, accent } = useTheme();
+  const { username } = useContext(UserContext);
 
   useEffect(() => {
     loadUserData();
@@ -23,17 +25,76 @@ export default function Backup() {
   const loadUserData = async () => {
     try {
       setLoading(true);
-      const [caught, profile, progress] = await Promise.all([
-        caughtAPI.getCaughtData(),
-        profileAPI.getProfile(),
-        profileAPI.getProgressBars()
-      ]);
       
-      setCaughtData(caught || {});
-      setProfileData(profile || {});
-      setProgressBars(progress || []);
+      // Try to get user data from context/localStorage if API fails
+      let caught = {};
+      let profile = {};
+      let progress = [];
+      
+      try {
+        // Try API calls first
+        const [caughtResult, profileResult, progressResult] = await Promise.all([
+          caughtAPI.getCaughtData(),
+          profileAPI.getProfile(),
+          profileAPI.getProgressBars()
+        ]);
+        
+        caught = caughtResult || {};
+        profile = profileResult || {};
+        progress = progressResult || [];
+      } catch (apiError) {
+        // If API fails, try to get data from localStorage or use fallbacks
+        console.warn('API calls failed, using fallback data:', apiError);
+        
+        // Try to get username from localStorage or use a fallback
+        const storedUsername = localStorage.getItem('username') || username || 'User';
+        
+        // Try to get caught data from localStorage
+        const storedCaught = localStorage.getItem('caughtData');
+        if (storedCaught) {
+          try {
+            caught = JSON.parse(storedCaught);
+          } catch (e) {
+            console.warn('Failed to parse stored caught data');
+          }
+        }
+        
+        // Try to get progress bars from localStorage
+        const storedProgress = localStorage.getItem('progressBars');
+        if (storedProgress) {
+          try {
+            progress = JSON.parse(storedProgress);
+          } catch (e) {
+            console.warn('Failed to parse stored progress data');
+          }
+        }
+        
+        // Create fallback profile data
+        profile = {
+          username: storedUsername,
+          email: 'email@example.com',
+          createdAt: new Date().toISOString(),
+          profileTrainer: null,
+          verified: false
+        };
+        
+        setMessage({ 
+          type: 'info', 
+          text: 'Running in offline mode. Some features may be limited.' 
+        });
+      }
+      
+      setCaughtData(caught);
+      setProfileData(profile);
+      setProgressBars(progress);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to load user data' });
+      console.error('Failed to load user data:', error);
+      setMessage({ type: 'error', text: 'Failed to load user data. Please check your connection.' });
+      
+      // Set fallback data so the page still works
+      setCaughtData({});
+      setProfileData({ username: username || 'User', email: '', createdAt: '', profileTrainer: null, verified: false });
+      setProgressBars([]);
     } finally {
       setLoading(false);
     }
@@ -43,19 +104,24 @@ export default function Backup() {
     try {
       setExporting(true);
       
+      // Ensure we have at least some data to export
+      if (!profileData.username) {
+        throw new Error('No user data available for export');
+      }
+      
       const exportData = {
         version: '1.0',
         exportDate: new Date().toISOString(),
         user: {
           username: profileData.username,
-          email: profileData.email,
-          createdAt: profileData.createdAt,
-          profileTrainer: profileData.profileTrainer,
-          verified: profileData.verified
+          email: profileData.email || 'unknown@example.com',
+          createdAt: profileData.createdAt || new Date().toISOString(),
+          profileTrainer: profileData.profileTrainer || null,
+          verified: profileData.verified || false
         },
         data: {
-          caught: caughtData,
-          progressBars: progressBars
+          caught: caughtData || {},
+          progressBars: progressBars || []
         }
       };
 
@@ -71,7 +137,8 @@ export default function Backup() {
 
       setMessage({ type: 'success', text: 'Data exported successfully!' });
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to export data' });
+      console.error('Export failed:', error);
+      setMessage({ type: 'error', text: `Failed to export data: ${error.message}` });
     } finally {
       setExporting(false);
     }
@@ -131,19 +198,24 @@ export default function Backup() {
     try {
       setBackingUp(true);
       
+      // Ensure we have at least some data to backup
+      if (!profileData.username) {
+        throw new Error('No user data available for backup');
+      }
+      
       const backupData = {
         version: '1.0',
         backupDate: new Date().toISOString(),
         user: {
           username: profileData.username,
-          email: profileData.email,
-          createdAt: profileData.createdAt,
-          profileTrainer: profileData.profileTrainer,
-          verified: profileData.verified
+          email: profileData.email || 'unknown@example.com',
+          createdAt: profileData.createdAt || new Date().toISOString(),
+          profileTrainer: profileData.profileTrainer || null,
+          verified: profileData.verified || false
         },
         data: {
-          caught: caughtData,
-          progressBars: progressBars
+          caught: caughtData || {},
+          progressBars: progressBars || []
         }
       };
 
@@ -156,15 +228,16 @@ export default function Backup() {
         id: backupKey,
         date: new Date().toISOString(),
         size: JSON.stringify(backupData).length,
-        caughtCount: Object.keys(caughtData).length,
-        progressCount: progressBars.length
+        caughtCount: Object.keys(caughtData || {}).length,
+        progressCount: (progressBars || []).length
       };
       
       setBackupHistory(prev => [newBackup, ...prev.slice(0, 9)]); // Keep last 10 backups
       
       setMessage({ type: 'success', text: 'Backup created successfully!' });
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to create backup' });
+      console.error('Backup creation failed:', error);
+      setMessage({ type: 'error', text: `Failed to create backup: ${error.message}` });
     } finally {
       setBackingUp(false);
     }
@@ -275,6 +348,12 @@ export default function Backup() {
         <div className="backup-header">
           <h1>Backup & Import</h1>
           <p>Manage your Pokemon data backups and imports</p>
+          {message.type === 'info' && (
+            <div className="offline-indicator">
+              <AlertCircle size={16} />
+              <span>Offline Mode - Limited functionality</span>
+            </div>
+          )}
         </div>
 
         {message.text && (
