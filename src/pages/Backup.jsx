@@ -415,8 +415,9 @@ export default function Backup() {
         {/* Removed message display as per new_code */}
 
         <div className="backup-sections">
-          {/* Export Section */}
-          <div className="backup-section">
+          {/* Left Box - Export & Import */}
+          <div className="backup-section left-section">
+            {/* Export Section */}
             <div className="section-header">
               <Download size={20} />
               <h2>Export Data</h2>
@@ -441,10 +442,11 @@ export default function Backup() {
             >
               {exporting ? 'Exporting...' : 'Export Data'}
             </button>
-          </div>
 
-          {/* Import Section */}
-          <div className="backup-section">
+            {/* Divider */}
+            <div className="section-divider"></div>
+
+            {/* Import Section */}
             <div className="section-header">
               <Upload size={20} />
               <h2>Import Data</h2>
@@ -469,8 +471,8 @@ export default function Backup() {
             </label>
           </div>
 
-          {/* Local Backup Section */}
-          <div className="backup-section">
+          {/* Right Box - Local Backups */}
+          <div className="backup-section right-section">
             <div className="section-header">
               <Database size={20} />
               <h2>Local Backups</h2>
@@ -501,47 +503,57 @@ export default function Backup() {
               )}
             </div>
 
-            {backupHistory.length > 0 && (
-              <div className="backup-history">
-                <h3 data-count={`(${backupHistory.length}/${MAX_BACKUPS})`}>
-                  Recent Backups
-                  {backupHistory.length >= 5 && (
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginLeft: 'auto' }}>
-                      Scroll to see more
-                    </span>
-                  )}
-                </h3>
-                <div className="backup-list">
-                  {backupHistory.map((backup) => (
-                    <div key={backup.id} className="backup-item">
-                      <div className="backup-info">
-                        <div className="backup-date">{formatDate(backup.date)}</div>
-                        <div className="backup-details">
-                          <span>{backup.caughtCount} Pokemon</span>
-                          <span>{formatFileSize(backup.size)}</span>
+            {/* Backup History Container - Always visible with grey background */}
+            <div className="backup-history-container">
+              {backupHistory.length > 0 ? (
+                <div className="backup-history">
+                  <h3 data-count={`(${backupHistory.length}/${MAX_BACKUPS})`}>
+                    Recent Backups
+                    {backupHistory.length >= 5 && (
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginLeft: 'auto' }}>
+                        Scroll to see more
+                      </span>
+                    )}
+                  </h3>
+                  <div className="backup-list">
+                    {backupHistory.map((backup) => (
+                      <div key={backup.id} className="backup-item">
+                        <div className="backup-info">
+                          <div className="backup-date">{formatDate(backup.date)}</div>
+                          <div className="backup-details">
+                            <span>{backup.caughtCount} Pokemon</span>
+                            <span>{formatFileSize(backup.size)}</span>
+                          </div>
+                        </div>
+                        <div className="backup-actions">
+                          <button 
+                            className="restore-button"
+                            onClick={() => restoreBackup(backup.id)}
+                            title="Restore this backup"
+                          >
+                            Restore
+                          </button>
+                          <button 
+                            className="delete-button"
+                            onClick={() => deleteBackup(backup.id)}
+                            title="Delete this backup"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </div>
-                      <div className="backup-actions">
-                        <button 
-                          className="restore-button"
-                          onClick={() => restoreBackup(backup.id)}
-                          title="Restore this backup"
-                        >
-                          Restore
-                        </button>
-                        <button 
-                          className="delete-button"
-                          onClick={() => deleteBackup(backup.id)}
-                          title="Delete this backup"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="empty-backups">
+                  <p>No backups yet</p>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                    Create your first backup to get started
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
