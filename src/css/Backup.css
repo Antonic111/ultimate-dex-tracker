@@ -163,7 +163,7 @@
   justify-content: center;
   gap: 10px;
   background: var(--accent);
-  color: white;
+  color: var(--text);
 }
 
 .action-button:hover:not(:disabled) {
@@ -184,7 +184,7 @@
 .file-input-button {
   display: inline-block;
   background: var(--accent);
-  color: white;
+  color: var(--text);
   padding: 15px 20px;
   border-radius: 8px;
   font-weight: 600;
@@ -279,7 +279,7 @@
 
 .restore-button {
   background: var(--accent);
-  color: white;
+  color: var(--text);
 }
 
 .restore-button:hover {
@@ -289,7 +289,7 @@
 
 .delete-button {
   background: #ef4444;
-  color: white;
+  color: var(--text);
 }
 
 .delete-button:hover {

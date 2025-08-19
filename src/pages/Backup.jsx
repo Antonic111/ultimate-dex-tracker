@@ -8,7 +8,6 @@ import '../css/Backup.css';
 export default function Backup() {
   const [caughtData, setCaughtData] = useState({});
   const [profileData, setProfileData] = useState({});
-  const [progressBars, setProgressBars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -20,18 +19,6 @@ export default function Backup() {
 
   useEffect(() => {
     loadUserData();
-    
-    // Test server connection
-    const testConnection = async () => {
-      try {
-        const response = await fetch('/api/health', { method: 'GET' });
-        console.log('Server health check:', response.status);
-      } catch (error) {
-        console.log('Server health check failed:', error);
-      }
-    };
-    
-    testConnection();
   }, []);
 
   const loadUserData = async () => {
@@ -41,23 +28,20 @@ export default function Backup() {
       // Try to get user data from API
       let caught = {};
       let profile = {};
-      let progress = [];
       
       try {
         // Try API calls first
-        const [caughtResult, profileResult, progressResult] = await Promise.all([
+        const [caughtResult, profileResult] = await Promise.all([
           caughtAPI.getCaughtData(),
-          profileAPI.getProfile(),
-          profileAPI.getProgressBars()
+          profileAPI.getProfile()
         ]);
         
-        console.log('API Results:', { caughtResult, profileResult, progressResult });
+        console.log('API Results:', { caughtResult, profileResult });
         
         caught = caughtResult || {};
         profile = profileResult || {};
-        progress = progressResult || [];
         
-        // Clear any offline mode messages
+        // Clear any error messages
         setMessage({ type: '', text: '' });
       } catch (apiError) {
         console.error('API calls failed:', apiError);
@@ -66,7 +50,6 @@ export default function Backup() {
       
       setCaughtData(caught);
       setProfileData(profile);
-      setProgressBars(progress);
     } catch (error) {
       console.error('Failed to load user data:', error);
       setMessage({ type: 'error', text: error.message });
@@ -74,7 +57,6 @@ export default function Backup() {
       // Set empty data so the page still works
       setCaughtData({});
       setProfileData({ username: username || 'User', email: '', createdAt: '', profileTrainer: null, verified: false });
-      setProgressBars([]);
     } finally {
       setLoading(false);
     }
@@ -100,8 +82,7 @@ export default function Backup() {
           verified: profileData.verified || false
         },
         data: {
-          caught: caughtData || {},
-          progressBars: progressBars || []
+          caught: caughtData || {}
         }
       };
 
@@ -134,16 +115,18 @@ export default function Backup() {
       const importedData = JSON.parse(text);
 
       // Validate the imported data structure
-      if (!importedData.version || !importedData.data) {
-        throw new Error('Invalid backup file format');
+      if (!importedData.data && !importedData.caught) {
+        throw new Error('Invalid backup file format - no Pokemon data found');
       }
 
+      // Calculate Pokemon count for confirmation
+      const pokemonCount = Object.keys(importedData.data?.caught || importedData.data || {}).length;
+      
       // Show confirmation dialog
       const confirmed = window.confirm(
-        `Import backup from ${importedData.exportDate}?\n\n` +
+        `Import backup from ${importedData.exportDate || 'an unknown date'}?\n\n` +
         `This will overwrite your current data:\n` +
-        `- ${Object.keys(importedData.data.caught || {}).length} caught Pokemon\n` +
-        `- ${(importedData.data.progressBars || []).length} progress bars\n\n` +
+        `- ${pokemonCount} caught Pokemon\n\n` +
         `Are you sure you want to continue?`
       );
 
@@ -153,14 +136,10 @@ export default function Backup() {
       }
 
       // Import the data
-      if (importedData.data.caught) {
-        await caughtAPI.updateCaughtData(importedData.data.caught);
-        setCaughtData(importedData.data.caught);
-      }
-
-      if (importedData.data.progressBars) {
-        await profileAPI.updateProgressBars(importedData.data.progressBars);
-        setProgressBars(importedData.data.progressBars);
+      const pokemonData = importedData.data?.caught || importedData.data;
+      if (pokemonData && Object.keys(pokemonData).length > 0) {
+        await caughtAPI.updateCaughtData(pokemonData);
+        setCaughtData(pokemonData);
       }
 
       setMessage({ type: 'success', text: 'Data imported successfully!' });
@@ -194,8 +173,7 @@ export default function Backup() {
           verified: profileData.verified || false
         },
         data: {
-          caught: caughtData || {},
-          progressBars: progressBars || []
+          caught: caughtData || {}
         }
       };
 
@@ -208,8 +186,7 @@ export default function Backup() {
         id: backupKey,
         date: new Date().toISOString(),
         size: JSON.stringify(backupData).length,
-        caughtCount: Object.keys(caughtData || {}).length,
-        progressCount: (progressBars || []).length
+        caughtCount: Object.keys(caughtData || {}).length
       };
       
       setBackupHistory(prev => [newBackup, ...prev.slice(0, 9)]); // Keep last 10 backups
@@ -233,28 +210,26 @@ export default function Backup() {
 
       const backup = JSON.parse(backupData);
       
+      // Handle both old and new backup formats
+      const caughtData = backup.data?.caught || backup.data || {};
+      
       const confirmed = window.confirm(
         `Restore backup from ${new Date(backup.backupDate).toLocaleString()}?\n\n` +
         `This will overwrite your current data:\n` +
-        `- ${Object.keys(backup.data.caught || {}).length} caught Pokemon\n` +
-        `- ${(backup.data.progressBars || []).length} progress bars\n\n` +
+        `- ${Object.keys(caughtData).length} caught Pokemon\n\n` +
         `Are you sure you want to continue?`
       );
 
       if (!confirmed) return;
 
-      if (backup.data.caught) {
-        await caughtAPI.updateCaughtData(backup.data.caught);
-        setCaughtData(backup.data.caught);
-      }
-
-      if (backup.data.progressBars) {
-        await profileAPI.updateProgressBars(backup.data.progressBars);
-        setProgressBars(backup.data.progressBars);
+      if (Object.keys(caughtData).length > 0) {
+        await caughtAPI.updateCaughtData(caughtData);
+        setCaughtData(caughtData);
       }
 
       setMessage({ type: 'success', text: 'Backup restored successfully!' });
     } catch (error) {
+      console.error('Restore failed:', error);
       setMessage({ type: 'error', text: 'Failed to restore backup' });
     }
   };
@@ -285,8 +260,7 @@ export default function Backup() {
               id: key,
               date: backupData.backupDate,
               size: JSON.stringify(backupData).length,
-              caughtCount: Object.keys(backupData.data?.caught || {}).length,
-              progressCount: (backupData.data?.progressBars || []).length
+              caughtCount: Object.keys(backupData.data?.caught || {}).length
             });
           } catch (error) {
             // Skip invalid backups
@@ -352,10 +326,6 @@ export default function Backup() {
               <div className="summary-item">
                 <span className="label">Caught Pokemon:</span>
                 <span className="value">{Object.keys(caughtData).length}</span>
-              </div>
-              <div className="summary-item">
-                <span className="label">Progress Bars:</span>
-                <span className="value">{progressBars.length}</span>
               </div>
               <div className="summary-item">
                 <span className="label">Username:</span>
@@ -425,7 +395,6 @@ export default function Backup() {
                         <div className="backup-date">{formatDate(backup.date)}</div>
                         <div className="backup-details">
                           <span>{backup.caughtCount} Pokemon</span>
-                          <span>{backup.progressCount} Progress Bars</span>
                           <span>{formatFileSize(backup.size)}</span>
                         </div>
                       </div>
@@ -457,7 +426,7 @@ export default function Backup() {
           <div className="footer-info">
             <FileText size={16} />
             <span>
-              Your data is automatically saved to the server. Local backups provide an additional layer of protection.
+              Your Pokemon data is automatically saved to the server. Local backups provide an additional layer of protection.
             </span>
           </div>
         </div>
