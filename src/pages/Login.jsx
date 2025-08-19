@@ -48,6 +48,9 @@ export default function Login({ onLogin }) {
       }
 
       // Use the user data from the login response
+      console.log('Login response received:', loginData);
+      console.log('Progress bars from login:', loginData.user.progressBars);
+      
       onLogin({
         username: loginData.user.username,
         email: loginData.user.email,

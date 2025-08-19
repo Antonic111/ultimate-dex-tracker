@@ -170,20 +170,40 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const userMenuRef = useRef(null);
   const [authReady, setAuthReady] = useState(false);
+  const [justLoggedIn, setJustLoggedIn] = useState(false); // Add flag to track recent login
 
   // Helper to check if user is still logged in
   const checkAuth = async (silent = false) => {
+    // Skip auth check if user just logged in to prevent overwriting progress bars
+    if (justLoggedIn) {
+      console.log('Skipping checkAuth because user just logged in');
+      return;
+    }
+    
     if (!silent) setLoading(true);
     try {
       const userData = await authAPI.getCurrentUser();
       console.log('checkAuth called, userData:', userData);
+      
+      // Preserve existing progress bars if server response doesn't include them
+      const existingProgressBars = user.progressBars || [];
+      const newProgressBars = userData.progressBars || existingProgressBars;
+      
+      console.log('Progress bars preservation:', {
+        existing: existingProgressBars.length,
+        server: userData.progressBars?.length || 0,
+        final: newProgressBars.length,
+        serverResponse: userData,
+        existingUser: user
+      });
+      
       setUser({
         username: userData.username,
         email: userData.email,
         createdAt: userData.createdAt,
         profileTrainer: userData.profileTrainer,
         verified: userData.verified,
-        progressBars: userData.progressBars || [],
+        progressBars: newProgressBars,
       });
     } catch (error) {
       console.log('checkAuth failed, clearing user data');
@@ -202,6 +222,27 @@ export default function App() {
     }
   };
 
+  // Custom setUser function that handles login properly
+  const handleUserUpdate = (newUserData) => {
+    console.log('handleUserUpdate called with:', newUserData);
+    
+    // If this is a login (has username and progressBars), set the flag
+    if (newUserData.username && newUserData.progressBars) {
+      setJustLoggedIn(true);
+      console.log('Login detected, setting justLoggedIn flag');
+    }
+    
+    setUser(newUserData);
+    
+    // Clear the flag after a short delay
+    if (newUserData.username && newUserData.progressBars) {
+      setTimeout(() => {
+        setJustLoggedIn(false);
+        console.log('Clearing justLoggedIn flag');
+      }, 2000);
+    }
+  };
+
 
   // Initial auth check on page load
   useEffect(() => {
@@ -214,9 +255,10 @@ export default function App() {
     console.log('User state changed:', {
       username: user.username,
       progressBars: user.progressBars,
-      progressBarsLength: user.progressBars?.length
+      progressBarsLength: user.progressBars?.length,
+      justLoggedIn: justLoggedIn
     });
-  }, [user.username, user.progressBars]);
+  }, [user.username, user.progressBars, justLoggedIn]);
 
 useEffect(() => {
   // close sidebar on login/logout
@@ -226,6 +268,12 @@ useEffect(() => {
 
 useEffect(() => {
   const onPageShow = (e) => {
+    // Skip auth refresh if user just logged in or if we have valid user data
+    if (justLoggedIn) {
+      console.log('Skipping pageshow auth refresh because user just logged in');
+      return;
+    }
+    
     // Only refresh auth if the page was restored from cache AND we don't have valid user data
     if ((e.persisted || document.wasDiscarded) && (!user?.username || !user?.verified)) {
       console.log('Page restored from cache, refreshing auth');
@@ -234,7 +282,7 @@ useEffect(() => {
   };
   window.addEventListener("pageshow", onPageShow);
   return () => window.removeEventListener("pageshow", onPageShow);
-}, [user?.username, user?.verified]);
+}, [user?.username, user?.verified, justLoggedIn]);
 
 
   const [caught, setCaught] = useState({});
@@ -602,7 +650,7 @@ function updateCaughtInfo(poke, info) {
   return (
     <ThemeProvider>
       <LoadingProvider>
-        <UserContext.Provider value={{ ...user, setUser, loading }}>
+        <UserContext.Provider value={{ ...user, setUser: handleUserUpdate, loading }}>
           <MessageProvider>
             <Router>
 
@@ -610,7 +658,7 @@ function updateCaughtInfo(poke, info) {
 
             <HeaderWithConditionalAuth
               user={user}
-              setUser={setUser}
+              setUser={handleUserUpdate}
               showMenu={showMenu}
               setShowMenu={setShowMenu}
               userMenuRef={userMenuRef}
@@ -730,11 +778,11 @@ function updateCaughtInfo(poke, info) {
 
               <Route
                 path="/login"
-                element={user.username ? <Navigate to="/" /> : <Login onLogin={setUser} />}
+                element={user.username ? <Navigate to="/" /> : <Login onLogin={handleUserUpdate} />}
               />
               <Route
                 path="/register"
-                element={user.username ? <Navigate to="/" /> : <Register onRegister={setUser} />}
+                element={user.username ? <Navigate to="/" /> : <Register onRegister={handleUserUpdate} />}
               />
               <Route
                 path="/email-sent"
