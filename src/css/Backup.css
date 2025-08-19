@@ -12,20 +12,21 @@
 }
 
 .backup-header {
-  text-align: center;
-  margin-bottom: 15px;
+  text-align: left;
+  margin-bottom: 20px;
 }
 
 .backup-header h1 {
   font-size: 2.5rem;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   color: var(--accent);
 }
 
-.backup-header p {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  margin: 0;
+.header-divider {
+  height: 2px;
+  background: var(--accent);
+  width: 100%;
+  opacity: 0.8;
 }
 
 .backup-sections {
@@ -54,10 +55,10 @@
 }
 
 .section-divider {
-  height: 1px;
-  background: var(--border-color);
+  height: 2px;
+  background-color: var(--dividers);
   margin: 25px 0;
-  opacity: 0.6;
+  width: 100%;
 }
 
 .section-header {
@@ -267,10 +268,10 @@
   background: var(--pokemon-box-bg2);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 12px;
+  padding: 10px 15px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 15px;
 }
 
@@ -283,28 +284,39 @@
   min-width: 0;
 }
 
-.backup-date {
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 8px;
-  font-size: 0.95rem;
-}
-
-.backup-details {
+.backup-header-line {
   display: flex;
-  gap: 8px;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  align-items: center;
+  gap: 20px;
   flex-wrap: wrap;
 }
 
-.backup-details span {
+.backup-date {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.95rem;
+  min-width: fit-content;
+}
+
+.backup-count {
+  color: var(--accent);
+  font-weight: 500;
+  font-size: 0.9rem;
   background: var(--pokemon-box-bg);
-  padding: 3px 6px;
+  padding: 3px 8px;
   border-radius: 4px;
   border: 1px solid var(--border-color);
   white-space: nowrap;
-  font-size: 0.8rem;
+}
+
+.backup-size {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  background: var(--pokemon-box-bg);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  white-space: nowrap;
 }
 
 .backup-actions {
@@ -400,6 +412,12 @@
     flex-direction: column;
     align-items: stretch;
     gap: 15px;
+    padding: 12px;
+  }
+  
+  .backup-header-line {
+    gap: 10px;
+    justify-content: center;
   }
   
   .backup-actions {

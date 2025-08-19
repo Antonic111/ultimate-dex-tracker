@@ -408,8 +408,8 @@ export default function Backup() {
     <div className="backup-page">
       <div className="backup-container">
         <div className="backup-header">
-          <h1>Backup & Import</h1>
-          <p>Manage your Pokemon data backups and imports</p>
+          <h1>Backup & Import/Export</h1>
+          <div className="header-divider"></div>
         </div>
 
         {/* Removed message display as per new_code */}
@@ -451,7 +451,7 @@ export default function Backup() {
               <Upload size={20} />
               <h2>Import Data</h2>
             </div>
-            <p>Import Pokemon data from a previously exported backup file. This will overwrite your current data.</p>
+            <p>Import Pokemon data from a previously exported backup file.</p>
             
             <div className="import-warning">
               <span>Warning: Importing will overwrite your current data. Make sure to export first!</span>
@@ -509,20 +509,15 @@ export default function Backup() {
                 <div className="backup-history">
                   <h3 data-count={`(${backupHistory.length}/${MAX_BACKUPS})`}>
                     Recent Backups
-                    {backupHistory.length >= 5 && (
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginLeft: 'auto' }}>
-                        Scroll to see more
-                      </span>
-                    )}
                   </h3>
                   <div className="backup-list">
                     {backupHistory.map((backup) => (
                       <div key={backup.id} className="backup-item">
                         <div className="backup-info">
-                          <div className="backup-date">{formatDate(backup.date)}</div>
-                          <div className="backup-details">
-                            <span>{backup.caughtCount} Pokemon</span>
-                            <span>{formatFileSize(backup.size)}</span>
+                          <div className="backup-header-line">
+                            <span className="backup-date">{formatDate(backup.date)}</span>
+                            <span className="backup-count">{backup.caughtCount} Pokemon</span>
+                            <span className="backup-size">{formatFileSize(backup.size)}</span>
                           </div>
                         </div>
                         <div className="backup-actions">
