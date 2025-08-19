@@ -1,8 +1,9 @@
 import { useState, useEffect, useContext } from 'react';
-import { Download, Upload, Database, FileText, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { Download, Upload, Database, FileText } from 'lucide-react';
 import { caughtAPI, profileAPI } from '../utils/api';
 import { useTheme } from '../components/Shared/ThemeContext';
 import { UserContext } from '../components/Shared/UserContext';
+import { toast } from 'react-hot-toast';
 import '../css/Backup.css';
 
 export default function Backup() {
@@ -12,8 +13,13 @@ export default function Backup() {
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
   const [backingUp, setBackingUp] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
   const [backupHistory, setBackupHistory] = useState([]);
+  const [lastBackupData, setLastBackupData] = useState(null);
+  const [lastBackupTime, setLastBackupTime] = useState(0);
+  const [lastExportTime, setLastExportTime] = useState(0);
+  const [lastImportTime, setLastImportTime] = useState(0);
+  const [lastRestoreTime, setLastRestoreTime] = useState(0);
+  const [lastDeleteTime, setLastDeleteTime] = useState(0);
   const { theme, accent } = useTheme();
   const { username } = useContext(UserContext);
 
@@ -42,7 +48,7 @@ export default function Backup() {
         profile = profileResult || {};
         
         // Clear any error messages
-        setMessage({ type: '', text: '' });
+        // setMessage({ type: '', text: '' }); // This line is removed as per the new_code
       } catch (apiError) {
         console.error('API calls failed:', apiError);
         throw new Error('Failed to connect to server. Please check your connection and try again.');
@@ -52,7 +58,7 @@ export default function Backup() {
       setProfileData(profile);
     } catch (error) {
       console.error('Failed to load user data:', error);
-      setMessage({ type: 'error', text: error.message });
+      // setMessage({ type: 'error', text: error.message }); // This line is removed as per the new_code
       
       // Set empty data so the page still works
       setCaughtData({});
@@ -65,6 +71,14 @@ export default function Backup() {
   const exportData = async () => {
     try {
       setExporting(true);
+      
+      // Check cooldown (prevent clicking within 1 second)
+      const now = Date.now();
+      if (now - lastExportTime < 1000) {
+        toast.error('Please wait a moment before exporting again.');
+        setExporting(false);
+        return;
+      }
       
       // Use username from context if profile data doesn't have it
       const usernameToUse = profileData.username || username || 'User';
@@ -94,10 +108,11 @@ export default function Backup() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      setMessage({ type: 'success', text: 'Data exported successfully!' });
+      setLastExportTime(now); // Update the last export time
+      toast.success('Data exported successfully!');
     } catch (error) {
       console.error('Export failed:', error);
-      setMessage({ type: 'error', text: `Failed to export data: ${error.message}` });
+      toast.error(`Failed to export data: ${error.message}`);
     } finally {
       setExporting(false);
     }
@@ -109,6 +124,15 @@ export default function Backup() {
 
     try {
       setImporting(true);
+      
+      // Check cooldown (prevent clicking within 1 second)
+      const now = Date.now();
+      if (now - lastImportTime < 1000) {
+        toast.error('Please wait a moment before importing again.');
+        setImporting(false);
+        return;
+      }
+      
       const text = await file.text();
       const importedData = JSON.parse(text);
 
@@ -140,12 +164,13 @@ export default function Backup() {
         setCaughtData(pokemonData);
       }
 
-      setMessage({ type: 'success', text: 'Data imported successfully!' });
+      setLastImportTime(now); // Update the last import time
+      toast.success('Data imported successfully!');
       
       // Clear the file input
       event.target.value = '';
     } catch (error) {
-      setMessage({ type: 'error', text: `Failed to import data: ${error.message}` });
+      toast.error(`Failed to import data: ${error.message}`);
     } finally {
       setImporting(false);
     }
@@ -154,6 +179,14 @@ export default function Backup() {
   const createBackup = async () => {
     try {
       setBackingUp(true);
+      
+      // Check cooldown (prevent clicking within 2 seconds)
+      const now = Date.now();
+      if (now - lastBackupTime < 2000) {
+        toast.error('Please wait a moment before creating another backup.');
+        setBackingUp(false);
+        return;
+      }
       
       // Use username from context if profile data doesn't have it
       const usernameToUse = profileData.username || username || 'User';
@@ -173,6 +206,15 @@ export default function Backup() {
         }
       };
 
+      // Check if this backup would be identical to the last one
+      if (lastBackupData && 
+          JSON.stringify(backupData.data) === JSON.stringify(lastBackupData.data) &&
+          lastBackupData.user.username === backupData.user.username) {
+        toast.error('Backup data is identical to the last backup. No changes detected.');
+        setBackingUp(false);
+        return;
+      }
+
       // Store backup in localStorage for now (could be enhanced to store on server)
       const backupKey = `pokemon-backup-${usernameToUse}-${Date.now()}`;
       localStorage.setItem(backupKey, JSON.stringify(backupData));
@@ -186,11 +228,13 @@ export default function Backup() {
       };
       
       setBackupHistory(prev => [newBackup, ...prev.slice(0, 9)]); // Keep last 10 backups
+      setLastBackupData(backupData); // Store the last backup data for comparison
+      setLastBackupTime(now); // Update the last backup time
       
-      setMessage({ type: 'success', text: 'Backup created successfully!' });
+      toast.success('Backup created successfully!');
     } catch (error) {
       console.error('Backup creation failed:', error);
-      setMessage({ type: 'error', text: `Failed to create backup: ${error.message}` });
+      toast.error(`Failed to create backup: ${error.message}`);
     } finally {
       setBackingUp(false);
     }
@@ -198,9 +242,16 @@ export default function Backup() {
 
   const restoreBackup = async (backupId) => {
     try {
+      const now = Date.now();
+      if (now - lastRestoreTime < 1000) {
+        toast.error('Please wait a moment before restoring again.');
+        return;
+      }
+
       const backupData = localStorage.getItem(backupId);
       if (!backupData) {
-        setMessage({ type: 'error', text: 'Backup not found' });
+        // setMessage({ type: 'error', text: 'Backup not found' }); // This line is removed as per the new_code
+        toast.error('Backup not found');
         return;
       }
 
@@ -223,23 +274,35 @@ export default function Backup() {
         setCaughtData(caughtData);
       }
 
-      setMessage({ type: 'success', text: 'Backup restored successfully!' });
+      // setMessage({ type: 'success', text: 'Backup restored successfully!' }); // This line is removed as per the new_code
+      toast.success('Backup restored successfully!');
+      setLastRestoreTime(now); // Update the last restore time
     } catch (error) {
       console.error('Restore failed:', error);
-      setMessage({ type: 'error', text: 'Failed to restore backup' });
+      // setMessage({ type: 'error', text: 'Failed to restore backup' }); // This line is removed as per the new_code
+      toast.error('Failed to restore backup');
     }
   };
 
   const deleteBackup = async (backupId) => {
     try {
+      const now = Date.now();
+      if (now - lastDeleteTime < 1000) {
+        toast.error('Please wait a moment before deleting again.');
+        return;
+      }
+
       const confirmed = window.confirm('Are you sure you want to delete this backup?');
       if (!confirmed) return;
 
       localStorage.removeItem(backupId);
       setBackupHistory(prev => prev.filter(backup => backup.id !== backupId));
-      setMessage({ type: 'success', text: 'Backup deleted successfully!' });
+      // setMessage({ type: 'success', text: 'Backup deleted successfully!' }); // This line is removed as per the new_code
+      toast.success('Backup deleted successfully!');
+      setLastDeleteTime(now); // Update the last delete time
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to delete backup' });
+      // setMessage({ type: 'error', text: 'Failed to delete backup' }); // This line is removed as per the new_code
+      toast.error('Failed to delete backup');
     }
   };
 
@@ -300,14 +363,7 @@ export default function Backup() {
           <p>Manage your Pokemon data backups and imports</p>
         </div>
 
-        {message.text && (
-          <div className={`message ${message.type}`}>
-            {message.type === 'success' && <CheckCircle size={16} />}
-            {message.type === 'error' && <XCircle size={16} />}
-            {message.type === 'info' && <AlertCircle size={16} />}
-            <span>{message.text}</span>
-          </div>
-        )}
+        {/* Removed message display as per new_code */}
 
         <div className="backup-sections">
           {/* Export Section */}
@@ -347,7 +403,6 @@ export default function Backup() {
             <p>Import Pokemon data from a previously exported backup file. This will overwrite your current data.</p>
             
             <div className="import-warning">
-              <AlertCircle size={16} />
               <span>Warning: Importing will overwrite your current data. Make sure to export first!</span>
             </div>
 
