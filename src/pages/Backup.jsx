@@ -4,6 +4,7 @@ import { caughtAPI, profileAPI } from '../utils/api';
 import { useTheme } from '../components/Shared/ThemeContext';
 import { UserContext } from '../components/Shared/UserContext';
 import { useMessage } from '../components/Shared/MessageContext';
+import { fetchCaughtData } from '../api/caught';
 import '../css/Backup.css';
 
 export default function Backup() {
@@ -23,6 +24,8 @@ export default function Backup() {
   const { theme, accent } = useTheme();
   const { username } = useContext(UserContext);
   const { showMessage } = useMessage();
+
+  const MAX_BACKUPS = 10; // Maximum number of backups to keep
 
   useEffect(() => {
     loadUserData();
@@ -88,11 +91,7 @@ export default function Backup() {
         version: '1.0',
         exportDate: new Date().toISOString(),
         user: {
-          username: usernameToUse,
-          email: profileData.email || 'unknown@example.com',
-          createdAt: profileData.createdAt || new Date().toISOString(),
-          profileTrainer: profileData.profileTrainer || null,
-          verified: profileData.verified || false
+          username: usernameToUse
         },
         data: {
           caught: caughtData || {}
@@ -142,6 +141,18 @@ export default function Backup() {
         throw new Error('Invalid backup file format - no Pokemon data found');
       }
 
+      // Check if username matches (optional but helpful)
+      if (importedData.user?.username && importedData.user.username !== username) {
+        const confirmed = window.confirm(
+          `This backup was created by "${importedData.user.username}" but you are logged in as "${username}".\n\n` +
+          `Do you still want to import this data?`
+        );
+        if (!confirmed) {
+          setImporting(false);
+          return;
+        }
+      }
+
       // Calculate Pokemon count for confirmation
       const pokemonCount = Object.keys(importedData.data?.caught || importedData.data || {}).length;
       
@@ -163,6 +174,19 @@ export default function Backup() {
       if (pokemonData && Object.keys(pokemonData).length > 0) {
         await caughtAPI.updateCaughtData(pokemonData);
         setCaughtData(pokemonData);
+        
+        // Refresh the main dex grid data by calling fetchCaughtData
+        try {
+          const refreshedData = await fetchCaughtData(username);
+          if (refreshedData) {
+            // Force a page refresh to ensure the dex grid shows updated data
+            window.location.reload();
+          }
+        } catch (error) {
+          console.error('Failed to refresh caught data:', error);
+          // If refresh fails, still show success but suggest manual refresh
+          showMessage('Data imported successfully! You may need to refresh the page to see changes in the dex grid.', 'success');
+        }
       }
 
       setLastImportTime(now); // Update the last import time
@@ -196,11 +220,7 @@ export default function Backup() {
         version: '1.0',
         backupDate: new Date().toISOString(),
         user: {
-          username: usernameToUse,
-          email: profileData.email || 'unknown@example.com',
-          createdAt: profileData.createdAt || new Date().toISOString(),
-          profileTrainer: profileData.profileTrainer || null,
-          verified: profileData.verified || false
+          username: usernameToUse
         },
         data: {
           caught: caughtData || {}
@@ -228,8 +248,11 @@ export default function Backup() {
         caughtCount: Object.keys(caughtData || {}).length
       };
       
-      setBackupHistory(prev => [newBackup, ...prev.slice(0, 9)]); // Keep last 10 backups
-      setLastBackupData(backupData); // Store the last backup data for comparison
+      setBackupHistory(prev => [newBackup, ...prev.slice(0, MAX_BACKUPS - 1)]); // Keep last MAX_BACKUPS backups
+      
+      // Store the last backup data for comparison (include the ID for deletion tracking)
+      const backupDataWithId = { ...backupData, id: backupKey };
+      setLastBackupData(backupDataWithId);
       setLastBackupTime(now); // Update the last backup time
       
       showMessage('Backup created successfully!', 'success');
@@ -251,7 +274,6 @@ export default function Backup() {
 
       const backupData = localStorage.getItem(backupId);
       if (!backupData) {
-        // setMessage({ type: 'error', text: 'Backup not found' }); // This line is removed as per the new_code
         showMessage('Backup not found', 'error');
         return;
       }
@@ -260,6 +282,15 @@ export default function Backup() {
       
       // Handle both old and new backup formats
       const caughtData = backup.data?.caught || backup.data || {};
+      
+      // Check if username matches (optional but helpful)
+      if (backup.user?.username && backup.user.username !== username) {
+        const confirmed = window.confirm(
+          `This backup was created by "${backup.user.username}" but you are logged in as "${username}".\n\n` +
+          `Do you still want to restore this backup?`
+        );
+        if (!confirmed) return;
+      }
       
       const confirmed = window.confirm(
         `Restore backup from ${new Date(backup.backupDate).toLocaleString()}?\n\n` +
@@ -273,14 +304,24 @@ export default function Backup() {
       if (Object.keys(caughtData).length > 0) {
         await caughtAPI.updateCaughtData(caughtData);
         setCaughtData(caughtData);
+        
+        // Refresh the main dex grid data by calling fetchCaughtData
+        try {
+          const refreshedData = await fetchCaughtData(username);
+          if (refreshedData) {
+            // Force a page refresh to ensure the dex grid shows updated data
+            window.location.reload();
+          }
+        } catch (error) {
+          console.error('Failed to refresh caught data:', error);
+          // If refresh fails, still show success but suggest manual refresh
+          showMessage('Backup restored successfully! You may need to refresh the page to see changes in the dex grid.', 'success');
+        }
       }
 
-      // setMessage({ type: 'success', text: 'Backup restored successfully!' }); // This line is removed as per the new_code
-      showMessage('Backup restored successfully!', 'success');
       setLastRestoreTime(now); // Update the last restore time
     } catch (error) {
       console.error('Restore failed:', error);
-      // setMessage({ type: 'error', text: 'Failed to restore backup' }); // This line is removed as per the new_code
       showMessage('Failed to restore backup', 'error');
     }
   };
@@ -298,11 +339,15 @@ export default function Backup() {
 
       localStorage.removeItem(backupId);
       setBackupHistory(prev => prev.filter(backup => backup.id !== backupId));
-      // setMessage({ type: 'success', text: 'Backup deleted successfully!' }); // This line is removed as per the new_code
+      
+      // If we deleted the last backup data, clear it so new backups can be created
+      if (lastBackupData && backupId === lastBackupData.id) {
+        setLastBackupData(null);
+      }
+      
       showMessage('Backup deleted successfully!', 'success');
       setLastDeleteTime(now); // Update the last delete time
     } catch (error) {
-      // setMessage({ type: 'error', text: 'Failed to delete backup' }); // This line is removed as per the new_code
       showMessage('Failed to delete backup', 'error');
     }
   };
@@ -316,21 +361,24 @@ export default function Backup() {
         if (key && key.startsWith('pokemon-backup-')) {
           try {
             const backupData = JSON.parse(localStorage.getItem(key));
+            // Handle both old and new backup formats
+            const caughtCount = Object.keys(backupData.data?.caught || backupData.data || {}).length;
             history.push({
               id: key,
-              date: backupData.backupDate,
+              date: backupData.backupDate || backupData.exportDate || new Date().toISOString(),
               size: JSON.stringify(backupData).length,
-              caughtCount: Object.keys(backupData.data?.caught || {}).length
+              caughtCount: caughtCount
             });
           } catch (error) {
             // Skip invalid backups
+            console.warn('Skipping invalid backup:', key, error);
           }
         }
       }
       
-      // Sort by date (newest first) and take last 10
+      // Sort by date (newest first) and take last MAX_BACKUPS
       history.sort((a, b) => new Date(b.date) - new Date(a.date));
-      setBackupHistory(history.slice(0, 10));
+      setBackupHistory(history.slice(0, MAX_BACKUPS));
     };
 
     loadBackupHistory();
@@ -437,9 +485,32 @@ export default function Backup() {
               {backingUp ? 'Creating Backup...' : 'Create Backup'}
             </button>
 
+            <div style={{ 
+              fontSize: '0.85rem', 
+              color: 'var(--text-secondary)', 
+              textAlign: 'center', 
+              marginTop: '10px',
+              padding: '8px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: '6px'
+            }}>
+              {backupHistory.length >= MAX_BACKUPS ? (
+                `Maximum backups reached (${MAX_BACKUPS}). Delete old backups to create new ones.`
+              ) : (
+                `${backupHistory.length} of ${MAX_BACKUPS} backups used`
+              )}
+            </div>
+
             {backupHistory.length > 0 && (
               <div className="backup-history">
-                <h3>Recent Backups</h3>
+                <h3 data-count={`(${backupHistory.length}/${MAX_BACKUPS})`}>
+                  Recent Backups
+                  {backupHistory.length >= 5 && (
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginLeft: 'auto' }}>
+                      Scroll to see more
+                    </span>
+                  )}
+                </h3>
                 <div className="backup-list">
                   {backupHistory.map((backup) => (
                     <div key={backup.id} className="backup-item">

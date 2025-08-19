@@ -179,12 +179,45 @@
   margin-bottom: 15px;
   color: var(--accent);
   font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.backup-history h3::after {
+  content: attr(data-count);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: normal;
+  margin-left: auto;
 }
 
 .backup-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: 400px; /* Limit height to prevent infinite page extension */
+  overflow-y: auto; /* Add scroll when content exceeds height */
+  padding-right: 5px; /* Add some padding for scrollbar */
+}
+
+/* Custom scrollbar styling */
+.backup-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.backup-list::-webkit-scrollbar-track {
+  background: var(--pokemon-box-bg);
+  border-radius: 4px;
+}
+
+.backup-list::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+.backup-list::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover);
 }
 
 .backup-item {
