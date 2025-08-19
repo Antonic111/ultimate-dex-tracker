@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, User, Settings, Users } from "lucide-react";
+import { LogOut, User, Settings, Users, Database } from "lucide-react";
 import { authAPI } from './utils/api';
 import { useTheme } from "./components/Shared/ThemeContext";
 
@@ -108,6 +108,10 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                   <Link to="/settings" className="dropdown-item" onClick={handleCloseMenu}>
                     <Settings size={16} className="dropdown-icon" />
                     Settings
+                  </Link>
+                  <Link to="/backup" className="dropdown-item" onClick={handleCloseMenu}>
+                    <Database size={16} className="dropdown-icon" />
+                    Backup
                   </Link>
                   <button
                     className="dropdown-item"

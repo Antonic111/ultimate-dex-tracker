@@ -28,6 +28,7 @@ import Profile from "./pages/Profile";
 import PublicHome from "./pages/PublicHome";
 import HeaderWithConditionalAuth from "./Header";
 import Settings from "./pages/Settings";
+import Backup from "./pages/Backup";
 import { ThemeProvider } from "./components/Shared/ThemeContext";
 import './css/theme.css';
 import Trainers from "./pages/Trainers";
@@ -753,6 +754,15 @@ function updateCaughtInfo(poke, info) {
                 element={
                   <RequireAuth loading={loading} authReady={authReady} user={user}>
                     <Settings />
+                  </RequireAuth>
+                }
+              />
+
+              <Route
+                path="/backup"
+                element={
+                  <RequireAuth loading={loading} authReady={authReady} user={user}>
+                    <Backup />
                   </RequireAuth>
                 }
               />
