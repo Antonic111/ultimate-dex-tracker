@@ -28,20 +28,6 @@
   margin: 0;
 }
 
-.offline-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(245, 158, 11, 0.15);
-  color: #d97706;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  margin-top: 15px;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
 .message {
   display: flex;
   align-items: center;
@@ -79,16 +65,14 @@
 
 .backup-section {
   background: var(--card-bg);
-  border: 2px solid var(--border); /* Increased border thickness for better contrast */
+  border: 2px solid var(--border);
   border-radius: 12px;
   padding: 25px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow for better depth */
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .backup-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  /* Remove the excessive hover effects */
 }
 
 .section-header {
@@ -127,7 +111,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
+  padding: 10px 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -138,12 +122,19 @@
 .summary-item .label {
   color: var(--text-secondary);
   font-weight: 500;
+  font-size: 0.95rem;
 }
 
 .summary-item .value {
   color: var(--accent);
   font-weight: 600;
   font-size: 1.1rem;
+  background: var(--card-bg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  min-width: 40px;
+  text-align: center;
 }
 
 .import-warning {
@@ -171,31 +162,18 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+  background: var(--accent);
+  color: white;
+}
+
+.action-button:hover:not(:disabled) {
+  background: var(--accent-hover);
+  color: white;
 }
 
 .action-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.action-button.export {
-  background: var(--accent);
-  color: white;
-}
-
-.action-button.export:hover:not(:disabled) {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
-}
-
-.action-button.backup {
-  background: var(--accent);
-  color: white;
-}
-
-.action-button.backup:hover:not(:disabled) {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
 }
 
 .file-input-label {
@@ -218,7 +196,7 @@
 
 .file-input-button:hover {
   background: var(--accent-hover);
-  transform: translateY(-1px);
+  color: white;
 }
 
 .backup-history {
@@ -244,48 +222,59 @@
   padding: 15px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 15px;
-  transition: all 0.2s ease;
 }
 
 .backup-item:hover {
-  background: var(--card-bg);
-  border-color: var(--accent);
-  transform: translateX(2px);
+  /* Remove the excessive hover effects */
 }
 
 .backup-info {
   flex: 1;
+  min-width: 0;
 }
 
 .backup-date {
   font-weight: 600;
   color: var(--text);
   margin-bottom: 8px;
+  font-size: 0.95rem;
 }
 
 .backup-details {
   display: flex;
-  gap: 15px;
-  font-size: 0.9rem;
+  gap: 8px;
+  font-size: 0.85rem;
   color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+
+.backup-details span {
+  background: var(--card-bg);
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  font-size: 0.8rem;
 }
 
 .backup-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .restore-button,
 .delete-button {
-  padding: 8px 16px;
+  padding: 6px 12px;
   border: none;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-width: 60px;
 }
 
 .restore-button {
@@ -295,6 +284,7 @@
 
 .restore-button:hover {
   background: var(--accent-hover);
+  color: white;
 }
 
 .delete-button {
@@ -304,6 +294,7 @@
 
 .delete-button:hover {
   background: #dc2626;
+  color: white;
 }
 
 .backup-footer {

@@ -20,13 +20,25 @@ export default function Backup() {
 
   useEffect(() => {
     loadUserData();
+    
+    // Test server connection
+    const testConnection = async () => {
+      try {
+        const response = await fetch('/api/health', { method: 'GET' });
+        console.log('Server health check:', response.status);
+      } catch (error) {
+        console.log('Server health check failed:', error);
+      }
+    };
+    
+    testConnection();
   }, []);
 
   const loadUserData = async () => {
     try {
       setLoading(true);
       
-      // Try to get user data from context/localStorage if API fails
+      // Try to get user data from API
       let caught = {};
       let profile = {};
       let progress = [];
@@ -39,49 +51,17 @@ export default function Backup() {
           profileAPI.getProgressBars()
         ]);
         
+        console.log('API Results:', { caughtResult, profileResult, progressResult });
+        
         caught = caughtResult || {};
         profile = profileResult || {};
         progress = progressResult || [];
+        
+        // Clear any offline mode messages
+        setMessage({ type: '', text: '' });
       } catch (apiError) {
-        // If API fails, try to get data from localStorage or use fallbacks
-        console.warn('API calls failed, using fallback data:', apiError);
-        
-        // Try to get username from localStorage or use a fallback
-        const storedUsername = localStorage.getItem('username') || username || 'User';
-        
-        // Try to get caught data from localStorage
-        const storedCaught = localStorage.getItem('caughtData');
-        if (storedCaught) {
-          try {
-            caught = JSON.parse(storedCaught);
-          } catch (e) {
-            console.warn('Failed to parse stored caught data');
-          }
-        }
-        
-        // Try to get progress bars from localStorage
-        const storedProgress = localStorage.getItem('progressBars');
-        if (storedProgress) {
-          try {
-            progress = JSON.parse(storedProgress);
-          } catch (e) {
-            console.warn('Failed to parse stored progress data');
-          }
-        }
-        
-        // Create fallback profile data
-        profile = {
-          username: storedUsername,
-          email: 'email@example.com',
-          createdAt: new Date().toISOString(),
-          profileTrainer: null,
-          verified: false
-        };
-        
-        setMessage({ 
-          type: 'info', 
-          text: 'Running in offline mode. Some features may be limited.' 
-        });
+        console.error('API calls failed:', apiError);
+        throw new Error('Failed to connect to server. Please check your connection and try again.');
       }
       
       setCaughtData(caught);
@@ -89,9 +69,9 @@ export default function Backup() {
       setProgressBars(progress);
     } catch (error) {
       console.error('Failed to load user data:', error);
-      setMessage({ type: 'error', text: 'Failed to load user data. Please check your connection.' });
+      setMessage({ type: 'error', text: error.message });
       
-      // Set fallback data so the page still works
+      // Set empty data so the page still works
       setCaughtData({});
       setProfileData({ username: username || 'User', email: '', createdAt: '', profileTrainer: null, verified: false });
       setProgressBars([]);
@@ -348,12 +328,6 @@ export default function Backup() {
         <div className="backup-header">
           <h1>Backup & Import</h1>
           <p>Manage your Pokemon data backups and imports</p>
-          {message.type === 'info' && (
-            <div className="offline-indicator">
-              <AlertCircle size={16} />
-              <span>Offline Mode - Limited functionality</span>
-            </div>
-          )}
         </div>
 
         {message.text && (
