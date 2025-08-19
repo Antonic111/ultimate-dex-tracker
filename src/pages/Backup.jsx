@@ -3,7 +3,7 @@ import { Download, Upload, Database, FileText } from 'lucide-react';
 import { caughtAPI, profileAPI } from '../utils/api';
 import { useTheme } from '../components/Shared/ThemeContext';
 import { UserContext } from '../components/Shared/UserContext';
-import { toast } from 'react-hot-toast';
+import { useMessage } from '../components/Shared/MessageContext';
 import '../css/Backup.css';
 
 export default function Backup() {
@@ -22,6 +22,7 @@ export default function Backup() {
   const [lastDeleteTime, setLastDeleteTime] = useState(0);
   const { theme, accent } = useTheme();
   const { username } = useContext(UserContext);
+  const { showMessage } = useMessage();
 
   useEffect(() => {
     loadUserData();
@@ -75,7 +76,7 @@ export default function Backup() {
       // Check cooldown (prevent clicking within 1 second)
       const now = Date.now();
       if (now - lastExportTime < 1000) {
-        toast.error('Please wait a moment before exporting again.');
+        showMessage('Please wait a moment before exporting again.', 'error');
         setExporting(false);
         return;
       }
@@ -109,10 +110,10 @@ export default function Backup() {
       URL.revokeObjectURL(url);
 
       setLastExportTime(now); // Update the last export time
-      toast.success('Data exported successfully!');
+      showMessage('Data exported successfully!', 'success');
     } catch (error) {
       console.error('Export failed:', error);
-      toast.error(`Failed to export data: ${error.message}`);
+      showMessage(`Failed to export data: ${error.message}`, 'error');
     } finally {
       setExporting(false);
     }
@@ -128,7 +129,7 @@ export default function Backup() {
       // Check cooldown (prevent clicking within 1 second)
       const now = Date.now();
       if (now - lastImportTime < 1000) {
-        toast.error('Please wait a moment before importing again.');
+        showMessage('Please wait a moment before importing again.', 'error');
         setImporting(false);
         return;
       }
@@ -165,12 +166,12 @@ export default function Backup() {
       }
 
       setLastImportTime(now); // Update the last import time
-      toast.success('Data imported successfully!');
+      showMessage('Data imported successfully!', 'success');
       
       // Clear the file input
       event.target.value = '';
     } catch (error) {
-      toast.error(`Failed to import data: ${error.message}`);
+      showMessage(`Failed to import data: ${error.message}`, 'error');
     } finally {
       setImporting(false);
     }
@@ -183,7 +184,7 @@ export default function Backup() {
       // Check cooldown (prevent clicking within 2 seconds)
       const now = Date.now();
       if (now - lastBackupTime < 2000) {
-        toast.error('Please wait a moment before creating another backup.');
+        showMessage('Please wait a moment before creating another backup.', 'error');
         setBackingUp(false);
         return;
       }
@@ -210,7 +211,7 @@ export default function Backup() {
       if (lastBackupData && 
           JSON.stringify(backupData.data) === JSON.stringify(lastBackupData.data) &&
           lastBackupData.user.username === backupData.user.username) {
-        toast.error('Backup data is identical to the last backup. No changes detected.');
+        showMessage('Backup data is identical to the last backup. No changes detected.', 'error');
         setBackingUp(false);
         return;
       }
@@ -231,10 +232,10 @@ export default function Backup() {
       setLastBackupData(backupData); // Store the last backup data for comparison
       setLastBackupTime(now); // Update the last backup time
       
-      toast.success('Backup created successfully!');
+      showMessage('Backup created successfully!', 'success');
     } catch (error) {
       console.error('Backup creation failed:', error);
-      toast.error(`Failed to create backup: ${error.message}`);
+      showMessage(`Failed to create backup: ${error.message}`, 'error');
     } finally {
       setBackingUp(false);
     }
@@ -244,14 +245,14 @@ export default function Backup() {
     try {
       const now = Date.now();
       if (now - lastRestoreTime < 1000) {
-        toast.error('Please wait a moment before restoring again.');
+        showMessage('Please wait a moment before restoring again.', 'error');
         return;
       }
 
       const backupData = localStorage.getItem(backupId);
       if (!backupData) {
         // setMessage({ type: 'error', text: 'Backup not found' }); // This line is removed as per the new_code
-        toast.error('Backup not found');
+        showMessage('Backup not found', 'error');
         return;
       }
 
@@ -275,12 +276,12 @@ export default function Backup() {
       }
 
       // setMessage({ type: 'success', text: 'Backup restored successfully!' }); // This line is removed as per the new_code
-      toast.success('Backup restored successfully!');
+      showMessage('Backup restored successfully!', 'success');
       setLastRestoreTime(now); // Update the last restore time
     } catch (error) {
       console.error('Restore failed:', error);
       // setMessage({ type: 'error', text: 'Failed to restore backup' }); // This line is removed as per the new_code
-      toast.error('Failed to restore backup');
+      showMessage('Failed to restore backup', 'error');
     }
   };
 
@@ -288,7 +289,7 @@ export default function Backup() {
     try {
       const now = Date.now();
       if (now - lastDeleteTime < 1000) {
-        toast.error('Please wait a moment before deleting again.');
+        showMessage('Please wait a moment before deleting again.', 'error');
         return;
       }
 
@@ -298,11 +299,11 @@ export default function Backup() {
       localStorage.removeItem(backupId);
       setBackupHistory(prev => prev.filter(backup => backup.id !== backupId));
       // setMessage({ type: 'success', text: 'Backup deleted successfully!' }); // This line is removed as per the new_code
-      toast.success('Backup deleted successfully!');
+      showMessage('Backup deleted successfully!', 'success');
       setLastDeleteTime(now); // Update the last delete time
     } catch (error) {
       // setMessage({ type: 'error', text: 'Failed to delete backup' }); // This line is removed as per the new_code
-      toast.error('Failed to delete backup');
+      showMessage('Failed to delete backup', 'error');
     }
   };
 
