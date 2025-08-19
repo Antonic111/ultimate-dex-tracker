@@ -2223,6 +2223,25 @@
     }
   },
   {
+    "id": 876,
+    "name": "indeedee-female",
+    "baseSpecies": "indeedee",
+    "types": [
+      "psychic",
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/876.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/876.png"
+    },
+    "gen": 8,
+    "formType": "gender",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
     "id": 902,
     "name": "basculegion-female",
     "baseSpecies": "basculegion",
@@ -2263,25 +2282,6 @@
     "next": []
     }
   },
-{
-  "id": 876,
-  "name": "indeedee-female",
-  "baseSpecies": "indeedee",
-  "types": [
-    "psychic",
-    "normal"
-  ],
-  "sprites": {
-    "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/876.png",
-    "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/876.png"
-  },
-  "gen": 8,
-  "formType": "gender",
-  "evolution": {
-    "pre": null,
-    "next": []
-  }
-},
   {
     "formType": "------------------------------------------------------------------------------------------- ALOLAN FORMS ----------------------------------------------------------------------------------------",
     "evolution": {
@@ -9965,8 +9965,8 @@
       "dragon"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/705.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/705.png"
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10241.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10241.png"
     },
     "gen": "6",
     "evolution": {
@@ -9993,8 +9993,8 @@
       "dragon"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/706.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/706.png"
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10242.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10242.png"
     },
     "gen": "6",
     "evolution": {

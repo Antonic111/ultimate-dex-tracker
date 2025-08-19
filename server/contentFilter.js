@@ -109,8 +109,8 @@ function normalizeText(text) {
     .replace(/[^ a-z0-9]/g, "")
     // Normalize multiple spaces to single space
     .replace(/\s+/g, " ")
-    // Normalize repeated characters if they appear 3+ times (like fuuuuck -> fuck, gggggggggggggggg -> g)
-    .replace(/(.)\1{2,}/g, "$1")
+    // Normalize repeated characters if they appear 3+ times (like fuuuuck -> fuuck, coooon -> coon)
+    .replace(/(.)\1{2,}/g, "$1$1")
     .trim();
 }
 
@@ -151,6 +151,101 @@ function generateWordVariations(word) {
   return Array.from(variations);
 }
 
+// Check for repeated character bypasses (like "coooon" containing "coon")
+function checkRepeatedCharacterBypass(text, bannedWords) {
+  const lowerText = text.toLowerCase();
+  
+  for (const bannedWord of bannedWords) {
+    if (bannedWord.length < 3) continue; // Skip very short words
+    
+    // Check for patterns like "coooon" where repeated characters are used to bypass
+    // We'll check if removing repeated characters reveals the banned word
+    const cleaned = lowerText.replace(/(.)\1+/g, "$1");
+    if (cleaned.includes(bannedWord)) {
+      // Additional check: only block if this looks like a bypass attempt
+      // Don't block legitimate words like "coonhound" that contain the banned word
+      
+      // If the cleaned text is exactly the banned word, it's definitely a bypass
+      if (cleaned === bannedWord) {
+        return true;
+      }
+      
+      // If the cleaned text starts with the banned word and has additional characters, 
+      // it might be a legitimate word (like "coonhound")
+      if (cleaned.startsWith(bannedWord) && cleaned.length > bannedWord.length) {
+        // Check if the additional characters form a legitimate word part
+        const remaining = cleaned.substring(bannedWord.length);
+        // If the remaining part is a common word ending, it's likely legitimate
+        const commonEndings = ['hound', 'cat', 'can', 'dog', 'bird', 'fish', 'man', 'woman', 'boy', 'girl'];
+        if (commonEndings.some(ending => remaining.includes(ending))) {
+          continue; // Skip this one, it's likely legitimate
+        }
+      }
+      
+      // If the cleaned text ends with the banned word and has additional characters,
+      // it might be a legitimate word
+      if (cleaned.endsWith(bannedWord) && cleaned.length > bannedWord.length) {
+        const remaining = cleaned.substring(0, cleaned.length - bannedWord.length);
+        // If the remaining part is a common word beginning, it's likely legitimate
+        const commonBeginnings = ['raccoon', 'racoon', 'coon'];
+        if (commonBeginnings.some(beginning => remaining.includes(beginning))) {
+          continue; // Skip this one, it's likely legitimate
+        }
+      }
+      
+      // If we get here, it's likely a bypass attempt
+      return true;
+    }
+    
+    // Also check the original text for the banned word (catches cases where normalization works)
+    if (lowerText.includes(bannedWord)) {
+      // Same logic as above for legitimate words
+      if (lowerText === bannedWord) {
+        return true;
+      }
+      
+      if (lowerText.startsWith(bannedWord) && lowerText.length > bannedWord.length) {
+        const remaining = lowerText.substring(bannedWord.length);
+        const commonEndings = ['hound', 'cat', 'can', 'dog', 'bird', 'fish', 'man', 'woman', 'boy', 'girl'];
+        if (commonEndings.some(ending => remaining.includes(ending))) {
+          continue;
+        }
+      }
+      
+      if (lowerText.endsWith(bannedWord) && lowerText.length > bannedWord.length) {
+        const remaining = lowerText.substring(0, lowerText.length - bannedWord.length);
+        const commonBeginnings = ['raccoon', 'racoon', 'coon'];
+        if (commonBeginnings.some(beginning => remaining.includes(beginning))) {
+          continue;
+        }
+      }
+      
+      return true;
+    }
+  }
+  return false;
+}
+
+// Check for concatenated banned words (like "faggotfaggot")
+function checkConcatenatedBannedWords(normalizedText, bannedWords) {
+  for (const bannedWord of bannedWords) {
+    const normalizedBanned = normalizeText(bannedWord);
+    if (normalizedBanned.length < 3) continue; // Skip very short words
+    
+    // Check for the banned word repeated or concatenated
+    const repeated = normalizedBanned + normalizedBanned;
+    if (normalizedText.includes(repeated)) {
+      return true;
+    }
+    
+    // Check for the banned word embedded in longer text (like "faggotfaggot" containing "faggot")
+    if (normalizedText.includes(normalizedBanned)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // Check if text contains banned words or similar variations
 export function validateContent(text, fieldType = 'general') {
   const config = FILTER_CONFIGS[fieldType] || FILTER_CONFIGS.general;
@@ -181,11 +276,28 @@ export function validateContent(text, fieldType = 'general') {
       }
     }
 
-    // 0. Block known high-severity substrings even when embedded
+    // 0. Check for repeated character bypasses (like "coooon" containing "coon")
+    if (checkRepeatedCharacterBypass(input, bannedWords)) {
+      return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
+    }
+
+    // 1. Block known high-severity substrings even when embedded (use normalized text)
     for (const sub of (bannedSubstrings || [])) {
       if (!sub) continue;
       const normSub = normalizeText(sub);
       if (normSub && normalizedText.includes(normSub)) {
+        return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
+      }
+    }
+    
+    // 1. Check for concatenated banned words (like "faggotfaggot")
+    if (checkConcatenatedBannedWords(normalizedText, bannedWords)) {
+      return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
+    }
+    
+    // 2. Check if the normalized text itself contains banned words (catches repeated characters like "cooon" -> "coon")
+    for (const bannedWord of bannedWords) {
+      if (normalizedText.includes(bannedWord)) {
         return { isValid: false, error: `${config.fieldName} contains inappropriate content` };
       }
     }

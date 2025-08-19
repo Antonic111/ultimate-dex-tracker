@@ -363,6 +363,7 @@ export const bannedWords = [
 "jerk0ff",
 "jerked",
 "jerkoff",
+"jigaboo",
 "jism",
 "jiz",
 "jizm",
@@ -727,6 +728,7 @@ export const bannedWords = [
 "knuckledragger",
 "porch monkey",
 "nigg",
+"footjob",
 ];
 
 // High-severity substrings that should be blocked even when embedded in larger words
@@ -734,5 +736,11 @@ export const bannedSubstrings = [
   "nigg",
   "nigger",
   "nigga",
-  "fuck"
+  "fuck",
+  "faggot",
+  "coon",
+  "hitler",
+  "kkk",
+  "jigaboo",
+  "footjob"
 ];
