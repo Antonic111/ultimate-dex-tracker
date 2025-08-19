@@ -10,11 +10,30 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
   const [sending, setSending] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [emailCooldown, setEmailCooldown] = useState(0);
 
   const normalizedName = (username || "").trim().toLowerCase();
   const canDelete =
     code.trim().length === 6 &&
     confirmName.trim().toLowerCase() === normalizedName;
+
+  // Handle email cooldown countdown
+  useEffect(() => {
+    let interval;
+    if (emailCooldown > 0) {
+      interval = setInterval(() => {
+        setEmailCooldown(prev => {
+          if (prev <= 1) {
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [emailCooldown]);
 
   const handleClose = () => {
     setClosing(true);
@@ -28,6 +47,8 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
       setSending(true);
       await userAPI.sendDeleteCode();
       showMessage("Verification code sent to your email.", "success");
+      // Start 30 second cooldown
+      setEmailCooldown(30);
     } catch (e) {
       showMessage(e.message || "Couldn't send code", "error");
     } finally {
@@ -80,8 +101,12 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
         </p>
 
         <div className="modal-row">
-          <button className="modal-btn" onClick={sendCode} disabled={sending}>
-            {sending ? "Sending…" : "Send code"}
+          <button 
+            className={`modal-btn ${emailCooldown > 0 ? 'modal-btn--disabled' : ''}`}
+            onClick={sendCode} 
+            disabled={sending || emailCooldown > 0}
+          >
+            {sending ? "Sending…" : emailCooldown > 0 ? `Resend in ${emailCooldown}s` : "Send code"}
           </button>
         </div>
 

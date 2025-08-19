@@ -5,6 +5,7 @@ import { useTheme } from '../components/Shared/ThemeContext';
 import { UserContext } from '../components/Shared/UserContext';
 import { useMessage } from '../components/Shared/MessageContext';
 import { showConfirm } from '../components/Shared/ConfirmDialog';
+import { LoadingSpinner } from '../components/Shared';
 import { fetchCaughtData } from '../api/caught';
 import '../css/Backup.css';
 
@@ -423,7 +424,7 @@ export default function Backup() {
     return (
       <div className="backup-page">
         <div className="backup-container">
-          <div className="loading-spinner">Loading...</div>
+          <LoadingSpinner />
         </div>
       </div>
     );
@@ -447,7 +448,7 @@ export default function Backup() {
               <Download size={20} />
               <h2>Export Data</h2>
             </div>
-            <p>Download your Pokemon data as a JSON file for safekeeping or transfer to another device.</p>
+            <p>Download your Pokemon data as a JSON file for safekeeping or transfer to another account.</p>
             
             <div className="data-summary">
               <div className="summary-item">

@@ -404,13 +404,6 @@
   font-size: 0.95rem;
 }
 
-.loading-spinner {
-  text-align: center;
-  padding: 30px 20px;
-  font-size: 1.2rem;
-  color: var(--text-secondary);
-}
-
 /* Responsive design */
 @media (max-width: 768px) {
   .backup-container {

@@ -81,6 +81,19 @@
   cursor: default;
 }
 
+.modal-btn--disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: var(--accent);
+  color: #1a1a1a;
+}
+
+.modal-btn--disabled:hover {
+  background: var(--accent);
+  color: #1a1a1a;
+  cursor: not-allowed;
+}
+
 .modal-btn--secondary{
   background: transparent;
   color: var(--text);
