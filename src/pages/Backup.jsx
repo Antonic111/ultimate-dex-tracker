@@ -361,14 +361,19 @@ export default function Backup() {
         if (key && key.startsWith('pokemon-backup-')) {
           try {
             const backupData = JSON.parse(localStorage.getItem(key));
+            console.log('Processing backup:', key, backupData);
+            
             // Handle both old and new backup formats
             const caughtCount = Object.keys(backupData.data?.caught || backupData.data || {}).length;
-            history.push({
+            const backupItem = {
               id: key,
               date: backupData.backupDate || backupData.exportDate || new Date().toISOString(),
               size: JSON.stringify(backupData).length,
               caughtCount: caughtCount
-            });
+            };
+            
+            console.log('Created backup item:', backupItem);
+            history.push(backupItem);
           } catch (error) {
             // Skip invalid backups
             console.warn('Skipping invalid backup:', key, error);
@@ -376,9 +381,13 @@ export default function Backup() {
         }
       }
       
+      console.log('Final backup history:', history);
+      
       // Sort by date (newest first) and take last MAX_BACKUPS
       history.sort((a, b) => new Date(b.date) - new Date(a.date));
-      setBackupHistory(history.slice(0, MAX_BACKUPS));
+      const finalHistory = history.slice(0, MAX_BACKUPS);
+      console.log('Final sorted history:', finalHistory);
+      setBackupHistory(finalHistory);
     };
 
     loadBackupHistory();
@@ -511,33 +520,36 @@ export default function Backup() {
                     Recent Backups
                   </h3>
                   <div className="backup-list">
-                    {backupHistory.map((backup) => (
-                      <div key={backup.id} className="backup-item">
-                        <div className="backup-info">
-                          <div className="backup-header-line">
-                            <span className="backup-date">{formatDate(backup.date)}</span>
-                            <span className="backup-count">{backup.caughtCount} Pokemon</span>
-                            <span className="backup-size">{formatFileSize(backup.size)}</span>
+                    {backupHistory.map((backup) => {
+                      console.log('Rendering backup item:', backup);
+                      return (
+                        <div key={backup.id} className="backup-item">
+                          <div className="backup-info">
+                            <div className="backup-header-line">
+                              <span className="backup-date">{formatDate(backup.date)}</span>
+                              <span className="backup-count">{backup.caughtCount} Pokemon</span>
+                              <span className="backup-size">{formatFileSize(backup.size)}</span>
+                            </div>
+                          </div>
+                          <div className="backup-actions">
+                            <button 
+                              className="restore-button"
+                              onClick={() => restoreBackup(backup.id)}
+                              title="Restore this backup"
+                            >
+                              Restore
+                            </button>
+                            <button 
+                              className="delete-button"
+                              onClick={() => deleteBackup(backup.id)}
+                              title="Delete this backup"
+                            >
+                              Delete
+                            </button>
                           </div>
                         </div>
-                        <div className="backup-actions">
-                          <button 
-                            className="restore-button"
-                            onClick={() => restoreBackup(backup.id)}
-                            title="Restore this backup"
-                          >
-                            Restore
-                          </button>
-                          <button 
-                            className="delete-button"
-                            onClick={() => deleteBackup(backup.id)}
-                            title="Delete this backup"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               ) : (

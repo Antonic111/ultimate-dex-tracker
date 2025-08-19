@@ -19,14 +19,14 @@
 .backup-header h1 {
   font-size: 2.5rem;
   margin-bottom: 15px;
-  color: var(--accent);
+  color: white;
 }
 
 .header-divider {
   height: 2px;
-  background: var(--accent);
+  background-color: var(--dividers);
   width: 100%;
-  opacity: 0.8;
+  margin: 8px 0;
 }
 
 .backup-sections {
@@ -268,11 +268,12 @@
   background: var(--pokemon-box-bg2);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 10px 15px;
+  padding: 12px 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 15px;
+  min-height: 60px;
 }
 
 .backup-item:hover {
@@ -282,13 +283,16 @@
 .backup-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  align-items: center;
 }
 
 .backup-header-line {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .backup-date {
@@ -296,6 +300,7 @@
   color: var(--text);
   font-size: 0.95rem;
   min-width: fit-content;
+  flex-shrink: 0;
 }
 
 .backup-count {
@@ -303,20 +308,24 @@
   font-weight: 500;
   font-size: 0.9rem;
   background: var(--pokemon-box-bg);
-  padding: 3px 8px;
+  padding: 4px 8px;
   border-radius: 4px;
   border: 1px solid var(--border-color);
   white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
 .backup-size {
   color: var(--text-secondary);
   font-size: 0.85rem;
   background: var(--pokemon-box-bg);
-  padding: 3px 8px;
+  padding: 4px 8px;
   border-radius: 4px;
   border: 1px solid var(--border-color);
   white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
 .backup-actions {
@@ -411,22 +420,26 @@
   .backup-item {
     flex-direction: column;
     align-items: stretch;
-    gap: 15px;
+    gap: 12px;
     padding: 12px;
+    min-height: auto;
   }
   
   .backup-header-line {
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
+    flex-wrap: wrap;
   }
   
   .backup-actions {
     justify-content: center;
+    width: 100%;
   }
   
-  .backup-details {
-    flex-direction: column;
-    gap: 5px;
+  .backup-count,
+  .backup-size {
+    font-size: 0.8rem;
+    padding: 3px 6px;
   }
 }
 
