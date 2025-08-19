@@ -4,6 +4,7 @@ import { caughtAPI, profileAPI } from '../utils/api';
 import { useTheme } from '../components/Shared/ThemeContext';
 import { UserContext } from '../components/Shared/UserContext';
 import { useMessage } from '../components/Shared/MessageContext';
+import { showConfirm } from '../components/Shared/ConfirmDialog';
 import { fetchCaughtData } from '../api/caught';
 import '../css/Backup.css';
 
@@ -21,6 +22,7 @@ export default function Backup() {
   const [lastImportTime, setLastImportTime] = useState(0);
   const [lastRestoreTime, setLastRestoreTime] = useState(0);
   const [lastDeleteTime, setLastDeleteTime] = useState(0);
+  const [restoring, setRestoring] = useState(false); // Added back setRestoring state
   const { theme, accent } = useTheme();
   const { username } = useContext(UserContext);
   const { showMessage } = useMessage();
@@ -143,9 +145,8 @@ export default function Backup() {
 
       // Check if username matches (optional but helpful)
       if (importedData.user?.username && importedData.user.username !== username) {
-        const confirmed = window.confirm(
-          `This backup was created by "${importedData.user.username}" but you are logged in as "${username}".\n\n` +
-          `Do you still want to import this data?`
+        const confirmed = await showConfirm(
+          `This backup was created by "${importedData.user.username}" but you are logged in as "${username}".\n\nDo you still want to import this data?`
         );
         if (!confirmed) {
           setImporting(false);
@@ -154,14 +155,12 @@ export default function Backup() {
       }
 
       // Calculate Pokemon count for confirmation
-      const pokemonCount = Object.keys(importedData.data?.caught || importedData.data || {}).length;
+      const pokemonData = importedData.data?.caught || importedData.data;
+      const pokemonCount = Object.keys(pokemonData).length;
       
       // Show confirmation dialog
-      const confirmed = window.confirm(
-        `Import backup from ${importedData.exportDate || 'an unknown date'}?\n\n` +
-        `This will overwrite your current data:\n` +
-        `- ${pokemonCount} caught Pokemon\n\n` +
-        `Are you sure you want to continue?`
+      const confirmed = await showConfirm(
+        `Are you sure you want to import this backup?\n\nThis will overwrite your current Pokemon data with ${Object.keys(pokemonData).length} Pokemon from ${importedData.user?.username || 'unknown user'}.\n\nMake sure you have exported your current data first!`
       );
 
       if (!confirmed) {
@@ -170,7 +169,6 @@ export default function Backup() {
       }
 
       // Import the data
-      const pokemonData = importedData.data?.caught || importedData.data;
       if (pokemonData && Object.keys(pokemonData).length > 0) {
         await caughtAPI.updateCaughtData(pokemonData);
         setCaughtData(pokemonData);
@@ -268,61 +266,65 @@ export default function Backup() {
     try {
       const now = Date.now();
       if (now - lastRestoreTime < 1000) {
-        showMessage('Please wait a moment before restoring again.', 'error');
+        showMessage('Please wait a moment before restoring another backup.', 'error');
         return;
       }
 
       const backupData = localStorage.getItem(backupId);
       if (!backupData) {
-        showMessage('Backup not found', 'error');
+        showMessage('Backup not found.', 'error');
         return;
       }
 
       const backup = JSON.parse(backupData);
-      
-      // Handle both old and new backup formats
       const caughtData = backup.data?.caught || backup.data || {};
-      
+
+      if (Object.keys(caughtData).length === 0) {
+        showMessage('This backup contains no Pokemon data.', 'error');
+        return;
+      }
+
       // Check if username matches (optional but helpful)
       if (backup.user?.username && backup.user.username !== username) {
-        const confirmed = window.confirm(
-          `This backup was created by "${backup.user.username}" but you are logged in as "${username}".\n\n` +
-          `Do you still want to restore this backup?`
+        const confirmed = await showConfirm(
+          `This backup was created by "${backup.user.username}" but you are logged in as "${username}".\n\nDo you still want to restore this data?`
         );
-        if (!confirmed) return;
-      }
-      
-      const confirmed = window.confirm(
-        `Restore backup from ${new Date(backup.backupDate).toLocaleString()}?\n\n` +
-        `This will overwrite your current data:\n` +
-        `- ${Object.keys(caughtData).length} caught Pokemon\n\n` +
-        `Are you sure you want to continue?`
-      );
-
-      if (!confirmed) return;
-
-      if (Object.keys(caughtData).length > 0) {
-        await caughtAPI.updateCaughtData(caughtData);
-        setCaughtData(caughtData);
-        
-        // Refresh the main dex grid data by calling fetchCaughtData
-        try {
-          const refreshedData = await fetchCaughtData(username);
-          if (refreshedData) {
-            // Force a page refresh to ensure the dex grid shows updated data
-            window.location.reload();
-          }
-        } catch (error) {
-          console.error('Failed to refresh caught data:', error);
-          // If refresh fails, still show success but suggest manual refresh
-          showMessage('Backup restored successfully! You may need to refresh the page to see changes in the dex grid.', 'success');
+        if (!confirmed) {
+          return;
         }
       }
 
-      setLastRestoreTime(now); // Update the last restore time
+      const confirmed = await showConfirm(
+        `Are you sure you want to restore this backup?\n\nThis will overwrite your current Pokemon data with ${Object.keys(caughtData).length} Pokemon from ${formatDate(backup.backupDate || backup.exportDate)}.`
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      setRestoring(true);
+      await caughtAPI.updateCaughtData(caughtData);
+      setCaughtData(caughtData);
+
+      // Refresh the main dex grid data by calling fetchCaughtData
+      try {
+        const refreshedData = await fetchCaughtData(username);
+        if (refreshedData) {
+          // Force a page refresh to ensure the dex grid shows updated data
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error('Failed to refresh caught data:', error);
+        // If refresh fails, still show success but suggest manual refresh
+        showMessage('Backup restored successfully! You may need to refresh the page to see changes in the dex grid.', 'success');
+      }
+
+      setLastRestoreTime(now);
+      showMessage('Backup restored successfully!', 'success');
     } catch (error) {
-      console.error('Restore failed:', error);
-      showMessage('Failed to restore backup', 'error');
+      showMessage(`Failed to restore backup: ${error.message}`, 'error');
+    } finally {
+      setRestoring(false);
     }
   };
 
@@ -330,25 +332,39 @@ export default function Backup() {
     try {
       const now = Date.now();
       if (now - lastDeleteTime < 1000) {
-        showMessage('Please wait a moment before deleting again.', 'error');
+        showMessage('Please wait a moment before deleting another backup.', 'error');
         return;
       }
 
-      const confirmed = window.confirm('Are you sure you want to delete this backup?');
-      if (!confirmed) return;
+      const backupData = localStorage.getItem(backupId);
+      if (!backupData) {
+        showMessage('Backup not found.', 'error');
+        return;
+      }
+
+      const backup = JSON.parse(backupData);
+      const caughtCount = Object.keys(backup.data?.caught || backup.data || {}).length;
+
+      const confirmed = await showConfirm(
+        `Are you sure you want to delete this backup?\n\nThis will permanently remove the backup containing ${caughtCount} Pokemon from ${formatDate(backup.backupDate || backup.exportDate)}.`
+      );
+
+      if (!confirmed) {
+        return;
+      }
 
       localStorage.removeItem(backupId);
       setBackupHistory(prev => prev.filter(backup => backup.id !== backupId));
-      
-      // If we deleted the last backup data, clear it so new backups can be created
+
+      // Clear lastBackupData if the deleted backup was the last one
       if (lastBackupData && backupId === lastBackupData.id) {
         setLastBackupData(null);
       }
-      
+
+      setLastDeleteTime(now);
       showMessage('Backup deleted successfully!', 'success');
-      setLastDeleteTime(now); // Update the last delete time
     } catch (error) {
-      showMessage('Failed to delete backup', 'error');
+      showMessage(`Failed to delete backup: ${error.message}`, 'error');
     }
   };
 
@@ -536,8 +552,9 @@ export default function Backup() {
                               className="restore-button"
                               onClick={() => restoreBackup(backup.id)}
                               title="Restore this backup"
+                              disabled={restoring}
                             >
-                              Restore
+                              {restoring ? 'Restoring...' : 'Restore'}
                             </button>
                             <button 
                               className="delete-button"
