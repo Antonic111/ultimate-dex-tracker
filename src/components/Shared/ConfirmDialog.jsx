@@ -41,9 +41,15 @@ function ConfirmDialog({ message, root, container }) {
     }
 
     return () => {
-      // Cleanup function - remove modal-open class
-      body.classList.remove("modal-open");
-      html.classList.remove("modal-open");
+      // Only remove modal-open class if no other modals are open
+      const progressModalOpen = document.querySelector('.progress-modal-overlay');
+      const otherModalsOpen = document.querySelectorAll('.modal-overlay, .confirm-overlay').length > 1;
+      
+      if (!progressModalOpen && !otherModalsOpen) {
+        // Cleanup function - remove modal-open class only if no other modals are open
+        body.classList.remove("modal-open");
+        html.classList.remove("modal-open");
+      }
     };
   }, []);
 

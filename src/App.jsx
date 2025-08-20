@@ -569,7 +569,8 @@ function updateCaughtInfo(poke, info) {
           mark: MARK_OPTIONS[0].value,
           method: METHOD_OPTIONS[0],
           game: GAME_OPTIONS[0].value,
-          notes: ""
+          notes: "",
+          caughtAt: new Date().toISOString() // Add timestamp when Pokemon is marked as caught
         };
 
         setCaughtInfoMap(prevInfoMap => ({

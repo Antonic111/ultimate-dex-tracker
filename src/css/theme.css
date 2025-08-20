@@ -1,5 +1,12 @@
 :root {
   --transition-speed: 0.3s;
+  
+  /* Z-Index System */
+  --z-dropdown: 1000;
+  --z-modal-overlay: 10050;
+  --z-modal-panel: 10051;
+  --z-modal-dropdown: 10052;
+  --z-loading: 10053;
 }
 
 [data-theme="dark"] {

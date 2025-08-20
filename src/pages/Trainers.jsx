@@ -34,9 +34,7 @@ export default function Trainers() {
   const [randomSeed, setRandomSeed] = useState(0);
   const sortButtonRef = useRef(null);
   const [usingFallback, setUsingFallback] = useState(false);
-  const [hasInitialized, setHasInitialized] = useState(false);
   const isMakingApiCall = useRef(false);
-  const prevQueryRef = useRef('');
 
   // Get current user context to filter out own profile
   const { username } = useContext(UserContext);
@@ -132,10 +130,10 @@ export default function Trainers() {
     };
   }, [showSortDropdown]);
 
-  // Handle initial load when username becomes available
+  // Handle initial load when username becomes available (including null for non-logged-in users)
   useEffect(() => {
     if (username !== undefined) {
-      // Trigger the main data fetch when username is available
+      // Trigger the main data fetch when username is available (including null for non-logged-in users)
       setPage(1);
     }
   }, [username]);
@@ -153,25 +151,17 @@ export default function Trainers() {
     // reset paging whenever the query changes
     setPage(1);
 
+
+
     const run = async () => {
-      // Prevent running if username is still loading/undefined
-      if (username === undefined) {
-        return;
-      }
-      
       // Prevent running if we're already making an API call
       if (isMakingApiCall.current) {
         return;
       }
       
-      // Only prevent running if we've already initialized and this is just a username change
-      // But allow running when query changes (including when it becomes empty)
-      if (hasInitialized && !query && prevQueryRef.current === '') {
-        // If we have no query and we're initialized, and the previous query was also empty,
-        // this is just a username change, so skip
-        return;
-      }
-      
+      // For non-logged-in users or when username is undefined (authentication still loading),
+      // we'll proceed with the API call to show public profiles
+      // This ensures the page works even if there are authentication issues
       isMakingApiCall.current = true;
       setLoading(true);
       try {
@@ -208,10 +198,6 @@ export default function Trainers() {
           setAllFilteredData(filteredData);
           // Reset to first page when query changes
           setPage(1);
-          // Mark as initialized
-          setHasInitialized(true);
-          // Update the previous query ref
-          prevQueryRef.current = query;
         }
       } catch (error) {
         console.error('Failed to fetch trainers:', error);
@@ -226,7 +212,7 @@ export default function Trainers() {
 
     const t = setTimeout(run, 300); // debounce typing
     return () => { clearTimeout(t); ignore = true; };
-  }, [query, username, hasInitialized]);
+  }, [query, username]);
 
 
 
@@ -425,8 +411,8 @@ export default function Trainers() {
         </div>
       )}
 
-      {/* Show loading only when we have a username and are actually loading */}
-      {(loading && username !== undefined) ? (
+      {/* Show loading when actually loading, regardless of login status */}
+      {loading ? (
          <div className="trainer-grid">
                        {Array.from({ length: 20 }).map((_, i) => (
               <div className="trainer-card skeleton-card" key={i}>

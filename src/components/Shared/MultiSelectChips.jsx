@@ -27,11 +27,11 @@ export default function MultiSelectChips({ label, value = [], options, onChange 
     if (open && groupRef.current) {
       const rect = groupRef.current.getBoundingClientRect();
       setDropdownStyle({
-        position: "absolute",
-        top: rect.bottom + window.scrollY,
-        left: rect.left + window.scrollX,
+        position: "fixed",
+        top: rect.bottom + 6, // Add small margin
+        left: rect.left,
         width: rect.width,
-        zIndex: 9999
+        zIndex: 10052 // This will be overridden by CSS variable
       });
     }
   }, [open]);

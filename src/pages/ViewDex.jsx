@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
 import DexView from "../components/Dex/DexView";
+import Sidebar from "../components/Dex/PokemonSidebar";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../data/forms.json";
 import { getCaughtKey } from "../caughtStorage";
@@ -197,35 +198,45 @@ export default function ViewDex() {
         };
 
         return (
-            <div className="page-container dex-page" style={{ position: 'relative' }}>
-                {(isLoading('view-dex-data') || isLoading('view-dex-profile')) && (
-                    <LoadingSpinner 
-                        overlay 
-                        text="Loading..." 
-                        variant="dots"
+            <>
+                <div className="page-container">
+                    <DexView
+                        viewingUsername={username}
+                        allMons={allMons}
+                        caughtInfoMap={caughtInfoMap}
+                        dexSections={dexSections}
+                        progressBarsOverride={progressBars}
+                        filters={filters}
+                        setFilters={setFilters}
+                        showShiny={showShiny}
+                        setShowShiny={setShowShiny}
+                        showForms={showForms}
+                        setShowForms={setShowForms}
+                        selectedPokemon={selectedPokemon}
+                        setSelectedPokemon={setSelectedPokemon}
+                        sidebarOpen={sidebarOpen}
+                        setSidebarOpen={setSidebarOpen}
+                        readOnly={true}
+                        title={`${username}'s Living Dex`}
+                        caught={caughtInfoMap}
+                        customFilterMons={customFilterMons}
                     />
-                )}
-                <DexView
-                    viewingUsername={username}
-                    allMons={allMons}
-                    caughtInfoMap={caughtInfoMap}
-                    dexSections={dexSections}
-                    progressBarsOverride={progressBars}
-                    filters={filters}
-                    setFilters={setFilters}
-                    showShiny={showShiny}
-                    setShowShiny={setShowShiny}
-                    showForms={showForms}
-                    setShowForms={setShowForms}
-                    selectedPokemon={selectedPokemon}
-                    setSelectedPokemon={setSelectedPokemon}
-                    sidebarOpen={sidebarOpen}
-                    setSidebarOpen={setSidebarOpen}
+                </div>
+                
+                {/* Sidebar - rendered outside page container to avoid stacking context issues */}
+                <Sidebar
+                    open={sidebarOpen}
                     readOnly={true}
-                    title={`${username}'s Living Dex`}
-                    caught={caughtInfoMap}
-                    customFilterMons={customFilterMons}
+                    pokemon={selectedPokemon}
+                    onClose={() => {
+                        setSidebarOpen(false);
+                        setSelectedPokemon(null);
+                    }}
+                    caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon)] : null}
+                    updateCaughtInfo={() => {}} // No-op for read-only mode
+                    showShiny={showShiny}
+                    viewingUsername={username}
                 />
-            </div>
+            </>
         );
 }

@@ -149,11 +149,31 @@ body {
    MODAL PANEL STYLES
 ==================================*/
 
+.modal-body {
+  overflow: visible;
+  max-width: 100%;
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Prevent horizontal scrolling on body and html during drag operations */
+body.dragging,
+html.dragging {
+  overflow-x: hidden !important;
+  /* Don't block vertical scrolling */
+  overflow-y: auto;
+}
+
+/* Ensure the modal overlay doesn't allow horizontal scrolling */
 .progress-modal-overlay {
+  overflow: hidden;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.8);
-  z-index: 10050; /* above search dropdowns and headers */
+  z-index: var(--z-modal-overlay);
   animation: fadeIn 0.3s ease-out;
   pointer-events: all;
 }
@@ -172,10 +192,23 @@ body {
   border-radius: 20px;
   box-shadow: 0 4px 12px #0006;
   max-height: 80vh;
-  overflow-y: auto;
+  min-height: auto; /* Allow modal to shrink to content */
+  height: auto; /* Let height be determined by content */
+  overflow: visible;
   animation: slideIn 0.3s ease-out;
   position: relative;
-  z-index: 10051;
+  z-index: var(--z-modal-panel);
+  display: flex;
+  flex-direction: column;
+  /* Ensure no horizontal scrolling */
+  width: 100%;
+  max-width: 800px;
+  overflow-x: hidden;
+  /* Prevent any horizontal movement */
+  left: 0;
+  right: 0;
+  /* Ensure vertical scrolling works in child elements */
+  overflow-y: visible;
 }
 
 .progress-modal-panel.closing {
@@ -283,6 +316,9 @@ body {
   padding: 18px;
   margin-bottom: 12px;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.6);
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
 .bar-settings-row {
@@ -373,6 +409,75 @@ body {
 .modal-close-btn:active {
   outline: none;
   box-shadow: none;
+}
+
+/* ================================
+   SORTABLE ITEMS
+==================================*/
+
+/* Ensure sortable items don't cause layout issues */
+.sortable-item {
+  max-width: 100%;
+  position: relative;
+  /* Prevent horizontal overflow */
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Ensure the bar settings group doesn't cause horizontal overflow */
+.bar-settings-group {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Ensure expanded filters maintain their height during drag */
+.bar-settings-filters {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Ensure dragging doesn't break layout */
+.progress-modal-panel [data-dragging="true"] {
+  z-index: 1000;
+}
+
+.sortable-item {
+  position: relative;
+  z-index: 1;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.sortable-item[data-dragging="true"] {
+  z-index: 1000;
+  opacity: 0.8;
+  transform: rotate(2deg) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transition: none;
+  /* Ensure the item doesn't extend beyond its container */
+  position: relative;
+  /* Maintain full height during drag */
+  height: auto !important;
+  min-height: fit-content !important;
+  /* Prevent height compression */
+  flex-shrink: 0;
+}
+
+/* Ensure dragged items appear above all modal content */
+.progress-modal-panel .sortable-item[data-dragging="true"] {
+  z-index: 9999;
+}
+
+/* Prevent clipping during drag operations */
+.progress-modal-panel {
+  overflow: visible;
+}
+
+.modal-body {
+  overflow: visible;
 }
 
 /* ================================
@@ -502,9 +607,7 @@ body {
 }
 
 .chip-filter-dropdown {
-  position: absolute;
-  top: 100%;
-  margin-top: 6px;
+  position: fixed;
   background-color: var(--modal-dropdown);
   transition: background-color var(--transition-speed );
   border: 1px solid #444;
@@ -513,7 +616,7 @@ body {
   max-height: 200px;
   overflow-y: auto;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
-  z-index: 99999;
+  z-index: var(--z-modal-dropdown); /* Above modal panel */
 }
 
 .chip-option {
@@ -669,4 +772,86 @@ body {
 
 .progress-modal-panel::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* Drag container with proper scrolling - controlled movement */
+.drag-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 50vh; /* Keep max height for when there are many bars */
+  min-height: auto; /* Allow container to shrink to content */
+  height: auto; /* Let height be determined by content */
+  position: relative;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #444;
+  flex: 0 1 auto; /* Don't grow, allow shrinking, auto basis */
+  scroll-behavior: smooth;
+  /* Ensure no horizontal scrolling can occur */
+  width: 100%;
+  max-width: 100%;
+  /* Allow some horizontal movement for drag operations */
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* Ensure the scrollable area has proper spacing */
+.drag-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.drag-container::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.drag-container:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
+}
+
+.drag-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Bottom section with buttons - always visible */
+.add-bar-row,
+.template-bar-buttons {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--progress-bg);
+  padding: 16px 0;
+  margin-top: -4px;
+  z-index: 10;
+}
+
+/* Ensure proper spacing between scrollable content and bottom buttons */
+.modal-body {
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  height: auto; /* Let height be determined by content */
+  min-height: 0; /* Allow shrinking */
+  /* Ensure vertical scrolling works in child elements */
+  overflow-y: visible;
+  overflow-x: hidden;
+}
+
+/* Ensure dragged items stay completely within their containers */
+.sortable-item[data-dragging="true"] {
+  z-index: 1000;
+  opacity: 0.8;
+  transform: rotate(2deg) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transition: none;
+  /* Ensure the item stays completely within bounds */
+  max-width: 100%;
+  max-height: 100%;
+  /* Prevent any overflow */
+  overflow: hidden;
+  /* Ensure the item doesn't extend beyond its container */
+  position: relative;
+  /* Don't interfere with scrolling */
+  pointer-events: none;
 }

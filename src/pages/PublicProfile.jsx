@@ -36,21 +36,54 @@ const guessISOFromLocation = (loc) => {
 
 
 function getTimeAgo(dateString) {
+    if (!dateString) return '';
+    
     const now = new Date();
-    const joined = new Date(dateString);
+    let joined;
+    
+    // Handle different date formats
+    if (typeof dateString === 'string') {
+        // Try parsing as ISO string first
+        joined = new Date(dateString);
+        if (isNaN(joined.getTime())) {
+            // Try parsing as timestamp
+            const timestamp = parseInt(dateString, 10);
+            if (!isNaN(timestamp)) {
+                joined = new Date(timestamp);
+            }
+        }
+    } else if (typeof dateString === 'number') {
+        joined = new Date(dateString);
+    } else {
+        joined = new Date(dateString);
+    }
+    
+    // Validate the date
+    if (isNaN(joined.getTime())) {
+        return 'Unknown date';
+    }
+    
     const diff = now - joined;
+    
+    // Handle future dates (shouldn't happen but just in case)
+    if (diff < 0) {
+        return 'Just now';
+    }
+
     const s = Math.floor(diff / 1000);
     const m = Math.floor(diff / 60000);
     const h = Math.floor(diff / 3600000);
     const d = Math.floor(diff / 86400000);
     const mo = Math.floor(d / 30.44);
     const y = Math.floor(d / 365.25);
+    
     if (y >= 1) return `${y} year${y > 1 ? "s" : ""} ago`;
     if (mo >= 1) return `${mo} month${mo > 1 ? "s" : ""} ago`;
     if (d >= 1) return `${d} day${d > 1 ? "s" : ""} ago`;
     if (h >= 1) return `${h} hour${h > 1 ? "s" : ""} ago`;
     if (m >= 1) return `${m} minute${m > 1 ? "s" : ""} ago`;
-    return `${s} second${s > 1 ? "s" : ""} ago`;
+    if (s >= 1) return `${s} second${s > 1 ? "s" : ""} ago`;
+    return 'Just now';
 }
 
 const toTitle = (s) => String(s || "").replace(/[-_]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
@@ -83,6 +116,7 @@ export default function PublicProfile() {
     const [stats, setStats] = useState({ shinies: 0, completion: 0, gamesPlayed: 0, topBall: null, topMark: null, topGame: null });
     const [loading, setLoading] = useState(true);
     const [recentAdded, setRecentAdded] = useState([]);
+    const [refreshKey, setRefreshKey] = useState(0);
     const [likeCount, setLikeCount] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
@@ -99,6 +133,31 @@ export default function PublicProfile() {
             showMessage("❌ Couldn't copy link", "error");
         }
     };
+
+    const refreshRecentPokemon = () => {
+        setRefreshKey(prev => prev + 1);
+    };
+
+    // Refresh recent Pokemon when the page becomes visible
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                refreshRecentPokemon();
+            }
+        };
+
+        const handleFocus = () => {
+            refreshRecentPokemon();
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, []);
 
     const handleLike = async () => {
         if (likeLoading || !currentUsername) return;
@@ -179,25 +238,53 @@ export default function PublicProfile() {
                 try {
                     const allMonsList = [...pokemonData, ...formsData];
                     const keyToMon = new Map(allMonsList.map(m => [getCaughtKey(m), m]));
-                    const recentList = Object.entries(map)
-                        .filter(([_, info]) => !!info)
-                        .map(([key, info]) => {
-                            const mon = keyToMon.get(key);
-                            const ts = info && info.date ? Date.parse(info.date) : Number.NEGATIVE_INFINITY;
-                            return { key, mon, info, ts };
-                        })
-                        .filter(item => !!item.mon)
-                        .sort((a, b) => b.ts - a.ts)
-                        .slice(0, 5)
-                        .map(({ mon, info }) => ({ mon, info }));
-                    if (!ignore) setRecentAdded(recentList);
+                                                              // First, separate Pokemon with and without caughtAt timestamps
+                     const withTimestamps = [];
+                     const withoutTimestamps = [];
+                     
+                     Object.entries(map).forEach(([key, info]) => {
+                         if (!info) return;
+                         
+                         const mon = keyToMon.get(key);
+                         if (!mon) return;
+                         
+                         if (info.caughtAt) {
+                             const parsedDate = new Date(info.caughtAt);
+                             if (!isNaN(parsedDate.getTime())) {
+                                 withTimestamps.push({ key, mon, info, ts: parsedDate.getTime() });
+                             }
+                         } else {
+                             withoutTimestamps.push({ key, mon, info });
+                         }
+                     });
+                     
+                     // Sort Pokemon with timestamps by newest first
+                     withTimestamps.sort((a, b) => b.ts - a.ts);
+                     
+                     // Add fallback timestamps to Pokemon without caughtAt (older than any with timestamps)
+                     // Reverse the order so the first Pokemon without timestamp gets the oldest fallback
+                     const baseTime = withTimestamps.length > 0 ? withTimestamps[withTimestamps.length - 1].ts - 86400000 : Date.now();
+                     withoutTimestamps.forEach((item, idx) => {
+                         // Reverse the index so first Pokemon gets oldest timestamp
+                         const reverseIdx = withoutTimestamps.length - 1 - idx;
+                         item.ts = baseTime - (reverseIdx * 86400000);
+                     });
+                     
+                     // Combine and sort all Pokemon by timestamp
+                     const allPokemon = [...withTimestamps, ...withoutTimestamps];
+                     allPokemon.sort((a, b) => b.ts - a.ts);
+                     
+                     const recentList = allPokemon.slice(0, 5).map(({ mon, info }) => ({ mon, info }));
+                    if (!ignore) {
+                        setRecentAdded(recentList);
+                    }
                 } catch {
                     if (!ignore) setRecentAdded([]);
                 }
-            } catch { }
+                            } catch { }
         })();
         return () => { ignore = true; };
-    }, [username]);
+    }, [username, refreshKey]); // Add refreshKey dependency to allow manual refresh
 
     // Load like data
     useEffect(() => {
@@ -455,15 +542,15 @@ export default function PublicProfile() {
 
                         </div>
 
-                        <div className="profile-field">
-                            <label>Gender</label>
-                            <div className="field-display">
-                                {data.gender === "Male" && <Mars size={16} color="#4aaaff" style={{ marginRight: 6 }} />}
-                                {data.gender === "Female" && <Venus size={16} color="#ff6ec7" style={{ marginRight: 6 }} />}
-                                {data.gender === "Other" && <VenusAndMars size={16} color="#ffffff" style={{ marginRight: 6 }} />}
-                                {data.gender || "N/A"}
-                            </div>
-                        </div>
+                                                 <div className="profile-field">
+                             <label>Gender</label>
+                             <div className="field-display">
+                                 {data.gender === "Male" && <Mars size={16} color="#4aaaff" style={{ marginRight: 6 }} />}
+                                 {data.gender === "Female" && <Venus size={16} color="#ff6ec7" style={{ marginRight: 6 }} />}
+                                 {data.gender === "Other" && <VenusAndMars size={16} color="#ffffff" style={{ marginRight: 6 }} />}
+                                 {data.gender === "Other" ? "Female" : (data.gender || "N/A")}
+                             </div>
+                         </div>
                     </div>
 
                     <div className="profile-field full-span">
@@ -574,29 +661,66 @@ export default function PublicProfile() {
                             <label>Top Game</label>
                             <div className="field-display">{stats.topGame || "—"}</div>
                         </div>
-                        <div className="profile-field full-span recent-field">
-                            <label>Recent Pokémon</label>
-                            <div className="field-display recent-field-box">
-                                <div className="profile-rank-row">
-                                    {recentAdded && recentAdded.length > 0 ? (
-                                        recentAdded.map(({ mon, info }, idx) => (
-                                            <div key={idx} className="profile-rank-item">
-                                                <div className="profile-pokemon-box" style={{ marginBottom: "2px" }}>
-                                                    <img
-                                                        src={mon?.sprites?.front_default}
-                                                        alt={formatPokemonName(mon?.name)}
-                                                        className="pokemon-img"
-                                                    />
-                                                </div>
-                                                <div className="rank-label">{formatPokemonName(mon?.name)}</div>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div style={{ opacity: 0.7 }}>No recent additions yet</div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                                                 <div className="profile-field full-span recent-field">
+                             <label>Recent Pokémon</label>
+                             <div className="field-display recent-field-box">
+                                 {recentAdded.length === 0 ? (
+                                     <div className="no-recent-pokemon">
+                                         <p>No recent Pokémon added yet</p>
+                                     </div>
+                                 ) : (
+                                     <div className="profile-rank-row recent-pokemon-row">
+                                         {Array.from({ length: 5 }).map((_, idx) => {
+                                             const pokemon = recentAdded[idx];
+                                             
+                                             if (!pokemon) {
+                                                 // Empty slot - render placeholder
+                                                 return (
+                                                     <div key={idx} className="profile-rank-item recent-pokemon-item empty-slot">
+                                                         <div className="profile-pokemon-box recent-pokemon-box">
+                                                             <div className="empty-pokemon-placeholder"></div>
+                                                         </div>
+                                                         <div className="rank-label recent-pokemon-name">
+                                                             <div className="empty-name-placeholder"></div>
+                                                         </div>
+                                                     </div>
+                                                 );
+                                             }
+                                             
+                                             const { mon, info } = pokemon;
+                                             const isNewest = idx === 0;
+                                             const isShiny = info?.shiny;
+                                             
+                                             return (
+                                                 <div key={idx} className={`profile-rank-item recent-pokemon-item ${isNewest ? 'newest' : ''}`}>
+                                                     {isNewest && (
+                                                         <div className="newest-badge">LATEST</div>
+                                                     )}
+                                                     <div className="profile-pokemon-box recent-pokemon-box">
+                                                         <img
+                                                             src={isShiny ? mon?.sprites?.front_shiny : mon?.sprites?.front_default}
+                                                             alt={formatPokemonName(mon?.name)}
+                                                             className="pokemon-img"
+                                                         />
+                                                         {isShiny && (
+                                                             <div className="shiny-indicator">✨</div>
+                                                         )}
+                                                     </div>
+                                                     <div className="rank-label recent-pokemon-name" data-order={idx + 1}>
+                                                         {formatPokemonName(mon?.name)}
+                                                         {mon?.formType && !['alcremie', 'other', 'unown'].includes(mon.formType.toLowerCase()) && (
+                                                             <div className="form-type-tag">
+                                                                 {mon.formType.charAt(0).toUpperCase() + mon.formType.slice(1)}
+                                                             </div>
+                                                         )}
+                                                     </div>
+                                                 </div>
+                                             );
+                                         })}
+                                     </div>
+                                 )}
+                             </div>
+                         </div>
                     </div>
                     {/* Full Dex button - place below the recent section */}
                     <div className="profile-full-dex-button">

@@ -162,6 +162,7 @@ button:focus {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
 }
 
 .profile-header-row {
@@ -269,6 +270,8 @@ button:focus {
   flex-direction: column;
   gap: 16px;
   margin-top: 32px;
+  width: 100%;
+  flex-grow: 1;
 }
 
 .profile-ranking-group h3 {
@@ -282,9 +285,10 @@ button:focus {
 
 .profile-rank-row {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 12px;
   width: 100%;
+  flex-grow: 1;
 }
 
 .profile-rank-item {
@@ -336,6 +340,150 @@ button:focus {
   display: block;
   padding: 18px 16px;
   min-height: 140px;
+}
+
+/* Override for recent Pokemon section */
+.recent-field .profile-rank-row {
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  flex-wrap: nowrap !important;
+  padding: 8px 0 !important;
+  width: 100%;
+}
+
+/* Form type tag styling */
+.form-type-tag {
+  font-size: 0.7rem;
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.1);
+  border: 1px solid rgba(var(--accent-rgb), 0.3);
+  border-radius: 8px;
+  padding: 2px 6px;
+  margin-top: 4px;
+  text-align: center;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* Empty slot placeholders for recent Pokemon */
+.empty-pokemon-placeholder {
+  width: 96px;
+  height: 96px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.empty-name-placeholder {
+  width: 80px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  margin: 0 auto;
+}
+
+/* LATEST badge styling */
+.newest-badge {
+  position: absolute;
+  top: 0px;
+  right: -8px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  border: 2px solid white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Shiny indicator styling */
+.shiny-indicator {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 0.8;
+  }
+}
+
+/* Recent Pokemon specific styling */
+.recent-field .profile-rank-item {
+  position: relative;
+}
+
+.recent-field .profile-pokemon-box {
+  position: relative;
+}
+
+.recent-field .rank-label {
+  margin-top: 0 !important;
+}
+
+/* Override for recent Pokemon section */
+.recent-field .profile-rank-row {
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  flex-wrap: nowrap !important;
+  padding: 8px 0 !important;
+  width: 100%;
+}
+
+/* Form type tag styling */
+.form-type-tag {
+  font-size: 0.7rem;
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.1);
+  border: 1px solid rgba(var(--accent-rgb), 0.3);
+  border-radius: 8px;
+  padding: 2px 6px;
+  margin-top: 4px;
+  text-align: center;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* No recent Pokemon message styling */
+.no-recent-pokemon {
+  text-align: center !important;
+  padding: 40px 20px !important;
+  width: 100% !important;
+  height: 120px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.1), rgba(var(--accent-rgb), 0.05));
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-image: linear-gradient(135deg, var(--accent), rgba(var(--accent-rgb), 0.5)) 1;
+  border-radius: 8px;
+}
+
+.no-recent-pokemon p {
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  margin: 0 !important;
+  color: var(--profile-labels) !important;
+  text-align: center !important;
+  width: 100% !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
 }
 
 

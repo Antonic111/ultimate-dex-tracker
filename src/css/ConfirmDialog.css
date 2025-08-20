@@ -8,11 +8,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: var(--z-modal-overlay);
   opacity: 1;
   transition: opacity 0.2s ease;
   animation: fadeIn 0.3s ease-out;
 }
+
+
 
 .confirm-overlay.closing {
   animation: fadeOut 0.3s ease-in forwards;

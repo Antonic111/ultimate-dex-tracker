@@ -8,11 +8,13 @@ export function SortableItem({ id, children }) {
     setNodeRef,
     transform,
     transition,
-  } = useSortable({ id, handle: true }); // <-- Add this line
+  } = useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    maxWidth: '100%',
+    overflow: 'hidden',
   };
 
   return (

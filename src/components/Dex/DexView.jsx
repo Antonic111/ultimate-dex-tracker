@@ -218,30 +218,34 @@ export default function DexView({
         <>
             {/* Profile Header - Only show when viewing someone else's profile */}
             {viewingUsername && (
-                <div className="profile-viewing-header">
+                <div className="profile-viewing-header page-animate-1">
                     <h1>Viewing <span className="username">{viewingUsername}'s</span> Profile</h1>
                 </div>
             )}
             
             {/* Progress Manager */}
-            <ProgressManager 
-                allMons={allMons} 
-                caughtInfoMap={caughtInfoMap} 
-                readOnly={readOnly}
-                progressBarsOverride={progressBarsOverride}
-            />
+            <div className="progress-manager-container page-animate-1">
+                <ProgressManager 
+                    allMons={allMons} 
+                    caughtInfoMap={caughtInfoMap} 
+                    readOnly={readOnly}
+                    progressBarsOverride={progressBarsOverride}
+                />
+            </div>
             
             {/* Search Bar */}
-            <SearchBar
-                filters={filters}
-                setFilters={setFilters}
-                typeOptions={typeOptions}
-                genOptions={GEN_OPTIONS}
-                showShiny={showShiny}
-                setShowShiny={setShowShiny}
-                showForms={showForms}
-                setShowForms={setShowForms}
-            />
+            <div className="search-bar-container page-animate-2">
+                <SearchBar
+                    filters={filters}
+                    setFilters={setFilters}
+                    typeOptions={typeOptions}
+                    genOptions={GEN_OPTIONS}
+                    showShiny={showShiny}
+                    setShowShiny={setShowShiny}
+                    showForms={showForms}
+                    setShowForms={setShowForms}
+                />
+            </div>
 
             {/* No Results Message - Show for both owner and viewer modes when there are no results */}
             {hasNoResults && (
@@ -259,7 +263,7 @@ export default function DexView({
             )}
 
             {/* Main Dex Section */}
-            <div className="main-bg">
+            <div className="main-bg page-animate-2">
                 {shouldUseCustomListUpdated ? (
                     // ViewDex mode - use customFilterMons to filter and display sections
                     dexSections.map(section => {
@@ -357,17 +361,19 @@ export default function DexView({
                 )}
             </div>
 
-            {/* Sidebar */}
-            <Sidebar
-                open={sidebarOpen}
-                readOnly={readOnly}
-                pokemon={selectedPokemon}
-                onClose={handleSidebarClose}
-                caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon)] : null}
-                updateCaughtInfo={updateCaughtInfo || (() => {})}
-                showShiny={showShiny}
-                viewingUsername={viewingUsername}
-            />
+            {/* Sidebar - Only render when not in ViewDex mode (when viewingUsername is null) */}
+            {!viewingUsername && (
+                <Sidebar
+                    open={sidebarOpen}
+                    readOnly={readOnly}
+                    pokemon={selectedPokemon}
+                    onClose={handleSidebarClose}
+                    caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon)] : null}
+                    updateCaughtInfo={updateCaughtInfo || (() => {})}
+                    showShiny={showShiny}
+                    viewingUsername={viewingUsername}
+                />
+            )}
         </>
     );
 }

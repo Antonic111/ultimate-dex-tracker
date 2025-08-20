@@ -5,8 +5,11 @@ import {
     DndContext,
     KeyboardSensor,
     PointerSensor,
+    MouseSensor,
     useSensor,
     useSensors,
+    DragOverlay,
+    defaultDropAnimationSideEffects,
 } from "@dnd-kit/core";
 import {
     arrayMove,
@@ -96,6 +99,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
     const [bars, setBars] = useState(initialBars);
     const [editingBars, setEditingBars] = useState([]); // New state for editing
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false); // Track changes
+    const [activeDragId, setActiveDragId] = useState(null); // Track active drag
 
     const caughtMap = caughtInfoMap;
 
@@ -136,10 +140,76 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
     }, [savedBars, progressBarsOverride, contextSavedBars]);
 
 
-    function handleDragStart() {
+    function handleDragStart(event) {
+        const { active } = event;
+        
+        // Auto-close any expanded progress bars before dragging
+        setEditingBars(prev => 
+            prev.map(bar => ({
+                ...bar,
+                __showFilters: false // Close all expanded filters
+            }))
+        );
+        
+        setActiveDragId(active.id);
+        
         setBars(prev =>
             prev.map(bar => ({ ...bar, __showFilters: false }))
         );
+        
+        // Add dragging class to body to prevent horizontal scrolling
+        document.body.classList.add('dragging');
+        document.documentElement.classList.add('dragging');
+    }
+
+    function handleDragOver(event) {
+        const { active } = event;
+        
+        // If this is the first drag over event, set the active drag ID
+        if (!activeDragId && active) {
+            setActiveDragId(active.id);
+        }
+        
+        // If we have an active drag, handle auto-scroll
+        if (activeDragId && active) {
+            handleAutoScroll(active);
+        }
+    }
+    
+    function handleAutoScroll(active) {
+        const activeElement = document.querySelector(`[data-id="${active.id}"]`);
+        if (!activeElement) {
+            return;
+        }
+        
+        const dragContainer = document.querySelector('.drag-container');
+        if (!dragContainer) {
+            return;
+        }
+        
+        const containerRect = dragContainer.getBoundingClientRect();
+        const elementRect = activeElement.getBoundingClientRect();
+        
+        // Calculate distance from edges
+        const distanceFromTop = elementRect.top - containerRect.top;
+        const distanceFromBottom = containerRect.bottom - elementRect.bottom;
+        
+        // Only auto-scroll when very close to edges
+        const scrollThreshold = 50;
+        const maxScrollDistance = 30;
+        
+        if (distanceFromTop < scrollThreshold && dragContainer.scrollTop > 0) {
+            // Scroll up
+            const scrollAmount = Math.max(5, Math.min(maxScrollDistance, (scrollThreshold - distanceFromTop)));
+            dragContainer.scrollTop = Math.max(0, dragContainer.scrollTop - scrollAmount);
+        } else if (distanceFromBottom < scrollThreshold && dragContainer.scrollTop < dragContainer.scrollHeight - dragContainer.clientHeight) {
+            // Scroll down
+            const scrollAmount = Math.max(5, Math.min(maxScrollDistance, (scrollThreshold - distanceFromBottom)));
+            dragContainer.scrollTop = Math.min(
+                dragContainer.scrollHeight - dragContainer.clientHeight,
+                dragContainer.scrollTop + scrollAmount
+            );
+        }
     }
 
     const { setUser } = useUser();
@@ -159,15 +229,58 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
         }
     }
 
+
+
     const [showSettings, setShowSettings] = useState(false);
     const [closing, setClosing] = useState(false);
 
+    // Custom modifier to restrict movement within modal boundaries
+    const restrictToModalBoundaries = ({ transform, dragging, active }) => {
+        if (!dragging || !active) {
+            return transform;
+        }
+
+        // Get the modal container dimensions
+        const modalContainer = document.querySelector('.drag-container');
+        if (!modalContainer) {
+            return transform;
+        }
+
+        const containerRect = modalContainer.getBoundingClientRect();
+        const activeElement = document.querySelector(`[data-id="${active.id}"]`);
+        if (!activeElement) {
+            return transform;
+        }
+
+        const elementRect = activeElement.getBoundingClientRect();
+        
+        // Allow minimal horizontal movement, moderate vertical movement for auto-scroll
+        const maxX = 10; // Allow 10px of horizontal movement
+        const maxY = 40; // Allow 40px of vertical movement for reliable auto-scroll
+        
+        return {
+            ...transform,
+            x: Math.max(-maxX, Math.min(maxX, transform.x)),
+            y: Math.max(-maxY, Math.min(maxY, transform.y)),
+        };
+    };
+
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8, // Require 8px movement before drag starts
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
+        }),
+        useSensor(MouseSensor, {
+            activationConstraint: {
+                distance: 8, // Require 8px movement before drag starts
+            },
         })
     );
+    
 
     useEffect(() => {
         const body = document.body;
@@ -341,6 +454,13 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             setEditingBars(updated);
             setHasUnsavedChanges(true);
         }
+        
+        // Clear active drag ID
+        setActiveDragId(null);
+        
+        // Remove dragging class from body to restore normal scrolling
+        document.body.classList.remove('dragging');
+        document.documentElement.classList.remove('dragging');
     }
 
     const visibleBars = bars.filter((b) => b.visible);
@@ -416,12 +536,23 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                         </div>
 
                         <div className="modal-body">
-                            <DndContext
-                                sensors={sensors}
-                                collisionDetection={closestCenter}
-                                onDragStart={handleDragStart}
-                                onDragEnd={handleDragEnd}
-                            >
+                            <div className="drag-container">
+                                <DndContext
+                                    sensors={sensors}
+                                    collisionDetection={closestCenter}
+                                    onDragStart={handleDragStart}
+                                    onDragEnd={handleDragEnd}
+                                    onDragOver={handleDragOver}
+                                    modifiers={[restrictToModalBoundaries]}
+                                    measuring={{
+                                        droppable: {
+                                            strategy: 'always',
+                                        },
+                                    }}
+                                    autoScroll={{
+                                        enabled: false, // Using custom auto-scroll handler
+                                    }}
+                                >
                                 <SortableContext items={editingBars.map((bar) => bar.id)} strategy={verticalListSortingStrategy}>
                                     {editingBars.map((bar, index) => {
                                         const visibleCount = editingBars.filter(b => b.visible).length;
@@ -433,7 +564,11 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                                                 {(listeners) => (
                                                     <div className="bar-settings-group">
                                                         <div className="bar-settings-row">
-                                                            <span className="drag-handle" title="Drag to reorder" {...listeners}>
+                                                            <span 
+                                                                className="drag-handle" 
+                                                                title="Drag to reorder" 
+                                                                {...listeners}
+                                                            >
                                                                 ⠇
                                                             </span>
 
@@ -499,13 +634,14 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
                                                                             try {
                                                                                 const confirm = await showConfirm("Are you sure you want to delete this progress bar?");
+                                                                                
                                                                                 if (confirm) {
                                                                                     const updated = editingBars.filter((_, i) => i !== index);
                                                                                     setEditingBars(updated);
                                                                                     setHasUnsavedChanges(true);
                                                                                 }
                                                                             } finally {
-                                                                                // Always re-enable the button, even if confirm is false or an error occurs
+                                                                                // Always re-enable the button
                                                                                 button.disabled = false;
                                                                             }
                                                                         }}
@@ -581,7 +717,9 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                                         );
                                     })}
                                 </SortableContext>
-                            </DndContext>
+
+                                </DndContext>
+                            </div>
 
                             <div className="add-bar-row">
                                 <button
