@@ -41,15 +41,49 @@ export default function DexSection({
 
   // use external caught map in view mode if provided, else fall back
   const caughtMap = caughtInfoMapOverride ?? caught ?? {};
-  const isCaught = (p) => !!caughtMap[getCaughtKey(p)];
+  const isCaught = (p) => !!caughtMap[getCaughtKey(p, null, showShiny)];
 
   if (filteredList.length === 0) {
     return null;
   }
 
   const boxes = [];
-  for (let i = 0; i < filteredList.length; i += 30) {
-    boxes.push(filteredList.slice(i, i + 30));
+  
+  // Special handling for Unown forms to separate regular and alpha variants
+  if (title === "Unown Forms") {
+    let currentBox = [];
+    let hasStartedAlpha = false;
+    let alphaBoxIndex = 0;
+    
+    for (let i = 0; i < filteredList.length; i++) {
+      const pokemon = filteredList[i];
+      const isAlpha = pokemon.name.endsWith('-alpha');
+      
+      // If this is the first alpha variant and we have Pokémon in the current box,
+      // start a new box
+      if (isAlpha && !hasStartedAlpha && currentBox.length > 0) {
+        boxes.push({ pokemon: currentBox, isAlpha: false, boxIndex: boxes.length });
+        currentBox = [];
+        hasStartedAlpha = true;
+        alphaBoxIndex = 0;
+      }
+      
+      currentBox.push(pokemon);
+      
+      // If we've reached 30 Pokémon or this is the last Pokémon, add the box
+      if (currentBox.length === 30 || i === filteredList.length - 1) {
+        const isAlphaBox = hasStartedAlpha;
+        const boxIndex = isAlphaBox ? alphaBoxIndex : boxes.length;
+        boxes.push({ pokemon: currentBox, isAlpha: isAlphaBox, boxIndex: boxIndex });
+        if (isAlphaBox) alphaBoxIndex++;
+        currentBox = [];
+      }
+    }
+  } else {
+    // Default behavior for other sections
+    for (let i = 0; i < filteredList.length; i += 30) {
+      boxes.push({ pokemon: filteredList.slice(i, i + 30), isAlpha: false, boxIndex: i / 30 });
+    }
   }
 
   const [collapsed, setCollapsed] = useState(false);
@@ -86,41 +120,59 @@ export default function DexSection({
 
         {!collapsed && (
           <div className="boxes-row">
-            {boxes.map((box, i) => (
-              <div className="box" key={`box-${box[0]?.id ?? i}-${i}`}>
-                <div className="box-header-overlap">
-                  <span>
-                    {(() => {
-                      const FORM_TYPES = [
-                        "gender",
-                        "alolan",
-                        "galarian",
-                        "gmax",
-                        "hisuian",
-                        "paldean",
-                        "unown",
-                        "other",
-                        "alcremie",
-                        "alpha",
-                      ];
-                      const tstr = String(title || "").toLowerCase();
-                      const match = FORM_TYPES.find((type) => tstr.includes(type));
-                      if (match) {
-                        const capitalized =
-                          match.charAt(0).toUpperCase() +
-                          match.slice(1).toLowerCase();
-                        const label =
-                          match === "alcremie"
-                            ? "Alcremie's Box"
-                            : match === "unown"
-                              ? "Unown's Box"
-                              : `${capitalized} Forms Box`;
-                        return `${label} ${i + 1}`;
-                      } else {
-                        return `${String(box[0]?.id ?? "????").padStart(4, "0")} - ${String(box[box.length - 1]?.id ?? "????").padStart(4, "0")}`;
-                      }
-                    })()}
-                  </span>
+            {boxes.map((boxData, i) => {
+              const box = boxData.pokemon || boxData; // Handle both new and old structure
+              const isAlphaBox = boxData.isAlpha;
+              const boxIndex = boxData.boxIndex !== undefined ? boxData.boxIndex : i;
+              
+              return (
+                <div className="box" key={`box-${box[0]?.id ?? i}-${i}`}>
+                  <div className="box-header-overlap">
+                    <span>
+                      {(() => {
+                        const FORM_TYPES = [
+                          "gender",
+                          "alolan",
+                          "galarian",
+                          "gmax",
+                          "hisuian",
+                          "paldean",
+                          "unown",
+                          "other",
+                          "alcremie",
+                          "alpha",
+                        ];
+                        const tstr = String(title || "").toLowerCase();
+                        const match = FORM_TYPES.find((type) => tstr.includes(type));
+                        if (match) {
+                          const capitalized =
+                            match.charAt(0).toUpperCase() +
+                            match.slice(1).toLowerCase();
+                          let label;
+                          
+                          if (match === "alcremie") {
+                            label = "Alcremie's Box";
+                          } else if (match === "unown") {
+                            // Special naming for Unown boxes
+                            if (isAlphaBox) {
+                              label = "Alpha Unown's Box";
+                            } else {
+                              label = "Unown's Box";
+                            }
+                          } else if (match === "alpha") {
+                            label = "Alpha Forms Box";
+                          } else {
+                            label = `${capitalized} Forms Box`;
+                          }
+                          
+                          return `${label} ${boxIndex + 1}`;
+                        } else if (title === "Alpha Genders & Others") {
+                          return `Alpha Genders & Others Box ${boxIndex + 1}`;
+                        } else {
+                          return `${String(box[0]?.id ?? "????").padStart(4, "0")} - ${String(box[box.length - 1]?.id ?? "????").padStart(4, "0")}`;
+                        }
+                      })()}
+                    </span>
 
                   {/* hide mark-all in read-only */}
                   {!readOnly && onMarkAll && (
@@ -192,7 +244,8 @@ export default function DexSection({
                   })}
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         )}
       </div>

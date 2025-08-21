@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { getCaughtKey } from './caughtStorage';
+import { getCaughtKey, migrateOldCaughtData } from './caughtStorage';
 import { fetchCaughtData, updateCaughtData } from './api/caught';
 import { authAPI } from './utils/api';
 import { debugAPI } from './utils/debug';
@@ -99,7 +99,8 @@ const FORM_TYPES = [
   "unown",
   "other",
   "alcremie",
-  "alpha"
+  "alpha",
+  "alphaother"
 ];
 
 const dexSections = [
@@ -110,7 +111,7 @@ const dexSections = [
   },
   ...FORM_TYPES.map(type => ({
     key: type,
-    title: `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
+    title: type === "alphaother" ? "Alpha Genders & Others" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
     getList: () => formsData.filter(p => p.formType === type)
   }))
 ];
@@ -364,14 +365,33 @@ useEffect(() => {
 
   const [caughtInfoMap, setCaughtInfoMap] = useState({});
 
+  // Migration: Convert old caught data to new format when component mounts
+  useEffect(() => {
+    if (Object.keys(caughtInfoMap).length > 0 && user?.username) {
+      const migratedData = migrateOldCaughtData(caughtInfoMap);
+      
+      if (JSON.stringify(migratedData) !== JSON.stringify(caughtInfoMap)) {
+        console.log("🔄 Migrating existing data to new shiny format...");
+        setCaughtInfoMap(migratedData);
+        // Save migrated data to backend
+        updateCaughtData(user.username, null, migratedData).then(() => {
+          console.log("✅ Migration completed and saved successfully");
+        }).catch((error) => {
+          console.error("❌ Migration failed:", error);
+        });
+      }
+    }
+  }, [caughtInfoMap, user?.username]);
 
-  function filterMons(list, forceShowForms = false) {
+  function filterMons(list, forceShowForms = false, isShiny = false) {
     return list.filter(poke => {
       // 🧬 Respect toggle or force flag
       if (!forceShowForms && !showForms && poke.formType && poke.formType !== "main" && poke.formType !== "default") {
         return false;
       }
-      const info = caughtInfoMap[getCaughtKey(poke)] || {};
+      
+      // Get caught info for the appropriate shiny status
+      const info = caughtInfoMap[getCaughtKey(poke, null, isShiny)] || {};
 
       // Search by name/dex
       if (filters.searchTerm) {
@@ -401,9 +421,10 @@ useEffect(() => {
       if (filters.type && !(poke.types || []).includes(filters.type)) return false;
       // Gen
       if (filters.gen && String(poke.gen) !== String(filters.gen)) return false;
-      // Caught/uncaught
-      if (filters.caught === "caught" && !caught[getCaughtKey(poke)]) return false;
-      if (filters.caught === "uncaught" && caught[getCaughtKey(poke)]) return false;
+      // Caught/uncaught - check the appropriate shiny status
+      const caughtKey = getCaughtKey(poke, null, isShiny);
+      if (filters.caught === "caught" && !caught[caughtKey]) return false;
+      if (filters.caught === "uncaught" && caught[caughtKey]) return false;
 
       return true;
     });
@@ -423,8 +444,8 @@ function CloseSidebarOnRouteChange() {
 
 
 
-function updateCaughtInfo(poke, info) {
-  const key = getCaughtKey(poke);
+function updateCaughtInfo(poke, info, isShiny = false) {
+  const key = getCaughtKey(poke, null, isShiny);
 
   setCaughtInfoMap(prev => {
     // If we're resetting/clearing data
@@ -466,20 +487,20 @@ function updateCaughtInfo(poke, info) {
     setSelectedPokemon(poke);
   }
 
-  async function handleMarkAll(box) {
-    const allMarked = box.every(p => caught[getCaughtKey(p)]);
+  async function handleMarkAll(box, isShiny = false) {
+    const allMarked = box.every(p => caught[getCaughtKey(p, null, isShiny)]);
 
     // 🔍 Check for any Pokémon that has saved info
     if (allMarked) {
       const hasInfo = box.some(p => {
-        const key = getCaughtKey(p);
+        const key = getCaughtKey(p, null, isShiny);
         const info = caughtInfoMap[key];
         return hasMeaningfulInfo(info);
       });
 
       if (hasInfo) {
         const confirmed = await showConfirm(
-          `Unmarking will delete saved info for one or more Pokémon in this section. Continue?`
+          `Unmarking will delete saved info for one or more ${isShiny ? 'shiny ' : ''}Pokémon in this section. Continue?`
         );
         if (!confirmed) return;
       }
@@ -490,7 +511,7 @@ function updateCaughtInfo(poke, info) {
     const delta = {};
 
     box.forEach(p => {
-      const key = getCaughtKey(p);
+      const key = getCaughtKey(p, null, isShiny);
       const shouldBeCaught = !allMarked;
 
       newCaughtMap[key] = shouldBeCaught;
@@ -533,7 +554,7 @@ function updateCaughtInfo(poke, info) {
     }
 
     if (selectedPokemon) {
-      const affected = box.find(p => getCaughtKey(p) === getCaughtKey(selectedPokemon));
+      const affected = box.find(p => getCaughtKey(p, null, isShiny) === getCaughtKey(selectedPokemon, null, isShiny));
       if (affected) {
         setSelectedPokemon({ ...selectedPokemon });
       }
@@ -545,14 +566,14 @@ function updateCaughtInfo(poke, info) {
 
 
   // App.jsx
-  async function handleToggleCaught(poke) {
-    const key = getCaughtKey(poke);
+  async function handleToggleCaught(poke, isShiny = false) {
+    const key = getCaughtKey(poke, null, isShiny);
 
     if (caught[key]) {
       const info = caughtInfoMap[key];
       if (hasMeaningfulInfo(info)) {
         const confirmed = await showConfirm(
-          `Doing this will delete ALL info for ${formatPokemonName(poke?.name)}. Are you sure you wanna continue?`
+          `Doing this will delete ALL info for ${isShiny ? 'shiny ' : ''}${formatPokemonName(poke?.name)}. Are you sure you wanna continue?`
         );
 
         if (!confirmed) return;
@@ -594,7 +615,7 @@ function updateCaughtInfo(poke, info) {
       return newState;
     });
 
-    if (sidebarOpen && (!selectedPokemon || getCaughtKey(selectedPokemon) !== key)) {
+    if (sidebarOpen && (!selectedPokemon || getCaughtKey(selectedPokemon, null, isShiny) !== key)) {
       setSelectedPokemon(poke);
     }
   }
@@ -602,10 +623,11 @@ function updateCaughtInfo(poke, info) {
   let mergedMons = [];
   const seen = new Set();
 
+  // Use current shiny state for search suggestions
   mergedMons = dexSections
-    .flatMap(section => filterMons(section.getList(), showForms)) // ✅ Pass toggle state
+    .flatMap(section => filterMons(section.getList(), showForms, showShiny))
     .filter(mon => {
-      const key = getCaughtKey(mon);
+      const key = getCaughtKey(mon, null, showShiny);
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
@@ -677,6 +699,7 @@ function updateCaughtInfo(poke, info) {
                           allMons={[...pokemonData, ...formsData]}
                           caughtInfoMap={caughtInfoMap}
                           progressBarsOverride={user.progressBars}
+                          showShiny={showShiny}
                         />
                       </div>
 
@@ -693,54 +716,110 @@ function updateCaughtInfo(poke, info) {
                         />
                       </div>
 
-                      <div className="main-bg page-container fade-in-up">
-                        {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
-                          ? dexSections.map(section => {
-                            const filteredMons = filterMons(section.getList(), showForms)
-                              .sort((a, b) => a.id - b.id);
-                            if (!filteredMons.length) return null;
+                                             <div className="main-bg page-container fade-in-up">
+                         {/* Dynamic Dex Grid based on showShiny toggle */}
+                         {showShiny ? (
+                           // Show Shiny Pokémon Grid
+                           <div className="dex-grid-section">
+                             {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
+                               ? dexSections.map(section => {
+                                 const filteredMons = filterMons(section.getList(), showForms, true)
+                                   .sort((a, b) => a.id - b.id);
+                                 if (!filteredMons.length) return null;
 
-                            return (
-                              <DexSection
-                                readOnly={false}
-                                caughtInfoMap={caughtInfoMap}
-                                updateCaughtInfo={updateCaughtInfo}
-                                key={section.key}
-                                sidebarOpen={sidebarOpen}
-                                title={section.title}
-                                pokemonList={filteredMons}
-                                caught={caught}
-                                onMarkAll={handleMarkAll}
-                                onToggleCaught={handleToggleCaught}
-                                onSelect={handleSelectPokemon}
-                                showShiny={showShiny}
-                                showForms={true}
-                              />
-                            );
-                          })
-                          : dexSections.map(section => {
-                            const filteredMons = filterMons(section.getList());
-                            if (!filteredMons.length) return null;
+                                 return (
+                                   <DexSection
+                                     readOnly={false}
+                                     caughtInfoMap={caughtInfoMap}
+                                     updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
+                                     key={`shiny_${section.key}`}
+                                     sidebarOpen={sidebarOpen}
+                                     title={section.title}
+                                     pokemonList={filteredMons}
+                                     caught={caught}
+                                     onMarkAll={(box) => handleMarkAll(box, true)}
+                                     onToggleCaught={(poke) => handleToggleCaught(poke, true)}
+                                     onSelect={handleSelectPokemon}
+                                     showShiny={true}
+                                     showForms={showForms}
+                                   />
+                                 );
+                               })
+                               : dexSections.map(section => {
+                                 const filteredMons = filterMons(section.getList(), false, true);
+                                 if (!filteredMons.length) return null;
 
-                            return (
-                              <DexSection
-                                readOnly={false}
-                                caughtInfoMap={caughtInfoMap}
-                                updateCaughtInfo={updateCaughtInfo}
-                                key={section.key}
-                                sidebarOpen={sidebarOpen}
-                                title={section.title}
-                                pokemonList={filteredMons}
-                                caught={caught}
-                                onMarkAll={handleMarkAll}
-                                onToggleCaught={handleToggleCaught}
-                                onSelect={handleSelectPokemon}
-                                showShiny={showShiny}
-                                showForms={showForms}
-                              />
-                            );
-                          })}
-                      </div>
+                                 return (
+                                   <DexSection
+                                     readOnly={false}
+                                     caughtInfoMap={caughtInfoMap}
+                                     updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
+                                     key={`shiny_${section.key}`}
+                                     sidebarOpen={sidebarOpen}
+                                     title={section.title}
+                                     pokemonList={filteredMons}
+                                     caught={caught}
+                                     onMarkAll={(box) => handleMarkAll(box, true)}
+                                     onToggleCaught={(poke) => handleToggleCaught(poke, true)}
+                                     onSelect={handleSelectPokemon}
+                                     showShiny={true}
+                                     showForms={showForms}
+                                   />
+                                 );
+                               })}
+                           </div>
+                         ) : (
+                           // Show Regular Pokémon Grid
+                           <div className="dex-grid-section">
+                             {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
+                               ? dexSections.map(section => {
+                                 const filteredMons = filterMons(section.getList(), showForms, false)
+                                   .sort((a, b) => a.id - b.id);
+                                 if (!filteredMons.length) return null;
+
+                                 return (
+                                   <DexSection
+                                     readOnly={false}
+                                     caughtInfoMap={caughtInfoMap}
+                                     updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
+                                     key={`regular_${section.key}`}
+                                     sidebarOpen={sidebarOpen}
+                                     title={section.title}
+                                     pokemonList={filteredMons}
+                                     caught={caught}
+                                     onMarkAll={(box) => handleMarkAll(box, false)}
+                                     onToggleCaught={(poke) => handleToggleCaught(poke, false)}
+                                     onSelect={handleSelectPokemon}
+                                     showShiny={false}
+                                     showForms={showForms}
+                                   />
+                                 );
+                               })
+                               : dexSections.map(section => {
+                                 const filteredMons = filterMons(section.getList(), false, false);
+                                 if (!filteredMons.length) return null;
+
+                                 return (
+                                   <DexSection
+                                     readOnly={false}
+                                     caughtInfoMap={caughtInfoMap}
+                                     updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
+                                     key={`regular_${section.key}`}
+                                     sidebarOpen={sidebarOpen}
+                                     title={section.title}
+                                     pokemonList={filteredMons}
+                                     caught={caught}
+                                     onMarkAll={(box) => handleMarkAll(box, false)}
+                                     onToggleCaught={(poke) => handleToggleCaught(poke, false)}
+                                     onSelect={handleSelectPokemon}
+                                     showShiny={false}
+                                     showForms={showForms}
+                                   />
+                                 );
+                               })}
+                           </div>
+                         )}
+                       </div>
 
                         {showNoResults && filters.searchTerm && (
                          <NoResults
@@ -758,8 +837,8 @@ function updateCaughtInfo(poke, info) {
                           setSidebarOpen(false);
                           setSelectedPokemon(null);
                         }}
-                        caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon)] : null}
-                        updateCaughtInfo={updateCaughtInfo}
+                        caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon, null, showShiny)] : null}
+                        updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, showShiny)}
                         showShiny={showShiny}
                       />
                     </>

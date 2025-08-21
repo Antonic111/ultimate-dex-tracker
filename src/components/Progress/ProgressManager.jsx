@@ -38,6 +38,12 @@ const DEFAULT_BARS = [
         filters: {},
         visible: true,
     },
+    {
+        id: "default_shiny",
+        name: "Shiny Pokémon",
+        filters: { shiny: true },
+        visible: true,
+    },
 ];
 
 const TEMPLATE_PRESETS = [
@@ -83,7 +89,7 @@ function loadFullCaughtMap() {
     return caughtMap;
 }
 
-export default function ProgressManager({ allMons, caughtInfoMap, readOnly = false, progressBarsOverride = null, }) {
+export default function ProgressManager({ allMons, caughtInfoMap, readOnly = false, progressBarsOverride = null, showShiny = false }) {
     const { username, progressBars: contextSavedBars = [] } = useContext(UserContext);
     const { showMessage } = useMessage();
     
@@ -413,10 +419,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             return { total: allGameValues.size, caught: foundGames.size };
         }
 
-
-
         const filtered = allMons.filter((mon) => {
-            const key = getCaughtKey(mon);
             const formType = mon.formType || "main";
 
             if (bar.filters?.formType?.length > 0) {
@@ -440,7 +443,31 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
         });
 
         const total = filtered.length;
-        const caught = filtered.filter((mon) => !!caughtMap[getCaughtKey(mon)]).length;
+        
+        // Count both regular and shiny Pokémon for the total
+        // For caught count, check if the progress bar is specifically for shiny tracking
+        const isShinyBar = bar.filters?.shiny === true;
+        
+        // If showShiny is true and this is a general progress bar (not specifically shiny), 
+        // prioritize showing shiny progress. If showShiny is false, prioritize regular progress.
+        const shouldShowShinyProgress = showShiny && !isShinyBar;
+        
+        const caught = filtered.filter((mon) => {
+            const regularKey = getCaughtKey(mon, null, false);
+            const shinyKey = getCaughtKey(mon, null, true);
+            
+            if (isShinyBar) {
+                // This bar tracks shiny Pokémon specifically
+                return !!caughtMap[shinyKey];
+            } else if (shouldShowShinyProgress) {
+                // We're showing shiny grid, so prioritize shiny progress for general bars
+                return !!caughtMap[shinyKey];
+            } else {
+                // We're showing regular grid, so show regular progress for general bars
+                return !!caughtMap[regularKey];
+            }
+        }).length;
+        
         return { total, caught };
     }
 

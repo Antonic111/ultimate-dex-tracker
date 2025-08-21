@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import "../css/Profile.css";
-import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart } from "lucide-react";
+import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles } from "lucide-react";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../data/forms.json";
@@ -113,7 +113,7 @@ const countTop = (list, key) => {
 export default function PublicProfile() {
     const { username } = useParams();
     const [data, setData] = useState(null);
-    const [stats, setStats] = useState({ shinies: 0, completion: 0, gamesPlayed: 0, topBall: null, topMark: null, topGame: null });
+    const [stats, setStats] = useState({ regularCaught: 0, regularCompletion: 0, shinyCaught: 0, shinyCompletion: 0, gamesPlayed: 0, topBall: null, topMark: null, topGame: null });
     const [loading, setLoading] = useState(true);
     const [recentAdded, setRecentAdded] = useState([]);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -220,19 +220,27 @@ export default function PublicProfile() {
                     ...formsData.map(p => getCaughtKey(p)),
                 ];
                 const total = allKeys.length;
-                const caughtInfos = Object.values(map).filter(Boolean);
-                const shinies = caughtInfos.length;
-                const completion = total ? Math.round((shinies / total) * 100) : 0;
-                const gamesPlayed = new Set(caughtInfos.map(i => i.game).filter(Boolean)).size;
+                
+                // Separate regular and shiny counts
+                const regularEntries = Object.entries(map).filter(([key, info]) => info && !key.includes('_shiny'));
+                const shinyEntries = Object.entries(map).filter(([key, info]) => info && key.includes('_shiny'));
+                
+                const regularCaught = regularEntries.length;
+                const shinyCaught = shinyEntries.length;
+                const regularCompletion = total ? Math.round((regularCaught / total) * 100) : 0;
+                const shinyCompletion = total ? Math.round((shinyCaught / total) * 100) : 0;
+                
+                const allCaughtInfos = [...regularEntries.map(([, info]) => info), ...shinyEntries.map(([, info]) => info)];
+                const gamesPlayed = new Set(allCaughtInfos.map(i => i.game).filter(Boolean)).size;
 
-                const topBallKey = countTop(caughtInfos, "ball");
-                const topMarkKey = countTop(caughtInfos, "mark");
-                const topGameKey = countTop(caughtInfos, "game");
+                const topBallKey = countTop(allCaughtInfos, "ball");
+                const topMarkKey = countTop(allCaughtInfos, "mark");
+                const topGameKey = countTop(allCaughtInfos, "game");
                 const topBall = fromOptionsOrTitle(BALL_OPTIONS, topBallKey, " Ball");
                 const topMark = fromOptionsOrTitle(MARK_OPTIONS, topMarkKey, " Mark");
                 const topGame = fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) ? "Pokemon " + fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) : null;
 
-                if (!ignore) setStats({ shinies, completion, gamesPlayed, topBall, topMark, topGame });
+                if (!ignore) setStats({ regularCaught, regularCompletion, shinyCaught, shinyCompletion, gamesPlayed, topBall, topMark, topGame });
 
                 // Build recent 5 added list (newest by date first)
                 try {
@@ -245,16 +253,24 @@ export default function PublicProfile() {
                      Object.entries(map).forEach(([key, info]) => {
                          if (!info) return;
                          
-                         const mon = keyToMon.get(key);
+                         // Check if this is a shiny Pokémon by looking for _shiny suffix in the key
+                         const isShiny = key.includes('_shiny');
+                         
+                         // Get the base key (without _shiny suffix) to find the Pokémon data
+                         const baseKey = isShiny ? key.replace('_shiny', '') : key;
+                         const mon = keyToMon.get(baseKey);
                          if (!mon) return;
+                         
+                         // Add shiny status to the info object
+                         const infoWithShiny = { ...info, isShiny };
                          
                          if (info.caughtAt) {
                              const parsedDate = new Date(info.caughtAt);
                              if (!isNaN(parsedDate.getTime())) {
-                                 withTimestamps.push({ key, mon, info, ts: parsedDate.getTime() });
+                                 withTimestamps.push({ key, mon, info: infoWithShiny, ts: parsedDate.getTime() });
                              }
                          } else {
-                             withoutTimestamps.push({ key, mon, info });
+                             withoutTimestamps.push({ key, mon, info: infoWithShiny });
                          }
                      });
                      
@@ -638,12 +654,20 @@ export default function PublicProfile() {
                 <div className="profile-right">
                     <div className="profile-stats-grid">
                         <div className="profile-field">
-                            <label>Total Shinies</label>
-                            <div className="field-display">{stats.shinies}</div>
+                            <label>Regular Caught</label>
+                            <div className="field-display">{stats.regularCaught}</div>
                         </div>
                         <div className="profile-field">
-                            <label>Living Dex Completion</label>
-                            <div className="field-display">{stats.completion}%</div>
+                            <label>Regular Completion</label>
+                            <div className="field-display">{stats.regularCompletion}%</div>
+                        </div>
+                        <div className="profile-field">
+                            <label>Shiny Caught</label>
+                            <div className="field-display">{stats.shinyCaught}</div>
+                        </div>
+                        <div className="profile-field">
+                            <label>Shiny Completion</label>
+                            <div className="field-display">{stats.shinyCompletion}%</div>
                         </div>
                         <div className="profile-field">
                             <label>Games Hunted In</label>
@@ -662,34 +686,18 @@ export default function PublicProfile() {
                             <div className="field-display">{stats.topGame || "—"}</div>
                         </div>
                                                  <div className="profile-field full-span recent-field">
-                             <label>Recent Pokémon</label>
+                             <label>Recent Entries</label>
                              <div className="field-display recent-field-box">
                                  {recentAdded.length === 0 ? (
                                      <div className="no-recent-pokemon">
-                                         <p>No recent Pokémon added yet</p>
+                                         <p>No recent entries yet</p>
                                      </div>
                                  ) : (
                                      <div className="profile-rank-row recent-pokemon-row">
-                                         {Array.from({ length: 5 }).map((_, idx) => {
-                                             const pokemon = recentAdded[idx];
-                                             
-                                             if (!pokemon) {
-                                                 // Empty slot - render placeholder
-                                                 return (
-                                                     <div key={idx} className="profile-rank-item recent-pokemon-item empty-slot">
-                                                         <div className="profile-pokemon-box recent-pokemon-box">
-                                                             <div className="empty-pokemon-placeholder"></div>
-                                                         </div>
-                                                         <div className="rank-label recent-pokemon-name">
-                                                             <div className="empty-name-placeholder"></div>
-                                                         </div>
-                                                     </div>
-                                                 );
-                                             }
-                                             
+                                         {recentAdded.map((pokemon, idx) => {
                                              const { mon, info } = pokemon;
                                              const isNewest = idx === 0;
-                                             const isShiny = info?.shiny;
+                                             const isShiny = info?.isShiny;
                                              
                                              return (
                                                  <div key={idx} className={`profile-rank-item recent-pokemon-item ${isNewest ? 'newest' : ''}`}>
@@ -703,7 +711,9 @@ export default function PublicProfile() {
                                                              className="pokemon-img"
                                                          />
                                                          {isShiny && (
-                                                             <div className="shiny-indicator">✨</div>
+                                                             <div className="shiny-indicator">
+                                                                 <Sparkles size={20} className="shiny-sparkles-icon" />
+                                                             </div>
                                                          )}
                                                      </div>
                                                      <div className="rank-label recent-pokemon-name" data-order={idx + 1}>

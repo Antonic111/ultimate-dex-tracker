@@ -125,6 +125,8 @@ button:focus {
   color: var(--accent-hover);
 }
 
+
+
 .profile-edit-btn,
 .profile-cancel-btn {
   display: flex;
@@ -351,19 +353,7 @@ button:focus {
   width: 100%;
 }
 
-/* Form type tag styling */
-.form-type-tag {
-  font-size: 0.7rem;
-  color: var(--accent);
-  background: rgba(var(--accent-rgb), 0.1);
-  border: 1px solid rgba(var(--accent-rgb), 0.3);
-  border-radius: 8px;
-  padding: 2px 6px;
-  margin-top: 4px;
-  text-align: center;
-  font-weight: 500;
-  text-transform: capitalize;
-}
+
 
 /* Empty slot placeholders for recent Pokemon */
 .empty-pokemon-placeholder {
@@ -385,7 +375,7 @@ button:focus {
 /* LATEST badge styling */
 .newest-badge {
   position: absolute;
-  top: 0px;
+  top: 12px;
   right: -8px;
   background: linear-gradient(135deg, #ff6b6b, #ee5a24);
   color: white;
@@ -402,35 +392,51 @@ button:focus {
 /* Shiny indicator styling */
 .shiny-indicator {
   position: absolute;
-  top: -8px;
-  left: -8px;
-  font-size: 1.2rem;
-  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
-  animation: sparkle 1.5s ease-in-out infinite;
+  top: 2px;
+  left: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@keyframes sparkle {
-  0%, 100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.2) rotate(180deg);
-    opacity: 0.8;
-  }
+.shiny-sparkles-icon {
+  color: #FFB800;
+  opacity: 1;
+  width: 20px;
+  height: 20px;
 }
 
 /* Recent Pokemon specific styling */
 .recent-field .profile-rank-item {
   position: relative;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 12px;
 }
 
 .recent-field .profile-pokemon-box {
   position: relative;
+  flex-shrink: 0;
+  margin-bottom: 4px;
 }
 
 .recent-field .rank-label {
   margin-top: 0 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 40px;
+  justify-content: flex-start;
+}
+
+/* Tighter spacing for form tags in recent entries */
+.recent-field .form-type-tag {
+  margin-top: 1px;
+  padding: 1px 3px;
+  font-size: 0.65rem;
 }
 
 /* Override for recent Pokemon section */
@@ -442,18 +448,20 @@ button:focus {
   width: 100%;
 }
 
-/* Form type tag styling */
+/* Form type tag styling - Updated */
 .form-type-tag {
   font-size: 0.7rem;
   color: var(--accent);
   background: rgba(var(--accent-rgb), 0.1);
   border: 1px solid rgba(var(--accent-rgb), 0.3);
   border-radius: 8px;
-  padding: 2px 6px;
-  margin-top: 4px;
+  padding: 1px 4px;
+  margin-top: 2px;
   text-align: center;
   font-weight: 500;
   text-transform: capitalize;
+  flex-shrink: 0;
+  line-height: 1.1;
 }
 
 /* No recent Pokemon message styling */

@@ -473,8 +473,20 @@ export default function Backup() {
             
             <div className="data-summary">
               <div className="summary-item">
-                <span className="label">Caught Pokemon:</span>
+                <span className="label">Total Pokemon:</span>
                 <span className="value">{Object.keys(caughtData).length}</span>
+              </div>
+              <div className="summary-item">
+                <span className="label">Shiny Pokemon:</span>
+                <span className="value">
+                  {Object.keys(caughtData).filter(key => key.endsWith('_shiny')).length}
+                </span>
+              </div>
+              <div className="summary-item">
+                <span className="label">Regular Pokemon:</span>
+                <span className="value">
+                  {Object.keys(caughtData).filter(key => !key.endsWith('_shiny')).length}
+                </span>
               </div>
               <div className="summary-item">
                 <span className="label">Username:</span>
@@ -516,6 +528,9 @@ export default function Backup() {
                 {importing ? 'Importing...' : 'Choose File & Import'}
               </span>
             </label>
+            
+            {/* Add space after import button */}
+            <div style={{ height: '15px' }}></div>
           </div>
 
           {/* Right Box - Local Backups */}
@@ -568,6 +583,7 @@ export default function Backup() {
                               <span className="backup-count">{backup.caughtCount} Pokemon</span>
                               <span className="backup-size">{formatFileSize(backup.size)}</span>
                             </div>
+
                           </div>
                           <div className="backup-actions">
                             <button 

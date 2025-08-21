@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Sparkles } from "lucide-react";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS } from "../../Constants";
 import EvolutionChain from "../Dex/EvolutionChain";
 import { formatPokemonName, getFormDisplayName, renderTypeBadge } from "../../utils";
@@ -168,8 +169,18 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
               width={92}
               height={92}
             />
+            {showShiny && (
+              <div className="shiny-sparkles-overlay">
+                <Sparkles 
+                  size={16} 
+                  className="shiny-sparkles-icon" 
+                />
+              </div>
+            )}
           </div>
-          <span className="sidebar-poke-name">{pokeName}</span>
+          <div className="sidebar-poke-name-container">
+            <span className="sidebar-poke-name">{pokeName}</span>
+          </div>
         </div>
 
         {/* Second row: Meta (left) + Badges (right) */}

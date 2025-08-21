@@ -1,14 +1,21 @@
 .backup-page {
-  min-height: calc(100vh - 200px);
+  height: calc(100vh - 200px);
   background: var(--bg);
   color: var(--text);
   padding: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .backup-container {
   max-width: 1300px;
   margin: 0 auto;
   padding: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .backup-header {
@@ -37,6 +44,9 @@
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   margin-bottom: 15px;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 .backup-section {
@@ -45,22 +55,27 @@
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-height: 0;
+  overflow: hidden;
 }
 
 .left-section {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  padding-bottom: 20px;
 }
 
 .right-section {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .section-divider {
   height: 2px;
   background-color: var(--dividers);
-  margin: 25px 0;
+  margin: 16px 0;
   width: 100%;
 }
 
@@ -188,13 +203,18 @@
   color: white;
 }
 
+.file-input-label {
+  margin-bottom: 15px;
+}
+
 .backup-history-container {
   background: var(--pokemon-box-bg2);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 20px;
   margin-top: 20px;
-  height: 400px;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -222,6 +242,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow: hidden;
 }
 
 .backup-history h3 {
@@ -247,9 +268,11 @@
   gap: 10px;
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding-right: 8px;
   margin-right: -8px;
   min-height: 0;
+  max-height: 100%;
 }
 
 /* Custom scrollbar styling */
@@ -350,6 +373,8 @@
   text-align: center;
 }
 
+
+
 .backup-actions {
   display: flex;
   gap: 8px;
@@ -428,7 +453,7 @@
   }
   
   .backup-history-container {
-    height: 300px;
+    min-height: 0;
     padding: 15px;
   }
   

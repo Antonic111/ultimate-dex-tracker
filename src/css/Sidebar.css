@@ -79,6 +79,7 @@
   justify-content: center;
   border: 3px solid #313131;
   image-rendering: pixelated;
+  position: relative;
 }
 .sidebar-poke-img {
   width: 100px;
@@ -102,6 +103,33 @@
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.8;
+}
+
+.sidebar-poke-name-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shiny-sparkles-overlay {
+  position: absolute;
+  top: 0px;
+  right: -8px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #FFB800;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  z-index: 10;
+}
+
+.shiny-sparkles-icon {
+  color: #FFB800;
+  opacity: 1;
 }
 
 /* Info + badges grid below name */

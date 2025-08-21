@@ -102,10 +102,16 @@ export function formatPokemonName(name) {
     .replace(/-gmax/i, "")
     .replace(/-hisui(a)?/i, "")
     .replace(/-paldea(n)?/i, "")
+    .replace(/-alphaother/i, "")  // Remove alphaother first (before alpha)
     .replace(/-alpha/i, "");
 
-  return name
-    .split("-")
+  // If the name is empty after removing suffixes, return empty string
+  if (!name.trim()) return "";
+
+  // Split by remaining hyphens and format each part
+  const parts = name.split("-").filter(part => part.trim() !== "");
+  
+  return parts
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
 }
@@ -164,6 +170,15 @@ export function getFormDisplayName(pokemon) {
       suffix = String.fromCharCode(65 + letterIndex); // A-Z
     }
 
+    // Check if this is an alpha variant
+    if (name.endsWith("-alpha")) {
+      const letter = suffix.replace("-alpha", "");
+      if (letter === "!") return "Alpha Form (!)";
+      if (letter === "?") return "Alpha Form (?)";
+      if (/^[a-z]$/i.test(letter)) return `Alpha Form (${letter.toUpperCase()})`;
+      return "Alpha Form";
+    }
+
     if (suffix === "!") return "Unown Form (!)";
     if (suffix === "?") return "Unown Form (?)";
     if (/^[a-z]$/i.test(suffix)) return `Unown Form (${suffix.toUpperCase()})`;
@@ -171,7 +186,13 @@ export function getFormDisplayName(pokemon) {
   }
 
   // ✅ Gender forms
-  if (pokemon.formType === "gender") return "Female";
+  if (pokemon.formType === "gender") {
+    // Check if this is an alpha gender variant
+    if (name.endsWith("-alpha")) {
+      return "Alpha Female";
+    }
+    return "Female";
+  }
 
   // ✅ Paldean Tauros
   if (name === "tauros-paldea-aqua-breed") return "Paldean Aqua Form";
@@ -185,6 +206,14 @@ export function getFormDisplayName(pokemon) {
     return "Male";
   }
 
+  // ✅ Alpha variants for other forms (not Unown)
+  if (name.endsWith("-alpha") && pokemon.formType === "other") {
+    // Remove the -alpha suffix and format the base name
+    const baseName = name.replace("-alpha", "");
+    const formattedName = formatPokemonName(baseName);
+    return `Alpha ${formattedName}`;
+  }
+
   const formLabels = {
     alolan: "Alolan Form",
     galarian: "Galarian Form",
@@ -193,7 +222,8 @@ export function getFormDisplayName(pokemon) {
     paldean: "Paldean Form",
     other: "Alt Form",
     alcremie: "Alcremie Variant",
-    alpha: "Alpha Pokémon"
+    alpha: "Alpha Pokémon",
+    alphaother: "Alpha Female"
   };
 
   return formLabels[pokemon.formType] || "";

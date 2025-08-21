@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "../components/Shared/UserContext";
 import "../css/Profile.css";
-import { NotebookPen, Trophy, Mars, Venus, VenusAndMars, PencilLine, SquareX, Link as LinkIcon, Heart } from "lucide-react";
+import { NotebookPen, Trophy, Mars, Venus, VenusAndMars, PencilLine, SquareX, Link as LinkIcon, Heart, Sparkles } from "lucide-react";
 import { IconDropdown } from "../components/Shared/IconDropdown";
 import FavoriteSelectionModal from "../components/Shared/FavoriteSelectionModal";
 import "flag-icons/css/flag-icons.min.css";
@@ -135,6 +135,10 @@ export default function Profile() {
     const [stats, setStats] = useState({
         shinies: 0,
         completion: 0,
+        regularCaught: 0,
+        regularCompletion: 0,
+        shinyCaught: 0,
+        shinyCompletion: 0,
         gamesPlayed: 0,
         topBall: null,
         topMark: null,
@@ -195,15 +199,30 @@ export default function Profile() {
             try {
                 const map = await caughtAPI.getCaughtData();
 
-                const allKeys = [
-                    ...pokemonData.map(p => getCaughtKey(p)),
-                    ...formsData.map(p => getCaughtKey(p)),
+                // Count regular and shiny Pokémon separately
+                const regularKeys = [
+                    ...pokemonData.map(p => getCaughtKey(p, null, false)),
+                    ...formsData.map(p => getCaughtKey(p, null, false)),
                 ];
-                const total = allKeys.length;
+                const shinyKeys = [
+                    ...pokemonData.map(p => getCaughtKey(p, null, true)),
+                    ...formsData.map(p => getCaughtKey(p, null, true)),
+                ];
+                const totalRegular = regularKeys.length;
+                const totalShiny = shinyKeys.length;
 
                 const caughtInfos = Object.values(map).filter(Boolean);
-                const shinies = caughtInfos.length;
-                const completion = total ? Math.round((shinies / total) * 100) : 0;
+                
+                // Count regular and shiny Pokémon separately
+                const regularCaught = regularKeys.filter(key => map[key]).length;
+                const shinyCaught = shinyKeys.filter(key => map[key]).length;
+                
+                const regularCompletion = totalRegular ? Math.round((regularCaught / totalRegular) * 100) : 0;
+                const shinyCompletion = totalShiny ? Math.round((shinyCaught / totalShiny) * 100) : 0;
+                
+                // For backward compatibility, keep the old stats structure
+                const shinies = regularCaught; // This was actually regular Pokémon count
+                const completion = regularCompletion;
                 const gamesPlayed = new Set(caughtInfos.map(i => i.game).filter(Boolean)).size;
 
                 const toTitle = (s) =>
@@ -248,7 +267,18 @@ export default function Profile() {
                 const topMark = fromOptionsOrTitle(MARK_OPTIONS, topMarkKey, " Mark");
                 const topGame = fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) ? "Pokemon " + fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) : null;
 
-                if (!ignore) setStats({ shinies, completion, gamesPlayed, topBall, topMark, topGame });
+                if (!ignore) setStats({ 
+                    shinies, 
+                    completion, 
+                    regularCaught, 
+                    regularCompletion, 
+                    shinyCaught, 
+                    shinyCompletion, 
+                    gamesPlayed, 
+                    topBall, 
+                    topMark, 
+                    topGame 
+                });
 
                 // Build recent 5 added list (newest by date first)
                 try {
@@ -261,16 +291,24 @@ export default function Profile() {
                      Object.entries(map).forEach(([key, info]) => {
                          if (!info) return;
                          
-                         const mon = keyToMon.get(key);
+                         // Check if this is a shiny Pokémon by looking for _shiny suffix in the key
+                         const isShiny = key.includes('_shiny');
+                         
+                         // Get the base key (without _shiny suffix) to find the Pokémon data
+                         const baseKey = isShiny ? key.replace('_shiny', '') : key;
+                         const mon = keyToMon.get(baseKey);
                          if (!mon) return;
+                         
+                         // Add shiny status to the info object
+                         const infoWithShiny = { ...info, isShiny };
                          
                          if (info.caughtAt) {
                              const parsedDate = new Date(info.caughtAt);
                              if (!isNaN(parsedDate.getTime())) {
-                                 withTimestamps.push({ key, mon, info, ts: parsedDate.getTime() });
+                                 withTimestamps.push({ key, mon, info: infoWithShiny, ts: parsedDate.getTime() });
                              }
                          } else {
-                             withoutTimestamps.push({ key, mon, info });
+                             withoutTimestamps.push({ key, mon, info: infoWithShiny });
                          }
                      });
                      
@@ -437,6 +475,8 @@ export default function Profile() {
         setRefreshKey(prev => prev + 1);
     };
 
+
+
     // Refresh recent Pokemon when the page becomes visible
     useEffect(() => {
         const handleVisibilityChange = () => {
@@ -518,6 +558,7 @@ export default function Profile() {
 
                 <div className="profile-header-right">
                     <div className="profile-actions">
+
                         <button
                             className={`profile-edit-btn ${isEditing ? "active" : ""}`}
                             disabled={isLoading('save-profile')}
@@ -842,12 +883,20 @@ export default function Profile() {
                 <div className="profile-right">
                     <div className="profile-stats-grid">
                         <div className="profile-field">
-                            <label>Total Shinies</label>
-                            <div className="field-display">{stats.shinies}</div>
+                            <label>Regular Pokémon</label>
+                            <div className="field-display">{stats.regularCaught || stats.shinies}</div>
                         </div>
                         <div className="profile-field">
-                            <label>Living Dex Completion</label>
-                            <div className="field-display">{stats.completion}%</div>
+                            <label>Regular Completion</label>
+                            <div className="field-display">{stats.regularCompletion || stats.completion}%</div>
+                        </div>
+                        <div className="profile-field">
+                            <label>Shiny Pokémon</label>
+                            <div className="field-display">{stats.shinyCaught || 0}</div>
+                        </div>
+                        <div className="profile-field">
+                            <label>Shiny Completion</label>
+                            <div className="field-display">{stats.shinyCompletion || 0}%</div>
                         </div>
                         <div className="profile-field">
                             <label>Games Hunted In</label>
@@ -866,34 +915,18 @@ export default function Profile() {
                             <div className="field-display">{stats.topGame ? stats.topGame : "—"}</div>
                         </div>
                                                  <div className="profile-field full-span recent-field">
-                             <label>Recent Pokémon</label>
+                             <label>Recent Entries</label>
                              <div className="field-display recent-field-box">
                                  {recentAdded.length === 0 ? (
                                      <div className="no-recent-pokemon">
-                                         <p>No recent Pokémon added yet</p>
+                                         <p>No recent entries yet</p>
                                      </div>
                                  ) : (
                                      <div className="profile-rank-row recent-pokemon-row">
-                                         {Array.from({ length: 5 }).map((_, idx) => {
-                                             const pokemon = recentAdded[idx];
-                                             
-                                             if (!pokemon) {
-                                                 // Empty slot - render placeholder
-                                                 return (
-                                                     <div key={idx} className="profile-rank-item recent-pokemon-item empty-slot">
-                                                         <div className="profile-pokemon-box recent-pokemon-box">
-                                                             <div className="empty-pokemon-placeholder"></div>
-                                                         </div>
-                                                         <div className="rank-label recent-pokemon-name">
-                                                             <div className="empty-name-placeholder"></div>
-                                                         </div>
-                                                     </div>
-                                                 );
-                                             }
-                                             
+                                         {recentAdded.map((pokemon, idx) => {
                                              const { mon, info } = pokemon;
                                              const isNewest = idx === 0;
-                                             const isShiny = info?.shiny;
+                                             const isShiny = info?.isShiny;
                                              
                                              return (
                                                  <div key={idx} className={`profile-rank-item recent-pokemon-item ${isNewest ? 'newest' : ''}`}>
@@ -907,7 +940,9 @@ export default function Profile() {
                                                              className="pokemon-img"
                                                          />
                                                          {isShiny && (
-                                                             <div className="shiny-indicator">✨</div>
+                                                             <div className="shiny-indicator">
+                                                                 <Sparkles size={20} className="shiny-sparkles-icon" />
+                                                             </div>
                                                          )}
                                                      </div>
                                                      <div className="rank-label recent-pokemon-name" data-order={idx + 1}>

@@ -31,7 +31,8 @@ const createDexSections = () => {
         "unown",
         "other",
         "alcremie",
-        "alpha"
+        "alpha",
+        "alphaother"
     ];
 
     return [
@@ -42,7 +43,7 @@ const createDexSections = () => {
         },
         ...FORM_TYPES.map(type => ({
             key: type,
-            title: `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
+            title: type === "alphaother" ? "Alpha Genders & Others" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
             getList: () => formsData.filter(p => p.formType === type)
         }))
     ];
@@ -109,13 +110,13 @@ export default function DexView({
         
         const sections = createDexSections();
         return sections.map(section => {
-            const sectionPokemon = actualPokemonList.filter(pokemon => {
-                if (section.key === "main") {
-                    return !pokemon.formType; // Main Pokémon have no formType
-                } else {
-                    return pokemon.formType === section.key;
-                }
-            });
+            let sectionPokemon;
+            
+            if (section.key === "main") {
+                sectionPokemon = actualPokemonList.filter(pokemon => !pokemon.formType);
+            } else {
+                sectionPokemon = actualPokemonList.filter(pokemon => pokemon.formType === section.key);
+            }
             
             return {
                 ...section,
@@ -230,6 +231,7 @@ export default function DexView({
                     caughtInfoMap={caughtInfoMap} 
                     readOnly={readOnly}
                     progressBarsOverride={progressBarsOverride}
+                    showShiny={showShiny}
                 />
             </div>
             
@@ -368,7 +370,7 @@ export default function DexView({
                     readOnly={readOnly}
                     pokemon={selectedPokemon}
                     onClose={handleSidebarClose}
-                    caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon)] : null}
+                    caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon, null, showShiny)] : null}
                     updateCaughtInfo={updateCaughtInfo || (() => {})}
                     showShiny={showShiny}
                     viewingUsername={viewingUsername}

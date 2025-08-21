@@ -134,7 +134,8 @@ export default function ViewDex() {
         "unown",
         "other",
         "alcremie",
-        "alpha"
+        "alpha",
+        "alphaother"
     ];
 
     const dexSections = [
@@ -145,7 +146,7 @@ export default function ViewDex() {
         },
         ...FORM_TYPES.map(type => ({
             key: type,
-            title: `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
+            title: type === "alphaother" ? "Alpha Genders & Others" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
             getList: () => formsData.filter(p => p.formType === type)
         }))
     ];
@@ -158,7 +159,8 @@ export default function ViewDex() {
                     return false;
                 }
 
-                const caughtInfo = caughtInfoMap[getCaughtKey(pokemon)];
+                // Get caught info based on the current shiny toggle state
+                const caughtInfo = caughtInfoMap[getCaughtKey(pokemon, null, showShiny)];
 
                 // Search by name/dex
                 if (filters.searchTerm) {
@@ -232,7 +234,7 @@ export default function ViewDex() {
                         setSidebarOpen(false);
                         setSelectedPokemon(null);
                     }}
-                    caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon)] : null}
+                    caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon, null, showShiny)] : null}
                     updateCaughtInfo={() => {}} // No-op for read-only mode
                     showShiny={showShiny}
                     viewingUsername={username}

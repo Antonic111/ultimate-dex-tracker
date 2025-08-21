@@ -137,8 +137,6 @@ html.modal-open {
   transition: padding 0.2s, margin 0.2s;
   box-sizing: border-box;
   width: 100%;
-  padding-left: 16px;
-  padding-right: 16px;
 }
 
 .main-header.collapsed {
@@ -512,4 +510,30 @@ html.modal-open {
   .hide-sm{
     display:none;
   }
+}
+
+/* ================================
+   DEX GRID SECTIONS
+   ================================ */
+
+.dex-grid-section {
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+.dex-section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 2px solid var(--accent);
+}
+
+.dex-section-title:first-child {
+  margin-top: 0;
 }
