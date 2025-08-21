@@ -13,6 +13,7 @@ import { useMessage } from "../components/Shared";
 import { profileAPI } from "../utils/api";
 import { UserContext } from "../components/Shared/UserContext";
 
+
 const POKEMON_OPTIONS = pokemonData.map((p) => ({
     name: formatPokemonName(p.name),
     value: p.name,
@@ -121,6 +122,7 @@ export default function PublicProfile() {
     const [hasLiked, setHasLiked] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
     const [likeBurst, setLikeBurst] = useState(0);
+    const [profileOwnerPreferences, setProfileOwnerPreferences] = useState(null);
     const { showMessage } = useMessage();
     const { username: currentUsername } = useContext(UserContext);
 
@@ -200,24 +202,100 @@ export default function PublicProfile() {
                 const j = await profileAPI.getPublicProfile(username);
                 if (!ignore) {
                     setData(j);
+                    
+                    // Store the profile owner's dex preferences
+                    if (j?.dexPreferences) {
+                        setProfileOwnerPreferences(j.dexPreferences);
+                    } else {
+                        // Use default preferences if none are set
+                        setProfileOwnerPreferences({
+                            showGenderForms: true,
+                            showAlolanForms: true,
+                            showGalarianForms: true,
+                            showHisuianForms: true,
+                            showPaldeanForms: true,
+                            showGmaxForms: true,
+                            showUnownForms: true,
+                            showOtherForms: true,
+                            showAlcremieForms: true,
+                            showAlphaForms: true,
+                            showAlphaOtherForms: true,
+                        });
+                    }
                 }
             } catch {
-                if (!ignore) setData(null);
+                if (!ignore) {
+                    setData(null);
+                    // Set default preferences on error
+                    setProfileOwnerPreferences({
+                        showGenderForms: true,
+                        showAlolanForms: true,
+                        showGalarianForms: true,
+                        showHisuianForms: true,
+                        showPaldeanForms: true,
+                        showGmaxForms: true,
+                        showUnownForms: true,
+                        showOtherForms: true,
+                        showAlcremieForms: true,
+                        showAlphaForms: true,
+                        showAlphaOtherForms: true,
+                    });
+                }
             } finally { if (!ignore) setLoading(false); }
         })();
         return () => { ignore = true; };
     }, [username]);
 
+    // Custom filtering function that uses profile owner's preferences
+    const getFilteredFormsDataForProfile = (forms, preferences) => {
+        if (!preferences || !forms) return forms;
+        
+        return forms.filter(form => {
+            const formType = form.formType;
+            
+            // Skip separator headers (they start with dashes)
+            if (typeof formType === 'string' && formType.startsWith('-')) {
+                return false;
+            }
+            
+            // Skip forms without a valid formType
+            if (!formType || typeof formType !== 'string') {
+                return false;
+            }
+            
+            switch (formType) {
+                case 'gender': return preferences.showGenderForms;
+                case 'alolan': return preferences.showAlolanForms;
+                case 'galarian': return preferences.showGalarianForms;
+                case 'hisuian': return preferences.showHisuianForms;
+                case 'paldean': return preferences.showPaldeanForms;
+                case 'gmax': return preferences.showGmaxForms;
+                case 'unown': return preferences.showUnownForms;
+                case 'other': return preferences.showOtherForms;
+                case 'alcremie': return preferences.showAlcremieForms;
+                case 'alpha': return preferences.showAlphaForms;
+                case 'alphaother': return preferences.showAlphaOtherForms;
+                default: return true;
+            }
+        });
+    };
+
     // Load public caught stats (so right column matches owner page)
     useEffect(() => {
-        if (!username) return;
+        if (!username || loading) return; // Don't calculate stats while profile is still loading
         let ignore = false;
         (async () => {
             try {
                 const map = await profileAPI.getPublicCaughtData(username); // { [key]: info|null }
+                // Only calculate stats if we have the profile owner's preferences
+                if (!profileOwnerPreferences) {
+                    if (!ignore) setStats({ regularCaught: 0, regularCompletion: 0, shinyCaught: 0, shinyCompletion: 0, gamesPlayed: 0, topBall: null, topMark: null, topGame: null });
+                    return;
+                }
+                
                 const allKeys = [
                     ...pokemonData.map(p => getCaughtKey(p)),
-                    ...formsData.map(p => getCaughtKey(p)),
+                    ...getFilteredFormsDataForProfile(formsData, profileOwnerPreferences).map(p => getCaughtKey(p)),
                 ];
                 const total = allKeys.length;
                 
@@ -244,7 +322,13 @@ export default function PublicProfile() {
 
                 // Build recent 5 added list (newest by date first)
                 try {
-                    const allMonsList = [...pokemonData, ...formsData];
+                    // Only build recent list if we have the profile owner's preferences
+                    if (!profileOwnerPreferences) {
+                        if (!ignore) setRecentAdded([]);
+                        return;
+                    }
+                    
+                    const allMonsList = [...pokemonData, ...getFilteredFormsDataForProfile(formsData, profileOwnerPreferences)];
                     const keyToMon = new Map(allMonsList.map(m => [getCaughtKey(m), m]));
                                                               // First, separate Pokemon with and without caughtAt timestamps
                      const withTimestamps = [];
@@ -300,7 +384,7 @@ export default function PublicProfile() {
                             } catch { }
         })();
         return () => { ignore = true; };
-    }, [username, refreshKey]); // Add refreshKey dependency to allow manual refresh
+    }, [username, refreshKey, profileOwnerPreferences, loading]); // Add profileOwnerPreferences and loading dependencies
 
     // Load like data
     useEffect(() => {

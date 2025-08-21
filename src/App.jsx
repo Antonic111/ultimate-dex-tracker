@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { getCaughtKey, migrateOldCaughtData } from './caughtStorage';
 import { fetchCaughtData, updateCaughtData } from './api/caught';
 import { authAPI } from './utils/api';
@@ -38,6 +38,8 @@ import ViewDex from "./pages/ViewDex.jsx";
 import { LoadingProvider, useLoading } from "./components/Shared/LoadingContext";
 import { LoadingSpinner } from "./components/Shared";
 import Footer from "./components/Shared/Footer";
+import { getFilteredFormsData, getDexPreferences } from "./utils/dexPreferences";
+
 
 // Global Loading Indicator Component
 const GlobalLoadingIndicator = () => {
@@ -67,6 +69,27 @@ const GlobalLoadingIndicator = () => {
   );
 };
 
+// Location Listener Component for detecting navigation to home page
+const LocationListener = ({ onNavigateToHome }) => {
+  const location = useLocation();
+  const prevLocationRef = useRef(location.pathname);
+  
+  useEffect(() => {
+    const prevPath = prevLocationRef.current;
+    const currentPath = location.pathname;
+    
+    // Only trigger if we're navigating TO the home page (not already on it)
+    if (currentPath === '/' && prevPath !== '/') {
+      onNavigateToHome();
+    }
+    
+    // Update the previous location
+    prevLocationRef.current = currentPath;
+  }, [location.pathname, onNavigateToHome]);
+  
+  return null; // This component doesn't render anything
+};
+
 
 
 const typeOptions = [
@@ -75,17 +98,17 @@ const typeOptions = [
 ];
 
 
-const TYPE_OPTIONS = Array.from(
+const getTypeOptions = () => Array.from(
   new Set([
     ...pokemonData.flatMap(p => p.types),
-    ...formsData.flatMap(p => p.types)
+    ...getCurrentFilteredFormsData().flatMap(p => p.types)
   ])
 ).sort();
 
-const GEN_OPTIONS = Array.from(
+const getGenOptions = () => Array.from(
   new Set([
     ...pokemonData.map(p => p.gen),
-    ...formsData.map(p => p.gen)
+    ...getCurrentFilteredFormsData().map(p => p.gen)
   ])
 ).filter(Boolean).sort((a, b) => a - b);
 
@@ -103,18 +126,30 @@ const FORM_TYPES = [
   "alphaother"
 ];
 
-const dexSections = [
-  {
-    key: "main",
-    title: "Main Living Dex",
-    getList: () => pokemonData
-  },
-  ...FORM_TYPES.map(type => ({
-    key: type,
-    title: type === "alphaother" ? "Alpha Genders & Others" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
-    getList: () => formsData.filter(p => p.formType === type)
-  }))
-];
+// Function to get filtered forms data based on current user preferences
+const getCurrentFilteredFormsData = () => getFilteredFormsData(formsData);
+
+// Function to create dex sections with current filtered forms data
+const createDexSections = () => {
+  const currentFilteredFormsData = getCurrentFilteredFormsData();
+  
+  return [
+    {
+      key: "main",
+      title: "Main Living Dex",
+      getList: () => pokemonData
+    },
+    ...FORM_TYPES.map(type => ({
+      key: type,
+      title: type === "alphaother" ? "Alpha Genders & Other's" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
+      getList: () => currentFilteredFormsData.filter(p => p.formType === type)
+    }))
+  ];
+};
+
+
+
+
 
 // Place near the top of App.jsx
 function saveDexToggles({ showShiny, showForms }) {
@@ -173,6 +208,18 @@ export default function App() {
   const userMenuRef = useRef(null);
   const [authReady, setAuthReady] = useState(false);
   const [justLoggedIn, setJustLoggedIn] = useState(false); // Add flag to track recent login
+  const [dexSections, setDexSections] = useState(() => createDexSections());
+  const [currentDexPreferences, setCurrentDexPreferences] = useState(() => getDexPreferences());
+
+  // Memoized callback for refreshing dex preferences
+  // This prevents infinite re-renders when used in LocationListener
+  const refreshDexPreferences = useCallback(() => {
+    const newPreferences = getDexPreferences();
+    setCurrentDexPreferences(newPreferences);
+    setDexSections(createDexSections());
+    // Force a re-render to update all dynamic values
+    setCaught(prev => ({ ...prev }));
+  }, []);
 
   // Helper to check if user is still logged in
   const checkAuth = async (silent = false) => {
@@ -309,12 +356,25 @@ useEffect(() => {
       setToggles(prev => ({ ...prev, ...e.detail }));
     };
     
+    // Listen for dex preferences refresh event (from logo click)
+    const handleRefreshDexPreferences = refreshDexPreferences;
+    
+    // Listen for dex preferences changes
+    const handleDexPreferencesChanged = () => {
+      const newPreferences = getDexPreferences();
+      setCurrentDexPreferences(newPreferences);
+    };
+    
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('dexTogglesChanged', handleToggleChange);
+    window.addEventListener('refreshDexPreferences', handleRefreshDexPreferences);
+    window.addEventListener('dexPreferencesChanged', handleDexPreferencesChanged);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('dexTogglesChanged', handleToggleChange);
+      window.removeEventListener('refreshDexPreferences', handleRefreshDexPreferences);
+      window.removeEventListener('dexPreferencesChanged', handleDexPreferencesChanged);
     };
   }, []);
 
@@ -354,13 +414,13 @@ useEffect(() => {
   }, []);
 
 
-  // Collect all keys for main + form Pokémon
-  const allMonKeys = [
+  // Function to get all keys for main + form Pokémon
+  const getAllMonKeys = () => [
     ...pokemonData.map(p => getCaughtKey(p)),
-    ...formsData.map(p => getCaughtKey(p))
+    ...getCurrentFilteredFormsData().map(p => getCaughtKey(p))
   ];
 
-  const totalCount = allMonKeys.length;
+  const totalCount = getAllMonKeys().length;
   const caughtCount = Object.values(caught).filter(Boolean).length;
 
   const [caughtInfoMap, setCaughtInfoMap] = useState({});
@@ -371,11 +431,10 @@ useEffect(() => {
       const migratedData = migrateOldCaughtData(caughtInfoMap);
       
       if (JSON.stringify(migratedData) !== JSON.stringify(caughtInfoMap)) {
-        console.log("🔄 Migrating existing data to new shiny format...");
         setCaughtInfoMap(migratedData);
         // Save migrated data to backend
         updateCaughtData(user.username, null, migratedData).then(() => {
-          console.log("✅ Migration completed and saved successfully");
+          // Migration completed successfully
         }).catch((error) => {
           console.error("❌ Migration failed:", error);
         });
@@ -623,10 +682,10 @@ function updateCaughtInfo(poke, info, isShiny = false) {
   let mergedMons = [];
   const seen = new Set();
 
-  // Use current shiny state for search suggestions
-  mergedMons = dexSections
-    .flatMap(section => filterMons(section.getList(), showForms, showShiny))
-    .filter(mon => {
+     // Use current shiny state for search suggestions
+   mergedMons = dexSections
+     .flatMap(section => filterMons(section.getList(), showForms, showShiny))
+     .filter(mon => {
       const key = getCaughtKey(mon, null, showShiny);
       if (seen.has(key)) return false;
       seen.add(key);
@@ -638,9 +697,9 @@ function updateCaughtInfo(poke, info, isShiny = false) {
 
   if (showNoResults && filters.searchTerm) {
     const searchTerm = filters.searchTerm.toLowerCase();
-    const allNames = dexSections.flatMap(section =>
-      section.getList().map(p => p.name)
-    );
+         const allNames = dexSections.flatMap(section =>
+       section.getList().map(p => p.name)
+     );
 
     const ranked = allNames
       .map(name => ({
@@ -677,240 +736,245 @@ function updateCaughtInfo(poke, info, isShiny = false) {
             
             {/* Global Loading Indicator */}
             <GlobalLoadingIndicator />
+            
+            {/* Location Listener for detecting navigation to home page */}
+            <LocationListener onNavigateToHome={refreshDexPreferences} />
 
 
-            <Routes>
-              {/* Main App */}
-              <Route
-                path="/"
-                element={
-                  (loading || !authReady) ? (
-                    <LoadingSpinner 
-                      fullScreen 
-                      text="Loading..." 
-                      variant="dots"
-                      size="large"
-                    />
-                  ) : user?.username ? (
+                  <Routes>
+                    {/* Main App */}
+                    <Route
+                      path="/"
+                      element={
+                        (loading || !authReady) ? (
+                          <LoadingSpinner 
+                            fullScreen 
+                            text="Loading..." 
+                            variant="dots"
+                            size="large"
+                          />
+                        ) : user?.username ? (
 
-                    <>
-                      <div className="progress-manager-container page-animate-1">
-                        <ProgressManager
-                          allMons={[...pokemonData, ...formsData]}
-                          caughtInfoMap={caughtInfoMap}
-                          progressBarsOverride={user.progressBars}
-                          showShiny={showShiny}
-                        />
-                      </div>
+                          <>
+                            <div className="progress-manager-container page-animate-1">
+                              <ProgressManager
+                                allMons={[...pokemonData, ...getFilteredFormsData(formsData, currentDexPreferences)]}
+                                caughtInfoMap={caughtInfoMap}
+                                progressBarsOverride={user.progressBars}
+                                showShiny={showShiny}
+                                dexPreferences={currentDexPreferences}
+                              />
 
-                      <div className="search-bar-container page-animate-2">
-                        <SearchBar
-                          filters={filters}
-                          setFilters={setFilters}
-                          typeOptions={typeOptions}
-                          genOptions={GEN_OPTIONS}
-                          showShiny={showShiny}
-                          setShowShiny={setShowShiny}
-                          showForms={showForms}
-                          setShowForms={setShowForms}
-                        />
-                      </div>
+                            </div>
+
+                            <div className="search-bar-container page-animate-2">
+                              <SearchBar
+                                filters={filters}
+                                setFilters={setFilters}
+                                typeOptions={typeOptions}
+                                genOptions={getGenOptions()}
+                                showShiny={showShiny}
+                                setShowShiny={setShowShiny}
+                                showForms={showForms}
+                                setShowForms={setShowForms}
+                              />
+                            </div>
 
                                              <div className="main-bg page-container fade-in-up">
-                         {/* Dynamic Dex Grid based on showShiny toggle */}
-                         {showShiny ? (
-                           // Show Shiny Pokémon Grid
-                           <div className="dex-grid-section">
-                             {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
-                               ? dexSections.map(section => {
-                                 const filteredMons = filterMons(section.getList(), showForms, true)
-                                   .sort((a, b) => a.id - b.id);
-                                 if (!filteredMons.length) return null;
+                           {/* Dynamic Dex Grid based on showShiny toggle */}
+                           {showShiny ? (
+                             // Show Shiny Pokémon Grid
+                             <div className="dex-grid-section">
+                               {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
+                                                                 ? dexSections.map(section => {
+                                  const filteredMons = filterMons(section.getList(), showForms, true)
+                                    .sort((a, b) => a.id - b.id);
+                                  if (!filteredMons.length) return null;
 
-                                 return (
-                                   <DexSection
-                                     readOnly={false}
-                                     caughtInfoMap={caughtInfoMap}
-                                     updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
-                                     key={`shiny_${section.key}`}
-                                     sidebarOpen={sidebarOpen}
-                                     title={section.title}
-                                     pokemonList={filteredMons}
-                                     caught={caught}
-                                     onMarkAll={(box) => handleMarkAll(box, true)}
-                                     onToggleCaught={(poke) => handleToggleCaught(poke, true)}
-                                     onSelect={handleSelectPokemon}
-                                     showShiny={true}
-                                     showForms={showForms}
-                                   />
-                                 );
-                               })
-                               : dexSections.map(section => {
-                                 const filteredMons = filterMons(section.getList(), false, true);
-                                 if (!filteredMons.length) return null;
+                                   return (
+                                     <DexSection
+                                       readOnly={false}
+                                       caughtInfoMap={caughtInfoMap}
+                                       updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
+                                       key={`shiny_${section.key}`}
+                                       sidebarOpen={sidebarOpen}
+                                       title={section.title}
+                                       pokemonList={filteredMons}
+                                       caught={caught}
+                                       onMarkAll={(box) => handleMarkAll(box, true)}
+                                       onToggleCaught={(poke) => handleToggleCaught(poke, true)}
+                                       onSelect={handleSelectPokemon}
+                                       showShiny={true}
+                                       showForms={showForms}
+                                     />
+                                   );
+                                 })
+                                                                   : dexSections.map(section => {
+                                    const filteredMons = filterMons(section.getList(), false, true);
+                                    if (!filteredMons.length) return null;
 
-                                 return (
-                                   <DexSection
-                                     readOnly={false}
-                                     caughtInfoMap={caughtInfoMap}
-                                     updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
-                                     key={`shiny_${section.key}`}
-                                     sidebarOpen={sidebarOpen}
-                                     title={section.title}
-                                     pokemonList={filteredMons}
-                                     caught={caught}
-                                     onMarkAll={(box) => handleMarkAll(box, true)}
-                                     onToggleCaught={(poke) => handleToggleCaught(poke, true)}
-                                     onSelect={handleSelectPokemon}
-                                     showShiny={true}
-                                     showForms={showForms}
-                                   />
-                                 );
-                               })}
-                           </div>
-                         ) : (
-                           // Show Regular Pokémon Grid
-                           <div className="dex-grid-section">
-                             {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
-                               ? dexSections.map(section => {
-                                 const filteredMons = filterMons(section.getList(), showForms, false)
-                                   .sort((a, b) => a.id - b.id);
-                                 if (!filteredMons.length) return null;
+                                   return (
+                                     <DexSection
+                                       readOnly={false}
+                                       caughtInfoMap={caughtInfoMap}
+                                       updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
+                                       key={`shiny_${section.key}`}
+                                       sidebarOpen={sidebarOpen}
+                                       title={section.title}
+                                       pokemonList={filteredMons}
+                                       caught={caught}
+                                       onMarkAll={(box) => handleMarkAll(box, true)}
+                                       onToggleCaught={(poke) => handleToggleCaught(poke, true)}
+                                       onSelect={handleSelectPokemon}
+                                       showShiny={true}
+                                       showForms={showForms}
+                                     />
+                                   );
+                                 })}
+                             </div>
+                           ) : (
+                             // Show Regular Pokémon Grid
+                             <div className="dex-grid-section">
+                               {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
+                                                                 ? dexSections.map(section => {
+                                  const filteredMons = filterMons(section.getList(), showForms, false)
+                                    .sort((a, b) => a.id - b.id);
+                                  if (!filteredMons.length) return null;
 
-                                 return (
-                                   <DexSection
-                                     readOnly={false}
-                                     caughtInfoMap={caughtInfoMap}
-                                     updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
-                                     key={`regular_${section.key}`}
-                                     sidebarOpen={sidebarOpen}
-                                     title={section.title}
-                                     pokemonList={filteredMons}
-                                     caught={caught}
-                                     onMarkAll={(box) => handleMarkAll(box, false)}
-                                     onToggleCaught={(poke) => handleToggleCaught(poke, false)}
-                                     onSelect={handleSelectPokemon}
-                                     showShiny={false}
-                                     showForms={showForms}
-                                   />
-                                 );
-                               })
-                               : dexSections.map(section => {
-                                 const filteredMons = filterMons(section.getList(), false, false);
-                                 if (!filteredMons.length) return null;
+                                   return (
+                                     <DexSection
+                                       readOnly={false}
+                                       caughtInfoMap={caughtInfoMap}
+                                       updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
+                                       key={`regular_${section.key}`}
+                                       sidebarOpen={sidebarOpen}
+                                       title={section.title}
+                                       pokemonList={filteredMons}
+                                       caught={caught}
+                                       onMarkAll={(box) => handleMarkAll(box, false)}
+                                       onToggleCaught={(poke) => handleToggleCaught(poke, false)}
+                                       onSelect={handleSelectPokemon}
+                                       showShiny={false}
+                                       showForms={showForms}
+                                     />
+                                   );
+                                 })
+                                                                 : dexSections.map(section => {
+                                  const filteredMons = filterMons(section.getList(), false, false);
+                                  if (!filteredMons.length) return null;
 
-                                 return (
-                                   <DexSection
-                                     readOnly={false}
-                                     caughtInfoMap={caughtInfoMap}
-                                     updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
-                                     key={`regular_${section.key}`}
-                                     sidebarOpen={sidebarOpen}
-                                     title={section.title}
-                                     pokemonList={filteredMons}
-                                     caught={caught}
-                                     onMarkAll={(box) => handleMarkAll(box, false)}
-                                     onToggleCaught={(poke) => handleToggleCaught(poke, false)}
-                                     onSelect={handleSelectPokemon}
-                                     showShiny={false}
-                                     showForms={showForms}
-                                   />
-                                 );
-                               })}
-                           </div>
-                         )}
-                       </div>
+                                   return (
+                                     <DexSection
+                                       readOnly={false}
+                                       caughtInfoMap={caughtInfoMap}
+                                       updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
+                                       key={`regular_${section.key}`}
+                                       sidebarOpen={sidebarOpen}
+                                       title={section.title}
+                                       pokemonList={filteredMons}
+                                       caught={caught}
+                                       onMarkAll={(box) => handleMarkAll(box, false)}
+                                       onToggleCaught={(poke) => handleToggleCaught(poke, false)}
+                                       onSelect={handleSelectPokemon}
+                                       showShiny={false}
+                                       showForms={showForms}
+                                     />
+                                   );
+                                 })}
+                             </div>
+                           )}
+                         </div>
 
-                        {showNoResults && filters.searchTerm && (
-                         <NoResults
-                           searchTerm={filters.searchTerm}
-                           suggestion={suggestion}
-                           onSuggestionClick={(suggestion) => setFilters(f => ({ ...f, searchTerm: suggestion }))}
-                         />
-                        )}
+                          {showNoResults && filters.searchTerm && (
+                           <NoResults
+                             searchTerm={filters.searchTerm}
+                             suggestion={suggestion}
+                             onSuggestionClick={(suggestion) => setFilters(f => ({ ...f, searchTerm: suggestion }))}
+                           />
+                          )}
 
 
-                      <Sidebar
-                        open={sidebarOpen}
-                        pokemon={selectedPokemon}
-                        onClose={() => {
-                          setSidebarOpen(false);
-                          setSelectedPokemon(null);
-                        }}
-                        caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon, null, showShiny)] : null}
-                        updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, showShiny)}
-                        showShiny={showShiny}
-                      />
-                    </>
-                  ) : (
-                    <PublicHome />
-                  )
-                }
-              />
+                        <Sidebar
+                          open={sidebarOpen}
+                          pokemon={selectedPokemon}
+                          onClose={() => {
+                            setSidebarOpen(false);
+                            setSelectedPokemon(null);
+                          }}
+                          caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon, null, showShiny)] : null}
+                          updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, showShiny)}
+                          showShiny={showShiny}
+                        />
+                      </>
+                    ) : (
+                      <PublicHome />
+                    )
+                  }
+                />
 
-              <Route
-                path="/login"
-                element={user?.username ? <Navigate to="/" /> : <Login onLogin={handleUserUpdate} />}
-              />
-              <Route
-                path="/register"
-                element={user?.username ? <Navigate to="/" /> : <Register onRegister={handleUserUpdate} />}
-              />
-              <Route
-                path="/email-sent"
-                element={!user?.username ? <EmailSent /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/forgot-password"
-                element={!user?.username ? <ForgotPassword /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/reset-password"
-                element={!user?.username ? <ResetPassword /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/enter-reset-code"
-                element={!user?.username ? <EnterResetCode /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/profile"
-                element={
-                  <RequireAuth loading={loading} authReady={authReady} user={user}>
-                    <Profile />
-                  </RequireAuth>
-                }
-              />
+                <Route
+                  path="/login"
+                  element={user?.username ? <Navigate to="/" /> : <Login onLogin={handleUserUpdate} />}
+                />
+                <Route
+                  path="/register"
+                  element={user?.username ? <Navigate to="/" /> : <Register onRegister={handleUserUpdate} />}
+                />
+                <Route
+                  path="/email-sent"
+                  element={!user?.username ? <EmailSent /> : <Navigate to="/" />}
+                />
+                <Route
+                  path="/forgot-password"
+                  element={!user?.username ? <ForgotPassword /> : <Navigate to="/" />}
+                />
+                <Route
+                  path="/reset-password"
+                  element={!user?.username ? <ResetPassword /> : <Navigate to="/" />}
+                />
+                <Route
+                  path="/enter-reset-code"
+                  element={!user?.username ? <EnterResetCode /> : <Navigate to="/" />}
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <RequireAuth loading={loading} authReady={authReady} user={user}>
+                      <Profile />
+                    </RequireAuth>
+                  }
+                />
 
-              <Route path="/trainers" element={<Trainers />} />
-              <Route path="/u/:username" element={<PublicProfile />} />
-              <Route path="/u/:username/dex" element={<ViewDex />} />
+                <Route path="/trainers" element={<Trainers />} />
+                <Route path="/u/:username" element={<PublicProfile />} />
+                <Route path="/u/:username/dex" element={<ViewDex />} />
 
-              <Route
-                path="/settings"
-                element={
-                  <RequireAuth loading={loading} authReady={authReady} user={user}>
-                    <Settings />
-                  </RequireAuth>
-                }
-              />
+                <Route
+                  path="/settings"
+                  element={
+                    <RequireAuth loading={loading} authReady={authReady} user={user}>
+                      <Settings />
+                    </RequireAuth>
+                  }
+                />
 
-              <Route
-                path="/backup"
-                element={
-                  <RequireAuth loading={loading} authReady={authReady} user={user}>
-                    <Backup />
-                  </RequireAuth>
-                }
-              />
+                <Route
+                  path="/backup"
+                  element={
+                    <RequireAuth loading={loading} authReady={authReady} user={user}>
+                      <Backup />
+                    </RequireAuth>
+                  }
+                />
 
-            </Routes>
+                                         </Routes>
             
             <Footer />
             
           </Router>
         </MessageProvider>
       </UserContext.Provider>
-        </LoadingProvider>
-    </ThemeProvider>
-  );
+    </LoadingProvider>
+  </ThemeProvider>
+);
 }

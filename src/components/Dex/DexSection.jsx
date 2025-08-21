@@ -166,8 +166,8 @@ export default function DexSection({
                           }
                           
                           return `${label} ${boxIndex + 1}`;
-                        } else if (title === "Alpha Genders & Others") {
-                          return `Alpha Genders & Others Box ${boxIndex + 1}`;
+                        } else if (title === "Alpha Genders & Other's") {
+                          return `Alpha Genders & Other's Box ${boxIndex + 1}`;
                         } else {
                           return `${String(box[0]?.id ?? "????").padStart(4, "0")} - ${String(box[box.length - 1]?.id ?? "????").padStart(4, "0")}`;
                         }

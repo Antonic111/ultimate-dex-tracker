@@ -18,7 +18,7 @@ import {
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Eye, EyeOff, Pencil, Plus, Settings, Trash2 } from "lucide-react";
-import { useEffect, useState, useContext, useRef } from "react";
+import { useEffect, useState, useContext, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { getCaughtKey } from "../../caughtStorage";
 import { showConfirm } from "../Shared/ConfirmDialog";
@@ -36,12 +36,6 @@ const DEFAULT_BARS = [
         id: "default_all",
         name: "All Pokémon",
         filters: {},
-        visible: true,
-    },
-    {
-        id: "default_shiny",
-        name: "Shiny Pokémon",
-        filters: { shiny: true },
         visible: true,
     },
 ];
@@ -89,7 +83,7 @@ function loadFullCaughtMap() {
     return caughtMap;
 }
 
-export default function ProgressManager({ allMons, caughtInfoMap, readOnly = false, progressBarsOverride = null, showShiny = false }) {
+export default function ProgressManager({ allMons, caughtInfoMap, readOnly = false, progressBarsOverride = null, showShiny = false, dexPreferences = null }) {
     const { username, progressBars: contextSavedBars = [] } = useContext(UserContext);
     const { showMessage } = useMessage();
     
@@ -108,6 +102,40 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
     const [activeDragId, setActiveDragId] = useState(null); // Track active drag
 
     const caughtMap = caughtInfoMap;
+
+    // Filter allMons based on dex preferences to only count visible forms
+    // This ensures progress bars only count Pokémon that are actually visible to the user
+    const visibleMons = useMemo(() => {
+        if (!dexPreferences || !allMons) return allMons;
+        
+        const filtered = allMons.filter(pokemon => {
+            // Always include main Pokémon (no formType or formType is "main"/"default")
+            if (!pokemon.formType || pokemon.formType === "main" || pokemon.formType === "default") {
+                return true;
+            }
+            
+            // Check if this form type is enabled in preferences
+            const formType = pokemon.formType;
+            switch (formType) {
+                case 'gender': return dexPreferences.showGenderForms;
+                case 'alolan': return dexPreferences.showAlolanForms;
+                case 'galarian': return dexPreferences.showGalarianForms;
+                case 'hisuian': return dexPreferences.showHisuianForms;
+                case 'paldean': return dexPreferences.showPaldeanForms;
+                case 'gmax': return dexPreferences.showGmaxForms;
+                case 'unown': return dexPreferences.showUnownForms;
+                case 'other': return dexPreferences.showOtherForms;
+                case 'alcremie': return dexPreferences.showAlcremieForms;
+                case 'alpha': return dexPreferences.showAlphaForms;
+                case 'alphaother': return dexPreferences.showAlphaOtherForms;
+                default: return true;
+            }
+        });
+        
+        return filtered;
+    }, [allMons, dexPreferences]);
+
+
 
 
 
@@ -419,7 +447,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             return { total: allGameValues.size, caught: foundGames.size };
         }
 
-        const filtered = allMons.filter((mon) => {
+        const filtered = visibleMons.filter((mon) => {
             const formType = mon.formType || "main";
 
             if (bar.filters?.formType?.length > 0) {
@@ -708,6 +736,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                                                                             { label: "Other", value: "other" },
                                                                             { label: "Alcremie", value: "alcremie" },
                                                                             { label: "Alpha", value: "alpha" },
+                                                                            { label: "Alpha Genders & Other's", value: "alphaother" },
                                                                         ]}
                                                                         onChange={(val) => {
                                                                             handleEditChange(index, 'filters', { formType: val });

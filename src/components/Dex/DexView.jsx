@@ -8,6 +8,7 @@ import { getLevenshteinDistance } from "../../utils";
 import noResultsImg from "../../data/pikachu.png";
 import pokemonData from "../../data/pokemon.json";
 import formsData from "../../data/forms.json";
+import { getFilteredFormsData } from "../../utils/dexPreferences";
 
 const typeOptions = [
     "normal", "fire", "water", "grass", "electric", "ice", "fighting", "poison", "ground", "flying",
@@ -16,7 +17,7 @@ const typeOptions = [
 
 const GEN_OPTIONS = Array.from(new Set([
     ...pokemonData.map(p => p.gen),
-    ...formsData.map(p => p.gen),
+    ...getFilteredFormsData(formsData).map(p => p.gen),
 ])).filter(Boolean).sort((a, b) => a - b);
 
 // Create the same dex sections structure for ViewDex
@@ -35,6 +36,9 @@ const createDexSections = () => {
         "alphaother"
     ];
 
+    // Get filtered forms data based on user preferences
+    const filteredFormsData = getFilteredFormsData(formsData);
+
     return [
         {
             key: "main",
@@ -43,8 +47,8 @@ const createDexSections = () => {
         },
         ...FORM_TYPES.map(type => ({
             key: type,
-            title: type === "alphaother" ? "Alpha Genders & Others" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
-            getList: () => formsData.filter(p => p.formType === type)
+            title: type === "alphaother" ? "Alpha Genders & Other's" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
+            getList: () => filteredFormsData.filter(p => p.formType === type)
         }))
     ];
 };

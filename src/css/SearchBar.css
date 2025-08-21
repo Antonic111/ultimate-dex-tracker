@@ -65,6 +65,30 @@
   opacity: 0.6;
 }
 
+.clear-search-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-speed);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.clear-search-btn:hover {
+  color: black;
+  transform: scale(1.1);
+}
+
+.clear-search-btn:active {
+  transform: scale(0.95);
+}
+
 .searchbar-icon-dropdown {
   width: 100%;
   min-width: 0;

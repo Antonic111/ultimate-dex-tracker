@@ -60,7 +60,15 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
 
     <header className="site-header">
       <div className="site-header-content">
-        <Link to="/" className="site-logo" aria-label="PokéTracker">
+        <Link 
+          to="/" 
+          className="site-logo" 
+          aria-label="PokéTracker"
+          onClick={() => {
+            // Dispatch event to refresh dex preferences
+            window.dispatchEvent(new CustomEvent('refreshDexPreferences'));
+          }}
+        >
           <img src={logoSrc} onError={handleLogoError} alt="" className="Logo-img" />
         </Link>
 

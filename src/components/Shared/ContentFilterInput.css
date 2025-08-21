@@ -172,7 +172,6 @@
   }
   
   .character-count {
-    position: static;
     margin-top: 8px;
     text-align: right;
   }

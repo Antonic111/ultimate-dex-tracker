@@ -6,6 +6,7 @@ import { useMessage } from "../components/Shared/MessageContext";
 import { useTheme } from "../components/Shared/ThemeContext";
 import DeleteAccountModal from "../components/Shared/DeleteAccountModal";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
+import DexPreferences from "../components/Shared/DexPreferences";
 import { validateContent } from "../../shared/contentFilter";
 import { profileAPI, userAPI } from "../utils/api";
 
@@ -198,6 +199,11 @@ export default function Settings() {
                             ))}
                         </div>
                     </div>
+
+                    <div className="setting-divider" />
+
+                    {/* Dex Preferences */}
+                    <DexPreferences />
 
                     <div className="setting-divider" />
                 </div>

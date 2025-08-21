@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import "flag-icons/css/flag-icons.min.css";
 import "../css/Trainers.css";
 import { COUNTRY_OPTIONS } from "../data/countries";
-import { Mars, Venus, VenusAndMars, Sparkles, Search, Heart, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, RefreshCcw, MoveUp, MoveDown, Check } from "lucide-react";
+import { Mars, Venus, VenusAndMars, Search, Heart, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, RefreshCcw, MoveUp, MoveDown, Check } from "lucide-react";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { profileAPI } from "../utils/api";
 import { UserContext } from "../components/Shared/UserContext";
+import { PokeballIcon } from "../components/Shared/SearchBar";
 
 const PAGE_SIZE = 20;
 
@@ -29,7 +30,7 @@ export default function Trainers() {
   const [sortType, setSortType] = useState("random");
   const [sortDirection, setSortDirection] = useState("desc"); // "asc" or "desc"
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-  const [hideZeroShinies, setHideZeroShinies] = useState(false);
+  const [hideZeroCaught, setHideZeroCaught] = useState(false);
   const [refreshRotating, setRefreshRotating] = useState(false);
   const [randomSeed, setRandomSeed] = useState(0);
   const sortButtonRef = useRef(null);
@@ -51,12 +52,13 @@ export default function Trainers() {
     
     let filtered = [...allFilteredData];
     
-    // Filter out profiles with 0 shinies if toggle is enabled
-    if (hideZeroShinies) {
+    // Filter out profiles with 0 caught if toggle is enabled
+    if (hideZeroCaught) {
       filtered = filtered.filter(u => {
         // Handle different possible data structures from API
-        const shinies = u.shinies || u.shinyCount || u.totalShinies || 0;
-        return typeof shinies === "number" && shinies > 0;
+        // TODO: Update this when API provides total caught count (shiny + regular)
+        const totalCaught = u.shinies || u.shinyCount || u.totalShinies || 0;
+        return typeof totalCaught === "number" && totalCaught > 0;
       });
     }
     
@@ -64,6 +66,8 @@ export default function Trainers() {
     switch (sortType) {
       case "most-shinies":
         const shiniesSorted = filtered.sort((a, b) => {
+          // TODO: Update this when API provides total caught count (shiny + regular)
+          // For now, using shiny count as placeholder
           const aShinies = a.shinies || a.shinyCount || a.totalShinies || 0;
           const bShinies = b.shinies || b.shinyCount || b.totalShinies || 0;
           return sortDirection === "desc" ? bShinies - aShinies : aShinies - bShinies;
@@ -84,7 +88,7 @@ export default function Trainers() {
       default:
         return filtered;
     }
-  }, [allFilteredData, sortType, sortDirection, hideZeroShinies, randomSeed]);
+  }, [allFilteredData, sortType, sortDirection, hideZeroCaught, randomSeed]);
 
   // Get current page items from sorted and filtered data
   useEffect(() => {
@@ -104,7 +108,7 @@ export default function Trainers() {
   // Reset to first page when sorting or filtering changes
   useEffect(() => {
     setPage(1);
-  }, [sortType, sortDirection, hideZeroShinies]);
+  }, [sortType, sortDirection, hideZeroCaught]);
 
   // Reset page to 1 when filtered data becomes empty to prevent pagination errors
   useEffect(() => {
@@ -219,7 +223,7 @@ export default function Trainers() {
   const getSortLabel = () => {
     switch (sortType) {
       case "most-shinies": 
-        return sortDirection === "desc" ? "Most Shinies" : "Least Shinies";
+        return sortDirection === "desc" ? "Most Caught" : "Least Caught";
       case "most-likes": 
         return sortDirection === "desc" ? "Most Likes" : "Least Likes";
       case "alphabetical": 
@@ -265,11 +269,11 @@ export default function Trainers() {
           <label className="toggle-label">
             <input
               type="checkbox"
-              checked={hideZeroShinies}
-              onChange={(e) => setHideZeroShinies(e.target.checked)}
+              checked={hideZeroCaught}
+              onChange={(e) => setHideZeroCaught(e.target.checked)}
               className="toggle-checkbox"
             />
-            <span className="toggle-text">Hide 0 Shinies</span>
+            <span className="toggle-text">Hide 0 Caught</span>
           </label>
         </div>
         
@@ -287,8 +291,8 @@ export default function Trainers() {
             <div className="sort-dropdown">
               <div className="sort-section">
                 <div className="sort-section-title">
-                  <Sparkles size={12} />
-                  <span>Shinies</span>
+                  <PokeballIcon size={12} />
+                  <span>Caught</span>
                 </div>
                 <button
                   className={`sort-option ${sortType === "most-shinies" && sortDirection === "desc" ? "active" : ""}`}
@@ -298,7 +302,7 @@ export default function Trainers() {
                     setShowSortDropdown(false);
                   }}
                 >
-                  Most Shinies
+                  Most Caught
                 </button>
                 <button
                   className={`sort-option ${sortType === "most-shinies" && sortDirection === "asc" ? "active" : ""}`}
@@ -308,7 +312,7 @@ export default function Trainers() {
                     setShowSortDropdown(false);
                   }}
                 >
-                  Least Shinies
+                  Least Caught
                 </button>
               </div>
               
@@ -433,11 +437,13 @@ export default function Trainers() {
             {sortedItems.map((u) => (
               <Link key={u.username} to={`/u/${u.username}`} className="trainer-card">
                 {(() => {
-                  const shinies = u.shinies || u.shinyCount || u.totalShinies || 0;
-                  return typeof shinies === "number" ? (
+                  // TODO: Update this when API provides total caught count (shiny + regular)
+                  // For now, using shiny count as placeholder
+                  const totalCaught = u.shinies || u.shinyCount || u.totalShinies || 0;
+                  return typeof totalCaught === "number" ? (
                     <div className="trainer-badge">
-                      <Sparkles size={14} />
-                      <span>{shinies}</span>
+                      <PokeballIcon size={14} />
+                      <span>{totalCaught}</span>
                     </div>
                   ) : null;
                 })()}
@@ -585,10 +591,10 @@ export default function Trainers() {
       ) : (
         <div className="muted" style={{ marginTop: 16, textAlign: 'center' }}>
           {query ? `No trainers found matching "${query}"` : 
-           hideZeroShinies ? (
+           hideZeroCaught ? (
              <>
-               No trainers with shinies found.<br />
-               Try disabling the 'Hide 0 Shinies' filter.
+               No trainers with caught Pokemon found.<br />
+               Try disabling the 'Hide 0 Caught' filter.
              </>
            ) : 
            "No trainers found"}

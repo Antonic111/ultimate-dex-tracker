@@ -9,6 +9,7 @@ import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { useLoading } from "../components/Shared/LoadingContext";
 import { profileAPI } from "../utils/api";
 
+
 // Helper function to load the viewer's own dex toggle preferences
 function loadDexToggles() {
     const raw = localStorage.getItem("dexToggles");
@@ -85,6 +86,7 @@ export default function ViewDex() {
     }, []);
     const [selectedPokemon, setSelectedPokemon] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [profileOwnerPreferences, setProfileOwnerPreferences] = useState(null);
 
     // fetch the public caught map your API exposes
     useEffect(() => {
@@ -101,7 +103,7 @@ export default function ViewDex() {
         })();
     }, [username, setLoading]);
 
-    // Fetch the viewed user's public profile to get their saved progress bars
+    // Fetch the viewed user's public profile to get their saved progress bars and dex preferences
     useEffect(() => {
         setLoading('view-dex-profile', true);
         (async () => {
@@ -112,16 +114,48 @@ export default function ViewDex() {
                 if (bars && bars.length > 0) {
                     setProgressBars(bars);
                 }
+                
+                // Store the profile owner's dex preferences
+                if (user.dexPreferences) {
+                    setProfileOwnerPreferences(user.dexPreferences);
+                } else {
+                    // Use default preferences if none are set
+                    setProfileOwnerPreferences({
+                        showGenderForms: true,
+                        showAlolanForms: true,
+                        showGalarianForms: true,
+                        showHisuianForms: true,
+                        showPaldeanForms: true,
+                        showGmaxForms: true,
+                        showUnownForms: true,
+                        showOtherForms: true,
+                        showAlcremieForms: true,
+                        showAlphaForms: true,
+                        showAlphaOtherForms: true,
+                    });
+                }
             } catch (error) {
                 // Handle error silently
                 setProgressBars([]);
+                // Set default preferences on error
+                setProfileOwnerPreferences({
+                    showGenderForms: true,
+                    showAlolanForms: true,
+                    showGalarianForms: true,
+                    showHisuianForms: true,
+                    showPaldeanForms: true,
+                    showGmaxForms: true,
+                    showUnownForms: true,
+                    showOtherForms: true,
+                        showAlcremieForms: true,
+                        showAlphaForms: true,
+                        showAlphaOtherForms: true,
+                });
             } finally {
                 setLoading('view-dex-profile', false);
             }
         })();
     }, [username, setLoading]);
-
-    const allMons = [...pokemonData, ...formsData];
 
     // Create dex sections structure for ViewDex
     const FORM_TYPES = [
@@ -138,25 +172,118 @@ export default function ViewDex() {
         "alphaother"
     ];
 
+    // Get filtered forms data based on profile owner's preferences
+    const getFilteredFormsDataForProfile = (forms, preferences) => {
+        if (!preferences || !forms) return forms;
+        return forms.filter(form => {
+            const formType = form.formType;
+            switch (formType) {
+                case 'gender': return preferences.showGenderForms;
+                case 'alolan': return preferences.showAlolanForms;
+                case 'galarian': return preferences.showGalarianForms;
+                case 'hisuian': return preferences.showHisuianForms;
+                case 'paldean': return preferences.showPaldeanForms;
+                case 'gmax': return preferences.showGmaxForms;
+                case 'unown': return preferences.showUnownForms;
+                case 'other': return preferences.showOtherForms;
+                case 'alcremie': return preferences.showAlcremieForms;
+                case 'alpha': return preferences.showAlphaForms;
+                case 'alphaother': return preferences.showAlphaOtherForms;
+                default: return true;
+            }
+        });
+    };
+
+    const filteredFormsData = profileOwnerPreferences 
+        ? getFilteredFormsDataForProfile(formsData, profileOwnerPreferences)
+        : formsData; // Show all forms while loading preferences
+
+    const allMons = [...pokemonData, ...filteredFormsData];
+
     const dexSections = [
         {
             key: "main",
             title: "Main Living Dex",
             getList: () => pokemonData
         },
-        ...FORM_TYPES.map(type => ({
-            key: type,
-            title: type === "alphaother" ? "Alpha Genders & Others" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
-            getList: () => formsData.filter(p => p.formType === type)
-        }))
+        ...FORM_TYPES.map(type => {
+            // Check if this form type should be shown based on profile owner's preferences
+            if (profileOwnerPreferences) {
+                let shouldShow = false;
+                switch (type) {
+                    case 'gender': shouldShow = profileOwnerPreferences.showGenderForms; break;
+                    case 'alolan': shouldShow = profileOwnerPreferences.showAlolanForms; break;
+                    case 'galarian': shouldShow = profileOwnerPreferences.showGalarianForms; break;
+                    case 'hisuian': shouldShow = profileOwnerPreferences.showHisuianForms; break;
+                    case 'paldean': shouldShow = profileOwnerPreferences.showPaldeanForms; break;
+                    case 'gmax': shouldShow = profileOwnerPreferences.showGmaxForms; break;
+                    case 'unown': shouldShow = profileOwnerPreferences.showUnownForms; break;
+                    case 'other': shouldShow = profileOwnerPreferences.showOtherForms; break;
+                    case 'alcremie': shouldShow = profileOwnerPreferences.showAlcremieForms; break;
+                    case 'alpha': shouldShow = profileOwnerPreferences.showAlphaForms; break;
+                    case 'alphaother': shouldShow = profileOwnerPreferences.showAlphaOtherForms; break;
+                    default: shouldShow = true;
+                }
+                
+                // Only create section if this form type should be shown
+                if (!shouldShow) return null;
+            }
+            
+            return {
+                key: type,
+                title: type === "alphaother" ? "Alpha Genders & Other's" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
+                getList: () => filteredFormsData.filter(p => p.formType === type)
+            };
+        }).filter(Boolean) // Remove null sections
     ];
 
             // Custom filter function for public profile view
         const customFilterMons = (list, forceShowForms = false) => {
             return list.filter(pokemon => {
-                // Respect forms toggle
-                if (!forceShowForms && !showForms && pokemon.formType && pokemon.formType !== "main" && pokemon.formType !== "default") {
-                    return false;
+                // When viewing someone else's dex, always show forms (respect their preferences)
+                // The current user's showForms toggle doesn't apply to viewing other people's dexes
+                if (pokemon.formType && pokemon.formType !== "main" && pokemon.formType !== "default") {
+                    // Check if this form type is enabled in the profile owner's preferences
+                    const formType = pokemon.formType;
+                    if (profileOwnerPreferences) {
+                        switch (formType) {
+                            case 'gender': 
+                                if (!profileOwnerPreferences.showGenderForms) return false;
+                                break;
+                            case 'alolan': 
+                                if (!profileOwnerPreferences.showAlolanForms) return false;
+                                break;
+                            case 'galarian': 
+                                if (!profileOwnerPreferences.showGalarianForms) return false;
+                                break;
+                            case 'hisuian': 
+                                if (!profileOwnerPreferences.showHisuianForms) return false;
+                                break;
+                            case 'paldean': 
+                                if (!profileOwnerPreferences.showPaldeanForms) return false;
+                                break;
+                            case 'gmax': 
+                                if (!profileOwnerPreferences.showGmaxForms) return false;
+                                break;
+                            case 'unown': 
+                                if (!profileOwnerPreferences.showUnownForms) return false;
+                                break;
+                            case 'other': 
+                                if (!profileOwnerPreferences.showOtherForms) return false;
+                                break;
+                            case 'alcremie': 
+                                if (!profileOwnerPreferences.showAlcremieForms) return false;
+                                break;
+                            case 'alpha': 
+                                if (!profileOwnerPreferences.showAlphaForms) return false;
+                                break;
+                            case 'alphaother': 
+                                if (!profileOwnerPreferences.showAlphaOtherForms) return false;
+                                break;
+                            default: 
+                                break;
+                        }
+                    }
                 }
 
                 // Get caught info based on the current shiny toggle state

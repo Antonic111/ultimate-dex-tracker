@@ -439,6 +439,21 @@ router.put("/profile", authenticateUser, async (req, res) => {
       user.isProfilePublic = !!req.body.isProfilePublic;
     }
 
+    // Handle dex preferences
+    if (req.body.dexPreferences) {
+      const { dexPreferences } = req.body;
+      if (typeof dexPreferences === 'object') {
+        const allowedKeys = [
+          'showGenderForms','showAlolanForms','showGalarianForms','showHisuianForms','showPaldeanForms','showGmaxForms','showUnownForms','showOtherForms','showAlcremieForms','showAlphaForms','showAlphaOtherForms'
+        ];
+        Object.keys(dexPreferences).forEach(key => {
+          if (allowedKeys.includes(key) && typeof dexPreferences[key] === 'boolean') {
+            user.dexPreferences[key] = dexPreferences[key];
+          }
+        });
+      }
+    }
+
     await user.save();
 
     res.json({ message: "Profile updated", user: {
@@ -450,7 +465,8 @@ router.put("/profile", authenticateUser, async (req, res) => {
       favoritePokemonShiny: user.favoritePokemonShiny,
       profileTrainer: user.profileTrainer,
       switchFriendCode: user.switchFriendCode,
-      isProfilePublic: user.isProfilePublic
+      isProfilePublic: user.isProfilePublic,
+      dexPreferences: user.dexPreferences,
     }});
   } catch (err) {
     console.error('🔥 PUT /profile - Error:', err);
@@ -464,7 +480,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes");
+    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes dexPreferences");
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -479,6 +495,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
       switchFriendCode: user.switchFriendCode,
       isProfilePublic: user.isProfilePublic,
       likeCount: user.likes ? user.likes.length : 0,
+      dexPreferences: user.dexPreferences,
     });
   } catch (err) {
     res.status(401).json({ error: "Invalid or expired token" });
@@ -824,7 +841,7 @@ router.get("/users/:username/public", async (req, res) => {
       username: req.params.username,
       isProfilePublic: { $ne: false }
     })
-      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes verified")
+      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes verified dexPreferences")
       .lean();
       
     if (!u) return res.status(404).json({ error: "User not found or private" });

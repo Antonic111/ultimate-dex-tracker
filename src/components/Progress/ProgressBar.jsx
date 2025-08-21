@@ -6,7 +6,8 @@ export default function ProgressBar({ total, caughtCount, label }) {
   
   // Cap the progress bar width to prevent it from extending too far
   // This ensures visual consistency with the top progress bar
-  const cappedPercent = Math.min(percent, 95); // Cap at 95% to maintain visual boundaries
+  // Allow 100% to show as full width, but cap other percentages at 95%
+  const cappedPercent = percent === 100 ? 100 : Math.min(percent, 95);
 
   return (
     <div className="progress-bar-wrapper">

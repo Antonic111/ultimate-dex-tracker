@@ -79,13 +79,14 @@ function toggleOption(val) {
           <div className="chip-filter-dropdown" style={dropdownStyle}>
             {options.map(opt => {
               const val = typeof opt === "string" ? opt : opt.value;
+              const label = typeof opt === "string" ? opt : opt.label;
               return (
                 <button
                   key={val}
                   className="chip-option"
                   onClick={() => toggleOption(val)}
                 >
-                  {formatLabel(val)}
+                  {label || formatLabel(val)}
                 </button>
               );
             })}

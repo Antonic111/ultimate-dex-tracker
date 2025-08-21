@@ -1,6 +1,7 @@
 import { genderForms, specialCases, specialFormLabels } from "./Constants";
 import formsData from './data/forms.json';
 import pokemonData from './data/pokemon.json';
+import { getFilteredFormsData } from './utils/dexPreferences';
 
 
 // utils.js or at the top of App.jsx for now:
@@ -33,7 +34,7 @@ export function formatFormType(type) {
   }
 }
 
-const allSources = [pokemonData, formsData]; // Add more arrays here if you have them separately
+const allSources = [pokemonData, getFilteredFormsData(formsData)]; // Add more arrays here if you have them separately
 
 export function findPokemon(id, name = null) {
   // First try exact id + name in all sources

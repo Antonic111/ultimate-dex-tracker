@@ -64,7 +64,7 @@
 .setting-block {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px; /* Reduced from 12px */
 }
 
 .setting-divider {
@@ -391,3 +391,84 @@
 .theme-preview.dark .preview-lines span{ background: rgba(255,255,255,.12); }
 .theme-preview.light .preview-lines span:first-child{ background: rgba(0,0,0,.25); }
 .theme-preview.dark  .preview-lines span:first-child{ background: rgba(255,255,255,.25); }
+
+/* --------------------------------------------
+   Dex Preferences
+--------------------------------------------- */
+.setting-description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 12px; /* Reduced from 16px */
+  line-height: 1.4;
+}
+
+.dex-preferences-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px; /* Reduced from 12px */
+}
+
+.preference-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px; /* Reduced from 12px 16px */
+  background: var(--settings-input);
+  border-radius: 6px; /* Reduced from 8px */
+  border: 1px solid var(--dividers);
+  transition: all 0.2s ease;
+}
+
+.preference-item:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.preference-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Reduced from 12px */
+  cursor: pointer;
+  width: 100%;
+}
+
+.preference-checkbox input[type="checkbox"] {
+  width: 16px; /* Reduced from 18px */
+  height: 16px; /* Reduced from 18px */
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+.preference-label {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.95rem; /* Reduced from 1rem */
+  cursor: pointer;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .dex-preferences-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .preference-item {
+    padding: 10px 14px;
+  }
+  
+  .preference-checkbox {
+    gap: 10px;
+  }
+  
+  .preference-label {
+    font-size: 0.95rem;
+  }
+}
+
+.saving-indicator {
+  text-align: center;
+  padding: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+  font-size: 0.9rem;
+}

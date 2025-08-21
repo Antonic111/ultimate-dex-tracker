@@ -41,7 +41,7 @@
 
 .trainers-page .trainer-search::placeholder { color: var(--trainer-search-placeholder); }
 
-/* ===== Hide Zero Shinies Toggle ===== */
+/* ===== Hide Zero Caught Toggle ===== */
 .trainers-page .hide-zero-shinies-toggle {
   flex-shrink: 0;
 }
@@ -330,11 +330,23 @@
   justify-content: center;
   image-rendering: pixelated;
 }
-.trainers-page .trainer-meta { display: flex; flex-direction: column; gap: 2px; }
+.trainers-page .trainer-meta { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 2px; 
+  flex: 1;
+  min-width: 0; /* Allow flex item to shrink below content size */
+  overflow: hidden; /* Ensure content doesn't overflow */
+}
 .trainers-page .trainer-name { 
   font-weight: 800; 
   line-height: 1.1; 
   color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 45px); /* Leave less space for badges */
+  padding-right: 8px; /* Add some breathing room */
 }
 .trainers-page .trainer-sub { 
   opacity: .75; 
@@ -399,7 +411,7 @@
 }
 
 .trainers-page .trainer-badge svg {
-  color: #ffd700; /* Always golden yellow for sparkles */
+  color: var(--accent); /* Use site accent color for Pokéball icon */
 }
 
 .trainers-page .trainer-likes {

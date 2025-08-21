@@ -211,6 +211,7 @@ button:focus {
   flex-direction: column;
   justify-content: flex-end;
   padding-top: 11px;
+  padding-bottom: 25px; /* Add bottom padding to accommodate character count */
   overflow: hidden;
 }
 

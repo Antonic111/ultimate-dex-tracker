@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useUser } from "../components/Shared/UserContext";
 import "../css/Profile.css";
 import { NotebookPen, Trophy, Mars, Venus, VenusAndMars, PencilLine, SquareX, Link as LinkIcon, Heart, Sparkles } from "lucide-react";
@@ -19,6 +19,7 @@ import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
 import { validateContent } from "../../shared/contentFilter";
 import { profileAPI, caughtAPI } from "../utils/api";
+import { getFilteredFormsData } from "../utils/dexPreferences";
 
 const FORM_TYPES_FOR_FAVORITES = [
     "alolan",
@@ -38,21 +39,7 @@ const BASE_POKEMON_OPTIONS = pokemonData.map((p) => ({
     shinyImage: p.sprites.front_shiny,
 }));
 
-const FORM_POKEMON_OPTIONS = formsData
-    .filter((p) => FORM_TYPES_FOR_FAVORITES.includes(p.formType))
-    .map((p) => {
-        const formLabel = getFormDisplayName(p);
-        const baseName = formatPokemonName(p.name);
-        const name = formLabel ? `${baseName} (${formLabel})` : baseName;
-        return {
-            name,
-            value: p.name,
-            image: p.sprites.front_default,
-            shinyImage: p.sprites.front_shiny,
-        };
-    });
-
-const POKEMON_OPTIONS = [...BASE_POKEMON_OPTIONS, ...FORM_POKEMON_OPTIONS];
+// We'll calculate these inside the component to be reactive to user preferences
 
 function getTimeAgo(dateString) {
     if (!dateString) return '';
@@ -120,6 +107,43 @@ export default function Profile() {
     const { setLoading, isLoading } = useLoading();
     const { showMessage } = useMessage();
 
+    // Get user's dex preferences for filtering forms
+    const [dexPreferences, setDexPreferences] = useState(() => {
+        try {
+            const savedPrefs = localStorage.getItem('dexPreferences');
+            return savedPrefs ? JSON.parse(savedPrefs) : null;
+        } catch (error) {
+            return null;
+        }
+    });
+
+    // Calculate filtered forms data based on current preferences
+    const filteredFormsData = useMemo(() => {
+        if (!dexPreferences) return formsData; // Show all forms if no preferences
+        return getFilteredFormsData(formsData, dexPreferences);
+    }, [dexPreferences]);
+
+    // Calculate form options for favorites
+    const FORM_POKEMON_OPTIONS = useMemo(() => {
+        return filteredFormsData
+            .filter((p) => FORM_TYPES_FOR_FAVORITES.includes(p.formType))
+            .map((p) => {
+                const formLabel = getFormDisplayName(p);
+                const baseName = formatPokemonName(p.name);
+                const name = formLabel ? `${baseName} (${formLabel})` : baseName;
+                return {
+                    name,
+                    value: p.name,
+                    image: p.sprites.front_default,
+                    shinyImage: p.sprites.front_shiny,
+                };
+            });
+    }, [filteredFormsData]);
+
+    const POKEMON_OPTIONS = useMemo(() => {
+        return [...BASE_POKEMON_OPTIONS, ...FORM_POKEMON_OPTIONS];
+    }, [FORM_POKEMON_OPTIONS]);
+
     const [isEditing, setIsEditing] = useState(false);
     const [showGameModal, setShowGameModal] = useState(false);
     const [gameSlotIndex, setGameSlotIndex] = useState(null);
@@ -164,6 +188,25 @@ export default function Profile() {
         }
     }, [loading, username, email, navigate]);
 
+    // Listen for dex preference changes
+    useEffect(() => {
+        const handleDexPreferencesChanged = () => {
+            try {
+                const savedPrefs = localStorage.getItem('dexPreferences');
+                if (savedPrefs) {
+                    setDexPreferences(JSON.parse(savedPrefs));
+                }
+            } catch (error) {
+                console.error('Failed to parse dex preferences:', error);
+            }
+        };
+
+        window.addEventListener('dexPreferencesChanged', handleDexPreferencesChanged);
+        return () => {
+            window.removeEventListener('dexPreferencesChanged', handleDexPreferencesChanged);
+        };
+    }, []);
+
     useEffect(() => {
         setLoading('profile-data', true);
         profileAPI.getProfile()
@@ -202,11 +245,11 @@ export default function Profile() {
                 // Count regular and shiny Pokémon separately
                 const regularKeys = [
                     ...pokemonData.map(p => getCaughtKey(p, null, false)),
-                    ...formsData.map(p => getCaughtKey(p, null, false)),
+                    ...filteredFormsData.map(p => getCaughtKey(p, null, false)),
                 ];
                 const shinyKeys = [
                     ...pokemonData.map(p => getCaughtKey(p, null, true)),
-                    ...formsData.map(p => getCaughtKey(p, null, true)),
+                    ...filteredFormsData.map(p => getCaughtKey(p, null, true)),
                 ];
                 const totalRegular = regularKeys.length;
                 const totalShiny = shinyKeys.length;
@@ -282,7 +325,7 @@ export default function Profile() {
 
                 // Build recent 5 added list (newest by date first)
                 try {
-                    const allMonsList = [...pokemonData, ...formsData];
+                    const allMonsList = [...pokemonData, ...filteredFormsData];
                     const keyToMon = new Map(allMonsList.map(m => [getCaughtKey(m), m]));
                                                               // First, separate Pokemon with and without caughtAt timestamps
                      const withTimestamps = [];

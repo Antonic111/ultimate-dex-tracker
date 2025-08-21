@@ -5235,8 +5235,8 @@
       "electric"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10148.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/25-partner-cap.png"
+      "front_default": "/Sprites/partner-cap-pikachu.png",
+      "front_shiny": "/Sprites/partner-cap-pikachu-shiny.png"
     },
     "gen": 1,
     "evolution": {
@@ -5704,8 +5704,8 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/669-yellow.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/669-yellow.png"
+      "front_default": "/Sprites/flabebe-yellow.png",
+      "front_shiny": "/Sprites/flabebe-yellow-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5722,8 +5722,8 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/669-orange.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/669-orange.png"
+      "front_default": "/Sprites/flabebe-orange.png",
+      "front_shiny": "/Sprites/flabebe-orange-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5740,8 +5740,8 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/669-blue.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/669-blue.png"
+      "front_default": "/Sprites/flabebe-blue.png",
+      "front_shiny": "/Sprites/flabebe-blue-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5758,8 +5758,8 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/669-white.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/669-white.png"
+      "front_default": "/Sprites/flabebe-white.png",
+      "front_shiny": "/Sprites/flabebe-white-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5776,8 +5776,8 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/670-yellow.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/670-yellow.png"
+      "front_default": "/Sprites/floette-yellow.png",
+      "front_shiny": "/Sprites/floette-yellow-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5794,8 +5794,8 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/670-orange.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/670-orange.png"
+      "front_default": "/Sprites/floette-orange.png",
+      "front_shiny": "/Sprites/floette-orange-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5812,8 +5812,8 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/670-blue.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/670-blue.png"
+      "front_default": "/Sprites/floette-blue.png",
+      "front_shiny": "/Sprites/floette-blue-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5830,8 +5830,8 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/670-white.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/670-white.png"
+      "front_default": "/Sprites/floette-white.png",
+      "front_shiny": "/Sprites/floette-white-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5848,8 +5848,8 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/671-yellow.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/671-yellow.png"
+      "front_default": "/Sprites/florges-yellow.png",
+      "front_shiny": "/Sprites/florges-yellow-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5866,8 +5866,8 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/671-orange.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/671-orange.png"
+      "front_default": "/Sprites/florges-orange.png",
+      "front_shiny": "/Sprites/florges-orange-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5884,8 +5884,8 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/671-blue.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/671-blue.png"
+      "front_default": "/Sprites/florges-blue.png",
+      "front_shiny": "/Sprites/florges-blue-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5902,8 +5902,8 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/671-white.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/671-white.png"
+      "front_default": "/Sprites/florges-white.png",
+      "front_shiny": "/Sprites/florges-white-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5920,8 +5920,8 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/676-heart.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/676-heart.png"
+      "front_default": "/Sprites/furfrou-heart.png",
+      "front_shiny": "/Sprites/furfrou-heart-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5938,8 +5938,8 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/676-star.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/676-star.png"
+      "front_default": "/Sprites/furfrou-star.png",
+      "front_shiny": "/Sprites/furfrou-star-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5956,8 +5956,8 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/676-diamond.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/676-diamond.png"
+      "front_default": "/Sprites/furfrou-diamond.png",
+      "front_shiny": "/Sprites/furfrou-diamond-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5974,8 +5974,8 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/676-debutante.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/676-debutante.png"
+      "front_default": "/Sprites/furfrou-debutante.png",
+      "front_shiny": "/Sprites/furfrou-debutante-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -5992,8 +5992,8 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/676-matron.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/676-matron.png"
+      "front_default": "/Sprites/furfrou-matron.png",
+      "front_shiny": "/Sprites/furfrou-matron-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -6010,8 +6010,8 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/676-dandy.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/676-dandy.png"
+      "front_default": "/Sprites/furfrou-dandy.png",
+      "front_shiny": "/Sprites/furfrou-dandy-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -6021,15 +6021,15 @@
   },
   {
     "id": 676,
-    "name": "furfrou-la-reine",
+    "name": "furfrou-lareine",
     "formType": "other",
     "baseSpecies": "furfrou",
     "types": [
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/676-la-reine.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/676-la-reine.png"
+      "front_default": "/Sprites/furfrou-lareine.png",
+      "front_shiny": "/Sprites/furfrou-lareine-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -6046,8 +6046,8 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/676-kabuki.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/676-kabuki.png"
+      "front_default": "/Sprites/furfrou-kabuki.png",
+      "front_shiny": "/Sprites/furfrou-kabuki-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -6064,8 +6064,8 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/676-pharaoh.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/676-pharaoh.png"
+      "front_default": "/Sprites/furfrou-pharaoh.png",
+      "front_shiny": "/Sprites/furfrou-pharaoh-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -6080,8 +6080,8 @@
   "baseSpecies": "pumpkaboo",
   "types": ["ghost", "grass"],
   "sprites": {
-    "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/710.png",
-    "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/710-small.png"
+    "front_default": "/Sprites/pumpkaboo-small.png",
+    "front_shiny": "/Sprites/pumpkaboo-small-shiny.png"
   },
   "sizeScale": 0.85,
   "gen": 6,
@@ -6097,8 +6097,8 @@
   "baseSpecies": "pumpkaboo",
   "types": ["ghost", "grass"],
   "sprites": {
-    "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/710.png",
-    "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/710-large.png"
+    "front_default": "/Sprites/pumpkaboo-large.png",
+    "front_shiny": "/Sprites/pumpkaboo-large-shiny.png"
   },
   "sizeScale": 1.15,
   "gen": 6,
@@ -6114,8 +6114,8 @@
   "baseSpecies": "pumpkaboo",
   "types": ["ghost", "grass"],
   "sprites": {
-    "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/710.png",
-    "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/710-super.png"
+    "front_default": "/Sprites/pumpkaboo-super.png",
+    "front_shiny": "/Sprites/pumpkaboo-super-shiny.png"
   },
   "sizeScale": 1.5,
   "gen": 6,
@@ -6134,8 +6134,8 @@
       "grass"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/7/76/HOME0711Sm.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/711-small.png"
+      "front_default": "/Sprites/gourgeist-small.png",
+      "front_shiny": "/Sprites/gourgeist-small-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -6153,8 +6153,8 @@
       "grass"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/6/6d/HOME0711La.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/711-large.png"
+      "front_default": "/Sprites/gourgeist-large.png",
+      "front_shiny": "/Sprites/gourgeist-large-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -6172,8 +6172,8 @@
       "grass"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/3/36/HOME0711Su.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/711-super.png"
+      "front_default": "/Sprites/gourgeist-super.png",
+      "front_shiny": "/Sprites/gourgeist-super-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -6191,8 +6191,8 @@
       "ground"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/f/f8/0718Zygarde-10Percent.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/718-10.png"
+      "front_default": "/Sprites/zygarde-10.png",
+      "front_shiny": "/Sprites/zygarde-10-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -6210,8 +6210,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/e/ea/HOME0741Po.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/a/aa/HOME0741Po_s.png"
+      "front_default": "/Sprites/oricorio-pom-pom.png",
+      "front_shiny": "/Sprites/oricorio-pom-pom-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -6229,8 +6229,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/7/78/HOME0741Pa.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/c/c4/HOME0741Pa_s.png"
+      "front_default": "/Sprites/oricorio-pau.png",
+      "front_shiny": "/Sprites/oricorio-pau-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -6248,8 +6248,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/1/12/HOME0741Se.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/4/41/HOME0741Se_s.png"
+      "front_default": "/Sprites/oricorio-sensu.png",
+      "front_shiny": "/Sprites/oricorio-sensu-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -6266,8 +6266,8 @@
       "rock"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/d/d3/HOME0745Mn.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/7/7a/HOME0745Mn_s.png"
+      "front_default": "/Sprites/lycanroc-midnight.png",
+      "front_shiny": "/Sprites/lycanroc-midnight-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -6284,8 +6284,8 @@
       "rock"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/0/0c/HOME0745D.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/4/40/HOME0745D_s.png"
+      "front_default": "/Sprites/lycanroc-dusk.png",
+      "front_shiny": "/Sprites/lycanroc-dusk-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -6303,8 +6303,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/b/b3/774Minior_Orange_Dream.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/b/b3/774Minior_Orange_Dream.png"
+      "front_default": "/Sprites/minior-orange.png",
+      "front_shiny": "/Sprites/minior-orange-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -6322,8 +6322,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/d/dd/774Minior_Yellow_Dream.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/d/dd/774Minior_Yellow_Dream.png"
+      "front_default": "/Sprites/minior-yellow.png",
+      "front_shiny": "/Sprites/minior-yellow-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -6341,8 +6341,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/d/d8/774Minior_Green_Dream.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/d/d8/774Minior_Green_Dream.png"
+      "front_default": "/Sprites/minior-green.png",
+      "front_shiny": "/Sprites/minior-green-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -6360,8 +6360,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/8/81/774Minior_Blue_Dream.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/8/81/774Minior_Blue_Dream.png"
+      "front_default": "/Sprites/minior-blue.png",
+      "front_shiny": "/Sprites/minior-blue-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -6379,8 +6379,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/9/91/774Minior_Indigo_Dream.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/9/91/774Minior_Indigo_Dream.png"
+      "front_default": "/Sprites/minior-indigo.png",
+      "front_shiny": "/Sprites/minior-indigo-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -6398,8 +6398,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/3/33/774Minior_Violet_Dream.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/3/33/774Minior_Violet_Dream.png"
+      "front_default": "/Sprites/minior-violet.png",
+      "front_shiny": "/Sprites/minior-violet-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -6417,8 +6417,8 @@
       "poison"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/a/a1/HOME0849L.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/4/46/HOME0849L_s.png"
+      "front_default": "/Sprites/toxtricity-lowkey.png",
+      "front_shiny": "/Sprites/toxtricity-lowkey-shiny.png"
     },
     "gen": 8,
     "evolution": {
@@ -6471,8 +6471,8 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/8/8b/HOME0925T.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/a/ad/HOME0925T_s.png"
+      "front_default": "/Sprites/maushold-family-of-three.png",
+      "front_shiny": "/Sprites/maushold-family-of-three-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -6490,8 +6490,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/6/6a/HOME0931B.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/4/4a/HOME0931B_s.png"
+      "front_default": "/Sprites/sqwuawkabilly-blue.png",
+      "front_shiny": "/Sprites/sqwuawkabilly-blue-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -6509,8 +6509,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/9/9e/HOME0931Y.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/3/3d/HOME0931Y_s.png"
+      "front_default": "/Sprites/sqwuawkabilly-yellow.png",
+      "front_shiny": "/Sprites/sqwuawkabilly-yellow-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -6528,8 +6528,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/b/b3/HOME0931W.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/2/22/HOME0931W_s.png"
+      "front_default": "/Sprites/sqwuawkabilly-white.png",
+      "front_shiny": "/Sprites/sqwuawkabilly-white-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -6547,8 +6547,8 @@
       "water"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/5/5e/HOME0978D.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/c/ce/HOME0978D_s.png"
+      "front_default": "/Sprites/tatsugiri-droopy.png",
+      "front_shiny": "/Sprites/tatsugiri-droopy-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -6566,8 +6566,8 @@
       "water"
     ],
     "sprites": {
-      "front_default": "https://archives.bulbagarden.net/media/upload/a/a4/HOME0978S.png",
-      "front_shiny": "https://archives.bulbagarden.net/media/upload/6/67/HOME0978S_s.png"
+      "front_default": "/Sprites/tatsugiri-stretchy.png",
+      "front_shiny": "/Sprites/tatsugiri-stretchy-shiny.png"
     },
     "gen": 9,
     "evolution": {

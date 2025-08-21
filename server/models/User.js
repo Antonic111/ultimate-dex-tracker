@@ -67,6 +67,21 @@ const userSchema = new mongoose.Schema({
   isProfilePublic: { type: Boolean, default: true },
   // LIKES ----------------------------------------- //
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  // DEX PREFERENCES ----------------------------------------- //
+  dexPreferences: {
+    showGenderForms: { type: Boolean, default: true },
+    showAlolanForms: { type: Boolean, default: true },
+    showGalarianForms: { type: Boolean, default: true },
+    showHisuianForms: { type: Boolean, default: true },
+    showPaldeanForms: { type: Boolean, default: true },
+    showGmaxForms: { type: Boolean, default: true },
+    showUnownForms: { type: Boolean, default: true },
+    showOtherForms: { type: Boolean, default: true },
+    // Newly added
+    showAlcremieForms: { type: Boolean, default: true },
+    showAlphaForms: { type: Boolean, default: true },
+    showAlphaOtherForms: { type: Boolean, default: true },
+  },
   // DELETE ACCOUNT CODE ----------------------------------------- //
   deleteCodeHash: { type: String, default: null },
   deleteCodeExpires: { type: Date, default: null },

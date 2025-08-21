@@ -269,6 +269,11 @@ export const profileAPI = {
     return api.put('/profile', profileData);
   },
 
+  // Update dex preferences
+  async updateDexPreferences(dexPreferences) {
+    return api.put('/profile', { dexPreferences });
+  },
+
   // Get public users for trainers page
   async getPublicUsers(query = '', page = 1, pageSize = 24, random = false) {
     const params = new URLSearchParams();

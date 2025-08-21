@@ -5,7 +5,8 @@ import {
     Gamepad2,
     Hash,
     Search as SearchIcon,
-    Star
+    Star,
+    X
 } from "lucide-react";
 import React from "react";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS } from "../../Constants";
@@ -183,6 +184,16 @@ export default function SearchBar({
                     onChange={e => setFilters(f => ({ ...f, searchTerm: e.target.value }))}
                     maxLength={20}
                 />
+                {filters.searchTerm && (
+                    <button
+                        type="button"
+                        className="clear-search-btn"
+                        onClick={() => setFilters(f => ({ ...f, searchTerm: "" }))}
+                        title="Clear search"
+                    >
+                        <X size={16} />
+                    </button>
+                )}
             </div>
 
             {/* Game Dropdown */}
