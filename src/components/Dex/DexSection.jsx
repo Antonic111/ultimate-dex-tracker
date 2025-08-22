@@ -140,6 +140,7 @@ export default function DexSection({
                           "unown",
                           "other",
                           "alcremie",
+                          "vivillon",
                           "alpha",
                         ];
                         const tstr = String(title || "").toLowerCase();
@@ -152,6 +153,8 @@ export default function DexSection({
                           
                           if (match === "alcremie") {
                             label = "Alcremie's Box";
+                          } else if (match === "vivillon") {
+                            label = "Vivillon's Box";
                           } else if (match === "unown") {
                             // Special naming for Unown boxes
                             if (isAlphaBox) {

@@ -122,6 +122,7 @@ const FORM_TYPES = [
   "unown",
   "other",
   "alcremie",
+  "vivillon",
   "alpha",
   "alphaother"
 ];

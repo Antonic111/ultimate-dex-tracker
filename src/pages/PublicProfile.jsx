@@ -217,10 +217,11 @@ export default function PublicProfile() {
                             showGmaxForms: true,
                             showUnownForms: true,
                             showOtherForms: true,
-                            showAlcremieForms: true,
-                            showAlphaForms: true,
-                            showAlphaOtherForms: true,
-                        });
+                                                    showAlcremieForms: true,
+                        showVivillonForms: true,
+                        showAlphaForms: true,
+                        showAlphaOtherForms: true,
+                    });
                     }
                 }
             } catch {
@@ -237,6 +238,7 @@ export default function PublicProfile() {
                         showUnownForms: true,
                         showOtherForms: true,
                         showAlcremieForms: true,
+                        showVivillonForms: true,
                         showAlphaForms: true,
                         showAlphaOtherForms: true,
                     });
@@ -273,6 +275,7 @@ export default function PublicProfile() {
                 case 'unown': return preferences.showUnownForms;
                 case 'other': return preferences.showOtherForms;
                 case 'alcremie': return preferences.showAlcremieForms;
+                case 'vivillon': return preferences.showVivillonForms;
                 case 'alpha': return preferences.showAlphaForms;
                 case 'alphaother': return preferences.showAlphaOtherForms;
                 default: return true;

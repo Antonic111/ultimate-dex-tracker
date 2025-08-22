@@ -13,6 +13,7 @@ export default function DexPreferences() {
         showUnownForms: true,
         showOtherForms: true,
         showAlcremieForms: true,
+        showVivillonForms: true,
         showAlphaForms: true,
         showAlphaOtherForms: true,
     };
@@ -27,7 +28,11 @@ export default function DexPreferences() {
         if (savedPrefs) {
             try {
                 const parsedPrefs = JSON.parse(savedPrefs) || {};
-                setPreferences(prev => ({ ...prev, ...parsedPrefs }));
+                // Merge with defaults to ensure all preferences are present
+                const mergedPrefs = { ...defaultPreferences, ...parsedPrefs };
+                setPreferences(mergedPrefs);
+                // Update localStorage with the merged preferences
+                localStorage.setItem('dexPreferences', JSON.stringify(mergedPrefs));
             } catch (error) {
                 console.error('Failed to parse saved dex preferences:', error);
             }
@@ -93,6 +98,7 @@ export default function DexPreferences() {
         { key: 'showUnownForms', label: 'Unown Forms' },
         { key: 'showOtherForms', label: 'Other Forms' },
         { key: 'showAlcremieForms', label: 'Alcremie Forms' },
+        { key: 'showVivillonForms', label: 'Vivillon Forms' },
         { key: 'showAlphaForms', label: 'Alpha Forms' },
         { key: 'showAlphaOtherForms', label: "Alpha Genders & Others" },
     ];

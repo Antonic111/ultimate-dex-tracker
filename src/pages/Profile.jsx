@@ -30,6 +30,7 @@ const FORM_TYPES_FOR_FAVORITES = [
     "unown",
     "other",
     "alcremie",
+    "vivillon",
 ];
 
 const BASE_POKEMON_OPTIONS = pokemonData.map((p) => ({

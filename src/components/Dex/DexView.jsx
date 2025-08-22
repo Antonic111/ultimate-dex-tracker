@@ -32,6 +32,7 @@ const createDexSections = () => {
         "unown",
         "other",
         "alcremie",
+        "vivillon",
         "alpha",
         "alphaother"
     ];

@@ -14328,7 +14328,7 @@
     "next": [
       {
         "id": 666,
-        "name": "vivillon",
+        "name": "vivillon-meadow",
         "how": "Level Up to 12"
       }
     ]
@@ -14336,14 +14336,14 @@
 },
 {
   "id": 666,
-  "name": "vivillon",
+  "name": "vivillon-meadow",
   "types": [
     "bug",
     "flying"
   ],
   "sprites": {
-    "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/666.png",
-    "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/666.png"
+      "front_default": "/Sprites/vivillon-meadow.png",
+      "front_shiny": "/Sprites/vivillon-meadow-shiny.png"
   },
   "gen": 6,
   "evolution": {
@@ -16651,8 +16651,8 @@
     "flying"
   ],
   "sprites": {
-    "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/774.png",
-    "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/774.png"
+      "front_default": "/Sprites/minior-red.png",
+      "front_shiny": "/Sprites/minior-red-shiny.png"
   },
   "gen": 7,
   "evolution": {
@@ -19044,15 +19044,20 @@
     "next": [
       {
         "id": 892,
-        "name": "urshifu",
-        "how": "tower of darkness"
+        "name": "urshifu-single-strike",
+        "how": "High friendship, Lvl 70 and challenge the Tower of Darkness"
+      },
+      {
+        "id": 892,
+        "name": "urshifu-rapid-strike",
+        "how": "High friendship, Lvl 70 and challenge the Tower of Waters"
       }
     ]
   }
 },
 {
   "id": 892,
-  "name": "urshifu",
+  "name": "urshifu-single-strike",
   "types": [
     "fighting",
     "dark"
@@ -19065,7 +19070,7 @@
   "evolution": {
     "pre": {
       "id": 891,
-      "name": "urshifu",
+      "name": "urshifu-single-strike",
       "how": "tower of darkness"
     },
     "next": []

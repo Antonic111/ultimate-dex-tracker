@@ -130,6 +130,7 @@ export default function ViewDex() {
                         showUnownForms: true,
                         showOtherForms: true,
                         showAlcremieForms: true,
+                        showVivillonForms: true,
                         showAlphaForms: true,
                         showAlphaOtherForms: true,
                     });
@@ -148,6 +149,7 @@ export default function ViewDex() {
                     showUnownForms: true,
                     showOtherForms: true,
                         showAlcremieForms: true,
+                        showVivillonForms: true,
                         showAlphaForms: true,
                         showAlphaOtherForms: true,
                 });
@@ -168,6 +170,7 @@ export default function ViewDex() {
         "unown",
         "other",
         "alcremie",
+        "vivillon",
         "alpha",
         "alphaother"
     ];
@@ -187,6 +190,7 @@ export default function ViewDex() {
                 case 'unown': return preferences.showUnownForms;
                 case 'other': return preferences.showOtherForms;
                 case 'alcremie': return preferences.showAlcremieForms;
+                case 'vivillon': return preferences.showVivillonForms;
                 case 'alpha': return preferences.showAlphaForms;
                 case 'alphaother': return preferences.showAlphaOtherForms;
                 default: return true;
@@ -273,6 +277,9 @@ export default function ViewDex() {
                                 break;
                             case 'alcremie': 
                                 if (!profileOwnerPreferences.showAlcremieForms) return false;
+                                break;
+                            case 'vivillon': 
+                                if (!profileOwnerPreferences.showVivillonForms) return false;
                                 break;
                             case 'alpha': 
                                 if (!profileOwnerPreferences.showAlphaForms) return false;

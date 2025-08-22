@@ -5535,6 +5535,25 @@
     }
   },
   {
+    "id": 492,
+    "name": "shaymin-sky",
+    "formType": "other",
+    "baseSpecies": "shaymin",
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10006.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/492-sky.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
     "id": 550,
     "name": "basculin-blue-striped",
     "formType": "other",
@@ -5688,6 +5707,62 @@
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/586-winter.png",
       "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/586-winter.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 641,
+    "name": "tornadus-therian",
+    "formType": "other",
+    "baseSpecies": "tornadus",
+    "types": [
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10019.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/641-therian.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 642,
+    "name": "thundurus-therian",
+    "formType": "other",
+    "baseSpecies": "thundurus",
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10020.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/642-therian.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 645,
+    "name": "landorus-therian",
+    "formType": "other",
+    "baseSpecies": "landorus",
+    "types": [
+      "ground",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10021.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/645-therian.png"
     },
     "gen": 5,
     "evolution": {
@@ -6455,6 +6530,44 @@
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/855.png",
       "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/855.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 892,
+    "name": "urshifu-rapid-strike",
+    "formType": "other",
+    "baseSpecies": "urshifu",
+    "types": [
+      "fighting",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10191.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10191.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 905,
+    "name": "enamorus-therian",
+    "formType": "other",
+    "baseSpecies": "enamorus",
+    "types": [
+      "fairy",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10249.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10249.png"
     },
     "gen": 8,
     "evolution": {
@@ -7759,6 +7872,374 @@
       "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-rainbow-swirl-ribbon-sweet.png"
     },
     "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "formType": "------------------------------------------------------------------------------------------- VIVILLON FORMS ----------------------------------------------------------------------------------------",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-archipelago",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-archipelago.png",
+      "front_shiny": "/Sprites/vivillon-archipelago-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-continental",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-continental.png",
+      "front_shiny": "/Sprites/vivillon-continental-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-elegant",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-elegant.png",
+      "front_shiny": "/Sprites/vivillon-elegant-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-garden",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-garden.png",
+      "front_shiny": "/Sprites/vivillon-garden-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-high-plains",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-high-plains.png",
+      "front_shiny": "/Sprites/vivillon-high-plains-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-icy-snow",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-icy-snow.png",
+      "front_shiny": "/Sprites/vivillon-icy-snow-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-jungle",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-jungle.png",
+      "front_shiny": "/Sprites/vivillon-jungle-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-marine",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-marine.png",
+      "front_shiny": "/Sprites/vivillon-marine-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-modern",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-modern.png",
+      "front_shiny": "/Sprites/vivillon-modern-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-monsoon",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-monsoon.png",
+      "front_shiny": "/Sprites/vivillon-monsoon-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-ocean",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-ocean.png",
+      "front_shiny": "/Sprites/vivillon-ocean-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-polar",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-polar.png",
+      "front_shiny": "/Sprites/vivillon-polar-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-river",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-river.png",
+      "front_shiny": "/Sprites/vivillon-river-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-sandstorm",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-sandstorm.png",
+      "front_shiny": "/Sprites/vivillon-sandstorm-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-savanna",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-savanna.png",
+      "front_shiny": "/Sprites/vivillon-savanna-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-sun",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-sun.png",
+      "front_shiny": "/Sprites/vivillon-sun-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-tundra",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-tundra.png",
+      "front_shiny": "/Sprites/vivillon-tundra-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-fancy",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-fancy.png",
+      "front_shiny": "/Sprites/vivillon-fancy-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-pokeball",
+    "formType": "vivillon",
+    "baseSpecies": "vivillon",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/vivillon-pokeball.png",
+      "front_shiny": "/Sprites/vivillon-pokeball-shiny.png"
+    },
+    "gen": 6,
     "evolution": {
       "pre": null,
       "next": []

@@ -79,6 +79,7 @@ const userSchema = new mongoose.Schema({
     showOtherForms: { type: Boolean, default: true },
     // Newly added
     showAlcremieForms: { type: Boolean, default: true },
+    showVivillonForms: { type: Boolean, default: true },
     showAlphaForms: { type: Boolean, default: true },
     showAlphaOtherForms: { type: Boolean, default: true },
   },

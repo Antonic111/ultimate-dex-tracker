@@ -126,6 +126,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                 case 'unown': return dexPreferences.showUnownForms;
                 case 'other': return dexPreferences.showOtherForms;
                 case 'alcremie': return dexPreferences.showAlcremieForms;
+                case 'vivillon': return dexPreferences.showVivillonForms;
                 case 'alpha': return dexPreferences.showAlphaForms;
                 case 'alphaother': return dexPreferences.showAlphaOtherForms;
                 default: return true;

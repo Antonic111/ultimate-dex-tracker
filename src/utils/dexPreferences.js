@@ -39,6 +39,8 @@ export const filterFormsByPreferences = (forms, preferences) => {
                 return preferences.showOtherForms;
             case 'alcremie':
                 return preferences.showAlcremieForms;
+            case 'vivillon':
+                return preferences.showVivillonForms;
             case 'alpha':
                 return preferences.showAlphaForms;
             case 'alphaother':
@@ -57,7 +59,23 @@ export const getDexPreferences = () => {
     try {
         const savedPrefs = localStorage.getItem('dexPreferences');
         if (savedPrefs) {
-            return JSON.parse(savedPrefs);
+            const parsedPrefs = JSON.parse(savedPrefs);
+            // Merge with defaults to ensure all preferences are present
+            return {
+                showGenderForms: true,
+                showAlolanForms: true,
+                showGalarianForms: true,
+                showHisuianForms: true,
+                showPaldeanForms: true,
+                showGmaxForms: true,
+                showUnownForms: true,
+                showOtherForms: true,
+                showAlcremieForms: true,
+                showVivillonForms: true,
+                showAlphaForms: true,
+                showAlphaOtherForms: true,
+                ...parsedPrefs // User preferences override defaults
+            };
         }
     } catch (error) {
         console.error('Failed to parse saved dex preferences:', error);
@@ -73,6 +91,7 @@ export const getDexPreferences = () => {
         showUnownForms: true,
         showOtherForms: true,
         showAlcremieForms: true,
+        showVivillonForms: true,
         showAlphaForms: true,
         showAlphaOtherForms: true,
     };
