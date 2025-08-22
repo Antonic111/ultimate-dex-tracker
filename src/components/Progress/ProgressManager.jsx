@@ -413,11 +413,18 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             const foundMarks = new Set();
 
             Object.values(caughtMap).forEach((data) => {
-                if (data && data.mark && allMarkValues.has(data.mark)) {
+                if (data && data.entries && Array.isArray(data.entries)) {
+                    // New format: extract from entries array
+                    data.entries.forEach(entry => {
+                        if (entry && entry.mark && allMarkValues.has(entry.mark)) {
+                            foundMarks.add(entry.mark);
+                        }
+                    });
+                } else if (data && data.mark && allMarkValues.has(data.mark)) {
+                    // Old format: use data directly
                     foundMarks.add(data.mark);
                 }
             });
-
 
             return { total: allMarkValues.size, caught: foundMarks.size };
         }
@@ -427,7 +434,15 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             const foundBalls = new Set();
 
             Object.values(caughtMap).forEach((data) => {
-                if (data && data.ball && allBallValues.has(data.ball)) {
+                if (data && data.entries && Array.isArray(data.entries)) {
+                    // New format: extract from entries array
+                    data.entries.forEach(entry => {
+                        if (entry && entry.ball && allBallValues.has(entry.ball)) {
+                            foundBalls.add(entry.ball);
+                        }
+                    });
+                } else if (data && data.ball && allBallValues.has(data.ball)) {
+                    // Old format: use data directly
                     foundBalls.add(data.ball);
                 }
             });
@@ -440,7 +455,15 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             const foundGames = new Set();
 
             Object.values(caughtMap).forEach((data) => {
-                if (data && data.game && allGameValues.has(data.game)) {
+                if (data && data.entries && Array.isArray(data.entries)) {
+                    // New format: extract from entries array
+                    data.entries.forEach(entry => {
+                        if (entry && entry.game && allGameValues.has(entry.game)) {
+                            foundGames.add(entry.game);
+                        }
+                    });
+                } else if (data && data.game && allGameValues.has(data.game)) {
+                    // Old format: use data directly
                     foundGames.add(data.game);
                 }
             });

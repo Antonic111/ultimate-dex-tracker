@@ -257,6 +257,22 @@ export default function Profile() {
 
                 const caughtInfos = Object.values(map).filter(Boolean);
                 
+                // Extract all entries from the new data structure
+                const allEntries = [];
+                caughtInfos.forEach(info => {
+                    if (info.entries && Array.isArray(info.entries)) {
+                        // New format: extract entries
+                        info.entries.forEach(entry => {
+                            if (entry && (entry.ball || entry.mark || entry.game || entry.method)) {
+                                allEntries.push(entry);
+                            }
+                        });
+                    } else if (info.ball || info.mark || info.game || info.method) {
+                        // Old format: use the info directly
+                        allEntries.push(info);
+                    }
+                });
+                
                 // Count regular and shiny Pokémon separately
                 const regularCaught = regularKeys.filter(key => map[key]).length;
                 const shinyCaught = shinyKeys.filter(key => map[key]).length;
@@ -267,7 +283,7 @@ export default function Profile() {
                 // For backward compatibility, keep the old stats structure
                 const shinies = regularCaught; // This was actually regular Pokémon count
                 const completion = regularCompletion;
-                const gamesPlayed = new Set(caughtInfos.map(i => i.game).filter(Boolean)).size;
+                const gamesPlayed = new Set(allEntries.map(i => i.game).filter(Boolean)).size;
 
                 const toTitle = (s) =>
                     String(s || "")
@@ -303,13 +319,13 @@ export default function Profile() {
                     return top;
                 };
 
-                const topBallKey = countTop(caughtInfos, "ball");
-                const topMarkKey = countTop(caughtInfos, "mark");
-                const topGameKey = countTop(caughtInfos, "game");
+                const topBallKey = countTop(allEntries, "ball");
+                const topMarkKey = countTop(allEntries, "mark");
+                const topGameKey = countTop(allEntries, "game");
 
                 const topBall = fromOptionsOrTitle(BALL_OPTIONS, topBallKey, " Ball");
                 const topMark = fromOptionsOrTitle(MARK_OPTIONS, topMarkKey, " Mark");
-                const topGame = fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) ? "Pokemon " + fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) : null;
+                const topGame = fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey);
 
                 if (!ignore) setStats({ 
                     shinies, 

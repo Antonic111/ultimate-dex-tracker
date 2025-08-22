@@ -2,11 +2,16 @@
 import { Resend } from "resend";
 
 // Check if emails are disabled in development
-const forceDevMode = true; // Set to false when you want real emails
-const emailsDisabled = forceDevMode || (process.env.NODE_ENV === 'development' && process.env.DISABLE_EMAILS === 'true');
+const emailsDisabled = process.env.NODE_ENV === 'development' && process.env.DISABLE_EMAILS === 'true';
 
 // Debug logging
-// removed verbose environment logs
+console.log('Email configuration:', {
+  NODE_ENV: process.env.NODE_ENV,
+  DISABLE_EMAILS: process.env.DISABLE_EMAILS,
+  RESEND_API_KEY: process.env.RESEND_API_KEY ? 'Set' : 'Not set',
+  EMAIL_FROM: process.env.EMAIL_FROM ? 'Set' : 'Not set',
+  emailsDisabled
+});
 
 // Only initialize Resend if emails are enabled
 const resend = emailsDisabled ? null : new Resend(process.env.RESEND_API_KEY);
@@ -14,7 +19,7 @@ const resend = emailsDisabled ? null : new Resend(process.env.RESEND_API_KEY);
 export async function sendCodeEmail(user, subject, code, action) {
   // If emails are disabled in development, return mock success
   if (emailsDisabled) {
-    // dev-mode email stub logs removed
+    console.log(`[DEV MODE] Email would be sent: ${subject} to ${user.email} with code ${code}`);
     return { 
       success: true, 
       message: 'Email would be sent in production',
@@ -28,12 +33,12 @@ export async function sendCodeEmail(user, subject, code, action) {
 
   if (!process.env.RESEND_API_KEY) {
     console.error('RESEND_API_KEY not set');
-    return;
+    return { success: false, error: 'RESEND_API_KEY not configured' };
   }
 
   if (!process.env.EMAIL_FROM) {
     console.error('EMAIL_FROM not set');
-    return;
+    return { success: false, error: 'EMAIL_FROM not configured' };
   }
 
   try {
@@ -55,6 +60,7 @@ export async function sendCodeEmail(user, subject, code, action) {
       throw error;
     }
 
+    console.log('Email sent successfully:', { to: user.email, subject, action });
     return data;
   } catch (error) {
     console.error('Failed to send email:', error);

@@ -316,14 +316,31 @@ export default function PublicProfile() {
                 const shinyCompletion = total ? Math.round((shinyCaught / total) * 100) : 0;
                 
                 const allCaughtInfos = [...regularEntries.map(([, info]) => info), ...shinyEntries.map(([, info]) => info)];
-                const gamesPlayed = new Set(allCaughtInfos.map(i => i.game).filter(Boolean)).size;
+                
+                // Extract all entries from the new data structure
+                const allEntries = [];
+                allCaughtInfos.forEach(info => {
+                    if (info.entries && Array.isArray(info.entries)) {
+                        // New format: extract entries
+                        info.entries.forEach(entry => {
+                            if (entry && (entry.ball || entry.mark || entry.game || entry.method)) {
+                                allEntries.push(entry);
+                            }
+                        });
+                    } else if (info.ball || info.mark || info.game || info.method) {
+                        // Old format: use the info directly
+                        allEntries.push(info);
+                    }
+                });
+                
+                const gamesPlayed = new Set(allEntries.map(i => i.game).filter(Boolean)).size;
 
-                const topBallKey = countTop(allCaughtInfos, "ball");
-                const topMarkKey = countTop(allCaughtInfos, "mark");
-                const topGameKey = countTop(allCaughtInfos, "game");
+                const topBallKey = countTop(allEntries, "ball");
+                const topMarkKey = countTop(allEntries, "mark");
+                const topGameKey = countTop(allEntries, "game");
                 const topBall = fromOptionsOrTitle(BALL_OPTIONS, topBallKey, " Ball");
                 const topMark = fromOptionsOrTitle(MARK_OPTIONS, topMarkKey, " Mark");
-                const topGame = fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) ? "Pokemon " + fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey) : null;
+                const topGame = fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey);
 
                 if (!ignore) setStats({ regularCaught, regularCompletion, shinyCaught, shinyCompletion, gamesPlayed, topBall, topMark, topGame });
 
