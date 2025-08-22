@@ -41,6 +41,24 @@ const calculateDistance = (a, b) => {
   return matrix[b.length][a.length];
 };
 
+// Whitelist of legitimate words that should never be blocked
+const LEGITIMATE_WORDS = new Set([
+  "chalk",
+  "monkey",
+  "chalkboard",
+  "chalky",
+  "monkeying",
+  "monkeyshines",
+  "monkeywrench",
+  "falling", // contains "fall" but is legitimate
+  "balloon", // contains "ball" but is legitimate
+  "chalky", // contains "chalk" but is legitimate
+  "monkeying", // contains "monkey" but is legitimate
+  "chalkboard", // contains "chalk" but is legitimate
+  "monkeywrench", // contains "monkey" but is legitimate
+  "monkeyshines" // contains "monkey" but is legitimate
+]);
+
 // Content filter configuration for different field types
 export const FILTER_CONFIGS = {
   username: {
@@ -94,9 +112,9 @@ export const FILTER_CONFIGS = {
 function normalizeText(text) {
   return text
     .toLowerCase()
-    // Common character substitutions (only actual obfuscation, not legitimate letters)
+    // Enhanced character substitutions (catch more bypass attempts)
     .replace(/[@4]/g, "a")
-    .replace(/[!1]/g, "i")
+    .replace(/[!1|/\\]/g, "i")  // Added | and \ for i
     .replace(/[3]/g, "e")
     .replace(/[5\$]/g, "s")
     .replace(/[7]/g, "t")
@@ -110,6 +128,30 @@ function normalizeText(text) {
     // Normalize multiple spaces to single space
     .replace(/\s+/g, " ")
     // Normalize repeated characters if they appear 3+ times (like fuuuuck -> fuuck, coooon -> coon)
+    .replace(/(.)\1{2,}/g, "$1$1")
+    .trim();
+}
+
+// Enhanced text normalization that preserves some special characters for better detection
+function normalizeTextForDetection(text) {
+  return text
+    .toLowerCase()
+    // Enhanced character substitutions (catch more bypass attempts)
+    .replace(/[@4]/g, "a")
+    .replace(/[!1|/\\]/g, "i")  // Added | and \ for i
+    .replace(/[3]/g, "e")
+    .replace(/[5\$]/g, "s")
+    .replace(/[7]/g, "t")
+    .replace(/[0]/g, "o")
+    .replace(/[8]/g, "b")
+    .replace(/[6]/g, "g")
+    .replace(/[2]/g, "z")
+    .replace(/[9]/g, "g")
+    // Keep some special characters for pattern detection
+    .replace(/[^ a-z0-9|/\\\-_]/g, "")
+    // Normalize multiple spaces to single space
+    .replace(/\s+/g, " ")
+    // Normalize repeated characters if they appear 3+ times
     .replace(/(.)\1{2,}/g, "$1$1")
     .trim();
 }
@@ -157,6 +199,11 @@ function containsBannedWordAsCompleteWord(text, bannedWord) {
   const words = text.split(/\s+/);
   
   for (const word of words) {
+    // Skip legitimate words that should never be blocked
+    if (LEGITIMATE_WORDS.has(word)) {
+      continue;
+    }
+    
     // Only check for exact word matches - no substring matching
     if (word === bannedWord) {
       return true;
@@ -218,9 +265,32 @@ function checkConcatenatedBannedWords(normalized, bannedWords) {
 // Advanced banned word detection (more intelligent)
 function containsBannedWords(text, similarityThreshold = 0.2) {
   const normalized = normalizeText(text);
+  const detectionNormalized = normalizeTextForDetection(text);
 
   // -1- Regex match for obfuscated high-severity slurs on raw text (case/Unicode-insensitive)
   for (const rx of bannedRegexes) {
+    if (rx.test(String(text || ''))) return true;
+  }
+
+  // Enhanced regex patterns for common bypass attempts
+  const enhancedBannedRegexes = [
+    // Catch "n|gger", "n/gger", "n\gger" patterns
+    /n[|/\\]gg[ae]r?/gi,
+    // Catch "n!gger", "n1gger" patterns  
+    /n[!1]gg[ae]r?/gi,
+    // Catch "n!gg@r", "n1gg4r" patterns
+    /n[!1]gg[@4]r/gi,
+    // Catch "f@gg0t", "f4gg0t" patterns
+    /f[@4]gg[0o]t/gi,
+    // Catch "f!gg0t", "f1gg0t" patterns
+    /f[!1]gg[0o]t/gi,
+    // Catch "ch@lk m0nkey" patterns
+    /ch[@4]lk\s*m[0o]nkey/gi,
+    // Catch "ch!lk m0nkey" patterns
+    /ch[!1]lk\s*m[0o]nkey/gi
+  ];
+
+  for (const rx of enhancedBannedRegexes) {
     if (rx.test(String(text || ''))) return true;
   }
 
@@ -230,16 +300,65 @@ function containsBannedWords(text, similarityThreshold = 0.2) {
     return true;
   }
   
+  // Check for "chalk monkey" and similar combinations
+  const chalkMonkeyPatterns = [
+    /\bchalk\s+monkey\b/gi,
+    /\bch@lk\s+monkey\b/gi,
+    /\bch!lk\s+monkey\b/gi,
+    /\bchalk\s+m0nkey\b/gi,
+    /\bch@lk\s+m0nkey\b/gi,
+    /\bch!lk\s+m0nkey\b/gi
+  ];
+  
+  for (const pattern of chalkMonkeyPatterns) {
+    if (pattern.test(String(text || ''))) return true;
+  }
+  
   // 0. Check for repeated character bypasses (like "coooon" containing "coon")
   if (checkRepeatedCharacterBypass(text, bannedWords)) {
     return true;
   }
   
   // 1. Block known high-severity substrings even when embedded (use normalized text)
+  // BUT be more intelligent to avoid false positives on legitimate content
   for (const sub of (bannedSubstrings || [])) {
     if (!sub) continue;
     const normSub = normalizeText(sub);
-    if (normSub && normalized.includes(normSub)) return true;
+    if (normSub && normalized.includes(normSub)) {
+      // Additional check: only block if this looks like a bypass attempt
+      // Don't block legitimate words that happen to contain the substring
+      
+      // Check if the substring appears as a complete word (more likely to be intentional)
+      if (containsBannedWordAsCompleteWord(normalized, normSub)) {
+        return true;
+      }
+      
+      // Check if the substring appears in a context that suggests bypass (like spaced out)
+      const spacedSub = normSub.split('').join(' ');
+      if (containsBannedWordAsCompleteWord(normalized, spacedSub)) {
+        return true;
+      }
+      
+      // For very short substrings (like "nigg"), be more careful to avoid false positives
+      if (normSub.length < 4) {
+        // Only block if it appears in a context that suggests it's part of a bypass
+        // This prevents "chalk" from blocking legitimate content
+        continue;
+      }
+      
+      // For longer substrings, check if they appear in a suspicious context
+      // This catches cases like "fuck" embedded in longer words
+      const words = normalized.split(/\s+/);
+      for (const word of words) {
+        if (word.includes(normSub) && word !== normSub) {
+          // Check if this looks like a bypass attempt (word is close to the banned substring)
+          const distance = calculateDistance(word, normSub);
+          if (distance <= 2 && word.length <= normSub.length + 3) {
+            return true;
+          }
+        }
+      }
+    }
   }
 
   // 1. Check for concatenated banned words (like "faggotfaggot")
@@ -274,12 +393,17 @@ function containsBannedWords(text, similarityThreshold = 0.2) {
       }
     }
     
-    // 4. Advanced pattern matching for obvious spaced words (more targeted)
-    if (detectObviousSpacedPattern(normalized, bannedWord)) {
+    // 4. Enhanced pattern matching for sophisticated bypasses
+    if (detectEnhancedSpacedPattern(detectionNormalized, bannedWord)) {
       return true;
     }
     
-    // 5. Similarity check using Levenshtein distance (as fallback, but more conservative)
+    // 5. Check for mixed character bypasses (like "n|gger" -> "nigger")
+    if (detectMixedCharacterBypass(detectionNormalized, bannedWord)) {
+      return true;
+    }
+    
+    // 6. Similarity check using Levenshtein distance (as fallback, but more conservative)
     const maxDistance = Math.max(1, Math.floor(bannedWord.length * similarityThreshold));
     const actualDistance = calculateDistance(normalized, bannedWord);
     
@@ -369,6 +493,115 @@ function detectObviousSpacedPattern(text, targetWord) {
           return true;
         }
       }
+    }
+  }
+  
+  return false;
+}
+
+// Enhanced spaced pattern detection for sophisticated bypasses
+function detectEnhancedSpacedPattern(text, targetWord) {
+  // First, use the original function
+  if (detectObviousSpacedPattern(text, targetWord)) {
+    return true;
+  }
+  
+  // NEW: Check for patterns with special characters like "n|gger" -> "nigger"
+  const specialCharPatterns = [
+    // Replace common bypass characters
+    { from: /[|/\\]/g, to: 'i' },
+    { from: /[@4]/g, to: 'a' },
+    { from: /[!1]/g, to: 'i' },
+    { from: /[3]/g, to: 'e' },
+    { from: /[0]/g, to: 'o' },
+    { from: /[5\$]/g, to: 's' },
+    { from: /[7]/g, to: 't' },
+    { from: /[8]/g, to: 'b' },
+    { from: /[6]/g, to: 'g' },
+    { from: /[2]/g, to: 'z' },
+    { from: /[9]/g, to: 'g' }
+  ];
+  
+  // Try different character substitution combinations
+  let testText = text;
+  for (const pattern of specialCharPatterns) {
+    testText = testText.replace(pattern.from, pattern.to);
+  }
+  
+  // Check if the substituted text contains the banned word
+  if (containsBannedWordAsCompleteWord(testText, targetWord)) {
+    return true;
+  }
+  
+  // Check for mixed patterns like "n| g g e r" (special chars + spacing)
+  const mixedPattern = targetWord.split('').map(char => {
+    if (char === 'i') return '[i|!1/\\\\]';
+    if (char === 'a') return '[a@4]';
+    if (char === 'e') return '[e3]';
+    if (char === 'o') return '[o0]';
+    if (char === 's') return '[s5\$]';
+    if (char === 't') return '[t7]';
+    if (char === 'b') return '[b8]';
+    if (char === 'g') return '[g69]';
+    if (char === 'z') return '[z2]';
+    return char;
+  }).join('\\s*');
+  
+  const mixedRegex = new RegExp(`\\b${mixedPattern}\\b`, 'gi');
+  if (mixedRegex.test(text)) {
+    return true;
+  }
+  
+  return false;
+}
+
+// Detect mixed character bypasses (like "n|gger" -> "nigger")
+function detectMixedCharacterBypass(text, targetWord) {
+  // Check for patterns where special characters are used to bypass
+  const bypassPatterns = [
+    // Common bypass character mappings
+    { char: 'i', bypass: /[|/\\!1]/g },
+    { char: 'a', bypass: /[@4]/g },
+    { char: 'e', bypass: /[3]/g },
+    { char: 'o', bypass: /[0]/g },
+    { char: 's', bypass: /[5\$]/g },
+    { char: 't', bypass: /[7]/g },
+    { char: 'b', bypass: /[8]/g },
+    { char: 'g', bypass: /[69]/g },
+    { char: 'z', bypass: /[2]/g }
+  ];
+  
+  // Try to reconstruct the original word by replacing bypass characters
+  let reconstructed = text;
+  for (const pattern of bypassPatterns) {
+    reconstructed = reconstructed.replace(pattern.bypass, pattern.char);
+  }
+  
+  // Check if the reconstructed text contains the banned word
+  if (containsBannedWordAsCompleteWord(reconstructed, targetWord)) {
+    return true;
+  }
+  
+  // Check for partial bypasses (some characters substituted, some not)
+  const partialPatterns = [];
+  for (const pattern of bypassPatterns) {
+    if (targetWord.includes(pattern.char)) {
+      // Create pattern that allows both the original character and bypass characters
+      const charPattern = `[${pattern.char}${pattern.bypass.source.replace(/[\[\]/]/g, '')}]`;
+      partialPatterns.push({ char: pattern.char, pattern: charPattern });
+    }
+  }
+  
+  // Build a flexible pattern for the target word
+  if (partialPatterns.length > 0) {
+    let flexiblePattern = targetWord;
+    for (const { char, pattern } of partialPatterns) {
+      flexiblePattern = flexiblePattern.replace(new RegExp(char, 'g'), pattern);
+    }
+    
+    const flexibleRegex = new RegExp(`\\b${flexiblePattern}\\b`, 'gi');
+    if (flexibleRegex.test(text)) {
+      return true;
     }
   }
   

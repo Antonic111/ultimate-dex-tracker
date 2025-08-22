@@ -727,6 +727,7 @@ export const bannedWords = [
 "zipperhead",
 "knuckledragger",
 "porch monkey",
+"chalk monkey",
 "nigg",
 "footjob",
 ];
