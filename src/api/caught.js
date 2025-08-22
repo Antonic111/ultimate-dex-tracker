@@ -14,12 +14,15 @@ export async function updateCaughtData(username, key, infoMap) {
   try {
     if (key) {
       // Atomic per-entry update to avoid race conditions
-      await caughtAPI.updateCaughtEntry(key, infoMap);
+      const result = await caughtAPI.updateCaughtEntry(key, infoMap);
+      return result;
     } else {
       // Full map update (from mark all operations)
-      await caughtAPI.updateCaughtData(infoMap);
+      const result = await caughtAPI.updateCaughtData(infoMap);
+      return result;
     }
   } catch (err) {
     console.error("updateCaughtData error:", err);
+    throw err;
   }
 }

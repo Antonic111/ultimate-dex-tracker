@@ -4,7 +4,7 @@ import DexView from "../components/Dex/DexView";
 import Sidebar from "../components/Dex/PokemonSidebar";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../data/forms.json";
-import { getCaughtKey } from "../caughtStorage";
+import { getCaughtKey, migrateOldCaughtData } from "../caughtStorage";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { useLoading } from "../components/Shared/LoadingContext";
 import { profileAPI } from "../utils/api";
@@ -94,7 +94,11 @@ export default function ViewDex() {
         (async () => {
             try {
                 const data = await profileAPI.getPublicCaughtData(username);
-                setCaughtInfoMap(data || {});
+                const caughtData = data?.caughtPokemon || {};
+                
+                // Migrate old data format to new entries format if needed
+                const migratedData = migrateOldCaughtData(caughtData);
+                setCaughtInfoMap(migratedData);
             } catch (error) {
                 // Handle error silently
             } finally {
@@ -295,6 +299,9 @@ export default function ViewDex() {
 
                 // Get caught info based on the current shiny toggle state
                 const caughtInfo = caughtInfoMap[getCaughtKey(pokemon, null, showShiny)];
+                
+                // Get the first entry for filtering (or use old structure for backward compatibility)
+                const firstEntry = caughtInfo?.entries?.[0] || caughtInfo;
 
                 // Search by name/dex
                 if (filters.searchTerm) {
@@ -307,16 +314,16 @@ export default function ViewDex() {
                 }
 
                 // Game filter
-                if (filters.game && caughtInfo?.game !== filters.game) return false;
+                if (filters.game && firstEntry?.game !== filters.game) return false;
                 
                 // Ball filter
-                if (filters.ball && caughtInfo?.ball !== filters.ball) return false;
+                if (filters.ball && firstEntry?.ball !== filters.ball) return false;
                 
                 // Mark filter
-                if (filters.mark && caughtInfo?.mark !== filters.mark) return false;
+                if (filters.mark && firstEntry?.mark !== filters.mark) return false;
                 
                 // Method filter
-                if (filters.method && caughtInfo?.method !== filters.method) return false;
+                if (filters.method && firstEntry?.method !== filters.method) return false;
                 
                 // Type filter
                 if (filters.type && !pokemon.types?.includes(filters.type)) return false;

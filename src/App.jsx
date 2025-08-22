@@ -165,6 +165,13 @@ function loadDexToggles() {
 
 function hasMeaningfulInfo(info) {
   if (!info) return false;
+  
+  // Handle new entries format
+  if (info.entries && Array.isArray(info.entries)) {
+    return info.entries.some(entry => hasMeaningfulInfo(entry));
+  }
+  
+  // Handle old format (direct fields)
   const { date, ball, mark, method, game, checks, notes } = info;
 
   // date filled?
@@ -286,10 +293,7 @@ export default function App() {
     checkAuth(false);
   }, []);
 
-  // Debug: Log user state changes
-  useEffect(() => {
-    
-  }, [user?.username, user?.progressBars, justLoggedIn]);
+
 
 useEffect(() => {
   // close sidebar on login/logout
@@ -320,6 +324,8 @@ useEffect(() => {
   const [toggles, setToggles] = useState(() => loadDexToggles());
   const showShiny = toggles.showShiny;
   const showForms = toggles.showForms;
+
+
   const setShowShiny = val => setToggles(prev => {
     const updated = { ...prev, showShiny: val };
     saveDexToggles(updated);
@@ -365,7 +371,7 @@ useEffect(() => {
       const newPreferences = getDexPreferences();
       setCurrentDexPreferences(newPreferences);
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('dexTogglesChanged', handleToggleChange);
     window.addEventListener('refreshDexPreferences', handleRefreshDexPreferences);
@@ -397,7 +403,21 @@ useEffect(() => {
       setCaughtInfoMap(data || {});
       const caughtMap = {};
       for (const key in data) {
-        caughtMap[key] = !!data[key];
+        const info = data[key];
+        // Check if Pokemon is actually caught (has entries or is marked as caught)
+        if (info && typeof info === 'object') {
+          // New format: check if it has entries or is marked as caught
+          if (info.entries && Array.isArray(info.entries) && info.entries.length > 0) {
+            caughtMap[key] = true;
+          } else if (info.caught === true) {
+            caughtMap[key] = true;
+          } else {
+            caughtMap[key] = false;
+          }
+        } else {
+          // Old format: simple boolean check
+          caughtMap[key] = !!info;
+        }
       }
       setCaught(caughtMap);
     });
@@ -435,13 +455,35 @@ useEffect(() => {
         setCaughtInfoMap(migratedData);
         // Save migrated data to backend
         updateCaughtData(user.username, null, migratedData).then(() => {
-          // Migration completed successfully
+          // Force a refresh of the caught data to ensure UI updates
+          fetchCaughtData(user.username).then(freshData => {
+            setCaughtInfoMap(freshData);
+            // Also refresh the caught state
+            const caughtMap = {};
+            for (const key in freshData) {
+              const info = freshData[key];
+              if (info && typeof info === 'object') {
+                if (info.entries && Array.isArray(info.entries) && info.entries.length > 0) {
+                  caughtMap[key] = true;
+                } else if (info.caught === true) {
+                  caughtMap[key] = true;
+                } else {
+                  caughtMap[key] = false;
+                }
+              } else {
+                caughtMap[key] = !!info;
+              }
+            }
+            setCaught(caughtMap);
+          });
         }).catch((error) => {
-          console.error("❌ Migration failed:", error);
+          console.error("Migration failed:", error);
         });
       }
     }
   }, [caughtInfoMap, user?.username]);
+
+
 
   function filterMons(list, forceShowForms = false, isShiny = false) {
     return list.filter(poke => {
@@ -452,6 +494,9 @@ useEffect(() => {
       
       // Get caught info for the appropriate shiny status
       const info = caughtInfoMap[getCaughtKey(poke, null, isShiny)] || {};
+      
+      // Get the first entry for filtering (or use old structure for backward compatibility)
+      const firstEntry = info.entries?.[0] || info;
 
       // Search by name/dex
       if (filters.searchTerm) {
@@ -470,13 +515,13 @@ useEffect(() => {
         if (!nameMatch && !dexMatch) return false;
       }
       // Game
-      if (filters.game && info.game !== filters.game) return false;
+      if (filters.game && firstEntry.game !== filters.game) return false;
       // Ball
-      if (filters.ball && info.ball !== filters.ball) return false;
+      if (filters.ball && firstEntry.ball !== filters.ball) return false;
       // Mark
-      if (filters.mark && info.mark !== filters.mark) return false;
+      if (filters.mark && firstEntry.mark !== filters.mark) return false;
       // Method
-      if (filters.method && info.method !== filters.method) return false;
+      if (filters.method && firstEntry.method !== filters.method) return false;
       // Type (must match at least one)
       if (filters.type && !(poke.types || []).includes(filters.type)) return false;
       // Gen
@@ -504,14 +549,18 @@ function CloseSidebarOnRouteChange() {
 
 
 
-function updateCaughtInfo(poke, info, isShiny = false) {
-  const key = getCaughtKey(poke, null, isShiny);
+  function updateCaughtInfo(poke, info, isShiny = false) {
+    const key = getCaughtKey(poke, null, isShiny);
+
+
 
   setCaughtInfoMap(prev => {
     // If we're resetting/clearing data
     if (info == null) {
+      console.log("  - Clearing data for key:", key);
       const updated = { ...prev, [key]: null };
       if (user?.username) {
+        console.log("  - Calling updateCaughtData with null");
         updateCaughtData(user.username, key, null); // persist delete
       }
       return updated;
@@ -528,8 +577,11 @@ function updateCaughtInfo(poke, info, isShiny = false) {
       delete cleanedInfo.checks;
     }
 
+    console.log("  - cleanedInfo:", cleanedInfo);
+
     const updated = { ...prev, [key]: cleanedInfo };
     if (user?.username) {
+      console.log("  - Calling updateCaughtData with:", cleanedInfo);
       updateCaughtData(user.username, key, cleanedInfo); // persist update
     }
     return updated;
@@ -579,14 +631,22 @@ function updateCaughtInfo(poke, info, isShiny = false) {
       if (shouldBeCaught) {
         // ✅ Only add fresh info if there isn't already info saved
         if (!newInfoMap[key]) {
-          const freshInfo = {
+          const newEntry = {
             date: "",
             ball: BALL_OPTIONS[0].value,
             mark: MARK_OPTIONS[0].value,
             method: METHOD_OPTIONS[0],
             game: GAME_OPTIONS[0].value,
-            notes: ""
+            checks: "",
+            notes: "",
+            entryId: Math.random().toString(36).substr(2, 9)
           };
+          
+          const freshInfo = {
+            caught: true,
+            entries: [newEntry]
+          };
+          
           newInfoMap[key] = freshInfo;
           delta[key] = freshInfo;
         }
@@ -613,12 +673,7 @@ function updateCaughtInfo(poke, info, isShiny = false) {
       // swallow; UI already updated optimistically
     }
 
-    if (selectedPokemon) {
-      const affected = box.find(p => getCaughtKey(p, null, isShiny) === getCaughtKey(selectedPokemon, null, isShiny));
-      if (affected) {
-        setSelectedPokemon({ ...selectedPokemon });
-      }
-    }
+
 
   }
 
@@ -644,14 +699,20 @@ function updateCaughtInfo(poke, info, isShiny = false) {
       const newState = { ...prev, [key]: !prev[key] };
 
       if (!prev[key]) {
-        const freshInfo = {
+        const newEntry = {
           date: "",
           ball: BALL_OPTIONS[0].value,
           mark: MARK_OPTIONS[0].value,
           method: METHOD_OPTIONS[0],
           game: GAME_OPTIONS[0].value,
+          checks: "",
           notes: "",
-          caughtAt: new Date().toISOString() // Add timestamp when Pokemon is marked as caught
+          entryId: Math.random().toString(36).substr(2, 9)
+        };
+
+        const freshInfo = {
+          caught: true,
+          entries: [newEntry]
         };
 
         setCaughtInfoMap(prevInfoMap => ({
@@ -675,9 +736,7 @@ function updateCaughtInfo(poke, info, isShiny = false) {
       return newState;
     });
 
-    if (sidebarOpen && (!selectedPokemon || getCaughtKey(selectedPokemon, null, isShiny) !== key)) {
-      setSelectedPokemon(poke);
-    }
+
   }
 
   let mergedMons = [];
@@ -895,17 +954,20 @@ function updateCaughtInfo(poke, info, isShiny = false) {
                           )}
 
 
-                        <Sidebar
-                          open={sidebarOpen}
-                          pokemon={selectedPokemon}
-                          onClose={() => {
-                            setSidebarOpen(false);
-                            setSelectedPokemon(null);
-                          }}
-                          caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon, null, showShiny)] : null}
-                          updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, showShiny)}
-                          showShiny={showShiny}
-                        />
+                        {selectedPokemon && (() => {
+                          const key = getCaughtKey(selectedPokemon, null, showShiny);
+                          const caughtInfo = caughtInfoMap[key];
+                          return (
+                            <Sidebar
+                              open={!!selectedPokemon}
+                              pokemon={selectedPokemon}
+                              onClose={() => setSelectedPokemon(null)}
+                              caughtInfo={caughtInfo}
+                              updateCaughtInfo={updateCaughtInfo}
+                              showShiny={showShiny}
+                            />
+                          );
+                        })()}
                       </>
                     ) : (
                       <PublicHome />

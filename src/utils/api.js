@@ -304,7 +304,7 @@ export const profileAPI = {
 
   // Get public caught data for a username
   async getPublicCaughtData(username) {
-    return api.get(`/caught/${encodeURIComponent(username)}/public`);
+    return api.get(`/public/dex/${encodeURIComponent(username)}`);
   },
 
   // Toggle profile like

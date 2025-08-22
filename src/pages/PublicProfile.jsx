@@ -289,7 +289,11 @@ export default function PublicProfile() {
         let ignore = false;
         (async () => {
             try {
-                const map = await profileAPI.getPublicCaughtData(username); // { [key]: info|null }
+                const response = await profileAPI.getPublicCaughtData(username); // { username: string, caughtPokemon: { [key]: info|null } }
+                
+                // Extract the actual caughtPokemon data from the response
+                const map = response?.caughtPokemon || {};
+                
                 // Only calculate stats if we have the profile owner's preferences
                 if (!profileOwnerPreferences) {
                     if (!ignore) setStats({ regularCaught: 0, regularCompletion: 0, shinyCaught: 0, shinyCompletion: 0, gamesPlayed: 0, topBall: null, topMark: null, topGame: null });

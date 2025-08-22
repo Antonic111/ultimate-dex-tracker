@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import User from "../models/User.js";
 import { Resend } from "resend";
 import dotenv from "dotenv";
@@ -507,10 +508,12 @@ router.get("/caught", authenticateUser, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: "User not found" });
+    
     // Ensure we return a plain object regardless of Map serialization
     const caught = user.caughtPokemon instanceof Map
       ? Object.fromEntries(user.caughtPokemon)
       : (user.caughtPokemon || {});
+    
     res.json(caught);
   } catch (err) {
     console.error('Error getting caught data:', err);
@@ -919,13 +922,17 @@ router.post("/account/delete/confirm", authenticateUser, async (req, res) => {
 router.get("/public/dex/:username", async (req, res) => {
   const user = await User.findOne({ username: req.params.username }).lean();
   if (!user) return res.status(404).json({ error: "User not found" });
-  if (user.profilePrivate) return res.status(403).json({ error: "This dex is private." });
+  if (user.isProfilePublic === false) return res.status(403).json({ error: "This dex is private." });
 
-  // Build the same caughtInfoMap shape you use in the app
-  const caughtInfoMap = user.caughtInfoMap || {}; // adapt to your schema/source
+  // Get the caughtPokemon data and convert Map to object if needed
+  const caughtPokemon = user.caughtPokemon instanceof Map
+    ? Object.fromEntries(user.caughtPokemon)
+    : (user.caughtPokemon || {});
 
-  res.json({ username: user.username, caughtInfoMap });
+  res.json({ username: user.username, caughtPokemon });
 });
+
+
 
 
 export default router;

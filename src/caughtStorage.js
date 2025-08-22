@@ -62,32 +62,152 @@ export function getPokemonCaughtStatus(poke, caughtMap) {
 
 // Migration helper: convert old caught data to new format
 export function migrateOldCaughtData(oldCaughtMap) {
+  // Handle null or undefined input
+  if (!oldCaughtMap || typeof oldCaughtMap !== 'object') {
+    return {};
+  }
+  
   const newCaughtMap = {};
   const migratedKeys = new Set();
   
   Object.entries(oldCaughtMap).forEach(([key, info]) => {
-    // If the key doesn't already have a shiny suffix, it's old data
-    if (!key.endsWith('_shiny')) {
-      // Check if this was likely a shiny Pokémon based on the data
-      const isLikelyShiny = detectLikelyShinyPokemon(key, info);
-      
-      if (isLikelyShiny) {
-        // This was likely a shiny, move it to shiny storage
-        const shinyKey = key + '_shiny';
-        newCaughtMap[shinyKey] = info;
-        migratedKeys.add(key);
-        console.log(`Migrated likely shiny Pokémon: ${key} → ${shinyKey}`);
+    // Skip null or undefined info values
+    if (info === null || info === undefined) {
+      return;
+    }
+    
+    // Check if this needs migration
+    if (info.entries && Array.isArray(info.entries) && info.entries.length > 0) {
+      // Already properly migrated with data, keep as is
+      newCaughtMap[key] = info;
+    } else if (info.hasOwnProperty('ball') || info.hasOwnProperty('mark') || info.hasOwnProperty('method') || info.hasOwnProperty('game') || info.hasOwnProperty('checks') || info.hasOwnProperty('date') || info.hasOwnProperty('notes')) {
+      // This is old format data, migrate it regardless of key
+      newCaughtMap[key] = migrateToEntriesFormat(info);
+    } else if (info.entries && Array.isArray(info.entries) && info.entries.length === 0) {
+      // Has entries structure but empty - this is a broken migration
+      // Check if there's old format data at the root level that should be moved into entries
+      if (info.hasOwnProperty('ball') || info.hasOwnProperty('mark') || info.hasOwnProperty('method') || info.hasOwnProperty('game') || info.hasOwnProperty('checks') || info.hasOwnProperty('date') || info.hasOwnProperty('notes')) {
+        // Move the old data into the first entry
+        const fixedData = {
+          ...info,
+          entries: [{
+            ball: info.ball || "",
+            mark: info.mark || "",
+            method: info.method || "",
+            game: info.game || "",
+            checks: info.checks || "",
+            date: info.date || "",
+            notes: info.notes || "",
+            entryId: Math.random().toString(36).substr(2, 9)
+          }]
+        };
+        // Clear the old fields from the root level
+        delete fixedData.ball;
+        delete fixedData.mark;
+        delete fixedData.method;
+        delete fixedData.game;
+        delete fixedData.checks;
+        delete fixedData.date;
+        delete fixedData.notes;
+        
+        newCaughtMap[key] = fixedData;
       } else {
-        // Keep as regular Pokémon
-        newCaughtMap[key] = info;
+        // Empty entries with no old data, but Pokemon is caught - create default entry
+        if (info.caught === true) {
+          const defaultEntry = {
+            ...info,
+            entries: [{
+              ball: "",
+              mark: "",
+              method: "",
+              game: "",
+              checks: "",
+              date: "",
+              notes: "",
+              entryId: Math.random().toString(36).substr(2, 9)
+            }]
+          };
+          newCaughtMap[key] = defaultEntry;
+        } else {
+          // Empty entries with no old data, keep as is
+          newCaughtMap[key] = info;
+        }
       }
+    } else if (info.caught === true) {
+      // Pokemon is marked as caught but has no entries structure - create default entry
+      const defaultEntry = {
+        caught: true,
+        entries: [{
+          ball: "",
+          mark: "",
+          method: "",
+          game: "",
+          checks: "",
+          date: "",
+          notes: "",
+          entryId: Math.random().toString(36).substr(2, 9)
+        }]
+      };
+      newCaughtMap[key] = defaultEntry;
     } else {
-      // This is already new format data, keep it
+      // Simple data (boolean, empty object), keep as is
       newCaughtMap[key] = info;
     }
   });
   
   return newCaughtMap;
+}
+
+// Helper function to migrate old data structure to new entries format
+function migrateToEntriesFormat(oldInfo) {
+  // Handle null or undefined input
+  if (oldInfo === null || oldInfo === undefined) {
+    return null;
+  }
+  
+  // If it's already in the new format with actual data, return as is
+  if (oldInfo.entries && Array.isArray(oldInfo.entries) && oldInfo.entries.length > 0) {
+    return oldInfo;
+  }
+  
+  // If it's the old format (has ball, mark, etc. directly), convert to entries
+  if (oldInfo.hasOwnProperty('ball') || oldInfo.hasOwnProperty('mark') || oldInfo.hasOwnProperty('method') || oldInfo.hasOwnProperty('game') || oldInfo.hasOwnProperty('checks') || oldInfo.hasOwnProperty('date') || oldInfo.hasOwnProperty('notes')) {
+    const newFormat = {
+      caught: true,
+      entries: [{
+        ball: oldInfo.ball || "",
+        mark: oldInfo.mark || "",
+        method: oldInfo.method || "",
+        game: oldInfo.game || "",
+        checks: oldInfo.checks || "",
+        date: oldInfo.date || "",
+        notes: oldInfo.notes || "",
+        entryId: Math.random().toString(36).substr(2, 9)
+      }]
+    };
+    return newFormat;
+  }
+  
+  // If it's marked as caught but has no specific data, create default entry
+  if (oldInfo.caught === true) {
+    const defaultFormat = {
+      caught: true,
+      entries: [{
+        ball: "",
+        mark: "",
+        method: "",
+        game: "",
+        checks: "",
+        date: "",
+        notes: "",
+        entryId: Math.random().toString(36).substr(2, 9)
+      }]
+    };
+    return defaultFormat;
+  }
+  
+  // If it's just a boolean or empty object, keep as is
+  return oldInfo;
 }
 
 
@@ -117,8 +237,8 @@ function detectLikelyShinyPokemon(key, info) {
   }
   
   // Check if the user added a note about it being shiny
-  if (info.note && typeof info.note === 'string') {
-    const note = info.note.toLowerCase();
+  if (info.notes && typeof info.notes === 'string') {
+    const note = info.notes.toLowerCase();
     const shinyKeywords = [
       'shiny', '✨', 'sparkle', 'star', 'golden', 'alternate color',
       'different color', 'rare color', 'special color'
@@ -134,7 +254,7 @@ function detectLikelyShinyPokemon(key, info) {
   }
   
   // Only migrate from high shiny probability games if other indicators are present
-  const hasOtherIndicators = info.method || info.note || (info.ball && info.ball.toLowerCase().includes('master'));
+  const hasOtherIndicators = info.method || info.notes || (info.ball && info.ball.toLowerCase().includes('master'));
   if (hasOtherIndicators && info.game && typeof info.game === 'string') {
     const game = info.game.toLowerCase();
     const shinyGames = ['go', 'legends', 'scarlet', 'violet', 'sword', 'shield'];

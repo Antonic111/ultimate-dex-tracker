@@ -121,6 +121,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                     <Database size={16} className="dropdown-icon" />
                     Backup
                   </Link>
+
                   <button
                     className="dropdown-item"
                     onClick={async () => {

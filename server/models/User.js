@@ -37,13 +37,16 @@ const userSchema = new mongoose.Schema({
     type: Map,
     of: new mongoose.Schema({
       caught: Boolean,
-      ball: String,
-      mark: String,
-      method: String,
-      game: String,
-      checks: Number,
-      date: String,
-      notes: String,
+      entries: [{
+        ball: String,
+        mark: String,
+        method: String,
+        game: String,
+        checks: Number,
+        date: String,
+        notes: String,
+        entryId: { type: String, default: () => Math.random().toString(36).substr(2, 9) }
+      }]
     }, { _id: false }),
     default: new Map(),
   },

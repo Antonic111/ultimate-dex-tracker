@@ -508,6 +508,313 @@ select {
   box-sizing: border-box;
 }
 
+/* --- Simple Entries Display --- */
+.entries-display {
+  margin-bottom: 1em;
+}
+
+.entries-warning {
+  text-align: center;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.warning-text {
+  color: #ff4444;
+  font-size: 1rem;
+  font-weight: 500;
+  background-color: rgba(255, 68, 68, 0.1);
+  padding: 0.4em 0.8em;
+  border-radius: 0.5em;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  display: inline-block;
+}
+
+
+
+.entries-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+.entries-page-buttons {
+  display: flex;
+  gap: 0.5em;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.entries-page-btn {
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 0.3em;
+  padding: 0.4em 0.8em;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 2.5em;
+  text-align: center;
+}
+
+.entries-page-btn:hover {
+  background: #e0e0e0;
+  border-color: #bbb;
+}
+
+.entries-page-btn.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.entries-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8em;
+  margin-bottom: 1.5em;
+  min-height: 2em; /* Match the height of individual entry buttons */
+  flex-wrap: wrap;
+}
+
+/* Pagination styles matching the trainers page */
+.entries-pagination {
+  margin-bottom: 1em;
+}
+
+.pagination-info {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.5em;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 0.3em;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--accent-dark, #d32f2f);
+  color: #fff;
+}
+
+.pagination-btn:disabled {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 0.3em;
+  align-items: center;
+}
+
+.page-btn {
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 0.3em;
+  padding: 0.4em 0.8em;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 2.5em;
+  text-align: center;
+}
+
+.page-btn:hover {
+  background: #e0e0e0;
+  border-color: #bbb;
+}
+
+.page-btn.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.page-ellipsis {
+  color: #666;
+  font-weight: 500;
+  padding: 0 0.5em;
+}
+
+.entry-button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3em;
+  position: relative;
+  min-height: 2em; /* Match the height of the entry buttons */
+}
+
+.entry-circle-btn {
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: var(--sidebar-display);
+  color: var(--accent);
+  font-weight: bold;
+  font-size: 1em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  box-shadow: 0 2px 6px #0004;
+  line-height: 1;
+  padding: 0;
+  text-align: center;
+  outline: none;
+}
+
+.entry-circle-btn:hover:not(.active) {
+  color: #fff !important;
+  background: var(--sidebar-display) !important;
+  outline: none !important;
+  border: 2px solid var(--accent) !important;
+}
+
+.entry-circle-btn.active {
+  background: var(--accent);
+  color: #000;
+  border: 2px solid var(--accent);
+  outline: none;
+}
+
+
+
+
+
+.add-entry-circle-btn {
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  border: 2px solid var(--sidebar-display);
+  background: var(--sidebar-display);
+  color: var(--accent);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  box-shadow: 0 2px 6px #0004;
+  font-weight: bold;
+  font-size: 1.2em;
+  line-height: 1;
+  padding: 0;
+  text-align: center;
+  font-family: monospace;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.add-entry-circle-btn:hover {
+  color: #fff !important;
+  background: var(--sidebar-display) !important;
+  outline: none !important;
+  border: 2px solid var(--sidebar-display) !important;
+}
+
+.add-entry-circle-btn.disabled {
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  color: #9ca3af !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+
+.add-entry-circle-btn.disabled:hover {
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  color: #9ca3af !important;
+  cursor: not-allowed !important;
+}
+
+.delete-entry-btn-small {
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  border: 1px solid #ff4444;
+  background: #ff4444;
+  color: white;
+  font-weight: bold;
+  font-size: 0.7em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease, transform 0.1s ease;
+  line-height: 1;
+  padding: 0;
+  position: absolute;
+  top: -0.15em;
+  right: -0.15em;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  font-family: monospace; /* Better × symbol rendering */
+  outline: none !important; /* Remove default browser outline */
+  border: 1px solid #ff4444 !important; /* Ensure only our red border */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important; /* Ensure only our shadow */
+}
+
+.delete-entry-btn-small:hover {
+  background: #ff6666;
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.delete-entry-btn {
+  background: #e62829 !important;
+  color: white !important;
+  border-color: #e62829 !important;
+}
+
+.delete-entry-btn:hover,
+.delete-entry-btn:focus,
+.delete-entry-btn:active {
+  background: #b91c1c !important;
+  border-color: #b91c1c !important;
+  color: white !important;
+}
+
+/* Override any conflicting hover styles from entry-circle-btn */
+.entry-circle-btn.delete-entry-btn:hover,
+.entry-circle-btn.delete-entry-btn:focus,
+.entry-circle-btn.delete-entry-btn:active {
+  background: #b91c1c !important;
+  border-color: #b91c1c !important;
+  color: white !important;
+}
+
+
+
 /* --- Info Cards and Other Details (unchanged) --- */
 .sidebar-caught-info-list {
   display: flex;
@@ -578,13 +885,16 @@ select {
 }
 
 .not-caught-text {
-  color: #ff4141;
-  font-weight: bold;
-  font-size: 1.2rem;
+  color: #ff4444;
+  font-size: 1rem;
+  font-weight: 500;
+  background-color: rgba(255, 68, 68, 0.1);
+  padding: 0.4em 0.8em;
+  border-radius: 0.5em;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  display: inline-block;
   text-align: center;
-  letter-spacing: 1px;
   margin-bottom: 1em;
-  text-shadow: 0 1px 3px #000, 0 0 6px #c00;
 }
 
 .set-caught-btn {
@@ -599,10 +909,14 @@ select {
 }
 
 .no-data-message {
-  color: #ff4141;
-  font-weight: bold;
-  font-size: 1.2rem;
+  color: #ff4444;
+  font-size: 1rem;
+  font-weight: 500;
+  background-color: rgba(255, 68, 68, 0.1);
+  padding: 0.4em 0.8em;
+  border-radius: 0.5em;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  display: block;
   text-align: center;
-  margin: 5px 0 0 0;
-  text-shadow: 0 1px 3px #000, 0 0 6px #c00;
+  margin: 0.5em auto;
 }
