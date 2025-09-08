@@ -1,0 +1,108 @@
+/* ================================
+   PUBLIC DEX PAGE STYLES
+==================================*/
+
+/* Profile Viewing Header */
+.profile-viewing-header {
+  text-align: center;
+  margin: 40px 0 20px 0;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.profile-viewing-header h1 {
+  color: var(--text);
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0;
+  transition: color var(--transition-speed);
+}
+
+.profile-viewing-header .username {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* Mobile responsive header */
+@media (max-width: 768px) {
+  .profile-viewing-header {
+    margin: 20px 0 16px 0;
+    padding: 0 12px;
+  }
+  
+  .profile-viewing-header h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-viewing-header {
+    margin: 16px 0 12px 0;
+    padding: 0 8px;
+  }
+  
+  .profile-viewing-header h1 {
+    font-size: 1.75rem;
+    line-height: 1.1;
+  }
+}
+
+/* Sidebar Not Caught Message - From Backup */
+.sidebar-not-caught {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 5px 0 0 0;
+}
+
+.sidebar-not-caught-text {
+  color: #ff4444;
+  font-size: 1rem;
+  font-weight: 500;
+  background-color: rgba(255, 68, 68, 0.1);
+  padding: 0.4em 0.8em;
+  border-radius: 0.5em;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  display: inline-block;
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+/* Sidebar Message - Same styling as not caught */
+.sidebar-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 5px 0 0 0;
+}
+
+.sidebar-message div {
+  color: #ff4444;
+  font-size: 1rem;
+  font-weight: 500;
+  background-color: rgba(255, 68, 68, 0.1);
+  padding: 0.4em 0.8em;
+  border-radius: 0.5em;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  display: inline-block;
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+/* Mobile responsive sidebar text */
+@media (max-width: 768px) {
+  .sidebar-not-caught-text,
+  .sidebar-message div {
+    font-size: 0.9rem;
+    padding: 0.3em 0.6em;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar-not-caught-text,
+  .sidebar-message div {
+    font-size: 0.85rem;
+    padding: 0.25em 0.5em;
+  }
+}

@@ -47,7 +47,7 @@ export default function DexPreferences() {
             const profile = await profileAPI.getProfile();
             if (profile?.dexPreferences) {
                 const merged = { ...defaultPreferences, ...profile.dexPreferences };
-                setPreferences(prev => ({ ...prev, ...merged }));
+                setPreferences(merged);
                 // Also save to localStorage as backup
                 localStorage.setItem('dexPreferences', JSON.stringify(merged));
             }
@@ -73,13 +73,13 @@ export default function DexPreferences() {
         try {
             setSaving(true);
             await profileAPI.updateDexPreferences(newPreferences);
-            showMessage("✅ Dex preferences updated!", "success");
+            showMessage("Dex preferences updated!", "success");
             
             // Dispatch event to notify App component of preference changes
             window.dispatchEvent(new CustomEvent('dexPreferencesChanged'));
         } catch (error) {
             console.error('Failed to save dex preferences:', error);
-            showMessage("❌ Failed to save preferences", "error");
+            showMessage("Failed to save preferences", "error");
             // Revert on error
             setPreferences(previous);
             localStorage.setItem('dexPreferences', JSON.stringify(previous));
@@ -124,7 +124,6 @@ export default function DexPreferences() {
                     </div>
                 ))}
             </div>
-            
 
         </div>
     );

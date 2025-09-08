@@ -13,7 +13,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: var(--z-dropdown);
+  z-index: 10001;
   animation: fadeIn 0.3s ease-out;
 }
 
@@ -25,12 +25,12 @@
 .favorite-modal {
   height: 65vh;
   max-height: 65vh;
-  width: 90%;
+  width: 85%;
   max-width: 650px;
   background-color: var(--profile-modal-bg);
   transition: background-color var(--transition-speed );
   border-radius: 12px;
-  padding: 20px;
+  padding: 18px;
   position: relative;
   animation: slideIn 0.3s ease-out;
   display: flex;
@@ -96,7 +96,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #333;
   margin-bottom: 5px;
   flex-shrink: 0;
 }
@@ -104,51 +103,76 @@
 .favorite-modal-header h2 {
   font-size: 1.4rem;
   color: var(--accent);
+  font-weight: 700;
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 1.2rem;
-  color: #aaa;
+  padding: 0;
   cursor: pointer;
 }
 
-/* Scrollable Grid Section */
+.close-btn .sidebar-close-icon svg {
+  display: block;
+  transition: transform 0.18s, filter 0.18s;
+}
+
+.close-btn:hover .sidebar-close-icon svg,
+.close-btn:focus .sidebar-close-icon svg {
+  transform: scale(1.13) rotate(-17deg);
+  filter: drop-shadow(0 0 6px #ffffff77);
+}
+
+.close-btn:focus,
+.close-btn:active {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Scrollable Grid Section - Desktop Default */
 .favorite-grid {
   display: grid;
-  /* Exactly 6 columns, fixed size squares */
-  grid-template-columns: repeat(6, var(--fav-size));
-  gap: var(--fav-gap);
-  padding: 8px 16px 8px 0px; /* extra right padding for scrollbar */
-  margin-left: -8px; /* pull grid flush to the left edge */
+  grid-template-columns: repeat(6, 90px);
+  gap: 10px;
+  padding: 8px 16px 8px 0px;
+  margin-left: -8px;
   overflow-y: auto;
   overflow-x: hidden;
   flex: 1;
   min-height: 0;
   align-items: start;
-  align-content: start; /* pack rows at the top, avoid big vertical gaps */
+  align-content: start;
   justify-items: center;
   justify-content: start;
-  /* Reserve space for scrollbar to avoid overlaying content (Chromium/Firefox) */
   scrollbar-gutter: stable both-edges;
   scrollbar-width: auto;
-  /* Consistent row height to keep square tracks */
-  grid-auto-rows: var(--fav-size);
+  grid-auto-rows: 90px;
 }
 
-/* Clean, subtle scrollbar styling */
-.favorite-grid::-webkit-scrollbar { width: 12px; }
+/* Use the same scrollbar styling as dropdowns */
+.favorite-grid {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--searchbar-dropdown);
+}
+
+.favorite-grid::-webkit-scrollbar {
+  width: 12px;
+}
+
 .favorite-grid::-webkit-scrollbar-track {
-  background: #1b1b1b;
-  border-radius: 8px;
+  background: var(--searchbar-dropdown);
+  border-radius: 4px;
 }
+
 .favorite-grid::-webkit-scrollbar-thumb {
-  background: #3a3a3a;
-  border-radius: 8px;
+  background: var(--accent);
+  border-radius: 4px;
+  border: 1px solid var(--searchbar-dropdown);
 }
+
 .favorite-grid::-webkit-scrollbar-thumb:hover {
-  background: #5a5a5a;
+  background: var(--accent-hover);
 }
 
 .favorite-item {
@@ -165,11 +189,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  height: var(--fav-size);
-  max-height: var(--fav-size);
+  height: 90px;
+  max-height: 90px;
   overflow: hidden;
-  width: var(--fav-size);
-  min-width: var(--fav-size);
+  width: 90px;
+  min-width: 90px;
 }
 
 .favorite-item:hover {
@@ -245,7 +269,7 @@
   border: none;
   border-radius: 6px;
   padding: 8px 16px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
@@ -261,6 +285,8 @@
   margin: 6px 0 8px;
   width: 100%;
   flex-shrink: 0;
+  border-bottom: 2px solid #333;
+  padding-bottom: 8px;
 }
 
 .favorite-modal-search-row input {
@@ -276,17 +302,71 @@
 }
 
 .switch-label {
-  margin-right: 54px;
   margin-left: 20px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch-emoji {
+  font-size: 1.2rem;
+  transition: color 0.2s ease;
 }
 
 .switch-emoji.inactive {
   color: #777;
+  opacity: 0.5;
+  filter: grayscale(100%);
 }
 
 .switch-emoji.active {
   color: var(--accent);
+  opacity: 1;
+}
+
+/* Create a proper toggle switch */
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  margin-left: 8px;
+}
+
+.toggle-track {
+  width: 100%;
+  height: 100%;
+  background: #333;
+  border-radius: 12px;
+  border: 2px solid #555;
+  transition: background 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: var(--accent);
+  border-radius: 50%;
+  transition: transform 0.3s ease, background 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  pointer-events: none;
+}
+
+/* Toggle switch states */
+.switch-label input:checked ~ .toggle-track {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.switch-label input:checked ~ .toggle-knob {
+  transform: translateX(20px);
+  background: white;
 }
 
 .clear-btn {
@@ -304,4 +384,84 @@
 .clear-btn:hover {
   background-color: #fd3333;
 }
+
+/* Mobile responsiveness - Tablet */
+@media (max-width: 768px) {
+  .favorite-modal {
+    width: 95%;
+    max-width: 95vw;
+    height: 80vh;
+    max-height: 80vh;
+    padding: 15px;
+  }
+  
+  .favorite-grid {
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    gap: 8px;
+    padding: 8px 8px 8px 0px;
+    margin-left: 0;
+    grid-auto-rows: 70px;
+  }
+  
+  .favorite-item {
+    height: 70px;
+    max-height: 70px;
+    width: 70px;
+    min-width: 70px;
+  }
+  
+  .favorite-img {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .favorite-label {
+    font-size: 0.7rem;
+  }
+  
+  .favorite-modal-search-row {
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  .switch-label {
+    margin: 0;
+    flex-shrink: 0;
+  }
+}
+
+/* Mobile responsiveness - Phone */
+@media (max-width: 480px) {
+  .favorite-modal {
+    width: 98%;
+    max-width: 98vw;
+    padding: 12px;
+  }
+  
+  .favorite-grid {
+    grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
+    gap: 6px;
+    padding: 8px 8px 8px 0px;
+    margin-left: 0;
+    grid-auto-rows: 65px;
+  }
+  
+  .favorite-item {
+    height: 65px;
+    max-height: 65px;
+    width: 65px;
+    min-width: 65px;
+  }
+  
+  .favorite-img {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .favorite-label {
+    font-size: 0.65rem;
+  }
+}
+
 

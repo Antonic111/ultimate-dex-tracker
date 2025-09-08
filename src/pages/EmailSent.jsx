@@ -4,6 +4,7 @@ import { useMessage } from "../components/Shared/MessageContext";
 import { useUser } from "../components/Shared/UserContext";
 import { KeyRound, Mail, Lightbulb, CheckCircle, Smartphone } from "lucide-react";
 import { authAPI } from "../utils/api";
+import "../css/EmailSent.css";
 
 const EmailSent = () => {
   const [searchParams] = useSearchParams();
@@ -20,7 +21,7 @@ const EmailSent = () => {
   useEffect(() => {
     // Only run once when component mounts
     if (!email) {
-      showMessage("❌ Missing email", "error");
+              showMessage("Missing email", "error");
       navigate("/register");
     } else {
       sessionStorage.setItem("verifyEmail", email);
@@ -39,14 +40,14 @@ const EmailSent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !code) {
-      showMessage("❌ Please enter the code", "error");
+              showMessage("Please enter the code", "error");
       return;
     }
 
     setLoading(true);
     try {
       const data = await authAPI.verifyCode(email, code);
-      showMessage("✅ Email verified! Welcome!", "success");
+              showMessage("Email verified! Welcome!", "success");
       
       // Set user data and navigate to home
       setUser({
@@ -59,7 +60,7 @@ const EmailSent = () => {
       // Navigate to home page - App.jsx will handle authentication check
       navigate("/", { replace: true });
     } catch (err) {
-      showMessage("❌ Server error", "error");
+              showMessage("Server error", "error");
     } finally {
       setLoading(false);
     }
@@ -73,13 +74,13 @@ const EmailSent = () => {
       showMessage("📨 Verification email resent!", "success");
       setResendCooldown(30); // Start 30-second cooldown
     } catch {
-      showMessage("❌ Failed to resend email", "error");
+              showMessage("Failed to resend email", "error");
     }
   };
 
   return (
-    <div className="auth-form page-container auth-page">
-      <h2>VERIFY YOUR EMAIL</h2>
+    <div className="email-sent-form page-container auth-page">
+      <h2 className="email-sent-title">VERIFY YOUR EMAIL</h2>
       <div className="email-sent-message">
         <p>
           <Mail className="auth-icon" size={20} /> A 6-digit verification code was sent to:
@@ -88,7 +89,7 @@ const EmailSent = () => {
           <span className="instruction">Enter the code below to verify your account.</span>
         </p>
       </div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="email-sent-form-fields">
         <div className="input-icon-wrapper">
           <KeyRound className="auth-icon" size={20} />
           <input
@@ -96,12 +97,13 @@ const EmailSent = () => {
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="Enter 6-digit code"
+            className="email-sent-input"
             required
             maxLength={6}
           />
         </div>
 
-        <button type="submit" disabled={loading}>
+        <button type="submit" className="email-sent-button" disabled={loading}>
           {loading ? "Verifying..." : "Verify"}
         </button>
 
@@ -109,8 +111,7 @@ const EmailSent = () => {
           type="button"
           onClick={handleResend}
           disabled={resendCooldown > 0}
-          className="auth-button resend-button"
-          style={{ marginTop: "10px" }}
+          className="resend-button"
         >
           {resendCooldown > 0
             ? `Resend Email (${resendCooldown}s)`

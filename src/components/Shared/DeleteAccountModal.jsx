@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useMessage } from "./MessageContext";
 import { userAPI } from "../../utils/api";
+import LoadingButton from "./LoadingButton";
 import "../../css/DeleteAccountModal.css";
 
 export default function DeleteAccountModal({ isOpen, email, username, onClose, onDeleted }) {
@@ -66,7 +67,7 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
     try {
       setDeleting(true);
       await userAPI.confirmDeleteAccount(code, username);
-      showMessage("🗑️ Account deleted", "success");
+              showMessage("Account deleted", "success");
       onDeleted?.();
     } catch (e) {
       showMessage(e.message, "error");
@@ -76,22 +77,26 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
   };
 
   useEffect(() => {
-    const body = document.body;
-    const html = document.documentElement;
+    const preventScroll = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    };
 
     if (isOpen) {
-      body.classList.add("modal-open");
-      html.classList.add("modal-open");
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('wheel', preventScroll, { passive: false });
+      document.addEventListener('touchmove', preventScroll, { passive: false });
     } else {
-      setTimeout(() => {
-        body.classList.remove("modal-open");
-        html.classList.remove("modal-open");
-      }, closing ? 320 : 0);
+      document.body.style.overflow = '';
+      document.removeEventListener('wheel', preventScroll);
+      document.removeEventListener('touchmove', preventScroll);
     }
-
+    
     return () => {
-      body.classList.remove("modal-open");
-      html.classList.remove("modal-open");
+      document.body.style.overflow = '';
+      document.removeEventListener('wheel', preventScroll);
+      document.removeEventListener('touchmove', preventScroll);
     };
   }, [isOpen]);
 
@@ -104,13 +109,16 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
         </p>
 
         <div className="modal-row">
-          <button 
-            className={`modal-btn ${emailCooldown > 0 ? 'modal-btn--disabled' : ''}`}
-            onClick={sendCode} 
-            disabled={sending || emailCooldown > 0}
+          <LoadingButton 
+            variant="primary"
+            size="medium"
+            loading={sending}
+            loadingText="Sending..."
+            disabled={emailCooldown > 0}
+            onClick={sendCode}
           >
-            {sending ? "Sending…" : emailCooldown > 0 ? `Resend in ${emailCooldown}s` : "Send code"}
-          </button>
+            {emailCooldown > 0 ? `Resend in ${emailCooldown}s` : "Send code"}
+          </LoadingButton>
         </div>
 
         <form onSubmit={confirmDelete}>
@@ -134,12 +142,24 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
           />
 
           <div className="modal-row">
-            <button type="submit" className="modal-btn modal-btn--danger" disabled={!canDelete || deleting}>
-              {deleting ? "Deleting…" : "Delete Account"}
-            </button>
-            <button type="button" className="modal-btn modal-btn--link" onClick={handleClose}>
+            <LoadingButton 
+              type="submit" 
+              variant="danger"
+              size="medium"
+              loading={deleting}
+              loadingText="Deleting..."
+              disabled={!canDelete}
+            >
+              Delete Account
+            </LoadingButton>
+            <LoadingButton 
+              type="button" 
+              variant="secondary"
+              size="medium"
+              onClick={handleClose}
+            >
               Cancel
-            </button>
+            </LoadingButton>
           </div>
         </form>
       </div>

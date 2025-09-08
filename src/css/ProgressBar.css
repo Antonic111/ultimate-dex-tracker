@@ -6,14 +6,13 @@ button:focus {
   outline: none;
 }
 
-
 * {
   box-sizing: border-box;
 }
+
 body {
   font-family: 'Segoe UI', sans-serif;
 }
-
 
 /* ================================
    PROGRESS BAR DISPLAY SECTION
@@ -24,7 +23,7 @@ body {
   padding: 10px;
   border-radius: 8px;
   background-color: var(--progressbar-bg);
-  transition: background-color var(--transition-speed );
+  transition: background-color var(--transition-speed);
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
 }
 
@@ -44,10 +43,9 @@ body {
 .progress-bar-summary {
   font-size: 0.95rem;
   color: var(--progressbar-info);
-  transition: color var(--transition-speed );
+  transition: color var(--transition-speed);
   text-align: right;
 }
-
 
 .progress-bar-count {
   opacity: 0.75;
@@ -58,7 +56,7 @@ body {
   height: 18px;
   width: 100%;
   background-color: var(--progressbar-track);
-  transition: background-color var(--transition-speed );
+  transition: background-color var(--transition-speed);
   border-radius: 999px;
 }
 
@@ -69,33 +67,210 @@ body {
   border-radius: 999px;
 }
 
-.progress-bar-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-  gap: 0px 20px;
-}
+/* Progress bars grid is now handled by Tailwind classes */
 
 .progress-bar-grid-item {
   width: 100%;
-}
-
-.progress-bar-grid.odd-count .progress-bar-grid-item:last-child {
-  grid-column: span 2;
 }
 
 /* ================================
    PROGRESS MANAGER: WRAPPER + MODAL
 ==================================*/
 
-.progress-manager-wrapper {
-  margin: 32px auto;
+/* Progress Manager Container */
+.progress-manager-container {
   max-width: 1300px;
   width: 100%;
-  padding: 0px 16px 16px 16px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .progress-manager-container {
+    max-width: calc(100% - 32px);
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .progress-manager-container {
+    max-width: calc(100% - 24px);
+    margin: 0 auto;
+  }
+}
+
+.progress-manager-wrapper {
+  margin: 32px auto;
+  max-width: 100%;
+  width: 100%;
+  padding: 0px 16px 4px 16px;
   background-color: var(--progress-bg);
-  transition: background-color var(--transition-speed );
+  transition: background-color var(--transition-speed);
   border-radius: 8px;
   box-shadow: 0 4px 12px #0006;
+}
+
+@media (max-width: 768px) {
+  .progress-manager-wrapper {
+    max-width: 100%;
+    margin: 12px 16px;
+    padding: 0px 8px 2px 8px;
+  }
+  
+  .progress-title {
+    font-size: 1rem;
+    margin: 8px 0px;
+  }
+  
+  .progress-header-row {
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .progress-settings-btn {
+    transform: scale(0.8);
+  }
+  
+  /* Scale progress bars for mobile */
+  .progress-bar {
+    min-height: 24px;
+    padding: 4px 8px;
+    margin-bottom: 6px;
+    font-size: 0.75rem;
+  }
+  
+  .progress-bar-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  
+  .progress-bar-text {
+    font-size: 0.65rem;
+    line-height: 1.2;
+  }
+  
+  .progress-bar-percentage {
+    font-size: 0.65rem;
+    font-weight: 600;
+  }
+  
+  .bar-filter-editor {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  
+  /* Ensure progress bars fit mobile width */
+  .progress-bar {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .progress-bar-fill {
+    max-width: 100%;
+    height: 4px;
+    border-radius: 2px;
+  }
+  
+  .progress-bar-content {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  /* Make progress bar elements more compact */
+  .progress-bar-header {
+    margin-bottom: 2px;
+  }
+  
+  .progress-bar-stats {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  
+  /* Compact chip filters */
+  .chip-filter-chips {
+    min-height: 24px;
+    padding: 2px 4px;
+  }
+  
+  .chip {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .progress-manager-wrapper {
+    max-width: 100%;
+    margin: 8px 12px;
+    padding: 0px 4px 4px 4px;
+  }
+  
+  .progress-title {
+    font-size: 0.9rem;
+    margin: 6px 0px;
+  }
+  
+  .progress-settings-btn {
+    transform: scale(0.7);
+  }
+  
+  /* Ultra-compact progress bars for very small screens */
+  .progress-bar {
+    min-height: 20px;
+    padding: 3px 6px;
+    margin-bottom: 4px;
+    font-size: 0.7rem;
+  }
+  
+  .progress-bar-label {
+    font-size: 0.65rem;
+    line-height: 1.1;
+  }
+  
+  .progress-bar-text {
+    font-size: 0.6rem;
+    line-height: 1.1;
+  }
+  
+  .progress-bar-percentage {
+    font-size: 0.6rem;
+  }
+  
+  .progress-bar-fill {
+    height: 3px;
+    border-radius: 1.5px;
+  }
+  
+  .progress-bar-content {
+    gap: 3px;
+  }
+  
+  .progress-bar-stats {
+    gap: 4px;
+  }
+  
+  .progress-bar-header {
+    margin-bottom: 1px;
+  }
+  
+  .chip-filter-chips {
+    min-height: 20px;
+    padding: 2px 3px;
+  }
+  
+  .chip {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+  }
+  
+  .bar-filter-editor {
+    gap: 3px;
+    margin-top: 6px;
+  }
 }
 
 .progress-header-row {
@@ -106,26 +281,27 @@ body {
   margin-top: 0px;
 }
 
-
 .progress-title {
   font-size: 2rem;
   font-weight: 800;
   margin: 15px 0px;
   color: var(--text);
-  transition: color var(--transition-speed );
+  transition: color var(--transition-speed);
 }
 
 .progress-settings-btn {
   background: none;
   border: none;
   color: var(--progress-icons);
-  transition: color var(--transition-speed );
+  transition: color var(--transition-speed);
   cursor: pointer;
   transition: background 0.2s;
 }
+
 .progress-settings-btn:hover {
   background: none;
 }
+
 .progress-settings-btn svg {
   vertical-align: middle;
 }
@@ -136,14 +312,13 @@ body {
 
 .progress-settings-btn:hover svg,
 .progress-settings-btn:focus svg {
-  transform: rotate(20deg);
+  transform: none;
 }
 
 .progress-settings-btn:focus {
   outline: none;
   box-shadow: none;
 }
-
 
 /* ================================
    MODAL PANEL STYLES
@@ -157,6 +332,19 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+
+/* Prevent scrolling when modal is open */
+body.modal-open,
+html.modal-open {
+  overflow: hidden !important;
+}
+
+/* Prevent layout shift by keeping scrollbar space - PC only */
+@media (min-width: 769px) {
+  body.modal-open {
+    padding-right: 16px; /* Standard scrollbar width */
+  }
 }
 
 /* Prevent horizontal scrolling on body and html during drag operations */
@@ -187,8 +375,8 @@ html.dragging {
   max-width: 800px;
   margin: 140px auto;
   background-color: var(--progress-bg);
-  transition: background-color var(--transition-speed );
-  padding: 0px 25px 25px 25px;
+  transition: background-color var(--transition-speed);
+  padding: 20px 35px 15px 35px;
   border-radius: 20px;
   box-shadow: 0 4px 12px #0006;
   max-height: 80vh;
@@ -260,6 +448,8 @@ html.dragging {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .modal-header h3 {
@@ -310,10 +500,10 @@ html.dragging {
 
 .bar-settings-group {
   background-color: var(--progressbar-bg);
-  transition: background-color var(--transition-speed );
+  transition: background-color var(--transition-speed);
   border: none;
   border-radius: 12px;
-  padding: 18px;
+  padding: 16px 24px;
   margin-bottom: 12px;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.6);
   max-width: 100%;
@@ -332,13 +522,12 @@ html.dragging {
   flex: 1;
   padding: 8px 12px;
   background-color: var(--progressbar-input);
-  transition: background-color var(--transition-speed );
+  transition: background-color var(--transition-speed);
   color: white;
   border: 2px solid #444;
   border-radius: 8px;
   font-size: 0.95rem;
 }
-
 
 /* ================================
    ICON BUTTONS (EYE, SETTINGS, TRASH, CLOSE)
@@ -351,7 +540,6 @@ html.dragging {
   margin-left: 4px; /* Optional: align better with input */
 }
 
-
 .bar-controls button svg {
   width: 20px;
   height: 20px;
@@ -362,7 +550,7 @@ html.dragging {
 .eye-toggle-btn,
 .filter-toggle-btn {
   background-color: var(--modal-buttons);
-  transition: background-color var(--transition-speed );
+  transition: background-color var(--transition-speed);
   color: var(--progress-icons);
   border: 2px solid #444;
   border-radius: 8px;
@@ -370,6 +558,7 @@ html.dragging {
   cursor: pointer;
   transition: all 0.2s ease;
 }
+
 .bar-controls button:hover,
 .eye-toggle-btn:hover,
 .filter-toggle-btn:hover {
@@ -385,7 +574,6 @@ html.dragging {
   outline: none;
   box-shadow: none;
 }
-
 
 .modal-close-btn {
   background: none;
@@ -488,21 +676,20 @@ html.dragging {
   cursor: grab;
   font-size: 1.2rem;
   color: var(--progress-icons);
-  transition: color var(--transition-speed );
+  transition: color var(--transition-speed);
   user-select: none;
 }
+
 .drag-handle:active {
   cursor: grabbing;
 }
-
 
 /* ================================
    FILTER EXPANSION AREA
 ==================================*/
 
 .bar-settings-filters {
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 16px 8px;
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -516,7 +703,6 @@ html.dragging {
     transform: scaleY(1);
   }
 }
-
 
 /* ================================
    CHIP FILTER SYSTEM (MULTISELECT)
@@ -540,7 +726,7 @@ html.dragging {
 .chip-filter-label {
   font-size: 0.85rem;
   color: var(--text);
-  transition: color var(--transition-speed );
+  transition: color var(--transition-speed);
   margin-left: 2px;
 }
 
@@ -548,8 +734,9 @@ html.dragging {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  gap: 6px;
   color: var(--text);
-  transition: color var(--transition-speed );
+  transition: color var(--transition-speed);
   border: 2px solid #444;
   border-radius: 8px;
   padding: 6px 8px;
@@ -558,103 +745,159 @@ html.dragging {
 }
 
 .chip {
-  background: #3a3a3a;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  color: white;
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  border-radius: 20px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  color: black;
+  font-weight: 600;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.chip::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .chip:hover {
-  background: #4a4a4a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  color: black;
+}
+
+.chip:hover::before {
+  left: 100%;
 }
 
 .chip-remove {
   background: none;
   border: none;
-  color: white;
-  font-size: 0.9rem;
+  color: black;
+  font-size: 1rem;
   cursor: pointer;
-  padding: 0;
+  padding: 2px;
   line-height: 1;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-weight: bold;
+}
+
+.chip-remove:hover {
+  background: rgba(0, 0, 0, 0.1);
+  transform: scale(1.1);
 }
 
 .chip-add-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: #444;
-  color: white;
-  border-radius: 999px;
-  border: none;
-  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  color: black;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  font-size: 20px;
   cursor: pointer;
   padding: 0;
   line-height: 1;
-  transition: background 0.2s ease;
-  margin-left: 8px;
+  transition: all 0.2s ease;
+  margin-left: 6px;
   font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .chip-add-btn:hover {
-  background: #555;
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .chip-filter-dropdown {
-  position: fixed;
-  background-color: var(--modal-dropdown);
-  transition: background-color var(--transition-speed );
-  border: 1px solid #444;
-  border-radius: 8px;
+  position: absolute;
+  background-color: var(--searchbar-dropdown);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
   width: 100%;
-  max-height: 200px;
+  max-height: 240px;
   overflow-y: auto;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
-  z-index: var(--z-modal-dropdown); /* Above modal panel */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  z-index: var(--z-modal-dropdown);
+  margin-top: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--searchbar-dropdown);
+}
+
+.chip-filter-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chip-filter-dropdown::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+.chip-filter-dropdown::-webkit-scrollbar-track {
+  background: var(--searchbar-dropdown);
 }
 
 .chip-option {
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 12px;
   background: none;
-  color: var(--text);
-  transition: color var(--transition-speed );
+  color: var(--dropdown-item-text);
   text-align: left;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   border: none;
   cursor: pointer;
-  transition: background 0.2s;
-}
-.chip-option:hover {
-  background: #3a3a3a;
-  color: var(--modal-buttons-hover-text);
-}
-.chip-option.selected {
-  background: #555;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
+.chip-option:hover {
+  background: var(--dropdown-item-hover-bg);
+  color: var(--dropdown-item-hover-text);
+}
+
+.chip-option.selected {
+  background: var(--searchbar-dropdown-selected);
+  color: var(--dropdown-item-text);
+}
 
 /* ================================
    ADD BAR BUTTON
 ==================================*/
 
 .add-bar-row {
-  margin-top: 16px;
+  margin-top: 12px;
+  padding: 0 10px;
 }
 
 .add-bar-row button {
   width: 100%;
   background-color: var(--add-progress-btn);
-  transition: background-color var(--transition-speed );
+  transition: background-color var(--transition-speed);
   border: 2px dashed #444;
   color: var(--text);
-  transition: color var(--transition-speed );
+  transition: color var(--transition-speed);
   padding: 18px;
   font-size: 1rem;
   border-radius: 12px;
@@ -665,6 +908,7 @@ html.dragging {
   justify-content: center;
   gap: 8px;
 }
+
 .add-bar-row button:hover {
   background: #181818;
   border-color: #666;
@@ -710,8 +954,8 @@ html.dragging {
   flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
-  margin-top: 12px;
-  padding-bottom: 12px;
+  margin-top: 16px;
+  padding: 0 10px 16px 10px;
 }
 
 .template-bar-buttons button {
@@ -720,9 +964,9 @@ html.dragging {
   gap: 8px;
   padding: 6px 12px;
   background-color: var(--template-buttons);
-  transition: background-color var(--transition-speed );
+  transition: background-color var(--transition-speed);
   color: var(--text);
-  transition: color var(--transition-speed );
+  transition: color var(--transition-speed);
   border: 1px solid #3a3a3a;
   border-radius: 6px;
   font-size: 14px;
@@ -739,8 +983,6 @@ html.dragging {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
-
 
 /* ================================
    MODAL SCROLL BAR
@@ -760,7 +1002,6 @@ html.dragging {
   border-radius: 8px;
   opacity: 0;
   transition: opacity 0.3s ease;
-
   /* Here's the trick: these create shorter thumb illusion */
   margin-top: 16px;
   margin-bottom: 16px;
@@ -782,17 +1023,14 @@ html.dragging {
   min-height: auto; /* Allow container to shrink to content */
   height: auto; /* Let height be determined by content */
   position: relative;
-  padding-bottom: 20px;
-  margin-bottom: 20px;
+  padding: 10px 15px 15px 15px;
+  margin-bottom: 15px;
   border-bottom: 1px solid #444;
   flex: 0 1 auto; /* Don't grow, allow shrinking, auto basis */
   scroll-behavior: smooth;
   /* Ensure no horizontal scrolling can occur */
   width: 100%;
   max-width: 100%;
-  /* Allow some horizontal movement for drag operations */
-  padding-left: 10px;
-  padding-right: 10px;
 }
 
 /* Ensure the scrollable area has proper spacing */
@@ -821,8 +1059,8 @@ html.dragging {
   position: sticky;
   bottom: 0;
   background-color: var(--progress-bg);
-  padding: 16px 0;
-  margin-top: -4px;
+  padding: 20px 0;
+  margin-top: 0px;
   z-index: 10;
 }
 
@@ -854,4 +1092,157 @@ html.dragging {
   position: relative;
   /* Don't interfere with scrolling */
   pointer-events: none;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .progress-modal-panel {
+    max-width: 98vw;
+    margin: 20px auto;
+    padding: 6px 8px 12px 8px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+  }
+
+  .modal-header {
+    padding-bottom: 6px;
+    margin-bottom: 3px;
+  }
+
+  .modal-header h3 {
+    font-size: 1rem;
+  }
+
+  .modal-actions {
+    gap: 6px;
+  }
+
+  .modal-save-btn,
+  .modal-cancel-btn {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+  }
+
+  .bar-settings-group {
+    padding: 4px 6px;
+    margin-bottom: 4px;
+    border-radius: 6px;
+  }
+
+  .bar-settings-row {
+    gap: 6px;
+  }
+
+  .bar-name-input {
+    padding: 4px 6px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+  }
+
+  .bar-controls {
+    gap: 3px;
+  }
+
+  .bar-controls button svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .bar-controls button,
+  .eye-toggle-btn,
+  .filter-toggle-btn {
+    padding: 2px 3px;
+    border-radius: 3px;
+    border-width: 1px;
+    min-width: 24px;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .drag-container {
+    padding: 3px 4px 8px 4px;
+    margin-bottom: 8px;
+  }
+
+  .add-bar-row {
+    margin-top: 10px;
+    padding: 0 3px;
+  }
+
+  .add-bar-row button {
+    padding: 8px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+  }
+
+  .template-bar-buttons {
+    margin-top: 8px;
+    padding: 0 3px 8px 3px;
+    gap: 8px;
+  }
+
+  .template-bar-buttons button {
+    padding: 3px 6px;
+    font-size: 0.7rem;
+    border-radius: 3px;
+    min-height: 24px;
+    line-height: 1;
+  }
+
+  .chip-filter-chips {
+    padding: 1px 2px;
+    min-height: 20px;
+    gap: 2px;
+    border-radius: 4px;
+  }
+
+  .chip {
+    padding: 1px 3px;
+    font-size: 0.65rem;
+    gap: 1px;
+    border-radius: 8px;
+  }
+
+  .chip-add-btn {
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+    margin-left: 1px;
+  }
+
+  .chip-remove {
+    width: 12px;
+    height: 12px;
+    font-size: 0.65rem;
+  }
+
+  .chip-filter-dropdown {
+    max-height: 150px;
+    border-radius: 3px;
+  }
+
+  .chip-option {
+    padding: 4px 6px;
+    font-size: 0.75rem;
+  }
+
+  .bar-settings-filters {
+    padding: 4px 2px;
+  }
+
+  .drag-handle {
+    font-size: 0.9rem;
+  }
+
+  .bar-filter-editor {
+    gap: 4px;
+    margin-top: 6px;
+  }
+
+  .chip-filter-label {
+    font-size: 0.7rem;
+  }
 }

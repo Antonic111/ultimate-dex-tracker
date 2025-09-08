@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
-import "../css/Profile.css";
+// import "../css/Profile.css"; // Moved to backup folder
 import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles } from "lucide-react";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import pokemonData from "../data/pokemon.json";
@@ -20,6 +20,37 @@ const POKEMON_OPTIONS = pokemonData.map((p) => ({
     image: p.sprites.front_default,
     shinyImage: p.sprites.front_shiny,
 }));
+
+// Create a comprehensive Pokémon lookup that includes forms
+const createPokemonLookup = () => {
+    const lookup = new Map();
+    
+    // Add base forms
+    pokemonData.forEach(p => {
+        lookup.set(p.name, {
+            name: formatPokemonName(p.name),
+            value: p.name,
+            image: p.sprites.front_default,
+            shinyImage: p.sprites.front_shiny,
+        });
+    });
+    
+    // Add form-specific entries
+    formsData.forEach(form => {
+        if (form.sprites && form.sprites.front_default) {
+            lookup.set(form.name, {
+                name: formatPokemonName(form.name),
+                value: form.name,
+                image: form.sprites.front_default,
+                shinyImage: form.sprites.front_shiny || form.sprites.front_default,
+            });
+        }
+    });
+    
+    return lookup;
+};
+
+const POKEMON_LOOKUP = createPokemonLookup();
 
 // Turn "US" -> 🇺🇸  (works for any 2-letter ISO code)
 const flagFromISO = (cc) =>
@@ -124,15 +155,44 @@ export default function PublicProfile() {
     const [likeBurst, setLikeBurst] = useState(0);
     const [profileOwnerPreferences, setProfileOwnerPreferences] = useState(null);
     const { showMessage } = useMessage();
-    const { username: currentUsername } = useContext(UserContext);
+    const { username: currentUsername, loading: userLoading } = useContext(UserContext);
 
     const handleCopyLink = async () => {
         const url = `${window.location.origin}/u/${encodeURIComponent(username)}`;
+        
+        // Try modern clipboard API first (requires HTTPS or localhost)
+        if (navigator.clipboard && window.isSecureContext) {
+            try {
+                await navigator.clipboard.writeText(url);
+                showMessage("Share link copied", "success");
+                return;
+            } catch (err) {
+                console.warn("Clipboard API failed, trying fallback:", err);
+            }
+        }
+        
+        // Fallback for HTTP or when clipboard API fails
         try {
-            await navigator.clipboard.writeText(url);
-            showMessage("🔗 Share link copied", "success");
-        } catch {
-            showMessage("❌ Couldn't copy link", "error");
+            const textArea = document.createElement('textarea');
+            textArea.value = url;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            if (successful) {
+                showMessage("Share link copied", "success");
+            } else {
+                throw new Error("execCommand failed");
+            }
+        } catch (err) {
+            console.error("Copy failed:", err);
+            showMessage("Couldn't copy link", "error");
         }
     };
 
@@ -181,12 +241,12 @@ export default function PublicProfile() {
             // Update with the actual server response
             setHasLiked(newHasLiked);
             setLikeCount(newCount);
-            showMessage(newHasLiked ? "❤️ Profile liked!" : "💔 Like removed", "success");
+            showMessage(newHasLiked ? "Profile liked!" : "Like removed", "success");
         } catch (error) {
             // Revert optimistic update on error
             setHasLiked(wasLiked);
             setLikeCount(previousCount);
-            showMessage("❌ Failed to update like", "error");
+            showMessage("Failed to update like", "error");
         } finally {
             setLikeLoading(false);
         }
@@ -203,6 +263,7 @@ export default function PublicProfile() {
                 if (!ignore) {
                     setData(j);
                     
+                    
                     // Store the profile owner's dex preferences
                     if (j?.dexPreferences) {
                         setProfileOwnerPreferences(j.dexPreferences);
@@ -217,11 +278,11 @@ export default function PublicProfile() {
                             showGmaxForms: true,
                             showUnownForms: true,
                             showOtherForms: true,
-                                                    showAlcremieForms: true,
-                        showVivillonForms: true,
-                        showAlphaForms: true,
-                        showAlphaOtherForms: true,
-                    });
+                            showAlcremieForms: true,
+                            showVivillonForms: true,
+                            showAlphaForms: true,
+                            showAlphaOtherForms: true,
+                        });
                     }
                 }
             } catch {
@@ -412,7 +473,7 @@ export default function PublicProfile() {
 
     // Load like data
     useEffect(() => {
-        if (!username) return;
+        if (!username || userLoading) return; // Wait for user context to be ready
         let ignore = false;
         (async () => {
             try {
@@ -434,7 +495,7 @@ export default function PublicProfile() {
             } catch { }
         })();
         return () => { ignore = true; };
-    }, [username, currentUsername]);
+    }, [username, currentUsername, userLoading]);
 
     // Set initial like count from profile data
     useEffect(() => {
@@ -721,15 +782,20 @@ export default function PublicProfile() {
                         )}
 
                         {/* Favorite Pokémon */}
-                        {Array.isArray(data.favoritePokemon) && data.favoritePokemon.some(Boolean) && (
+                        {Array.isArray(data.favoritePokemon) && data.favoritePokemon.some(poke => poke && poke.trim() !== '') && (
                             <>
                                 <h3>Favorite Pokémon</h3>
                                 <div className="profile-rank-row">
                                     {Array.from({ length: 5 }).map((_, index) => {
                                         const poke = data.favoritePokemon[index];
                                         const shiny = Array.isArray(data.favoritePokemonShiny) ? data.favoritePokemonShiny[index] : false;
-                                        const p = POKEMON_OPTIONS.find(x => x.value === poke);
-                                        const isEmpty = !p;
+                                        
+                                        
+                                        const p = poke && poke.trim() !== '' ? POKEMON_LOOKUP.get(poke) || 
+                                            // Fallback: try to find base form for special forms like gmax, alolan, etc.
+                                            POKEMON_LOOKUP.get(poke.split('-')[0]) : null;
+                                        const isEmpty = !p || !poke || poke.trim() === '';
+                                        
                                         return (
                                             <div key={index} className="profile-rank-item">
                                                 {index < 3 && !isEmpty && (
@@ -746,7 +812,7 @@ export default function PublicProfile() {
                                                         />
                                                     </div>
                                                 )}
-                                                <div className="rank-label">{p?.name ? formatPokemonName(p.value) : null}</div>
+                                                <div className="rank-label">{p?.name ? formatPokemonName(poke) : null}</div>
                                             </div>
                                         );
                                     })}

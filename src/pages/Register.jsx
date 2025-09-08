@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import "../css/auth.css";
+import "../css/Register.css";
 import { useMessage } from "../components/Shared/MessageContext";
 import { Eye, EyeOff, User, Mail, Lock } from "lucide-react";
 import { validateContent } from "../../shared/contentFilter.js";
@@ -34,7 +34,7 @@ export default function Register() {
     setLoading(true);
 
     if (form.password !== form.confirmPassword) {
-      showMessage("❌ Passwords do not match", "error");
+              showMessage("Passwords do not match", "error");
       setLoading(false);
       clickedRef.current = false;
       return;
@@ -44,7 +44,7 @@ export default function Register() {
 
     const usernameValidation = validateContent(form.username, 'username');
     if (!usernameValidation.isValid) {
-      showMessage(`❌ ${usernameValidation.error}`, "error");
+              showMessage(`${usernameValidation.error}`, "error");
       setLoading(false);
       clickedRef.current = false;
       return;
@@ -58,7 +58,7 @@ export default function Register() {
         profileTrainer: "ash.png",
       });
 
-      showMessage("✅ Account created! Please verify your email.", "success");
+              showMessage("Account created! Please verify your email.", "success");
       setTimeout(() => navigate(`/email-sent?email=${encodeURIComponent(form.email)}`), 1000);
 
     } catch (err) {
@@ -84,10 +84,10 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-form page-container auth-page">
-      <h2>SIGN UP</h2>
+    <div className="register-form page-container auth-page">
+      <h2 className="register-title">SIGN UP</h2>
       
-      <form onSubmit={handleSubmit} className="auth-form-fields">
+      <form onSubmit={handleSubmit} className="register-form-fields">
         <div className="input-icon-wrapper">
           <User className="auth-icon" size={20} />
           <input
@@ -95,6 +95,7 @@ export default function Register() {
             value={form.username}
             onChange={handleChange}
             placeholder="Username"
+            className="register-input"
             required
           />
         </div>
@@ -106,6 +107,7 @@ export default function Register() {
             type="email"
             placeholder="Email"
             onChange={handleChange}
+            className="register-input"
             required
           />
         </div>
@@ -117,6 +119,7 @@ export default function Register() {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             onChange={handleChange}
+            className="register-input"
             autoComplete="new-password"
             required
           />
@@ -127,10 +130,9 @@ export default function Register() {
             aria-label="Toggle password visibility"
             tabIndex={-1}
           >
-            {showPassword ? <EyeOff size={25} /> : <Eye size={25} />}
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
         </div>
-
 
         <div className="input-icon-wrapper password-wrapper">
           <Lock className="auth-icon" size={20} />
@@ -139,6 +141,7 @@ export default function Register() {
             type={showConfirmPassword ? "text" : "password"}
             placeholder="Confirm Password"
             onChange={handleChange}
+            className="register-input"
             autoComplete="new-password"
             required
           />
@@ -149,12 +152,13 @@ export default function Register() {
             aria-label="Toggle password visibility"
             tabIndex={-1}
           >
-            {showConfirmPassword ? <EyeOff size={25} /> : <Eye size={25} />}
+            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
         </div>
 
-
-        <button type="submit" disabled={loading}>{loading ? "Creating account..." : "Create Account"}</button>
+        <button type="submit" className="register-button" disabled={loading}>
+          {loading ? "Creating account..." : "Create Account"}
+        </button>
         
         <p className="auth-redirect">
           Already have an account? <a href="/login">Login here</a>.

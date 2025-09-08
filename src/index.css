@@ -1,72 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Basic reset and global styles */
+* {
+  box-sizing: border-box;
+}
+
+/* Default site background (dark theme) */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --site-background: linear-gradient(to right, #0a0a0a 0%, #0d0d0d 5%, #0f0f0f 10%, #111 15%, #111 85%, #0f0f0f 90%, #0d0d0d 95%, #0a0a0a 100%);
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
+html, body {
   margin: 0;
-  min-width: 320px;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--site-background);
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
+  height: 100%;
+}
+
+#root {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Custom placeholder colors for dark theme */
+::placeholder {
+  color: var(--searchbar-placeholder-text) !important;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Theme-specific background gradients */
+[data-theme="dark"] {
+  --site-background: linear-gradient(to right, #0a0a0a 0%, #0d0d0d 5%, #0f0f0f 10%, #111 15%, #111 85%, #0f0f0f 90%, #0d0d0d 95%, #0a0a0a 100%);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+[data-theme="light"] {
+  --site-background: linear-gradient(to right, #f5f5f5 0%, #f5f5f5 20%, #fafafa 40%, #fafafa 60%, #f5f5f5 80%, #f5f5f5 100%);
 }
 
-html.modal-open,
-body.modal-open {
-  overflow: hidden !important;
-  padding-right: 7.5px;
+/* Custom scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--searchbar-dropdown);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+  border: 1px solid var(--searchbar-dropdown);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover);
+}
+
+/* Firefox scrollbar styling */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--searchbar-dropdown);
+}
+
+/* Override progress bar grid width constraints */
+.progress-bars-grid {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }

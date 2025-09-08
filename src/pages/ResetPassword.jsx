@@ -3,6 +3,7 @@ import { useMessage } from "../components/Shared/MessageContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Lock, Eye, EyeOff } from "lucide-react";
 import { authAPI } from "../utils/api";
+import "../css/ResetPassword.css";
 
 
 const ResetPassword = () => {
@@ -21,7 +22,7 @@ const ResetPassword = () => {
 
   useEffect(() => {
   if (!email || !code) {
-    showMessage("❌ Invalid or expired reset session", "error");
+            showMessage("Invalid or expired reset session", "error");
     navigate("/forgot-password");
   }
 }, [email, code, navigate, showMessage]);
@@ -36,24 +37,24 @@ const ResetPassword = () => {
 
     try {
       if (newPassword !== confirmPassword) {
-        showMessage("❌ Passwords do not match", "error");
+        showMessage("Passwords do not match", "error");
         return;
       }
 
       const data = await authAPI.resetPassword(email, code, newPassword);
 
       if (data.status === 429 || data.message === "Too many requests, please try again later.") {
-        showMessage("❌ Too many requests, please try again later.", "error");
+        showMessage("Too many requests, please try again later.", "error");
         return;
       }
       if (data.success) {
-        showMessage("✅ Password reset successful!", "success");
+        showMessage("Password reset successful!", "success");
         navigate("/login");
       } else {
-        showMessage(`❌ ${data.error || "Something went wrong"}`, "error");
+        showMessage(`${data.error || "Something went wrong"}`, "error");
       }
     } catch (err) {
-      showMessage("❌ Server error", "error");
+              showMessage("Server error", "error");
     } finally {
       setLoading(false);
       setTimeout(() => {
@@ -63,9 +64,9 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="auth-form page-container auth-page">
-      <h2>RESET PASSWORD</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="reset-password-form page-container auth-page">
+      <h2 className="reset-password-title">RESET PASSWORD</h2>
+      <form onSubmit={handleSubmit} className="reset-password-form-fields">
         <div className="input-icon-wrapper password-wrapper">
           <Lock className="auth-icon" size={20} />
           <input
@@ -73,6 +74,7 @@ const ResetPassword = () => {
             placeholder="New password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
+            className="reset-password-input"
             required
           />
           <button
@@ -93,6 +95,7 @@ const ResetPassword = () => {
             placeholder="Confirm password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            className="reset-password-input"
             required
           />
           <button
@@ -106,7 +109,7 @@ const ResetPassword = () => {
           </button>
         </div>
 
-        <button type="submit" disabled={loading}>
+        <button type="submit" className="reset-password-button" disabled={loading}>
           {loading ? "Resetting..." : "Reset Password"}
         </button>
       </form>

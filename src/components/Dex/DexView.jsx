@@ -9,6 +9,7 @@ import noResultsImg from "../../data/pikachu.png";
 import pokemonData from "../../data/pokemon.json";
 import formsData from "../../data/forms.json";
 import { getFilteredFormsData } from "../../utils/dexPreferences";
+import "../../css/PublicDex.css";
 
 const typeOptions = [
     "normal", "fire", "water", "grass", "electric", "ice", "fighting", "poison", "ground", "flying",
@@ -249,8 +250,6 @@ export default function DexView({
                     genOptions={GEN_OPTIONS}
                     showShiny={showShiny}
                     setShowShiny={setShowShiny}
-                    showForms={showForms}
-                    setShowForms={setShowForms}
                 />
             </div>
 
@@ -295,6 +294,7 @@ export default function DexView({
                                 showShiny={showShiny}
                                 showForms={showForms}
                                 caught={caught || {}}
+                                isCaught={(poke) => (caught || {})[getCaughtKey(poke, null, showShiny)] || false}
                                 updateCaughtInfo={updateCaughtInfo || (() => {})}
                                 onToggleCaught={onToggleCaught || (() => {})}
                                 onMarkAll={onMarkAll || (() => {})}
@@ -326,6 +326,7 @@ export default function DexView({
                                         title={section.title}
                                         pokemonList={filteredMons}
                                         caught={caught}
+                                        isCaught={(poke) => (caught || {})[getCaughtKey(poke, null, showShiny)] || false}
                                         onMarkAll={onMarkAll}
                                         onToggleCaught={onToggleCaught}
                                         onSelect={onSelectPokemon || handlePokemonSelect}
@@ -355,6 +356,7 @@ export default function DexView({
                                         title={section.title}
                                         pokemonList={filteredMons}
                                         caught={caught}
+                                        isCaught={(poke) => (caught || {})[getCaughtKey(poke, null, showShiny)] || false}
                                         onMarkAll={onMarkAll}
                                         onToggleCaught={onToggleCaught}
                                         onSelect={onSelectPokemon || handlePokemonSelect}

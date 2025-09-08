@@ -1,474 +1,739 @@
-/* --------------------------------------------
-   Base Layout
---------------------------------------------- */
+/* Settings Page - Tailwind Compatible with CSS Variables */
+
+/* Page Container Animation */
+.page-container {
+  @apply mb-12;
+  animation: pageFadeIn 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.page-container.fade-in-up {
+  animation: componentFadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes componentFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Base Layout */
 .settings-page {
-  padding: 10px;
-  max-width: 1300px;
-  width: 100%;
-  margin: 0 auto;
-  margin-bottom: 100px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  @apply px-2.5 max-w-[1300px] w-full mx-auto mb-[100px] flex-1 flex flex-col;
+}
+
+.app-divider {
+  @apply h-1 w-full mb-6 rounded-sm;
+  background: linear-gradient(90deg, var(--dividers) 30%, var(--accent) 100%);
 }
 
 .settings-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 50px;
-  background-color: var(--settings-bg);
-  transition: background-color var(--transition-speed );
-  border-radius: 8px;
-  padding: 30px;
-  box-shadow: 0 3px 20px #000c;
+  @apply flex flex-wrap gap-12 bg-[var(--settings-bg)] rounded-lg p-8 shadow-[0_3px_20px_rgba(0,0,0,0.75)];
+  transition: background-color var(--transition-speed);
 }
 
 .settings-column {
-  flex: 1;
-  min-width: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  color: var(--text);
-  transition: color var(--transition-speed );
+  @apply flex-1 min-w-[400px] flex flex-col gap-4 text-[var(--text)];
+  transition: color var(--transition-speed);
 }
 
-/* --------------------------------------------
-   Headings & Titles
---------------------------------------------- */
+/* Headings & Titles */
 .settings-page .page-title {
-  margin: 40px 0 30px;
-  font-weight: 800;
-  letter-spacing: .2px;
-  position: relative;
-  color: var(--text-color);
+  @apply mt-12 mb-6 text-5xl font-extrabold tracking-wide relative text-[var(--text-color)];
 }
 
 .setting-block h3 {
-  font-size: 1.5rem;
-  color: var(--accent);
-  margin-bottom: 4px;
-  margin-top: 4px;
+  @apply text-2xl text-[var(--accent)] mb-1 mt-1;
 }
 
 .setting-block p {
-  font-size: 1rem;
-  color: var(--text);
-  transition: color var(--transition-speed );
-  margin-top: -8px;
+  @apply text-base text-[var(--text)] -mt-2;
+  transition: color var(--transition-speed);
 }
 
-/* --------------------------------------------
-   Blocks & Dividers
---------------------------------------------- */
+/* Blocks & Dividers */
 .setting-block {
-  display: flex;
-  flex-direction: column;
-  gap: 10px; /* Reduced from 12px */
+  @apply flex flex-col gap-2.5;
 }
 
 .setting-divider {
-  height: 2px;
-  background-color: var(--dividers);
-  transition: background-color var(--transition-speed );
-  margin: 8px 0;
-  width: 100%;
+  @apply h-0.5 bg-[var(--dividers)] my-2 w-full;
+  transition: background-color var(--transition-speed);
 }
 
-/* --------------------------------------------
-   Inputs & Buttons
---------------------------------------------- */
+/* Inputs & Buttons */
 .setting-block input[type="text"],
 .setting-block input[type="password"] {
-  background-color: var(--settings-input);
-  transition: background-color var(--transition-speed );
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-size: 1rem;
+  @apply rounded-lg px-3 py-2.5 text-base;
+  transition: background-color var(--transition-speed);
 }
 
 .setting-block button {
-  background: var(--accent);
-  color: #1a1a1a;
-  font-weight: 700;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
+  @apply bg-[var(--accent)] text-[#1a1a1a] font-bold border-0 px-2.5 py-2.5 rounded-md cursor-pointer;
   transition: background-color 0.2s ease;
 }
 
 .setting-block button:hover {
-  background: var(--accent);
-  color: white;
+  @apply bg-[var(--accent)] text-white;
 }
 
-/* --------------------------------------------
-   Accent Color Picker
---------------------------------------------- */
+/* Accent Color Picker */
 .accent-color-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 8px;
+  @apply flex flex-wrap gap-2.5 mt-2;
 }
 
 .accent-circle {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid transparent;
+  @apply w-7 h-7 rounded-full cursor-pointer border-2 border-transparent;
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .accent-circle.selected {
-  border-color: var(--accent);
-  transform: scale(1.3);
+  @apply border-[var(--accent)] scale-[1.3];
 }
 
 /* Color examples */
-.accent-circle.red { background-color: #ef4444; }
-.accent-circle.orange { background-color: #f97316; }
-.accent-circle.green { background-color: #22c55e; }
-.accent-circle.blue { background-color: #3b82f6; }
-.accent-circle.cyan { background-color: #06b6d4; }
-.accent-circle.purple { background-color: #a855f7; }
-.accent-circle.pink { background-color: #ec4899; }
-.accent-circle.brown { background-color: #8f4d00; }
-.accent-circle.yellow { background-color: #facc15; }
+.accent-circle.red { @apply bg-red-500; }
+.accent-circle.orange { @apply bg-orange-500; }
+.accent-circle.green { @apply bg-green-500; }
+.accent-circle.blue { @apply bg-blue-500; }
+.accent-circle.cyan { @apply bg-cyan-500; }
+.accent-circle.purple { @apply bg-purple-500; }
+.accent-circle.pink { @apply bg-pink-500; }
+.accent-circle.brown { @apply bg-amber-800; }
+.accent-circle.yellow { @apply bg-yellow-500; }
 
-/* --------------------------------------------
-   Theme Toggle (Light / Dark)
---------------------------------------------- */
+/* Theme Toggle (Light / Dark) */
 .theme-toggle {
-  display: flex;
-  gap: 8px;
+  @apply flex gap-2;
 }
 
 .theme-option {
-  padding: 6px 14px;
-  border-radius: 6px;
-  background: #333;
-  color: #ccc;
-  cursor: pointer;
-  font-weight: 500;
-  border: 1px solid #444;
+  @apply px-3.5 py-1.5 rounded-md bg-gray-800 text-gray-300 cursor-pointer font-medium border border-gray-700;
   transition: all 0.2s;
 }
 
 .theme-option.active {
-  background: var(--accent);
-  color: #000;
-  border-color: var(--accent);
+  @apply bg-[var(--accent)] text-black border-[var(--accent)];
 }
 
 .theme-option:hover {
-  background: #555;
+  @apply bg-gray-600;
 }
 
-/* --------------------------------------------
-   Delete Account Button
---------------------------------------------- */
+/* Delete Account Button */
 .delete-btn {
-  background: var(--accent) !important;
-  color: #1a1a1a !important;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 8px;
+  @apply bg-[var(--accent)] text-[#1a1a1a] border-0 px-3.5 py-2.5 rounded-md font-semibold cursor-pointer mt-2 w-full;
   transition: background-color 0.2s ease;
-  width: 100%;
 }
 
 .delete-btn:hover {
-  background: var(--accent) !important;
-  color: white !important;
+  @apply bg-[var(--accent)] text-white;
 }
 
-/* --------------------------------------------
-   Misc
---------------------------------------------- */
+/* Misc */
 .coming-soon-note {
-  font-size: 0.9rem;
-  color: #aaa;
-  font-style: italic;
+  @apply text-sm text-gray-400 italic;
 }
 
-/* --------------------------------------------
-   SVG WRAPPERS
---------------------------------------------- */
-
+/* SVG WRAPPERS */
 .input-icon-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  background-color: var(--settings-input);
-  transition: background-color var(--transition-speed );
-  border: 2px solid #444;
-  border-radius: 8px;
-  gap: 0px;
-  height: 50px;
+  @apply relative flex items-center bg-[var(--settings-input)] border-2 border-[var(--dividers)] rounded-lg gap-0 h-12 pl-3;
+  transition: background-color var(--transition-speed);
 }
 
 .input-icon-wrapper input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--text);
-  transition: color var(--transition-speed );
-  font-size: 1rem;
-  outline: none;
-  padding: 10px 12px;
+  @apply flex-1 bg-transparent border-0 text-[var(--text)] text-base outline-none px-3 py-2.5;
+  transition: color var(--transition-speed);
 }
 
 .input-icon-wrapper .auth-icon {
-  color: #888;
+  @apply text-[var(--svg-icons)];
 }
 
 /* Fix ContentFilterInput alignment in settings */
 .input-icon-wrapper .content-filter-wrapper {
-  height: 100%;
+  @apply h-full;
+  flex: 1;
   display: flex;
   align-items: center;
+  margin-left: 0;
 }
 
-.input-icon-wrapper .content-filter-input {
+.input-icon-wrapper .content-filter-wrapper input {
+  @apply border-0 bg-transparent outline-none;
+  width: 100%;
   height: 100%;
-  border: none;
-  background: transparent;
-  padding: 10px 12px;
+  padding: 10px 12px 10px 0;
   font-size: 1rem;
-  outline: none;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.input-icon-wrapper .content-filter-wrapper input:focus {
+  @apply outline-none;
+}
+
+.input-icon-wrapper .content-filter-wrapper input::placeholder {
+  color: var(--input-placeholder);
 }
 
 .show-password-toggle {
-  all: unset;
-  position: absolute;
-  top: 50%;
-  right: 14px;
-  transform: translateY(-50%);
-  cursor: pointer;
-  transition: color 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @apply absolute top-1/2 right-3.5 -translate-y-1/2 cursor-pointer flex items-center justify-center border-0 p-0 shadow-none outline-none w-auto h-auto min-w-0 min-h-0 text-xl;
   background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  box-shadow: none !important;
-  outline: none !important;
-  width: auto !important;
-  height: auto !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  font-size: 1.25rem !important;
+  transition: color 0.2s ease;
 }
 
 .show-password-toggle:hover {
-  color: #fff;
+  @apply text-white;
 }
-
 
 /* Switch label text next to the toggle */
 .setting-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  @apply flex items-center gap-3;
 }
 
 .switch-state {
-  font-weight: 600;
-  color: var(--text);
-  min-width: 64px;  /* keeps the row from jumping when text changes */
+  @apply font-semibold text-[var(--text)] min-w-16;
 }
 
+/* Switch Component - Updated to match Favorite Modal style */
+.switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
 
+.switch-input {
+  @apply opacity-0 w-0 h-0 absolute;
+}
 
+.switch-slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #333;
+  border-radius: 12px;
+  border: 2px solid #555;
+  transition: background 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
 
+.switch-slider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  transition: transform 0.3s ease, background 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
 
+.switch-input:checked + .switch-slider {
+  background: var(--accent);
+  border-color: var(--accent);
+}
 
+.switch-input:checked + .switch-slider::after {
+  transform: translateX(20px) translateY(-50%);
+  background: white;
+}
 
+.switch-input:disabled + .switch-slider {
+  @apply opacity-50;
+}
 
+.switch-input:disabled ~ .switch {
+  @apply opacity-50 cursor-not-allowed;
+}
 
-
-
-
-
-
-
-
+/* Mobile-Only Switch Override - Simple and Reliable */
+@media (max-width: 768px) {
+  .switch {
+    width: 60px !important;
+    height: 32px !important;
+    margin-right: 12px !important;
+    display: block !important;
+  }
+  
+  .switch-input {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    z-index: 10 !important;
+  }
+  
+  .switch-slider {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: #2a2a2a !important;
+    border: 2px solid #444 !important;
+    border-radius: 16px !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    display: block !important;
+  }
+  
+  .switch-slider::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 2px !important;
+    left: 2px !important;
+    width: 24px !important;
+    height: 24px !important;
+    background: #666 !important;
+    border-radius: 50% !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4) !important;
+    pointer-events: none !important;
+    transform: none !important;
+  }
+  
+  .switch-input:checked + .switch-slider {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+  }
+  
+  .switch-input:checked + .switch-slider::after {
+    transform: translateX(28px) !important;
+    background: white !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
+  }
+  
+  .switch-input:disabled + .switch-slider {
+    opacity: 0.5 !important;
+  }
+  
+  .switch-input:disabled {
+    cursor: not-allowed !important;
+  }
+}
 
 /* Theme cards */
-.theme-choice-grid{
-  display:grid;
+.theme-choice-grid {
+  @apply grid grid-cols-3 gap-3;
   grid-template-columns: repeat(3, minmax(140px, 1fr));
-  gap:12px;
 }
 
-.theme-card{
-  position:relative;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:8px;
-  padding:10px;
-  border:1px solid var(--dividers);
-  border-radius:14px;
+.theme-card {
+  @apply relative flex flex-col items-center gap-2 p-2.5 border border-[var(--dividers)] rounded-2xl cursor-pointer select-none;
   background: linear-gradient(135deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-  cursor:pointer;
-  user-select:none;
-  transition:border-color .15s ease, box-shadow .15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.theme-card input{ position:absolute; inset:0; opacity:0; pointer-events:none; }
-.theme-card.active{
-  border-color: var(--accent);
+
+.theme-card input { 
+  @apply absolute inset-0 opacity-0 pointer-events-none; 
+}
+
+.theme-card.active {
+  @apply border-[var(--accent)];
   box-shadow: 0 0 0 2px rgba(0,0,0,.2) inset, 0 0 0 1px var(--accent);
 }
 
-.theme-label{
-  font-weight:700;
-  padding:6px 10px;
-  border-radius:999px;
+.theme-label {
+  @apply font-bold px-2.5 py-1.5 rounded-full;
   background: rgba(255,255,255,.06);
 }
 
 /* Mini preview */
-.theme-preview{
-  width:100%;
-  height:110px;
-  border-radius:12px;
-  overflow:hidden;
-  border:1px solid var(--dividers);
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
+.theme-preview {
+  @apply w-full h-[110px] rounded-xl overflow-hidden border border-[var(--dividers)] flex flex-col justify-start;
 }
 
 /* Light / Dark / System canvases */
-.theme-preview.light{
-  background:#f3f4f7;
+.theme-preview.light {
+  @apply bg-gray-100;
 }
-.theme-preview.dark{
-  background:#0f0f10;
+
+.theme-preview.dark {
+  background: #0f0f10;
 }
-.theme-preview.system{
-  position:relative;
+
+.theme-preview.system {
+  @apply relative;
   background: linear-gradient(90deg, #f3f4f7 0 50%, #0f0f10 50% 100%);
 }
-.theme-preview.system::after{
-  content:"";
-  position:absolute; inset:0;
-  border-left:1px solid var(--dividers);
+
+.theme-preview.system::after {
+  content: "";
+  @apply absolute inset-0 border-l border-[var(--dividers)];
 }
 
 /* Header bar & avatar dot */
-.preview-header{
-  height:28px;
-  padding:6px 8px;
-  display:flex; align-items:center;
-  gap:8px;
-  border-bottom:1px solid var(--dividers);
+.preview-header {
+  @apply h-7 px-2 py-1.5 flex items-center gap-2 border-b border-[var(--dividers)];
   background: rgba(0,0,0,.04);
 }
-.theme-preview.dark .preview-header{ background: rgba(255,255,255,.04); }
-.theme-preview.system .preview-header{ background: transparent; }
 
-.avatar-dot{
-  width:16px; height:16px; border-radius:50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 2px rgba(0,0,0,.15);
+.theme-preview.dark .preview-header { 
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.theme-preview.system .preview-header { 
+  @apply bg-transparent; 
+}
+
+.avatar-dot {
+  @apply w-4 h-4 rounded-full bg-[var(--accent)] shadow-[0_0_0_2px_rgba(0,0,0,.15)];
 }
 
 /* Content lines */
-.preview-lines{ padding:8px; display:flex; flex-direction:column; gap:6px; }
-.preview-lines span{
-  height:10px; border-radius:6px;
-  background: rgba(0,0,0,.15);
+.preview-lines { 
+  @apply p-2 flex flex-col gap-1.5; 
 }
-.theme-preview.dark .preview-lines span{ background: rgba(255,255,255,.12); }
-.theme-preview.light .preview-lines span:first-child{ background: rgba(0,0,0,.25); }
-.theme-preview.dark  .preview-lines span:first-child{ background: rgba(255,255,255,.25); }
 
-/* --------------------------------------------
-   Dex Preferences
---------------------------------------------- */
+.preview-lines span {
+  @apply h-2.5 rounded-md;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.theme-preview.dark .preview-lines span { 
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.theme-preview.light .preview-lines span:first-child { 
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.theme-preview.dark .preview-lines span:first-child { 
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Dex Preferences */
 .setting-description {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin-bottom: 12px; /* Reduced from 16px */
-  line-height: 1.4;
+  @apply text-[var(--text-secondary)] text-sm mb-3 leading-relaxed;
 }
 
 .dex-preferences-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px; /* Reduced from 12px */
+  @apply grid grid-cols-2 gap-2;
 }
 
 .preference-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px; /* Reduced from 12px 16px */
-  background: var(--settings-input);
-  border-radius: 6px; /* Reduced from 8px */
-  border: 1px solid var(--dividers);
+  @apply flex items-center px-3 py-2 bg-[var(--settings-input)] rounded-md border border-[var(--dividers)];
   transition: all 0.2s ease;
 }
 
 .preference-item:hover {
-  border-color: var(--accent);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  @apply border-[var(--accent)] shadow-[0_2px_8px_rgba(0,0,0,0.1)];
 }
 
 .preference-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 8px; /* Reduced from 12px */
-  cursor: pointer;
-  width: 100%;
+  @apply flex items-center gap-2 cursor-pointer w-full;
 }
 
 .preference-checkbox input[type="checkbox"] {
-  width: 16px; /* Reduced from 18px */
-  height: 16px; /* Reduced from 18px */
-  cursor: pointer;
+  @apply w-4 h-4 cursor-pointer;
   accent-color: var(--accent);
+  -webkit-appearance: none;
+  appearance: none;
+  border: 2px solid var(--dividers);
+  border-radius: 3px;
+  background-color: transparent;
+  position: relative;
+}
+
+.preference-checkbox input[type="checkbox"]:checked {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.preference-checkbox input[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #1a1a1a;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 .preference-label {
-  font-weight: 600;
-  color: var(--text);
-  font-size: 0.95rem; /* Reduced from 1rem */
-  cursor: pointer;
-}
-
-/* Responsive design for smaller screens */
-@media (max-width: 768px) {
-  .dex-preferences-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  
-  .preference-item {
-    padding: 10px 14px;
-  }
-  
-  .preference-checkbox {
-    gap: 10px;
-  }
-  
-  .preference-label {
-    font-size: 0.95rem;
-  }
+  @apply font-semibold text-[var(--text)] text-sm cursor-pointer;
 }
 
 .saving-indicator {
-  text-align: center;
-  padding: 12px;
-  color: var(--text-secondary);
-  font-style: italic;
-  font-size: 0.9rem;
+  @apply text-center p-3 text-[var(--text-secondary)] italic text-sm;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+  .settings-page {
+    @apply px-4;
+  }
+  
+  .settings-container {
+    @apply flex-col gap-6 p-5;
+  }
+  
+  .settings-column {
+    @apply min-w-0 w-full;
+  }
+  
+  .settings-page .page-title {
+    @apply text-xl my-8;
+  }
+  
+  .setting-block h3 {
+    @apply text-xl;
+  }
+  
+  .setting-block p {
+    @apply text-sm;
+  }
+  
+  .theme-choice-grid {
+    @apply grid-cols-1 gap-3;
+  }
+  
+  .theme-card {
+    @apply min-w-0 p-2;
+  }
+  
+  .theme-preview {
+    @apply h-20;
+  }
+  
+  .theme-label {
+    @apply text-sm px-2 py-1;
+  }
+  
+  .dex-preferences-grid {
+    @apply grid-cols-1 gap-2;
+  }
+  
+  .preference-item {
+    @apply px-3 py-1.5;
+  }
+  
+  .preference-checkbox {
+    @apply gap-2;
+  }
+  
+  .preference-checkbox input[type="checkbox"] {
+    @apply w-4 h-4;
+  }
+  
+  .preference-label {
+    @apply text-sm;
+  }
+  
+  .accent-color-options {
+    @apply justify-center gap-2;
+  }
+  
+  .accent-circle {
+    @apply w-6 h-6;
+  }
+  
+  .input-icon-wrapper {
+    @apply h-10;
+  }
+  
+  .input-icon-wrapper .auth-icon {
+    @apply w-5 h-5;
+  }
+  
+  .input-icon-wrapper input {
+    @apply px-2.5 py-2 text-sm;
+  }
+  
+  .input-icon-wrapper .content-filter-wrapper input {
+    padding: 8px 10px 8px 0;
+    font-size: 0.875rem;
+    line-height: 1.25;
+    background: transparent;
+  }
+  
+  .setting-block button {
+    @apply px-2.5 py-2 text-sm;
+  }
+  
+  .switch {
+    @apply w-10 h-5;
+  }
+  
+  .switch-slider {
+    @apply w-4 h-4 top-0.5 left-0.5;
+  }
+  
+  .switch-input:checked + .switch-slider {
+    @apply left-5;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-page {
+    @apply px-3;
+  }
+  
+  .settings-container {
+    @apply p-4 gap-5;
+  }
+  
+  .settings-page .page-title {
+    @apply my-6 text-3xl;
+  }
+  
+  .setting-block h3 {
+    @apply text-lg;
+  }
+  
+  .setting-block p {
+    @apply text-xs;
+  }
+  
+  .theme-choice-grid {
+    @apply gap-2;
+  }
+  
+  .theme-card {
+    @apply p-1.5;
+  }
+  
+  .theme-preview {
+    @apply h-16;
+  }
+  
+  .theme-label {
+    @apply text-xs px-1.5 py-0.5;
+  }
+  
+  .preference-item {
+    @apply px-2.5 py-1;
+  }
+  
+  .preference-checkbox input[type="checkbox"] {
+    @apply w-3.5 h-3.5;
+  }
+  
+  .preference-label {
+    @apply text-xs;
+  }
+  
+  .accent-circle {
+    @apply w-5 h-5;
+  }
+  
+  .input-icon-wrapper {
+    @apply h-9;
+  }
+  
+  .input-icon-wrapper .auth-icon {
+    @apply w-4 h-4;
+  }
+  
+  .input-icon-wrapper input {
+    @apply px-2 py-1.5 text-xs;
+  }
+  
+  .input-icon-wrapper .content-filter-wrapper input {
+    padding: 6px 8px 6px 0;
+    font-size: 0.75rem;
+    line-height: 1.125;
+    background: transparent;
+  }
+  
+  .setting-block button {
+    @apply px-2 py-1.5 text-xs;
+  }
+  
+  .switch {
+    @apply w-9 h-4;
+  }
+  
+  .switch-slider {
+    @apply w-3.5 h-3.5 top-0.5 left-0.5;
+  }
+  
+  .switch-input:checked + .switch-slider {
+    left: 18px;
+  }
+  
+  .show-password-toggle {
+    @apply right-2.5 text-base;
+  }
+}
+
+/* Focus states for better accessibility */
+.setting-block input:focus,
+.input-icon-wrapper input:focus {
+  @apply outline-none border-[var(--accent)];
+}
+
+/* Button disabled states */
+.setting-block button:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.setting-block button:disabled:hover {
+  @apply bg-[var(--accent)] text-[#1a1a1a];
+}
+
+/* Ensure proper contrast for text */
+.setting-block input::placeholder {
+  @apply text-[var(--input-placeholder)];
+  opacity: 1;
+}
+
+/* Animation for theme cards */
+.theme-card {
+  @apply transition-all duration-150 ease-in-out;
+}
+
+.theme-card:hover {
+  @apply transform scale-[1.02];
+}
+
+/* Smooth transitions for all interactive elements */
+.accent-circle,
+.theme-option,
+.preference-item,
+.setting-block button {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+/* Ensure proper spacing for mobile touch targets */
+@media (max-width: 768px) {
+  .setting-block button,
+  .accent-circle,
+  .theme-card,
+  .preference-checkbox {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  .accent-circle {
+    @apply min-h-0 min-w-0;
+  }
 }

@@ -4,9 +4,11 @@ import { caughtAPI, profileAPI } from '../utils/api';
 import { useTheme } from '../components/Shared/ThemeContext';
 import { UserContext } from '../components/Shared/UserContext';
 import { useMessage } from '../components/Shared/MessageContext';
-import { showConfirm } from '../components/Shared/ConfirmDialog';
 import { LoadingSpinner } from '../components/Shared';
 import { fetchCaughtData } from '../api/caught';
+import ImportConfirmModal from '../components/Shared/ImportConfirmModal';
+import RestoreBackupModal from '../components/Shared/RestoreBackupModal';
+import DeleteBackupModal from '../components/Shared/DeleteBackupModal';
 import '../css/Backup.css';
 
 export default function Backup() {
@@ -24,6 +26,12 @@ export default function Backup() {
   const [lastRestoreTime, setLastRestoreTime] = useState(0);
   const [lastDeleteTime, setLastDeleteTime] = useState(0);
   const [restoring, setRestoring] = useState(false); // Added back setRestoring state
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [pendingImportData, setPendingImportData] = useState(null);
+  const [pendingRestoreData, setPendingRestoreData] = useState(null);
+  const [pendingDeleteData, setPendingDeleteData] = useState(null);
   const { theme, accent } = useTheme();
   const { username } = useContext(UserContext);
   const { showMessage } = useMessage();
@@ -33,6 +41,103 @@ export default function Backup() {
   useEffect(() => {
     loadUserData();
   }, []);
+
+  const handleImportConfirm = async () => {
+    if (!pendingImportData) return;
+
+    try {
+      setImporting(true);
+      const pokemonData = pendingImportData.data?.caught || pendingImportData.data;
+      
+      if (pokemonData && Object.keys(pokemonData).length > 0) {
+        await caughtAPI.updateCaughtData(pokemonData);
+        setCaughtData(pokemonData);
+        
+        // Refresh the main dex grid data by calling fetchCaughtData
+        try {
+          const refreshedData = await fetchCaughtData(username);
+          if (refreshedData) {
+            // Force a page refresh to ensure the dex grid shows updated data
+            window.location.reload();
+          }
+        } catch (error) {
+          console.error('Failed to refresh caught data:', error);
+          // If refresh fails, still show success but suggest manual refresh
+          showMessage('Data imported successfully! You may need to refresh the page to see changes in the dex grid.', 'success');
+        }
+      }
+
+      setLastImportTime(Date.now());
+      showMessage('Data imported successfully!', 'success');
+      
+      // Clear the file input after successful import
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) {
+        fileInput.value = '';
+      }
+    } catch (error) {
+      showMessage(`Failed to import data: ${error.message}`, 'error');
+    } finally {
+      setImporting(false);
+      setPendingImportData(null);
+    }
+  };
+
+  const handleRestoreConfirm = async () => {
+    if (!pendingRestoreData) return;
+
+    try {
+      setRestoring(true);
+      const caughtData = pendingRestoreData.data?.caught || pendingRestoreData.data;
+      
+      await caughtAPI.updateCaughtData(caughtData);
+      setCaughtData(caughtData);
+
+      // Refresh the main dex grid data by calling fetchCaughtData
+      try {
+        const refreshedData = await fetchCaughtData(username);
+        if (refreshedData) {
+          // Force a page refresh to ensure the dex grid shows updated data
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error('Failed to refresh caught data:', error);
+        // If refresh fails, still show success but suggest manual refresh
+        showMessage('Backup restored successfully! You may need to refresh the page to see changes in the dex grid.', 'success');
+      }
+
+      setLastRestoreTime(Date.now());
+      showMessage('Backup restored successfully!', 'success');
+    } catch (error) {
+      showMessage(`Failed to restore backup: ${error.message}`, 'error');
+    } finally {
+      setRestoring(false);
+      setPendingRestoreData(null);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!pendingDeleteData) return;
+
+    try {
+      const backupId = pendingDeleteData.id;
+      
+      localStorage.removeItem(backupId);
+      setBackupHistory(prev => prev.filter(backup => backup.id !== backupId));
+
+      // Clear lastBackupData if the deleted backup was the last one
+      if (lastBackupData && backupId === lastBackupData.id) {
+        setLastBackupData(null);
+      }
+
+      setLastDeleteTime(Date.now());
+      showMessage('Backup deleted successfully!', 'success');
+    } catch (error) {
+      showMessage(`Failed to delete backup: ${error.message}`, 'error');
+    } finally {
+      setPendingDeleteData(null);
+    }
+  };
 
   const loadUserData = async () => {
     try {
@@ -144,55 +249,11 @@ export default function Backup() {
         throw new Error('Invalid backup file format - no Pokemon data found');
       }
 
-      // Check if username matches (optional but helpful)
-      if (importedData.user?.username && importedData.user.username !== username) {
-        const confirmed = await showConfirm(
-          `This backup was created by "${importedData.user.username}" but you are logged in as "${username}".\n\nDo you still want to import this data?`
-        );
-        if (!confirmed) {
-          setImporting(false);
-          return;
-        }
-      }
-
-      // Calculate Pokemon count for confirmation
-      const pokemonData = importedData.data?.caught || importedData.data;
-      const pokemonCount = Object.keys(pokemonData).length;
-      
-      // Show confirmation dialog
-      const confirmed = await showConfirm(
-        `Are you sure you want to import this backup?\n\nThis will overwrite your current Pokemon data with ${Object.keys(pokemonData).length} Pokemon from ${importedData.user?.username || 'unknown user'}.\n\nMake sure you have exported your current data first!`
-      );
-
-      if (!confirmed) {
-        setImporting(false);
-        return;
-      }
-
-      // Import the data
-      if (pokemonData && Object.keys(pokemonData).length > 0) {
-        await caughtAPI.updateCaughtData(pokemonData);
-        setCaughtData(pokemonData);
-        
-        // Refresh the main dex grid data by calling fetchCaughtData
-        try {
-          const refreshedData = await fetchCaughtData(username);
-          if (refreshedData) {
-            // Force a page refresh to ensure the dex grid shows updated data
-            window.location.reload();
-          }
-        } catch (error) {
-          console.error('Failed to refresh caught data:', error);
-          // If refresh fails, still show success but suggest manual refresh
-          showMessage('Data imported successfully! You may need to refresh the page to see changes in the dex grid.', 'success');
-        }
-      }
-
-      setLastImportTime(now); // Update the last import time
-      showMessage('Data imported successfully!', 'success');
-      
-      // Clear the file input
-      event.target.value = '';
+      // Store the imported data and show modal
+      setPendingImportData(importedData);
+      setShowImportModal(true);
+      setImporting(false);
+      return;
     } catch (error) {
       showMessage(`Failed to import data: ${error.message}`, 'error');
     } finally {
@@ -293,43 +354,10 @@ export default function Backup() {
         return;
       }
 
-      // Check if username matches (optional but helpful)
-      if (backup.user?.username && backup.user.username !== username) {
-        const confirmed = await showConfirm(
-          `This backup was created by "${backup.user.username}" but you are logged in as "${username}".\n\nDo you still want to restore this data?`
-        );
-        if (!confirmed) {
-          return;
-        }
-      }
-
-      const confirmed = await showConfirm(
-        `Are you sure you want to restore this backup?\n\nThis will overwrite your current Pokemon data with ${Object.keys(caughtData).length} Pokemon from ${formatDate(backup.backupDate || backup.exportDate)}.`
-      );
-
-      if (!confirmed) {
-        return;
-      }
-
-      setRestoring(true);
-      await caughtAPI.updateCaughtData(caughtData);
-      setCaughtData(caughtData);
-
-      // Refresh the main dex grid data by calling fetchCaughtData
-      try {
-        const refreshedData = await fetchCaughtData(username);
-        if (refreshedData) {
-          // Force a page refresh to ensure the dex grid shows updated data
-          window.location.reload();
-        }
-      } catch (error) {
-        console.error('Failed to refresh caught data:', error);
-        // If refresh fails, still show success but suggest manual refresh
-        showMessage('Backup restored successfully! You may need to refresh the page to see changes in the dex grid.', 'success');
-      }
-
-      setLastRestoreTime(now);
-      showMessage('Backup restored successfully!', 'success');
+      // Store the backup data and show modal
+      setPendingRestoreData(backup);
+      setShowRestoreModal(true);
+      return;
     } catch (error) {
       showMessage(`Failed to restore backup: ${error.message}`, 'error');
     } finally {
@@ -354,24 +382,10 @@ export default function Backup() {
       const backup = JSON.parse(backupData);
       const caughtCount = Object.keys(backup.data?.caught || backup.data || {}).length;
 
-      const confirmed = await showConfirm(
-        `Are you sure you want to delete this backup?\n\nThis will permanently remove the backup containing ${caughtCount} Pokemon from ${formatDate(backup.backupDate || backup.exportDate)}.`
-      );
-
-      if (!confirmed) {
-        return;
-      }
-
-      localStorage.removeItem(backupId);
-      setBackupHistory(prev => prev.filter(backup => backup.id !== backupId));
-
-      // Clear lastBackupData if the deleted backup was the last one
-      if (lastBackupData && backupId === lastBackupData.id) {
-        setLastBackupData(null);
-      }
-
-      setLastDeleteTime(now);
-      showMessage('Backup deleted successfully!', 'success');
+      // Store the backup data and show modal
+      setPendingDeleteData({ ...backup, id: backupId });
+      setShowDeleteModal(true);
+      return;
     } catch (error) {
       showMessage(`Failed to delete backup: ${error.message}`, 'error');
     }
@@ -628,6 +642,50 @@ export default function Backup() {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      {showImportModal && (
+        <ImportConfirmModal
+          isOpen={showImportModal}
+          onClose={() => {
+            setShowImportModal(false);
+            setPendingImportData(null);
+            // Clear the file input when modal is closed
+            const fileInput = document.querySelector('input[type="file"]');
+            if (fileInput) {
+              fileInput.value = '';
+            }
+          }}
+          onConfirm={handleImportConfirm}
+          backupData={pendingImportData}
+          username={username}
+        />
+      )}
+
+      {showRestoreModal && (
+        <RestoreBackupModal
+          isOpen={showRestoreModal}
+          onClose={() => {
+            setShowRestoreModal(false);
+            setPendingRestoreData(null);
+          }}
+          onConfirm={handleRestoreConfirm}
+          backupData={pendingRestoreData}
+          username={username}
+        />
+      )}
+
+      {showDeleteModal && (
+        <DeleteBackupModal
+          isOpen={showDeleteModal}
+          onClose={() => {
+            setShowDeleteModal(false);
+            setPendingDeleteData(null);
+          }}
+          onConfirm={handleDeleteConfirm}
+          backupData={pendingDeleteData}
+        />
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 // ConfirmDialog.jsx
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import "../../css/ConfirmDialog.css";
+// import "../../css/ConfirmDialog.css"; // Moved to backup folder
 
 let resolver = null;
 let isDialogOpen = false;
@@ -29,27 +29,10 @@ function ConfirmDialog({ message, root, container }) {
 
   useEffect(() => {
     const body = document.body;
-    const html = document.documentElement;
-
-    // Check if sidebar is open before adding modal-open class
-    const sidebarOpen = document.querySelector('.sidebar-overlay.open');
+    body.style.overflow = 'hidden';
     
-    if (!sidebarOpen) {
-      // Add modal-open class to prevent scrolling only if sidebar is not open
-      body.classList.add("modal-open");
-      html.classList.add("modal-open");
-    }
-
     return () => {
-      // Only remove modal-open class if no other modals are open
-      const progressModalOpen = document.querySelector('.progress-modal-overlay');
-      const otherModalsOpen = document.querySelectorAll('.modal-overlay, .confirm-overlay').length > 1;
-      
-      if (!progressModalOpen && !otherModalsOpen) {
-        // Cleanup function - remove modal-open class only if no other modals are open
-        body.classList.remove("modal-open");
-        html.classList.remove("modal-open");
-      }
+      body.style.overflow = '';
     };
   }, []);
 

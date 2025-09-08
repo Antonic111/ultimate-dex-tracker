@@ -1,0 +1,251 @@
+/* ================================
+   LOGIN PAGE STYLES - TAILWIND + MOBILE
+==================================*/
+
+/* Header logo sizing for auth pages */
+.auth-page header img {
+  @apply h-[40px] md:h-[90px] max-w-[280px] md:max-w-[380px] lg:max-w-[450px];
+}
+
+/* Main login form container */
+.login-form {
+  @apply max-w-lg mx-auto mt-10 mb-8 px-8 pb-5 rounded-lg shadow-lg w-full border-2;
+  background-color: var(--auth-boxes);
+  border-color: var(--border-color);
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Login title */
+.login-title {
+  @apply text-center text-4xl font-black py-9 m-0;
+  color: var(--accent);
+}
+
+/* Form fields container */
+.login-form-fields {
+  @apply flex flex-col gap-3;
+}
+
+/* Input wrapper with icon */
+.input-icon-wrapper {
+  @apply flex items-center rounded-md p-4;
+  background: var(--settings-input);
+  border: 1px solid var(--border-color);
+}
+
+/* Input fields */
+.login-input {
+  @apply flex-1 bg-transparent border-0 outline-none text-base;
+  color: var(--text);
+}
+
+.login-input::placeholder {
+  color: var(--searchbar-placeholder-text);
+}
+
+/* Password wrapper for toggle button */
+.password-wrapper {
+  @apply relative;
+}
+
+/* Show/hide password toggle */
+.show-password-toggle {
+  @apply absolute top-1/2 right-4 transform -translate-y-1/2 cursor-pointer;
+  color: var(--svg-icons);
+  transition: color var(--transition-speed);
+}
+
+.show-password-toggle:hover {
+  color: var(--svg-icons);
+}
+
+/* Auth icons */
+.auth-icon {
+  @apply w-5 h-5 mr-3;
+  stroke: var(--svg-icons);
+  transition: color var(--transition-speed);
+}
+
+/* Remember me checkbox */
+.remember-me-checkbox {
+  @apply flex items-center cursor-pointer select-none text-sm font-medium my-3;
+  color: var(--remember-me-text);
+  transition: color var(--transition-speed);
+  gap: 8px;
+  position: relative;
+  padding-left: 28px;
+  line-height: 1;
+}
+
+.remember-me-checkbox input[type="checkbox"] {
+  @apply absolute opacity-0 cursor-pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Checkbox container */
+.remember-me-checkbox .checkbox-svg {
+  @apply absolute left-0 h-5 w-5 flex items-center justify-center rounded;
+  border: 2px solid var(--accent);
+  background-color: var(--settings-input);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* SVG tick styling */
+.remember-me-checkbox .checkbox-check {
+  @apply w-3.5 h-3.5;
+  stroke: var(--text);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.remember-me-checkbox input:checked ~ .checkbox-svg {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.remember-me-checkbox input:checked ~ .checkbox-svg .checkbox-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Login button */
+.login-button {
+  @apply py-3 rounded-lg font-bold cursor-pointer transition-all duration-200;
+  background-color: var(--accent);
+  color: #000;
+  border: none;
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+  color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.login-button:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Auth redirect links */
+.auth-redirect {
+  @apply mt-3 text-sm text-center;
+  color: #ccc;
+}
+
+.auth-redirect a {
+  color: var(--accent);
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.auth-redirect a:hover {
+  opacity: 0.7;
+}
+
+.auth-redirect.double {
+  @apply flex flex-col items-center gap-2 mt-4;
+}
+
+.auth-divider {
+  @apply w-3/5 h-px;
+  background: var(--dividers);
+  transition: background var(--transition-speed);
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .login-form {
+    @apply max-w-sm mx-4 mt-24 mb-48 px-6 pb-4;
+  }
+  
+  .login-title {
+    @apply text-3xl py-6;
+  }
+  
+  .input-icon-wrapper {
+    @apply p-3;
+  }
+  
+  .login-input {
+    @apply text-sm;
+  }
+  
+  .auth-icon {
+    @apply w-4 h-4 mr-2;
+  }
+  
+  .show-password-toggle {
+    @apply right-3;
+  }
+  
+  .login-button {
+    @apply py-2.5 text-sm;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form {
+    @apply mx-3 mt-16 mb-36 px-4 pb-3;
+  }
+  
+  .login-title {
+    @apply text-2xl py-4;
+  }
+  
+  .input-icon-wrapper {
+    @apply p-2.5;
+  }
+  
+  .login-input {
+    @apply text-sm;
+  }
+  
+  .auth-icon {
+    @apply w-4 h-4 mr-2;
+  }
+  
+  .login-button {
+    @apply py-2 text-sm;
+  }
+  
+  .auth-redirect {
+    @apply text-xs;
+  }
+}
+
+/* Animation keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Transparent autofill styling - maintains site theme */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-internal-autofill-selected {
+  background-color: transparent !important;
+  color: var(--text) !important;
+  transition: background-color 9999s ease-in-out 0s;
+  -webkit-text-fill-color: var(--text) !important;
+  box-shadow: none !important;
+}
+

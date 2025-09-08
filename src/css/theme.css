@@ -1,3 +1,5 @@
+/* CSS Variables for Ultimate Dex Tracker Theme */
+
 :root {
   --transition-speed: 0.3s;
   
@@ -10,17 +12,17 @@
 }
 
 [data-theme="dark"] {
-
-    /* GLOBALS*/
+  /* GLOBALS*/
   --accent: #ffe76a;
   --accent-hover: #e6cd55;
+  --accent-rgb: 255, 231, 106;
   --dividers: #3f3f3f;
   --main-bg: #111;
   --main-bg2: #0a0a0a;
   --text: #ffffff;
   --header-hello: #aaa;
 
-    /* APP.CSS */
+  /* APP.CSS */
   --header: #0a0a0a;
   --grid-headers: #ffffff;
   --grid-desc: #d5d5d5;
@@ -60,10 +62,10 @@
   --confirm-panel-text: #ffffff;
 
   /* SIDEBAR.CSS */
-  --sidebar-bg: #232323;
+  --sidebar-bg: #181818;
   --sidebar-pokemon-bg: #181818;
   --sidebar-text: #ffffff;
-  --sidebar-edit-inputs: #191919;
+  --sidebar-edit-inputs: #0f0f0f;
   --sidebar-display: #181818;
 
   /* EVOLUTIONCHAIN.CSS */
@@ -97,6 +99,9 @@
   --progress-bg: #181818;
   --progress-icons: #ffffff;
   --progressbar-input: #3f3f3f;
+
+  /* INPUT PLACEHOLDER STYLES */
+  --input-placeholder: #4a4a4a;
   --modal-buttons: #2f2f2f;
   --modal-buttons-hover: #3a3a3a;
   --modal-buttons-hover-text: #e0e0e0;
@@ -117,7 +122,7 @@
   --trainer-search-border: #333333;
   --trainer-search-text: #ffffff;
   --trainer-search-placeholder: #8a8a8a;
-  --trainer-card-bg: linear-gradient(135deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+  --trainer-card-bg: #151515;
   --trainer-card-border: #333333;
   --trainer-card-shadow: 0 10px 28px rgba(0,0,0,.35);
   --trainer-card-hover-shadow: 0 10px 28px rgba(0,0,0,.45);
@@ -127,134 +132,197 @@
   --skeleton-bg: linear-gradient(90deg,#141414 25%,#1b1b1b 37%,#141414 63%);
 }
 
-
-
-
-
-
-
-
-
-
-
 [data-theme="light"] {
+  /* GLOBALS - Improved light mode with better blending */
+  --accent: #fbbf24; /* amber-400 */
+  --accent-hover: #f59e0b; /* amber-500 */
+  --dividers: #d1d5db; /* gray-300 - softer */
+  --main-bg: #fafafa; /* slightly off-white for better blending */
+  --main-bg2: #f3f4f6; /* gray-100 */
+  --text: #1f2937; /* gray-800 - better contrast than gray-900 */
+  --header-hello: #4b5563; /* gray-600 - softer */
 
-    /* GLOBALS */
-  --accent: #ffe76a;
-  --accent-hover: #e6cd55;
-  --dividers: #3f3f3f;
-  --main-bg: #ffff;
-  --main-bg2: #f6f6f6;
-  --text: #000000;
-  --header-hello: #000000;
-
-    /* APP.CSS */
-  --header: #e1e1e1;
-  --grid-headers: #000000;
-  --grid-desc: #000000;
-  --main-grid-divider: #000000;
-  --pokemon-box-bg: #ffffff;
-  --pokemon-box-bg2: #ffffff;
-  --border-color: #ffffff;
-  --pokeslot: #e1e1e1;
-  --pokename: #000000;
-  --collapse-btn: #000000;
-  --collapse-icon: #ffffff;
+  /* APP.CSS */
+  --header: #f8fafc; /* slate-50 - softer than gray-100 */
+  --grid-headers: #1f2937; /* gray-800 */
+  --grid-desc: #4b5563; /* gray-600 */
+  --main-grid-divider: #9ca3af; /* gray-400 */
+  --pokemon-box-bg: #ffffff; /* white */
+  --pokemon-box-bg2: #f8fafc; /* slate-50 */
+  --border-color: #d1d5db; /* gray-300 - more visible than gray-200 */
+  --pokeslot: #f3f4f6; /* gray-100 */
+  --pokename: #1f2937; /* gray-800 */
+  --collapse-btn: #4b5563; /* gray-600 */
+  --collapse-icon: #ffffff; /* white */
 
   /* AUTH.CSS */
-  --auth-boxes: #ffffff;
-  --text-color: #000000;
-  --remember-me-text: #000000;
-  --svg-icons: #000000;
-  --user-dropdown: #ffffff;
-  --nav-link-bg: rgba(0, 0, 0, 0.05);
-  --nav-link-border: rgba(0, 0, 0, 0.1);
-  --nav-link-hover-bg: rgba(0, 0, 0, 0.1);
-  --nav-link-text: #333333;
-  --nav-link-hover-text: #000000;
-  --nav-link-shadow: rgba(0, 0, 0, 0.1);
-  --dropdown-bg: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
-  --dropdown-border: rgba(0, 0, 0, 0.1);
-  --dropdown-item-text: #333333;
-  --dropdown-item-hover-bg: rgba(0, 0, 0, 0.08);
-  --dropdown-item-hover-text: #000000;
-  --dropdown-icon: #333333;
-  --dropdown-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.1);
-  --dropdown-inset-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.1);
+  --auth-boxes: #ffffff; /* white */
+  --text-color: #1f2937; /* gray-800 */
+  --remember-me-text: #4b5563; /* gray-600 */
+  --svg-icons: #6b7280; /* gray-500 */
+  --user-dropdown: #ffffff; /* white */
+  --nav-link-bg: rgba(0, 0, 0, 0.04);
+  --nav-link-border: rgba(0, 0, 0, 0.08);
+  --nav-link-hover-bg: rgba(0, 0, 0, 0.06);
+  --nav-link-text: #4b5563; /* gray-600 */
+  --nav-link-hover-text: #1f2937; /* gray-800 */
+  --nav-link-shadow: rgba(0, 0, 0, 0.08);
+  --dropdown-bg: #ffffff; /* white */
+  --dropdown-border: #d1d5db; /* gray-300 */
+  --dropdown-item-text: #4b5563; /* gray-600 */
+  --dropdown-item-hover-bg: #f8fafc; /* slate-50 */
+  --dropdown-item-hover-text: #1f2937; /* gray-800 */
+  --dropdown-icon: #6b7280; /* gray-500 */
+  --dropdown-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --dropdown-inset-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.04);
 
   /* CONFIRMDIALOG.CSS */
-  --confirm-panel: #ffffff;
-  --confirm-panel-text: #000000;
+  --confirm-panel: #ffffff; /* white */
+  --confirm-panel-text: #111827; /* gray-900 */
 
   /* SIDEBAR.CSS */
-  --sidebar-bg: #e1e1e1;
-  --sidebar-pokemon-bg: #ffffff;
-  --sidebar-text: #000000;
-  --sidebar-edit-inputs: #ffffff;
-  --sidebar-display: #ffffff;
+  --sidebar-bg: #f8fafc; /* slate-50 */
+  --sidebar-pokemon-bg: #ffffff; /* white */
+  --sidebar-text: #1f2937; /* gray-800 */
+  --sidebar-edit-inputs: #ffffff; /* white */
+  --sidebar-display: #ffffff; /* white */
 
   /* EVOLUTIONCHAIN.CSS */
-  --evo-arrow: #000000;
-  --evo-bg: #ffffff;
-  --evo-text: #000000;
+  --evo-arrow: #6b7280; /* gray-500 */
+  --evo-bg: #ffffff; /* white */
+  --evo-text: #1f2937; /* gray-800 */
 
   /* PROFILE.CSS */
-  --profile-card-bg: #ffffff;
-  --profile-top-bg: #ffffff;
-  --profile-text: #000000;
-  --profile-labels: #000000;
-  --profile-fields: #ffffff;
+  --profile-card-bg: #ffffff; /* white */
+  --profile-top-bg: #f8fafc; /* slate-50 */
+  --profile-text: #1f2937; /* gray-800 */
+  --profile-labels: #6b7280; /* gray-500 */
+  --profile-fields: #f8fafc; /* slate-50 */
 
   /* FAVORITESELECTIONMODAL.CSS */
-  --profile-modal-bg: #ffffff;
-  --profile-modal-boxes: #ffffff;
-  --profile-modal-search-bg: #ffffff;
+  --profile-modal-bg: #ffffff; /* white */
+  --profile-modal-boxes: #f8fafc; /* slate-50 */
+  --profile-modal-search-bg: #ffffff; /* white */
 
   /* SEARCHBAR.CSS */
-  --searchbar-bg: #ffffff;
-  --searchbar-inputs: #ececec;
-  --searchbar-dropdown: #e1e1e1;
-  --searchbar-dropdown-selected: #999;
-  --searchbar-placeholder-text: #000000;
+  --searchbar-bg: #ffffff; /* white */
+  --searchbar-inputs: #f8fafc; /* slate-50 */
+  --searchbar-dropdown: #f8fafc; /* slate-50 */
+  --searchbar-dropdown-selected: #d1d5db; /* gray-300 */
+  --searchbar-placeholder-text: #9ca3af; /* gray-400 */
 
   /* PROGRESSBARS.CSS */
-  --progressbar-info: #000000;
-  --progressbar-bg: #f6f6f6;
-  --progressbar-track: #e1e1e1;
-  --progress-bg: #ffffff;
-  --progress-icons: #000000;
-  --progressbar-input: #ffffff;
-  --modal-buttons: #ffffff;
-  --modal-buttons-hover: #e8e8e8;
-  --modal-buttons-hover-text: #333333;
-  --modal-inputs: #313131;
-  --modal-dropdown: #ffffff;
-  --template-buttons: #ffffff;
+  --progressbar-info: #6b7280; /* gray-500 */
+  --progressbar-bg: #f8fafc; /* slate-50 */
+  --progressbar-track: #d1d5db; /* gray-300 */
+  --progress-bg: #ffffff; /* white */
+  --progress-icons: #4b5563; /* gray-600 */
+  --progressbar-input: #f8fafc; /* slate-50 */
+  --modal-buttons: #f8fafc; /* slate-50 */
+  --modal-buttons-hover: #d1d5db; /* gray-300 */
+  --modal-buttons-hover-text: #4b5563; /* gray-600 */
+  --modal-inputs: #f8fafc; /* slate-50 */
+  --modal-dropdown: #ffffff; /* white */
+  --template-buttons: #f8fafc; /* slate-50 */
 
   /* WELCOMEPAGE.CSS */
-  --welcome-text: #2d2d2d;
+  --welcome-text: #4b5563; /* gray-600 */
 
-    /* SETTINGS.CSS */
-  --settings-bg: #ffffff;
-  --settings-input: #f0f0f0;
+  /* SETTINGS.CSS */
+  --settings-bg: #ffffff; /* white */
+  --settings-input: #f8fafc; /* slate-50 */
 
   /* TRAINERS.CSS */
-  --trainer-search-bg: #f0f0f0;
-  --trainer-search-border: #d0d0d0;
-  --trainer-search-text: #333333;
-  --trainer-search-placeholder: #666666;
-  --trainer-card-bg: linear-gradient(135deg, rgba(0,0,0,.03), rgba(0,0,0,.01));
-  --trainer-card-border: #d0d0d0;
-  --trainer-card-shadow: 0 10px 28px rgba(0,0,0,.15);
-  --trainer-card-hover-shadow: 0 10px 28px rgba(0,0,0,.25);
-  --trainer-avatar-border: #999999;
-  --trainer-avatar-bg: radial-gradient(circle at center, #3b3b3f 0%, #1e1e20 100%);
+  --trainer-search-bg: #f8fafc; /* slate-50 */
+  --trainer-search-border: #d1d5db; /* gray-300 */
+  --trainer-search-text: #4b5563; /* gray-600 */
+  --trainer-search-placeholder: #9ca3af; /* gray-400 */
+  --trainer-card-bg: #ffffff; /* white */
+  --trainer-card-border: #e5e7eb; /* gray-200 */
+  --trainer-card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --trainer-card-hover-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --trainer-avatar-border: #d1d5db; /* gray-300 */
+  --trainer-avatar-bg: #f3f4f6; /* gray-100 */
 
-  --skeleton-bg: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 37%,#f0f0f0 63%);
+  --skeleton-bg: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
+
+  /* INPUT PLACEHOLDER STYLES */
+  --input-placeholder: #9ca3af;
 }
 
-
-
-/*
+/* Example usage:
   background-color: var(--header);
-  transition: background-color var(--transition-speed );
+  transition: background-color var(--transition-speed);
+*/
+
+/* Dropdown animation */
+@keyframes dropdownOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pokémon Slot Hover Effects - Pure CSS (PC Only) */
+@media (min-width: 768px) {
+  [data-readonly="false"]:hover {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 6px var(--accent) !important;
+  }
+
+  /* Caught Pokémon get green hover effects */
+  [data-caught="true"][data-readonly="false"]:hover {
+    border-color: #22c55e !important; /* green-500 */
+    box-shadow: 0 0 6px #22c55e !important; /* green-500 */
+  }
+
+  /* Reset styles when not hovering */
+  [data-readonly="false"] {
+    transition: all 0.1s ease;
+  }
+}
+
+/* Override any global image constraints for profile images */
+.profile-icon {
+  max-width: none !important;
+  width: auto !important;
+}
+
+/* Sidebar animation keyframes */
+@keyframes slideInSidebar {
+  from { transform: translateX(115%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideOutSidebar {
+  from { transform: translateX(0); }
+  to { transform: translateX(115%); }
+}
+
+/* Input placeholder styling for better visibility */
+input::placeholder,
+textarea::placeholder {
+  color: var(--input-placeholder) !important;
+  opacity: 1 !important;
+}
+
+/* Ensure text inputs have proper contrast */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="email"],
+input[type="password"],
+textarea {
+  color: var(--sidebar-text) !important;
+}
+
+/* Focus states for better accessibility */
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+}

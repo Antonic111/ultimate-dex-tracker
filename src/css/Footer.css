@@ -1,10 +1,12 @@
+/* Footer Styles - Traditional CSS with Tailwind integration */
+
 .site-footer {
   background-color: var(--header);
   border-top: 8px solid var(--accent);
   padding: 40px 0 20px 0;
   color: var(--text);
   transition: background-color var(--transition-speed);
-  margin-top: auto; /* Push footer to bottom */
+  margin-top: auto;
 }
 
 .footer-content {
@@ -14,6 +16,16 @@
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 40px;
   padding: 0 16px;
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    max-width: 100%;
+    margin: 0 8px;
+    padding: 0 12px;
+    gap: 20px;
+    grid-template-columns: 1fr;
+  }
 }
 
 .footer-section h3 {
@@ -66,25 +78,27 @@
 }
 
 .social-links {
-  margin-top: 16px;
+  margin-top: 12px;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: row;
+  justify-content: center;
+  gap: 16px;
 }
 
 .social-link {
   color: var(--accent);
   text-decoration: none;
-  font-weight: 600;
   transition: color var(--transition-speed);
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all var(--transition-speed);
 }
 
 .social-link:hover {
   color: var(--text);
-  text-decoration: underline;
 }
 
 .youtube-link {
@@ -95,6 +109,20 @@
   color: var(--accent);
 }
 
+.discord-link {
+  color: var(--accent);
+}
+
+.discord-icon {
+  fill: currentColor;
+  opacity: 0.8;
+  transition: opacity var(--transition-speed);
+}
+
+.discord-link:hover .discord-icon {
+  opacity: 1;
+}
+
 .footer-bottom {
   max-width: 1300px;
   margin: 0 auto;
@@ -102,6 +130,7 @@
   padding: 20px 16px 0 16px;
   border-top: 1px solid var(--accent);
   margin-top: 30px;
+  overflow: hidden;
 }
 
 .footer-bottom p {
@@ -109,6 +138,9 @@
   color: var(--text);
   font-size: 0.9rem;
   opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Inline poké ball icons for the footer tagline */
@@ -118,6 +150,8 @@
   vertical-align: -3px;
   margin: 0 4px;
   image-rendering: -webkit-optimize-contrast;
+  display: inline-block;
+  flex-shrink: 0;
 }
 
 /* Responsive adjustments */
@@ -133,6 +167,14 @@
   
   .site-footer {
     padding: 30px 0 15px 0;
+  }
+  
+  /* Allow footer tagline to wrap on mobile */
+  .footer-bottom p {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.4;
   }
 }
 

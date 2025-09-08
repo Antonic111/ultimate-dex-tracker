@@ -169,8 +169,8 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
     res
       .cookie("token", token, {
         httpOnly: true,
-        secure: true,        // true for HTTPS (both Vercel and Render use HTTPS)
-        sameSite: "none",    // required for cross-origin requests
+        secure: process.env.NODE_ENV === 'production', // Only secure in production (HTTPS)
+        sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax", // lax for localhost, none for production
         maxAge: rememberMe ? 1000 * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 2, // 30 days vs 2 hours
       })
       .json({
@@ -269,8 +269,8 @@ router.post("/verify-code", corsMiddleware, async (req, res) => {
     res
       .cookie("token", token, {
         httpOnly: true,
-        secure: true,
-        sameSite: "none",
+        secure: process.env.NODE_ENV === 'production', // Only secure in production (HTTPS)
+        sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax", // lax for localhost, none for production
         maxAge: 1000 * 60 * 60 * 24 * 7,
       })
       .json({
@@ -402,8 +402,8 @@ router.post("/reset-password", async (req, res) => {
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    sameSite: "none",   // required for cross-origin requests
-    secure: true,       // true for HTTPS (both Vercel and Render use HTTPS)
+    sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax", // lax for localhost, none for production
+    secure: process.env.NODE_ENV === 'production', // Only secure in production (HTTPS)
     path: "/",         // be explicit
   });
   return res.status(204).end(); // no body, prevents caching weirdness
@@ -870,8 +870,8 @@ router.delete("/account", authenticateUser, async (req, res) => {
     // kill auth cookie
     res.clearCookie("token", {
       httpOnly: true,
-      sameSite: "none",  // required for cross-origin requests
-      secure: true,      // true for HTTPS (both Vercel and Render use HTTPS)
+      sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax", // lax for localhost, none for production
+      secure: process.env.NODE_ENV === 'production', // Only secure in production (HTTPS)
       path: "/",
     });
 
@@ -910,7 +910,12 @@ router.post("/account/delete/confirm", authenticateUser, async (req, res) => {
     if (!ok) return res.status(400).json({ error: "Wrong code." });
 
     await User.findByIdAndDelete(req.userId);
-    res.clearCookie("token", { httpOnly: true, sameSite: "none", secure: true, path: "/" });
+    res.clearCookie("token", { 
+      httpOnly: true, 
+      sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax", 
+      secure: process.env.NODE_ENV === 'production', 
+      path: "/" 
+    });
     return res.status(204).end();
   } catch (e) {
     console.error("Delete account confirmation error:", e);

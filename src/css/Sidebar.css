@@ -1,121 +1,38 @@
-/* === Sidebar Overlay & Panel === */
-.sidebar-overlay {
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: 1000;
-}
+/* Sidebar Styles using Tailwind @apply */
 
-.sidebar-panel {
-    display: flex;
-  flex-direction: column;
+.sidebar-container {
+  @apply fixed right-0 top-0 h-full w-full md:w-80 lg:w-96 z-50 overflow-y-auto shadow-[-6px_0_24px_rgba(0,0,0,0.75)];
   background-color: var(--sidebar-bg);
-  transition: background-color var(--transition-speed );
-  width: 390px;
-  height: 100vh;
-  box-shadow: -6px 0 24px #000c;
-  padding: 32px 24px 24px 24px;
-  position: relative;
-  animation: slideInSidebar 0.37s cubic-bezier(.65,0,.35,1) both;
-  will-change: transform;
-  overflow: visible;
-  box-sizing: border-box;
-  overflow-y: auto;
 }
 
-.sidebar-panel.slide-out {
-  animation: slideOutSidebar 0.37s cubic-bezier(.65,0,.35,1) both;
+/* Desktop: Start sidebar after scrollbar background */
+@media (min-width: 769px) {
+  .sidebar-container {
+    right: 20px;
+  }
 }
 
-/* === Sidebar Close Button === */
-.sidebar-close {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  z-index: 10;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.sidebar-close-icon svg {
-  display: block;
-  transition: transform 0.18s, filter 0.18s;
-}
-.sidebar-close:hover,
-.sidebar-close:focus {
-  background: #ffffff33;
-  box-shadow: 0 2px 10px #ffffff80;
-  outline: none;
-}
-.sidebar-close:hover .sidebar-close-icon svg,
-.sidebar-close:focus .sidebar-close-icon svg {
-  transform: scale(1.13) rotate(-17deg);
-  filter: drop-shadow(0 0 6px #ffffff77);
+.sidebar-close-button {
+  @apply absolute top-2 right-2 p-2 rounded-full transition-all duration-200 z-10;
 }
 
-
-/* Flex row: image + name aligned horizontally */
-.sidebar-top-flex {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  margin-bottom: 10px;
-}
-.sidebar-poke-img-wrap {
-  background-color: var(--sidebar-pokemon-bg);
-  transition: background-color var(--transition-speed );
-  border-radius: 50%;
-  box-shadow: 0 2px 16px #0008;
-  width: 92px;
-  height: 92px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 3px solid #313131;
-  image-rendering: pixelated;
-  position: relative;
-}
-.sidebar-poke-img {
-  width: 100px;
-  height: 100px;
+.sidebar-close-icon {
+  @apply hover:drop-shadow-[0_0_2px_rgba(255,255,255,0.9)] md:hover:drop-shadow-[0_0_3px_rgba(255,255,255,1)] md:hover:-rotate-[30deg] md:hover:scale-110 lg:hover:drop-shadow-[0_0_4px_rgba(255,255,255,1)] lg:hover:-rotate-[30deg] lg:hover:scale-110 transition-all duration-200;
 }
 
-.caught-info-icon img {
-  width: 45px;
-  height: 45px;
-  max-width: 45px;
-  max-height: 45px;
+.sidebar-header {
+  @apply flex items-center gap-4 p-6 pt-6;
 }
 
-.sidebar-poke-name {
-  font-size: 2rem;
-  font-weight: 900;
-  color: var(--accent);
-  letter-spacing: 0.5px;
-  text-shadow: 0 2px 5px rgb(0, 0, 0);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.8;
-}
-
-.sidebar-poke-name-container {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.sidebar-pokemon-image {
+  @apply relative bg-[var(--sidebar-pokemon-bg)] rounded-full p-1 border-4 border-[var(--accent)];
 }
 
 .shiny-sparkles-overlay {
   position: absolute;
   top: 0px;
   right: -8px;
-  background: rgba(0, 0, 0, 0.8);
+  background: #000000;
   border-radius: 50%;
   width: 28px;
   height: 28px;
@@ -132,791 +49,588 @@
   opacity: 1;
 }
 
-/* Info + badges grid below name */
-.sidebar-info-badges-row {
-  min-height: 80px;
-  display: flex;
-  gap: 32px;
+.sidebar-pokemon-name {
+  @apply text-3xl font-bold text-[var(--accent)] drop-shadow-[0_4px_1px_rgba(0,0,0,0.8)];
 }
 
-.sidebar-poke-meta-centered {
-  font-size: 1rem;
-  width: 100%;
+.sidebar-meta-section {
+  @apply flex items-start justify-between px-6 pb-1;
 }
 
-.sidebar-dexnum {
-  font-family: 'Roboto Mono', 'Consolas', monospace;
-  color: var(--sidebar-text);
-  transition: color var(--transition-speed );
-  font-weight: 800;
-  font-size: 1rem;
+.sidebar-meta-info {
+  @apply flex flex-col gap-0.5;
 }
 
-.sidebar-generation {
-  color: var(--sidebar-text);
-  transition: color var(--transition-speed );
-  font-weight: 700;
-  font-size: 1rem;
+.sidebar-meta-text {
+  @apply text-sm text-[var(--sidebar-text)] opacity-95;
+}
+
+.sidebar-type-badges {
+  @apply flex flex-col gap-2 items-start;
+}
+
+.sidebar-divider {
+  @apply absolute left-6 right-6 border-t-4 border-[var(--accent)] opacity-60 rounded-full;
+}
+
+.sidebar-content {
+  @apply absolute left-6 right-6 pb-4 flex flex-col;
+  top: 0;
+  min-height: calc(100% - 300px);
+}
+
+.sidebar-not-caught {
+  @apply text-center py-8;
+}
+
+.sidebar-not-caught-text {
+  @apply text-lg text-[var(--sidebar-text)] mb-4;
+}
+
+.sidebar-set-caught-button {
+  @apply px-6 py-2 bg-[var(--accent)] text-black font-bold rounded-lg hover:bg-[var(--accent-hover)] hover:text-white transition-all duration-200;
 }
 
 .sidebar-form {
+  @apply space-y-2 px-0;
+}
+
+.sidebar-form-group {
+  @apply space-y-0.5;
+}
+
+.sidebar-label {
+  @apply block text-sm font-semibold m-0 p-0;
   color: var(--sidebar-text);
-  transition: color var(--transition-speed );
-  font-weight: 600;
-  font-size: 1rem;
-
 }
 
-.sidebar-type-col {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+.sidebar-input {
+    @apply w-full px-3 rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-opacity-50 transition-all duration-200;
+    background-color: var(--sidebar-edit-inputs);
+    border: 1px solid var(--border-color);
+    color: var(--sidebar-text);
+    height: 36px;
+    min-height: 36px;
+    max-height: 36px;
+    padding: 8px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
 }
 
-/* Type badge styles (as before) */
-.type-badge {
-  border: 3px solid;
-  border-color: currentColor;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 2px 10px 2px 10px;
-  border-radius: 999px;
-  font-size: 1rem;
-  font-weight: 700;
-  box-shadow: 0 2px 12px #0001;
-  border: none;
-  min-width: 130px;
-  width: 100px;
+.sidebar-input::placeholder {
+  color: var(--input-placeholder);
 }
 
-.type-badge-icon {
-  width: 25px;
-  height: 25px;
-  margin-right: 6px;
-}
-.type-badge-label {
-  font-weight: 700;
-  font-size: 1.1em;
-  letter-spacing: 0.2px;
-  margin-left: 2px;
-}
-
-
-/* Type Colors (provided by you) */
-.type-grass   { background: #3fa129; color: #fff; border: 3px solid #265817; }
-.type-poison  { background: #9141cb; color: #fff; border: 3px solid #431061; }
-.type-fire    { background: #e62829; color: #fff; border: 3px solid #861212; }
-.type-water   { background: #2980ef; color: #fff; border: 3px solid #104073; }
-.type-flying  { background: #81b9ef; color: #fff; border: 3px solid #335985; }
-.type-bug     { background: #91a119; color: #fff; border: 3px solid #495710; }
-.type-normal  { background: #9fa19f; color: #fff; border: 3px solid #545554; }
-.type-electric{ background: #fac000; color: #fff; border: 3px solid #b39400; }
-.type-psychic { background: #ef4179; color: #fff; border: 3px solid #7d1f3f; }
-.type-ice     { background: #3fd8ff; color: #fff; border: 3px solid #156077; }
-.type-ground  { background: #915121; color: #fff; border: 3px solid #513011; }
-.type-rock    { background: #afa981; color: #fff; border: 3px solid #63603f; }
-.type-steel   { background: #60a1b8; color: #fff; border: 3px solid #285466; }
-.type-ghost   { background: #704170; color: #fff; border: 3px solid #2f1933; }
-.type-dragon  { background: #5060e1; color: #fff; border: 3px solid #2c3073; }
-.type-dark    { background: #50413f; color: #fff; border: 3px solid #201313; }
-.type-fairy   { background: #ef70ef; color: #fff; border: 3px solid #b030b0; }
-.type-fighting{ background: #ff8000; color: #fff; border: 3px solid #a14500; }
-
-
-/* Divider & Animation as before */
-.sidebar-divider {
-  width: 100%;
-  border: none;
-  border-top: 3px solid #3f3f3f;
-  margin: 20px auto 10px auto;
-}
-
-@keyframes slideInSidebar {
-  from { transform: translateX(115%); }
-  to   { transform: translateX(0); }
-}
-@keyframes slideOutSidebar {
-  from { transform: translateX(0); }
-  to   { transform: translateX(115%); }
-}
-
-
-/* ------------------------------------------SIDE BAR INFORMATION INPUT STYLES ---------------------------------------- */
-
-/* --- Sidebar Form Root Styles --- */
-.sidebar-caught-section {
-  margin-top: 12px;
-  padding-bottom: 10px;
-  font-size: 1.1em;
-}
-
-/* --- Form & Buttons --- */
-.edit-caught-form {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.edit-caught-form label {
-  color: var(--sidebar-text);
-  transition: color var(--transition-speed );
-  font-size: 0.98em;
-  font-weight: 700;
-}
-.edit-caught-form input,
-.edit-caught-form textarea {
-  margin-top: 2px;
-  border-radius: 8px;
-  border: 2px solid #333;
-  background: var(--sidebar-edit-inputs);
-  transition: background var(--transition-speed );
-  padding: 8px 12px;
-  font-size: 1em;
-  width: 100%;
-  margin-bottom: 2px;
-  font-weight: 700;
-  box-sizing: border-box;
-  height: 44px;
-  color: var(--sidebar-text);
-  transition: color var(--transition-speed );
-}
-.edit-caught-form textarea {
-  min-height: 80px;
-  max-height: 130px;
-  height: 80px;
+/* Make textarea inputs bigger in the sidebar */
+.sidebar-input[type="textarea"],
+.sidebar-input textarea,
+.sidebar-container textarea {
+  height: 80px !important;
+  min-height: 80px !important;
+  max-height: 80px !important;
   resize: none;
-  font-family: inherit;
 }
 
-.edit-caught-form textarea::placeholder,
-.edit-caught-form input::placeholder {
-  color: #5a5a5a;
-  font-weight: 400;
+/* Make sidebar dropdowns smaller on PC */
+@media (min-width: 769px) {
+  .sidebar-container .mobile-dropdown-field {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    padding: 4px 8px !important;
+  }
+  
+  .sidebar-container .mobile-dropdown-field input {
+    height: 24px !important;
+    min-height: 24px !important;
+    max-height: 24px !important;
+    line-height: 24px !important;
+    font-size: 13px !important;
+  }
+  
+  .sidebar-container .mobile-dropdown-field img {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  
+  .sidebar-container .mobile-dropdown-field button {
+    padding: 2px !important;
+  }
 }
 
-.character-counter {
-  font-size: 0.8em;
-  color: #888;
-  text-align: right;
-  margin-top: 2px;
-  font-weight: 500;
+.sidebar-form-buttons {
+  @apply flex gap-3 pt-5;
 }
 
-/* --- Buttons --- */
-.set-caught-btn,
-.edit-caught-btn,
-.save-caught-btn,
-.cancel-caught-btn {
-  background: var(--accent);
-  box-shadow: 0 2px 10px #0002;
-  color: #1a1a1a;
-  border: none;
-  border-radius: 11px;
-  padding: 8px 24px;
-  font-weight: 800;
-  font-size: 1.1em;
-  margin: 4px;
+.sidebar-button {
+  @apply flex-1 px-2 py-2 bg-[var(--accent)] text-black font-bold rounded-lg hover:bg-[var(--accent-hover)] hover:text-white transition-all duration-200;
+}
+
+.sidebar-entries-info {
+  @apply text-center text-sm text-[var(--sidebar-text)] opacity-80;
+}
+
+.sidebar-navigation {
+  @apply flex items-center justify-center gap-2;
+}
+
+.sidebar-nav-button {
+  @apply w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  border: 2px solid var(--accent);
+}
+
+.sidebar-nav-button:hover:not(:disabled) {
+  background-color: var(--accent);
+  color: black;
+  transform: scale-105;
+}
+
+.sidebar-nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--border-color);
+}
+
+.sidebar-current-entry {
+  @apply w-8 h-8 rounded-full flex items-center justify-center cursor-default;
+  background-color: var(--accent);
+  color: black;
+  border: 2px solid var(--accent);
+  font-weight: bold;
+}
+
+.sidebar-delete-button {
+  @apply w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200;
+  background-color: var(--accent);
+  color: black;
+}
+
+.sidebar-delete-button:hover {
+  background-color: var(--accent-hover);
+  color: white;
+  transform: scale-105;
+}
+
+.sidebar-add-button {
+  @apply w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200;
+  background-color: var(--accent);
+  color: black;
+}
+
+.sidebar-add-button:hover {
+  background-color: var(--accent-hover);
+  color: white;
+  transform: scale-105;
+}
+
+.sidebar-add-button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--border-color) !important;
+  color: var(--sidebar-text) !important;
+}
+
+.sidebar-add-button-disabled:hover {
+  transform: none !important;
+  background-color: var(--border-color) !important;
+  color: var(--sidebar-text) !important;
+}
+
+.sidebar-display-section {
+  @apply space-y-3 mt-4;
+}
+
+.sidebar-display-card {
+  @apply flex items-center justify-between p-2 rounded-lg;
+  background-color: var(--sidebar-edit-inputs);
+  border: 1px solid var(--border-color);
+}
+
+.sidebar-display-info {
+  @apply flex flex-col;
+}
+
+.sidebar-display-label {
+  @apply text-xs text-[var(--sidebar-text)] opacity-70 uppercase tracking-wide;
+}
+
+.sidebar-display-value {
+  @apply text-sm text-[var(--sidebar-text)] font-medium;
+}
+
+.sidebar-display-icon {
+  @apply text-3xl;
+}
+
+.sidebar-display-image {
+  @apply w-10 h-10 flex items-center justify-center;
+}
+
+.sidebar-display-image-large {
+  @apply w-10 h-10 flex items-center justify-center;
+}
+
+.sidebar-warning {
+  @apply p-3 bg-yellow-500 bg-opacity-20 border border-yellow-500 rounded-lg;
+}
+
+.sidebar-warning-text {
+  @apply text-sm text-yellow-200;
+}
+
+.sidebar-edit-section {
+  @apply flex justify-center pt-4;
+}
+
+.sidebar-message {
+  @apply text-center p-4 text-[var(--sidebar-text)] opacity-70;
+}
+
+.sidebar-reset-section {
+  @apply flex justify-center pt-4;
+}
+
+.sidebar-reset-button {
+  @apply px-6 py-2 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-all duration-200;
+}
+
+/* Custom Scrollbar Styling */
+.sidebar-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-container::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
   transition: background-color 0.2s ease;
 }
-.set-caught-btn:hover,
-.edit-caught-btn:hover,
-.save-caught-btn:hover,
-.cancel-caught-btn:hover {
+
+.sidebar-container::-webkit-scrollbar-thumb:hover {
   background: var(--accent);
-  color: white;
 }
 
-.caught-btn-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 14px;         /* space between buttons */
-  margin: 12px 0;
-  width: 100%;
+/* Firefox scrollbar styling */
+.sidebar-container {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
 }
 
-
-.caught-btn-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 14px;
-  margin: 12px 0;
-  width: 100%;
+/* Animation classes */
+.sidebar-slide-in {
+  @apply animate-[slideInSidebar_0.37s_cubic-bezier(.65,0,.35,1)_both];
 }
 
-.reset-caught-btn {
-  display: block;
-  margin: 0 auto;
-  background: #ff5353;
-  color: #fff;
-  border: none;
-  border-radius: 9px;
-  padding: 8px 32px;
-  font-weight: 900;
-  font-size: 1.07em;
+/* Checks arrows spacing - make them closer vertically */
+.sidebar-container .checks-arrows {
+  gap: 0;
+}
+
+.sidebar-container .checks-arrows button {
+  padding: 2px;
+  margin: 0;
+}
+
+/* Target the specific checks arrows structure */
+.sidebar-container .flex.flex-col.gap-0 {
+  gap: 0 !important;
+}
+
+.sidebar-container .flex.flex-col.gap-0 button {
+  padding: 1px !important;
+  margin: 0 !important;
+  height: 16px !important;
+  min-height: 16px !important;
+  max-height: 16px !important;
+}
+
+.sidebar-slide-out {
+  @apply animate-[slideOutSidebar_0.37s_cubic-bezier(.65,0,.35,1)_both];
+}
+
+/* Override placeholder colors for all sidebar form elements */
+.sidebar-container input[type="date"]::placeholder,
+.sidebar-container input[type="date"]::-webkit-input-placeholder,
+.sidebar-container input[type="date"]::-moz-placeholder {
+  color: var(--input-placeholder);
+}
+
+/* Override placeholder colors for dropdown inputs */
+.sidebar-container .searchbar-dropdown input::placeholder,
+.sidebar-container .searchbar-dropdown input::-webkit-input-placeholder,
+.sidebar-container .searchbar-dropdown input::-moz-placeholder {
+  color: var(--searchbar-placeholder-text) !important;
+}
+
+/* Target all inputs within the sidebar form */
+.sidebar-container form input::placeholder,
+.sidebar-container form input::-webkit-input-placeholder,
+.sidebar-container form input::-moz-placeholder {
+  color: var(--searchbar-placeholder-text) !important;
+}
+
+/* Target the SearchbarIconDropdown component specifically */
+.sidebar-container [id*="dropdown"] input::placeholder,
+.sidebar-container [id*="dropdown"] input::-webkit-input-placeholder,
+.sidebar-container [id*="dropdown"] input::-moz-placeholder {
+  color: var(--searchbar-placeholder-text) !important;
+}
+
+/* Target any input with placeholder text in the sidebar */
+.sidebar-container input[placeholder]::placeholder,
+.sidebar-container input[placeholder]::-webkit-input-placeholder,
+.sidebar-container input[placeholder]::-moz-placeholder {
+  color: var(--searchbar-placeholder-text) !important;
+}
+
+/* Force override for specific dropdown IDs in sidebar */
+#ball-dropdown input::placeholder,
+#ball-dropdown input::-webkit-input-placeholder,
+#ball-dropdown input::-moz-placeholder,
+#game-dropdown input::placeholder,
+#game-dropdown input::-webkit-input-placeholder,
+#game-dropdown input::-moz-placeholder,
+#mark-dropdown input::placeholder,
+#mark-dropdown input::-webkit-input-placeholder,
+#mark-dropdown input::-moz-placeholder,
+#method-dropdown input::placeholder,
+#method-dropdown input::-webkit-input-placeholder,
+#method-dropdown input::-moz-placeholder {
+  color: var(--searchbar-placeholder-text) !important;
+}
+
+/* Nuclear option - override ALL placeholders in sidebar */
+.sidebar-container *::placeholder {
+  color: var(--searchbar-placeholder-text) !important;
+}
+
+.sidebar-container *::-webkit-input-placeholder {
+  color: var(--searchbar-placeholder-text) !important;
+}
+
+.sidebar-container *::-moz-placeholder {
+  color: var(--searchbar-placeholder-text) !important;
+}
+
+/* Hide the default browser calendar picker indicator but keep functionality */
+.sidebar-container input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.sidebar-container input[type="date"]::-moz-calendar-picker-indicator {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.sidebar-container input[type="date"]::-ms-calendar-picker-indicator {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Ensure date input is clickable and functional on PC */
+.sidebar-container input[type="date"] {
   cursor: pointer;
-  box-shadow: 0 2px 10px #0002;
-  margin-bottom: 5px;
-  transition: background 0.14s;
-}
-.reset-caught-btn:hover {
-  background: #ffffff;
-  color: #ff5353;
 }
 
-/* --- Consistent Select AND Custom Dropdown Styles --- */
-.icon-dropdown-selected {
-  color: #5a5a5a;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-weight: 700;
-  font-size: 1em;
-  height: 44px;
-  box-sizing: border-box;
-  outline: none;
-  width: 100%;
-  transition: border 0.12s, background 0.12s, box-shadow 0.12s;
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+/* Try to style the date picker dropdown for better dark mode appearance */
+.sidebar-container input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) hue-rotate(180deg);
 }
 
-.icon-dropdown-selected .placeholder {
-  color: #5a5a5a;
-  font-weight: 400;
-}
-.icon-dropdown-selected .selected-value {
-  color: #fff;
-  font-weight: 700;
+/* For Firefox - try to style the date picker */
+.sidebar-container input[type="date"]::-moz-calendar-picker-indicator {
+  filter: invert(1) hue-rotate(180deg);
 }
 
-.icon-dropdown-search {
-  width: 100%;
-  padding: 8px 10px;
-  background: #202020;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  border-radius: 0; /* optional: remove corner rounding */
-  color: #f0f0f0;
-  font-size: 0.95rem;
-  font-weight: 500;
-  margin-bottom: 6px;
+/* For Edge/IE */
+.sidebar-container input[type="date"]::-ms-calendar-picker-indicator {
+  filter: invert(1) hue-rotate(180deg);
 }
 
-.icon-dropdown-search:focus,
-.icon-dropdown-search:hover,
-.icon-dropdown-search:active {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-
-
-/* --- Custom Dropdown Container --- */
-.icon-dropdown {
-  position: relative;
-  width: 100%;
-  min-width: 0;
-}
-
-/* --- Custom Dropdown Button (Selected) --- */
-.icon-dropdown-selected {
-  cursor: pointer;
-  justify-content: flex-start;
-  gap: 9px;
-  box-shadow: none;
-  position: relative;
-  min-height: 44px;
-  font-family: inherit;
-  border: 2px solid #333;
-}
-
-.icon-dropdown .icon-dropdown-selected:hover {
-  border-color: #333;
-}
-
-
-.icon-dropdown-selected:after {
-  content: "▼";
-  margin-left: auto;
-  font-size: 1em;
+/* Clear button hover system - clean and simple */
+.sidebar-container button[title*="Clear"] {
   color: var(--accent);
-  pointer-events: none;
-  padding-left: 8px;
-}
-
-.select-wrapper::after {
-  content: "▼";
+  transition: color 0.2s ease;
   position: absolute;
-  right: 2.1em;
+  right: 44px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--accent);
-  pointer-events: none;
-}
-
-/* --- Dropdown Menu --- */
-.icon-dropdown-list {
-  position: absolute;
-  top: 110%;
-  width: 100%;
-  background: #191919;
-  border: 1px solid #333;
-  border-radius: 8px;
-  z-index: 100;
-  box-shadow: 0 2px 12px #000c;
-  max-height: 250px;
-  overflow-y: auto;
-}
-
-/* --- Dropdown Option --- */
-.icon-dropdown-option {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 8px 12px;
-  background: none;
-  border: none;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 1em;
-  cursor: pointer;
-  gap: 5px;
-  font-family: inherit;
-}
-.icon-dropdown-option.selected,
-.icon-dropdown-option:hover {
-  background: #232323;
-  color: #ffffff;
-}
-
-/* --- Dropdown Images --- */
-.icon-dropdown-selected img,
-.icon-dropdown-option img {
-  width: 26px;
-  height: 26px;
-  margin-right: 8px;
-  box-sizing: border-box;
-}
-
-/* --- Simple Entries Display --- */
-.entries-display {
-  margin-bottom: 1em;
-}
-
-.entries-warning {
-  text-align: center;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-}
-
-.warning-text {
-  color: #ff4444;
-  font-size: 1rem;
-  font-weight: 500;
-  background-color: rgba(255, 68, 68, 0.1);
-  padding: 0.4em 0.8em;
-  border-radius: 0.5em;
-  border: 1px solid rgba(255, 68, 68, 0.3);
-  display: inline-block;
-}
-
-
-
-.entries-navigation {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 1em;
-}
-
-.entries-page-buttons {
-  display: flex;
-  gap: 0.5em;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.entries-page-btn {
-  background: #f0f0f0;
-  color: #333;
-  border: 1px solid #ddd;
-  border-radius: 0.3em;
-  padding: 0.4em 0.8em;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  min-width: 2.5em;
-  text-align: center;
-}
-
-.entries-page-btn:hover {
-  background: #e0e0e0;
-  border-color: #bbb;
-}
-
-.entries-page-btn.active {
-  background: var(--accent);
-  color: #000;
-  border-color: var(--accent);
-  font-weight: 600;
-}
-
-.entries-buttons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.8em;
-  margin-bottom: 1.5em;
-  min-height: 2em; /* Match the height of individual entry buttons */
-  flex-wrap: wrap;
-}
-
-/* Pagination styles matching the trainers page */
-.entries-pagination {
-  margin-bottom: 1em;
-}
-
-.pagination-info {
-  text-align: center;
-  color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 0.5em;
-}
-
-.pagination-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1em;
-  flex-wrap: wrap;
-}
-
-.pagination-btn {
-  background: var(--accent);
-  color: #000;
-  border: none;
-  border-radius: 0.3em;
-  padding: 0.5em 1em;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.pagination-btn:hover:not(:disabled) {
-  background: var(--accent-dark, #d32f2f);
-  color: #fff;
-}
-
-.pagination-btn:disabled {
-  background: #ccc;
-  color: #666;
-  cursor: not-allowed;
-}
-
-.page-numbers {
-  display: flex;
-  gap: 0.3em;
-  align-items: center;
-}
-
-.page-btn {
-  background: #f0f0f0;
-  color: #333;
-  border: 1px solid #ddd;
-  border-radius: 0.3em;
-  padding: 0.4em 0.8em;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  min-width: 2.5em;
-  text-align: center;
-}
-
-.page-btn:hover {
-  background: #e0e0e0;
-  border-color: #bbb;
-}
-
-.page-btn.active {
-  background: var(--accent);
-  color: #000;
-  border-color: var(--accent);
-  font-weight: 600;
-}
-
-.page-ellipsis {
-  color: #666;
-  font-weight: 500;
-  padding: 0 0.5em;
-}
-
-.entry-button-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3em;
-  position: relative;
-  min-height: 2em; /* Match the height of the entry buttons */
-}
-
-.entry-circle-btn {
-  width: 2em;
-  height: 2em;
-  border-radius: 50%;
-  border: 2px solid var(--accent);
-  background: var(--sidebar-display);
-  color: var(--accent);
-  font-weight: bold;
-  font-size: 1em;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s ease;
-  box-shadow: 0 2px 6px #0004;
-  line-height: 1;
-  padding: 0;
-  text-align: center;
-  outline: none;
-}
-
-.entry-circle-btn:hover:not(.active) {
-  color: #fff !important;
-  background: var(--sidebar-display) !important;
-  outline: none !important;
-  border: 2px solid var(--accent) !important;
-}
-
-.entry-circle-btn.active {
-  background: var(--accent);
-  color: #000;
-  border: 2px solid var(--accent);
-  outline: none;
-}
-
-
-
-
-
-.add-entry-circle-btn {
-  width: 2em;
-  height: 2em;
-  border-radius: 50%;
-  border: 2px solid var(--sidebar-display);
-  background: var(--sidebar-display);
-  color: var(--accent);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s ease;
-  box-shadow: 0 2px 6px #0004;
-  font-weight: bold;
-  font-size: 1.2em;
-  line-height: 1;
-  padding: 0;
-  text-align: center;
-  font-family: monospace;
-  transform: translateY(-1px);
-  outline: none;
-}
-
-.add-entry-circle-btn:hover {
-  color: #fff !important;
-  background: var(--sidebar-display) !important;
-  outline: none !important;
-  border: 2px solid var(--sidebar-display) !important;
-}
-
-.add-entry-circle-btn.disabled {
-  background: #6b7280 !important;
-  border-color: #6b7280 !important;
-  color: #9ca3af !important;
-  cursor: not-allowed !important;
-  opacity: 0.6;
-}
-
-.add-entry-circle-btn.disabled:hover {
-  background: #6b7280 !important;
-  border-color: #6b7280 !important;
-  color: #9ca3af !important;
-  cursor: not-allowed !important;
-}
-
-.delete-entry-btn-small {
-  width: 1em;
-  height: 1em;
-  border-radius: 50%;
-  border: 1px solid #ff4444;
-  background: #ff4444;
-  color: white;
-  font-weight: bold;
-  font-size: 0.7em;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease, transform 0.1s ease;
-  line-height: 1;
-  padding: 0;
-  position: absolute;
-  top: -0.15em;
-  right: -0.15em;
   z-index: 10;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  font-family: monospace; /* Better × symbol rendering */
-  outline: none !important; /* Remove default browser outline */
-  border: 1px solid #ff4444 !important; /* Ensure only our red border */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important; /* Ensure only our shadow */
 }
 
-.delete-entry-btn-small:hover {
-  background: #ff6666;
-  transform: scale(1.1);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+/* All clear buttons use the same hover effect */
+.sidebar-container button[title*="Clear"]:hover {
+  color: white;
 }
 
-.delete-entry-btn {
-  background: #e62829 !important;
-  color: white !important;
-  border-color: #e62829 !important;
+/* Dropdown clear buttons need different positioning but same hover system */
+.sidebar-container .searchbar-dropdown button[title*="Clear"],
+.sidebar-container [id*="dropdown"] button[title*="Clear"] {
+  right: 52px;
 }
 
-.delete-entry-btn:hover,
-.delete-entry-btn:focus,
-.delete-entry-btn:active {
-  background: #b91c1c !important;
-  border-color: #b91c1c !important;
-  color: white !important;
+/* Hide the default browser number input arrows */
+.sidebar-container input[type="number"]::-webkit-outer-spin-button,
+.sidebar-container input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-/* Override any conflicting hover styles from entry-circle-btn */
-.entry-circle-btn.delete-entry-btn:hover,
-.entry-circle-btn.delete-entry-btn:focus,
-.entry-circle-btn.delete-entry-btn:active {
-  background: #b91c1c !important;
-  border-color: #b91c1c !important;
-  color: white !important;
+.sidebar-container input[type="number"] {
+  -moz-appearance: textfield;
 }
 
-
-
-/* --- Info Cards and Other Details (unchanged) --- */
-.sidebar-caught-info-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5em;
-  width: 100%;
-  box-sizing: border-box;
-}
-.caught-info-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: var(--sidebar-display);
-  transition: background-color var(--transition-speed );
-  box-shadow: 0 3px 5px #000b;
-  border-radius: 12px;
-  padding: 0.3em 1em;
-  margin-bottom: 0em;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
+.sidebar-container input[type="number"]::-webkit-outer-spin-button,
+.sidebar-container input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
 }
 
-.caught-info-label {
-  color: var(--accent);
-  font-weight: 700;
-  font-size: 1em;
-  letter-spacing: 0.3px;
-  text-shadow: 0 1px 3px rgb(0, 0, 0);
-}
-.caught-info-value {
-  color: var(--sidebar-text);
-  transition: color var(--transition-speed );
-  font-weight: 600;
-  font-size: 1em;
-  word-break: break-word;
-}
-.caught-info-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Force date input placeholder override */
+.sidebar-container input[type="date"]::placeholder,
+.sidebar-container input[type="date"]::-webkit-input-placeholder,
+.sidebar-container input[type="date"]::-moz-placeholder,
+.sidebar-container input[type="date"]::-ms-input-placeholder {
+  color: var(--searchbar-placeholder-text) !important;
 }
 
-.dropdown-label {
-  color: var(--accent);
-  font-size: 0.98em;
-  font-weight: 600;
-  display: block;
-  cursor: default;
-  user-select: none;
+/* Target the default date input text when no date is selected */
+.sidebar-container input[type="date"]:not([value]) {
+  color: var(--searchbar-placeholder-text) !important;
 }
 
-.icon-dropdown .icon-dropdown-selected:focus,
-.icon-dropdown .icon-dropdown-selected:focus-visible {
-  outline: none;
-  box-shadow: none;
-  border-color: #333;
+/* Target the date input when it's empty */
+.sidebar-container input[type="date"]:invalid {
+  color: var(--searchbar-placeholder-text) !important;
 }
 
-/*--------------------------------------------- NOT CAUGHT SIDE BAR STYLE ------------------------------------*/
-
-.not-caught-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 5px 0 0 0;
+/* Force all text in date input to be the right color */
+.sidebar-container input[type="date"] {
+  color: var(--searchbar-placeholder-text) !important;
 }
 
-.not-caught-text {
-  color: #ff4444;
-  font-size: 1rem;
-  font-weight: 500;
-  background-color: rgba(255, 68, 68, 0.1);
-  padding: 0.4em 0.8em;
-  border-radius: 0.5em;
-  border: 1px solid rgba(255, 68, 68, 0.3);
-  display: inline-block;
-  text-align: center;
-  margin-bottom: 1em;
+/* When a date is actually selected, make it use theme text color */
+.sidebar-container input[type="date"][value]:not([value=""]) {
+  color: var(--sidebar-text) !important;
 }
 
-.set-caught-btn {
-  background: #353535;
-  color: var(--accent);
-  font-weight: bold;
-  padding: 0.5em 1em;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 2px 16px #0004;
-  transition: background 0.15s;
-}
-
-.no-data-message {
-  color: #ff4444;
-  font-size: 1rem;
-  font-weight: 500;
-  background-color: rgba(255, 68, 68, 0.1);
-  padding: 0.4em 0.8em;
-  border-radius: 0.5em;
-  border: 1px solid rgba(255, 68, 68, 0.3);
-  display: block;
-  text-align: center;
-  margin: 0.5em auto;
+/* Mobile-specific styling */
+@media (max-width: 768px) {
+  /* Make all sidebar inputs 48px on mobile to match dropdowns */
+  .sidebar-container .sidebar-input {
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+    padding: 12px !important;
+  }
+  
+  /* Align checks arrows with other field icons on mobile */
+  .sidebar-container .checks-arrows,
+  .sidebar-container .flex.flex-col.gap-0 {
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    top: 0 !important;
+    transform: none !important;
+  }
+  
+  .sidebar-container .checks-arrows button,
+  .sidebar-container .flex.flex-col.gap-0 button {
+    height: 20px !important;
+    min-height: 20px !important;
+    max-height: 20px !important;
+    width: 20px !important;
+    min-width: 20px !important;
+    max-width: 20px !important;
+    padding: 2px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* Mobile-specific date input styling */
+  .sidebar-container input[type="date"] {
+    /* Remove appearance override to let mobile browsers handle it naturally */
+    /* -webkit-appearance: none; */
+    /* -moz-appearance: none; */
+    /* appearance: none; */
+    
+      /* Ensure consistent height with other fields */
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+    /* Make sure the input is visible */
+    background-color: var(--sidebar-bg) !important;
+    color: var(--searchbar-placeholder-text) !important;
+    /* Add some visual indication that it's a date input */
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px; /* Prevent zoom on iOS */
+    /* Ensure the input is visible on mobile */
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+  
+        /* Mobile calendar picker styling - keep functionality but hide indicator */
+    .sidebar-container input[type="date"]::-webkit-calendar-picker-indicator {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .sidebar-container input[type="date"]::-moz-calendar-picker-indicator {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .sidebar-container input[type="date"]::-ms-calendar-picker-indicator {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+  
+     /* Additional mobile-specific overrides */
+   .sidebar-container input[type="date"] {
+     /* Keep natural appearance on mobile for better functionality */
+   }
+  
+  /* Ensure the date input shows placeholder-like behavior on mobile */
+  .sidebar-container input[type="date"]:not([value]) {
+    color: var(--searchbar-placeholder-text) !important;
+  }
+  
+  /* Force mobile browsers to show the date input */
+  .sidebar-container input[type="date"] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+  
+  /* Make textarea inputs bigger on mobile */
+  .sidebar-container textarea,
+  .sidebar-container .sidebar-input[type="textarea"] {
+    height: 120px !important;
+    min-height: 120px !important;
+    max-height: 120px !important;
+    padding: 16px !important;
+  }
 }

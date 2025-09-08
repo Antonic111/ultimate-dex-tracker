@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "flag-icons/css/flag-icons.min.css";
 import "../css/Trainers.css";
 import { COUNTRY_OPTIONS } from "../data/countries";
-import { Mars, Venus, VenusAndMars, Search, Heart, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, RefreshCcw, MoveUp, MoveDown, Check } from "lucide-react";
+import { Mars, Venus, VenusAndMars, Search, Heart, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, RefreshCcw, MoveUp, MoveDown, Check, X } from "lucide-react";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { profileAPI } from "../utils/api";
 import { UserContext } from "../components/Shared/UserContext";
@@ -255,29 +255,49 @@ export default function Trainers() {
       <div className="search-row">
         <div className="search-input-wrap">
           <Search className="search-icon" size={18} />
-          <input
-            className="trainer-search has-icon"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search username…"
-            autoFocus
-            aria-label="Search trainers"
-          />
-        </div>
-        
-        <div className="hide-zero-shinies-toggle">
-          <label className="toggle-label">
+          <div className="relative flex-1">
             <input
-              type="checkbox"
-              checked={hideZeroCaught}
-              onChange={(e) => setHideZeroCaught(e.target.checked)}
-              className="toggle-checkbox"
+              className="trainer-search has-icon"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search username…"
+              autoFocus
+              aria-label="Search trainers"
+              style={{ width: '100%' }}
             />
-            <span className="toggle-text">Hide 0 Caught</span>
-          </label>
+            {q && (
+              <button
+                onClick={() => setQ('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 transition-colors"
+                style={{ color: 'var(--accent)' }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = 'var(--text)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = 'var(--accent)';
+                }}
+                title="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
         </div>
         
-        <div className={`sort-button-wrap ${showSortDropdown ? 'open' : ''}`} ref={sortButtonRef}>
+        <div className="search-controls">
+          <div className="hide-zero-shinies-toggle">
+            <label className="toggle-label">
+              <input
+                type="checkbox"
+                checked={hideZeroCaught}
+                onChange={(e) => setHideZeroCaught(e.target.checked)}
+                className="toggle-checkbox"
+              />
+              <span className="toggle-text">Hide 0 Caught</span>
+            </label>
+          </div>
+          
+          <div className={`sort-button-wrap ${showSortDropdown ? 'open' : ''}`} ref={sortButtonRef}>
           <button
             className="sort-button"
             onClick={() => setShowSortDropdown(!showSortDropdown)}
@@ -398,6 +418,7 @@ export default function Trainers() {
             <MoveUp size={20} style={{width: '20px', height: '20px', minWidth: '20px', minHeight: '20px', maxWidth: '20px', maxHeight: '20px'}} />
           )}
         </button>
+        </div>
       </div>
 
       <div className="app-divider" />

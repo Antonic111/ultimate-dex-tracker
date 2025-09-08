@@ -1,0 +1,307 @@
+.favorite-grid {
+  --fav-size: 90px;
+  --fav-gap: 10px;
+}
+/* Backdrop */
+.favorite-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-dropdown);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.favorite-modal-backdrop.closing {
+  animation: fadeOut 0.3s ease-in forwards;
+  pointer-events: none;
+}
+
+.favorite-modal {
+  height: 65vh;
+  max-height: 65vh;
+  width: 90%;
+  max-width: 650px;
+  background-color: var(--profile-modal-bg);
+  transition: background-color var(--transition-speed );
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  animation: slideIn 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.favorite-modal.closing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+.favorite-modal-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative; /* for hover preview positioning */
+}
+
+.favorite-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #333;
+  margin-bottom: 5px;
+  flex-shrink: 0;
+}
+
+.favorite-modal-header h2 {
+  font-size: 1.4rem;
+  color: var(--accent);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #aaa;
+  cursor: pointer;
+}
+
+/* Scrollable Grid Section */
+.favorite-grid {
+  display: grid;
+  /* Exactly 6 columns, fixed size squares */
+  grid-template-columns: repeat(6, var(--fav-size));
+  gap: var(--fav-gap);
+  padding: 8px 16px 8px 0px; /* extra right padding for scrollbar */
+  margin-left: -8px; /* pull grid flush to the left edge */
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+  align-items: start;
+  align-content: start; /* pack rows at the top, avoid big vertical gaps */
+  justify-items: center;
+  justify-content: start;
+  /* Reserve space for scrollbar to avoid overlaying content (Chromium/Firefox) */
+  scrollbar-gutter: stable both-edges;
+  scrollbar-width: auto;
+  /* Consistent row height to keep square tracks */
+  grid-auto-rows: var(--fav-size);
+}
+
+/* Clean, subtle scrollbar styling */
+.favorite-grid::-webkit-scrollbar { width: 12px; }
+.favorite-grid::-webkit-scrollbar-track {
+  background: #1b1b1b;
+  border-radius: 8px;
+}
+.favorite-grid::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+  border-radius: 8px;
+}
+.favorite-grid::-webkit-scrollbar-thumb:hover {
+  background: #5a5a5a;
+}
+
+.favorite-item {
+  background: var(--profile-modal-boxes);
+  transition: background var(--transition-speed );
+  box-shadow: 0 3px 5px #000b;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  padding: 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: var(--fav-size);
+  max-height: var(--fav-size);
+  overflow: hidden;
+  width: var(--fav-size);
+  min-width: var(--fav-size);
+}
+
+.favorite-item:hover {
+  background: var(--profile-modal-boxes-hover);
+}
+
+.favorite-item.selected {
+  border-color: var(--accent);
+}
+
+.favorite-img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  margin-bottom: 4px;
+  border-radius: 4px;
+}
+
+.favorite-label {
+  font-size: 0.75rem;
+  color: var(--profile-text);
+  transition: color var(--transition-speed );
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Hover preview (only used when enabled) */
+.favorite-hover-preview {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background: var(--profile-modal-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+.favorite-hover-preview img {
+  width: 120px;
+  height: 120px;
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+.favorite-hover-caption {
+  font-size: 0.8rem;
+  color: var(--profile-text);
+  text-align: center;
+  max-width: 160px;
+}
+
+.favorite-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  border-top: 1px solid #333;
+  margin-top: 10px;
+  padding-top: 10px;
+  font-size: 0.9rem;
+  color: #ccc;
+  flex-shrink: 0;
+}
+
+.save-btn {
+  background: var(--accent);
+  color: #1a1a1a;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.save-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.favorite-modal-search-row {
+  display: flex;
+  align-items: center;
+  margin: 6px 0 8px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.favorite-modal-search-row input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 2px solid #444;
+  background-color: var(--profile-modal-search-bg);
+  transition: background-color var(--transition-speed );
+  color: #eee;
+  font-size: 0.9rem;
+  min-width: 0;
+}
+
+.switch-label {
+  margin-right: 54px;
+  margin-left: 20px;
+  flex-shrink: 0;
+}
+
+.switch-emoji.inactive {
+  color: #777;
+}
+
+.switch-emoji.active {
+  color: var(--accent);
+}
+
+.clear-btn {
+  background-color: #dd5a5a;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+  margin-right: 10px;
+}
+
+.clear-btn:hover {
+  background-color: #fd3333;
+}
+

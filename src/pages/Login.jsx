@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import "../css/auth.css";
+import "../css/Login.css";
 import { useMessage } from "../components/Shared/MessageContext";
 import { Eye, EyeOff, User, Lock } from "lucide-react";
 import { authAPI } from "../utils/api.js";
@@ -20,7 +20,7 @@ export default function Login({ onLogin }) {
 
   useEffect(() => {
     if (showVerifiedMessage) {
-      showMessage("✅ Email verified! You can now log in.", "success");
+              showMessage("Email verified! You can now log in.", "success");
     }
   }, []);
 
@@ -44,7 +44,7 @@ export default function Login({ onLogin }) {
 
       // Check if the user is verified from the login response
       if (!loginData.user.verified) {
-        showMessage("📧 Please verify your email before logging in.", "error");
+        showMessage("Please verify your email before logging in.", "error");
         navigate(`/email-sent?email=${encodeURIComponent(loginData.user.email)}`);
         return;
       }
@@ -90,7 +90,7 @@ export default function Login({ onLogin }) {
       if (err.message.includes('Account not verified')) {
         // Check if the backend provided the email in the error response
         if (err.data && err.data.email) {
-          showMessage("📧 Account not verified. Redirecting to verification page...", "info");
+          showMessage("Account not verified. Redirecting to verification page...", "info");
           setTimeout(() => {
             navigate(`/email-sent?email=${encodeURIComponent(err.data.email)}`);
           }, 1500);
@@ -98,16 +98,16 @@ export default function Login({ onLogin }) {
           // Fallback: try to extract email from the input field
           const email = form.usernameOrEmail.includes('@') ? form.usernameOrEmail : '';
           if (email) {
-            showMessage("📧 Account not verified. Redirecting to verification page...", "info");
+            showMessage("Account not verified. Redirecting to verification page...", "info");
             setTimeout(() => {
               navigate(`/email-sent?email=${encodeURIComponent(email)}`);
             }, 1500);
           } else {
-            showMessage("📧 Account not verified. Please use your email address to login.", "error");
+            showMessage("Account not verified. Please use your email address to login.", "error");
           }
         }
       } else {
-        showMessage(`❌ ${err.message}`, "error");
+        showMessage(`${err.message}`, "error");
       }
     } finally {
       setLoading(false);
@@ -119,16 +119,17 @@ export default function Login({ onLogin }) {
 
 
   return (
-    <div className={`auth-form page-container auth-page ${loading ? "loading" : ""}`}>
-      <h2>LOGIN</h2>
+    <div className={`login-form page-container auth-page ${loading ? "loading" : ""}`}>
+      <h2 className="login-title">LOGIN</h2>
       
-      <form onSubmit={handleSubmit} className="auth-form-fields">
+      <form onSubmit={handleSubmit} className="login-form-fields">
         <div className="input-icon-wrapper">
           <User className="auth-icon" size={20} />
           <input
             name="usernameOrEmail"
             placeholder="Username or Email"
             onChange={handleChange}
+            className="login-input"
             required
           />
         </div>
@@ -140,6 +141,7 @@ export default function Login({ onLogin }) {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             onChange={handleChange}
+            className="login-input"
             required
             autoComplete="current-password"
           />
@@ -150,12 +152,9 @@ export default function Login({ onLogin }) {
             aria-label="Toggle password visibility"
             tabIndex={-1}
           >
-            {showPassword ? <EyeOff size={25} /> : <Eye size={25} />}
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
         </div>
-
-
-
 
         <label className="remember-me-checkbox">
           <input
@@ -168,7 +167,6 @@ export default function Login({ onLogin }) {
             <svg viewBox="0 0 24 24" className="checkbox-check">
               <path
                 fill="none"
-                stroke="black"
                 strokeWidth="3"
                 d="M4 12l5 5L20 7"
               />
@@ -177,8 +175,7 @@ export default function Login({ onLogin }) {
           Remember me
         </label>
 
-
-        <button type="submit" disabled={loading}>
+        <button type="submit" className="login-button" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
 

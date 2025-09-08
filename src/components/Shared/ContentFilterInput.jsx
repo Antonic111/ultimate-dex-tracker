@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { validateContent, getRealTimeValidation, getCharacterInfo } from '../../../shared/contentFilter.js';
+import { useMessage } from './MessageContext';
 import './ContentFilterInput.css';
 
 const ContentFilterInput = ({
@@ -17,6 +18,7 @@ const ContentFilterInput = ({
   debounceMs = 300,
   ...props
 }) => {
+  const { showMessage } = useMessage();
   const [localValue, setLocalValue] = useState(value);
   const [validation, setValidation] = useState(() => {
     // Initialize with a default validation state to prevent null access errors
@@ -25,7 +27,9 @@ const ContentFilterInput = ({
       isValid: true,
       error: null,
       warning: null,
-      charInfo
+      charInfo,
+      errorShown: false,
+      warningShown: false
     };
   });
   const [isFocused, setIsFocused] = useState(false);
@@ -44,7 +48,9 @@ const ContentFilterInput = ({
       isValid: true,
       error: null,
       warning: null,
-      charInfo
+      charInfo,
+      errorShown: false,
+      warningShown: false
     };
     setValidation(initialValidation);
     
@@ -54,7 +60,7 @@ const ContentFilterInput = ({
     }
   }, [value, configType, showRealTimeValidation, onValidationChange]);
 
-  // Debounced validation
+  // Debounced validation - only for character count updates, not for showing toasts
   const debouncedValidation = useCallback((text) => {
     if (debounceTimer) {
       clearTimeout(debounceTimer);
@@ -63,8 +69,15 @@ const ContentFilterInput = ({
     const timer = setTimeout(() => {
       if (showRealTimeValidation) {
         const realTimeValidation = getRealTimeValidation(text, configType);
-        setValidation(realTimeValidation);
-        onValidationChange?.(realTimeValidation);
+        const charInfo = getCharacterInfo(text, configType);
+        const validationWithFlags = {
+          ...realTimeValidation,
+          charInfo,
+          errorShown: false,
+          warningShown: false
+        };
+        setValidation(validationWithFlags);
+        onValidationChange?.(validationWithFlags);
       }
     }, debounceMs);
     
@@ -80,31 +93,45 @@ const ContentFilterInput = ({
       const charInfo = getCharacterInfo(newValue, configType);
       const immediateValidation = {
         ...getRealTimeValidation(newValue, configType),
-        charInfo
+        charInfo,
+        errorShown: false,
+        warningShown: false
       };
       setValidation(immediateValidation);
       onValidationChange?.(immediateValidation);
     }
 
+    // Only update character count, don't show validation toasts while typing
     debouncedValidation(newValue);
     onChange?.(e);
   };
 
-  // Handle blur - do final validation
+  // Handle blur - do final validation and show toast if there are errors
   const handleBlur = (e) => {
     setIsFocused(false);
     const finalValidation = validateContent(localValue, configType);
+    const charInfo = getCharacterInfo(localValue, configType);
+    
+         // Show toast notification for validation errors on blur
+     if (finalValidation.error) {
+       showMessage(finalValidation.error, 'error');
+     } else if (finalValidation.warning) {
+                   showMessage(`${finalValidation.warning}`, 'warning');
+     }
+    
     setValidation({
       isValid: finalValidation.isValid,
       error: finalValidation.error,
-      warning: null,
-      charInfo: getCharacterInfo(localValue, configType)
+      warning: finalValidation.warning,
+      charInfo,
+      errorShown: !!finalValidation.error,
+      warningShown: !!finalValidation.warning
     });
     onValidationChange?.({
       isValid: finalValidation.isValid,
       error: finalValidation.error,
-      warning: null,
-      charInfo: getCharacterInfo(localValue, configType)
+      warning: finalValidation.warning,
+      charInfo
     });
   };
 
@@ -157,12 +184,12 @@ const ContentFilterInput = ({
       return baseClass;
     }
     
-    // Only apply validation styling when validation is enabled and initialized
-    if (validation.isValid === false) {
-      return `${baseClass} content-filter-input-invalid`.trim();
-    } else if (validation.isValid === true) {
-      return `${baseClass} content-filter-input-valid`.trim();
-    }
+         // Only apply validation styling when validation is enabled and initialized
+     if (validation.isValid === false) {
+       return `${baseClass}`;
+     } else if (validation.isValid === true) {
+       return `${baseClass}`;
+     }
     
     return baseClass;
   };
@@ -205,24 +232,10 @@ const ContentFilterInput = ({
   };
 
   return (
-    <div className={`content-filter-wrapper ${isFocused ? 'is-focused' : ''}`}>
+          <div className={`content-filter-wrapper ${isFocused ? 'is-focused' : ''}`}>
       {renderInput()}
       
-      {/* Validation messages */}
-      {validation && (
-        <div className="validation-messages">
-          {validation.error && (
-            <div className="validation-error">
-              ❌ {validation.error}
-            </div>
-          )}
-          {validation.warning && !validation.error && (
-            <div className="validation-warning">
-              ⚠️ {validation.warning}
-            </div>
-          )}
-        </div>
-      )}
+      {/* Validation state is now handled in blur events, no inline display needed */}
       
       {/* Character count */}
       {showCharacterCount && validation?.charInfo && (

@@ -3,6 +3,7 @@ import { useMessage } from "../components/Shared/MessageContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { KeyRound } from "lucide-react";
 import { authAPI } from "../utils/api";
+import "../css/EnterResetCode.css";
 
 const EnterResetCode = () => {
   const [code, setCode] = useState("");
@@ -19,7 +20,7 @@ const EnterResetCode = () => {
 
   useEffect(() => {
     if (!email) {
-      showMessage("❌ Missing email in URL", "error");
+              showMessage("Missing email in URL", "error");
       navigate("/forgot-password");
     } else {
       sessionStorage.setItem("resetEmail", email); // persist for refreshes
@@ -42,7 +43,7 @@ const EnterResetCode = () => {
     clickedRef.current = true;
 
     if (!email || !code) {
-      showMessage("❌ Email or code missing", "error");
+              showMessage("Email or code missing", "error");
       return;
     }
 
@@ -51,17 +52,17 @@ const EnterResetCode = () => {
       const data = await authAPI.verifyResetCode(email, code);
 
       if (data.status === 429 || data.message === "Too many requests, please try again later.") {
-        showMessage("❌ Too many requests, please try again later.", "error");
+        showMessage("Too many requests, please try again later.", "error");
         return;
       }
       if (data.success) {
-        showMessage("✅ Code verified! Reset your password.", "success");
+        showMessage("Code verified! Reset your password.", "success");
         navigate(`/reset-password?email=${encodeURIComponent(email)}&code=${code}`);
       } else {
-        showMessage(`❌ ${data.error || "Invalid code"}`, "error");
+        showMessage(`${data.error || "Invalid code"}`, "error");
       }
     } catch (err) {
-      showMessage("❌ Server error", "error");
+              showMessage("Server error", "error");
     } finally {
       setLoading(false);
       setTimeout(() => {
@@ -77,20 +78,20 @@ const EnterResetCode = () => {
       const data = await authAPI.forgotPassword(email);
 
       if (data.success) {
-        showMessage("📧 Reset code resent!", "success");
+        showMessage("Reset code resent!", "success");
         setResendCooldown(30); // Start 30-second cooldown
       } else {
-        showMessage(`❌ ${data.error || "Failed to resend email"}`, "error");
+        showMessage(`${data.error || "Failed to resend email"}`, "error");
       }
     } catch {
-      showMessage("❌ Failed to resend email", "error");
+              showMessage("Failed to resend email", "error");
     }
   };
 
   return (
-    <div className="auth-form page-container auth-page">
-      <h2 className="auth-heading">ENTER RESET CODE</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="enter-reset-code-form page-container auth-page">
+      <h2 className="enter-reset-code-title">ENTER RESET CODE</h2>
+      <form onSubmit={handleSubmit} className="enter-reset-code-form-fields">
         <p className="auth-subtext">
           A 6-digit code was sent to:<br />
           <strong>{email}</strong>
@@ -102,12 +103,13 @@ const EnterResetCode = () => {
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="Enter 6-digit code"
+            className="enter-reset-code-input"
             required
             maxLength={6}
           />
         </div>
 
-        <button type="submit" disabled={loading} className="auth-button">
+        <button type="submit" className="enter-reset-code-button" disabled={loading}>
           {loading ? "Verifying..." : "Verify Code"}
         </button>
 
@@ -115,12 +117,7 @@ const EnterResetCode = () => {
           type="button"
           onClick={handleResend}
           disabled={resendCooldown > 0}
-          className="auth-button resend-button"
-          style={{ 
-            marginTop: "10px",
-            opacity: resendCooldown > 0 ? 0.5 : 1,
-            cursor: resendCooldown > 0 ? 'not-allowed' : 'pointer'
-          }}
+          className="resend-button"
         >
           {resendCooldown > 0
             ? `Resend Email (${resendCooldown}s)`

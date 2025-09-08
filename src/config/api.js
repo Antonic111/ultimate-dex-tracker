@@ -3,7 +3,7 @@ import { currentConfig } from './environment.js';
 
 const API_CONFIG = {
   development: {
-    baseURL: 'http://localhost:5000'
+    baseURL: 'http://192.168.2.15:5000'
   },
   production: {
     baseURL: currentConfig.API_BASE_URL

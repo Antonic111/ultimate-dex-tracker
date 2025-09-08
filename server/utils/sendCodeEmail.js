@@ -14,7 +14,17 @@ console.log('Email configuration:', {
 });
 
 // Only initialize Resend if emails are enabled
-const resend = emailsDisabled ? null : new Resend(process.env.RESEND_API_KEY);
+let resend = null;
+
+function initializeResend() {
+  if (!resend && !emailsDisabled) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY not set');
+    }
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+}
 
 export async function sendCodeEmail(user, subject, code, action) {
   // If emails are disabled in development, return mock success
@@ -42,7 +52,12 @@ export async function sendCodeEmail(user, subject, code, action) {
   }
 
   try {
-    const { data, error } = await resend.emails.send({
+    const resendInstance = initializeResend();
+    if (!resendInstance) {
+      return { success: false, error: 'Email service not available' };
+    }
+    
+    const { data, error } = await resendInstance.emails.send({
       from: `Ultimate Dex Tracker <${process.env.EMAIL_FROM}>`,
       to: [user.email],
       subject: subject,

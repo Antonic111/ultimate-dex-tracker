@@ -51,18 +51,64 @@ export function findPokemon(id, name = null) {
 }
 
 export function renderTypeBadge(type) {
-  const typeClass = "type-badge type-" + type.toLowerCase();
+  const typeColors = {
+    normal: "#9fa19f",
+    fire: "#e62829",
+    water: "#2980ef",
+    grass: "#3fa129",
+    electric: "#fac000",
+    ice: "#3fd8ff",
+    fighting: "#ff8000",
+    poison: "#9141cb",
+    ground: "#915121",
+    flying: "#81b9ef",
+    psychic: "#ef4179",
+    bug: "#91a119",
+    rock: "#afa981",
+    ghost: "#704170",
+    dragon: "#5060e1",
+    dark: "#50413f",
+    steel: "#60a1b8",
+    fairy: "#ef70ef"
+  };
+
+  const typeBorders = {
+    normal: "#545554",
+    fire: "#861212",
+    water: "#104073",
+    grass: "#265817",
+    electric: "#b39400",
+    ice: "#156077",
+    fighting: "#a14500",
+    poison: "#431061",
+    ground: "#513011",
+    flying: "#335985",
+    psychic: "#7d1f3f",
+    bug: "#495710",
+    rock: "#63603f",
+    ghost: "#2f1933",
+    dragon: "#2c3073",
+    dark: "#201313",
+    steel: "#285466",
+    fairy: "#b030b0"
+  };
+
+  const bgColor = typeColors[type.toLowerCase()] || "#9fa19f";
+  const borderColor = typeBorders[type.toLowerCase()] || "#545554";
+
   return (
-    <span className={typeClass} key={type}>
+         <span 
+       key={type}
+       className="inline-flex items-center justify-center gap-1 px-3 py-0.5 rounded-full text-white font-semibold text-sm border-4 w-28"
+       style={{ backgroundColor: bgColor, borderColor: borderColor, borderStyle: 'solid' }}
+     >
       <img
         src={`/type-icons/${type.toLowerCase()}.png`}
         alt={type}
-        className="type-badge-icon"
+        className="w-5 h-5"
         draggable={false}
       />
-      <span className="type-badge-label">
-        {type.charAt(0).toUpperCase() + type.slice(1)}
-      </span>
+      <span className="text-base">{type.charAt(0).toUpperCase() + type.slice(1)}</span>
     </span>
   );
 }

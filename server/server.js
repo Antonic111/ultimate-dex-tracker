@@ -1,14 +1,15 @@
-import express from "express";
-import mongoose from "mongoose";
 import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
-import authRoutes from "./routes/auth.js";
-import profileRoutes from "./routes/profiles.js";
-import session from "express-session";
 
 // Load environment variables from both .env and .env.local
 dotenv.config();
 dotenv.config({ path: '.env.local' });
+
+import express from "express";
+import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
+import authRoutes from "./routes/auth.js";
+import profileRoutes from "./routes/profiles.js";
+import session from "express-session";
 
 // Debug: Log environment variables for development
 // removed development environment console logs to reduce noise
@@ -27,7 +28,8 @@ app.use((req, res, next) => {
     'https://ultimate-dex-tracker-pr5vf4mcr-antonics-projects.vercel.app',
     'https://ultimate-dex-tracker.vercel.app',
     'http://localhost:3000',
-    'http://localhost:5173'
+    'http://localhost:5173',
+    'http://192.168.2.15:5173'
   ];
   if (origin && allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
@@ -53,8 +55,8 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: true,
-    sameSite: "none",
+    secure: process.env.NODE_ENV === 'production', // Only secure in production (HTTPS)
+    sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax", // lax for localhost, none for production
     domain: process.env.NODE_ENV === 'production' ? undefined : undefined, // Let browser handle domain
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   },
@@ -91,7 +93,7 @@ mongoose
   })
   .then(() => {
     // startup logs minimized
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       // server running log minimized
     });
   })

@@ -1,0 +1,58 @@
+.public-home {
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--welcome-text);
+  transition: color var(--transition-speed );
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
+.public-home h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.public-home p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.public-home-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 2rem;
+}
+
+.home-login-btn,
+.home-signup-btn {
+  padding: 12px 24px;
+  font-size: 1rem;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #000000;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.2s ease;
+}
+
+.home-login-btn:hover,
+.home-signup-btn:hover {
+  background: var(--accent-hover);
+  color: #000000;
+}
+
+.preview-section h2 {
+  margin-bottom: 1rem;
+}
+
+.preview-section ul {
+  list-style: none;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}

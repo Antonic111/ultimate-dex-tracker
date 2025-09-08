@@ -3,6 +3,7 @@ import { useMessage } from "../components/Shared/MessageContext";
 import { useNavigate } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { authAPI } from "../utils/api";
+import "../css/ForgotPassword.css";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -16,24 +17,24 @@ const handleSubmit = async (e) => {
   if (clickedRef.current || loading) return; // 🛑 prevent spam
   clickedRef.current = true;
 
-  if (!email) return showMessage("❌ Please enter your email", "error");
+      if (!email) return showMessage("Please enter your email", "error");
 
   setLoading(true);
   try {
     const data = await authAPI.forgotPassword(email);
 
     if (data.status === 429) {
-      showMessage(`❌ ${data.message}`, "error");
+              showMessage(`${data.message}`, "error");
       return;
     }
     if (data.success) {
-      showMessage("📧 Password reset email sent!", "success");
+              showMessage("Password reset email sent!", "success");
       navigate(`/enter-reset-code?email=${encodeURIComponent(email)}`);
     } else {
-      showMessage(`❌ ${data.error || "Something went wrong"}`, "error");
+              showMessage(`${data.error || "Something went wrong"}`, "error");
     }
   } catch (err) {
-    showMessage("❌ Failed to send reset email", "error");
+            showMessage("Failed to send reset email", "error");
   } finally {
     setLoading(false);
     setTimeout(() => {
@@ -43,28 +44,27 @@ const handleSubmit = async (e) => {
 };
 
   return (
-    <div className="auth-form page-container auth-page">
-      <h2>FORGOT PASSWORD</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="auth-form-fields">
-          <div className="input-icon-wrapper">
-<Mail className="auth-icon" size={20} />
-
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+    <div className="forgot-password-form page-container auth-page">
+      <h2 className="forgot-password-title">FORGOT PASSWORD</h2>
+      <form onSubmit={handleSubmit} className="forgot-password-form-fields">
+        <div className="input-icon-wrapper">
+          <Mail className="auth-icon" size={20} />
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="forgot-password-input"
+            required
+          />
         </div>
-        <button type="submit" disabled={loading}>
+        
+        <button type="submit" className="forgot-password-button" disabled={loading}>
           {loading ? "Sending..." : "Send Reset Link"}
         </button>
         
         <div className="auth-redirect">
-          <a href="/login" style={{ textDecoration: 'none' }}>Back to Login</a>
+          <a href="/login">Back to Login</a>
         </div>
       </form>
     </div>

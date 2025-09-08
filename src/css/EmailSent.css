@@ -1,0 +1,230 @@
+/* ================================
+   EMAIL SENT PAGE STYLES - TAILWIND + MOBILE
+==================================*/
+
+/* Header logo sizing for auth pages */
+.auth-page header img {
+  @apply h-[40px] md:h-[90px] max-w-[280px] md:max-w-[380px] lg:max-w-[450px];
+}
+
+/* Main email sent form container */
+.email-sent-form {
+  @apply max-w-lg mx-auto mt-10 mb-8 px-8 pb-5 rounded-lg shadow-lg w-full border-2;
+  background-color: var(--auth-boxes);
+  border-color: var(--border-color);
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Email sent title */
+.email-sent-title {
+  @apply text-center text-4xl font-black py-9 m-0;
+  color: var(--accent);
+}
+
+/* Email sent message */
+.email-sent-message {
+  @apply text-center mb-6 text-base leading-relaxed;
+  color: #ccc;
+}
+
+.email-sent-message p {
+  @apply flex items-center justify-center gap-2 flex-wrap;
+}
+
+.email-sent-message .instruction {
+  @apply block mt-2;
+}
+
+.email-sent-message .auth-icon {
+  @apply mr-0 flex-shrink-0;
+}
+
+.email-sent-message strong {
+  @apply font-semibold;
+  color: #fff;
+}
+
+/* Form fields container */
+.email-sent-form-fields {
+  @apply flex flex-col gap-3;
+}
+
+/* Input wrapper with icon */
+.input-icon-wrapper {
+  @apply flex items-center rounded-md p-4;
+  background: var(--settings-input);
+  border: 1px solid var(--border-color);
+}
+
+/* Input fields */
+.email-sent-input {
+  @apply flex-1 bg-transparent border-0 outline-none text-base;
+  color: var(--text);
+}
+
+.email-sent-input::placeholder {
+  color: var(--searchbar-placeholder-text);
+}
+
+/* Auth icons */
+.auth-icon {
+  @apply w-5 h-5 mr-3;
+  stroke: var(--svg-icons);
+  transition: color var(--transition-speed);
+}
+
+/* Email sent button */
+.email-sent-button {
+  @apply py-3 rounded-lg font-bold cursor-pointer transition-all duration-200;
+  background-color: var(--accent);
+  color: #000;
+  border: none;
+}
+
+.email-sent-button:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+  color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.email-sent-button:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Resend button */
+.resend-button {
+  @apply py-3 rounded-lg font-bold cursor-pointer transition-all duration-200 mt-2;
+  background-color: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+}
+
+.resend-button:hover:not(:disabled) {
+  background-color: var(--accent);
+  color: #000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.resend-button:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Verification info */
+.verification-info {
+  @apply mt-6 p-4 rounded-lg;
+  background: rgba(68, 68, 68, 0.1);
+  border: 1px solid rgba(68, 68, 68, 0.3);
+}
+
+.verification-info p {
+  @apply m-1 text-sm leading-relaxed flex items-center gap-2;
+  color: var(--text);
+}
+
+.verification-info p:first-child {
+  @apply mt-0;
+}
+
+.verification-info p:last-child {
+  @apply mb-0;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .email-sent-form {
+    @apply max-w-sm mx-4 mt-24 mb-48 px-6 pb-4;
+  }
+  
+  .email-sent-title {
+    @apply text-3xl py-6;
+  }
+  
+  .input-icon-wrapper {
+    @apply p-3;
+  }
+  
+  .email-sent-input {
+    @apply text-sm;
+  }
+  
+  .auth-icon {
+    @apply w-4 h-4 mr-2;
+  }
+  
+  .email-sent-button,
+  .resend-button {
+    @apply py-2.5 text-sm;
+  }
+  
+  .email-sent-message {
+    @apply text-sm;
+  }
+}
+
+@media (max-width: 480px) {
+  .email-sent-form {
+    @apply mx-3 mt-16 mb-36 px-4 pb-3;
+  }
+  
+  .email-sent-title {
+    @apply text-2xl py-4;
+  }
+  
+  .input-icon-wrapper {
+    @apply p-2.5;
+  }
+  
+  .email-sent-input {
+    @apply text-sm;
+  }
+  
+  .auth-icon {
+    @apply w-4 h-4 mr-2;
+  }
+  
+  .email-sent-button,
+  .resend-button {
+    @apply py-2 text-sm;
+  }
+  
+  .email-sent-message {
+    @apply text-xs;
+  }
+  
+  .verification-info {
+    @apply p-3;
+  }
+  
+  .verification-info p {
+    @apply text-xs;
+  }
+}
+
+/* Animation keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Transparent autofill styling - maintains site theme */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-internal-autofill-selected {
+  background-color: transparent !important;
+  color: var(--text) !important;
+  transition: background-color 9999s ease-in-out 0s;
+  -webkit-text-fill-color: var(--text) !important;
+  box-shadow: none !important;
+}

@@ -1,4 +1,5 @@
 import detectivePikachu from "../../data/pikachu.png";
+import "../../css/NoResults.css";
 
 export default function NoResults({ searchTerm, suggestion, onSuggestionClick }) {
     if (!searchTerm) return null;

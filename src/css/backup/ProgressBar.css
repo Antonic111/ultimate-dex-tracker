@@ -1,0 +1,1042 @@
+/* ================================
+   GLOBAL RESETS + FONT
+==================================*/
+
+button:focus {
+  outline: none;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+
+/* ================================
+   PROGRESS BAR DISPLAY SECTION
+==================================*/
+
+.progress-bar-wrapper {
+  margin: 0px auto 15px auto;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: var(--progressbar-bg);
+  transition: background-color var(--transition-speed );
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+}
+
+.progress-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.progress-bar-title {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.progress-bar-summary {
+  font-size: 0.95rem;
+  color: var(--progressbar-info);
+  transition: color var(--transition-speed );
+  text-align: right;
+}
+
+
+.progress-bar-count {
+  opacity: 0.75;
+  font-style: italic;
+}
+
+.progress-bar-track {
+  height: 18px;
+  width: 100%;
+  background-color: var(--progressbar-track);
+  transition: background-color var(--transition-speed );
+  border-radius: 999px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+  transition: width 0.3s ease-in-out;
+  border-radius: 999px;
+}
+
+.progress-bar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 0px 20px;
+}
+
+.progress-bar-grid-item {
+  width: 100%;
+}
+
+.progress-bar-grid.odd-count .progress-bar-grid-item:last-child {
+  grid-column: span 2;
+}
+
+/* ================================
+   PROGRESS MANAGER: WRAPPER + MODAL
+==================================*/
+
+/* Progress Manager Container */
+.progress-manager-container {
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .progress-manager-container {
+    max-width: calc(100% - 32px);
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .progress-manager-container {
+    max-width: calc(100% - 24px);
+    margin: 0 auto;
+  }
+}
+
+.progress-manager-wrapper {
+  margin: 32px auto;
+  max-width: 100%;
+  width: 100%;
+  padding: 0px 16px 4px 16px;
+  background-color: var(--progress-bg);
+  transition: background-color var(--transition-speed );
+  border-radius: 8px;
+  box-shadow: 0 4px 12px #0006;
+}
+
+@media (max-width: 768px) {
+  .progress-manager-wrapper {
+    max-width: 100%;
+    margin: 12px 16px;
+    padding: 0px 8px 2px 8px;
+  }
+  
+  .progress-title {
+    font-size: 1rem;
+    margin: 8px 0px;
+  }
+  
+  .progress-header-row {
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .progress-settings-btn {
+    transform: scale(0.8);
+  }
+  
+  /* Scale progress bars for mobile */
+  .progress-bar {
+    min-height: 24px;
+    padding: 4px 8px;
+    margin-bottom: 6px;
+    font-size: 0.75rem;
+  }
+  
+  .progress-bar-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  
+  .progress-bar-text {
+    font-size: 0.65rem;
+    line-height: 1.2;
+  }
+  
+  .progress-bar-percentage {
+    font-size: 0.65rem;
+    font-weight: 600;
+  }
+  
+  .bar-filter-editor {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  
+  /* Ensure progress bars fit mobile width */
+  .progress-bar {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .progress-bar-fill {
+    max-width: 100%;
+    height: 4px;
+    border-radius: 2px;
+  }
+  
+  .progress-bar-content {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  /* Make progress bar elements more compact */
+  .progress-bar-header {
+    margin-bottom: 2px;
+  }
+  
+  .progress-bar-stats {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  
+  /* Compact chip filters */
+  .chip-filter-chips {
+    min-height: 24px;
+    padding: 2px 4px;
+  }
+  
+  .chip {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .progress-manager-wrapper {
+    max-width: 100%;
+    margin: 8px 12px;
+    padding: 0px 4px 4px 4px;
+  }
+  
+  .progress-title {
+    font-size: 0.9rem;
+    margin: 6px 0px;
+  }
+  
+  .progress-settings-btn {
+    transform: scale(0.7);
+  }
+  
+  /* Ultra-compact progress bars for very small screens */
+  .progress-bar {
+    min-height: 20px;
+    padding: 3px 6px;
+    margin-bottom: 4px;
+    font-size: 0.7rem;
+  }
+  
+  .progress-bar-label {
+    font-size: 0.65rem;
+    line-height: 1.1;
+  }
+  
+  .progress-bar-text {
+    font-size: 0.6rem;
+    line-height: 1.1;
+  }
+  
+  .progress-bar-percentage {
+    font-size: 0.6rem;
+  }
+  
+  .progress-bar-fill {
+    height: 3px;
+    border-radius: 1.5px;
+  }
+  
+  .progress-bar-content {
+    gap: 3px;
+  }
+  
+  .progress-bar-stats {
+    gap: 4px;
+  }
+  
+  .progress-bar-header {
+    margin-bottom: 1px;
+  }
+  
+  .chip-filter-chips {
+    min-height: 20px;
+    padding: 2px 3px;
+  }
+  
+  .chip {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+  }
+  
+  .bar-filter-editor {
+    gap: 3px;
+    margin-top: 6px;
+  }
+}
+
+.progress-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+
+.progress-title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 15px 0px;
+  color: var(--text);
+  transition: color var(--transition-speed );
+}
+
+.progress-settings-btn {
+  background: none;
+  border: none;
+  color: var(--progress-icons);
+  transition: color var(--transition-speed );
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.progress-settings-btn:hover {
+  background: none;
+}
+.progress-settings-btn svg {
+  vertical-align: middle;
+}
+
+.progress-settings-btn svg {
+  transition: transform 0.3s ease, filter 0.2s ease;
+}
+
+.progress-settings-btn:hover svg,
+.progress-settings-btn:focus svg {
+  transform: none;
+}
+
+.progress-settings-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+
+/* ================================
+   MODAL PANEL STYLES
+==================================*/
+
+.modal-body {
+  overflow: visible;
+  max-width: 100%;
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Prevent horizontal scrolling on body and html during drag operations */
+body.dragging,
+html.dragging {
+  overflow-x: hidden !important;
+  /* Don't block vertical scrolling */
+  overflow-y: auto;
+}
+
+/* Ensure the modal overlay doesn't allow horizontal scrolling */
+.progress-modal-overlay {
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: var(--z-modal-overlay);
+  animation: fadeIn 0.3s ease-out;
+  pointer-events: all;
+}
+
+.progress-modal-overlay.closing {
+  animation: fadeOut 0.3s ease-in forwards;
+  pointer-events: none;
+}
+
+.progress-modal-panel {
+  max-width: 800px;
+  margin: 140px auto;
+  background-color: var(--progress-bg);
+  transition: background-color var(--transition-speed );
+  padding: 0px 25px 25px 25px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px #0006;
+  max-height: 80vh;
+  min-height: auto; /* Allow modal to shrink to content */
+  height: auto; /* Let height be determined by content */
+  overflow: visible;
+  animation: slideIn 0.3s ease-out;
+  position: relative;
+  z-index: var(--z-modal-panel);
+  display: flex;
+  flex-direction: column;
+  /* Ensure no horizontal scrolling */
+  width: 100%;
+  max-width: 800px;
+  overflow-x: hidden;
+  /* Prevent any horizontal movement */
+  left: 0;
+  right: 0;
+  /* Ensure vertical scrolling works in child elements */
+  overflow-y: visible;
+}
+
+.progress-modal-panel.closing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-save-btn,
+.modal-cancel-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background-color: var(--accent);
+  color: black;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 0.9rem;
+}
+
+.modal-save-btn:hover:not(:disabled),
+.modal-cancel-btn:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+  color: var(--text);
+}
+
+.modal-save-btn:disabled,
+.modal-cancel-btn:disabled {
+  background-color: #666;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ================================
+   EACH PROGRESS BAR CONFIG BLOCK
+==================================*/
+
+.bar-settings-group {
+  background-color: var(--progressbar-bg);
+  transition: background-color var(--transition-speed );
+  border: none;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 12px;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.6);
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-block: 2px;
+}
+
+.bar-name-input {
+  flex: 1;
+  padding: 8px 12px;
+  background-color: var(--progressbar-input);
+  transition: background-color var(--transition-speed );
+  color: white;
+  border: 2px solid #444;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+
+/* ================================
+   ICON BUTTONS (EYE, SETTINGS, TRASH, CLOSE)
+==================================*/
+
+.bar-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Tighter spacing between icons */
+  margin-left: 4px; /* Optional: align better with input */
+}
+
+
+.bar-controls button svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.bar-controls button,
+.eye-toggle-btn,
+.filter-toggle-btn {
+  background-color: var(--modal-buttons);
+  transition: background-color var(--transition-speed );
+  color: var(--progress-icons);
+  border: 2px solid #444;
+  border-radius: 8px;
+  padding: 5px 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.bar-controls button:hover,
+.eye-toggle-btn:hover,
+.filter-toggle-btn:hover {
+  background-color: var(--modal-buttons-hover);
+  color: var(--modal-buttons-hover-text);
+  border: 2px solid #444;
+}
+
+.bar-controls button:focus,
+.bar-controls button:active,
+.eye-toggle-btn:focus,
+.eye-toggle-btn:active {
+  outline: none;
+  box-shadow: none;
+}
+
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.modal-close-btn .sidebar-close-icon svg {
+  display: block;
+  transition: transform 0.18s, filter 0.18s;
+}
+
+.modal-close-btn:hover .sidebar-close-icon svg,
+.modal-close-btn:focus .sidebar-close-icon svg {
+  transform: scale(1.13) rotate(-17deg);
+  filter: drop-shadow(0 0 6px #ffffff77);
+}
+
+.modal-close-btn:focus,
+.modal-close-btn:active {
+  outline: none;
+  box-shadow: none;
+}
+
+/* ================================
+   SORTABLE ITEMS
+==================================*/
+
+/* Ensure sortable items don't cause layout issues */
+.sortable-item {
+  max-width: 100%;
+  position: relative;
+  /* Prevent horizontal overflow */
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Ensure the bar settings group doesn't cause horizontal overflow */
+.bar-settings-group {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Ensure expanded filters maintain their height during drag */
+.bar-settings-filters {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Ensure dragging doesn't break layout */
+.progress-modal-panel [data-dragging="true"] {
+  z-index: 1000;
+}
+
+.sortable-item {
+  position: relative;
+  z-index: 1;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.sortable-item[data-dragging="true"] {
+  z-index: 1000;
+  opacity: 0.8;
+  transform: rotate(2deg) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transition: none;
+  /* Ensure the item doesn't extend beyond its container */
+  position: relative;
+  /* Maintain full height during drag */
+  height: auto !important;
+  min-height: fit-content !important;
+  /* Prevent height compression */
+  flex-shrink: 0;
+}
+
+/* Ensure dragged items appear above all modal content */
+.progress-modal-panel .sortable-item[data-dragging="true"] {
+  z-index: 9999;
+}
+
+/* Prevent clipping during drag operations */
+.progress-modal-panel {
+  overflow: visible;
+}
+
+.modal-body {
+  overflow: visible;
+}
+
+/* ================================
+   DRAG HANDLE ICON
+==================================*/
+
+.drag-handle {
+  cursor: grab;
+  font-size: 1.2rem;
+  color: var(--progress-icons);
+  transition: color var(--transition-speed );
+  user-select: none;
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+
+/* ================================
+   FILTER EXPANSION AREA
+==================================*/
+
+.bar-settings-filters {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scaleY(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+
+/* ================================
+   CHIP FILTER SYSTEM (MULTISELECT)
+==================================*/
+
+.bar-filter-editor {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  font-size: 0.85rem;
+  margin-top: 12px;
+}
+
+.chip-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+.chip-filter-label {
+  font-size: 0.85rem;
+  color: var(--text);
+  transition: color var(--transition-speed );
+  margin-left: 2px;
+}
+
+.chip-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  color: var(--text);
+  transition: color var(--transition-speed );
+  border: 2px solid #444;
+  border-radius: 8px;
+  padding: 6px 8px;
+  min-height: 38px;
+  transition: border 0.2s;
+}
+
+.chip {
+  background: #3a3a3a;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+
+.chip:hover {
+  background: #4a4a4a;
+}
+
+.chip-remove {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.chip-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #444;
+  color: white;
+  border-radius: 999px;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: background 0.2s ease;
+  margin-left: 8px;
+  font-weight: bold;
+}
+
+.chip-add-btn:hover {
+  background: #555;
+}
+
+.chip-filter-dropdown {
+  position: fixed;
+  background-color: var(--modal-dropdown);
+  transition: background-color var(--transition-speed );
+  border: 1px solid #444;
+  border-radius: 8px;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  z-index: var(--z-modal-dropdown); /* Above modal panel */
+}
+
+.chip-option {
+  width: 100%;
+  padding: 10px 12px;
+  background: none;
+  color: var(--text);
+  transition: color var(--transition-speed );
+  text-align: left;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.chip-option:hover {
+  background: #3a3a3a;
+  color: var(--modal-buttons-hover-text);
+}
+.chip-option.selected {
+  background: #555;
+}
+
+
+/* ================================
+   ADD BAR BUTTON
+==================================*/
+
+.add-bar-row {
+  margin-top: 16px;
+}
+
+.add-bar-row button {
+  width: 100%;
+  background-color: var(--add-progress-btn);
+  transition: background-color var(--transition-speed );
+  border: 2px dashed #444;
+  color: var(--text);
+  transition: color var(--transition-speed );
+  padding: 18px;
+  font-size: 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s, border 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.add-bar-row button:hover {
+  background: #181818;
+  border-color: #666;
+  color: var(--modal-buttons-hover-text);
+}
+
+/* ================================
+   SPECIAL CHECKS FOR BALL & MARK
+==================================*/
+
+.special-tally-dropdown {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.special-tally-dropdown label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.special-tally-dropdown select {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+}
+
+/* ================================
+   SPECIAL CHECKS BUTTONS
+==================================*/
+
+.bar-template-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.template-bar-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding-bottom: 12px;
+}
+
+.template-bar-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background-color: var(--template-buttons);
+  transition: background-color var(--transition-speed );
+  color: var(--text);
+  transition: color var(--transition-speed );
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: background-color 0.2s ease, border 0.2s ease;
+}
+
+.template-bar-buttons button:hover:not(:disabled) {
+  background-color: #3a3a3a;
+  border-color: #4a4a4a;
+  color: var(--modal-buttons-hover-text);
+}
+
+.template-bar-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+
+/* ================================
+   MODAL SCROLL BAR
+==================================*/
+
+.progress-modal-panel {
+  scrollbar-gutter: stable;
+}
+
+/* WebKit scrollbar customization */
+.progress-modal-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.progress-modal-panel::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  /* Here's the trick: these create shorter thumb illusion */
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.progress-modal-panel:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
+}
+
+.progress-modal-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Drag container with proper scrolling - controlled movement */
+.drag-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 50vh; /* Keep max height for when there are many bars */
+  min-height: auto; /* Allow container to shrink to content */
+  height: auto; /* Let height be determined by content */
+  position: relative;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #444;
+  flex: 0 1 auto; /* Don't grow, allow shrinking, auto basis */
+  scroll-behavior: smooth;
+  /* Ensure no horizontal scrolling can occur */
+  width: 100%;
+  max-width: 100%;
+  /* Allow some horizontal movement for drag operations */
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* Ensure the scrollable area has proper spacing */
+.drag-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.drag-container::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.drag-container:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
+}
+
+.drag-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Bottom section with buttons - always visible */
+.add-bar-row,
+.template-bar-buttons {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--progress-bg);
+  padding: 16px 0;
+  margin-top: -4px;
+  z-index: 10;
+}
+
+/* Ensure proper spacing between scrollable content and bottom buttons */
+.modal-body {
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  height: auto; /* Let height be determined by content */
+  min-height: 0; /* Allow shrinking */
+  /* Ensure vertical scrolling works in child elements */
+  overflow-y: visible;
+  overflow-x: hidden;
+}
+
+/* Ensure dragged items stay completely within their containers */
+.sortable-item[data-dragging="true"] {
+  z-index: 1000;
+  opacity: 0.8;
+  transform: rotate(2deg) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transition: none;
+  /* Ensure the item stays completely within bounds */
+  max-width: 100%;
+  max-height: 100%;
+  /* Prevent any overflow */
+  overflow: hidden;
+  /* Ensure the item doesn't extend beyond its container */
+  position: relative;
+  /* Don't interfere with scrolling */
+  pointer-events: none;
+}

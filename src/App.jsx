@@ -3,7 +3,7 @@ import { getCaughtKey, migrateOldCaughtData } from './caughtStorage';
 import { fetchCaughtData, updateCaughtData } from './api/caught';
 import { authAPI } from './utils/api';
 import { debugAPI } from './utils/debug';
-import { showConfirm } from "./components/Shared/ConfirmDialog";
+
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS } from "./Constants";
 import "./css/App.css";
 import formsData from "./data/forms.json";
@@ -31,15 +31,88 @@ import Settings from "./pages/Settings";
 import Backup from "./pages/Backup";
 import { ThemeProvider } from "./components/Shared/ThemeContext";
 import './css/theme.css';
-import './css/pageAnimations.css';
+// import './css/pageAnimations.css'; // Moved to backup folder
 import Trainers from "./pages/Trainers";
 import PublicProfile from "./pages/PublicProfile";
 import ViewDex from "./pages/ViewDex.jsx";
 import { LoadingProvider, useLoading } from "./components/Shared/LoadingContext";
 import { LoadingSpinner } from "./components/Shared";
 import Footer from "./components/Shared/Footer";
+import CustomScrollbar from "./components/Shared/CustomScrollbar";
 import { getFilteredFormsData, getDexPreferences } from "./utils/dexPreferences";
+import { createPortal } from "react-dom";
+import { RotateCcw } from "lucide-react";
 
+// Mobile Keyboard Handler Hook
+const useMobileKeyboardHandler = () => {
+  useEffect(() => {
+    // Only run on mobile devices
+    const isMobile = () => window.innerWidth <= 768;
+    
+    if (!isMobile()) return;
+
+    let initialViewportHeight = window.innerHeight;
+    let isSidebarOpen = false;
+    let savedScrollY = 0;
+    
+    const handleResize = () => {
+      const newHeight = window.innerHeight;
+      
+      // If height decreased significantly, keyboard likely appeared
+      if (newHeight < initialViewportHeight * 0.8) {
+        // Add padding to bottom to account for keyboard
+        document.body.style.paddingBottom = `${initialViewportHeight - newHeight}px`;
+      }
+      // If height increased back to normal, keyboard likely disappeared
+      else if (newHeight >= initialViewportHeight * 0.95) {
+        document.body.style.paddingBottom = '0px';
+      }
+    };
+
+    // Prevent main page scrolling when sidebar is open on mobile
+    const preventScroll = () => {
+      if (isMobile()) {
+        savedScrollY = window.scrollY;
+        document.body.classList.add('sidebar-open');
+        document.body.style.top = `-${savedScrollY}px`;
+      }
+    };
+
+    const allowScroll = () => {
+      if (isMobile()) {
+        document.body.classList.remove('sidebar-open');
+        document.body.style.top = '';
+        window.scrollTo(0, savedScrollY);
+      }
+    };
+
+    // Listen for sidebar open/close events
+    const handleSidebarOpen = () => {
+      isSidebarOpen = true;
+      preventScroll();
+    };
+
+    const handleSidebarClose = () => {
+      isSidebarOpen = false;
+      allowScroll();
+    };
+
+    // Add event listeners
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('sidebarOpen', handleSidebarOpen);
+    window.addEventListener('sidebarClose', handleSidebarClose);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('sidebarOpen', handleSidebarOpen);
+      window.removeEventListener('sidebarClose', handleSidebarClose);
+      document.body.style.paddingBottom = '0px';
+      document.body.classList.remove('sidebar-open');
+      document.body.style.top = '';
+    };
+  }, []);
+};
 
 // Global Loading Indicator Component
 const GlobalLoadingIndicator = () => {
@@ -219,6 +292,9 @@ export default function App() {
   const [dexSections, setDexSections] = useState(() => createDexSections());
   const [currentDexPreferences, setCurrentDexPreferences] = useState(() => getDexPreferences());
 
+  // Mobile keyboard handling
+  useMobileKeyboardHandler();
+
   // Memoized callback for refreshing dex preferences
   // This prevents infinite re-renders when used in LocationListener
   const refreshDexPreferences = useCallback(() => {
@@ -322,6 +398,17 @@ useEffect(() => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [toggles, setToggles] = useState(() => loadDexToggles());
+  
+  // Reset modal state for grid clicks and bulk operations
+  const [resetModal, setResetModal] = useState({ 
+    show: false, 
+    pokemon: null, 
+    pokemonName: '', 
+    isShiny: false, 
+    isBulkReset: false, 
+    box: null 
+  });
+  const [resetModalClosing, setResetModalClosing] = useState(false);
   const showShiny = toggles.showShiny;
   const showForms = toggles.showForms;
 
@@ -446,6 +533,45 @@ useEffect(() => {
 
   const [caughtInfoMap, setCaughtInfoMap] = useState({});
 
+  // Load cached caught info immediately for seamless refreshes
+  useEffect(() => {
+    if (!user?.username) return;
+    try {
+      const raw = localStorage.getItem(`caughtInfoMap:${user.username}`);
+      if (raw) {
+        const cached = JSON.parse(raw);
+        if (cached && typeof cached === 'object') {
+          setCaughtInfoMap(prev => (Object.keys(prev).length ? prev : cached));
+          // Derive caught booleans from cache for instant UI
+          const caughtMap = {};
+          for (const key in cached) {
+            const info = cached[key];
+            if (info && typeof info === 'object') {
+              if (info.entries && Array.isArray(info.entries) && info.entries.length > 0) {
+                caughtMap[key] = true;
+              } else if (info.caught === true) {
+                caughtMap[key] = true;
+              } else {
+                caughtMap[key] = false;
+              }
+            } else {
+              caughtMap[key] = !!info;
+            }
+          }
+          setCaught(prev => (Object.keys(prev).length ? prev : caughtMap));
+        }
+      }
+    } catch {}
+  }, [user?.username]);
+
+  // Persist caught info to cache on change
+  useEffect(() => {
+    if (!user?.username) return;
+    try {
+      localStorage.setItem(`caughtInfoMap:${user.username}`, JSON.stringify(caughtInfoMap));
+    } catch {}
+  }, [caughtInfoMap, user?.username]);
+
   // Migration: Convert old caught data to new format when component mounts
   useEffect(() => {
     if (Object.keys(caughtInfoMap).length > 0 && user?.username) {
@@ -483,7 +609,30 @@ useEffect(() => {
     }
   }, [caughtInfoMap, user?.username]);
 
+  // Prevent scrolling when reset modal is open
+  useEffect(() => {
+    const preventScroll = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    };
 
+    if (resetModal.show) {
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('wheel', preventScroll, { passive: false });
+      document.addEventListener('touchmove', preventScroll, { passive: false });
+    } else {
+      document.body.style.overflow = '';
+      document.removeEventListener('wheel', preventScroll);
+      document.removeEventListener('touchmove', preventScroll);
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('wheel', preventScroll);
+      document.removeEventListener('touchmove', preventScroll);
+    };
+  }, [resetModal.show]);
 
   function filterMons(list, forceShowForms = false, isShiny = false) {
     return list.filter(poke => {
@@ -590,8 +739,11 @@ function CloseSidebarOnRouteChange() {
   // caught = true if we have info, false if we cleared it
   setCaught(prev => ({ ...prev, [key]: !!info }));
 
-  // keep sidebar in sync
-  if (sidebarOpen) setSelectedPokemon(poke);
+  // keep sidebar in sync - only switch when caught status actually changes
+  if (sidebarOpen && selectedPokemon && selectedPokemon.id !== poke.id) {
+    console.log("Sidebar is open, switching to newly caught pokemon:", poke.name);
+    setSelectedPokemon(poke);
+  }
 }
 
   function handleSelectPokemon(poke) {
@@ -611,10 +763,23 @@ function CloseSidebarOnRouteChange() {
       });
 
       if (hasInfo) {
-        const confirmed = await showConfirm(
-          `Unmarking will delete saved info for one or more ${isShiny ? 'shiny ' : ''}Pokémon in this section. Continue?`
-        );
-        if (!confirmed) return;
+        // Show reset modal instead of old confirm dialog
+        const boxNames = box.map(p => formatPokemonName(p.name));
+        const uniqueNames = [...new Set(boxNames)];
+        const displayNames = uniqueNames.length <= 3 
+          ? uniqueNames.join(', ') 
+          : `${uniqueNames.slice(0, 2).join(', ')} and ${uniqueNames.length - 2} others`;
+        
+        setResetModal({ 
+          show: true, 
+          pokemon: null, // Special case for bulk reset
+          pokemonName: displayNames, 
+          isShiny: isShiny,
+          isBulkReset: true,
+          box: box
+        });
+        setResetModalClosing(false);
+        return;
       }
     }
 
@@ -687,11 +852,15 @@ function CloseSidebarOnRouteChange() {
     if (caught[key]) {
       const info = caughtInfoMap[key];
       if (hasMeaningfulInfo(info)) {
-        const confirmed = await showConfirm(
-          `Doing this will delete ALL info for ${isShiny ? 'shiny ' : ''}${formatPokemonName(poke?.name)}. Are you sure you wanna continue?`
-        );
-
-        if (!confirmed) return;
+        // Show reset modal instead of old confirm dialog
+        setResetModal({ 
+          show: true, 
+          pokemon: poke, 
+          pokemonName: formatPokemonName(poke?.name), 
+          isShiny: isShiny 
+        });
+        setResetModalClosing(false);
+        return;
       }
     }
 
@@ -736,8 +905,79 @@ function CloseSidebarOnRouteChange() {
       return newState;
     });
 
-
+    // keep sidebar in sync - switch to newly caught pokemon
+    if (sidebarOpen && selectedPokemon && selectedPokemon.id !== poke.id) {
+      console.log("Sidebar is open, switching to newly toggled pokemon:", poke.name);
+      setSelectedPokemon(poke);
+    }
   }
+
+  // Handle reset confirmation from grid click or bulk operations
+  const handleResetConfirm = () => {
+    // Close modal with animation
+    setResetModalClosing(true);
+    setTimeout(() => {
+      setResetModal({ 
+        show: false, 
+        pokemon: null, 
+        pokemonName: '', 
+        isShiny: false, 
+        isBulkReset: false, 
+        box: null 
+      });
+      setResetModalClosing(false);
+    }, 300);
+    
+    if (resetModal.isBulkReset && resetModal.box) {
+      // Handle bulk reset (Unmark All)
+      const newCaughtMap = { ...caught };
+      const newInfoMap = { ...caughtInfoMap };
+      const delta = {};
+      
+      resetModal.box.forEach(p => {
+        const key = getCaughtKey(p, null, resetModal.isShiny);
+        newCaughtMap[key] = false;
+        newInfoMap[key] = null;
+        delta[key] = null;
+      });
+      
+      setCaught(newCaughtMap);
+      setCaughtInfoMap(newInfoMap);
+      
+      // Send changes to server
+      if (user?.username) {
+        try {
+          const { caughtAPI } = import('./utils/api.js');
+          caughtAPI.patchCaughtData({ changes: delta });
+        } catch (e) {
+          // Fallback to full save
+          updateCaughtData(user.username, null, newInfoMap);
+        }
+      }
+      
+      // Close sidebar if any of these Pokémon were selected
+      if (selectedPokemon && resetModal.box.some(p => getCaughtKey(p, null, resetModal.isShiny) === getCaughtKey(selectedPokemon, null, showShiny))) {
+        setSelectedPokemon(null);
+        setSidebarOpen(false);
+      }
+    } else if (resetModal.pokemon) {
+      // Handle individual reset (grid click)
+      const key = getCaughtKey(resetModal.pokemon, null, resetModal.isShiny);
+      
+      // Actually reset the Pokémon data
+      setCaught(prev => ({ ...prev, [key]: false }));
+      setCaughtInfoMap(prev => ({ ...prev, [key]: null }));
+      if (user?.username) {
+        updateCaughtData(user.username, key, null);
+      }
+      
+      // Close sidebar if this Pokémon was selected
+      if (selectedPokemon && getCaughtKey(selectedPokemon, null, showShiny) === key) {
+        setSelectedPokemon(null);
+        setSidebarOpen(false);
+      }
+    }
+  };
 
   let mergedMons = [];
   const seen = new Set();
@@ -783,24 +1023,24 @@ function CloseSidebarOnRouteChange() {
         <UserContext.Provider value={{ ...user, setUser: handleUserUpdate, loading }}>
           <MessageProvider>
             <Router>
+              <div className="flex flex-col min-h-screen">
+                <CloseSidebarOnRouteChange />
 
-            <CloseSidebarOnRouteChange />
+                <HeaderWithConditionalAuth
+                  user={user}
+                  setUser={handleUserUpdate}
+                  showMenu={showMenu}
+                  setShowMenu={setShowMenu}
+                  userMenuRef={userMenuRef}
+                />
+                
+                {/* Global Loading Indicator */}
+                <GlobalLoadingIndicator />
+                
+                {/* Location Listener for detecting navigation to home page */}
+                <LocationListener onNavigateToHome={refreshDexPreferences} />
 
-            <HeaderWithConditionalAuth
-              user={user}
-              setUser={handleUserUpdate}
-              showMenu={showMenu}
-              setShowMenu={setShowMenu}
-              userMenuRef={userMenuRef}
-            />
-            
-            {/* Global Loading Indicator */}
-            <GlobalLoadingIndicator />
-            
-            {/* Location Listener for detecting navigation to home page */}
-            <LocationListener onNavigateToHome={refreshDexPreferences} />
-
-
+                <main className="flex-grow">
                   <Routes>
                     {/* Main App */}
                     <Route
@@ -835,12 +1075,27 @@ function CloseSidebarOnRouteChange() {
                                 genOptions={getGenOptions()}
                                 showShiny={showShiny}
                                 setShowShiny={setShowShiny}
-                                showForms={showForms}
-                                setShowForms={setShowForms}
                               />
                             </div>
 
-                                             <div className="main-bg page-container fade-in-up">
+                            {/* Mobile tip below the entire search section, above categories/grid */}
+                            <div className="md:hidden w-full mt-3 mb-5 px-3 fade-in-up page-animate-3">
+                              <div
+                                className="text-sm rounded-md px-3 py-2"
+                                style={{
+                                  background: 'var(--searchbar-dropdown)',
+                                  border: '1px solid var(--border-color)',
+                                  color: 'var(--text)'
+                                }}
+                              >
+                                <ul className="list-disc pl-5 space-y-1">
+                                  <li>Tap a Pokémon to toggle caught.</li>
+                                  <li>Hold to open the sidebar.</li>
+                                </ul>
+                              </div>
+                            </div>
+
+                            <div className="main-bg page-container fade-in-up">
                            {/* Dynamic Dex Grid based on showShiny toggle */}
                            {showShiny ? (
                              // Show Shiny Pokémon Grid
@@ -861,6 +1116,7 @@ function CloseSidebarOnRouteChange() {
                                        title={section.title}
                                        pokemonList={filteredMons}
                                        caught={caught}
+                                       isCaught={(poke) => caught[getCaughtKey(poke, null, true)] || false}
                                        onMarkAll={(box) => handleMarkAll(box, true)}
                                        onToggleCaught={(poke) => handleToggleCaught(poke, true)}
                                        onSelect={handleSelectPokemon}
@@ -883,6 +1139,7 @@ function CloseSidebarOnRouteChange() {
                                        title={section.title}
                                        pokemonList={filteredMons}
                                        caught={caught}
+                                       isCaught={(poke) => caught[getCaughtKey(poke, null, true)] || false}
                                        onMarkAll={(box) => handleMarkAll(box, true)}
                                        onToggleCaught={(poke) => handleToggleCaught(poke, true)}
                                        onSelect={handleSelectPokemon}
@@ -911,6 +1168,7 @@ function CloseSidebarOnRouteChange() {
                                        title={section.title}
                                        pokemonList={filteredMons}
                                        caught={caught}
+                                       isCaught={(poke) => caught[getCaughtKey(poke, null, false)] || false}
                                        onMarkAll={(box) => handleMarkAll(box, false)}
                                        onToggleCaught={(poke) => handleToggleCaught(poke, false)}
                                        onSelect={handleSelectPokemon}
@@ -933,6 +1191,7 @@ function CloseSidebarOnRouteChange() {
                                        title={section.title}
                                        pokemonList={filteredMons}
                                        caught={caught}
+                                       isCaught={(poke) => caught[getCaughtKey(poke, null, false)] || false}
                                        onMarkAll={(box) => handleMarkAll(box, false)}
                                        onToggleCaught={(poke) => handleToggleCaught(poke, false)}
                                        onSelect={handleSelectPokemon}
@@ -943,6 +1202,20 @@ function CloseSidebarOnRouteChange() {
                                  })}
                              </div>
                            )}
+                         </div>
+
+                         {/* Mobile tip below entire section */}
+                         <div className="md:hidden w-full mt-4">
+                           <div
+                             className="text-sm rounded-md px-3 py-2"
+                             style={{
+                               background: 'var(--searchbar-dropdown)',
+                               border: '1px solid var(--border-color)',
+                               color: 'var(--text)'
+                             }}
+                           >
+                             Tip: Tap a Pokémon to toggle caught. Hold to open details.
+                           </div>
                          </div>
 
                           {showNoResults && filters.searchTerm && (
@@ -1030,14 +1303,98 @@ function CloseSidebarOnRouteChange() {
                   }
                 />
 
-                                         </Routes>
+                  </Routes>
+                </main>
+                
+                <Footer />
+                
+                {/* Custom Scrollbar for Desktop */}
+                <CustomScrollbar />
+              </div>
+            </Router>
             
-            <Footer />
-            
-          </Router>
-        </MessageProvider>
-      </UserContext.Provider>
-    </LoadingProvider>
-  </ThemeProvider>
-);
+            {/* Reset Modal for Grid Clicks */}
+            {resetModal.show && createPortal(
+              <div
+                className={`fixed inset-0 z-[20000] ${resetModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
+                onClick={() => {
+                  setResetModalClosing(true);
+                  setTimeout(() => {
+                    setResetModal({ 
+                      show: false, 
+                      pokemon: null, 
+                      pokemonName: '', 
+                      isShiny: false, 
+                      isBulkReset: false, 
+                      box: null 
+                    });
+                    setResetModalClosing(false);
+                  }, 300);
+                }}
+              >
+                <div className="bg-black/80 w-full h-full flex items-center justify-center">
+                  <div
+                    className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${resetModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
+                        <RotateCcw className="w-5 h-5 text-red-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-[var(--accent)]">
+                          {resetModal.isBulkReset ? 'Unmark All Pokémon' : 'Reset Pokémon'}
+                        </h3>
+                        <p className="text-sm text-[var(--progressbar-info)]">This action cannot be undone</p>
+                      </div>
+                    </div>
+                    <p className="text-gray-300 mb-6">
+                      {resetModal.isBulkReset ? (
+                        <>
+                          Are you sure you want to unmark all Pokémon in this section? This will delete all saved data for <span className="font-semibold text-[var(--accent)]">{resetModal.pokemonName}</span>.
+                        </>
+                      ) : (
+                        <>
+                          Are you sure you want to reset <span className="font-semibold text-[var(--accent)]">{resetModal.pokemonName}</span>?
+                          This will delete all saved data.
+                        </>
+                      )}
+                    </p>
+                    <div className="flex gap-3 justify-end">
+                      <button
+                        onClick={() => {
+                          setResetModalClosing(true);
+                          setTimeout(() => {
+                            setResetModal({ 
+                              show: false, 
+                              pokemon: null, 
+                              pokemonName: '', 
+                              isShiny: false, 
+                              isBulkReset: false, 
+                              box: null 
+                            });
+                            setResetModalClosing(false);
+                          }, 300);
+                        }}
+                        className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleResetConfirm}
+                        className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
+                      >
+                        {resetModal.isBulkReset ? 'Unmark All' : 'Reset Pokémon'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>,
+              document.body
+            )}
+          </MessageProvider>
+        </UserContext.Provider>
+      </LoadingProvider>
+    </ThemeProvider>
+  );
 }

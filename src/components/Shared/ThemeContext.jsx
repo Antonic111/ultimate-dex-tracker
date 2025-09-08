@@ -8,7 +8,7 @@ const THEME_KEY = "theme";
 const ACCENT_KEY = "accent";
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => localStorage.getItem(THEME_KEY) || "dark");
+  const [theme, setTheme] = useState(() => localStorage.getItem(THEME_KEY) || "light");
   const [accent, setAccent] = useState(() => localStorage.getItem(ACCENT_KEY) || "yellow");
 
   // OS preference watcher for "system"

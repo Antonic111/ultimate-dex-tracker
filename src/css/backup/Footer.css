@@ -1,0 +1,156 @@
+.site-footer {
+  background-color: var(--header);
+  border-top: 8px solid var(--accent);
+  padding: 40px 0 20px 0;
+  color: var(--text);
+  transition: background-color var(--transition-speed);
+  margin-top: auto; /* Push footer to bottom */
+}
+
+.footer-content {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+  padding: 0 16px;
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    max-width: 100%;
+    margin: 0 8px;
+    padding: 0 12px;
+    gap: 20px;
+  }
+}
+
+.footer-section h3 {
+  color: var(--accent);
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-section ul li {
+  margin-bottom: 8px;
+}
+
+.footer-section ul li a {
+  color: var(--text);
+  text-decoration: none;
+  transition: color var(--transition-speed);
+  font-size: 0.9rem;
+}
+
+.footer-section ul li a:hover {
+  color: var(--accent);
+}
+
+.credit-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-speed);
+}
+
+.credit-link:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.footer-section p {
+  margin: 0;
+  line-height: 1.6;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.social-links {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.social-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-speed);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.social-link:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.youtube-link {
+  color: var(--accent);
+}
+
+.twitch-link {
+  color: var(--accent);
+}
+
+.footer-bottom {
+  max-width: 1300px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px 16px 0 16px;
+  border-top: 1px solid var(--accent);
+  margin-top: 30px;
+}
+
+.footer-bottom p {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Inline poké ball icons for the footer tagline */
+.inline-ball {
+  width: 18px;
+  height: 18px;
+  vertical-align: -3px;
+  margin: 0 4px;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .footer-section {
+    text-align: center;
+  }
+  
+  .site-footer {
+    padding: 30px 0 15px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-content {
+    padding: 0 12px;
+  }
+  
+  .footer-bottom {
+    padding: 20px 12px 0 12px;
+  }
+}

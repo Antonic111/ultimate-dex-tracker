@@ -20,6 +20,7 @@ import ContentFilterInput from "../components/Shared/ContentFilterInput";
 import { validateContent } from "../../shared/contentFilter";
 import { profileAPI, caughtAPI } from "../utils/api";
 import { getFilteredFormsData } from "../utils/dexPreferences";
+import { SearchbarIconDropdown } from "../components/Shared/SearchBar";
 
 const FORM_TYPES_FOR_FAVORITES = [
     "alolan",
@@ -448,11 +449,40 @@ export default function Profile() {
 
     const handleCopyLink = async () => {
         const url = `${window.location.origin}/u/${encodeURIComponent(username)}`;
+        
+        // Try modern clipboard API first (requires HTTPS or localhost)
+        if (navigator.clipboard && window.isSecureContext) {
+            try {
+                await navigator.clipboard.writeText(url);
+                showMessage("Share link copied", "success");
+                return;
+            } catch (err) {
+                console.warn("Clipboard API failed, trying fallback:", err);
+            }
+        }
+        
+        // Fallback for HTTP or when clipboard API fails
         try {
-            await navigator.clipboard.writeText(url);
-            showMessage("🔗 Share link copied", "success");
-        } catch {
-            showMessage("❌ Couldn't copy link", "error");
+            const textArea = document.createElement('textarea');
+            textArea.value = url;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            if (successful) {
+                showMessage("Share link copied", "success");
+            } else {
+                throw new Error("execCommand failed");
+            }
+        } catch (err) {
+            console.error("Copy failed:", err);
+            showMessage("Couldn't copy link", "error");
         }
     };
 
@@ -473,11 +503,11 @@ export default function Profile() {
             const { hasLiked: liked, likeCount: newCount } = await profileAPI.toggleProfileLike(username);
             setHasLiked(liked);
             setLikeCount(newCount);
-            showMessage(liked ? "❤️ Profile liked!" : "💔 Like removed", "success");
+            showMessage(liked ? "Profile liked!" : "Like removed", "success");
         } catch (error) {
             setHasLiked(wasLiked);
             setLikeCount(previousCount);
-            showMessage("❌ Failed to update like", "error");
+            showMessage("Failed to update like", "error");
         } finally {
             setLikeLoading(false);
         }
@@ -627,7 +657,7 @@ export default function Profile() {
                                     const fc = (form.switchFriendCode || "").toUpperCase().trim();
 
                                     if (fc && !SWITCH_FC_RE.test(fc)) {
-                                        showMessage("❌ Friend code must be like: SW-1234-5678-9012", "error");
+                                        showMessage("Friend code must be like: SW-1234-5678-9012", "error");
                                         return;
                                     }
 
@@ -639,7 +669,7 @@ export default function Profile() {
                                         // Validate bio at save-time
                                         const bioValidation = validateContent(String(form.bio || ''), 'bio');
                                         if (!bioValidation.isValid) {
-                                            showMessage(`❌ ${bioValidation.error}`, 'error');
+                                            showMessage(`${bioValidation.error}`, 'error');
                                             return;
                                         }
                                         setLoading('save-profile', true);
@@ -654,7 +684,7 @@ export default function Profile() {
                                             switchFriendCode: fc,
                                         });
 
-                                        showMessage("✅ Profile changes saved", "success");
+                                        showMessage("Profile changes saved", "success");
 
                                         setForm((prev) => ({
                                             ...prev,
@@ -671,7 +701,7 @@ export default function Profile() {
 
                                         setIsEditing(false);
                                     } catch (err) {
-                                        showMessage("❌ Failed to update profile", "error");
+                                        showMessage("Failed to update profile", "error");
                                     } finally {
                                         setLoading('save-profile', false);
                                     }
@@ -764,7 +794,7 @@ export default function Profile() {
                         <div className="profile-field">
                             <label>Location</label>
                             {isEditing ? (
-                                <IconDropdown
+                                <SearchbarIconDropdown
                                     options={COUNTRY_OPTIONS.map(country => ({
                                         name: country.name,
                                         value: country.value,
@@ -772,6 +802,8 @@ export default function Profile() {
                                     }))}
                                     value={form.location}
                                     onChange={(value) => setForm({ ...form, location: value })}
+                                    placeholder="Select location"
+                                    hideClearButton
                                 />
                             ) : (
                                 <div className="field-display">
@@ -793,7 +825,7 @@ export default function Profile() {
                                                          <div className="profile-field">
                                      <label>Gender</label>
                                      {isEditing ? (
-                                         <IconDropdown
+                                         <SearchbarIconDropdown
                                              options={[
                                                  { name: "Male", value: "Male", icon: <Mars size={18} color="#4aaaff" /> },
                                                  { name: "Female", value: "Female", icon: <Venus size={18} color="#ff6ec7" /> },
@@ -801,6 +833,8 @@ export default function Profile() {
                                              ]}
                                              value={form.gender}
                                              onChange={(value) => setForm({ ...form, gender: value })}
+                                             placeholder="Select gender"
+                                             hideClearButton
                                          />
                                      ) : (
                                          <div className="field-display">

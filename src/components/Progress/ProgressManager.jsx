@@ -17,11 +17,11 @@ import {
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Eye, EyeOff, Pencil, Plus, Settings, Trash2 } from "lucide-react";
+import { Eye, EyeOff, ListCollapse, Pencil, Plus, Settings, Trash2 } from "lucide-react";
 import { useEffect, useState, useContext, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { getCaughtKey } from "../../caughtStorage";
-import { showConfirm } from "../Shared/ConfirmDialog";
+
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS } from "../../Constants";
 import MultiSelectChips from "../Shared/MultiSelectChips";
 import ProgressBar from "./ProgressBar";
@@ -98,6 +98,8 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
     
     const [bars, setBars] = useState(initialBars);
     const [editingBars, setEditingBars] = useState([]); // New state for editing
+    const [deleteModal, setDeleteModal] = useState({ show: false, index: null, barName: '' });
+    const [deleteModalClosing, setDeleteModalClosing] = useState(false);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false); // Track changes
     const [activeDragId, setActiveDragId] = useState(null); // Track active drag
 
@@ -268,6 +270,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
     const [showSettings, setShowSettings] = useState(false);
     const [closing, setClosing] = useState(false);
+    const [collapsed, setCollapsed] = useState(true);
 
     // Custom modifier to restrict movement within modal boundaries
     const restrictToModalBoundaries = ({ transform, dragging, active }) => {
@@ -319,22 +322,13 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
     useEffect(() => {
         const body = document.body;
-        const html = document.documentElement;
-
         if (showSettings) {
-            body.classList.add("modal-open");
-            html.classList.add("modal-open");
+            body.style.overflow = 'hidden';
         } else {
-            // Delay removing modal-open until after closing animation completes
-            setTimeout(() => {
-                body.classList.remove("modal-open");
-                html.classList.remove("modal-open");
-            }, closing ? 320 : 0);
+            body.style.overflow = '';
         }
-
         return () => {
-            body.classList.remove("modal-open");
-            html.classList.remove("modal-open");
+            body.style.overflow = '';
         };
     }, [showSettings]);
 
@@ -372,7 +366,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
         
         setBars(editingBars);
         saveBarsToProfile(editingBars);
-        showMessage('✅ Progress bars updated successfully!', 'success');
+        showMessage('Progress bars updated successfully!', 'success');
         handleCloseModal();
     }
 
@@ -543,31 +537,47 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
     }
 
     const visibleBars = bars.filter((b) => b.visible);
-    const isOdd = visibleBars.length % 2 === 1;
-    const gridClass = `progress-bar-grid${isOdd ? " odd-count" : ""}`;
 
 
     return (
-        <div className="progress-manager-wrapper">
-            <div className="progress-header-row">
-                <h2 className="progress-title">Progress Bars</h2>
-                        {!readOnly && (
-         <button
-                    className="progress-settings-btn"
-                    title="Edit Progress Bars"
-                    onClick={openEditModal}
-                >
-                    <Settings size={30} />
-                          </button>
-        )}
-
+                                    <div className="w-full max-w-[1300px] mx-auto px-4 pt-2 pb-1 rounded-lg shadow-sm mb-6 mt-6" style={{ width: '100%', maxWidth: '1300px', backgroundColor: 'var(--searchbar-bg)', border: '1px solid var(--border-color)' }}>
+            <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Progress Bars</h2>
+                <div className="flex items-center gap-2">
+                    {/* Mobile-only collapse button - hide when only 1 progress bar */}
+                    {bars.length > 1 && (
+                        <button
+                            className="md:hidden p-2 rounded-lg transition-colors duration-200 hover:scale-105"
+                            onClick={() => setCollapsed(v => !v)}
+                            aria-label={collapsed ? "Expand progress bars" : "Collapse progress bars"}
+                            tabIndex={0}
+                        >
+                            <ListCollapse size={22} strokeWidth={4} style={{ color: 'var(--accent)' }} />
+                        </button>
+                    )}
+                    {!readOnly && (
+                        <button
+                            className="p-2 rounded-lg hover:rotate-45 transition-transform duration-300"
+                            style={{ color: 'var(--accent)' }}
+                            title="Edit Progress Bars"
+                            onClick={openEditModal}
+                        >
+                            <Settings size={24} />
+                        </button>
+                    )}
+                </div>
             </div>
 
-            <div className={gridClass}>
-                {visibleBars.map((bar) => {
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full pb-4">
+                {visibleBars.map((bar, index) => {
                     const { total, caught } = computeProgress(bar);
+                    const isLastOdd = index === visibleBars.length - 1 && visibleBars.length % 2 !== 0;
+                    const shouldShow = collapsed === false || window.innerWidth >= 768 || index === 0;
+                    
+                    if (!shouldShow) return null;
+                    
                     return (
-                        <div className="progress-bar-grid-item" key={bar.id}>
+                        <div key={bar.id} className={`w-full h-full ${isLastOdd ? 'md:col-span-2' : ''}`}>
                             <ProgressBar label={bar.name} total={total} caughtCount={caught} />
                         </div>
                     );
@@ -705,24 +715,14 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                                                                     )}
 
                                                                     <button
-                                                                        onClick={async (e) => {
+                                                                        onClick={() => {
                                                                             if (editingBars.length <= 1) return;
-
-                                                                            const button = e.currentTarget;
-                                                                            button.disabled = true;
-
-                                                                            try {
-                                                                                const confirm = await showConfirm("Are you sure you want to delete this progress bar?");
-                                                                                
-                                                                                if (confirm) {
-                                                                                    const updated = editingBars.filter((_, i) => i !== index);
-                                                                                    setEditingBars(updated);
-                                                                                    setHasUnsavedChanges(true);
-                                                                                }
-                                                                            } finally {
-                                                                                // Always re-enable the button
-                                                                                button.disabled = false;
-                                                                            }
+                                                                            setDeleteModalClosing(false);
+                                                                            setDeleteModal({ 
+                                                                                show: true, 
+                                                                                index: index, 
+                                                                                barName: bar.name 
+                                                                            });
                                                                         }}
                                                                         disabled={editingBars.length <= 1}
                                                                         title={editingBars.length <= 1 ? "You must keep at least 1 progress bar" : "Delete"}
@@ -872,6 +872,78 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                     </div>
                 </div>,
                 document.body)
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {deleteModal.show && createPortal(
+                <div className={`fixed inset-0 z-[20000] flex items-center justify-center ${deleteModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}>
+                    {/* Backdrop */}
+                    <div 
+                        className={`absolute inset-0 bg-black/80 ${deleteModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
+                        onClick={() => {
+                            setDeleteModalClosing(true);
+                            setTimeout(() => {
+                                setDeleteModal({ show: false, index: null, barName: '' });
+                                setDeleteModalClosing(false);
+                            }, 300);
+                        }}
+                    />
+                    
+                    {/* Modal */}
+                    <div className={`relative bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${deleteModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}>
+                        {/* Header */}
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
+                                <Trash2 className="w-5 h-5 text-red-400" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-[var(--accent)]">Delete Progress Bar</h3>
+                                <p className="text-sm text-[var(--progressbar-info)]">This action cannot be undone</p>
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="mb-6">
+                            <p className="text-[var(--text)]">
+                                Are you sure you want to delete <span className="font-semibold text-[var(--accent)]">"{deleteModal.barName}"</span>?
+                            </p>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={() => {
+                                    setDeleteModalClosing(true);
+                                    setTimeout(() => {
+                                        setDeleteModal({ show: false, index: null, barName: '' });
+                                        setDeleteModalClosing(false);
+                                    }, 300);
+                                }}
+                                className="px-4 py-2 text-[var(--text)] hover:text-[var(--modal-buttons-hover-text)] transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (deleteModal.index !== null) {
+                                        const updated = editingBars.filter((_, i) => i !== deleteModal.index);
+                                        setEditingBars(updated);
+                                        setHasUnsavedChanges(true);
+                                    }
+                                    setDeleteModalClosing(true);
+                                    setTimeout(() => {
+                                        setDeleteModal({ show: false, index: null, barName: '' });
+                                        setDeleteModalClosing(false);
+                                    }, 300);
+                                }}
+                                className="px-4 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-[var(--text)] rounded-lg transition-colors font-medium"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
             )}
         </div>
     );

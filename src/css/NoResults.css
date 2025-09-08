@@ -1,0 +1,111 @@
+/* ================================
+   NO RESULTS COMPONENT STYLES
+   (Detective Pikachu Search Results)
+==================================*/
+
+/* Main container - converted to Tailwind classes */
+.no-results-hint {
+  @apply flex flex-col items-center justify-center text-center w-full mt-12 mb-16;
+  color: var(--accent);
+}
+
+/* Detective Pikachu image */
+.no-results-img {
+  @apply w-32 h-auto mb-5;
+  filter: drop-shadow(0 0 6px #0008);
+}
+
+/* Main "No Pokémon found" text */
+.no-results-text {
+  @apply text-2xl font-bold;
+}
+
+/* Search term highlighting */
+.no-results-term {
+  color: var(--text);
+  transition: color var(--transition-speed);
+}
+
+/* Suggestion text */
+.no-results-suggestion {
+  @apply text-lg mt-1;
+}
+
+/* Suggestion button */
+.no-results-button {
+  @apply text-lg font-bold p-0 bg-transparent border-0 cursor-pointer underline;
+  color: var(--text);
+  transition: color var(--transition-speed);
+}
+
+.no-results-button:hover {
+  color: var(--accent);
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .no-results-hint {
+    @apply mt-8 mb-12;
+  }
+  
+  .no-results-img {
+    @apply w-24 mb-4;
+  }
+  
+  .no-results-text {
+    @apply text-xl;
+  }
+  
+  .no-results-suggestion {
+    @apply text-base;
+  }
+  
+  .no-results-button {
+    @apply text-base;
+  }
+}
+
+@media (max-width: 480px) {
+  .no-results-hint {
+    @apply mt-6 mb-10 px-4;
+  }
+  
+  .no-results-img {
+    @apply w-20 mb-3;
+  }
+  
+  .no-results-text {
+    @apply text-lg;
+  }
+  
+  .no-results-suggestion {
+    @apply text-sm;
+  }
+  
+  .no-results-button {
+    @apply text-sm;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 360px) {
+  .no-results-hint {
+    @apply mt-4 mb-8 px-2;
+  }
+  
+  .no-results-img {
+    @apply w-16 mb-2;
+  }
+  
+  .no-results-text {
+    @apply text-base;
+  }
+  
+  .no-results-suggestion {
+    @apply text-xs;
+  }
+  
+  .no-results-button {
+    @apply text-xs;
+  }
+}

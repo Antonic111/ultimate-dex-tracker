@@ -38,12 +38,12 @@ export default function Settings() {
             // re-fetch to lock UI to what’s saved
             const data = await profileAPI.getProfile();
             setIsPrivate(data?.isProfilePublic === false);
-            showMessage(data?.isProfilePublic === false ? "🔒 Profile set to private" : "🌐 Profile set to public", "success");
+            showMessage(data?.isProfilePublic === false ? "Profile set to private" : "Profile set to public", "success");
         } catch (error) {
             console.error('Failed to update privacy:', error);
             // revert UI on error
             setIsPrivate(prev => prev); // no-op (you can also refetch)
-            showMessage("❌ Couldn't update privacy", "error");
+            showMessage("Couldn't update privacy", "error");
         } finally {
             setSavingPrivacy(false);
         }
@@ -71,15 +71,15 @@ export default function Settings() {
             setSavingUsername(true);
             const validation = validateContent(String(newUsername || ''), 'username');
             if (!validation.isValid) {
-                showMessage(`❌ ${validation.error}`, 'error');
+                showMessage(`${validation.error}`, 'error');
                 setSavingUsername(false);
                 return;
             }
             const data = await userAPI.updateUsername(newUsername);
             setUser(prev => ({ ...prev, username: data.username }));
-            showMessage("✅ Username updated successfully!", "success");
+            showMessage("Username updated successfully!", "success");
         } catch (err) {
-            showMessage("❌ " + err.message, "error");
+            showMessage(err.message, "error");
         } finally {
             setSavingUsername(false);
         }
@@ -88,29 +88,29 @@ export default function Settings() {
     async function handlePasswordChange() {
         // Frontend validation
         if (!currentPassword || !newPassword || !confirmPassword) {
-            showMessage("❌ All fields are required", "error");
+            showMessage("All fields are required", "error");
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            showMessage("❌ New passwords do not match", "error");
+            showMessage("New passwords do not match", "error");
             return;
         }
 
         if (newPassword.length < 8) {
-            showMessage("❌ New password must be at least 8 characters", "error");
+            showMessage("New password must be at least 8 characters", "error");
             return;
         }
 
         try {
             setSavingPassword(true);
             await userAPI.changePassword(currentPassword, newPassword, confirmPassword);
-            showMessage("🔒 Password updated!", "success");
+            showMessage("Password updated!", "success");
             setCurrentPassword("");
             setNewPassword("");
             setConfirmPassword("");
         } catch (err) {
-            showMessage("❌ " + err.message, "error");
+            showMessage(err.message, "error");
         } finally {
             setSavingPassword(false);
         }
@@ -122,7 +122,7 @@ export default function Settings() {
       <h1 className="page-title">Settings</h1>
       <div className="app-divider" />
       <div className="settings-container">
-                {/* Left Column */}
+                {/* Left Column - Account Settings */}
                 <div className="settings-column">
 
                     {/* Change Username */}
@@ -144,72 +144,6 @@ export default function Settings() {
                     </div>
 
                     <div className="setting-divider" />
-
-                    {/* Theme Toggle */}
-                    {/* Website Theme */}
-                    <div className="setting-block">
-                        <h3>Website Theme</h3>
-
-                        <div className="theme-choice-grid">
-                            {["light", "dark", "system"].map((opt) => (
-                                <label
-                                    key={opt}
-                                    className={`theme-card ${theme === opt ? "active" : ""}`}
-                                >
-                                    <input
-                                        type="radio"
-                                        name="theme"
-                                        value={opt}
-                                        checked={theme === opt}
-                                        onChange={() => setTheme(opt)}
-                                    />
-
-                                    <div className={`theme-preview ${opt}`}>
-                                        <div className="preview-header">
-                                            <span className="avatar-dot" />
-                                        </div>
-                                        <div className="preview-lines">
-                                            <span />
-                                            <span />
-                                            <span />
-                                        </div>
-                                    </div>
-
-                                    <div className="theme-label">
-                                        {opt === "light" ? "Light" : opt === "dark" ? "Dark" : "System"}
-                                    </div>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-
-
-                    <div className="setting-divider" />
-
-                    {/* Accent Color */}
-                    <div className="setting-block">
-                        <h3>Accent Color</h3>
-                        <div className="accent-color-options">
-                            {accentOptions.map(color => (
-                                <div
-                                    key={color}
-                                    className={`accent-circle ${color} ${accent === color ? "selected" : ""}`}
-                                    onClick={() => setAccent(color)}
-                                />
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="setting-divider" />
-
-                    {/* Dex Preferences */}
-                    <DexPreferences />
-
-                    <div className="setting-divider" />
-                </div>
-
-                {/* Right Column */}
-                <div className="settings-column">
 
                     {/* Change Password */}
                     <div className="setting-block">
@@ -293,12 +227,12 @@ export default function Settings() {
                     <div className="setting-divider" />
 
                     {/* Connected Accounts */}
-                    <div className="setting-block">
+                    {/* <div className="setting-block">
                         <h3>Connected Accounts</h3>
                         <p className="coming-soon-note">Coming soon...</p>
                     </div>
 
-                    <div className="setting-divider" />
+                    <div className="setting-divider" /> */}
 
                     {/* Delete Account */}
                     <div className="setting-block danger-zone">
@@ -309,9 +243,72 @@ export default function Settings() {
                         </button>
                     </div>
                 </div>
+
+                {/* Right Column - Preferences & Customization */}
+                <div className="settings-column">
+
+                    {/* Website Theme */}
+                    <div className="setting-block">
+                        <h3>Website Theme</h3>
+
+                        <div className="theme-choice-grid">
+                            {["light", "dark", "system"].map((opt) => (
+                                <label
+                                    key={opt}
+                                    className={`theme-card ${theme === opt ? "active" : ""}`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="theme"
+                                        value={opt}
+                                        checked={theme === opt}
+                                        onChange={() => setTheme(opt)}
+                                    />
+
+                                    <div className={`theme-preview ${opt}`}>
+                                        <div className="preview-header">
+                                            <span className="avatar-dot" />
+                                        </div>
+                                        <div className="preview-lines">
+                                            <span />
+                                            <span />
+                                            <span />
+                                        </div>
+                                    </div>
+
+                                    <div className="theme-label">
+                                        {opt === "light" ? "Light" : opt === "dark" ? "Dark" : "System"}
+                                    </div>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="setting-divider" />
+
+                    {/* Accent Color */}
+                    <div className="setting-block">
+                        <h3>Accent Color</h3>
+                        <div className="accent-color-options">
+                            {accentOptions.map(color => (
+                                <div
+                                    key={color}
+                                    className={`accent-circle ${color} ${accent === color ? "selected" : ""}`}
+                                    onClick={() => setAccent(color)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="setting-divider" />
+
+                    {/* Dex Preferences */}
+                    <DexPreferences />
+                </div>
             </div>
             {showDeleteModal && (
                 <DeleteAccountModal
+                    isOpen={showDeleteModal}
                     email={email}                         // if you keep email in Settings state; else pass from context
                     username={username}
                     onClose={() => setShowDeleteModal(false)}

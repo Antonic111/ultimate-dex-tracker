@@ -1,0 +1,198 @@
+/* Backup Modals - Consistent with site modal design */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal-overlay);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-backdrop.closing {
+  animation: fadeOut 0.3s ease-out;
+}
+
+.modal-card {
+  background: var(--pokemon-box-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: slideIn 0.3s ease-out;
+}
+
+.modal-backdrop.closing .modal-card {
+  animation: slideOut 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 16px 0;
+  text-align: left;
+}
+
+.modal-desc {
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+  text-align: left;
+}
+
+.modal-warning {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 0 0 20px 0;
+  font-size: 0.9rem;
+}
+
+.modal-info {
+  background: var(--pokemon-box-bg2);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 0 0 20px 0;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.modal-row {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
+  padding: 0;
+}
+
+.modal-btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  width: auto;
+  flex: 0 0 auto;
+}
+
+.modal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal-btn--secondary {
+  background: transparent;
+  color: var(--text);
+  border: 2px solid var(--dividers);
+}
+
+.modal-btn--secondary:hover:not(:disabled) {
+  background: var(--dividers);
+  color: var(--text);
+}
+
+.modal-btn--danger {
+  background: #ef4444;
+  color: white;
+}
+
+.modal-btn--danger:hover:not(:disabled) {
+  background: #dc2626;
+  color: white;
+}
+
+.modal-btn--primary {
+  background: var(--accent);
+  color: black;
+}
+
+.modal-btn--primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  color: white;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .modal-card {
+    padding: 20px;
+    margin: 20px;
+    width: calc(100% - 40px);
+  }
+  
+  .modal-title {
+    font-size: 1.25rem;
+  }
+  
+  .modal-desc {
+    font-size: 0.9rem;
+  }
+  
+  .modal-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .modal-btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-card {
+    padding: 16px;
+    margin: 16px;
+    width: calc(100% - 32px);
+  }
+  
+  .modal-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}
