@@ -348,7 +348,7 @@ export default function DexSection({
                                 height={64}
                                 loading="lazy"
                                 decoding="async"
-                                fetchpriority="low"
+                                fetchPriority="low"
                                 draggable={false}
                                 onError={(e) => (e.currentTarget.style.display = "none")}
                               />
