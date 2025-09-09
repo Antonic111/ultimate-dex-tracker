@@ -903,8 +903,13 @@ router.post("/emergency-reset-password", async (req, res) => {
 // Send password verification code
 router.post("/send-password-verification-code", authenticateUser, async (req, res) => {
   try {
+    console.log('🔐 Password verification request from user:', req.userId);
+    
     const user = await User.findById(req.userId);
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user) {
+      console.error('❌ User not found for password verification:', req.userId);
+      return res.status(404).json({ error: "User not found" });
+    }
 
     // Generate 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -914,12 +919,15 @@ router.post("/send-password-verification-code", authenticateUser, async (req, re
     user.passwordVerificationExpires = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
 
+    console.log('✅ Password verification code generated for user:', user.email);
+
     // Send email
     await sendCodeEmail(user.email, code, "Password Change Verification");
 
+    console.log('📧 Password verification email sent to:', user.email);
     res.json({ message: "Verification code sent to your email" });
   } catch (err) {
-    console.error('Send password verification code error:', err);
+    console.error('❌ Send password verification code error:', err);
     res.status(500).json({ error: "Failed to send verification code" });
   }
 });

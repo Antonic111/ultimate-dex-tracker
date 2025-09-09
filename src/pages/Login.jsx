@@ -131,6 +131,7 @@ export default function Login({ onLogin }) {
             onChange={handleChange}
             className="login-input"
             required
+            autoComplete="username"
           />
         </div>
 

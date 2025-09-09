@@ -35,6 +35,10 @@ app.use((req, res, next) => {
   // Allow origin if it's in the allowed list
   if (origin && allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
+  } else if (origin) {
+    // Debug logging for CORS issues
+    console.log('🚫 CORS Blocked Origin:', origin);
+    console.log('✅ Allowed Origins:', allowedOrigins);
   }
   
   // Enhanced CORS headers for mobile compatibility
