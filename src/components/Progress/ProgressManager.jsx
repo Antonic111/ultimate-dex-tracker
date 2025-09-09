@@ -1,23 +1,7 @@
 // This is a replacement for ProgressManager.jsx — copy and paste fully
 
-import {
-    closestCenter,
-    DndContext,
-    KeyboardSensor,
-    PointerSensor,
-    MouseSensor,
-    useSensor,
-    useSensors,
-    DragOverlay,
-    defaultDropAnimationSideEffects,
-} from "@dnd-kit/core";
-import {
-    arrayMove,
-    SortableContext,
-    sortableKeyboardCoordinates,
-    verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { Eye, EyeOff, ListCollapse, Pencil, Plus, Settings, Trash2 } from "lucide-react";
+// Removed @dnd-kit imports - using arrow key controls instead
+import { Eye, EyeOff, ListCollapse, Pencil, Plus, Settings, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import { useEffect, useState, useContext, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { getCaughtKey } from "../../caughtStorage";
@@ -25,7 +9,7 @@ import { getCaughtKey } from "../../caughtStorage";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS } from "../../Constants";
 import MultiSelectChips from "../Shared/MultiSelectChips";
 import ProgressBar from "./ProgressBar";
-import { SortableItem } from "../Shared/SortableItem";
+// Removed SortableItem import - using arrow controls instead
 import { UserContext, useUser } from "../Shared/UserContext";
 import { useMessage } from "../Shared/MessageContext";
 import { validateContent } from "../../../shared/contentFilter";
@@ -101,7 +85,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
     const [deleteModal, setDeleteModal] = useState({ show: false, index: null, barName: '' });
     const [deleteModalClosing, setDeleteModalClosing] = useState(false);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false); // Track changes
-    const [activeDragId, setActiveDragId] = useState(null); // Track active drag
+    // Removed drag state - using arrow controls instead
 
     const caughtMap = caughtInfoMap;
 
@@ -177,75 +161,22 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
     }, [savedBars, progressBarsOverride, contextSavedBars]);
 
 
-    function handleDragStart(event) {
-        const { active } = event;
-        
-        // Auto-close any expanded progress bars before dragging
-        setEditingBars(prev => 
-            prev.map(bar => ({
-                ...bar,
-                __showFilters: false // Close all expanded filters
-            }))
-        );
-        
-        setActiveDragId(active.id);
-        
-        setBars(prev =>
-            prev.map(bar => ({ ...bar, __showFilters: false }))
-        );
-        
-        // Add dragging class to body to prevent horizontal scrolling
-        document.body.classList.add('dragging');
-        document.documentElement.classList.add('dragging');
+    // Arrow key reorder functions
+    function moveBarUp(index) {
+        if (index > 0) {
+            const newBars = [...editingBars];
+            [newBars[index - 1], newBars[index]] = [newBars[index], newBars[index - 1]];
+            setEditingBars(newBars);
+            setHasUnsavedChanges(true);
+        }
     }
 
-    function handleDragOver(event) {
-        const { active } = event;
-        
-        // If this is the first drag over event, set the active drag ID
-        if (!activeDragId && active) {
-            setActiveDragId(active.id);
-        }
-        
-        // If we have an active drag, handle auto-scroll
-        if (activeDragId && active) {
-            handleAutoScroll(active);
-        }
-    }
-    
-    function handleAutoScroll(active) {
-        const activeElement = document.querySelector(`[data-id="${active.id}"]`);
-        if (!activeElement) {
-            return;
-        }
-        
-        const dragContainer = document.querySelector('.drag-container');
-        if (!dragContainer) {
-            return;
-        }
-        
-        const containerRect = dragContainer.getBoundingClientRect();
-        const elementRect = activeElement.getBoundingClientRect();
-        
-        // Calculate distance from edges
-        const distanceFromTop = elementRect.top - containerRect.top;
-        const distanceFromBottom = containerRect.bottom - elementRect.bottom;
-        
-        // Only auto-scroll when very close to edges
-        const scrollThreshold = 50;
-        const maxScrollDistance = 30;
-        
-        if (distanceFromTop < scrollThreshold && dragContainer.scrollTop > 0) {
-            // Scroll up
-            const scrollAmount = Math.max(5, Math.min(maxScrollDistance, (scrollThreshold - distanceFromTop)));
-            dragContainer.scrollTop = Math.max(0, dragContainer.scrollTop - scrollAmount);
-        } else if (distanceFromBottom < scrollThreshold && dragContainer.scrollTop < dragContainer.scrollHeight - dragContainer.clientHeight) {
-            // Scroll down
-            const scrollAmount = Math.max(5, Math.min(maxScrollDistance, (scrollThreshold - distanceFromBottom)));
-            dragContainer.scrollTop = Math.min(
-                dragContainer.scrollHeight - dragContainer.clientHeight,
-                dragContainer.scrollTop + scrollAmount
-            );
+    function moveBarDown(index) {
+        if (index < editingBars.length - 1) {
+            const newBars = [...editingBars];
+            [newBars[index], newBars[index + 1]] = [newBars[index + 1], newBars[index]];
+            setEditingBars(newBars);
+            setHasUnsavedChanges(true);
         }
     }
 
@@ -272,52 +203,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
     const [closing, setClosing] = useState(false);
     const [collapsed, setCollapsed] = useState(true);
 
-    // Custom modifier to restrict movement within modal boundaries
-    const restrictToModalBoundaries = ({ transform, dragging, active }) => {
-        if (!dragging || !active) {
-            return transform;
-        }
-
-        // Get the modal container dimensions
-        const modalContainer = document.querySelector('.drag-container');
-        if (!modalContainer) {
-            return transform;
-        }
-
-        const containerRect = modalContainer.getBoundingClientRect();
-        const activeElement = document.querySelector(`[data-id="${active.id}"]`);
-        if (!activeElement) {
-            return transform;
-        }
-
-        const elementRect = activeElement.getBoundingClientRect();
-        
-        // Allow minimal horizontal movement, moderate vertical movement for auto-scroll
-        const maxX = 10; // Allow 10px of horizontal movement
-        const maxY = 40; // Allow 40px of vertical movement for reliable auto-scroll
-        
-        return {
-            ...transform,
-            x: Math.max(-maxX, Math.min(maxX, transform.x)),
-            y: Math.max(-maxY, Math.min(maxY, transform.y)),
-        };
-    };
-
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 8, // Require 8px movement before drag starts
-            },
-        }),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        }),
-        useSensor(MouseSensor, {
-            activationConstraint: {
-                distance: 8, // Require 8px movement before drag starts
-            },
-        })
-    );
+    // Removed drag-related modifiers and sensors - using arrow controls instead
     
 
     useEffect(() => {
@@ -338,6 +224,8 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
         const collapsed = bars.map(bar => ({
             ...bar,
             __showFilters: false,
+            // Ensure __locked property is preserved for template bars
+            __locked: bar.__locked || false,
         }));
         setEditingBars(collapsed);
         setHasUnsavedChanges(false);
@@ -517,24 +405,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
         return { total, caught };
     }
 
-    function handleDragEnd(event) {
-        const { active, over } = event;
-
-        if (over && active.id !== over.id) {
-            const oldIndex = editingBars.findIndex((bar) => bar.id === active.id);
-            const newIndex = editingBars.findIndex((bar) => bar.id === over.id);
-            const updated = arrayMove(editingBars, oldIndex, newIndex);
-            setEditingBars(updated);
-            setHasUnsavedChanges(true);
-        }
-        
-        // Clear active drag ID
-        setActiveDragId(null);
-        
-        // Remove dragging class from body to restore normal scrolling
-        document.body.classList.remove('dragging');
-        document.documentElement.classList.remove('dragging');
-    }
+    // Removed handleDragEnd - using arrow controls instead
 
     const visibleBars = bars.filter((b) => b.visible);
 
@@ -597,7 +468,10 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                                     className="modal-cancel-btn" 
                                     onClick={() => {
                                         // Revert to default progress bars
-                                        setEditingBars(DEFAULT_BARS);
+                                        setEditingBars(DEFAULT_BARS.map(bar => ({
+                                            ...bar,
+                                            __locked: false // Default bars are not locked
+                                        })));
                                         setHasUnsavedChanges(true);
                                     }}
                                 >
@@ -626,179 +500,157 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
                         <div className="modal-body">
                             <div className="drag-container">
-                                <DndContext
-                                    sensors={sensors}
-                                    collisionDetection={closestCenter}
-                                    onDragStart={handleDragStart}
-                                    onDragEnd={handleDragEnd}
-                                    onDragOver={handleDragOver}
-                                    modifiers={[restrictToModalBoundaries]}
-                                    measuring={{
-                                        droppable: {
-                                            strategy: 'always',
-                                        },
-                                    }}
-                                    autoScroll={{
-                                        enabled: false, // Using custom auto-scroll handler
-                                    }}
-                                >
-                                <SortableContext items={editingBars.map((bar) => bar.id)} strategy={verticalListSortingStrategy}>
-                                    {editingBars.map((bar, index) => {
-                                        const visibleCount = editingBars.filter(b => b.visible).length;
-                                        const isLastVisible = visibleCount <= 1 && bar.visible;
+                                {editingBars.map((bar, index) => {
+                                    const visibleCount = editingBars.filter(b => b.visible).length;
+                                    const isLastVisible = visibleCount <= 1 && bar.visible;
 
-                                        return (
+                                    return (
+                                        <div key={bar.id} className="bar-settings-group">
+                                            <div className="bar-settings-row">
+                                                <div className="arrow-controls">
+                                                    <button
+                                                        className="arrow-btn"
+                                                        onClick={() => moveBarUp(index)}
+                                                        disabled={index === 0}
+                                                        title="Move up"
+                                                    >
+                                                        <ChevronUp size={16} />
+                                                    </button>
+                                                    <button
+                                                        className="arrow-btn"
+                                                        onClick={() => moveBarDown(index)}
+                                                        disabled={index === editingBars.length - 1}
+                                                        title="Move down"
+                                                    >
+                                                        <ChevronDown size={16} />
+                                                    </button>
+                                                </div>
 
-                                            <SortableItem key={bar.id} id={bar.id}>
-                                                {(listeners) => (
-                                                    <div className="bar-settings-group">
-                                                        <div className="bar-settings-row">
-                                                            <span 
-                                                                className="drag-handle" 
-                                                                title="Drag to reorder" 
-                                                                {...listeners}
-                                                            >
-                                                                ⠇
-                                                            </span>
-
-                                                            {bar.__locked ? (
-                                                                <div className="bar-template-layout">
-                                                                    <span className="bar-name-label">{bar.name}</span>
-                                                                    <div className="bar-controls">
-                                                                    </div>
-                                                                </div>
-
-                                                            ) : (
-                                                                <input
-                                                                    type="text"
-                                                                    value={bar.name}
-                                                                    onChange={(e) => {
-                                                                        handleEditChange(index, 'name', e.target.value);
-                                                                    }}
-                                                                    className="bar-name-input"
-                                                                />
-                                                            )
-                                                            }
-
-                                                            <div className="bar-controls">
-                                                                <>
-                                                                    {!bar.__locked && (
-                                                                        <>
-                                                                            <button
-                                                                                className="eye-toggle-btn"
-                                                                                onClick={() => {
-                                                                                    if (isLastVisible) return;
-                                                                                    handleEditChange(index, 'visible', !bar.visible);
-                                                                                }}
-                                                                                disabled={isLastVisible}
-                                                                                title={isLastVisible ? "You must keep at least 1 visible bar" : (bar.visible ? "Hide" : "Show")}
-                                                                                style={{
-                                                                                    opacity: isLastVisible ? 0.5 : 1,
-                                                                                    cursor: isLastVisible ? "not-allowed" : "pointer"
-                                                                                }}
-                                                                            >
-                                                                                {bar.visible ? <Eye size={20} /> : <EyeOff size={20} />}
-                                                                            </button>
-
-                                                                            <button
-                                                                                className={`filter-toggle-btn${bar.__showFilters ? " active" : ""}`}
-                                                                                onClick={() => {
-                                                                                    const updated = [...editingBars];
-                                                                                    updated[index].__showFilters = !updated[index].__showFilters;
-                                                                                    setEditingBars(updated);
-                                                                                }}
-                                                                                title="Configure filters"
-                                                                            >
-                                                                                <Pencil size={18} />
-                                                                            </button>
-                                                                        </>
-                                                                    )}
-
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            if (editingBars.length <= 1) return;
-                                                                            setDeleteModalClosing(false);
-                                                                            setDeleteModal({ 
-                                                                                show: true, 
-                                                                                index: index, 
-                                                                                barName: bar.name 
-                                                                            });
-                                                                        }}
-                                                                        disabled={editingBars.length <= 1}
-                                                                        title={editingBars.length <= 1 ? "You must keep at least 1 progress bar" : "Delete"}
-                                                                        style={{
-                                                                            opacity: editingBars.length <= 1 ? 0.5 : 1,
-                                                                            cursor: editingBars.length <= 1 ? "not-allowed" : "pointer"
-                                                                        }}
-                                                                    >
-                                                                        <Trash2 />
-                                                                    </button>
-
-
-
-                                                                </>
-
-                                                            </div>
+                                                {bar.__locked ? (
+                                                    <div className="bar-template-layout">
+                                                        <span className="bar-name-label">{bar.name}</span>
+                                                        <div className="bar-controls">
                                                         </div>
-
-                                                        {bar.__showFilters && !bar.__locked && (
-                                                            <div className="bar-settings-filters">
-                                                                <div className="bar-filter-editor">
-                                                                    <MultiSelectChips
-                                                                        label="Form Types"
-                                                                        value={bar.filters.formType || []}
-                                                                        options={[
-                                                                            { label: "Main", value: "main" },
-                                                                            { label: "Forms", value: "forms" },
-                                                                            { label: "Gender", value: "gender" },
-                                                                            { label: "Alolan", value: "alolan" },
-                                                                            { label: "Galarian", value: "galarian" },
-                                                                            { label: "Gmax", value: "gmax" },
-                                                                            { label: "Hisuian", value: "hisuian" },
-                                                                            { label: "Paldean", value: "paldean" },
-                                                                            { label: "Unown", value: "unown" },
-                                                                            { label: "Other", value: "other" },
-                                                                            { label: "Alcremie", value: "alcremie" },
-                                                                            { label: "Alpha", value: "alpha" },
-                                                                            { label: "Alpha Genders & Other's", value: "alphaother" },
-                                                                        ]}
-                                                                        onChange={(val) => {
-                                                                            handleEditChange(index, 'filters', { formType: val });
-                                                                        }}
-                                                                    />
-
-                                                                    <MultiSelectChips
-                                                                        label="Generations"
-                                                                        value={bar.filters.gen || []}
-                                                                        options={["1", "2", "3", "4", "5", "6", "7", "8", "9"]}
-                                                                        onChange={(val) => {
-                                                                            handleEditChange(index, 'filters', { gen: val });
-                                                                        }}
-                                                                    />
-
-                                                                    <MultiSelectChips
-                                                                        label="Types"
-                                                                        value={bar.filters.type || []}
-                                                                        options={[
-                                                                            "normal", "fire", "water", "grass", "electric", "ice",
-                                                                            "fighting", "poison", "ground", "flying", "psychic", "bug",
-                                                                            "rock", "ghost", "dragon", "dark", "steel", "fairy"
-                                                                        ]}
-                                                                        onChange={(val) => {
-                                                                            handleEditChange(index, 'filters', { type: val });
-                                                                        }}
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        )}
                                                     </div>
+                                                ) : (
+                                                    <input
+                                                        type="text"
+                                                        value={bar.name}
+                                                        onChange={(e) => {
+                                                            handleEditChange(index, 'name', e.target.value);
+                                                        }}
+                                                        className="bar-name-input"
+                                                    />
                                                 )}
-                                            </SortableItem>
-                                        );
-                                    })}
-                                </SortableContext>
 
-                                </DndContext>
+                                                <div className="bar-controls">
+                                                    {!bar.__locked && (
+                                                        <>
+                                                            <button
+                                                                className="eye-toggle-btn"
+                                                                onClick={() => {
+                                                                    if (isLastVisible) return;
+                                                                    handleEditChange(index, 'visible', !bar.visible);
+                                                                }}
+                                                                disabled={isLastVisible}
+                                                                title={isLastVisible ? "You must keep at least 1 visible bar" : (bar.visible ? "Hide" : "Show")}
+                                                                style={{
+                                                                    opacity: isLastVisible ? 0.5 : 1,
+                                                                    cursor: isLastVisible ? "not-allowed" : "pointer"
+                                                                }}
+                                                            >
+                                                                {bar.visible ? <Eye size={20} /> : <EyeOff size={20} />}
+                                                            </button>
+
+                                                            <button
+                                                                className={`filter-toggle-btn${bar.__showFilters ? " active" : ""}`}
+                                                                onClick={() => {
+                                                                    const updated = [...editingBars];
+                                                                    updated[index].__showFilters = !updated[index].__showFilters;
+                                                                    setEditingBars(updated);
+                                                                }}
+                                                                title="Configure filters"
+                                                            >
+                                                                <Pencil size={18} />
+                                                            </button>
+                                                        </>
+                                                    )}
+
+                                                    <button
+                                                        onClick={() => {
+                                                            if (editingBars.length <= 1) return;
+                                                            setDeleteModalClosing(false);
+                                                            setDeleteModal({ 
+                                                                show: true, 
+                                                                index: index, 
+                                                                barName: bar.name 
+                                                            });
+                                                        }}
+                                                        disabled={editingBars.length <= 1}
+                                                        title={editingBars.length <= 1 ? "You must keep at least 1 progress bar" : "Delete"}
+                                                        style={{
+                                                            opacity: editingBars.length <= 1 ? 0.5 : 1,
+                                                            cursor: editingBars.length <= 1 ? "not-allowed" : "pointer"
+                                                        }}
+                                                    >
+                                                        <Trash2 />
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {bar.__showFilters && !bar.__locked && (
+                                                <div className="bar-settings-filters">
+                                                    <div className="bar-filter-editor">
+                                                        <MultiSelectChips
+                                                            label="Form Types"
+                                                            value={bar.filters.formType || []}
+                                                            options={[
+                                                                { label: "Main", value: "main" },
+                                                                { label: "Forms", value: "forms" },
+                                                                { label: "Gender", value: "gender" },
+                                                                { label: "Alolan", value: "alolan" },
+                                                                { label: "Galarian", value: "galarian" },
+                                                                { label: "Gmax", value: "gmax" },
+                                                                { label: "Hisuian", value: "hisuian" },
+                                                                { label: "Paldean", value: "paldean" },
+                                                                { label: "Unown", value: "unown" },
+                                                                { label: "Other", value: "other" },
+                                                                { label: "Alcremie", value: "alcremie" },
+                                                                { label: "Alpha", value: "alpha" },
+                                                                { label: "Alpha Genders & Other's", value: "alphaother" },
+                                                            ]}
+                                                            onChange={(val) => {
+                                                                handleEditChange(index, 'filters', { formType: val });
+                                                            }}
+                                                        />
+
+                                                        <MultiSelectChips
+                                                            label="Generations"
+                                                            value={bar.filters.gen || []}
+                                                            options={["1", "2", "3", "4", "5", "6", "7", "8", "9"]}
+                                                            onChange={(val) => {
+                                                                handleEditChange(index, 'filters', { gen: val });
+                                                            }}
+                                                        />
+
+                                                        <MultiSelectChips
+                                                            label="Types"
+                                                            value={bar.filters.type || []}
+                                                            options={[
+                                                                "normal", "fire", "water", "grass", "electric", "ice",
+                                                                "fighting", "poison", "ground", "flying", "psychic", "bug",
+                                                                "rock", "ghost", "dragon", "dark", "steel", "fairy"
+                                                            ]}
+                                                            onChange={(val) => {
+                                                                handleEditChange(index, 'filters', { type: val });
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
 
                             <div className="add-bar-row">
@@ -848,6 +700,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                                                 const newBar = {
                                                     ...template,
                                                     id: `custom_${template.id}_${Date.now()}`,
+                                                    __locked: true, // Ensure template bars are locked
                                                 };
                                                 const updated = [...editingBars, newBar];
                                                 setEditingBars(updated);

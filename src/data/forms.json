@@ -5245,6 +5245,52 @@
     }
   },
   {
+    "id": 129,
+    "name": "magikarp-level-100-male",
+    "formType": "other",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/129.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/129.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 130,
+          "name": "gyarados",
+          "how": "Level Up to 20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 129,
+    "name": "magikarp-level-100-female",
+    "formType": "other",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/129.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/129.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 130,
+          "name": "gyarados",
+          "how": "Level Up to 20"
+        }
+      ]
+    }
+  },
+  {
     "id": 386,
     "name": "deoxys-attack",
     "formType": "other",

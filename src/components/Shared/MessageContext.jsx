@@ -10,11 +10,6 @@ export const MessageProvider = ({ children }) => {
   const showMessage = (text, type = "info", duration = 4000) => {
     const id = Date.now() + Math.random();
 
-    const isDuplicate = messages.some(
-      (msg) => msg.text === text && msg.type === type
-    );
-    if (isDuplicate) return;
-
     const newMessage = { id, text, type, leaving: false, showing: true };
     setMessages((prev) => [...prev, newMessage]);
 
@@ -50,26 +45,27 @@ export const MessageProvider = ({ children }) => {
   return (
     <MessageContext.Provider value={{ showMessage }}>
       {children}
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-3 pointer-events-none">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`
-              pointer-events-auto cursor-pointer px-5 py-3 rounded-lg text-white text-base font-medium shadow-lg
-              transition-all duration-500 ease-out transform
-              ${msg.showing 
-                ? 'opacity-0 translate-y-8 scale-95' 
-                : msg.leaving 
-                  ? 'opacity-0 translate-y-2 scale-95' 
-                  : 'opacity-100 translate-y-0 scale-100'
-              }
-              ${msg.type === 'success' ? 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600' : ''}
-              ${msg.type === 'error' ? 'bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600' : ''}
-              ${msg.type === 'info' ? 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600' : ''}
-              ${msg.type === 'warning' ? 'bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-500 dark:hover:bg-yellow-600' : ''}
-            `}
-            onClick={() => dismissMessage(msg.id)}
-          >
+       <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[99999] flex flex-col gap-3 pointer-events-none max-w-[90vw]">
+         {messages.map((msg) => (
+           <div
+             key={msg.id}
+             className={`
+               pointer-events-auto cursor-pointer px-3 py-2 md:px-5 md:py-3 rounded-lg text-white text-sm md:text-base font-medium shadow-lg
+               w-full max-w-[90vw] md:w-auto md:max-w-md
+               transition-all duration-500 ease-out transform
+               ${msg.showing 
+                 ? 'opacity-0 translate-y-8 scale-95' 
+                 : msg.leaving 
+                   ? 'opacity-0 translate-y-2 scale-95' 
+                   : 'opacity-100 translate-y-0 scale-100'
+               }
+               ${msg.type === 'success' ? 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600' : ''}
+               ${msg.type === 'error' ? 'bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600' : ''}
+               ${msg.type === 'info' ? 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600' : ''}
+               ${msg.type === 'warning' ? 'bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-500 dark:hover:bg-yellow-600' : ''}
+             `}
+             onClick={() => dismissMessage(msg.id)}
+           >
             <div className="flex items-center gap-3">
               {/* Success Icon */}
               {msg.type === 'success' && (

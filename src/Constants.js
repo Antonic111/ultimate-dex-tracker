@@ -507,6 +507,8 @@ export const specialFormLabels = {
   "vivillon-tundra": "Tundra Forme",
   "vivillon-fancy": "Fancy Forme",
   "vivillon-pokeball": "Pokeball Forme",
+  "magikarp-level-100-female": "Lvl 100 Female",
+  "magikarp-level-100-male": "Lvl 100 Male",
 
 };
 
@@ -673,6 +675,8 @@ export const specialCases = {
   "tornadus-therian": "Tornadus",
   "thundurus-therian": "Thundurus",
   "enamorus-therian": "Enamorus",
+  "magikarp-level-100-female": "Magikarp",
+  "magikarp-level-100-male": "Magikarp",
 
   "VIVILLON!!!": "VIVILLON!!!",
   "vivillon-archipelago": "Vivillon",

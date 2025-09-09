@@ -77,7 +77,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                      <img src={logoSrc} onError={handleLogoError} alt="" className="h-[50px] md:h-[110px] w-auto max-w-[340px] md:max-w-[450px] lg:max-w-[550px]" />
         </Link>
 
-        <nav className="flex items-end gap-3 w-full max-w-full md:max-w-none self-end">
+        <nav className="flex items-end gap-3 w-full max-w-full md:max-w-none self-end ml-4 md:ml-8">
           {/* Only show Trainers button when not on auth flow pages, but allow on public home page */}
           {!['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
             <Link 

@@ -503,7 +503,7 @@ html.dragging {
   transition: background-color var(--transition-speed);
   border: none;
   border-radius: 12px;
-  padding: 16px 24px;
+  padding: 8px 24px;
   margin-bottom: 12px;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.6);
   max-width: 100%;
@@ -625,6 +625,82 @@ html.dragging {
   padding-top: 10px;
   padding-bottom: 10px;
   animation: fadeIn 0.2s ease-out;
+}
+
+/* Arrow controls for reordering */
+.arrow-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-right: 8px;
+}
+
+.arrow-btn {
+  background: var(--progress-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: var(--text);
+}
+
+.arrow-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: black;
+  border-color: var(--accent);
+}
+
+.arrow-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .arrow-controls {
+    margin-right: 4px;
+    gap: 1px;
+  }
+  
+  .arrow-btn {
+    padding: 2px;
+    min-width: 20px;
+    min-height: 20px;
+  }
+  
+  .arrow-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  /* Completely static buttons on mobile - no effects at all */
+  .arrow-btn,
+  .arrow-btn:hover,
+  .arrow-btn:active,
+  .arrow-btn:focus,
+  .arrow-btn:focus-visible,
+  .arrow-btn:focus-within,
+  .arrow-btn:target,
+  .arrow-btn:visited {
+    background: var(--progress-bg);
+    color: var(--text);
+    border-color: var(--border-color);
+    outline: none;
+    transform: none;
+    transition: none;
+    box-shadow: none;
+  }
+  
+  .arrow-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: var(--progress-bg);
+    color: var(--text);
+    border-color: var(--border-color);
+  }
 }
 
 /* Ensure dragging doesn't break layout */
@@ -1098,10 +1174,13 @@ html.dragging {
 @media (max-width: 768px) {
   .progress-modal-panel {
     max-width: 98vw;
-    margin: 20px auto;
+    max-height: 50vh;
+    margin: 20vh auto;
     padding: 6px 8px 12px 8px;
     border-radius: 8px;
     font-size: 0.7rem;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .modal-header {
@@ -1119,9 +1198,10 @@ html.dragging {
 
   .modal-save-btn,
   .modal-cancel-btn {
-    padding: 4px 8px;
-    font-size: 0.75rem;
+    padding: 6px 4px;
+    font-size: 0.6rem;
     border-radius: 4px;
+    min-height: 28px;
   }
 
   .bar-settings-group {

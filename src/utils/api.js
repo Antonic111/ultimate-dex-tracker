@@ -1,12 +1,41 @@
 import { buildApiUrl } from '../config/api.js';
 
+// Mobile and iOS detection utilities
+const isMobile = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+// Mobile retry utility with iOS-specific handling
+const mobileRetry = async (fn, maxRetries = 2) => {
+  const isIOSDevice = isIOS();
+  const retries = isIOSDevice ? 3 : maxRetries; // More retries for iOS
+  
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      
+      // iOS-specific: Longer wait times and different backoff strategy
+      const waitTime = isIOSDevice 
+        ? Math.pow(2, i) * 1500 + Math.random() * 1000 // 1.5s base + jitter for iOS
+        : Math.pow(2, i) * 1000; // 1s base for other mobile
+      
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+      
+      if (isIOSDevice) {
+        console.log(`🍎 iOS API Retry ${i + 1}/${retries} after ${waitTime}ms`);
+      }
+    }
+  }
+};
+
 // Centralized API utility for making authenticated requests
 export const api = {
   // GET request
   async get(endpoint, options = {}) {
     const url = buildApiUrl(endpoint);
     
-    try {
+    const fetchRequest = async () => {
       const response = await fetch(url, {
         method: 'GET',
         credentials: 'include',
@@ -39,16 +68,21 @@ export const api = {
       }
       
       return { message: 'Success' };
-    } catch (error) {
-      throw error;
+    };
+    
+    // Use mobile retry for mobile devices
+    if (isMobile()) {
+      return mobileRetry(fetchRequest);
     }
+    
+    return fetchRequest();
   },
 
   // POST request
   async post(endpoint, data = null, options = {}) {
     const url = buildApiUrl(endpoint);
     
-    try {
+    const fetchRequest = async () => {
       const response = await fetch(url, {
         method: 'POST',
         credentials: 'include',
@@ -87,9 +121,14 @@ export const api = {
       }
       
       return { message: 'Success' };
-    } catch (error) {
-      throw error;
+    };
+    
+    // Use mobile retry for mobile devices
+    if (isMobile()) {
+      return mobileRetry(fetchRequest);
     }
+    
+    return fetchRequest();
   },
 
   // PUT request
@@ -314,6 +353,16 @@ export const profileAPI = {
 };
 
 export const userAPI = {
+  // Check username availability
+  async checkUsernameAvailability(username) {
+    return api.get(`/check-username?username=${encodeURIComponent(username)}`);
+  },
+
+  // Check username change cooldown
+  async checkUsernameCooldown() {
+    return api.get('/username-cooldown');
+  },
+
   // Update username
   async updateUsername(newUsername) {
     return api.put('/update-username', { newUsername });
@@ -322,6 +371,16 @@ export const userAPI = {
   // Change password
   async changePassword(currentPassword, newPassword, confirmPassword) {
     return api.put('/change-password', { currentPassword, newPassword, confirmPassword });
+  },
+
+  // Send password verification code
+  async sendPasswordVerificationCode() {
+    return api.post('/send-password-verification-code');
+  },
+
+  // Verify password code
+  async verifyPasswordCode(code) {
+    return api.post('/verify-password-code', { code });
   },
 
   // Send delete account code

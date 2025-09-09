@@ -112,12 +112,14 @@ const ContentFilterInput = ({
     const finalValidation = validateContent(localValue, configType);
     const charInfo = getCharacterInfo(localValue, configType);
     
-         // Show toast notification for validation errors on blur
-     if (finalValidation.error) {
-       showMessage(finalValidation.error, 'error');
-     } else if (finalValidation.warning) {
-                   showMessage(`${finalValidation.warning}`, 'warning');
-     }
+    // Only show toast notifications if there's actual content and validation errors
+    if (localValue && localValue.trim() !== '') {
+      if (finalValidation.error) {
+        showMessage(finalValidation.error, 'error');
+      } else if (finalValidation.warning) {
+        showMessage(`${finalValidation.warning}`, 'warning');
+      }
+    }
     
     setValidation({
       isValid: finalValidation.isValid,

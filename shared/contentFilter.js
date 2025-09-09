@@ -43,20 +43,85 @@ const calculateDistance = (a, b) => {
 
 // Whitelist of legitimate words that should never be blocked
 const LEGITIMATE_WORDS = new Set([
-  "chalk",
-  "monkey",
-  "chalkboard",
-  "chalky",
-  "monkeying",
-  "monkeyshines",
-  "monkeywrench",
-  "falling", // contains "fall" but is legitimate
-  "balloon", // contains "ball" but is legitimate
-  "chalky", // contains "chalk" but is legitimate
-  "monkeying", // contains "monkey" but is legitimate
-  "chalkboard", // contains "chalk" but is legitimate
-  "monkeywrench", // contains "monkey" but is legitimate
-  "monkeyshines" // contains "monkey" but is legitimate
+  // Common male names that could be false flagged
+  "jack", "jacks", "jackson", "jackie", "jacky",
+  "dick", "dicks", "dickens", "dickinson", "dickie", "dicky",
+  "richard", "richards", "rick", "ricky", "rickie",
+  "william", "williams", "will", "willy", "bill", "billy", "billie",
+  "robert", "roberts", "rob", "robbie", "bobby", "bob", "bobbie",
+  "michael", "michaels", "mike", "mikey", "mick", "mickey",
+  "david", "davids", "dave", "davey", "davy",
+  "james", "jameses", "jim", "jimmy", "jimbo", "jamie",
+  "john", "johns", "johnny", "jon", "jonny", "jonnie",
+  "thomas", "thomases", "tom", "tommy", "tommie",
+  "charles", "charleses", "charlie", "chuck", "chucky",
+  "daniel", "daniels", "dan", "danny", "dannie",
+  "matthew", "matthews", "matt", "matty", "mattie",
+  "anthony", "anthonys", "tony", "tonnie",
+  "mark", "marks", "markie", "marky",
+  "donald", "donalds", "don", "donnie", "donny",
+  "steven", "stevens", "steve", "stevie",
+  "paul", "pauls", "paulie", "pauly",
+  "andrew", "andrews", "andy", "andie",
+  "joshua", "joshuas", "josh", "joshy",
+  "kenneth", "kenneths", "ken", "kenny", "kennie",
+  "kevin", "kevins", "kev", "kevie",
+  "brian", "brians", "bry", "brye",
+  "george", "georges", "georgie",
+  "edward", "edwards", "ed", "eddie", "eddy", "ted", "teddy",
+  "ronald", "ronalds", "ron", "ronnie", "ronny",
+  "timothy", "timothys", "tim", "timmy", "timmie",
+  "jason", "jasons", "jase", "jasey",
+  "jeffrey", "jeffreys", "jeff", "jeffie", "jeffy",
+  "ryan", "ryans", "rye",
+  "jacob", "jacobs", "jake", "jakey",
+  "gary", "garys", "garry",
+  "nicholas", "nicholases", "nick", "nickie", "nicky",
+  "eric", "erics", "rickie", "ricky",
+  "jonathan", "jonathans", "jon", "jonny", "jonnie",
+  "stephen", "stephens", "steve", "stevie",
+  "larry", "larries",
+  "justin", "justins", "justy",
+  "scott", "scotts", "scotty", "scottie",
+  "brandon", "brandons", "brandy",
+  "benjamin", "benjamins", "ben", "benny", "bennie",
+  "samuel", "samuels", "sam", "sammy", "sammie",
+  "gregory", "gregorys", "greg", "greggie",
+  "alexander", "alexanders", "alex", "alexie", "alexy",
+  "patrick", "patricks", "pat", "patty", "pattie",
+  "frank", "franks", "frankie", "franky",
+  "raymond", "raymonds", "ray", "rayie",
+  
+  // Common female names that could be false flagged
+  "mary", "marys", "marie", "maria",
+  "patricia", "patricias", "pat", "patty", "pattie", "tricia", "trish",
+  "jennifer", "jennifers", "jen", "jenny", "jennie",
+  "linda", "lindas", "lindy", "lindie",
+  "elizabeth", "elizabeths", "liz", "lizzie", "beth", "betty", "betsy",
+  "barbara", "barbaras", "barb", "barbie",
+  "susan", "susans", "sue", "suzie",
+  "jessica", "jessicas", "jess", "jessie", "jessy",
+  "sarah", "sarahs", "sara", "sarie",
+  "karen", "karens", "kari", "karie",
+  "nancy", "nancys", "nanci", "nancie",
+  "lisa", "lisas", "lise", "lisey",
+  "betty", "bettys", "bettie",
+  "helen", "helens", "helene",
+  "sandra", "sandras", "sandy", "sandie",
+  "donna", "donnas", "donnie", "donny",
+  "carol", "carols", "carolie", "caroly",
+  "ruth", "ruths", "ruthie",
+  "sharon", "sharons", "shari", "sharie",
+  "michelle", "michelles", "mich", "michie",
+  "laura", "lauras", "laurie", "laury",
+  "kimberly", "kimberlys", "kim", "kimmy", "kimmie",
+  "deborah", "deborahs", "debbie",
+  "dorothy", "dorothys", "dottie", "dotty",
+  
+  // Other legitimate words that could be false flagged
+  "chalk", "chalkboard", "chalky",
+  "monkey", "monkeying", "monkeyshines", "monkeywrench",
+  "falling", "balloon"
 ]);
 
 // Content filter configuration for different field types
@@ -406,6 +471,11 @@ function containsBannedWords(text, similarityThreshold = 0.2) {
     // 6. Similarity check using Levenshtein distance (as fallback, but more conservative)
     const maxDistance = Math.max(1, Math.floor(bannedWord.length * similarityThreshold));
     const actualDistance = calculateDistance(normalized, bannedWord);
+    
+    // Skip similarity check for legitimate words
+    if (LEGITIMATE_WORDS.has(normalized)) {
+      continue;
+    }
     
     // Make the Levenshtein check more conservative to avoid false positives
     // Only block if the distance is very small (1) and the words are very similar in length

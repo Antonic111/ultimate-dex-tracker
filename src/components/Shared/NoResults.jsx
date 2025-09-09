@@ -12,9 +12,12 @@ export default function NoResults({ searchTerm, suggestion, onSuggestionClick })
                 className="no-results-img"
             />
             <p className="no-results-text">
-                No Pokémon found for <span className="no-results-term">"{searchTerm}"</span>.
+                {searchTerm === "your search filters" 
+                    ? "No Pokémon found with your search filters."
+                    : <>No Pokémon found for <span className="no-results-term">"{searchTerm}"</span>.</>
+                }
             </p>
-            {suggestion && (
+            {suggestion && onSuggestionClick && (
                 <p className="no-results-suggestion">
                     Did you mean{" "}
                     <button

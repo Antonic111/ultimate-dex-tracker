@@ -198,7 +198,10 @@ export default function DexView({
 
     const finalSuggestion = suggestion || getSuggestion();
     
-    // Show no results when there's a search term and no results found
+    // Check if we have any active search criteria
+    const hasActiveSearch = filters.searchTerm || filters.game || filters.ball || filters.mark || filters.method || filters.type || filters.gen || filters.caught;
+    
+    // Show no results when there are no results found for any active search criteria
     // For ViewDex mode, check if all sections have no results using customFilterMons
     // For main App mode, use the showNoResults prop if provided
     let hasNoResults = false;
@@ -211,14 +214,14 @@ export default function DexView({
                 return total + filteredMons.length;
             }, 0);
             
-            hasNoResults = filters.searchTerm?.trim() && totalResults === 0;
+            hasNoResults = hasActiveSearch && totalResults === 0;
         } else {
             // Fallback if no customFilterMons provided
-            hasNoResults = filters.searchTerm?.trim() && actualPokemonList && actualPokemonList.length === 0;
+            hasNoResults = hasActiveSearch && actualPokemonList && actualPokemonList.length === 0;
         }
     } else {
         // Main App mode: use the showNoResults prop if provided, otherwise use local logic
-        hasNoResults = (pokemonList && pokemonList.length === 0) && filters.searchTerm?.trim();
+        hasNoResults = hasActiveSearch && (pokemonList && pokemonList.length === 0);
     }
 
     return (
@@ -256,7 +259,7 @@ export default function DexView({
             {/* No Results Message - Show for both owner and viewer modes when there are no results */}
             {hasNoResults && (
                 <NoResults
-                    searchTerm={filters.searchTerm}
+                    searchTerm={filters.searchTerm || "your search filters"}
                     suggestion={finalSuggestion}
                     onSuggestionClick={(suggestion) => {
                         if (onSuggestionClick) {

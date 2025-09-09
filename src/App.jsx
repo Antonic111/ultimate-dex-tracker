@@ -312,9 +312,38 @@ export default function App() {
       return;
     }
 
+    // Mobile and iOS debug logging
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    
+    if (isMobile && !silent) {
+      console.log('🔍 Mobile Auth Check:', {
+        userAgent: navigator.userAgent,
+        isIOS: isIOS,
+        cookies: document.cookie,
+        localStorage: localStorage.getItem('mobileUserBackup') ? 'Has backup' : 'No backup',
+        timestamp: new Date().toISOString()
+      });
+    }
+
     // Check if user is authenticated
     try {
       const userData = await authAPI.getCurrentUser();
+      
+      if (isMobile && !silent) {
+        console.log('📱 Mobile Auth Response:', {
+          success: !!userData,
+          hasUsername: !!userData?.username,
+          hasProgressBars: !!userData?.progressBars,
+          isIOS: isIOS,
+          data: userData
+        });
+        
+        // iOS-specific warning
+        if (isIOS && !userData) {
+          console.warn('🍎 iOS Safari detected - cookies may be blocked. Check Safari settings for "Prevent Cross-Site Tracking" and "Block All Cookies"');
+        }
+      }
       
       if (userData && userData.username) {
         // Preserve existing progress bars if the server response doesn't include them
@@ -331,10 +360,48 @@ export default function App() {
         });
       } else {
         // Clear user data if not authenticated
+        if (isMobile && !silent) {
+          console.warn('⚠️ Mobile Auth Failed: No user data received');
+        }
         setUser(null);
       }
     } catch (error) {
       // Clear user data on error
+      if (isMobile && !silent) {
+        console.error('❌ Mobile Auth Error:', error);
+        
+        // Try mobile fallback from localStorage and sessionStorage (iOS)
+        try {
+          let backupData = null;
+          
+          // Try localStorage first
+          const mobileBackup = localStorage.getItem('mobileUserBackup');
+          if (mobileBackup) {
+            backupData = JSON.parse(mobileBackup);
+          }
+          
+          // iOS fallback: Try sessionStorage if localStorage failed
+          if (!backupData && isIOS) {
+            const iosBackup = sessionStorage.getItem('iosUserBackup');
+            if (iosBackup) {
+              backupData = JSON.parse(iosBackup);
+              console.log('🍎 Using iOS sessionStorage backup');
+            }
+          }
+          
+          if (backupData) {
+            const isRecent = (Date.now() - backupData.timestamp) < (24 * 60 * 60 * 1000); // 24 hours
+            
+            if (isRecent && backupData.username) {
+              console.log('📱 Using mobile backup data:', backupData);
+              setUser(backupData);
+              return; // Don't clear user data, use backup instead
+            }
+          }
+        } catch (backupError) {
+          console.warn('Failed to use mobile backup:', backupError);
+        }
+      }
       setUser(null);
     } finally {
       if (!silent) {
@@ -353,6 +420,34 @@ export default function App() {
     }
     
     setUser(newUserData);
+    
+    // Mobile fallback: Store user data in localStorage as backup
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    
+    if (isMobile && newUserData && newUserData.username) {
+      try {
+        // More aggressive backup for iOS
+        const backupData = {
+          ...newUserData,
+          timestamp: Date.now(),
+          isIOS: isIOS
+        };
+        
+        localStorage.setItem('mobileUserBackup', JSON.stringify(backupData));
+        
+        // iOS-specific: Also store in sessionStorage as additional fallback
+        if (isIOS) {
+          sessionStorage.setItem('iosUserBackup', JSON.stringify(backupData));
+        }
+        
+        if (isIOS) {
+          console.log('🍎 iOS User Backup Stored:', backupData);
+        }
+      } catch (error) {
+        console.warn('Failed to store mobile user backup:', error);
+      }
+    }
     
     // Clear the flag after a short delay
     if (newUserData.username && newUserData.progressBars) {
@@ -995,24 +1090,30 @@ function CloseSidebarOnRouteChange() {
   const showNoResults = mergedMons.length === 0;
   let suggestion = null;
 
-  if (showNoResults && filters.searchTerm) {
-    const searchTerm = filters.searchTerm.toLowerCase();
-         const allNames = dexSections.flatMap(section =>
-       section.getList().map(p => p.name)
-     );
+  // Check if we have any active search criteria
+  const hasActiveSearch = filters.searchTerm || filters.game || filters.ball || filters.mark || filters.method || filters.type || filters.gen || filters.caught;
 
-    const ranked = allNames
-      .map(name => ({
-        name,
-        score:
-          getLevenshteinDistance(searchTerm, name.toLowerCase()) -
-          (name.toLowerCase().startsWith(searchTerm) ? 2 : 0) -
-          (name.toLowerCase().includes(searchTerm) ? 1 : 0)
-      }))
-      .sort((a, b) => a.score - b.score);
+  if (showNoResults && hasActiveSearch) {
+    // Only provide suggestions for name/dex searches, not for other filter types
+    if (filters.searchTerm) {
+      const searchTerm = filters.searchTerm.toLowerCase();
+      const allNames = dexSections.flatMap(section =>
+        section.getList().map(p => p.name)
+      );
 
-    if (ranked.length && ranked[0].score <= 4) {
-      suggestion = ranked[0].name;
+      const ranked = allNames
+        .map(name => ({
+          name,
+          score:
+            getLevenshteinDistance(searchTerm, name.toLowerCase()) -
+            (name.toLowerCase().startsWith(searchTerm) ? 2 : 0) -
+            (name.toLowerCase().includes(searchTerm) ? 1 : 0)
+        }))
+        .sort((a, b) => a.score - b.score);
+
+      if (ranked.length && ranked[0].score <= 4) {
+        suggestion = ranked[0].name;
+      }
     }
   }
 
@@ -1204,23 +1305,10 @@ function CloseSidebarOnRouteChange() {
                            )}
                          </div>
 
-                         {/* Mobile tip below entire section */}
-                         <div className="md:hidden w-full mt-4">
-                           <div
-                             className="text-sm rounded-md px-3 py-2"
-                             style={{
-                               background: 'var(--searchbar-dropdown)',
-                               border: '1px solid var(--border-color)',
-                               color: 'var(--text)'
-                             }}
-                           >
-                             Tip: Tap a Pokémon to toggle caught. Hold to open details.
-                           </div>
-                         </div>
 
-                          {showNoResults && filters.searchTerm && (
+                          {showNoResults && hasActiveSearch && (
                            <NoResults
-                             searchTerm={filters.searchTerm}
+                             searchTerm={filters.searchTerm || "your search filters"}
                              suggestion={suggestion}
                              onSuggestionClick={(suggestion) => setFilters(f => ({ ...f, searchTerm: suggestion }))}
                            />

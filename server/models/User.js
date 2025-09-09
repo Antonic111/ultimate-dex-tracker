@@ -89,6 +89,11 @@ const userSchema = new mongoose.Schema({
   // DELETE ACCOUNT CODE ----------------------------------------- //
   deleteCodeHash: { type: String, default: null },
   deleteCodeExpires: { type: Date, default: null },
+  // USERNAME COOLDOWN ----------------------------------------- //
+  usernameLastChanged: { type: Date, default: null },
+  // PASSWORD VERIFICATION ------------------------------------- //
+  passwordVerificationCode: { type: String, default: null },
+  passwordVerificationExpires: { type: Date, default: null },
 }, { timestamps: true });
 
 

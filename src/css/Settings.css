@@ -701,6 +701,80 @@
   @apply bg-[var(--accent)] text-[#1a1a1a];
 }
 
+/* Username Availability Indicator - Inline */
+.username-availability-inline {
+  @apply absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center;
+  z-index: 10;
+}
+
+.username-availability-inline .spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* Setting header with status on the right */
+.setting-header {
+  @apply flex items-center justify-between mb-3;
+}
+
+/* Status message above input on the right */
+.username-status-top {
+  @apply flex items-center;
+}
+
+.status-text {
+  @apply text-sm font-medium;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.status-text.checking {
+  @apply text-yellow-600;
+}
+
+.status-text.available {
+  @apply text-green-600;
+}
+
+.status-text.taken {
+  @apply text-red-600;
+}
+
+.status-text.error {
+  @apply text-red-600;
+}
+
+.status-text.cooldown {
+  @apply text-orange-600;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Ensure proper contrast for text */
 .setting-block input::placeholder {
   @apply text-[var(--input-placeholder)];

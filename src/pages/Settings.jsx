@@ -1,19 +1,22 @@
 import React, { useState, useContext, useEffect } from "react";
 import "../css/Settings.css";
-import { User, Lock, Eye, EyeOff } from "lucide-react";
+import { User, Lock, Eye, EyeOff, Check, X, Loader } from "lucide-react";
 import { UserContext } from "../components/Shared/UserContext";
 import { useMessage } from "../components/Shared/MessageContext";
 import { useTheme } from "../components/Shared/ThemeContext";
 import DeleteAccountModal from "../components/Shared/DeleteAccountModal";
+import PasswordVerificationModal from "../components/Shared/PasswordVerificationModal";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
 import DexPreferences from "../components/Shared/DexPreferences";
 import { validateContent } from "../../shared/contentFilter";
 import { profileAPI, userAPI } from "../utils/api";
+import { useUsernameAvailability } from "../hooks/useUsernameAvailability";
+import { useUsernameCooldown } from "../hooks/useUsernameCooldown";
 
 
 export default function Settings() {
     const { username, email, setUser } = useContext(UserContext);
-    const [newUsername, setNewUsername] = useState(username || "");
+    const [newUsername, setNewUsername] = useState("");
     const { theme, setTheme, accent, setAccent } = useTheme();
     const [isPrivate, setIsPrivate] = useState(false);
     const { showMessage } = useMessage();
@@ -27,6 +30,13 @@ export default function Settings() {
     const [savingUsername, setSavingUsername] = useState(false);
     const [savingPassword, setSavingPassword] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showPasswordVerificationModal, setShowPasswordVerificationModal] = useState(false);
+
+    // Username availability checking
+    const usernameAvailability = useUsernameAvailability(newUsername, username);
+    
+    // Username cooldown checking
+    const usernameCooldown = useUsernameCooldown();
 
     const togglePrivacy = async (nextPublic) => {
         // switch ON means Public, so isPrivate is the inverse
@@ -69,15 +79,34 @@ export default function Settings() {
     async function handleUsernameSave() {
         try {
             setSavingUsername(true);
+            
+            // Check cooldown first
+            if (!usernameCooldown.canChange) {
+                showMessage(usernameCooldown.message, "error");
+                setSavingUsername(false);
+                return;
+            }
+            
+            // Check if username is available
+            if (!usernameAvailability.available) {
+                showMessage("Username is not available", "error");
+                setSavingUsername(false);
+                return;
+            }
+            
             const validation = validateContent(String(newUsername || ''), 'username');
             if (!validation.isValid) {
                 showMessage(`${validation.error}`, 'error');
                 setSavingUsername(false);
                 return;
             }
+            
             const data = await userAPI.updateUsername(newUsername);
             setUser(prev => ({ ...prev, username: data.username }));
             showMessage("Username updated successfully!", "success");
+            
+            // Refresh cooldown status
+            usernameCooldown.refreshCooldown();
         } catch (err) {
             showMessage(err.message, "error");
         } finally {
@@ -85,7 +114,7 @@ export default function Settings() {
         }
     }
 
-    async function handlePasswordChange() {
+    function handlePasswordChange() {
         // Frontend validation
         if (!currentPassword || !newPassword || !confirmPassword) {
             showMessage("All fields are required", "error");
@@ -102,6 +131,11 @@ export default function Settings() {
             return;
         }
 
+        // Show verification modal instead of directly changing password
+        setShowPasswordVerificationModal(true);
+    }
+
+    async function handlePasswordVerification(verificationCode) {
         try {
             setSavingPassword(true);
             await userAPI.changePassword(currentPassword, newPassword, confirmPassword);
@@ -127,20 +161,58 @@ export default function Settings() {
 
                     {/* Change Username */}
                     <div className="setting-block">
-                        <h3>Change Username</h3>
+                        <div className="setting-header">
+                            <h3>Change Username</h3>
+                            {/* Status message above input on the right */}
+                            {!usernameCooldown.canChange ? (
+                                <div className="username-status-top">
+                                    <span className="status-text cooldown">
+                                        {usernameCooldown.message}
+                                    </span>
+                                </div>
+                            ) : newUsername && newUsername.trim() !== "" && usernameAvailability.message ? (
+                                <div className="username-status-top">
+                                    <span className={`status-text ${usernameAvailability.status}`}>
+                                        {usernameAvailability.message}
+                                    </span>
+                                </div>
+                            ) : null}
+                        </div>
                         <div className="input-icon-wrapper">
                             <User className="auth-icon" size={24} />
                             <ContentFilterInput
                                 type="text"
                                 value={newUsername}
                                 onChange={(e) => setNewUsername(e.target.value)}
-                                placeholder="New username"
+                                placeholder={username || "username"}
                                 configType="username"
                                 showCharacterCount={false}
                                 showRealTimeValidation={false}
                             />
+                            {/* Username availability indicator inside the input */}
+                            {newUsername && newUsername.trim() !== "" && (
+                                <div className="username-availability-inline">
+                                    {usernameAvailability.status === 'checking' && (
+                                        <Loader size={16} className="spinning" />
+                                    )}
+                                    {usernameAvailability.status === 'available' && (
+                                        <Check size={16} className="text-green-600" />
+                                    )}
+                                    {usernameAvailability.status === 'taken' && (
+                                        <X size={16} className="text-red-600" />
+                                    )}
+                                    {usernameAvailability.status === 'error' && (
+                                        <X size={16} className="text-red-600" />
+                                    )}
+                                </div>
+                            )}
                         </div>
-                        <button onClick={handleUsernameSave} disabled={savingUsername}>{savingUsername ? "Saving..." : "Save"}</button>
+                        <button 
+                            onClick={handleUsernameSave} 
+                            disabled={savingUsername || !usernameCooldown.canChange || !usernameAvailability.available || newUsername.trim() === ""}
+                        >
+                            {savingUsername ? "Saving..." : "Save"}
+                        </button>
                     </div>
 
                     <div className="setting-divider" />
@@ -317,6 +389,14 @@ export default function Settings() {
                         setUser({ username: null, email: null, createdAt: null, profileTrainer: null, verified: false, progressBars: [] });
                         window.location.replace("/");
                     }}
+                />
+            )}
+            {showPasswordVerificationModal && (
+                <PasswordVerificationModal
+                    isOpen={showPasswordVerificationModal}
+                    email={email}
+                    onClose={() => setShowPasswordVerificationModal(false)}
+                    onVerified={handlePasswordVerification}
                 />
             )}
 

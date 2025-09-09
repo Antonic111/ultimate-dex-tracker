@@ -3,21 +3,17 @@ import { createPortal } from "react-dom";
 import { useMessage } from "./MessageContext";
 import { userAPI } from "../../utils/api";
 import LoadingButton from "./LoadingButton";
-import "../../css/DeleteAccountModal.css";
+import "../../css/PasswordVerificationModal.css";
 
-export default function DeleteAccountModal({ isOpen, email, username, onClose, onDeleted }) {
+export default function PasswordVerificationModal({ isOpen, email, onClose, onVerified }) {
   const { showMessage } = useMessage();
   const [code, setCode] = useState("");
-  const [confirmName, setConfirmName] = useState("");
   const [sending, setSending] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [closing, setClosing] = useState(false);
   const [emailCooldown, setEmailCooldown] = useState(0);
 
-  const normalizedName = (username || "").trim().toLowerCase();
-  const canDelete =
-    code.trim().length === 6 &&
-    confirmName.trim().toLowerCase() === normalizedName;
+  const canVerify = code.trim().length === 6;
 
   // Handle email cooldown countdown
   useEffect(() => {
@@ -47,7 +43,7 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
   const sendCode = async () => {
     try {
       setSending(true);
-      await userAPI.sendDeleteCode();
+      await userAPI.sendPasswordVerificationCode();
       showMessage("Verification code sent to your email.", "success");
       // Start 30 second cooldown
       setEmailCooldown(30);
@@ -58,21 +54,22 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
     }
   };
 
-  const confirmDelete = async (e) => {
+  const confirmVerification = async (e) => {
     e.preventDefault();
-    if (!canDelete) {
-      showMessage(`Type your account name (${username}) exactly to continue.`, "error");
+    if (!canVerify) {
+      showMessage("Please enter the 6-digit code.", "error");
       return;
     }
     try {
-      setDeleting(true);
-      await userAPI.confirmDeleteAccount(code, username);
-              showMessage("Account deleted", "success");
-      onDeleted?.();
+      setVerifying(true);
+      await userAPI.verifyPasswordCode(code);
+      showMessage("Verification successful!", "success");
+      onVerified?.(code);
+      handleClose();
     } catch (e) {
       showMessage(e.message, "error");
     } finally {
-      setDeleting(false);
+      setVerifying(false);
     }
   };
 
@@ -103,9 +100,9 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
   return createPortal(
     <div className={`modal-backdrop${closing ? " closing" : ""}`}>
       <div className={`modal-card${closing ? " closing" : ""}`}>
-        <h3 className="modal-title">Delete Account</h3>
+        <h3 className="modal-title">Verify Password Change</h3>
         <p className="modal-desc">
-          We'll email a 6-digit code to <b className="email-highlight">{email}</b>. To confirm, type your account name exactly.
+          We'll email a 6-digit verification code to <b className="email-highlight">{email}</b> to confirm your password change.
         </p>
 
         <div className="modal-row">
@@ -121,7 +118,7 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
           </LoadingButton>
         </div>
 
-        <form onSubmit={confirmDelete}>
+        <form onSubmit={confirmVerification}>
           <label className="modal-label">6-digit code</label>
           <input
             className="modal-input"
@@ -130,27 +127,19 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
             value={code}
             onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
             placeholder="Enter code"
-          />
-
-          <label className="modal-label">Type your account name</label>
-          <input
-            className="modal-input"
-            value={confirmName}
-            onChange={(e) => setConfirmName(e.target.value)}
-            placeholder={username || "your username"}
-            autoComplete="off"
+            autoFocus
           />
 
           <div className="modal-row">
             <LoadingButton 
               type="submit" 
-              variant="danger"
+              variant="primary"
               size="medium"
-              loading={deleting}
-              loadingText="Deleting..."
-              disabled={!canDelete}
+              loading={verifying}
+              loadingText="Verifying..."
+              disabled={!canVerify}
             >
-              Delete Account
+              Verify & Continue
             </LoadingButton>
             <LoadingButton 
               type="button" 

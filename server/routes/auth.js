@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import { sendCodeEmail } from "../utils/sendCodeEmail.js";
 import { authLimiter } from "../middleware/rateLimit.js";
 import { validateContent } from "../contentFilter.js";
+import { sanitizeProfileData, sanitizeInput, sanitizeEntryData } from "../sanitizeInput.js";
 import { authenticateUser } from "../middleware/authenticateUser.js";
 
 // CORS middleware for auth routes
@@ -90,7 +91,24 @@ router.post("/account/delete/send", authenticateUser, async (req, res) => {
 router.post("/register", corsMiddleware, authLimiter, async (req, res) => {
   const { username, email, password, profileTrainer = "ash.png" } = req.body;
 
-  const usernameValidation = validateContent(username, 'username');
+  // Sanitize input data
+  const usernameResult = sanitizeInput(username, 'username');
+  const emailResult = sanitizeInput(email, 'email');
+  const trainerResult = sanitizeInput(profileTrainer, 'profileTrainer');
+
+  if (!usernameResult.isValid) {
+    return res.status(400).json({ error: usernameResult.error });
+  }
+
+  if (!emailResult.isValid) {
+    return res.status(400).json({ error: emailResult.error });
+  }
+
+  if (!trainerResult.isValid) {
+    return res.status(400).json({ error: trainerResult.error });
+  }
+
+  const usernameValidation = validateContent(usernameResult.sanitized, 'username');
   if (!usernameValidation.isValid) {
     return res.status(400).json({ error: usernameValidation.error });
   }
@@ -104,17 +122,17 @@ router.post("/register", corsMiddleware, authLimiter, async (req, res) => {
   }
 
   try {
-    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    const existingUser = await User.findOne({ $or: [{ username: usernameResult.sanitized }, { email: emailResult.sanitized }] });
     if (existingUser) {
       return res.status(400).json({ error: "Username or email already taken" });
     }
 
     const user = await User.create({
-      username,
-      email,
+      username: usernameResult.sanitized,
+      email: emailResult.sanitized,
       password,
       verified: false,
-      profileTrainer: "ash.png",
+      profileTrainer: trainerResult.sanitized,
     });
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -166,13 +184,24 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
       expiresIn: "7d",
     });
 
+    // iOS Safari specific cookie configuration
+    const isIOS = req.headers['user-agent'] && /iPhone|iPad|iPod/i.test(req.headers['user-agent']);
+    
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: isIOS ? "none" : "lax", // iOS needs 'none' for cross-site cookies
+      maxAge: rememberMe ? 1000 * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 2,
+      path: "/",
+    };
+    
+    // Only set domain for production and non-iOS
+    if (process.env.NODE_ENV === 'production' && !isIOS) {
+      cookieOptions.domain = '.ultimatedextracker.com';
+    }
+
     res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Only secure in production (HTTPS)
-        sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax", // lax for localhost, none for production
-        maxAge: rememberMe ? 1000 * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 2, // 30 days vs 2 hours
-      })
+      .cookie("token", token, cookieOptions)
       .json({
         message: "Login successful",
         user: {
@@ -226,6 +255,78 @@ router.get("/check-verified", async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Check username availability
+router.get("/check-username", async (req, res) => {
+  const { username } = req.query;
+  
+  if (!username) {
+    return res.status(400).json({ error: "Username parameter is required" });
+  }
+
+  // Sanitize the username
+  const usernameResult = sanitizeInput(username, 'username');
+  if (!usernameResult.isValid) {
+    return res.status(400).json({ 
+      error: usernameResult.error,
+      available: false 
+    });
+  }
+
+  try {
+    const user = await User.findOne({ username: usernameResult.sanitized });
+    const available = !user;
+    
+    res.json({ 
+      available,
+      username: usernameResult.sanitized,
+      message: available ? "Username is available" : "Username is already taken"
+    });
+  } catch (err) {
+    console.error('Error checking username availability:', err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Check username change cooldown
+router.get("/username-cooldown", authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const now = Date.now();
+    const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    
+    if (!user.usernameLastChanged) {
+      return res.json({ 
+        canChange: true, 
+        cooldownRemaining: 0,
+        message: "Username can be changed"
+      });
+    }
+
+    const timeSinceLastChange = now - user.usernameLastChanged.getTime();
+    const canChange = timeSinceLastChange >= cooldownPeriod;
+    
+    if (canChange) {
+      return res.json({ 
+        canChange: true, 
+        cooldownRemaining: 0,
+        message: "Username can be changed"
+      });
+    } else {
+      const timeRemaining = Math.ceil((cooldownPeriod - timeSinceLastChange) / (60 * 60 * 1000));
+      return res.json({ 
+        canChange: false, 
+        cooldownRemaining: timeRemaining,
+        message: `On cooldown for ${timeRemaining}h`
+      });
+    }
+  } catch (err) {
+    console.error('Error checking username cooldown:', err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -418,22 +519,34 @@ router.put("/profile", authenticateUser, async (req, res) => {
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // Update fields
+    // Sanitize all profile data
+    const sanitizationResult = sanitizeProfileData(req.body);
+    
+    if (!sanitizationResult.isValid) {
+      return res.status(400).json({ 
+        error: "Invalid input data", 
+        details: sanitizationResult.errors 
+      });
+    }
+
+    const sanitizedData = sanitizationResult.sanitized;
+
+    // Update fields with sanitized data
     if (req.body.bio !== undefined) {
-      const bioValidation = validateContent(String(req.body.bio || ''), 'bio');
+      const bioValidation = validateContent(sanitizedData.bio, 'bio');
       if (!bioValidation.isValid) {
         return res.status(400).json({ error: bioValidation.error });
       }
-      user.bio = req.body.bio;
+      user.bio = sanitizedData.bio;
     }
     
-    if (req.body.location !== undefined) user.location = req.body.location;
-    if (req.body.gender !== undefined) user.gender = req.body.gender;
-    if (req.body.favoriteGames !== undefined) user.favoriteGames = req.body.favoriteGames;
-    if (req.body.favoritePokemon !== undefined) user.favoritePokemon = req.body.favoritePokemon;
+    if (req.body.location !== undefined) user.location = sanitizedData.location;
+    if (req.body.gender !== undefined) user.gender = sanitizedData.gender;
+    if (req.body.favoriteGames !== undefined) user.favoriteGames = sanitizedData.favoriteGames;
+    if (req.body.favoritePokemon !== undefined) user.favoritePokemon = sanitizedData.favoritePokemon;
     if (req.body.favoritePokemonShiny !== undefined) user.favoritePokemonShiny = req.body.favoritePokemonShiny;
-    if (req.body.switchFriendCode !== undefined) user.switchFriendCode = req.body.switchFriendCode;
-    if (req.body.profileTrainer !== undefined) user.profileTrainer = req.body.profileTrainer;
+    if (req.body.switchFriendCode !== undefined) user.switchFriendCode = sanitizedData.switchFriendCode;
+    if (req.body.profileTrainer !== undefined) user.profileTrainer = sanitizedData.profileTrainer;
 
     // Handle profile visibility - saves both true and false
     if ("isProfilePublic" in req.body) {
@@ -529,11 +642,24 @@ router.post("/caught", authenticateUser, async (req, res) => {
     
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: "User not found" });
-    // Sanitize: remove nulls so Map doesn't store explicit null entries
+    
+    // Sanitize caught Pokemon data
     const sanitized = {};
-    for (const [k, v] of Object.entries(caughtMap)) {
-      if (v !== null && typeof v === 'object') sanitized[k] = v;
+    for (const [key, value] of Object.entries(caughtMap)) {
+      if (value !== null && typeof value === 'object') {
+        // Sanitize each entry's data
+        if (value.entries && Array.isArray(value.entries)) {
+          const sanitizedEntries = value.entries.map(entry => {
+            const entryResult = sanitizeEntryData(entry);
+            return entryResult.isValid ? entryResult.sanitized : entry;
+          });
+          sanitized[key] = { ...value, entries: sanitizedEntries };
+        } else {
+          sanitized[key] = value;
+        }
+      }
     }
+    
     user.caughtPokemon = sanitized;
     await user.save();
     
@@ -680,15 +806,28 @@ router.put("/update-username", authenticateUser, async (req, res) => {
       return res.status(400).json({ error: usernameValidation.error });
     }
 
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Check cooldown period (24 hours)
+    const now = Date.now();
+    const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    
+    if (user.usernameLastChanged && (now - user.usernameLastChanged.getTime()) < cooldownPeriod) {
+      const timeRemaining = Math.ceil((cooldownPeriod - (now - user.usernameLastChanged.getTime())) / (60 * 60 * 1000));
+      return res.status(429).json({ 
+        error: `On cooldown for ${timeRemaining}h`,
+        cooldownRemaining: timeRemaining
+      });
+    }
+
     const existing = await User.findOne({ username: trimmed });
     if (existing) {
       return res.status(400).json({ error: "Username is already taken." });
     }
 
-    const user = await User.findById(req.userId);
-    if (!user) return res.status(404).json({ error: "User not found" });
-
     user.username = trimmed;
+    user.usernameLastChanged = new Date();
     await user.save();
 
     res.json({ success: true, username: user.username });
@@ -758,6 +897,67 @@ router.post("/emergency-reset-password", async (req, res) => {
   } catch (err) {
     console.error('Emergency password reset error:', err);
     res.status(500).json({ error: "Password reset failed" });
+  }
+});
+
+// Send password verification code
+router.post("/send-password-verification-code", authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Generate 6-digit code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Store code with expiration (10 minutes)
+    user.passwordVerificationCode = code;
+    user.passwordVerificationExpires = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    // Send email
+    await sendCodeEmail(user.email, code, "Password Change Verification");
+
+    res.json({ message: "Verification code sent to your email" });
+  } catch (err) {
+    console.error('Send password verification code error:', err);
+    res.status(500).json({ error: "Failed to send verification code" });
+  }
+});
+
+// Verify password change code
+router.post("/verify-password-code", authenticateUser, async (req, res) => {
+  const { code } = req.body;
+  
+  if (!code) {
+    return res.status(400).json({ error: "Verification code is required" });
+  }
+
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Check if code exists and is not expired
+    if (!user.passwordVerificationCode || !user.passwordVerificationExpires) {
+      return res.status(400).json({ error: "No verification code found. Please request a new code." });
+    }
+
+    if (new Date() > user.passwordVerificationExpires) {
+      return res.status(400).json({ error: "Verification code has expired. Please request a new code." });
+    }
+
+    if (user.passwordVerificationCode !== code) {
+      return res.status(400).json({ error: "Invalid verification code" });
+    }
+
+    // Clear the verification code
+    user.passwordVerificationCode = undefined;
+    user.passwordVerificationExpires = undefined;
+    await user.save();
+
+    res.json({ message: "Verification successful" });
+  } catch (err) {
+    console.error('Verify password code error:', err);
+    res.status(500).json({ error: "Verification failed" });
   }
 });
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Youtube, Twitch } from 'lucide-react';
+import { Youtube, Twitch, Home, User, Users, Settings } from 'lucide-react';
 import '../../css/Footer.css';
 
 export default function Footer() {
@@ -11,12 +11,24 @@ export default function Footer() {
       <div className="footer-content">
         <div className="footer-section">
           <h3>Quick Links</h3>
-          <ul>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/profile">Profile</Link></li>
-            <li><Link to="/trainers">Trainers</Link></li>
-            <li><Link to="/settings">Settings</Link></li>
-          </ul>
+          <div className="quick-links-grid">
+            <Link to="/" className="quick-link">
+              <Home size={16} />
+              <span>Home</span>
+            </Link>
+            <Link to="/profile" className="quick-link">
+              <User size={16} />
+              <span>Profile</span>
+            </Link>
+            <Link to="/trainers" className="quick-link">
+              <Users size={16} />
+              <span>Trainers</span>
+            </Link>
+            <Link to="/settings" className="quick-link">
+              <Settings size={16} />
+              <span>Settings</span>
+            </Link>
+          </div>
         </div>
 
         <div className="footer-section">
