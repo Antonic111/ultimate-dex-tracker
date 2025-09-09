@@ -275,8 +275,8 @@ export default function Settings() {
                                     {showConfirmPassword ? <EyeOff className="auth-icon" size={24} /> : <Eye className="auth-icon" size={24} />}
                                 </button>
                             </div>
-                            <button type="submit" disabled={savingPassword}>{savingPassword ? "Updating..." : "Update Password"}</button>
                         </form>
+                        <button onClick={handlePasswordChange} disabled={savingPassword}>{savingPassword ? "Updating..." : "Update Password"}</button>
                     </div>
 
                     <div className="setting-divider" />
