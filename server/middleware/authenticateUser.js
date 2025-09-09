@@ -2,7 +2,17 @@
 import jwt from "jsonwebtoken";
 
 export function authenticateUser(req, res, next) {
-  const token = req.cookies.token;
+  // Check for token in cookies first (normal flow)
+  let token = req.cookies.token;
+  
+  // If no cookie token, check Authorization header (iPhone fallback)
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    }
+  }
+  
   if (!token) return res.status(401).json({ error: "Missing token" });
 
   try {

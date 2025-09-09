@@ -189,8 +189,8 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
     
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: isIOS ? "none" : "lax", // iOS needs 'none' for cross-site cookies
+      secure: process.env.NODE_ENV === 'production', // Only secure in production (HTTPS)
+      sameSite: process.env.NODE_ENV === 'production' ? (isIOS ? "none" : "lax") : "lax", // Use "lax" for local development
       maxAge: rememberMe ? 1000 * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 2,
       path: "/",
     };
@@ -200,19 +200,26 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
       cookieOptions.domain = '.ultimatedextracker.com';
     }
 
+    const responseData = {
+      message: "Login successful",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        createdAt: user.createdAt,
+        profileTrainer: user.profileTrainer,
+        verified: true,
+      },
+    };
+    
+    // For iPhone users, also return the token in the response
+    if (isIOS) {
+      responseData.token = token;
+    }
+    
     res
       .cookie("token", token, cookieOptions)
-      .json({
-        message: "Login successful",
-        user: {
-          id: user._id,
-          username: user.username,
-          email: user.email,
-          createdAt: user.createdAt,
-          profileTrainer: user.profileTrainer,
-          verified: true,
-        },
-      });
+      .json(responseData);
   } catch (err) {
     console.error('🔥 POST /login - Error:', err);
     res.status(500).json({ error: "Login failed" });

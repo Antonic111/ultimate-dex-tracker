@@ -312,38 +312,11 @@ export default function App() {
       return;
     }
 
-    // Mobile and iOS debug logging
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    
-    if (isMobile && !silent) {
-      console.log('🔍 Mobile Auth Check:', {
-        userAgent: navigator.userAgent,
-        isIOS: isIOS,
-        cookies: document.cookie,
-        localStorage: localStorage.getItem('mobileUserBackup') ? 'Has backup' : 'No backup',
-        timestamp: new Date().toISOString()
-      });
-    }
 
     // Check if user is authenticated
     try {
       const userData = await authAPI.getCurrentUser();
       
-      if (isMobile && !silent) {
-        console.log('📱 Mobile Auth Response:', {
-          success: !!userData,
-          hasUsername: !!userData?.username,
-          hasProgressBars: !!userData?.progressBars,
-          isIOS: isIOS,
-          data: userData
-        });
-        
-        // iOS-specific warning
-        if (isIOS && !userData) {
-          console.warn('🍎 iOS Safari detected - cookies may be blocked. Check Safari settings for "Prevent Cross-Site Tracking" and "Block All Cookies"');
-        }
-      }
       
       if (userData && userData.username) {
         // Preserve existing progress bars if the server response doesn't include them
@@ -360,47 +333,39 @@ export default function App() {
         });
       } else {
         // Clear user data if not authenticated
-        if (isMobile && !silent) {
-          console.warn('⚠️ Mobile Auth Failed: No user data received');
-        }
         setUser(null);
       }
     } catch (error) {
       // Clear user data on error
-      if (isMobile && !silent) {
-        console.error('❌ Mobile Auth Error:', error);
+      // Try mobile fallback from localStorage and sessionStorage (iOS)
+      try {
+        let backupData = null;
         
-        // Try mobile fallback from localStorage and sessionStorage (iOS)
-        try {
-          let backupData = null;
-          
-          // Try localStorage first
-          const mobileBackup = localStorage.getItem('mobileUserBackup');
-          if (mobileBackup) {
-            backupData = JSON.parse(mobileBackup);
-          }
-          
-          // iOS fallback: Try sessionStorage if localStorage failed
-          if (!backupData && isIOS) {
-            const iosBackup = sessionStorage.getItem('iosUserBackup');
-            if (iosBackup) {
-              backupData = JSON.parse(iosBackup);
-              console.log('🍎 Using iOS sessionStorage backup');
-            }
-          }
-          
-          if (backupData) {
-            const isRecent = (Date.now() - backupData.timestamp) < (24 * 60 * 60 * 1000); // 24 hours
-            
-            if (isRecent && backupData.username) {
-              console.log('📱 Using mobile backup data:', backupData);
-              setUser(backupData);
-              return; // Don't clear user data, use backup instead
-            }
-          }
-        } catch (backupError) {
-          console.warn('Failed to use mobile backup:', backupError);
+        // Try localStorage first
+        const mobileBackup = localStorage.getItem('mobileUserBackup');
+        if (mobileBackup) {
+          backupData = JSON.parse(mobileBackup);
         }
+        
+        // iOS fallback: Try sessionStorage if localStorage failed
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (!backupData && isIOS) {
+          const iosBackup = sessionStorage.getItem('iosUserBackup');
+          if (iosBackup) {
+            backupData = JSON.parse(iosBackup);
+          }
+        }
+        
+        if (backupData) {
+          const isRecent = (Date.now() - backupData.timestamp) < (24 * 60 * 60 * 1000); // 24 hours
+          
+          if (isRecent && backupData.username) {
+            setUser(backupData);
+            return; // Don't clear user data, use backup instead
+          }
+        }
+      } catch (backupError) {
+        // Silent fallback error handling
       }
       setUser(null);
     } finally {
@@ -441,11 +406,8 @@ export default function App() {
           sessionStorage.setItem('iosUserBackup', JSON.stringify(backupData));
         }
         
-        if (isIOS) {
-          console.log('🍎 iOS User Backup Stored:', backupData);
-        }
       } catch (error) {
-        console.warn('Failed to store mobile user backup:', error);
+        // Silent error handling for mobile backup
       }
     }
     

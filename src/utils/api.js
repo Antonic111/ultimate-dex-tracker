@@ -36,9 +36,21 @@ export const api = {
     const url = buildApiUrl(endpoint);
     
     const fetchRequest = async () => {
+      // Get token from localStorage for iPhone users
+      const token = localStorage.getItem('authToken');
+      const headers = {
+        ...options.headers,
+      };
+      
+      // Add Authorization header if token exists (for iPhone users)
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch(url, {
         method: 'GET',
         credentials: 'include',
+        headers,
         ...options,
       });
       
@@ -83,13 +95,22 @@ export const api = {
     const url = buildApiUrl(endpoint);
     
     const fetchRequest = async () => {
+      // Get token from localStorage for iPhone users
+      const token = localStorage.getItem('authToken');
+      const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+      
+      // Add Authorization header if token exists (for iPhone users)
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch(url, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
+        headers,
         body: data ? JSON.stringify(data) : undefined,
         ...options,
       });
@@ -224,7 +245,15 @@ export const authAPI = {
 
   // Login
   async login(credentials) {
-    return api.post('/login', credentials);
+    const response = await api.post('/login', credentials);
+    
+    // For iPhone users, store token in localStorage as backup
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isIOS && response.token) {
+      localStorage.setItem('authToken', response.token);
+    }
+    
+    return response;
   },
 
   // Register
@@ -234,7 +263,15 @@ export const authAPI = {
 
   // Logout
   async logout() {
-    return api.post('/logout');
+    const response = await api.post('/logout');
+    
+    // Clear token from localStorage for iPhone users
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isIOS) {
+      localStorage.removeItem('authToken');
+    }
+    
+    return response;
   },
 
   // Verify email code

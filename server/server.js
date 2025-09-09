@@ -67,9 +67,9 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // Only secure in production (HTTPS)
-    sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax", // lax for localhost, none for production
-    domain: process.env.NODE_ENV === 'production' ? undefined : undefined, // Let browser handle domain
+    secure: false, // Always false for local development (HTTP)
+    sameSite: "lax", // Use "lax" for local development to work with Safari
+    domain: undefined, // Let browser handle domain for local IPs
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   },
 }));
@@ -82,6 +82,31 @@ app.get("/api/health", (req, res) => {
 // Simple CORS test endpoint
 app.get("/api/cors-test", (req, res) => {
   res.json({ message: "CORS test successful", timestamp: new Date().toISOString() });
+});
+
+// iPhone cookie test endpoint
+app.get("/api/iphone-test", (req, res) => {
+  const isIOS = req.headers['user-agent'] && /iPhone|iPad|iPod/i.test(req.headers['user-agent']);
+  const isMobile = req.headers['user-agent'] && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(req.headers['user-agent']);
+  
+  // Set a test cookie
+  res.cookie('iphone-test-cookie', 'test-value', {
+    httpOnly: true,
+    secure: false, // Always false for local development
+    sameSite: "lax", // Use "lax" for local development
+    maxAge: 1000 * 60 * 5, // 5 minutes
+    path: "/",
+  });
+  
+  res.json({ 
+    message: "iPhone test successful", 
+    timestamp: new Date().toISOString(),
+    isIOS,
+    isMobile,
+    userAgent: req.headers['user-agent'],
+    cookies: req.cookies,
+    cookieHeader: req.headers.cookie
+  });
 });
 
 app.use("/api", authRoutes);
