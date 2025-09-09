@@ -153,8 +153,17 @@
 
 /* SVG WRAPPERS */
 .input-icon-wrapper {
-  @apply relative flex items-center bg-[var(--settings-input)] border-2 border-[var(--dividers)] rounded-lg gap-0 h-12 pl-3;
+  @apply relative flex items-center bg-[var(--settings-input)] border-2 border-[var(--dividers)] rounded-lg gap-0 h-12 pl-3 mb-4;
   transition: background-color var(--transition-speed);
+}
+
+/* Form spacing for password fields */
+form .input-icon-wrapper {
+  @apply mb-4;
+}
+
+form .input-icon-wrapper:last-of-type {
+  @apply mb-6;
 }
 
 .input-icon-wrapper input {

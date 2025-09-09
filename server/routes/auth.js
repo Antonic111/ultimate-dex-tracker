@@ -922,7 +922,7 @@ router.post("/send-password-verification-code", authenticateUser, async (req, re
     console.log('✅ Password verification code generated for user:', user.email);
 
     // Send email
-    await sendCodeEmail(user.email, code, "Password Change Verification");
+    await sendCodeEmail(user, "Password Change Verification", code, "password change verification");
 
     console.log('📧 Password verification email sent to:', user.email);
     res.json({ message: "Verification code sent to your email" });
