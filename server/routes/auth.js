@@ -210,12 +210,8 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
         profileTrainer: user.profileTrainer,
         verified: true,
       },
+      token: token, // Return token for all users (needed for Authorization header)
     };
-    
-    // For iPhone users, also return the token in the response
-    if (isIOS) {
-      responseData.token = token;
-    }
     
     res
       .cookie("token", token, cookieOptions)

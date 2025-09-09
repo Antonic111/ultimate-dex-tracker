@@ -36,13 +36,13 @@ export const api = {
     const url = buildApiUrl(endpoint);
     
     const fetchRequest = async () => {
-      // Get token from localStorage for iPhone users
+      // Get token from localStorage for all users
       const token = localStorage.getItem('authToken');
       const headers = {
         ...options.headers,
       };
       
-      // Add Authorization header if token exists (for iPhone users)
+      // Add Authorization header if token exists
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
