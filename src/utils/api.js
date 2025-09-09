@@ -156,14 +156,23 @@ export const api = {
   async put(endpoint, data = null, options = {}) {
     const url = buildApiUrl(endpoint);
     
-    try {
+    const fetchRequest = async () => {
+      // Get token from localStorage for all users
+      const token = localStorage.getItem('authToken');
+      const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+      
+      // Add Authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch(url, {
         method: 'PUT',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
+        headers,
         body: data ? JSON.stringify(data) : undefined,
         ...options,
       });
@@ -194,19 +203,38 @@ export const api = {
       }
       
       return { message: 'Success' };
-    } catch (error) {
-      throw error;
+    };
+    
+    // Use mobile retry for mobile devices
+    if (isMobile()) {
+      return mobileRetry(fetchRequest);
     }
+    
+    return fetchRequest();
   },
 
   // DELETE request
   async delete(endpoint, options = {}) {
     const url = buildApiUrl(endpoint);
-    const response = await fetch(url, {
-      method: 'DELETE',
-      credentials: 'include',
-      ...options,
-    });
+    
+    const fetchRequest = async () => {
+      // Get token from localStorage for all users
+      const token = localStorage.getItem('authToken');
+      const headers = {
+        ...options.headers,
+      };
+      
+      // Add Authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await fetch(url, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers,
+        ...options,
+      });
     
     if (!response.ok) {
       const contentType = response.headers.get('content-type');
@@ -233,6 +261,14 @@ export const api = {
     }
     
     return { message: 'Success' };
+    };
+    
+    // Use mobile retry for mobile devices
+    if (isMobile()) {
+      return mobileRetry(fetchRequest);
+    }
+    
+    return fetchRequest();
   },
 };
 
@@ -247,9 +283,8 @@ export const authAPI = {
   async login(credentials) {
     const response = await api.post('/login', credentials);
     
-    // For iPhone users, store token in localStorage as backup
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isIOS && response.token) {
+    // Store token in localStorage for all users (needed for Authorization header)
+    if (response.token) {
       localStorage.setItem('authToken', response.token);
     }
     
@@ -265,11 +300,8 @@ export const authAPI = {
   async logout() {
     const response = await api.post('/logout');
     
-    // Clear token from localStorage for iPhone users
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isIOS) {
-      localStorage.removeItem('authToken');
-    }
+    // Clear token from localStorage for all users
+    localStorage.removeItem('authToken');
     
     return response;
   },
