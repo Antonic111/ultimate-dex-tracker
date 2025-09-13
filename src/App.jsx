@@ -797,9 +797,15 @@ function CloseSidebarOnRouteChange() {
   setCaught(prev => ({ ...prev, [key]: !!info }));
 
   // keep sidebar in sync - only switch when caught status actually changes
-  if (sidebarOpen && selectedPokemon && selectedPokemon.id !== poke.id) {
-    console.log("Sidebar is open, switching to newly caught pokemon:", poke.name);
-    setSelectedPokemon(poke);
+  if (sidebarOpen && selectedPokemon) {
+    // Check if it's a different Pokémon (different ID) or different form (same ID but different name/formType)
+    const isDifferentPokemon = selectedPokemon.id !== poke.id;
+    const isDifferentForm = selectedPokemon.id === poke.id && selectedPokemon.name !== poke.name;
+    
+    if (isDifferentPokemon || isDifferentForm) {
+      console.log("Sidebar is open, switching to newly caught pokemon:", poke.name, "form:", poke.formType);
+      setSelectedPokemon(poke);
+    }
   }
 }
 
@@ -963,9 +969,15 @@ function CloseSidebarOnRouteChange() {
     });
 
     // keep sidebar in sync - switch to newly caught pokemon
-    if (sidebarOpen && selectedPokemon && selectedPokemon.id !== poke.id) {
-      console.log("Sidebar is open, switching to newly toggled pokemon:", poke.name);
-      setSelectedPokemon(poke);
+    if (sidebarOpen && selectedPokemon) {
+      // Check if it's a different Pokémon (different ID) or different form (same ID but different name/formType)
+      const isDifferentPokemon = selectedPokemon.id !== poke.id;
+      const isDifferentForm = selectedPokemon.id === poke.id && selectedPokemon.name !== poke.name;
+      
+      if (isDifferentPokemon || isDifferentForm) {
+        console.log("Sidebar is open, switching to newly toggled pokemon:", poke.name, "form:", poke.formType);
+        setSelectedPokemon(poke);
+      }
     }
   }
 

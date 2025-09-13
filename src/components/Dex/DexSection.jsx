@@ -216,6 +216,11 @@ export default function DexSection({
                             "vivillon",
                             "alpha",
                           ];
+                          // Check for specific titles first before doing form type matching
+                          if (title === "Alpha Genders & Other's") {
+                            return `Alpha Genders & Other's Box 1`;
+                          }
+                          
                           const tstr = String(title || "").toLowerCase();
                           const match = FORM_TYPES.find((type) => tstr.includes(type));
                           if (match) {
@@ -246,8 +251,6 @@ export default function DexSection({
                               return `${label} 1`;
                             }
                             return `${label} ${boxIndex + 1}`;
-                          } else if (title === "Alpha Genders & Other's") {
-                            return `Alpha Genders & Other's Box ${boxIndex + 1}`;
                           } else {
                             return `${String(box[0]?.id ?? "????").padStart(4, "0")} - ${String(box[box.length - 1]?.id ?? "????").padStart(4, "0")}`;
                           }

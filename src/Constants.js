@@ -252,7 +252,8 @@ export const METHOD_OPTIONS = [
   "Time Space Distortions",
   "Gift Pokémon",
   "Fossil Revivals",
-  "Mystery Gift"
+  "Mystery Gift",
+  "Permutations"
 ];
 
 

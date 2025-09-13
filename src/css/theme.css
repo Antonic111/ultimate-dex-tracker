@@ -130,6 +130,11 @@
   --trainer-avatar-bg: radial-gradient(circle at center, #3b3b3f 0%, #1e1e20 100%);
 
   --skeleton-bg: linear-gradient(90deg,#141414 25%,#1b1b1b 37%,#141414 63%);
+
+  /* SCROLLBAR VARIABLES */
+  --scrollbar-bg: #333333;
+  --scrollbar-track: rgba(255, 255, 255, 0.1);
+  --scrollbar-thumb: var(--accent);
 }
 
 [data-theme="light"] {
@@ -175,6 +180,11 @@
   --dropdown-icon: #6b7280; /* gray-500 */
   --dropdown-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
   --dropdown-inset-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.04);
+
+  /* SCROLLBAR VARIABLES */
+  --scrollbar-bg: #e5e7eb; /* neutral-200 */
+  --scrollbar-track: rgba(0,0,0,0.06);
+  --scrollbar-thumb: var(--accent);
 
   /* CONFIRMDIALOG.CSS */
   --confirm-panel: #ffffff; /* white */

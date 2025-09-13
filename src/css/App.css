@@ -215,6 +215,19 @@ html, body {
     z-index: 9999;
     pointer-events: none;
     border-radius: 4px;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+  }
+
+  /* Hide scrollbar track when not needed */
+  body.no-scrollbar::after {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  /* Hide scrollbar track during loading */
+  body.scrollbar-loading::after {
+    opacity: 0;
+    visibility: hidden;
   }
   
   /* Scrollbar background - always visible (theme-aware) */
@@ -228,6 +241,19 @@ html, body {
     background: var(--scrollbar-bg, #333333);
     z-index: 9998;
     pointer-events: none;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+  }
+
+  /* Hide scrollbar background when not needed */
+  body.no-scrollbar::before {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  /* Hide scrollbar elements during loading */
+  body.scrollbar-loading::before {
+    opacity: 0;
+    visibility: hidden;
   }
   
   /* Custom scrollbar thumb - will be positioned by JavaScript (theme-aware) */
@@ -242,7 +268,7 @@ html, body {
     pointer-events: auto;
     border-radius: 4px;
     opacity: 0.8;
-    transition: opacity 0.3s ease, transform 0.2s ease;
+    transition: opacity 0.15s ease, transform 0.1s ease, visibility 0.15s ease;
     user-select: none;
   }
   
@@ -264,12 +290,6 @@ html, body {
   }
 }
 
-/* Light theme scrollbar variables */
-[data-theme="light"] {
-  --scrollbar-bg: #e5e7eb; /* neutral-200 */
-  --scrollbar-track: rgba(0,0,0,0.06);
-  --scrollbar-thumb: var(--accent);
-}
 
 /* Pokémon Slot Hover Scaling Fix */
 .pokemon-slot-hover {

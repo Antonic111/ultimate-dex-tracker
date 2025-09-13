@@ -19,13 +19,15 @@ html, body {
   background: var(--site-background);
   color: var(--text);
   transition: background 0.3s ease, color 0.3s ease;
-  height: 100%;
+  height: auto; /* Allow body to grow with content */
+  min-height: 100%;
 }
 
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  height: auto; /* Allow content to grow beyond viewport */
 }
 
 /* Custom placeholder colors for dark theme */
