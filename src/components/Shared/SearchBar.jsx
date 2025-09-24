@@ -15,12 +15,30 @@ import {
 import React from "react";
 import { createPortal } from "react-dom";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS } from "../../Constants";
+import { HUNT_SYSTEM } from "../../utils/huntSystem";
 import "../../css/Settings.css";
 
 import { IconDropdown } from "../Shared/IconDropdown";
 
+// Get all unique methods from the hunt system
+function getAllUniqueMethods() {
+    const methodSet = new Set();
+    
+    // Extract all method names from all games
+    Object.values(HUNT_SYSTEM).forEach(game => {
+        if (game.methods) {
+            game.methods.forEach(method => {
+                methodSet.add(method.name);
+            });
+        }
+    });
+    
+    // Convert to array and sort alphabetically
+    return Array.from(methodSet).sort();
+}
+
 // Unique dropdown for SearchBar, with placeholder classes and image support
-export function SearchbarIconDropdown({ id, options, value, onChange, placeholder, customBackground, customBorder, hideClearButton = false }) {
+export function SearchbarIconDropdown({ id, options, value, onChange, placeholder, customBackground, customBorder, hideClearButton = false, disabled = false }) {
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState("");
     const [isClickingInside, setIsClickingInside] = React.useState(false);
@@ -62,17 +80,19 @@ export function SearchbarIconDropdown({ id, options, value, onChange, placeholde
                 <div 
                     className="mobile-dropdown-field flex items-center justify-between px-3 py-2 rounded-lg shadow-sm transition-colors duration-200 w-full" 
                     style={{ 
-                        backgroundColor: customBackground || 'var(--searchbar-inputs)', 
-                        border: isFocused ? `1px solid var(--accent)` : `1px solid ${customBorder || 'var(--border-color)'}`,
+                        backgroundColor: disabled ? 'var(--sidebar-edit-inputs-disabled)' : (customBackground || 'var(--searchbar-inputs)'), 
+                        border: isFocused && !disabled ? `1px solid var(--accent)` : `1px solid ${customBorder || 'var(--border-color)'}`,
                         height: '42px',
                         minHeight: '42px',
                         maxHeight: '42px',
                         overflow: 'hidden',
                         outline: 'none',
-                        boxShadow: 'none'
+                        boxShadow: 'none',
+                        opacity: disabled ? 0.6 : 1,
+                        cursor: disabled ? 'not-allowed' : 'default'
                     }}
-                    onMouseDown={() => setIsClickingInside(true)}
-                    onMouseUp={() => setIsClickingInside(false)}
+                    onMouseDown={() => !disabled && setIsClickingInside(true)}
+                    onMouseUp={() => !disabled && setIsClickingInside(false)}
                 >
                     <div className="flex items-center flex-1 min-w-0">
                         {selected?.image && (
@@ -92,17 +112,24 @@ export function SearchbarIconDropdown({ id, options, value, onChange, placeholde
                             <input
                                 type="text"
                                 className="flex-1 bg-transparent outline-none text-sm min-w-0 w-full"
-                                style={{ color: 'var(--dropdown-item-text)', border: 'none' }}
+                                style={{ 
+                                    color: disabled ? 'var(--sidebar-text-disabled)' : 'var(--dropdown-item-text)', 
+                                    border: 'none',
+                                    cursor: disabled ? 'not-allowed' : 'text'
+                                }}
                                 placeholder={placeholder}
                                 value={(isFocused || open || search.length > 0) ? search : (selected && selected.value !== "" && selected.value !== "default") ? selected.name : ""}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => !disabled && setSearch(e.target.value)}
                                 onFocus={() => {
-                                    setIsFocused(true);
-                                    setOpen(true);
+                                    if (!disabled) {
+                                        setIsFocused(true);
+                                        setOpen(true);
+                                    }
                                 }}
-                                onClick={() => setOpen(true)}
+                                onClick={() => !disabled && setOpen(true)}
                                 onBlur={() => setIsFocused(false)}
                                 onKeyDown={(e) => {
+                                    if (disabled) return;
                                     if (e.key === 'Escape') {
                                         setOpen(false);
                                         if (e.target && typeof e.target.blur === 'function') {
@@ -112,8 +139,10 @@ export function SearchbarIconDropdown({ id, options, value, onChange, placeholde
                                 }}
                                 id={id}
                                 autoComplete="off"
+                                disabled={disabled}
+                                readOnly={disabled}
                             />
-                            {!hideClearButton && (
+                            {!hideClearButton && !disabled && (
                                 <button
                                     type="button"
                                     className={`ml-2 p-1 transition-colors ${(search || (selected && selected.value !== "")) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
@@ -141,7 +170,7 @@ export function SearchbarIconDropdown({ id, options, value, onChange, placeholde
                             )}
                         </div>
                     </div>
-                    {open ? (
+                    {!disabled && (open ? (
                         <ChevronDown 
                             className="ml-2 flex-shrink-0 transition-transform duration-200 cursor-pointer" 
                             style={{ color: 'var(--accent)' }}
@@ -155,11 +184,11 @@ export function SearchbarIconDropdown({ id, options, value, onChange, placeholde
                             onClick={() => setOpen(true)}
                             title="Open dropdown"
                         />
-                    )}
+                    ))}
                 </div>
             </div>
 
-            {open && createPortal(
+            {open && !disabled && createPortal(
                 <ul 
                     className="absolute rounded-md shadow-lg max-h-60 overflow-auto"
                     style={{ 
@@ -411,11 +440,10 @@ export default function SearchBar({
                     id="searchbar-method"
                     options={[
                         { name: "None", value: "" },
-                        ...METHOD_OPTIONS.filter(m => m).map(opt =>
-                            typeof opt === "string"
-                                ? { name: opt, value: opt }
-                                : { name: opt.name, value: opt.value }
-                        )
+                        ...getAllUniqueMethods().map(method => ({
+                            name: method,
+                            value: method
+                        }))
                     ]}
                     value={filters.method}
                     onChange={val => setFilters(f => ({ ...f, method: val }))}

@@ -108,11 +108,13 @@
 /* Mobile responsive styles */
 @media (max-width: 768px) {
   .register-form {
-    @apply max-w-sm mx-4 mt-24 mb-48 px-6 pb-4;
+    @apply max-w-sm mx-4 mt-24 mb-48 px-4 pb-4;
+    max-width: calc(100vw - 32px) !important;
+    width: calc(100vw - 32px) !important;
   }
   
   .register-title {
-    @apply text-3xl py-6;
+    @apply text-2xl py-4;
   }
   
   .input-icon-wrapper {
@@ -138,15 +140,17 @@
 
 @media (max-width: 480px) {
   .register-form {
-    @apply mx-3 mt-16 mb-36 px-4 pb-3;
+    @apply mx-2 mt-16 mb-36 px-3 pb-3;
+    max-width: calc(100vw - 16px) !important;
+    width: calc(100vw - 16px) !important;
   }
   
   .register-title {
-    @apply text-2xl py-4;
+    @apply text-xl py-3;
   }
   
   .input-icon-wrapper {
-    @apply p-2.5;
+    @apply p-2;
   }
   
   .register-input {
@@ -159,6 +163,39 @@
   
   .register-button {
     @apply py-2 text-sm;
+  }
+  
+  .auth-redirect {
+    @apply text-xs;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 360px) {
+  .register-form {
+    @apply mx-1 mt-12 mb-24 px-2 pb-2;
+    max-width: calc(100vw - 8px) !important;
+    width: calc(100vw - 8px) !important;
+  }
+  
+  .register-title {
+    @apply text-lg py-2;
+  }
+  
+  .input-icon-wrapper {
+    @apply p-1.5;
+  }
+  
+  .register-input {
+    @apply text-xs;
+  }
+  
+  .auth-icon {
+    @apply w-3 h-3 mr-1.5;
+  }
+  
+  .register-button {
+    @apply py-1.5 text-xs;
   }
   
   .auth-redirect {

@@ -279,6 +279,11 @@ export const authAPI = {
     return api.get('/me');
   },
 
+  // Update user data
+  async updateUser(userData) {
+    return api.put('/profile', userData);
+  },
+
   // Login
   async login(credentials) {
     const response = await api.post('/login', credentials);
@@ -363,6 +368,18 @@ export const progressAPI = {
   // Update progress bars
   async updateProgressBars(progressBars) {
     return api.put('/progressBars', progressBars);
+  },
+};
+
+export const huntAPI = {
+  // Get hunt data
+  async getHuntData() {
+    return api.get('/hunts');
+  },
+
+  // Update hunt data
+  async updateHuntData(huntData) {
+    return api.put('/hunts', huntData);
   },
 };
 

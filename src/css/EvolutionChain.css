@@ -5,19 +5,30 @@
 /* Evolution Chain Spacer */
 .evolution-chain-spacer {
   @apply mt-auto;
-  height: 2rem;
+  height: 1rem;
+  border: none;
 }
 
 /* Evolution Chain Container */
 .evolution-chain-section {
-  @apply bg-[var(--evo-bg)] border-2 border-[var(--accent)] rounded-xl p-3 shadow-lg;
+  @apply px-3 pt-3 pb-4;
   transition: background-color var(--transition-speed);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
 }
 
 /* Evolution Chain Title */
 .evo-chain-title {
-  @apply font-bold text-[var(--accent)] mb-3 text-lg text-center;
+  @apply font-bold text-white mb-3 text-center;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Evolution Chain Divider */
+.evo-chain-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--border-color) 20%, var(--border-color) 80%, transparent 100%);
+  margin-bottom: 1rem;
+  margin-top: 0.75rem;
 }
 
 /* Evolution Chain Layout */
@@ -75,7 +86,7 @@
 
 /* Tooltip */
 .evo-tooltip {
-  @apply hidden absolute left-1/2 bottom-20 transform -translate-x-1/2 bg-black bg-opacity-95 text-white text-base font-medium px-3 py-2 rounded-lg shadow-xl z-50 max-w-96 min-w-36 break-words text-center;
+  @apply hidden absolute left-1/2 bottom-8 transform -translate-x-1/2 bg-black bg-opacity-95 text-white text-base font-medium px-3 py-2 rounded-lg shadow-xl z-50 max-w-96 min-w-36 break-words text-center;
 }
 
 .evo-arrow-wrapper {

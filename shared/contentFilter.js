@@ -287,9 +287,18 @@ function checkRepeatedCharacterBypass(text, bannedWords) {
     
     // Check for patterns like "coooon" where repeated characters are used to bypass
     // We'll check if removing repeated characters reveals the banned word
-    const cleaned = lowerText.replace(/(.)\1+/g, "$1");
-    const wordBoundaryRx = new RegExp(`\\b${bannedWord}\\b`);
-    if (wordBoundaryRx.test(cleaned)) {
+    const cleaned = lowerText.replace(/(.)\1{2,}/g, "$1");
+    
+    // Debug logging (remove in production)
+    if (lowerText.includes('nate') && lowerText.includes('higger')) {
+      console.log('Debug - Original:', lowerText);
+      console.log('Debug - Cleaned:', cleaned);
+      console.log('Debug - Banned word:', bannedWord);
+      console.log('Debug - Contains banned word:', cleaned.includes(bannedWord));
+    }
+    
+    // Check if the cleaned text contains the banned word (more flexible than word boundaries)
+    if (cleaned.includes(bannedWord)) {
       // Additional check: only block if this looks like a bypass attempt
       // Don't block legitimate words like "coonhound" that contain the banned word
       
@@ -298,11 +307,15 @@ function checkRepeatedCharacterBypass(text, bannedWords) {
         return true;
       }
       
-      // If we get here, it's likely a bypass attempt
-      return true;
+      // Check if the banned word appears as a complete word in the cleaned text
+      const wordBoundaryRx = new RegExp(`\\b${bannedWord}\\b`);
+      if (wordBoundaryRx.test(cleaned)) {
+        return true;
+      }
     }
     
     // Also check the original text for the banned word (catches cases where normalization works)
+    const wordBoundaryRx = new RegExp(`\\b${bannedWord}\\b`);
     if (wordBoundaryRx.test(lowerText)) {
       // Same logic as above for legitimate words
       if (lowerText === bannedWord) {
@@ -382,6 +395,16 @@ function containsBannedWords(text, similarityThreshold = 0.2) {
   // 0. Check for repeated character bypasses (like "coooon" containing "coon")
   if (checkRepeatedCharacterBypass(text, bannedWords)) {
     return true;
+  }
+  
+  // Special check for "nate higger" variations with repeated characters
+  const lowerText = text.toLowerCase();
+  if (lowerText.includes('nate') && lowerText.includes('higger')) {
+    // Clean repeated characters and check if it matches banned patterns
+    const cleaned = lowerText.replace(/(.)\1{2,}/g, "$1");
+    if (cleaned.includes('nate higger') || cleaned.includes('nate higgers')) {
+      return true;
+    }
   }
   
   // 1. Block known high-severity substrings even when embedded (use normalized text)

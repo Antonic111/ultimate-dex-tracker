@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, User, Settings, Users, Database } from "lucide-react";
+import { LogOut, User, Settings, Users, Database, Tally5 } from "lucide-react";
 import { authAPI } from './utils/api';
 import { useTheme } from "./components/Shared/ThemeContext";
 
@@ -77,7 +77,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                      <img src={logoSrc} onError={handleLogoError} alt="" className="h-[50px] md:h-[110px] w-auto max-w-[340px] md:max-w-[450px] lg:max-w-[550px]" />
         </Link>
 
-        <nav className="flex items-end gap-3 w-full max-w-full md:max-w-none self-end ml-4 md:ml-8">
+        <nav className="flex items-end gap-1 md:gap-3 w-full max-w-full md:max-w-none self-end ml-4 md:ml-8 mr-4 md:mr-8">
           {/* Only show Trainers button when not on auth flow pages, but allow on public home page */}
           {!['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
             <Link 
@@ -86,6 +86,17 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
             >
               <Users size={10} className="md:w-4 md:h-4 bg-transparent" />
               <span>Trainers</span>
+            </Link>
+          )}
+          
+          {/* Only show Counters button when not on auth flow pages, but allow on public home page */}
+          {!['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
+            <Link 
+              to="/counters" 
+              className={`flex items-center gap-1 md:gap-1.5 px-1 md:px-4 py-0.5 md:py-2 pb-1.5 md:pb-4 border-2 border-[var(--accent)] border-b-0 rounded-t-lg text-decoration-none cursor-pointer text-[10px] md:text-base font-medium transition-all duration-200 md:hover:bg-[var(--accent)] md:hover:text-white md:hover:pb-2.5 md:hover:pb-5 ${location.pathname === '/counters' ? 'bg-[var(--accent)] text-white pb-1.5 md:pb-5' : 'bg-[var(--header)] text-[var(--accent)]'}`}
+            >
+              <Tally5 size={10} className="md:w-4 md:h-4 bg-transparent" style={{ transform: 'rotate(-1deg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
+              <span>Counters</span>
             </Link>
           )}
           

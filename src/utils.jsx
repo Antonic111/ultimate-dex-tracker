@@ -99,16 +99,16 @@ export function renderTypeBadge(type) {
   return (
          <span 
        key={type}
-       className="inline-flex items-center justify-center gap-1 px-3 py-0.5 rounded-full text-white font-semibold text-sm border-4 w-28"
+       className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-full text-white font-semibold text-xs border-2 w-20"
        style={{ backgroundColor: bgColor, borderColor: borderColor, borderStyle: 'solid' }}
      >
       <img
         src={`/type-icons/${type.toLowerCase()}.png`}
         alt={type}
-        className="w-5 h-5"
+        className="w-4 h-4"
         draggable={false}
       />
-      <span className="text-base">{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+      <span className="text-sm">{type.charAt(0).toUpperCase() + type.slice(1)}</span>
     </span>
   );
 }

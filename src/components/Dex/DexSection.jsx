@@ -7,6 +7,8 @@ function formatDexNumber(num) {
   return `#${String(num).padStart(4, "0")}`;
 }
 
+
+
 export default function DexSection({
   title,
   pokemonList,
@@ -84,6 +86,7 @@ export default function DexSection({
     const raf = requestAnimationFrame(() => setTransitionReady(true));
     return () => cancelAnimationFrame(raf);
   }, []);
+
 
   // Helpers for mobile interactions: tap = toggle caught, long-press = open sidebar
   const handleTouchStart = useCallback((e, poke) => {
@@ -173,6 +176,7 @@ export default function DexSection({
         <div className={`w-full h-1 rounded-full ${collapsed ? "mb-2" : "mb-6"}`} style={{ 
           background: `linear-gradient(to right, var(--border-color) 35%, var(--accent))`
         }}></div>
+
 
         <div 
           ref={contentRef}
@@ -330,15 +334,19 @@ export default function DexSection({
                             {/* Info button - only show in edit mode if onSelect is available, hide in read-only mode */}
                             {!readOnly && onSelect && (
                               <button
-                                className="absolute bottom-0 right-0 p-1 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 z-20 hidden md:block"
-                                style={{ color: 'var(--accent)' }}
+                                className="absolute bottom-0.5 right-0.5 p-0.25 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 z-20 hidden md:block"
+                                style={{ 
+                                  color: 'white',
+                                  backgroundColor: 'var(--accent)',
+                                  border: 'none'
+                                }}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   if (onSelect) onSelect(poke);
                                 }}
                                 aria-label={`Details for ${formatPokemonName(poke.name)}`}
                               >
-                                <Info size={16} />
+                                <Info size={20} strokeWidth={3} color="white" />
                               </button>
                             )}
 

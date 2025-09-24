@@ -27,6 +27,7 @@ if (
   return (
     <div className="evolution-chain-section">
       <div className="evo-chain-title">Evolution Chain</div>
+      <div className="evo-chain-divider"></div>
       <div className="evo-chain-none-wrapper">
         <EvoSprite
           mon={pokemon}
@@ -54,6 +55,7 @@ if (
   return (
     <div className="evolution-chain-section">
       <div className="evo-chain-title">Evolution Chain</div>
+      <div className="evo-chain-divider"></div>
       <div className="evo-chain-table">
         <EvoChainNode
           mon={base}

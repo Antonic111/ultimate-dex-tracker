@@ -376,7 +376,7 @@ html.dragging {
   margin: 140px auto;
   background-color: var(--progress-bg);
   transition: background-color var(--transition-speed);
-  padding: 20px 35px 15px 35px;
+  padding: 4px 15px 4px 15px;
   border-radius: 20px;
   box-shadow: 0 4px 12px #0006;
   max-height: 80vh;
@@ -448,14 +448,14 @@ html.dragging {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 20px;
-  margin-bottom: 10px;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
 }
 
 .modal-header h3 {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--text);
 }
 
 .modal-actions {
@@ -639,7 +639,9 @@ html.dragging {
   background: var(--progress-bg);
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  padding: 4px;
+  padding: 1px;
+  min-width: 22px;
+  min-height: 22px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1099,7 +1101,7 @@ html.dragging {
   min-height: auto; /* Allow container to shrink to content */
   height: auto; /* Let height be determined by content */
   position: relative;
-  padding: 10px 15px 15px 15px;
+  padding: 4px 15px 15px 15px;
   margin-bottom: 15px;
   border-bottom: 1px solid #444;
   flex: 0 1 auto; /* Don't grow, allow shrinking, auto basis */
@@ -1189,7 +1191,7 @@ html.dragging {
   }
 
   .modal-header h3 {
-    font-size: 1rem;
+    font-size: 1rem !important;
   }
 
   .modal-actions {

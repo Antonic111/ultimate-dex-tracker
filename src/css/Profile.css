@@ -405,7 +405,8 @@ button:focus {
   @apply w-24 h-24 flex justify-center items-center;
 }
 
-.pokemon-img {
+.profile-pokemon-box .pokemon-img,
+.recent-field .pokemon-img {
   @apply w-20 h-20 object-contain;
 }
 
@@ -703,7 +704,7 @@ button:focus {
     @apply w-12 h-12;
   }
   
-  .pokemon-img,
+  .profile-pokemon-box .pokemon-img,
   .game-img {
     @apply w-10 h-10;
   }
@@ -782,7 +783,7 @@ button:focus {
     @apply text-[0.55rem] px-0.5 py-0;
   }
   
-  .recent-field .pokemon-img {
+  .recent-field .profile-pokemon-box .pokemon-img {
     @apply w-12 h-12;
   }
   

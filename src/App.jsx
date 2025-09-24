@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { getCaughtKey, migrateOldCaughtData } from './caughtStorage';
 import { fetchCaughtData, updateCaughtData } from './api/caught';
+import { migrateHuntMethods } from './utils/migrateHuntMethods';
 import { authAPI } from './utils/api';
 import { debugAPI } from './utils/debug';
 
@@ -33,6 +34,7 @@ import { ThemeProvider } from "./components/Shared/ThemeContext";
 import './css/theme.css';
 // import './css/pageAnimations.css'; // Moved to backup folder
 import Trainers from "./pages/Trainers";
+import Counters from "./pages/Counters";
 import PublicProfile from "./pages/PublicProfile";
 import ViewDex from "./pages/ViewDex.jsx";
 import { LoadingProvider, useLoading } from "./components/Shared/LoadingContext";
@@ -312,12 +314,36 @@ export default function App() {
       return;
     }
 
-
-    // Check if user is authenticated
     try {
-      const userData = await authAPI.getCurrentUser();
-      
-      
+      // Mobile-specific: Add retry logic for initial auth check
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      let userData = null;
+      let authError = null;
+
+      if (isMobile) {
+        // Try up to 3 times on mobile with delays
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          try {
+            userData = await authAPI.getCurrentUser();
+            break; // Success, exit retry loop
+          } catch (error) {
+            authError = error;
+            if (attempt < 3) {
+              console.log(`Mobile auth attempt ${attempt} failed, retrying...`);
+              await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+            }
+          }
+        }
+      } else {
+        // Desktop: single attempt
+        try {
+          userData = await authAPI.getCurrentUser();
+        } catch (error) {
+          authError = error;
+        }
+      }
+
+      // Check if user is authenticated
       if (userData && userData.username) {
         // Preserve existing progress bars if the server response doesn't include them
         const existingProgressBars = user.progressBars || [];
@@ -331,42 +357,67 @@ export default function App() {
           ...userData,
           progressBars: finalProgressBars
         });
+      } else if (authError) {
+        // Handle authentication failure
+        console.log('Auth check failed:', authError.message);
+        
+        // For mobile devices, try a more robust fallback approach
+        if (isMobile) {
+          try {
+            let backupData = null;
+            
+            // Try localStorage first
+            const mobileBackup = localStorage.getItem('mobileUserBackup');
+            if (mobileBackup) {
+              backupData = JSON.parse(mobileBackup);
+            }
+            
+            // iOS fallback: Try sessionStorage if localStorage failed
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            if (!backupData && isIOS) {
+              const iosBackup = sessionStorage.getItem('iosUserBackup');
+              if (iosBackup) {
+                backupData = JSON.parse(iosBackup);
+              }
+            }
+            
+            if (backupData) {
+              const isRecent = (Date.now() - backupData.timestamp) < (2 * 60 * 60 * 1000); // 2 hours instead of 24
+              
+              // Only use backup if it has essential fields and is recent
+              if (isRecent && backupData.username && backupData.verified !== undefined) {
+                console.log('Using mobile backup data');
+                setUser(backupData);
+                
+                // Try to refresh the data in the background
+                setTimeout(async () => {
+                  try {
+                    const freshData = await authAPI.getCurrentUser();
+                    if (freshData && freshData.username) {
+                      console.log('Background refresh successful, updating user data');
+                      setUser(freshData);
+                    }
+                  } catch (refreshError) {
+                    console.log('Background refresh failed, keeping backup data');
+                  }
+                }, 1000);
+                
+                return; // Don't clear user data, use backup instead
+              }
+            }
+          } catch (backupError) {
+            console.log('Mobile backup failed:', backupError.message);
+          }
+        }
+        
+        // Clear user data if no valid backup or not mobile
+        setUser(null);
       } else {
         // Clear user data if not authenticated
         setUser(null);
       }
     } catch (error) {
-      // Clear user data on error
-      // Try mobile fallback from localStorage and sessionStorage (iOS)
-      try {
-        let backupData = null;
-        
-        // Try localStorage first
-        const mobileBackup = localStorage.getItem('mobileUserBackup');
-        if (mobileBackup) {
-          backupData = JSON.parse(mobileBackup);
-        }
-        
-        // iOS fallback: Try sessionStorage if localStorage failed
-        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-        if (!backupData && isIOS) {
-          const iosBackup = sessionStorage.getItem('iosUserBackup');
-          if (iosBackup) {
-            backupData = JSON.parse(iosBackup);
-          }
-        }
-        
-        if (backupData) {
-          const isRecent = (Date.now() - backupData.timestamp) < (24 * 60 * 60 * 1000); // 24 hours
-          
-          if (isRecent && backupData.username) {
-            setUser(backupData);
-            return; // Don't clear user data, use backup instead
-          }
-        }
-      } catch (backupError) {
-        // Silent fallback error handling
-      }
+      console.log('Auth check failed:', error.message);
       setUser(null);
     } finally {
       if (!silent) {
@@ -392,9 +443,14 @@ export default function App() {
     
     if (isMobile && newUserData && newUserData.username) {
       try {
-        // More aggressive backup for iOS
+        // Ensure we have all essential fields for backup
         const backupData = {
-          ...newUserData,
+          username: newUserData.username,
+          email: newUserData.email,
+          verified: newUserData.verified,
+          createdAt: newUserData.createdAt,
+          profileTrainer: newUserData.profileTrainer,
+          progressBars: newUserData.progressBars || [],
           timestamp: Date.now(),
           isIOS: isIOS
         };
@@ -406,8 +462,10 @@ export default function App() {
           sessionStorage.setItem('iosUserBackup', JSON.stringify(backupData));
         }
         
+        console.log('Mobile backup data stored successfully');
+        
       } catch (error) {
-        // Silent error handling for mobile backup
+        console.log('Mobile backup storage failed:', error.message);
       }
     }
     
@@ -544,10 +602,73 @@ useEffect(() => {
   useEffect(() => {
     if (!user?.username) return;
     fetchCaughtData(user.username).then(data => {
-      setCaughtInfoMap(data || {});
+      // Check if user needs migration - be more explicit about the check
+      let migratedData;
+      const needsMigration = user.huntMethodMigrationCompleted === false || user.huntMethodMigrationCompleted === undefined;
+      
+      // Additional check: prevent migration if already done in this session
+      const migrationKey = `migration_completed_${user.username}`;
+      const alreadyMigratedThisSession = localStorage.getItem(migrationKey);
+      
+      console.log(`Migration check for ${user.username}:`, {
+        huntMethodMigrationCompleted: user.huntMethodMigrationCompleted,
+        migrationVersion: user.migrationVersion,
+        needsMigration,
+        alreadyMigratedThisSession
+      });
+      
+      if (alreadyMigratedThisSession) {
+        console.log(`User ${user.username} already migrated in this session - skipping`);
+        migratedData = data || {};
+      } else if (needsMigration) {
+        console.log(`Migrating hunt methods for user: ${user.username} (migration status: ${user.huntMethodMigrationCompleted})`);
+        // Set localStorage flag immediately to prevent multiple runs
+        localStorage.setItem(migrationKey, 'true');
+        // Migrate hunt methods to new system if needed
+        migratedData = migrateHuntMethods(data || {});
+        
+        // Save migrated data back to database if changes were made
+        if (migratedData !== data) {
+          updateCaughtData(user.username, null, migratedData).then(() => {
+            // Mark migration as completed
+            authAPI.updateUser({ huntMethodMigrationCompleted: true, migrationVersion: "1.1" })
+              .then(() => {
+                console.log(`Migration completed for user: ${user.username}`);
+                localStorage.setItem(migrationKey, 'true');
+                // Update local user state to prevent re-migration
+                setUser(prevUser => ({
+                  ...prevUser,
+                  huntMethodMigrationCompleted: true,
+                  migrationVersion: "1.1"
+                }));
+              })
+              .catch(console.error);
+          }).catch(console.error);
+        } else {
+          // No data changes needed, but mark as migrated
+          authAPI.updateUser({ huntMethodMigrationCompleted: true, migrationVersion: "1.1" })
+            .then(() => {
+              console.log(`Migration marked as completed for user: ${user.username} (no data changes needed)`);
+              localStorage.setItem(migrationKey, 'true');
+              // Update local user state to prevent re-migration
+              setUser(prevUser => ({
+                ...prevUser,
+                huntMethodMigrationCompleted: true,
+                migrationVersion: "1.1"
+              }));
+            })
+            .catch(console.error);
+        }
+      } else {
+        // User already migrated, use existing data
+        console.log(`User ${user.username} already migrated (version: ${user.migrationVersion})`);
+        migratedData = data || {};
+      }
+      
+      setCaughtInfoMap(migratedData);
       const caughtMap = {};
-      for (const key in data) {
-        const info = data[key];
+      for (const key in migratedData) {
+        const info = migratedData[key];
         // Check if Pokemon is actually caught (has entries or is marked as caught)
         if (info && typeof info === 'object') {
           // New format: check if it has entries or is marked as caught
@@ -665,6 +786,40 @@ useEffect(() => {
       }
     }
   }, [caughtInfoMap, user?.username]);
+
+  // Listen for caught data changes from other components (like Counters page)
+  useEffect(() => {
+    const handleCaughtDataChanged = (event) => {
+      const { pokemon, caughtInfo, caughtKey } = event.detail;
+      console.log('App.jsx - Received caughtDataChanged event:', { pokemon, caughtInfo, caughtKey });
+      
+      // Update the caughtInfoMap with the new data
+      setCaughtInfoMap(prev => {
+        const updated = {
+          ...prev,
+          [caughtKey]: caughtInfo
+        };
+        console.log('App.jsx - Updated caughtInfoMap:', updated);
+        return updated;
+      });
+      
+      // Update the caught boolean map
+      setCaught(prev => {
+        const updated = {
+          ...prev,
+          [caughtKey]: true
+        };
+        console.log('App.jsx - Updated caught map:', updated);
+        return updated;
+      });
+    };
+
+    window.addEventListener('caughtDataChanged', handleCaughtDataChanged);
+    
+    return () => {
+      window.removeEventListener('caughtDataChanged', handleCaughtDataChanged);
+    };
+  }, []);
 
   // Prevent scrolling when reset modal is open
   useEffect(() => {
@@ -1344,6 +1499,7 @@ function CloseSidebarOnRouteChange() {
                 />
 
                 <Route path="/trainers" element={<Trainers />} />
+                <Route path="/counters" element={<Counters />} />
                 <Route path="/u/:username" element={<PublicProfile />} />
                 <Route path="/u/:username/dex" element={<ViewDex />} />
 

@@ -18,6 +18,151 @@ html, body {
   }
 }
 
+/* Mobile Header Styles */
+@media (max-width: 768px) {
+  /* Reduce header height and padding on mobile */
+  header {
+    height: 50px !important;
+    max-height: 50px !important;
+    padding-bottom: 42px !important;
+  }
+  
+  /* Make header container more flexible */
+  header > div {
+    height: 50px !important;
+    max-height: 50px !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  
+  /* Scale down logo on mobile */
+  header img {
+    height: 35px !important;
+    max-width: 160px !important;
+  }
+  
+  /* Make navigation more compact but readable */
+  header nav {
+    gap: 0.375rem !important;
+    margin-left: 0.75rem !important;
+    margin-right: 0.75rem !important;
+  }
+  
+  /* Scale down navigation buttons but keep them readable */
+  header nav a {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.7rem !important;
+  }
+  
+  /* Scale down navigation icons */
+  header nav svg {
+    width: 8px !important;
+    height: 8px !important;
+  }
+  
+  /* Make user section more compact */
+  header .ml-auto {
+    margin-left: 0.25rem !important;
+  }
+  
+  /* Scale down user text but keep readable */
+  header .text-\[7px\] {
+    font-size: 0.6rem !important;
+  }
+  
+  header .text-\[10px\] {
+    font-size: 0.7rem !important;
+  }
+  
+  /* Scale down profile image */
+  header img[alt="Profile"] {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  /* Adjust dropdown positioning */
+  header .absolute {
+    top: calc(100% + 10px) !important;
+    right: 0 !important;
+    min-width: 120px !important;
+  }
+}
+
+/* Extra small mobile styles */
+@media (max-width: 480px) {
+  /* More compact header but still readable */
+  header {
+    height: 45px !important;
+    max-height: 45px !important;
+    padding-bottom: 42px !important;
+  }
+  
+  header > div {
+    height: 45px !important;
+    max-height: 45px !important;
+    padding-left: 0.375rem !important;
+    padding-right: 0.375rem !important;
+  }
+  
+  /* Smaller logo */
+  header img {
+    height: 30px !important;
+    max-width: 140px !important;
+  }
+  
+  /* Tighter navigation but still usable */
+  header nav {
+    gap: 0.25rem !important;
+    margin-left: 0.5rem !important;
+    margin-right: 0.5rem !important;
+  }
+  
+  /* Smaller navigation buttons but readable */
+  header nav a {
+    padding: 0.125rem 0.375rem !important;
+    font-size: 0.65rem !important;
+    transform: translateY(-3px) !important;
+  }
+  
+  /* Smaller navigation icons */
+  header nav svg {
+    width: 6px !important;
+    height: 6px !important;
+  }
+  
+  /* Smaller user text but readable */
+  header .text-\[7px\] {
+    font-size: 0.55rem !important;
+  }
+  
+  header .text-\[10px\] {
+    font-size: 0.65rem !important;
+  }
+  
+  /* Smaller profile image */
+  header img[alt="Profile"] {
+    width: 35px !important;
+    height: 35px !important;
+  }
+  
+  /* Adjust user section spacing */
+  header .flex.items-center.gap-3 {
+    gap: 0.5rem !important;
+  }
+  
+  /* Smaller dropdown but usable */
+  header .absolute {
+    min-width: 110px !important;
+    font-size: 0.8rem !important;
+  }
+  
+  header .absolute a,
+  header .absolute button {
+    padding: 0.375rem 0.625rem !important;
+    font-size: 0.8rem !important;
+  }
+}
+
 /* Page Animation Classes */
 .page-animate-1 {
   opacity: 0;
@@ -149,6 +294,7 @@ html, body {
     margin: 0 auto;
   }
 }
+
 
 /* Mobile Keyboard Handling */
 @media (max-width: 768px) {

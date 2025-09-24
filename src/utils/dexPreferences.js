@@ -20,6 +20,11 @@ export const filterFormsByPreferences = (forms, preferences) => {
             return false;
         }
         
+        // Special case: Pokemon with "-alpha" in their name should be treated as Alpha forms
+        if (form.name && form.name.toLowerCase().includes('-alpha')) {
+            return preferences.showAlphaForms;
+        }
+        
         switch (formType) {
             case 'gender':
                 return preferences.showGenderForms;

@@ -1,0 +1,2156 @@
+.counters-page {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.page-title {
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  position: relative;
+  color: var(--text-color);
+  text-align: left;
+}
+
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.search-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 300px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent);
+  z-index: 1;
+}
+
+.pokemon-search {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--background);
+  color: var(--text);
+  transition: all 0.2s ease;
+}
+
+.pokemon-search:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.1);
+}
+
+/* Active Hunts Section */
+.active-hunts-section {
+  margin-bottom: 3rem;
+}
+
+.active-hunts-section h2 {
+  font-size: 1.8rem;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+.hunts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.hunt-card {
+  background: var(--card-background);
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+
+.hunt-card:hover {
+  border-color: var(--accent-hover);
+}
+
+.hunt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0 1rem;
+  background: var(--searchbar-bg);
+  border-radius: 12px;
+  min-height: 100px;
+}
+
+.hunt-pokemon {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  flex: 0 0 auto;
+}
+
+.hunt-pokemon-image {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transition: transform 0.3s ease;
+}
+
+
+.hunt-info {
+  flex: 1;
+}
+
+.hunt-pokemon-info h3 {
+  font-size: 1.1rem;
+  font-weight: 950;
+  color: var(--text);
+  margin: 0;
+}
+
+.hunt-pokemon-form {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.hunt-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  margin: 0 1rem;
+}
+
+.hunt-detail-item {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 0.3rem 0.5rem;
+  background: #2a2a2a;
+  border-radius: 6px;
+  border-left: 3px solid var(--accent);
+}
+
+.hunt-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.hunt-delete-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hunt-delete-btn:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+}
+
+.hunt-reset-btn {
+  background: #f59e0b; /* Orange color for reset button */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hunt-reset-btn:hover {
+  background: #d97706;
+  transform: scale(1.05);
+}
+
+.hunt-settings-btn {
+  background: #8b5cf6; /* Purple color for settings button */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hunt-settings-btn:hover {
+  background: #7c3aed;
+  transform: scale(1.05);
+}
+
+.hunt-info-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hunt-info-btn:hover {
+  background: #2563eb;
+  transform: scale(1.05);
+}
+
+.hunt-checks {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  background: var(--searchbar-bg);
+  border-radius: 12px;
+  gap: 0.25rem;
+}
+
+.checks-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  min-width: 6rem;
+}
+
+.timer-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  align-items: flex-start;
+  width: 6rem;
+  padding: 0.5rem;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.total-time {
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.last-check-time {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.checks-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  width: 6rem;
+}
+
+.checks-label {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.checks-count {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.25rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.8rem;
+  width: 6rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.pause-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.pause-btn svg {
+  stroke-width: 2.5;
+}
+
+.pause-btn:hover {
+  background: var(--accent-hover, #f59e0b);
+  transform: translateY(-2px) scale(1.05);
+}
+
+.add-check-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  opacity: 1;
+}
+
+.add-check-btn svg {
+  stroke-width: 2.5;
+}
+
+.add-check-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+}
+
+.add-check-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.add-check-btn:disabled:hover {
+  transform: none;
+}
+
+.hunt-complete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.hunt-odds-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--searchbar-bg);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.odds-label {
+  font-weight: 500;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.odds-value {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--accent);
+}
+
+.complete-hunt-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.complete-hunt-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* Pokemon Grid Section */
+.pokemon-grid-section {
+  margin-top: 2rem;
+}
+
+.pokemon-grid-section h2 {
+  font-size: 1.8rem;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+.pokemon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.pokemon-card {
+  background: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pokemon-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: var(--accent);
+}
+
+
+
+.pokemon-types {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+
+/* Hunt Modal Backdrop - Matching Pokemon Modal */
+.hunt-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  margin: 0;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.hunt-modal-backdrop.closing {
+  animation: fadeOut 0.3s ease-in forwards;
+  pointer-events: none;
+}
+
+.hunt-modal {
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  max-width: 400px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 10000;
+  opacity: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--searchbar-dropdown);
+  animation: slideIn 0.3s ease-out;
+}
+
+.hunt-modal.closing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+.hunt-modal::-webkit-scrollbar {
+  width: 12px;
+}
+
+.hunt-modal::-webkit-scrollbar-track {
+  background: var(--searchbar-dropdown);
+  border-radius: 4px;
+}
+
+.hunt-modal::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+  border: 1px solid var(--searchbar-dropdown);
+}
+
+.hunt-modal::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover);
+}
+
+.hunt-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+}
+
+.hunt-pokemon-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.hunt-pokemon-image-container {
+  position: relative;
+  background: var(--sidebar-pokemon-bg);
+  border-radius: 50%;
+  padding: 0;
+  border: 4px solid var(--accent);
+}
+
+.hunt-pokemon-image {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Hunt Modal Specific Styles */
+.hunt-modal .hunt-pokemon-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.hunt-pokemon-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hunt-pokemon-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--accent);
+  margin: 0;
+  text-shadow: 0 4px 1px rgba(0,0,0,0.8);
+}
+
+.hunt-pokemon-number {
+  font-size: 0.875rem;
+  color: var(--sidebar-text);
+  opacity: 0.95;
+  margin: 0;
+}
+
+.hunt-pokemon-form {
+  font-size: 0.875rem;
+  color: var(--sidebar-text);
+  opacity: 0.95;
+  margin: -0.1rem 0 0 0;
+  text-transform: capitalize;
+  line-height: 1;
+}
+
+/* Modifiers Section */
+.modifiers-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.modifier-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--sidebar-text);
+}
+
+.modifier-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+/* Odds Display */
+.odds-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: var(--sidebar-edit-inputs);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+.odds-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-align: center;
+}
+
+.odds-percentage {
+  font-size: 0.8rem;
+  color: var(--sidebar-text);
+  opacity: 0.8;
+}
+
+/* Ultra Wormhole Odds */
+.ultra-wormhole-odds {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.ultra-wormhole-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.ultra-wormhole-base {
+  color: #10b981;
+  background: var(--searchbar-bg);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #10b981;
+  width: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ultra-wormhole-separator {
+  color: var(--sidebar-text);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.ultra-wormhole-max {
+  color: #10b981;
+  background: var(--searchbar-bg);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #10b981;
+  width: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ultra-wormhole-note {
+  text-align: center;
+}
+
+.ultra-wormhole-note-text {
+  font-size: 0.875rem;
+  color: var(--sidebar-text);
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* KO Method Odds Chart */
+.ko-method-odds {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: -0.75rem;
+  width: calc(100% + 1.5rem);
+}
+
+.ko-odds-header {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.ko-odds-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.ko-odds-table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--accent);
+  color: white;
+}
+
+.ko-odds-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--searchbar-bg);
+  border-top: 1px solid var(--border-color);
+}
+
+.ko-odds-table-row:nth-child(even) {
+  background: var(--sidebar-edit-inputs);
+}
+
+.ko-odds-cell {
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sidebar-text);
+  border-right: 1px solid var(--border-color);
+}
+
+.ko-odds-note {
+  text-align: center;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+  padding: 0 0.75rem;
+}
+
+.ko-odds-note-text {
+  font-size: 0.75rem;
+  color: var(--sidebar-text);
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.ko-odds-cell:last-child {
+  border-right: none;
+}
+
+.ko-odds-table-header .ko-odds-cell {
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+/* Poke Radar Odds Table */
+.pokeradar-odds {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: -0.75rem;
+  width: calc(100% + 1.5rem);
+}
+
+.pokeradar-odds-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.pokeradar-odds-table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--accent);
+  color: white;
+}
+
+.pokeradar-odds-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--searchbar-bg);
+  border-top: 1px solid var(--border-color);
+}
+
+.pokeradar-odds-table-row:nth-child(even) {
+  background: var(--sidebar-edit-inputs);
+}
+
+.pokeradar-odds-cell {
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sidebar-text);
+  border-right: 1px solid var(--border-color);
+}
+
+.pokeradar-odds-cell:last-child {
+  border-right: none;
+}
+
+.pokeradar-odds-table-header .pokeradar-odds-cell {
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+/* Chain Fishing Odds Table */
+.chainfishing-odds {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: -0.75rem;
+  width: calc(100% + 1.5rem);
+}
+
+.chainfishing-odds-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.chainfishing-odds-table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--accent);
+  color: white;
+}
+
+.chainfishing-odds-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--searchbar-bg);
+  border-top: 1px solid var(--border-color);
+}
+
+.chainfishing-odds-table-row:nth-child(even) {
+  background: var(--sidebar-edit-inputs);
+}
+
+.chainfishing-odds-cell {
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sidebar-text);
+  border-right: 1px solid var(--border-color);
+}
+
+.chainfishing-odds-cell:last-child {
+  border-right: none;
+}
+
+.chainfishing-odds-table-header .chainfishing-odds-cell {
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+/* Horde Encounters Odds */
+.horde-encounters-odds {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.horde-encounters-note {
+  text-align: center;
+}
+
+.horde-encounters-note-text {
+  font-size: 0.75rem;
+  color: var(--sidebar-text);
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* DexNav Odds Table */
+.dexnav-odds {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: -0.75rem;
+  width: calc(100% + 1.5rem);
+}
+
+.dexnav-odds-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.dexnav-odds-table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--accent);
+  color: white;
+}
+
+.dexnav-odds-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--searchbar-bg);
+  border-top: 1px solid var(--border-color);
+}
+
+.dexnav-odds-table-row:nth-child(even) {
+  background: var(--sidebar-edit-inputs);
+}
+
+.dexnav-odds-cell {
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sidebar-text);
+  border-right: 1px solid var(--border-color);
+}
+
+.dexnav-odds-cell:last-child {
+  border-right: none;
+}
+
+.dexnav-odds-table-header .dexnav-odds-cell {
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.dexnav-odds-note {
+  text-align: center;
+  margin-top: 0.125rem;
+  padding: 0 0.75rem 0.5rem 0.75rem;
+}
+
+.dexnav-odds-note-text {
+  font-size: 0.75rem;
+  color: var(--sidebar-text);
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* SOS Odds Table */
+.sos-odds {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: -0.75rem;
+  width: calc(100% + 1.5rem);
+}
+
+.sos-odds-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.sos-odds-table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--accent);
+  color: white;
+}
+
+.sos-odds-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--searchbar-bg);
+  border-top: 1px solid var(--border-color);
+}
+
+.sos-odds-table-row:nth-child(even) {
+  background: var(--sidebar-edit-inputs);
+}
+
+.sos-odds-cell {
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sidebar-text);
+  border-right: 1px solid var(--border-color);
+}
+
+.sos-odds-cell:last-child {
+  border-right: none;
+}
+
+.sos-odds-table-header .sos-odds-cell {
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+/* Catch Combo Odds Table */
+.catchcombo-odds {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: -0.75rem;
+  width: calc(100% + 1.5rem);
+}
+
+.catchcombo-odds-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.catchcombo-odds-table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--accent);
+  color: white;
+}
+
+.catchcombo-odds-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--searchbar-bg);
+  border-top: 1px solid var(--border-color);
+}
+
+.catchcombo-odds-table-row:nth-child(even) {
+  background: var(--sidebar-edit-inputs);
+}
+
+.catchcombo-odds-cell {
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sidebar-text);
+  border-right: 1px solid var(--border-color);
+}
+
+.catchcombo-odds-cell:last-child {
+  border-right: none;
+}
+
+.catchcombo-odds-table-header .catchcombo-odds-cell {
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+/* Mass Outbreak Odds Table */
+.massoutbreak-odds {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: -0.75rem;
+  width: calc(100% + 1.5rem);
+}
+
+.massoutbreak-odds-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.massoutbreak-odds-table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--accent);
+  color: white;
+}
+
+.massoutbreak-odds-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--searchbar-bg);
+  border-top: 1px solid var(--border-color);
+}
+
+.massoutbreak-odds-table-row:nth-child(even) {
+  background: var(--sidebar-edit-inputs);
+}
+
+.massoutbreak-odds-cell {
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sidebar-text);
+  border-right: 1px solid var(--border-color);
+}
+
+.massoutbreak-odds-cell:last-child {
+  border-right: none;
+}
+
+.massoutbreak-odds-table-header .massoutbreak-odds-cell {
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+/* No Hunt Data Message */
+.no-hunt-data-message {
+  padding: 1rem;
+  background: var(--sidebar-edit-inputs);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.no-hunt-data-message p {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  color: var(--sidebar-text);
+}
+
+.no-hunt-data-message p:first-child {
+  font-weight: 500;
+  color: var(--accent);
+}
+
+
+.hunt-modal-content {
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Available Games Section */
+.available-games-section {
+  padding-bottom: 1.5rem;
+}
+
+.available-games-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--sidebar-text);
+  margin: 0 0 0.75rem 0;
+}
+
+.available-games-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.game-tag {
+  background: var(--accent);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 1), 0 2px 4px rgba(0, 0, 0, 1), 0 3px 8px rgba(0, 0, 0, 1), 0 -1px 2px rgba(0, 0, 0, 1), 0 -2px 4px rgba(0, 0, 0, 1), 0 -3px 8px rgba(0, 0, 0, 1);
+}
+
+.hunt-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hunt-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hunt-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--sidebar-text);
+  margin: 0;
+}
+
+/* Close button positioning for hunt modal */
+.hunt-modal-header .close-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  margin: 0;
+  padding: 0.5rem;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: var(--searchbar-bg);
+  color: var(--text);
+}
+
+.modal-content {
+  padding: 1.5rem;
+}
+
+.hunt-details-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.form-group select,
+.form-group textarea {
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--background);
+  color: var(--text);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+  justify-content: flex-end;
+}
+
+.cancel-btn {
+  background: var(--searchbar-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.cancel-btn:hover {
+  background: var(--border);
+}
+
+.start-hunt-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.start-hunt-btn:hover {
+  background: var(--accent);
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+/* Add Hunt Card */
+.add-hunt-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 360px;
+  background: var(--pokemon-box-bg);
+  border: 2px dashed var(--accent);
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.add-hunt-card:hover {
+  background: var(--pokemon-box-bg2);
+  border-color: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.add-hunt-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, var(--accent) 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.add-hunt-card:hover::before {
+  opacity: 0.1;
+}
+
+.add-hunt-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.add-hunt-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  background: var(--accent);
+  border-radius: 50%;
+  color: black;
+  transition: all 0.3s ease;
+}
+
+.add-hunt-card:hover .add-hunt-icon {
+  background: var(--accent-hover);
+  color: var(--text);
+  transform: scale(1.1);
+}
+
+.add-hunt-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.add-hunt-content p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  opacity: 0.8;
+}
+
+
+/* Pokemon Selection Modal - Exact copy from Favorite Modal */
+.pokemon-grid {
+  --fav-size: 90px;
+  --fav-gap: 10px;
+}
+/* Backdrop */
+.pokemon-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.pokemon-modal-backdrop.closing {
+  animation: fadeOut 0.3s ease-in forwards;
+  pointer-events: none;
+}
+
+.pokemon-modal {
+  height: 65vh;
+  max-height: 65vh;
+  width: 85%;
+  max-width: 650px;
+  background-color: var(--profile-modal-bg);
+  transition: background-color var(--transition-speed );
+  border-radius: 12px;
+  padding: 18px;
+  position: relative;
+  animation: slideIn 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pokemon-modal.closing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+.pokemon-modal-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative; /* for hover preview positioning */
+}
+
+.pokemon-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  flex-shrink: 0;
+}
+
+.pokemon-modal-header h2 {
+  font-size: 1.4rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.close-btn .sidebar-close-icon svg {
+  
+  transition: transform 0.18s, filter 0.18s;
+}
+
+.close-btn:hover .sidebar-close-icon svg,
+.close-btn:focus .sidebar-close-icon svg {
+  transform: scale(1.13) rotate(-17deg);
+  filter: drop-shadow(0 0 6px #ffffff77);
+}
+
+.close-btn:focus,
+.close-btn:active {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Scrollable Grid Section - Desktop Default */
+.pokemon-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 90px);
+  gap: 10px;
+  padding: 8px 16px 8px 0px;
+  margin-left: -8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+  align-items: start;
+  align-content: start;
+  justify-items: center;
+  justify-content: start;
+  scrollbar-gutter: stable both-edges;
+  scrollbar-width: auto;
+  grid-auto-rows: 90px;
+}
+
+/* Use the same scrollbar styling as dropdowns */
+.pokemon-grid {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--searchbar-dropdown);
+}
+
+.pokemon-grid::-webkit-scrollbar {
+  width: 12px;
+}
+
+.pokemon-grid::-webkit-scrollbar-track {
+  background: var(--searchbar-dropdown);
+  border-radius: 4px;
+}
+
+.pokemon-grid::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+  border: 1px solid var(--searchbar-dropdown);
+}
+
+.pokemon-grid::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover);
+}
+
+.pokemon-item {
+  background: var(--profile-modal-boxes);
+  transition: background var(--transition-speed );
+  box-shadow: 0 3px 5px #000b;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  padding: 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 90px;
+  max-height: 90px;
+  overflow: hidden;
+  width: 90px;
+  min-width: 90px;
+}
+
+.pokemon-item:hover {
+  background: var(--profile-modal-boxes-hover);
+}
+
+.pokemon-item.selected {
+  border-color: var(--accent);
+}
+
+.pokemon-img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  margin-bottom: 4px;
+  border-radius: 4px;
+}
+
+.pokemon-label {
+  font-size: 0.75rem;
+  color: var(--profile-text);
+  transition: color var(--transition-speed );
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.pokemon-form {
+  font-size: 0.55rem;
+  color: var(--accent);
+  font-weight: 500;
+  text-transform: capitalize;
+  margin-top: 1px;
+  line-height: 1.1;
+  flex-shrink: 0;
+}
+
+.pokemon-modal-search-row {
+  display: flex;
+  align-items: center;
+  margin: 6px 0 8px;
+  width: 100%;
+  flex-shrink: 0;
+  border-bottom: 2px solid #333;
+  padding-bottom: 8px;
+}
+
+.pokemon-modal-search-row input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 2px solid #444;
+  background-color: var(--profile-modal-search-bg);
+  transition: background-color var(--transition-speed);
+  color: #eee;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+
+.pokemon-modal-search-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.pokemon-modal-search-row input::placeholder {
+  color: var(--searchbar-placeholder-text);
+}
+
+/* Mobile Responsive Styles - Exact copy from Favorite Modal */
+@media (max-width: 768px) {
+  .pokemon-modal {
+    width: 95%;
+    max-width: 95vw;
+    height: 80vh;
+    max-height: 80vh;
+    padding: 15px;
+  }
+  
+  .pokemon-grid {
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    gap: 8px;
+    padding: 8px 8px 8px 0px;
+    margin-left: 0;
+    grid-auto-rows: 70px;
+  }
+  
+  .pokemon-item {
+    height: 70px;
+    max-height: 70px;
+    width: 70px;
+    min-width: 70px;
+  }
+  
+  .pokemon-img {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .pokemon-label {
+    font-size: 0.55rem;
+  }
+  
+  .pokemon-form {
+    font-size: 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pokemon-modal {
+    width: 98%;
+    max-width: 98vw;
+    padding: 12px;
+  }
+  
+  .pokemon-grid {
+    grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
+    gap: 6px;
+    padding: 8px 8px 8px 0px;
+    margin-left: 0;
+    grid-auto-rows: 65px;
+  }
+  
+  .pokemon-item {
+    height: 65px;
+    max-height: 65px;
+    width: 65px;
+    min-width: 65px;
+  }
+  
+  .pokemon-img {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .pokemon-label {
+    font-size: 0.5rem;
+  }
+  
+  .pokemon-form {
+    font-size: 0.35rem;
+  }
+}
+
+.hunt-modal-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: 1px solid var(--border-color);
+  padding: 1.5rem;
+  flex-shrink: 0;
+}
+
+.hunt-start-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--accent);
+  color: black;
+  font-weight: bold;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.hunt-start-btn:hover {
+  background: var(--accent-hover);
+  color: white;
+  transform: scale(1.05);
+}
+
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.app-divider {
+  height: 4px;
+  width: 100%;
+  margin: 1rem 0 2rem 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--dividers) 30%, var(--accent) 100%);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .counters-page {
+    padding: 15px;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+  }
+  
+  .pokemon-card {
+    padding: 0.75rem;
+  }
+  
+  
+  .hunts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .hunt-card {
+    padding: 1rem;
+  }
+  
+  .hunt-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  
+  .hunt-pokemon {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .hunt-actions {
+    flex: 0 0 auto;
+    transform: scale(0.9);
+  }
+  
+  .hunt-pokemon-image {
+    width: 90px;
+    height: 90px;
+  }
+  
+  /* Ensure hunt details don't interfere with button layout */
+  .hunt-details {
+    margin: 0;
+    flex: 1;
+  }
+  
+  /* Mobile hunt-checks adjustments */
+  .hunt-checks {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    flex-wrap: wrap;
+  }
+  
+  .checks-display {
+    width: auto;
+    flex-shrink: 0;
+    order: 1;
+  }
+  
+  .checks-count {
+    font-size: 1.6rem;
+    width: 3.5rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .timer-display {
+    width: auto;
+    margin-left: 0;
+    align-items: flex-start;
+    text-align: left;
+    flex-shrink: 0;
+    min-width: 4rem;
+    order: 2;
+  }
+  
+  .checks-buttons {
+    min-width: auto;
+    flex-shrink: 0;
+    gap: 0.5rem;
+    order: 3;
+    margin-left: auto;
+  }
+  
+  .pause-btn,
+  .add-check-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .hunt-complete {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .hunt-odds-display {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .complete-hunt-btn {
+    width: 100%;
+  }
+  
+  /* Mobile add-hunt-card adjustments */
+  .add-hunt-card {
+    min-height: 280px;
+  }
+  
+  .add-hunt-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .add-hunt-content h3 {
+    font-size: 1.1rem;
+  }
+  
+  .search-input-wrap {
+    min-width: 100%;
+  }
+  
+  .search-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .modal-overlay {
+    padding: 0.5rem;
+  }
+  
+  .hunt-modal {
+    max-height: 95vh;
+  }
+  
+  .modal-header,
+  .modal-content,
+  .modal-footer {
+    padding: 1rem;
+  }
+  
+  
+  .pokemon-modal {
+    width: 95%;
+    height: 70vh;
+    max-height: 70vh;
+    padding: 15px;
+  }
+  
+  
+  
+  .empty-state {
+    min-height: 300px;
+    padding: 1rem;
+  }
+  
+  .empty-state-content h3 {
+    font-size: 1.25rem;
+  }
+  
+  .empty-state-content p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Additional mobile styles for very small screens */
+@media (max-width: 480px) {
+  .hunt-header {
+    gap: 0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  .hunt-pokemon {
+    min-width: 100px;
+    max-width: 120px;
+  }
+  
+  .hunt-pokemon-image {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .hunt-pokemon-name {
+    font-size: 0.6rem !important;
+    line-height: 1.0 !important;
+    word-break: break-word !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+  
+  .hunt-pokemon-info h3 {
+    font-size: 0.95rem !important;
+    line-height: 1.1 !important;
+    word-break: break-word !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+  
+  .hunt-actions {
+    gap: 0.25rem;
+    transform: scale(0.85) !important;
+  }
+  
+  .hunt-delete-btn,
+  .hunt-reset-btn,
+  .hunt-settings-btn,
+  .hunt-info-btn {
+    padding: 5px !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+  }
+  
+  .hunt-delete-btn svg,
+  .hunt-reset-btn svg,
+  .hunt-settings-btn svg,
+  .hunt-info-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  
+  /* Extra small screen hunt-checks adjustments */
+  .hunt-checks {
+    padding: 0.5rem;
+    gap: 0.25rem;
+  }
+  
+  .checks-count {
+    font-size: 1.4rem;
+    width: 3rem;
+    padding: 0.15rem 0.3rem;
+  }
+  
+  .timer-display {
+    min-width: 3.5rem;
+    font-size: 0.7rem;
+  }
+  
+  .pause-btn,
+  .add-check-btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+  }
+  
+  .checks-buttons {
+    gap: 0.25rem;
+  }
+  
+  /* Extra small screen add-hunt-card adjustments */
+  .add-hunt-card {
+    min-height: 240px;
+  }
+  
+  .add-hunt-icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .add-hunt-content h3 {
+    font-size: 1rem;
+  }
+}
+
+/* Active Hunt Styling */
+.pokemon-item.hunt-active {
+  background: linear-gradient(135deg, #00d4aa 0%, #00a8cc 100%); /* Teal gradient for active hunts */
+  border-color: #00a8cc; /* Teal border */
+  box-shadow: 0 4px 12px rgba(0, 212, 170, 0.3);
+}
+
+.pokemon-item.hunt-active:hover {
+  background: linear-gradient(135deg, #00a8cc 0%, #00d4aa 100%); /* Reversed teal gradient on hover */
+  box-shadow: 0 6px 16px rgba(0, 212, 170, 0.4);
+}
+
+/* Pokemon Go Random Encounters Note */
+.pokemon-go-random-odds {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pokemon-go-random-note {
+  text-align: center;
+  margin-top: 0.5rem;
+  padding: 0 0.75rem 0.5rem 0.75rem;
+}
+
+.pokemon-go-random-note-text {
+  font-size: 0.75rem;
+  color: var(--sidebar-text);
+  opacity: 0.8;
+  font-style: italic;
+}

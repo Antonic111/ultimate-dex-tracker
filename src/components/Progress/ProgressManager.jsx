@@ -76,11 +76,35 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
     const prevContextSavedBars = useRef(contextSavedBars);
     
     // Initialize bars based on whether we have override data or not
-    const initialBars = Array.isArray(progressBarsOverride) 
-        ? (progressBarsOverride.length > 0 ? progressBarsOverride : DEFAULT_BARS)
-        : (contextSavedBars.length > 0 ? contextSavedBars : DEFAULT_BARS);
+    const getInitialBars = () => {
+        const savedBars = Array.isArray(progressBarsOverride) 
+            ? (progressBarsOverride.length > 0 ? progressBarsOverride : DEFAULT_BARS)
+            : (contextSavedBars.length > 0 ? contextSavedBars : DEFAULT_BARS);
+        
+        // Apply __locked logic to initial bars
+        return savedBars.map((bar) => {
+            // Check if this bar matches any template preset by multiple criteria
+            const isTemplate = TEMPLATE_PRESETS.some((tpl) => {
+                // Match by tally type
+                if (bar.filters?.tally && tpl.filters?.tally === bar.filters.tally) {
+                    return true;
+                }
+                // Match by name (fallback for existing bars)
+                if (bar.name === tpl.name) {
+                    return true;
+                }
+                return false;
+            });
+            
+            // If it's already marked as locked or matches a template, keep it locked
+            const shouldBeLocked = bar.__locked === true || isTemplate;
+            
+            
+            return { ...bar, __locked: shouldBeLocked };
+        });
+    };
     
-    const [bars, setBars] = useState(initialBars);
+    const [bars, setBars] = useState(getInitialBars());
     const [editingBars, setEditingBars] = useState([]); // New state for editing
     const [deleteModal, setDeleteModal] = useState({ show: false, index: null, barName: '' });
     const [deleteModalClosing, setDeleteModalClosing] = useState(false);
@@ -145,10 +169,24 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
         
         if (savedBars && savedBars.length > 0) {
             const withLocked = savedBars.map((bar) => {
-                const isTemplate = TEMPLATE_PRESETS.some(
-                    (tpl) => bar.filters?.tally && tpl.filters?.tally === bar.filters.tally
-                );
-                return isTemplate ? { ...bar, __locked: true } : bar;
+                // Check if this bar matches any template preset by multiple criteria
+                const isTemplate = TEMPLATE_PRESETS.some((tpl) => {
+                    // Match by tally type
+                    if (bar.filters?.tally && tpl.filters?.tally === bar.filters.tally) {
+                        return true;
+                    }
+                    // Match by name (fallback for existing bars)
+                    if (bar.name === tpl.name) {
+                        return true;
+                    }
+                    return false;
+                });
+                
+                // If it's already marked as locked or matches a template, keep it locked
+                const shouldBeLocked = bar.__locked === true || isTemplate;
+                
+                
+                return { ...bar, __locked: shouldBeLocked };
             });
             setBars(withLocked);
         } else if (Array.isArray(progressBarsOverride) && progressBarsOverride.length === 0) {
@@ -188,6 +226,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             name: bar.name,
             visible: bar.visible,
             filters: bar.filters || {}, // ✅ ENSURE FILTERS IS INCLUDED
+            __locked: bar.__locked || false, // ✅ PRESERVE LOCKED STATUS
         }));
 
         try {
@@ -209,12 +248,33 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
     useEffect(() => {
         const body = document.body;
         if (showSettings) {
+            // Store current scroll position
+            const scrollY = window.scrollY;
+            
+            // Prevent scrolling
             body.style.overflow = 'hidden';
+            body.style.position = 'fixed';
+            body.style.top = `-${scrollY}px`;
+            body.style.width = '100%';
         } else {
+            // Restore scrolling
+            const scrollY = body.style.top;
             body.style.overflow = '';
+            body.style.position = '';
+            body.style.top = '';
+            body.style.width = '';
+            
+            // Restore scroll position
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY || '0') * -1);
+            }
         }
         return () => {
+            // Cleanup
             body.style.overflow = '';
+            body.style.position = '';
+            body.style.top = '';
+            body.style.width = '';
         };
     }, [showSettings]);
 
@@ -294,7 +354,11 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             const allMarkValues = new Set(MARK_OPTIONS.map((m) => m.value).filter(Boolean));
             const foundMarks = new Set();
 
-            Object.values(caughtMap).forEach((data) => {
+            Object.entries(caughtMap).forEach(([key, data]) => {
+                // Only count entries that match the current shiny state
+                const isShinyKey = key.includes('_shiny') || key.endsWith('_true');
+                if (isShinyKey !== showShiny) return;
+                
                 if (data && data.entries && Array.isArray(data.entries)) {
                     // New format: extract from entries array
                     data.entries.forEach(entry => {
@@ -315,7 +379,11 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             const allBallValues = new Set(BALL_OPTIONS.map((b) => b.value).filter(Boolean));
             const foundBalls = new Set();
 
-            Object.values(caughtMap).forEach((data) => {
+            Object.entries(caughtMap).forEach(([key, data]) => {
+                // Only count entries that match the current shiny state
+                const isShinyKey = key.includes('_shiny') || key.endsWith('_true');
+                if (isShinyKey !== showShiny) return;
+                
                 if (data && data.entries && Array.isArray(data.entries)) {
                     // New format: extract from entries array
                     data.entries.forEach(entry => {
@@ -336,7 +404,11 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             const allGameValues = new Set(GAME_OPTIONS.map((g) => g.value).filter(Boolean));
             const foundGames = new Set();
 
-            Object.values(caughtMap).forEach((data) => {
+            Object.entries(caughtMap).forEach(([key, data]) => {
+                // Only count entries that match the current shiny state
+                const isShinyKey = key.includes('_shiny') || key.endsWith('_true');
+                if (isShinyKey !== showShiny) return;
+                
                 if (data && data.entries && Array.isArray(data.entries)) {
                     // New format: extract from entries array
                     data.entries.forEach(entry => {
@@ -459,8 +531,18 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
             {!readOnly && showSettings && (
                 createPortal(
-                <div className={`progress-modal-overlay${closing ? " closing" : ""}`}>
-                    <div className={`progress-modal-panel${closing ? " closing" : ""}`}>
+                <div 
+                    className={`progress-modal-overlay${closing ? " closing" : ""}`}
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) {
+                            handleCloseModal();
+                        }
+                    }}
+                >
+                    <div 
+                        className={`progress-modal-panel${closing ? " closing" : ""}`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="modal-header">
                             <h3>Edit Progress Bars</h3>
                             <div className="modal-actions">

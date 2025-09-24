@@ -153,24 +153,74 @@
 
 .random-cards-container {
   @apply relative w-96 h-96;
+  min-height: 384px;
 }
 
 .random-card {
-  @apply absolute w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-bold;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  animation: float 3s ease-in-out infinite;
-  transform: translate(-50%, -50%);
+  @apply absolute rounded-xl flex items-center justify-center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  animation: float 6s ease-in-out infinite, fadeIn 0.8s ease-out;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  opacity: 0;
+  animation-fill-mode: forwards;
+  backdrop-filter: blur(10px);
+}
+
+.random-card.large {
+  @apply w-24 h-24;
+}
+
+.random-card.medium {
+  @apply w-20 h-20;
+}
+
+.random-card.small {
+  @apply w-16 h-16;
+}
+
+.random-card:hover {
+  transform: translate(-50%, -50%) scale(1.15) rotate(5deg);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+  z-index: 10;
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 @media (max-width: 768px) {
-  .random-card {
-    @apply w-16 h-16 text-2xl;
+  .random-cards-container {
+    @apply w-64 h-64;
+    min-height: 256px;
+  }
+  
+  .random-card.large {
+    @apply w-16 h-16;
+  }
+  
+  .random-card.medium {
+    @apply w-14 h-14;
+  }
+  
+  .random-card.small {
+    @apply w-12 h-12;
   }
 }
 
 @media (max-width: 480px) {
-  .random-card {
-    @apply w-12 h-12 text-xl;
+  .random-cards-container {
+    @apply w-56 h-56;
+    min-height: 224px;
+  }
+  
+  .random-card.large {
+    @apply w-14 h-14;
+  }
+  
+  .random-card.medium {
+    @apply w-12 h-12;
+  }
+  
+  .random-card.small {
+    @apply w-10 h-10;
   }
 }
 
@@ -314,12 +364,28 @@
 
 @keyframes float {
   0%, 100% {
-    transform: translate(-50%, -50%) translateY(0px);
+    transform: translate(-50%, -50%) translateY(0px) rotate(var(--rotation, 0deg));
+  }
+  25% {
+    transform: translate(-50%, -50%) translateY(-8px) rotate(calc(var(--rotation, 0deg) + 2deg));
   }
   50% {
-    transform: translate(-50%, -50%) translateY(-10px);
+    transform: translate(-50%, -50%) translateY(-12px) rotate(var(--rotation, 0deg));
   }
+  75% {
+    transform: translate(-50%, -50%) translateY(-6px) rotate(calc(var(--rotation, 0deg) - 1deg));
+  }
+}
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(30px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0px) scale(1);
+  }
 }
 
 @keyframes sparkle {

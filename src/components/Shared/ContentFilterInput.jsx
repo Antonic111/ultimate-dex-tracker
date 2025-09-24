@@ -113,10 +113,11 @@ const ContentFilterInput = ({
     const charInfo = getCharacterInfo(localValue, configType);
     
     // Only show toast notifications if there's actual content and validation errors
+    // and we haven't already shown a toast for this error/warning
     if (localValue && localValue.trim() !== '') {
-      if (finalValidation.error) {
+      if (finalValidation.error && !validation.errorShown) {
         showMessage(finalValidation.error, 'error');
-      } else if (finalValidation.warning) {
+      } else if (finalValidation.warning && !validation.warningShown) {
         showMessage(`${finalValidation.warning}`, 'warning');
       }
     }

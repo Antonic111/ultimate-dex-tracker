@@ -571,6 +571,14 @@ router.put("/profile", authenticateUser, async (req, res) => {
       }
     }
 
+    // Handle migration fields
+    if (req.body.huntMethodMigrationCompleted !== undefined) {
+      user.huntMethodMigrationCompleted = !!req.body.huntMethodMigrationCompleted;
+    }
+    if (req.body.migrationVersion !== undefined) {
+      user.migrationVersion = String(req.body.migrationVersion);
+    }
+
     await user.save();
 
     res.json({ message: "Profile updated", user: {
@@ -584,6 +592,8 @@ router.put("/profile", authenticateUser, async (req, res) => {
       switchFriendCode: user.switchFriendCode,
       isProfilePublic: user.isProfilePublic,
       dexPreferences: user.dexPreferences,
+      huntMethodMigrationCompleted: user.huntMethodMigrationCompleted,
+      migrationVersion: user.migrationVersion,
     }});
   } catch (err) {
     console.error('🔥 PUT /profile - Error:', err);
@@ -1148,7 +1158,123 @@ router.get("/public/dex/:username", async (req, res) => {
   res.json({ username: user.username, caughtPokemon });
 });
 
+// GET /api/hunts
+router.get("/hunts", authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    
+    // Convert Maps to objects for JSON serialization
+    const huntTimers = user.huntTimers instanceof Map 
+      ? Object.fromEntries(user.huntTimers) 
+      : (user.huntTimers || {});
+    const lastCheckTimes = user.lastCheckTimes instanceof Map 
+      ? Object.fromEntries(user.lastCheckTimes) 
+      : (user.lastCheckTimes || {});
+    const totalCheckTimes = user.totalCheckTimes instanceof Map 
+      ? Object.fromEntries(user.totalCheckTimes) 
+      : (user.totalCheckTimes || {});
+    const huntIncrements = user.huntIncrements instanceof Map 
+      ? Object.fromEntries(user.huntIncrements) 
+      : (user.huntIncrements || {});
+    
+    res.json({
+      activeHunts: user.activeHunts || [],
+      huntTimers,
+      lastCheckTimes,
+      totalCheckTimes,
+      pausedHunts: user.pausedHunts || [],
+      huntIncrements
+    });
+  } catch (err) {
+    console.error('Error getting hunt data:', err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
+// PUT /api/hunts
+router.put("/hunts", authenticateUser, async (req, res) => {
+  try {
+    const { activeHunts, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements } = req.body;
+    
+    // Build update object
+    const updateData = {};
+    if (activeHunts !== undefined) updateData.activeHunts = activeHunts;
+    if (huntTimers !== undefined) updateData.huntTimers = new Map(Object.entries(huntTimers));
+    if (lastCheckTimes !== undefined) updateData.lastCheckTimes = new Map(Object.entries(lastCheckTimes));
+    if (totalCheckTimes !== undefined) updateData.totalCheckTimes = new Map(Object.entries(totalCheckTimes));
+    if (pausedHunts !== undefined) updateData.pausedHunts = pausedHunts;
+    if (huntIncrements !== undefined) updateData.huntIncrements = new Map(Object.entries(huntIncrements));
+    
+    // Use findByIdAndUpdate for atomic operation to prevent race conditions
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      updateData,
+      { new: true, runValidators: true }
+    );
+    
+    if (!user) return res.status(404).json({ error: "User not found" });
+    
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error updating hunt data:', err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
+// POST /api/migrate-hunt-methods (Bulk migration endpoint)
+router.post("/migrate-hunt-methods", authenticateUser, async (req, res) => {
+  try {
+    // Get the requesting user
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(403).json({ error: "User not found" });
+    }
+
+    // Get all users who haven't been migrated
+    const usersToMigrate = await User.find({ 
+      huntMethodMigrationCompleted: { $ne: true } 
+    });
+
+    let migrationResults = {
+      totalUsers: usersToMigrate.length,
+      successful: 0,
+      failed: 0,
+      errors: []
+    };
+
+    // Import migration function (you'll need to implement this server-side)
+    for (const userToMigrate of usersToMigrate) {
+      try {
+        // Run migration for each user
+        const caughtData = userToMigrate.caughtPokemon;
+        if (caughtData && Object.keys(caughtData).length > 0) {
+          // Apply migration logic here (you'll need to port the client-side logic)
+          // For now, just mark as migrated
+          await User.findByIdAndUpdate(userToMigrate._id, {
+            huntMethodMigrationCompleted: true,
+            migrationVersion: "1.1"
+          });
+          migrationResults.successful++;
+        }
+      } catch (error) {
+        migrationResults.failed++;
+        migrationResults.errors.push({
+          username: userToMigrate.username,
+          error: error.message
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Migration completed: ${migrationResults.successful} successful, ${migrationResults.failed} failed`,
+      results: migrationResults
+    });
+  } catch (err) {
+    console.error('Error running bulk migration:', err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 export default router;

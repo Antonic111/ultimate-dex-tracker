@@ -11,8 +11,8 @@ export default function PublicHome() {
     // Scroll to top on page load
     window.scrollTo(0, 0);
     
-    // Generate 4-10 random cards with controlled positioning
-    const cardCount = Math.floor(Math.random() * 5) + 4; // 4-8 cards
+    // Fixed number of cards for clean display
+    const cardCount = 5;
     // Use the full Pokémon database
     const allPokemon = pokemonData;
     
@@ -38,53 +38,45 @@ export default function PublicHome() {
     // Use site accent color for all cards
     const accentColor = 'var(--accent)';
 
-    // Predefined positions with maximum separation - only 8 positions
+    // Dynamic, eye-catching asymmetrical layout
     const positions = [
-      { top: 5, left: 5 },
-      { top: 5, left: 95 },
-      { top: 25, left: 25 },
-      { top: 25, left: 75 },
-      { top: 75, left: 25 },
-      { top: 75, left: 75 },
-      { top: 95, left: 5 },
-      { top: 95, left: 95 }
+      { top: 10, left: 20, size: 'large', rotation: -8 },
+      { top: 25, left: 70, size: 'medium', rotation: 12 },
+      { top: 45, left: 5, size: 'small', rotation: -15 },
+      { top: 60, left: 80, size: 'large', rotation: 6 },
+      { top: 85, left: 35, size: 'medium', rotation: -10 }
     ];
-
-    // Shuffle positions and take only what we need
-    const shuffledPositions = [...positions].sort(() => Math.random() - 0.5);
     
     const cards = [];
     for (let i = 0; i < cardCount; i++) {
-      // 95% chance for database Pokémon, 5% chance for local special forms
-      const useLocalSprite = Math.random() < 0.05;
+      // 90% chance for database Pokémon, 10% chance for local special forms
+      const useLocalSprite = Math.random() < 0.1;
       
       if (useLocalSprite) {
         // Use local special form sprite
         const localSprite = localSprites[Math.floor(Math.random() * localSprites.length)];
-        const isShiny = Math.random() < 0.3; // 30% chance for shiny
-        const spriteName = isShiny ? `${localSprite}-shiny` : localSprite;
+        const spriteName = localSprite;
         
         cards.push({
           id: i,
           pokemon: { name: localSprite },
           spriteUrl: `/Sprites/${spriteName}.png`,
           color: accentColor,
-          delay: Math.random() * 2,
-          position: shuffledPositions[i]
+          delay: i * 0.1,
+          position: positions[i]
         });
       } else {
         // Use database Pokémon
         const randomPokemon = allPokemon[Math.floor(Math.random() * allPokemon.length)];
-        const isShiny = Math.random() < 0.3; // 30% chance for shiny
-        const spriteUrl = isShiny ? randomPokemon.sprites.front_shiny : randomPokemon.sprites.front_default;
+        const spriteUrl = randomPokemon.sprites.front_default;
         
         cards.push({
           id: i,
           pokemon: randomPokemon,
           spriteUrl: spriteUrl,
           color: accentColor,
-          delay: Math.random() * 2,
-          position: shuffledPositions[i]
+          delay: i * 0.1,
+          position: positions[i]
         });
       }
     }
@@ -139,12 +131,13 @@ export default function PublicHome() {
             {randomCards.map((card) => (
               <div
                 key={card.id}
-                className="random-card"
+                className={`random-card ${card.position.size}`}
                 style={{
                   background: card.color,
                   top: `${card.position.top}%`,
                   left: `${card.position.left}%`,
-                  animationDelay: `${card.delay}s`
+                  animationDelay: `${card.delay}s`,
+                  '--rotation': `${card.position.rotation}deg`
                 }}
               >
                 <img 

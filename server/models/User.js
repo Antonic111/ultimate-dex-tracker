@@ -94,6 +94,87 @@ const userSchema = new mongoose.Schema({
   // PASSWORD VERIFICATION ------------------------------------- //
   passwordVerificationCode: { type: String, default: null },
   passwordVerificationExpires: { type: Date, default: null },
+  // HUNT DATA ----------------------------------------- //
+  activeHunts: {
+    type: [new mongoose.Schema({
+      id: { type: Number, required: true },
+      pokemon: {
+        id: { type: Number, required: true },
+        name: { type: String, required: true },
+        formType: { type: String, default: "main" },
+        sprites: {
+          front_default: String,
+          front_shiny: String
+        }
+      },
+      game: { type: String, default: "" },
+      ball: { type: String, default: "" },
+      mark: { type: String, default: "" },
+      method: { type: String, default: "" },
+      notes: { type: String, default: "" },
+      checks: { type: Number, default: 0 },
+      odds: { type: Number, default: null },
+      startDate: { type: String, required: true },
+      startTime: { type: Number, required: true },
+      increment: { type: Number, default: 1 },
+      modifiers: {
+        type: {
+          shinyCharm: { type: Boolean, default: false },
+          shinyParents: { type: Boolean, default: false },
+          lureActive: { type: Boolean, default: false },
+          researchLv10: { type: Boolean, default: false },
+          perfectResearch: { type: Boolean, default: false },
+          sparklingLv1: { type: Boolean, default: false },
+          sparklingLv2: { type: Boolean, default: false },
+          sparklingLv3: { type: Boolean, default: false }
+        },
+        default: {
+          shinyCharm: false,
+          shinyParents: false,
+          lureActive: false,
+          researchLv10: false,
+          perfectResearch: false,
+          sparklingLv1: false,
+          sparklingLv2: false,
+          sparklingLv3: false
+        }
+      }
+    }, { _id: false })],
+    default: []
+  },
+  huntTimers: {
+    type: Map,
+    of: Number,
+    default: new Map()
+  },
+  lastCheckTimes: {
+    type: Map,
+    of: Number,
+    default: new Map()
+  },
+  totalCheckTimes: {
+    type: Map,
+    of: Number,
+    default: new Map()
+  },
+  pausedHunts: {
+    type: [Number],
+    default: []
+  },
+  huntIncrements: {
+    type: Map,
+    of: Number,
+    default: new Map()
+  },
+  // Migration tracking
+  huntMethodMigrationCompleted: {
+    type: Boolean,
+    default: false
+  },
+  migrationVersion: {
+    type: String,
+    default: "1.0"
+  }
 }, { timestamps: true });
 
 

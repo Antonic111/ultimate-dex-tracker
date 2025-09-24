@@ -9,6 +9,9 @@ import { SearchbarIconDropdown } from "../Shared/SearchBar";
 import ContentFilterInput from "../Shared/ContentFilterInput";
 import { useMessage } from "../Shared/MessageContext";
 import { validateContent } from "../../../shared/contentFilter";
+import gamePokemonData from "../../data/gamePokemon.json";
+import { getAvailableGamesForPokemon } from "../../utils/gameMapping";
+import { getMethodsForGame } from "../../utils/huntSystem";
 // import "../../css/EvolutionChain.css"; // Moved to backup folder
 import "../../css/Sidebar.css";
 
@@ -44,6 +47,292 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
 
 
   const [editData, setEditData] = useState(defaultEditData);
+  
+  // Get available methods based on selected game
+  const availableMethods = getMethodsForGame(editData.game);
+  
+  // Check if marks are available for the selected game
+  const marksAvailable = ["Scarlet", "Violet", "Sword", "Shield"].includes(editData.game);
+
+  // Game tag mapping with colors and abbreviations
+  const getGameTagInfo = (gameName) => {
+    const gameMap = {
+      "Red": { abbr: "R", colors: ["#ed2927", "#ed2927"] },
+      "Blue": { abbr: "B", colors: ["#027faf", "#027faf"] },
+      "Green": { abbr: "G", colors: ["#2ecc71", "#2ecc71"] },
+      "Yellow": { abbr: "Y", colors: ["#f9cf25", "#f9cf25"] },
+      "Gold": { abbr: "G", colors: ["#f39c12", "#f39c12"] },
+      "Silver": { abbr: "S", colors: ["#95a5a6", "#95a5a6"] },
+      "Crystal": { abbr: "C", colors: ["#8b8bc1", "#8b8bc1"] },
+      "Ruby": { abbr: "R", colors: ["#ed2927", "#ed2927"] },
+      "Sapphire": { abbr: "S", colors: ["#027faf", "#027faf"] },
+      "Emerald": { abbr: "E", colors: ["#2d993c", "#2d993c"] },
+      "Fire Red": { abbr: "FR", colors: ["#e74c3c", "#e74c3c"] },
+      "Leaf Green": { abbr: "LG", colors: ["#27ae60", "#27ae60"] },
+      "Diamond": { abbr: "D", colors: ["#74b9ff", "#74b9ff"] },
+      "Pearl": { abbr: "P", colors: ["#fd79a8", "#fd79a8"] },
+      "Platinum": { abbr: "P", colors: ["#f9e79f", "#f9e79f"] },
+      "Heart Gold": { abbr: "HG", colors: ["#f39c12", "#f39c12"] },
+      "Soul Silver": { abbr: "SS", colors: ["#95a5a6", "#95a5a6"] },
+      "Black": { abbr: "B", colors: ["#2c3e50", "#ecf0f1"] },
+      "White": { abbr: "W", colors: ["#ecf0f1", "#2c3e50"] },
+      "Black 2": { abbr: "B2", colors: ["#2c3e50", "#2c3e50"] },
+      "White 2": { abbr: "W2", colors: ["#ffffff", "#ffffff"] },
+      "X": { abbr: "X", colors: ["#065ba0", "#065ba0"] },
+      "Y": { abbr: "Y", colors: ["#d02942", "#d02942"] },
+      "Omega Ruby": { abbr: "OR", colors: ["#e04429", "#e04429"] },
+      "Alpha Sapphire": { abbr: "AS", colors: ["#079fd4", "#079fd4"] },
+      "Sun": { abbr: "S", colors: ["#f39c12", "#f39c12"] },
+      "Moon": { abbr: "M", colors: ["#9b59b6", "#9b59b6"] },
+      "Ultra Sun": { abbr: "US", colors: ["#f39c12", "#f39c12"] },
+      "Ultra Moon": { abbr: "UM", colors: ["#9b59b6", "#9b59b6"] },
+      "Lets GO Pikachu": { abbr: "LGPE", colors: ["#f2cb40", "#f2cb40"] },
+      "Lets GO Eevee": { abbr: "LGPE", colors: ["#d69c58", "#d69c58"] },
+      "Sword": { abbr: "Sw", colors: ["#3498db", "#3498db"] },
+      "Shield": { abbr: "Sh", colors: ["#e74c3c", "#e74c3c"] },
+      "Brilliant Diamond": { abbr: "BD", colors: ["#74b9ff", "#74b9ff"] },
+      "Shining Pearl": { abbr: "SP", colors: ["#fd79a8", "#fd79a8"] },
+      "Legends Arceus": { abbr: "LA", colors: ["#6bbd8d", "#6bbd8d"] },
+      "Scarlet": { abbr: "Sc", colors: ["#e74c3c", "#e74c3c"] },
+      "Violet": { abbr: "V", colors: ["#9b59b6", "#9b59b6"] },
+      "GO": { abbr: "GO", colors: ["#4285f4", "#4285f4"] }
+    };
+    return gameMap[gameName] || { abbr: gameName.substring(0, 3), colors: ["#95a5a6", "#95a5a6"] };
+  };
+
+  // Get games where a Pokemon can be caught, ordered by release date
+  const getAvailableGames = (pokemon) => {
+    if (!pokemon || !pokemon.id) return [];
+    
+    // Game release order (chronological)
+    const gameReleaseOrder = [
+      "Red", "Green",
+      "Blue",
+      "Yellow",
+      "Gold", "Silver",
+      "Crystal",
+      "Ruby", "Sapphire",
+      "Emerald",
+      "Fire Red", "Leaf Green",
+      "Diamond", "Pearl",
+      "Platinum",
+      "Heart Gold", "Soul Silver",
+      "Black", "White",
+      "Black 2", "White 2",
+      "X", "Y",
+      "Omega Ruby", "Alpha Sapphire",
+      "Sun", "Moon",
+      "Ultra Sun", "Ultra Moon",
+      "Lets GO Pikachu", "Lets GO Eevee",
+      "Sword", "Shield",
+      "Brilliant Diamond", "Shining Pearl",
+      "Legends Arceus",
+      "Scarlet", "Violet",
+      "GO"
+    ];
+    
+    // Special cases for regional forms
+    const pokemonName = pokemon.name?.toLowerCase() || '';
+    const formType = pokemon.formType?.toLowerCase() || '';
+    
+    // Alpha Pokemon - only available in Legends Arceus
+    if (formType === 'alpha' || formType === 'alphaother') {
+      return ["Legends Arceus"];
+    }
+    
+    // Therian forms - only available in Legends Arceus and GO
+    if (pokemonName.includes('therian') || pokemonName.includes('therian-') || pokemonName.includes('-therian')) {
+      return ["Legends Arceus", "GO"];
+    }
+    
+    // Level 100 Magikarps - only available in Platinum, Diamond, Pearl, and Scarlet/Violet
+    if (pokemonName.includes('magikarp') && (pokemonName.includes('level-100') || pokemonName.includes('level 100') || pokemonName.includes('lvl-100') || pokemonName.includes('lvl 100'))) {
+      return ["Diamond", "Pearl", "Platinum", "Scarlet", "Violet"];
+    }
+    
+    // Partner Cap Pikachu - only available in Ultra Sun and Ultra Moon
+    if (pokemonName.includes('partner-cap') || pokemonName.includes('partner cap') || pokemonName.includes('ash-cap') || pokemonName.includes('ash cap')) {
+      return ["Ultra Sun", "Ultra Moon"];
+    }
+    
+    // Unown forms - special availability
+    if (pokemonName.includes('unown') || pokemonName.toLowerCase().includes('unown')) {
+      // Regular Unown forms - available in multiple games
+      return ["Gold", "Silver", "Crystal", "Heart Gold", "Soul Silver", "Brilliant Diamond", "Shining Pearl", "Legends Arceus", "GO"];
+    }
+    
+    // GMAX forms - only available in Sword, Shield, and GO
+    if (formType === 'gmax' || pokemonName.includes('gmax') || pokemonName.includes('gigantamax')) {
+      return ["Sword", "Shield", "GO"];
+    }
+    
+    // Alolan forms - available in Alola games, LGPE, and some in other games
+    if (formType === 'alolan' || pokemonName.includes('-alolan') || pokemonName.includes('alolan-') || pokemonName.includes('alolan ')) {
+      // Handle different naming patterns: "rattata-alolan", "raichu-alolan", etc.
+      let baseName = pokemonName;
+      if (pokemonName.includes('-alolan')) {
+        baseName = pokemonName.replace('-alolan', '').trim();
+      } else if (pokemonName.includes('alolan ')) {
+        baseName = pokemonName.replace('alolan ', '').trim();
+      } else if (pokemonName.includes('alolan')) {
+        baseName = pokemonName.replace('alolan', '').trim();
+      }
+      // Remove any parentheses content like "(alolan)"
+      baseName = baseName.replace(/\s*\([^)]*\)\s*/, '').trim();
+      
+      
+      // Special cases for specific Alolan forms
+      if (baseName === 'vulpix' || baseName === 'ninetales') {
+        return ["Sun", "Moon", "Ultra Sun", "Ultra Moon", "Lets GO Pikachu", "Lets GO Eevee", "Sword", "Shield", "Legends Arceus", "Scarlet", "Violet", "GO"];
+      }
+      
+      // Alolan forms available in SV and SWSH: Raichu, Sandshrew, Sandslash, Diglett, Dugtrio, Meowth, Persian, Marowak, Exeggutor
+      const alolanInSV_SWSH = ['raichu', 'sandshrew', 'sandslash', 'diglett', 'dugtrio', 'meowth', 'persian', 'marowak', 'exeggutor'];
+      
+      // Alolan forms available in SV but NOT in SWSH: Geodude, Graveler, Golem, Grimer, Muk
+      const alolanInSV_Only = ['geodude', 'graveler', 'golem', 'grimer', 'muk'];
+      
+      if (alolanInSV_SWSH.includes(baseName)) {
+        return ["Sun", "Moon", "Ultra Sun", "Ultra Moon", "Lets GO Pikachu", "Lets GO Eevee", "Sword", "Shield", "Legends Arceus", "Scarlet", "Violet", "GO"];
+      } else if (alolanInSV_Only.includes(baseName)) {
+        return ["Sun", "Moon", "Ultra Sun", "Ultra Moon", "Lets GO Pikachu", "Lets GO Eevee", "Legends Arceus", "Scarlet", "Violet", "GO"];
+      } else {
+        // Alolan forms NOT in SV/SWSH: Rattata, Raticate, etc.
+        return ["Sun", "Moon", "Ultra Sun", "Ultra Moon", "Lets GO Pikachu", "Lets GO Eevee", "GO"];
+      }
+    }
+    
+    // Galarian forms - available in Galar games and some in SV
+    if (formType === 'galarian' || pokemonName.includes('-galarian') || pokemonName.includes('galarian-') || pokemonName.includes('galarian ') || pokemonName.includes('-galar') || pokemonName.includes('galar-')) {
+      // Galarian forms available in SV: Slowpoke, Slowbro, Slowking, Meowth, Weezing
+      const galarianInSV = ['slowpoke', 'slowbro', 'slowking', 'meowth', 'weezing'];
+      
+      // Check if this specific Galarian form is available in SV
+      let baseName = pokemonName;
+      if (pokemonName.includes('-galarian')) {
+        baseName = pokemonName.replace('-galarian', '').trim();
+      } else if (pokemonName.includes('-galar')) {
+        baseName = pokemonName.replace('-galar', '').trim();
+      } else if (pokemonName.includes('galarian ')) {
+        baseName = pokemonName.replace('galarian ', '').trim();
+      } else if (pokemonName.includes('galarian')) {
+        baseName = pokemonName.replace('galarian', '').trim();
+      }
+      // Remove any parentheses content like "(galarian)"
+      baseName = baseName.replace(/\s*\([^)]*\)\s*/, '').trim();
+      
+      
+      if (galarianInSV.includes(baseName)) {
+        return ["Sword", "Shield", "Scarlet", "Violet", "GO"];
+      } else {
+        // Galarian forms NOT in SV: Zigzagoon, Linoone, etc.
+        return ["Sword", "Shield", "GO"];
+      }
+    }
+    
+    // Hisuian forms - mostly only available in Legends: Arceus, but some exceptions
+    if (formType === 'hisuian' || pokemonName.includes('-hisuian') || pokemonName.includes('hisuian-') || pokemonName.includes('hisuian ') || pokemonName.includes('-hisui') || pokemonName.includes('hisui-')) {
+      // Handle different naming patterns: "voltorb-hisuian", "electrode-hisuian", etc.
+      let baseName = pokemonName;
+      if (pokemonName.includes('-hisuian')) {
+        baseName = pokemonName.replace('-hisuian', '').trim();
+      } else if (pokemonName.includes('-hisui')) {
+        baseName = pokemonName.replace('-hisui', '').trim();
+      } else if (pokemonName.includes('hisuian ')) {
+        baseName = pokemonName.replace('hisuian ', '').trim();
+      } else if (pokemonName.includes('hisuian')) {
+        baseName = pokemonName.replace('hisuian', '').trim();
+      }
+      // Remove any parentheses content like "(hisuian)"
+      baseName = baseName.replace(/\s*\([^)]*\)\s*/, '').trim();
+      
+      // Hisuian forms available in SV: Voltorb, Electrode, Qwilfish, Sneasel, Sliggoo, Goodra
+      const hisuianInSV = ['voltorb', 'electrode', 'qwilfish', 'sneasel', 'sliggoo', 'goodra'];
+      
+      
+      if (hisuianInSV.includes(baseName)) {
+        return ["Legends Arceus", "Scarlet", "Violet", "GO"];
+      } else {
+        // Other Hisuian forms - only available in Legends: Arceus and GO
+        return ["Legends Arceus", "GO"];
+      }
+    }
+    
+    // Paldean forms - only available in Paldea games and GO
+    if (formType === 'paldean' || pokemonName.includes('-paldean') || pokemonName.includes('paldean-') || pokemonName.includes('paldean ')) {
+      return ["Scarlet", "Violet", "GO"];
+    }
+    
+    // Default behavior for regular forms - use gamePokemonData as the source of truth
+    const availableGames = getAvailableGamesForPokemon(pokemon.id, gamePokemonData);
+    
+    // Sort by release order instead of alphabetically
+    return availableGames.sort((a, b) => {
+      const indexA = gameReleaseOrder.indexOf(a);
+      const indexB = gameReleaseOrder.indexOf(b);
+      return indexA - indexB;
+    });
+  };
+
+  // Group games into pairs for combined display, maintaining chronological order
+  const getGroupedGames = (games) => {
+    const gameGroups = [];
+    const processedGames = new Set();
+    
+    // Define game pairs with correct abbreviations in chronological order
+    const gamePairs = [
+      { games: ["Red", "Green"], abbr: "RG" },
+      { games: ["Gold", "Silver"], abbr: "GS" },
+      { games: ["Ruby", "Sapphire"], abbr: "RS" },
+      { games: ["Fire Red", "Leaf Green"], abbr: "FRLG" },
+      { games: ["Diamond", "Pearl"], abbr: "DP" },
+      { games: ["Heart Gold", "Soul Silver"], abbr: "HGSS" },
+      { games: ["Black", "White"], abbr: "BW" },
+      { games: ["Black 2", "White 2"], abbr: "B2W2" },
+      { games: ["X", "Y"], abbr: "XY" },
+      { games: ["Omega Ruby", "Alpha Sapphire"], abbr: "ORAS" },
+      { games: ["Sun", "Moon"], abbr: "SM" },
+      { games: ["Ultra Sun", "Ultra Moon"], abbr: "USUM" },
+      { games: ["Lets GO Pikachu", "Lets GO Eevee"], abbr: "LGPE" },
+      { games: ["Sword", "Shield"], abbr: "SWSH" },
+      { games: ["Brilliant Diamond", "Shining Pearl"], abbr: "BDSP" },
+      { games: ["Scarlet", "Violet"], abbr: "SV" }
+    ];
+    
+    // Process games in chronological order
+    games.forEach(game => {
+      if (processedGames.has(game)) return;
+      
+      // Check if this game is part of a pair
+      const pair = gamePairs.find(p => p.games.includes(game));
+      
+      if (pair && (games.includes(pair.games[0]) || games.includes(pair.games[1]))) {
+        // At least one game in the pair is available, create pair
+        const tagInfo1 = getGameTagInfo(pair.games[0]);
+        const tagInfo2 = getGameTagInfo(pair.games[1]);
+        gameGroups.push({
+          type: "pair",
+          games: pair.games,
+          displayName: pair.abbr,
+          colors: [tagInfo1.colors[0], tagInfo2.colors[0]]
+        });
+        processedGames.add(pair.games[0]);
+        processedGames.add(pair.games[1]);
+      } else {
+        // Individual game
+        const tagInfo = getGameTagInfo(game);
+        gameGroups.push({
+          type: "single",
+          games: [game],
+          displayName: tagInfo.abbr,
+          colors: tagInfo.colors
+        });
+        processedGames.add(game);
+      }
+    });
+    
+    return gameGroups;
+  };
 
   // Initialize state when component first mounts or when caughtInfo changes
   useEffect(() => {
@@ -339,7 +628,10 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     }, 370); // Match the original backup animation duration
   };
 
-  if ((!open || !pokemon) && !closing) return null;
+  if (!open && !closing) return null;
+
+  // Safety check for pokemon
+  if (!pokemon) return null;
 
   // Look up objects for display by value
   const ballObj = BALL_OPTIONS.find(opt => opt.value === (editData?.ball ?? ""));
@@ -420,7 +712,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
           </div>
         </div>
 
-                                                                       <hr className="sidebar-divider" style={{ top: '250px' }} />
+                                                                       <hr className="sidebar-divider" style={{ top: '235px' }} />
 
        {/* Caught info section */}
       <div className="sidebar-content" style={{ top: '275px' }}>
@@ -499,21 +791,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             id="game-dropdown"
             options={GAME_OPTIONS}
             value={editData.game}
-            onChange={val => setEditData(edit => ({ ...edit, game: val }))}
+            onChange={val => setEditData(edit => ({ ...edit, game: val, method: "", mark: "" }))}
             placeholder="Select a game..."
-            customBackground="var(--sidebar-edit-inputs)"
-            customBorder="var(--border-color)"
-          />
-      </div>
-
-             <div className="sidebar-form-group">
-                  <label className="sidebar-label">Mark:</label>
-                                   <SearchbarIconDropdown
-            id="mark-dropdown"
-            options={MARK_OPTIONS}
-            value={editData.mark}
-            onChange={val => setEditData(edit => ({ ...edit, mark: val }))}
-            placeholder="Select a mark..."
             customBackground="var(--sidebar-edit-inputs)"
             customBorder="var(--border-color)"
           />
@@ -525,13 +804,28 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             id="method-dropdown"
             options={[
               { name: "None", value: "" },
-              ...METHOD_OPTIONS.filter(m => m !== "").map(m => ({ name: m, value: m })),
+              ...availableMethods.map(method => ({ name: method.name, value: method.name })),
             ]}
             value={editData.method}
             onChange={val => setEditData(edit => ({ ...edit, method: val }))}
-            placeholder="Select a method..."
+            placeholder={editData.game ? "Select a method..." : "Select a game first"}
             customBackground="var(--sidebar-edit-inputs)"
             customBorder="var(--border-color)"
+            disabled={!editData.game}
+          />
+      </div>
+
+             <div className="sidebar-form-group">
+                  <label className="sidebar-label">Mark:</label>
+                                   <SearchbarIconDropdown
+            id="mark-dropdown"
+            options={MARK_OPTIONS}
+            value={editData.mark}
+            onChange={val => setEditData(edit => ({ ...edit, mark: val }))}
+            placeholder={marksAvailable ? "Select a mark..." : "Marks not available in this game"}
+            customBackground="var(--sidebar-edit-inputs)"
+            customBorder="var(--border-color)"
+            disabled={!marksAvailable}
           />
       </div>
 
@@ -819,6 +1113,16 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
              </div>
            )}
 
+                                                                                                                                   {editData.method && editData.method !== "" && (
+                <div className="sidebar-display-card">
+               <div className="sidebar-display-info">
+                 <div className="sidebar-display-label">Method</div>
+                 <div className="sidebar-display-value">{editData.method}</div>
+               </div>
+               <div className="sidebar-display-icon">🎯</div>
+             </div>
+           )}
+
                                                                                                                                    {markObj && editData.mark && (
                 <div className="sidebar-display-card">
                <div className="sidebar-display-info">
@@ -828,16 +1132,6 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                <div className="sidebar-display-image-large">
                  <img src={markObj.image} alt="" className="w-full h-full object-contain" onError={e => (e.target.style.display = "none")} />
                </div>
-             </div>
-           )}
-
-                                                                                                                                   {editData.method && editData.method !== "" && (
-                <div className="sidebar-display-card">
-               <div className="sidebar-display-info">
-                 <div className="sidebar-display-label">Method</div>
-                 <div className="sidebar-display-value">{editData.method}</div>
-               </div>
-               <div className="sidebar-display-icon">🎯</div>
              </div>
            )}
 
@@ -913,18 +1207,45 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             (localEntries.some(entry => entry.method && entry.method !== "" && entry.method !== METHOD_OPTIONS[0])) ||
             (localEntries.some(entry => entry.checks && String(entry.checks).trim() !== "" && entry.checks !== 0)) ||
             (localEntries.some(entry => entry.notes && entry.notes !== "")) ||
+            (localEntries.some(entry => entry.date && entry.date !== "")) ||
             (localEntries.length > 1)) && (
                                                <div className="sidebar-reset-section">
                <button className="sidebar-reset-button" onClick={handleReset}>Reset</button>
              </div>
          )
        )}
+
     </div>
   )}
 
         {/* Spacer for evolution chain */}
         <div className="evolution-chain-spacer"></div>
+        
+        {/* Available Games Section */}
+        {pokemon && (
+          <div className="available-games-section">
+            <h3 className="available-games-title">OBTAINABLE IN</h3>
+            <div className="available-games-divider"></div>
+            <div className="available-games-grid">
+              {getGroupedGames(getAvailableGames(pokemon)).map((gameGroup, index) => (
+                <div
+                  key={`${gameGroup.displayName}-${index}`}
+                  className={`game-tag ${gameGroup.type === 'pair' ? 'game-tag-pair' : 'game-tag-single'}`}
+                  style={{
+                    background: gameGroup.type === 'pair' 
+                      ? `linear-gradient(90deg, ${gameGroup.colors[0]} 50%, ${gameGroup.colors[1]} 50%)`
+                      : gameGroup.colors[0]
+                  }}
+                >
+                  {gameGroup.displayName}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {pokemon && <EvolutionChain pokemon={pokemon} showShiny={showShiny} />}
+
       </div>
 
              {/* Reset Pokémon Modal */}

@@ -105,11 +105,13 @@
 /* Mobile responsive styles */
 @media (max-width: 768px) {
   .enter-reset-code-form {
-    @apply max-w-sm mx-4 mt-24 mb-48 px-6 pb-4;
+    @apply max-w-sm mx-4 mt-24 mb-48 px-4 pb-4;
+    max-width: calc(100vw - 32px) !important;
+    width: calc(100vw - 32px) !important;
   }
   
   .enter-reset-code-title {
-    @apply text-3xl py-6;
+    @apply text-2xl py-4;
   }
   
   .input-icon-wrapper {
@@ -136,15 +138,17 @@
 
 @media (max-width: 480px) {
   .enter-reset-code-form {
-    @apply mx-3 mt-16 mb-36 px-4 pb-3;
+    @apply mx-2 mt-16 mb-36 px-3 pb-3;
+    max-width: calc(100vw - 16px) !important;
+    width: calc(100vw - 16px) !important;
   }
   
   .enter-reset-code-title {
-    @apply text-2xl py-4;
+    @apply text-xl py-3;
   }
   
   .input-icon-wrapper {
-    @apply p-2.5;
+    @apply p-2;
   }
   
   .enter-reset-code-input {
@@ -158,6 +162,40 @@
   .enter-reset-code-button,
   .resend-button {
     @apply py-2 text-sm;
+  }
+  
+  .auth-subtext {
+    @apply text-xs;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 360px) {
+  .enter-reset-code-form {
+    @apply mx-1 mt-12 mb-24 px-2 pb-2;
+    max-width: calc(100vw - 8px) !important;
+    width: calc(100vw - 8px) !important;
+  }
+  
+  .enter-reset-code-title {
+    @apply text-lg py-2;
+  }
+  
+  .input-icon-wrapper {
+    @apply p-1.5;
+  }
+  
+  .enter-reset-code-input {
+    @apply text-xs;
+  }
+  
+  .auth-icon {
+    @apply w-3 h-3 mr-1.5;
+  }
+  
+  .enter-reset-code-button,
+  .resend-button {
+    @apply py-1.5 text-xs;
   }
   
   .auth-subtext {

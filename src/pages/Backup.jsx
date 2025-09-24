@@ -8,6 +8,38 @@ import { LoadingSpinner } from '../components/Shared';
 import { fetchCaughtData } from '../api/caught';
 import ImportConfirmModal from '../components/Shared/ImportConfirmModal';
 import RestoreBackupModal from '../components/Shared/RestoreBackupModal';
+
+// Helper function to check if data contains old hunt methods that need migration
+const checkIfDataNeedsMigration = (caughtData) => {
+  if (!caughtData || typeof caughtData !== 'object') return false;
+  
+  // Check for old hunt method names that need migration
+  const oldMethods = [
+    'Battle Method', 'Chain Fishing', 'Chain Breeding', 'Chain SOS',
+    'Chain Shiny', 'Chain Horde', 'Chain Friend Safari', 'Chain DexNav',
+    'Chain Radar', 'Chain Masuda', 'Chain Shiny Charm', 'Chain Poké Radar',
+    'Chain Shiny Stone', 'Chain Shiny Rock', 'Chain Shiny Grass',
+    'Chain Shiny Water', 'Chain Shiny Cave', 'Chain Shiny Building'
+  ];
+  
+  for (const pokemonKey in caughtData) {
+    const pokemon = caughtData[pokemonKey];
+    if (pokemon && pokemon.entries && Array.isArray(pokemon.entries)) {
+      for (const entry of pokemon.entries) {
+        // Check for old methods (with or without game)
+        if (entry.method && oldMethods.includes(entry.method)) {
+          return true; // Found old method, needs migration
+        }
+        // Also check for entries with method but no game (invalid state)
+        if (entry.method && !entry.game) {
+          return true; // Found invalid entry, needs migration
+        }
+      }
+    }
+  }
+  
+  return false;
+};
 import DeleteBackupModal from '../components/Shared/DeleteBackupModal';
 import '../css/Backup.css';
 
@@ -90,8 +122,29 @@ export default function Backup() {
       setRestoring(true);
       const caughtData = pendingRestoreData.data?.caught || pendingRestoreData.data;
       
-      await caughtAPI.updateCaughtData(caughtData);
-      setCaughtData(caughtData);
+      // Check if this backup contains old hunt method data that needs migration
+      const needsMigration = checkIfDataNeedsMigration(caughtData);
+      let finalData = caughtData;
+      
+      if (needsMigration) {
+        console.log('Backup contains old hunt method data, applying migration...');
+        const { migrateHuntMethods } = await import('../utils/migrateHuntMethods');
+        finalData = migrateHuntMethods(caughtData);
+        
+        // Mark user as needing migration again since they restored old data
+        try {
+          const { authAPI } = await import('../utils/api');
+          await authAPI.updateUser({ 
+            huntMethodMigrationCompleted: false, 
+            migrationVersion: "1.0" 
+          });
+        } catch (error) {
+          console.warn('Failed to update migration status:', error);
+        }
+      }
+      
+      await caughtAPI.updateCaughtData(finalData);
+      setCaughtData(finalData);
 
       // Refresh the main dex grid data by calling fetchCaughtData
       try {
