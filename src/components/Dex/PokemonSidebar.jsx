@@ -427,6 +427,26 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     };
   }, [resetModal.show]);
 
+  // Function to format date from YYYY-MM-DD to MMM DD YYYY format
+  function formatDate(dateString) {
+    if (!dateString) return "";
+    
+    const months = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+      const year = parts[0];
+      const month = months[parseInt(parts[1]) - 1] || parts[1];
+      const day = parts[2];
+      return `${month} ${day} ${year}`;
+    }
+    
+    return dateString; // Return original if format is unexpected
+  }
+
   // Function to manually update editData when switching entries
   function switchToEntry(index) {
     if (localEntries && localEntries[index]) {
@@ -782,6 +802,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             placeholder="Select a ball..."
             customBackground="var(--sidebar-edit-inputs)"
             customBorder="var(--border-color)"
+            isSidebar={true}
           />
       </div>
 
@@ -795,6 +816,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             placeholder="Select a game..."
             customBackground="var(--sidebar-edit-inputs)"
             customBorder="var(--border-color)"
+            isSidebar={true}
           />
       </div>
 
@@ -812,6 +834,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             customBackground="var(--sidebar-edit-inputs)"
             customBorder="var(--border-color)"
             disabled={!editData.game}
+            isSidebar={true}
           />
       </div>
 
@@ -826,6 +849,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             customBackground="var(--sidebar-edit-inputs)"
             customBorder="var(--border-color)"
             disabled={!marksAvailable}
+            isSidebar={true}
           />
       </div>
 
@@ -1083,7 +1107,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                 <div className="sidebar-display-card">
                <div className="sidebar-display-info">
                  <div className="sidebar-display-label">Date</div>
-                 <div className="sidebar-display-value">{editData.date}</div>
+                 <div className="sidebar-display-value">{formatDate(editData.date)}</div>
                </div>
                <div className="sidebar-display-icon">📅</div>
              </div>

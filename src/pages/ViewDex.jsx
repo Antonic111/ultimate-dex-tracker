@@ -8,6 +8,7 @@ import { getCaughtKey, migrateOldCaughtData } from "../caughtStorage";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { useLoading } from "../components/Shared/LoadingContext";
 import { profileAPI } from "../utils/api";
+import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isSubLegendary, isStarter, isFossil, isBaby, isParadox, getPokemonCategory } from "../utils/pokemonCategories";
 
 
 // Helper function to load the viewer's own dex toggle preferences
@@ -335,6 +336,37 @@ export default function ViewDex() {
                 const isCaught = !!caughtInfo;
                 if (filters.caught === "caught" && !isCaught) return false;
                 if (filters.caught === "uncaught" && isCaught) return false;
+                
+                // Category filtering
+                if (filters.categories && filters.categories.length > 0) {
+                    const pokemonCategory = getPokemonCategory(pokemon);
+                    const matchesAnyCategory = filters.categories.some(category => {
+                        switch (category) {
+                            case "legendary":
+                                return isLegendary(pokemon);
+                            case "mythical":
+                                return isMythical(pokemon);
+                            case "ultra-beast":
+                                return isUltraBeast(pokemon);
+                            case "pseudo-legendary":
+                                return isPseudoLegendary(pokemon);
+                            case "sub-legendary":
+                                return isSubLegendary(pokemon);
+                            case "paradox":
+                                return isParadox(pokemon);
+                            case "starter":
+                                return isStarter(pokemon);
+                            case "fossil":
+                                return isFossil(pokemon);
+                            case "baby":
+                                return isBaby(pokemon);
+                            default:
+                                return false;
+                        }
+                    });
+                    
+                    if (!matchesAnyCategory) return false;
+                }
                 
                 return true;
             });

@@ -147,7 +147,7 @@
   font-size: 0.75rem;
   color: var(--text-muted);
   padding: 0.3rem 0.5rem;
-  background: #2a2a2a;
+  background: var(--sidebar-edit-inputs);
   border-radius: 6px;
   border-left: 3px solid var(--accent);
 }
@@ -283,6 +283,7 @@
   gap: 0.5rem;
   flex-shrink: 0;
   width: 6rem;
+  position: relative;
 }
 
 .checks-label {
@@ -362,6 +363,64 @@
 
 .add-check-btn:disabled:hover {
   transform: none;
+}
+
+.decrease-check-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  opacity: 1;
+  position: absolute;
+  bottom: -8px;
+  left: -8px;
+  width: 24px;
+  height: 24px;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Hide the counter overlay button on mobile, show the button row version instead */
+@media (max-width: 768px) {
+  .checks-display .decrease-check-btn {
+    display: none;
+  }
+}
+
+/* Hide the button row version on desktop, show the counter overlay version instead */
+@media (min-width: 769px) {
+  .checks-buttons .decrease-check-btn {
+    display: none;
+  }
+}
+
+.decrease-check-btn svg {
+  stroke-width: 2;
+  width: 12px;
+  height: 12px;
+}
+
+.decrease-check-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.decrease-check-btn:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.decrease-check-btn:disabled:hover {
+  transform: none;
+  background: #6b7280;
 }
 
 .hunt-complete {
@@ -631,6 +690,10 @@
   width: 16px;
   height: 16px;
   accent-color: var(--accent);
+  appearance: auto;
+  -webkit-appearance: auto;
+  background-color: var(--background);
+  border: 1px solid var(--border-color);
 }
 
 /* Odds Display */
@@ -1889,6 +1952,15 @@
     transform: scale(0.9);
   }
   
+  /* Mobile styles for expanded hunt view (info mode) */
+  .hunt-header .hunt-actions.expanded-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    transform: scale(0.9);
+    flex: 0 0 auto;
+  }
+  
   .hunt-pokemon-image {
     width: 90px;
     height: 90px;
@@ -2019,6 +2091,11 @@
   .empty-state-content p {
     font-size: 0.9rem;
   }
+  
+  /* Mobile hunt modal Pokemon name */
+  .hunt-pokemon-name {
+    font-size: 1.8rem;
+  }
 }
 
 /* Additional mobile styles for very small screens */
@@ -2040,8 +2117,8 @@
   }
   
   .hunt-pokemon-name {
-    font-size: 0.6rem !important;
-    line-height: 1.0 !important;
+    font-size: 1.8rem !important;
+    line-height: 1.2 !important;
     word-break: break-word !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -2062,10 +2139,19 @@
     transform: scale(0.85) !important;
   }
   
+  /* Extra small screen styles for expanded hunt view */
+  .hunt-actions.expanded-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    transform: scale(0.85) !important;
+  }
+  
   .hunt-delete-btn,
   .hunt-reset-btn,
   .hunt-settings-btn,
-  .hunt-info-btn {
+  .hunt-info-btn,
+  .hunt-edit-btn {
     padding: 5px !important;
     width: 32px !important;
     height: 32px !important;
@@ -2076,7 +2162,8 @@
   .hunt-delete-btn svg,
   .hunt-reset-btn svg,
   .hunt-settings-btn svg,
-  .hunt-info-btn svg {
+  .hunt-info-btn svg,
+  .hunt-edit-btn svg {
     width: 16px !important;
     height: 16px !important;
   }
@@ -2106,6 +2193,49 @@
   
   .checks-buttons {
     gap: 0.25rem;
+  }
+  
+  .decrease-check-btn {
+    display: flex;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    opacity: 1;
+    position: static;
+    width: auto;
+    height: auto;
+    bottom: auto;
+    left: auto;
+    z-index: auto;
+    box-shadow: none;
+  }
+  
+  .decrease-check-btn svg {
+    width: 12px;
+    height: 12px;
+    stroke-width: 2;
+  }
+  
+  .decrease-check-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+  }
+  
+  .decrease-check-btn:disabled {
+    background: #6b7280;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .decrease-check-btn:disabled:hover {
+    transform: none;
+    background: #6b7280;
   }
   
   /* Extra small screen add-hunt-card adjustments */
@@ -2153,4 +2283,31 @@
   color: var(--sidebar-text);
   opacity: 0.8;
   font-style: italic;
+}
+
+/* Edit Button Styles - Exact same as other hunt buttons */
+.hunt-edit-btn {
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.hunt-edit-btn:hover {
+  background: #7c3aed;
+  transform: scale(1.05);
+}
+
+/* Position X button below edit button */
+.hunt-actions .hunt-info-btn {
+  grid-column: 2;
+  grid-row: 2;
 }

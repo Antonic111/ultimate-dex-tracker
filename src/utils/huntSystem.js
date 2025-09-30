@@ -490,13 +490,14 @@ export const HUNT_SYSTEM = {
       { name: "Tera Raids", baseOdds: 4103, description: "Tera Raid Battles" },
       { name: "Mass Outbreaks", baseOdds: 4096, description: "Mass outbreak encounters" },
       { name: "Picnic Resets", baseOdds: 4096, description: "Resetting at picnic encounters" },
+      { name: "Sandwich", baseOdds: 4096, description: "Sandwich encounter power" },
       { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" }
     ],
     modifiers: {
       "Shiny Charm": 3, // Available in Gen 9 - triples odds
-      "Sparkling Lv 1": 1, // Special calculation for Scarlet/Violet
-      "Sparkling Lv 2": 1, // Special calculation for Scarlet/Violet
-      "Sparkling Lv 3": 1, // Special calculation for Scarlet/Violet
+      "Sparkling Lv 1": 2, // 2x shiny rolls (1/2048 without charm, 1/1024 with charm)
+      "Sparkling Lv 2": 3, // 3x shiny rolls (1/1365 without charm, 1/819 with charm)
+      "Sparkling Lv 3": 4, // 4x shiny rolls (1/1024 without charm, 1/683 with charm)
       "Event Boosted": 1 // Special calculation for Event Outbreaks in Scarlet/Violet
     }
   },
@@ -508,13 +509,14 @@ export const HUNT_SYSTEM = {
       { name: "Tera Raids", baseOdds: 4103, description: "Tera Raid Battles" },
       { name: "Mass Outbreaks", baseOdds: 4096, description: "Mass outbreak encounters" },
       { name: "Picnic Resets", baseOdds: 4096, description: "Resetting at picnic encounters" },
+      { name: "Sandwich", baseOdds: 4096, description: "Sandwich encounter power" },
       { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" }
     ],
     modifiers: {
       "Shiny Charm": 3, // Available in Gen 9 - triples odds
-      "Sparkling Lv 1": 1, // Special calculation for Scarlet/Violet
-      "Sparkling Lv 2": 1, // Special calculation for Scarlet/Violet
-      "Sparkling Lv 3": 1, // Special calculation for Scarlet/Violet
+      "Sparkling Lv 1": 2, // 2x shiny rolls (1/2048 without charm, 1/1024 with charm)
+      "Sparkling Lv 2": 3, // 3x shiny rolls (1/1365 without charm, 1/819 with charm)
+      "Sparkling Lv 3": 4, // 4x shiny rolls (1/1024 without charm, 1/683 with charm)
       "Event Boosted": 1 // Special calculation for Event Outbreaks in Scarlet/Violet
     }
   },
@@ -679,8 +681,8 @@ export const calculateOdds = (gameName, methodName, modifiers = {}) => {
     finalOdds = Math.floor(finalOdds / game.modifiers["Perfect Research"]);
   }
 
-  // Special calculation for Sparkling modifiers in Scarlet/Violet (only for Random Encounters and Mass Outbreaks)
-  if ((gameName === "Scarlet" || gameName === "Violet") && (modifiers.sparklingLv1 || modifiers.sparklingLv2 || modifiers.sparklingLv3) && (methodName === "Random Encounters" || methodName === "Mass Outbreaks")) {
+  // Special calculation for Sparkling modifiers in Scarlet/Violet (for Random Encounters, Mass Outbreaks, and Sandwich)
+  if ((gameName === "Scarlet" || gameName === "Violet") && (modifiers.sparklingLv1 || modifiers.sparklingLv2 || modifiers.sparklingLv3) && (methodName === "Random Encounters" || methodName === "Mass Outbreaks" || methodName === "Sandwich")) {
     if (modifiers.sparklingLv1) {
       finalOdds = modifiers.shinyCharm ? 1024 : 2048; // 1/1024 with charm, 1/2048 without
     } else if (modifiers.sparklingLv2) {

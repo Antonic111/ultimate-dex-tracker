@@ -46,7 +46,7 @@ function TimerDisplay({ huntId, lastCheckTime, isPaused, onTimeUpdate }) {
   
   return `${seconds}s`;
 }
-import { Search, X, Plus, Check, Trash2, Settings, Save, Info, RotateCcw, Pause, Play, CheckCircle } from "lucide-react";
+import { Search, X, Plus, Minus, Check, Trash2, Settings, Save, Info, RotateCcw, Pause, Play, CheckCircle, Edit } from "lucide-react";
 import { BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import { getMethodsForGame, calculateOdds, getAllGames, getModifiersForGame, getCurrentHuntOdds } from "../utils/huntSystem";
 import { GAME_OPTIONS } from "../Constants";
@@ -105,10 +105,12 @@ export default function Counters() {
   const [resetModal, setResetModal] = useState({ show: false, hunt: null });
   const [deleteModal, setDeleteModal] = useState({ show: false, hunt: null });
   const [settingsModal, setSettingsModal] = useState({ show: false, hunt: null });
+  const [editModal, setEditModal] = useState({ show: false, hunt: null });
   const [completionModal, setCompletionModal] = useState({ show: false, hunt: null });
   const [resetModalClosing, setResetModalClosing] = useState(false);
   const [deleteModalClosing, setDeleteModalClosing] = useState(false);
   const [settingsModalClosing, setSettingsModalClosing] = useState(false);
+  const [editModalClosing, setEditModalClosing] = useState(false);
   const [pokemonModalClosing, setPokemonModalClosing] = useState(false);
   const [huntModalClosing, setHuntModalClosing] = useState(false);
   const [backdropClosing, setBackdropClosing] = useState(false);
@@ -118,6 +120,28 @@ export default function Counters() {
     manualTotalTime: '',
     manualIncrements: ''
   });
+  const [editForm, setEditForm] = useState({
+    game: '',
+    method: '',
+    pokemon: null,
+    modifiers: {
+      shinyCharm: false,
+      shinyParents: false,
+      lureActive: false,
+      researchLv10: false,
+      perfectResearch: false,
+      sparklingLv1: false,
+      sparklingLv2: false,
+      sparklingLv3: false,
+      eventBoosted: false,
+      communityDay: false,
+      raidDay: false,
+      researchDay: false,
+      galarBirds: false,
+      hatchDay: false
+    }
+  });
+  const [isEditingPokemon, setIsEditingPokemon] = useState(false);
   const [completionForm, setCompletionForm] = useState({
     ball: '',
     mark: '',
@@ -132,10 +156,11 @@ export default function Counters() {
   const saveHuntData = useCallback(async (huntDataOverride = null) => {
     if (!username) return; // Don't save if user is not logged in
     
-    // Throttle saves to prevent rapid-fire requests (max 1 save per 500ms)
+    // Only throttle automatic saves (when no explicit data provided)
+    // Allow immediate saves when explicit data is provided (like from handleAddCheck)
     const now = Date.now();
-    if (now - lastSaveTime.current < 500) {
-      return; // Skip this save if it's too soon
+    if (!huntDataOverride && now - lastSaveTime.current < 500) {
+      return; // Skip this save if it's too soon (only for automatic saves)
     }
     lastSaveTime.current = now;
     
@@ -272,12 +297,22 @@ export default function Counters() {
 
   const handlePokemonSelect = (pokemon) => {
     if (!pokemonModalClosing) {
-    setSelectedPokemon(pokemon);
+      setSelectedPokemon(pokemon);
       setPokemonModalClosing(true);
       setTimeout(() => {
-    setShowPokemonModal(false);
+        setShowPokemonModal(false);
         setPokemonModalClosing(false);
-    setShowHuntModal(true);
+        
+        if (isEditingPokemon) {
+          // If we're editing, update the edit form and return to edit modal
+          setEditForm(prev => ({ ...prev, pokemon: pokemon }));
+          setIsEditingPokemon(false);
+          // Restore the edit modal with the original hunt data
+          setEditModal(prev => ({ ...prev, show: true }));
+        } else {
+          // Normal flow - go to hunt modal
+          setShowHuntModal(true);
+        }
       }, 300);
     }
   };
@@ -347,11 +382,11 @@ export default function Counters() {
         });
       };
     }
-  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, settingsModal.show, completionModal.show]);
+  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, settingsModal.show, editModal.show, completionModal.show]);
 
   // Simple body scroll disable when modals are open
   useEffect(() => {
-    const hasOpenModal = showPokemonModal || showHuntModal || resetModal.show || deleteModal.show || settingsModal.show || completionModal.show;
+    const hasOpenModal = showPokemonModal || showHuntModal || resetModal.show || deleteModal.show || settingsModal.show || editModal.show || completionModal.show;
     
     if (hasOpenModal) {
       // Store the current scroll position
@@ -374,11 +409,11 @@ export default function Counters() {
         window.scrollTo(0, scrollY);
       };
     }
-  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, settingsModal.show, completionModal.show]);
+  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, settingsModal.show, editModal.show, completionModal.show]);
 
   // Add CSS to prevent scroll chaining on modal content
   useEffect(() => {
-    const hasOpenModal = showPokemonModal || showHuntModal || resetModal.show || deleteModal.show || settingsModal.show || completionModal.show;
+    const hasOpenModal = showPokemonModal || showHuntModal || resetModal.show || deleteModal.show || settingsModal.show || editModal.show || completionModal.show;
     
     if (hasOpenModal) {
       // Add CSS to prevent scroll chaining
@@ -394,12 +429,13 @@ export default function Counters() {
         document.head.removeChild(style);
       };
     }
-  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, settingsModal.show, completionModal.show]);
+  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, settingsModal.show, editModal.show, completionModal.show]);
 
 
   const handleAddHunt = () => {
     setSearchTerm("");
     setPokemonModalClosing(false);
+    setIsEditingPokemon(false); // Reset editing state to ensure we start a new hunt
     setShowPokemonModal(true);
   };
 
@@ -536,6 +572,35 @@ export default function Counters() {
     }
   };
 
+  const handleDecreaseCheck = (huntId) => {
+    const hunt = activeHunts.find(h => h.id === huntId);
+    if (!hunt || hunt.checks <= 0) return; // Don't go below 0
+    
+    // Get the increment value for this hunt (default to 1 if not set)
+    const incrementValue = huntIncrements[huntId] || 1;
+    
+    const updatedActiveHunts = activeHunts.map(h => 
+        h.id === huntId 
+          ? { ...h, checks: Math.max(0, h.checks - incrementValue) } // Ensure it doesn't go below 0
+          : h
+    );
+
+    setActiveHunts(updatedActiveHunts);
+
+    // Save immediately for critical actions like decreasing checks
+    if (username) {
+      const huntData = {
+        activeHunts: updatedActiveHunts,
+        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
+        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes).map(([k, v]) => [k, v])),
+        totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes).map(([k, v]) => [k, v])),
+        pausedHunts: Array.from(pausedHunts),
+        huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
+      };
+      saveHuntData(huntData);
+    }
+  };
+
   const handleCompleteHunt = (hunt) => {
     // Open completion modal to get final details
     setCompletionModal({ show: true, hunt });
@@ -556,7 +621,14 @@ export default function Counters() {
       return;
     }
     
-    const hunt = completionModal.hunt;
+    // Get the current hunt data from activeHunts (in case it was edited)
+    const currentHunt = activeHunts.find(h => h.id === completionModal.hunt.id);
+    if (!currentHunt) {
+      showMessage('Hunt not found', 'error');
+      return;
+    }
+    
+    const hunt = currentHunt;
     const huntId = hunt.id;
     
     // Create the caught entry with completion details
@@ -777,6 +849,32 @@ export default function Counters() {
     });
   };
 
+  const handleEditHunt = (huntId) => {
+    const hunt = activeHunts.find(h => h.id === huntId);
+    setEditModal({ show: true, hunt });
+    setEditForm({
+      game: hunt.game || '',
+      method: hunt.method || '',
+      pokemon: hunt.pokemon || null,
+      modifiers: hunt.modifiers || {
+        shinyCharm: false,
+        shinyParents: false,
+        lureActive: false,
+        researchLv10: false,
+        perfectResearch: false,
+        sparklingLv1: false,
+        sparklingLv2: false,
+        sparklingLv3: false,
+        eventBoosted: false,
+        communityDay: false,
+        raidDay: false,
+        researchDay: false,
+        galarBirds: false,
+        hatchDay: false
+      }
+    });
+  };
+
   const handleSettingsConfirm = () => {
     if (!settingsModal.hunt) return;
     
@@ -807,7 +905,7 @@ export default function Counters() {
     
     // Save immediately after settings changes
     if (username) {
-      debouncedSave();
+      saveHuntData();
     }
     
     // Close modal with animation
@@ -816,6 +914,52 @@ export default function Counters() {
       setSettingsModal({ show: false, hunt: null });
       setSettingsModalClosing(false);
       showMessage("Hunt settings updated", "success");
+    }, 300);
+  };
+
+  const handleEditConfirm = () => {
+    if (!editModal.hunt) return;
+    
+    const huntId = editModal.hunt.id;
+    
+    // Calculate new odds based on the updated game, method, and modifiers
+    const newOdds = editForm.game && editForm.method 
+      ? calculateOdds(editForm.game, editForm.method, editForm.modifiers)
+      : null;
+    
+    // Update the hunt with new game, method, pokemon, modifiers, and recalculated odds
+    const updatedActiveHunts = activeHunts.map(hunt => 
+      hunt.id === huntId ? { 
+        ...hunt, 
+        game: editForm.game,
+        method: editForm.method,
+        pokemon: editForm.pokemon,
+        modifiers: editForm.modifiers,
+        odds: newOdds
+      } : hunt
+    );
+    
+    setActiveHunts(updatedActiveHunts);
+    
+    // Save immediately with the updated hunt data
+    if (username) {
+      const huntData = {
+        activeHunts: updatedActiveHunts,
+        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
+        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes).map(([k, v]) => [k, v])),
+        totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes).map(([k, v]) => [k, v])),
+        pausedHunts: Array.from(pausedHunts),
+        huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
+      };
+      saveHuntData(huntData);
+    }
+    
+    // Close modal with animation
+    setEditModalClosing(true);
+    setTimeout(() => {
+      setEditModal({ show: false, hunt: null });
+      setEditModalClosing(false);
+      showMessage("Hunt updated", "success");
     }, 300);
   };
 
@@ -1008,34 +1152,55 @@ export default function Counters() {
                         </div>
                       </div>
                       <div className="hunt-actions">
-                        <button 
-                          onClick={() => handleResetHunt(hunt.id)}
-                          className="hunt-reset-btn"
-                          title="Reset hunt"
-                        >
-                          <RotateCcw size={16} />
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteHunt(hunt.id)}
-                          className="hunt-delete-btn"
-                          title="Delete hunt"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                        <button 
-                          onClick={() => handleSettingsHunt(hunt.id)}
-                          className="hunt-settings-btn"
-                          title="Hunt settings"
-                        >
-                          <Settings size={16} />
-                        </button>
-                        <button 
-                          onClick={() => handleInfoHunt(hunt.id)}
-                          className="hunt-info-btn"
-                          title="Show hunt details"
-                        >
-                          <Info size={16} />
-                        </button>
+                        {!expandedHunts.has(hunt.id) ? (
+                          <>
+                            <button 
+                              onClick={() => handleResetHunt(hunt.id)}
+                              className="hunt-reset-btn"
+                              title="Reset hunt"
+                            >
+                              <RotateCcw size={16} />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteHunt(hunt.id)}
+                              className="hunt-delete-btn"
+                              title="Delete hunt"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                            <button 
+                              onClick={() => handleSettingsHunt(hunt.id)}
+                              className="hunt-settings-btn"
+                              title="Hunt settings"
+                            >
+                              <Settings size={16} />
+                            </button>
+                            <button 
+                              onClick={() => handleInfoHunt(hunt.id)}
+                              className="hunt-info-btn"
+                              title="Show hunt details"
+                            >
+                              <Info size={16} />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button 
+                              onClick={() => handleEditHunt(hunt.id)}
+                              className="hunt-edit-btn"
+                              title="Edit hunt"
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button 
+                              onClick={() => handleInfoHunt(hunt.id)}
+                              className="hunt-info-btn"
+                              title="Hide hunt details"
+                            >
+                              <X size={16} />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </>
                   ) : (
@@ -1045,32 +1210,20 @@ export default function Counters() {
                         <div className="hunt-detail-item">Game: {hunt.game || "NA"}</div>
                         <div className="hunt-detail-item">Method: {hunt.method || "NA"}</div>
                       </div>
-                      <div className="hunt-actions">
+                      <div className="hunt-actions expanded-view">
                         <button 
-                          onClick={() => handleResetHunt(hunt.id)}
-                          className="hunt-reset-btn"
-                          title="Reset hunt"
+                          onClick={() => handleEditHunt(hunt.id)}
+                          className="hunt-edit-btn"
+                          title="Edit hunt"
+                          style={{ gridColumn: '2', gridRow: '1' }}
                         >
-                          <RotateCcw size={16} />
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteHunt(hunt.id)}
-                          className="hunt-delete-btn"
-                          title="Delete hunt"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                        <button 
-                          onClick={() => handleSettingsHunt(hunt.id)}
-                          className="hunt-settings-btn"
-                          title="Hunt settings"
-                        >
-                          <Settings size={16} />
+                          <Edit size={16} />
                         </button>
                         <button 
                           onClick={() => handleInfoHunt(hunt.id)}
                           className="hunt-info-btn"
-                          title="Show Pokemon info"
+                          title="Hide hunt details"
+                          style={{ gridColumn: '2', gridRow: '2' }}
                         >
                           <X size={16} />
                         </button>
@@ -1082,6 +1235,14 @@ export default function Counters() {
                 <div className="hunt-checks">
                   <div className="checks-display">
                     <span className="checks-count">{hunt.checks}</span>
+                    <button 
+                      onClick={() => handleDecreaseCheck(hunt.id)}
+                      className="decrease-check-btn"
+                      title="Decrease check"
+                      disabled={hunt.checks <= 0}
+                    >
+                      <Minus size={12} />
+                    </button>
                   </div>
                   <div className="timer-display">
                     <div className="total-time">
@@ -1103,6 +1264,14 @@ export default function Counters() {
                       title={pausedHunts.has(hunt.id) ? "Resume hunt" : "Pause hunt"}
                     >
                       {pausedHunts.has(hunt.id) ? <Play size={16} /> : <Pause size={16} />}
+                    </button>
+                    <button 
+                      onClick={() => handleDecreaseCheck(hunt.id)}
+                      className="decrease-check-btn"
+                      title="Decrease check"
+                      disabled={hunt.checks <= 0}
+                    >
+                      <Minus size={16} />
                     </button>
                     <button 
                       onClick={() => handleAddCheck(hunt.id)}
@@ -1232,6 +1401,7 @@ export default function Counters() {
                     if (!pokemonModalClosing) {
                       setPokemonModalClosing(true);
                       setBackdropClosing(true);
+                      setIsEditingPokemon(false); // Reset editing state when closing modal
                       setTimeout(() => {
                         setShowPokemonModal(false);
                         setPokemonModalClosing(false);
@@ -1438,6 +1608,15 @@ export default function Counters() {
                       if (val !== "Catch Combo" && val !== "Random Encounters" && val !== "Soft Resets") {
                         setModifiers(prev => ({ ...prev, lureActive: false }));
                       }
+                      // For Sandwich method: automatically set Sparkling Lv 3
+                      if (val === "Sandwich" && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet")) {
+                        setModifiers(prev => ({ 
+                          ...prev, 
+                          sparklingLv1: false, 
+                          sparklingLv2: false, 
+                          sparklingLv3: true 
+                        }));
+                      }
                     }}
                     placeholder={huntDetails.game ? "Select a method..." : "Select a game first"}
                     customBackground="var(--sidebar-edit-inputs)"
@@ -1453,9 +1632,9 @@ export default function Counters() {
                   (gameModifiers["Lure Active"] > 0 && (huntDetails.method === "Catch Combo" || huntDetails.method === "Random Encounters" || (huntDetails.method === "Soft Resets" && huntDetails.game !== "Let's Go Pikachu" && huntDetails.game !== "Let's Go Eevee"))) ||
                   (gameModifiers["Research Lv 10"] > 0 && huntDetails.game === "Legends Arceus") ||
                   (gameModifiers["Perfect Research"] > 0 && huntDetails.game === "Legends Arceus") ||
-                  (gameModifiers["Sparkling Lv 1"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks")) ||
-                  (gameModifiers["Sparkling Lv 2"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks")) ||
-                  (gameModifiers["Sparkling Lv 3"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks")) ||
+                  (gameModifiers["Sparkling Lv 1"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich")) ||
+                  (gameModifiers["Sparkling Lv 2"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich")) ||
+                  (gameModifiers["Sparkling Lv 3"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich")) ||
                   (gameModifiers["Event Boosted"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && huntDetails.method === "Mass Outbreaks") ||
                   (gameModifiers["Community Day"] > 0 && huntDetails.game === "GO" && (huntDetails.method === "Random Encounters" || huntDetails.method === "Daily Adventure Incense")) ||
                   (gameModifiers["Raid Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Raid Battles") ||
@@ -1551,55 +1730,82 @@ export default function Counters() {
                           <span>Perfect Research</span>
                         </label>
                       )}
-                      {gameModifiers["Sparkling Lv 1"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks") && (
+                      {gameModifiers["Sparkling Lv 1"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") && (
                         <label className="modifier-checkbox">
                           <input
                             type="checkbox"
                             checked={modifiers.sparklingLv1}
                             onChange={(e) => {
                               const newSparklingLv1 = e.target.checked;
-                              setModifiers(prev => ({
-                                ...prev,
-                                sparklingLv1: newSparklingLv1,
-                                sparklingLv2: newSparklingLv1 ? false : prev.sparklingLv2,
-                                sparklingLv3: newSparklingLv1 ? false : prev.sparklingLv3
-                              }));
+                              setModifiers(prev => {
+                                const newModifiers = {
+                                  ...prev,
+                                  sparklingLv1: newSparklingLv1,
+                                  sparklingLv2: newSparklingLv1 ? false : prev.sparklingLv2,
+                                  sparklingLv3: newSparklingLv1 ? false : prev.sparklingLv3
+                                };
+                                
+                                // For Sandwich method: if turning off Lv 1 and no other sparkling is active, default to Lv 3
+                                if (huntDetails.method === "Sandwich" && !newSparklingLv1 && !newModifiers.sparklingLv2 && !newModifiers.sparklingLv3) {
+                                  newModifiers.sparklingLv3 = true;
+                                }
+                                
+                                return newModifiers;
+                              });
                             }}
                           />
                           <span>Sparkling Lv 1</span>
                         </label>
                       )}
-                      {gameModifiers["Sparkling Lv 2"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks") && (
+                      {gameModifiers["Sparkling Lv 2"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") && (
                         <label className="modifier-checkbox">
                           <input
                             type="checkbox"
                             checked={modifiers.sparklingLv2}
                             onChange={(e) => {
                               const newSparklingLv2 = e.target.checked;
-                              setModifiers(prev => ({
-                                ...prev,
-                                sparklingLv2: newSparklingLv2,
-                                sparklingLv1: newSparklingLv2 ? false : prev.sparklingLv1,
-                                sparklingLv3: newSparklingLv2 ? false : prev.sparklingLv3
-                              }));
+                              setModifiers(prev => {
+                                const newModifiers = {
+                                  ...prev,
+                                  sparklingLv2: newSparklingLv2,
+                                  sparklingLv1: newSparklingLv2 ? false : prev.sparklingLv1,
+                                  sparklingLv3: newSparklingLv2 ? false : prev.sparklingLv3
+                                };
+                                
+                                // For Sandwich method: if turning off Lv 2 and no other sparkling is active, default to Lv 3
+                                if (huntDetails.method === "Sandwich" && !newSparklingLv2 && !newModifiers.sparklingLv1 && !newModifiers.sparklingLv3) {
+                                  newModifiers.sparklingLv3 = true;
+                                }
+                                
+                                return newModifiers;
+                              });
                             }}
                           />
                           <span>Sparkling Lv 2</span>
                         </label>
                       )}
-                      {gameModifiers["Sparkling Lv 3"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks") && (
+                      {gameModifiers["Sparkling Lv 3"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") && (
                         <label className="modifier-checkbox">
                           <input
                             type="checkbox"
                             checked={modifiers.sparklingLv3}
                             onChange={(e) => {
                               const newSparklingLv3 = e.target.checked;
-                              setModifiers(prev => ({
-                                ...prev,
-                                sparklingLv3: newSparklingLv3,
-                                sparklingLv1: newSparklingLv3 ? false : prev.sparklingLv1,
-                                sparklingLv2: newSparklingLv3 ? false : prev.sparklingLv2
-                              }));
+                              setModifiers(prev => {
+                                const newModifiers = {
+                                  ...prev,
+                                  sparklingLv3: newSparklingLv3,
+                                  sparklingLv1: newSparklingLv3 ? false : prev.sparklingLv1,
+                                  sparklingLv2: newSparklingLv3 ? false : prev.sparklingLv2
+                                };
+                                
+                                // For Sandwich method: if turning off Lv 3 and no other sparkling is active, default back to Lv 3
+                                if (huntDetails.method === "Sandwich" && !newSparklingLv3 && !newModifiers.sparklingLv1 && !newModifiers.sparklingLv2) {
+                                  newModifiers.sparklingLv3 = true;
+                                }
+                                
+                                return newModifiers;
+                              });
                             }}
                           />
                           <span>Sparkling Lv 3</span>
@@ -2322,6 +2528,432 @@ export default function Counters() {
                   className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
                 >
                   Apply Settings
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Edit Hunt Modal */}
+      {editModal.show && createPortal(
+        <div 
+          className={`fixed inset-0 z-[20000] ${editModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setEditModalClosing(true);
+              setTimeout(() => {
+                setEditModal({ show: false, hunt: null });
+                setEditModalClosing(false);
+              }, 300);
+            }
+          }}
+        >
+          <div className="bg-black/80 w-full h-full flex items-center justify-center">
+            <div 
+              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${editModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                  <Edit className="w-5 h-5 text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-[var(--accent)]">Edit Hunt</h3>
+                  <p className="text-sm text-[var(--progressbar-info)]">Change game, method, or Pokemon</p>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                {/* Pokemon Selection */}
+                <div className="hunt-form-group">
+                  <label className="hunt-label">Pokemon:</label>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 px-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--sidebar-edit-inputs)] text-[var(--text)]">
+                      {editForm.pokemon ? formatPokemonName(editForm.pokemon.name) : "Select Pokemon"}
+                    </div>
+                    <button
+                      onClick={() => {
+                        setIsEditingPokemon(true);
+                        setEditModalClosing(true);
+                        setTimeout(() => {
+                          setEditModal(prev => ({ ...prev, show: false }));
+                          setEditModalClosing(false);
+                          setShowPokemonModal(true);
+                        }, 300);
+                      }}
+                      className="px-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--sidebar-edit-inputs)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors flex items-center justify-center h-[42px]"
+                      title="Change Pokemon"
+                    >
+                      <Edit size={20} className="text-[var(--accent)]" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Game Selection */}
+                <div className="hunt-form-group">
+                  <label className="hunt-label">Game:</label>
+                  <SearchbarIconDropdown
+                    id="edit-game-dropdown"
+                    options={GAME_OPTIONS}
+                    value={editForm.game}
+                    onChange={val => setEditForm(prev => ({ ...prev, game: val }))}
+                    placeholder="Select a game..."
+                    customBackground="var(--sidebar-edit-inputs)"
+                    customBorder="var(--border-color)"
+                  />
+                </div>
+
+                {/* Method Selection */}
+                <div className="hunt-form-group">
+                  <label className="hunt-label">Method:</label>
+                  <SearchbarIconDropdown
+                    id="edit-method-dropdown"
+                    options={[
+                      { name: "None", value: "" },
+                      ...(editForm.game ? getMethodsForGame(editForm.game).map(method => ({ 
+                        name: method.name, 
+                        value: method.name 
+                      })) : [])
+                    ]}
+                    value={editForm.method}
+                    onChange={val => setEditForm(prev => ({ ...prev, method: val }))}
+                    placeholder={editForm.game ? "Select a method..." : "Select a game first"}
+                    customBackground="var(--sidebar-edit-inputs)"
+                    customBorder="var(--border-color)"
+                    disabled={!editForm.game}
+                  />
+                </div>
+
+                {/* Modifiers Section */}
+                {editForm.game && (() => {
+                  const editAvailableMethods = getMethodsForGame(editForm.game);
+                  const editGameModifiers = getModifiersForGame(editForm.game);
+                  
+                  return (
+                    (editGameModifiers["Shiny Charm"] > 0 && !(editForm.method === "Fossil Revivals" && (editForm.game === "Let's Go Pikachu" || editForm.game === "Let's Go Eevee" || editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Dynamax Raids" && (editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Gift Pokemon" && (editForm.game === "Sword" || editForm.game === "Shield" || editForm.game === "Let's Go Eevee" || editForm.game === "Let's Go Pikachu")) && !(editForm.method === "Tera Raids" && (editForm.game === "Scarlet" || editForm.game === "Violet")) && !((editForm.method === "Random Encounters" || editForm.method === "Poke Radar" || editForm.method === "Soft Resets" || editForm.method === "Fossil Revivals" || editForm.method === "Gift Pokemon" || editForm.method === "Underground Diglett Hunt") && (editForm.game === "Brilliant Diamond" || editForm.game === "Shining Pearl")) && !(editForm.method === "Poke Radar" && (editForm.game === "X" || editForm.game === "Y")) && !(editForm.method === "Ultra Wormholes" && (editForm.game === "Ultra Sun" || editForm.game === "Ultra Moon"))) ||
+                    (editGameModifiers["Shiny Parents"] > 0 && editForm.method === "Breeding") ||
+                    (editGameModifiers["Lure Active"] > 0 && (editForm.method === "Catch Combo" || editForm.method === "Random Encounters" || (editForm.method === "Soft Resets" && editForm.game !== "Let's Go Pikachu" && editForm.game !== "Let's Go Eevee"))) ||
+                    (editGameModifiers["Research Lv 10"] > 0 && editForm.game === "Legends Arceus") ||
+                    (editGameModifiers["Perfect Research"] > 0 && editForm.game === "Legends Arceus") ||
+                    (editGameModifiers["Sparkling Lv 1"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich")) ||
+                    (editGameModifiers["Sparkling Lv 2"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich")) ||
+                    (editGameModifiers["Sparkling Lv 3"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich")) ||
+                    (editGameModifiers["Event Boosted"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && editForm.method === "Mass Outbreaks") ||
+                    (editGameModifiers["Community Day"] > 0 && editForm.game === "GO" && (editForm.method === "Random Encounters" || editForm.method === "Daily Adventure Incense")) ||
+                    (editGameModifiers["Raid Day"] > 0 && editForm.game === "GO" && editForm.method === "Raid Battles") ||
+                    (editGameModifiers["Research Day"] > 0 && editForm.game === "GO" && editForm.method === "Field Research") ||
+                    (editGameModifiers["Galar Birds"] > 0 && editForm.game === "GO" && editForm.method === "Daily Adventure Incense") ||
+                    (editGameModifiers["Hatch Day"] > 0 && editForm.game === "GO" && editForm.method === "Breeding")
+                  ) && editAvailableMethods.length > 0 && (
+                    <div className="hunt-form-group">
+                      <label className="hunt-label">Modifiers:</label>
+                      <div className="modifiers-section">
+                        {editGameModifiers["Shiny Charm"] > 0 && !(editForm.method === "Fossil Revivals" && (editForm.game === "Let's Go Pikachu" || editForm.game === "Let's Go Eevee" || editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Dynamax Raids" && (editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Gift Pokemon" && (editForm.game === "Sword" || editForm.game === "Shield" || editForm.game === "Let's Go Eevee" || editForm.game === "Let's Go Pikachu")) && !(editForm.method === "Tera Raids" && (editForm.game === "Scarlet" || editForm.game === "Violet")) && !((editForm.method === "Random Encounters" || editForm.method === "Poke Radar" || editForm.method === "Soft Resets" || editForm.method === "Fossil Revivals" || editForm.method === "Gift Pokemon" || editForm.method === "Underground Diglett Hunt") && (editForm.game === "Brilliant Diamond" || editForm.game === "Shining Pearl")) && !(editForm.method === "Poke Radar" && (editForm.game === "X" || editForm.game === "Y")) && !(editForm.method === "Ultra Wormholes" && (editForm.game === "Ultra Sun" || editForm.game === "Ultra Moon")) && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.shinyCharm}
+                              onChange={(e) => {
+                                const newShinyCharm = e.target.checked;
+                                setEditForm(prev => {
+                                  const newModifiers = { ...prev.modifiers, shinyCharm: newShinyCharm };
+                                  // Auto-check Research Lv 10 when Shiny Charm is checked in Legends Arceus
+                                  if (newShinyCharm && editForm.game === "Legends Arceus" && !prev.modifiers.researchLv10) {
+                                    newModifiers.researchLv10 = true;
+                                  }
+                                  return { ...prev, modifiers: newModifiers };
+                                });
+                              }}
+                            />
+                            <span>Shiny Charm</span>
+                          </label>
+                        )}
+                        {editGameModifiers["Shiny Parents"] > 0 && editForm.method === "Breeding" && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.shinyParents}
+                              onChange={(e) => setEditForm(prev => ({ ...prev, modifiers: { ...prev.modifiers, shinyParents: e.target.checked } }))}
+                            />
+                            <span>Shiny Parents</span>
+                          </label>
+                        )}
+                        {editGameModifiers["Lure Active"] > 0 && (editForm.method === "Catch Combo" || editForm.method === "Random Encounters" || (editForm.method === "Soft Resets" && editForm.game !== "Let's Go Pikachu" && editForm.game !== "Let's Go Eevee")) && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.lureActive}
+                              onChange={(e) => setEditForm(prev => ({ ...prev, modifiers: { ...prev.modifiers, lureActive: e.target.checked } }))}
+                            />
+                            <span>Lure Active</span>
+                          </label>
+                        )}
+                        {editGameModifiers["Research Lv 10"] > 0 && editForm.game === "Legends Arceus" && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.researchLv10}
+                              onChange={(e) => {
+                                const newResearchLv10 = e.target.checked;
+                                setEditForm(prev => {
+                                  const newModifiers = { ...prev.modifiers, researchLv10: newResearchLv10 };
+                                  // Auto-uncheck Shiny Charm and Perfect Research when Research Lv 10 is unchecked in Legends Arceus
+                                  if (!newResearchLv10 && editForm.game === "Legends Arceus") {
+                                    if (prev.modifiers.shinyCharm) {
+                                      newModifiers.shinyCharm = false;
+                                    }
+                                    if (prev.modifiers.perfectResearch) {
+                                      newModifiers.perfectResearch = false;
+                                    }
+                                  }
+                                  return { ...prev, modifiers: newModifiers };
+                                });
+                              }}
+                            />
+                            <span>Research Lv 10</span>
+                          </label>
+                        )}
+                        {editGameModifiers["Perfect Research"] > 0 && editForm.game === "Legends Arceus" && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.perfectResearch}
+                              onChange={(e) => {
+                                const newPerfectResearch = e.target.checked;
+                                setEditForm(prev => {
+                                  const newModifiers = { ...prev.modifiers, perfectResearch: newPerfectResearch };
+                                  // Auto-check Research Lv 10 when Perfect Research is checked in Legends Arceus
+                                  if (newPerfectResearch && editForm.game === "Legends Arceus" && !prev.modifiers.researchLv10) {
+                                    newModifiers.researchLv10 = true;
+                                  }
+                                  return { ...prev, modifiers: newModifiers };
+                                });
+                              }}
+                            />
+                            <span>Perfect Research</span>
+                          </label>
+                        )}
+                        {editGameModifiers["Sparkling Lv 1"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.sparklingLv1}
+                              onChange={(e) => {
+                                const newSparklingLv1 = e.target.checked;
+                                setEditForm(prev => {
+                                  const newModifiers = {
+                                    ...prev.modifiers,
+                                    sparklingLv1: newSparklingLv1,
+                                    sparklingLv2: newSparklingLv1 ? false : prev.modifiers.sparklingLv2,
+                                    sparklingLv3: newSparklingLv1 ? false : prev.modifiers.sparklingLv3
+                                  };
+                                  
+                                  // For Sandwich method: if turning off Lv 1 and no other sparkling is active, default to Lv 3
+                                  if (editForm.method === "Sandwich" && !newSparklingLv1 && !newModifiers.sparklingLv2 && !newModifiers.sparklingLv3) {
+                                    newModifiers.sparklingLv3 = true;
+                                  }
+                                  
+                                  return { ...prev, modifiers: newModifiers };
+                                });
+                              }}
+                            />
+                            <span>Sparkling Lv 1</span>
+                          </label>
+                        )}
+                        {editGameModifiers["Sparkling Lv 2"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.sparklingLv2}
+                              onChange={(e) => {
+                                const newSparklingLv2 = e.target.checked;
+                                setEditForm(prev => {
+                                  const newModifiers = {
+                                    ...prev.modifiers,
+                                    sparklingLv2: newSparklingLv2,
+                                    sparklingLv1: newSparklingLv2 ? false : prev.modifiers.sparklingLv1,
+                                    sparklingLv3: newSparklingLv2 ? false : prev.modifiers.sparklingLv3
+                                  };
+                                  
+                                  // For Sandwich method: if turning off Lv 2 and no other sparkling is active, default to Lv 3
+                                  if (editForm.method === "Sandwich" && !newSparklingLv2 && !newModifiers.sparklingLv1 && !newModifiers.sparklingLv3) {
+                                    newModifiers.sparklingLv3 = true;
+                                  }
+                                  
+                                  return { ...prev, modifiers: newModifiers };
+                                });
+                              }}
+                            />
+                            <span>Sparkling Lv 2</span>
+                          </label>
+                        )}
+                        {editGameModifiers["Sparkling Lv 3"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.sparklingLv3}
+                              onChange={(e) => {
+                                const newSparklingLv3 = e.target.checked;
+                                setEditForm(prev => {
+                                  const newModifiers = {
+                                    ...prev.modifiers,
+                                    sparklingLv3: newSparklingLv3,
+                                    sparklingLv1: newSparklingLv3 ? false : prev.modifiers.sparklingLv1,
+                                    sparklingLv2: newSparklingLv3 ? false : prev.modifiers.sparklingLv2
+                                  };
+                                  
+                                  // For Sandwich method: if turning off Lv 3 and no other sparkling is active, default back to Lv 3
+                                  if (editForm.method === "Sandwich" && !newSparklingLv3 && !newModifiers.sparklingLv1 && !newModifiers.sparklingLv2) {
+                                    newModifiers.sparklingLv3 = true;
+                                  }
+                                  
+                                  return { ...prev, modifiers: newModifiers };
+                                });
+                              }}
+                            />
+                            <span>Sparkling Lv 3</span>
+                          </label>
+                        )}
+                        {editGameModifiers["Event Boosted"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && editForm.method === "Mass Outbreaks" && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.eventBoosted}
+                              onChange={(e) => setEditForm(prev => ({ ...prev, modifiers: { ...prev.modifiers, eventBoosted: e.target.checked } }))}
+                            />
+                            <span>Event Boosted</span>
+                          </label>
+                        )}
+                        {editGameModifiers["Community Day"] > 0 && editForm.game === "GO" && (editForm.method === "Random Encounters" || editForm.method === "Daily Adventure Incense") && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.communityDay}
+                              onChange={(e) => {
+                                const newCommunityDay = e.target.checked;
+                                setEditForm(prev => ({
+                                  ...prev,
+                                  modifiers: {
+                                    ...prev.modifiers,
+                                    communityDay: newCommunityDay,
+                                    raidDay: newCommunityDay ? false : prev.modifiers.raidDay,
+                                    researchDay: newCommunityDay ? false : prev.modifiers.researchDay,
+                                    galarBirds: newCommunityDay ? false : prev.modifiers.galarBirds,
+                                    hatchDay: newCommunityDay ? false : prev.modifiers.hatchDay
+                                  }
+                                }));
+                              }}
+                            />
+                            <span>Community Day</span>
+                          </label>
+                        )}
+                        {editGameModifiers["Raid Day"] > 0 && editForm.game === "GO" && editForm.method === "Raid Battles" && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.raidDay}
+                              onChange={(e) => {
+                                const newRaidDay = e.target.checked;
+                                setEditForm(prev => ({
+                                  ...prev,
+                                  modifiers: {
+                                    ...prev.modifiers,
+                                    raidDay: newRaidDay,
+                                    communityDay: newRaidDay ? false : prev.modifiers.communityDay,
+                                    researchDay: newRaidDay ? false : prev.modifiers.researchDay
+                                  }
+                                }));
+                              }}
+                            />
+                            <span>Raid Day</span>
+                          </label>
+                        )}
+                        {editGameModifiers["Research Day"] > 0 && editForm.game === "GO" && editForm.method === "Field Research" && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.researchDay}
+                              onChange={(e) => {
+                                const newResearchDay = e.target.checked;
+                                setEditForm(prev => ({
+                                  ...prev,
+                                  modifiers: {
+                                    ...prev.modifiers,
+                                    researchDay: newResearchDay,
+                                    communityDay: newResearchDay ? false : prev.modifiers.communityDay,
+                                    raidDay: newResearchDay ? false : prev.modifiers.raidDay
+                                  }
+                                }));
+                              }}
+                            />
+                            <span>Research Day</span>
+                          </label>
+                        )}
+                        {editGameModifiers["Galar Birds"] > 0 && editForm.game === "GO" && editForm.method === "Daily Adventure Incense" && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.galarBirds}
+                              onChange={(e) => {
+                                const newGalarBirds = e.target.checked;
+                                setEditForm(prev => ({
+                                  ...prev,
+                                  modifiers: {
+                                    ...prev.modifiers,
+                                    galarBirds: newGalarBirds,
+                                    communityDay: newGalarBirds ? false : prev.modifiers.communityDay
+                                  }
+                                }));
+                              }}
+                            />
+                            <span>Galar Birds</span>
+                          </label>
+                        )}
+                        {editGameModifiers["Hatch Day"] > 0 && editForm.game === "GO" && editForm.method === "Breeding" && (
+                          <label className="modifier-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={editForm.modifiers.hatchDay}
+                              onChange={(e) => {
+                                const newHatchDay = e.target.checked;
+                                setEditForm(prev => ({
+                                  ...prev,
+                                  modifiers: {
+                                    ...prev.modifiers,
+                                    hatchDay: newHatchDay,
+                                    communityDay: newHatchDay ? false : prev.modifiers.communityDay
+                                  }
+                                }));
+                              }}
+                            />
+                            <span>Hatch Day</span>
+                          </label>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+              
+              <div className="flex gap-3 justify-end mt-6">
+                <button
+                  onClick={() => {
+                    setEditModalClosing(true);
+                    setTimeout(() => {
+                      setEditModal({ show: false, hunt: null });
+                      setEditModalClosing(false);
+                    }, 300);
+                  }}
+                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleEditConfirm}
+                  className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
+                >
+                  Update Hunt
                 </button>
               </div>
             </div>

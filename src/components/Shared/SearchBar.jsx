@@ -10,12 +10,14 @@ import {
     Search as SearchIcon,
     Sparkles,
     Star,
-    X
+    X,
+    Crown
 } from "lucide-react";
 import React from "react";
 import { createPortal } from "react-dom";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS } from "../../Constants";
 import { HUNT_SYSTEM } from "../../utils/huntSystem";
+import { getPokemonCategories } from "../../utils/pokemonCategories";
 import "../../css/Settings.css";
 
 import { IconDropdown } from "../Shared/IconDropdown";
@@ -38,7 +40,7 @@ function getAllUniqueMethods() {
 }
 
 // Unique dropdown for SearchBar, with placeholder classes and image support
-export function SearchbarIconDropdown({ id, options, value, onChange, placeholder, customBackground, customBorder, hideClearButton = false, disabled = false }) {
+export function SearchbarIconDropdown({ id, options, value, onChange, placeholder, customBackground, customBorder, hideClearButton = false, disabled = false, isSidebar = false }) {
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState("");
     const [isClickingInside, setIsClickingInside] = React.useState(false);
@@ -190,15 +192,19 @@ export function SearchbarIconDropdown({ id, options, value, onChange, placeholde
 
             {open && !disabled && createPortal(
                 <ul 
-                    className="absolute rounded-md shadow-lg max-h-60 overflow-auto"
+                    className={`${isSidebar ? "fixed" : "absolute"} rounded-md shadow-lg max-h-60 overflow-auto`}
                     style={{ 
                         zIndex: 100000,
                         backgroundColor: 'var(--searchbar-dropdown)', 
                         border: '1px solid var(--border-color)',
                         scrollbarWidth: 'thin',
                         scrollbarColor: 'var(--accent) var(--searchbar-dropdown)',
-                        top: ref.current?.getBoundingClientRect().bottom + window.scrollY + 4,
-                        left: ref.current?.getBoundingClientRect().left + window.scrollX,
+                        top: isSidebar 
+                            ? ref.current?.getBoundingClientRect().bottom + 4
+                            : ref.current?.getBoundingClientRect().bottom + window.scrollY + 4,
+                        left: isSidebar 
+                            ? ref.current?.getBoundingClientRect().left
+                            : ref.current?.getBoundingClientRect().left + window.scrollX,
                         width: ref.current?.getBoundingClientRect().width
                     }} 
                     role="listbox"
@@ -257,6 +263,198 @@ export function SearchbarIconDropdown({ id, options, value, onChange, placeholde
     );
 }
 
+// Multi-select dropdown for SearchBar with checkboxes
+export function SearchbarMultiSelectDropdown({ id, options, selectedValues = [], onChange, placeholder, customBackground, customBorder, disabled = false, isSidebar = false }) {
+    const [open, setOpen] = React.useState(false);
+    const [isClickingInside, setIsClickingInside] = React.useState(false);
+    const [isFocused, setIsFocused] = React.useState(false);
+    const ref = React.useRef();
+
+    React.useEffect(() => {
+        function handle(e) {
+            if (ref.current && !ref.current.contains(e.target)) {
+                if (!isClickingInside) {
+                    setOpen(false);
+                    setIsFocused(false);
+                }
+            }
+        }
+        if (open) document.addEventListener("mousedown", handle);
+        return () => document.removeEventListener("mousedown", handle);
+    }, [open, isClickingInside]);
+
+    const displayText = selectedValues.length === 0 
+        ? "" 
+        : selectedValues.length === 1 
+            ? options.find(opt => opt.value === selectedValues[0])?.name || ""
+            : `${selectedValues.length} selected`;
+
+    const handleToggle = (value) => {
+        const newValues = selectedValues.includes(value)
+            ? selectedValues.filter(v => v !== value)
+            : [...selectedValues, value];
+        onChange(newValues);
+    };
+
+    return (
+        <>
+            <style>{`
+                .dropdown-item-hover:hover {
+                    background-color: var(--dropdown-item-hover-bg) !important;
+                    color: var(--dropdown-item-hover-text) !important;
+                }
+                .dropdown-item-selected {
+                    background-color: var(--searchbar-dropdown-selected) !important;
+                }
+            `}</style>
+            <div className="relative w-full multiselect-dropdown" tabIndex={0} ref={ref} style={{ zIndex: 10000 }}>
+                <div className="relative w-full">
+                    <div 
+                        className="mobile-dropdown-field flex items-center justify-between px-3 py-2 rounded-lg shadow-sm transition-colors duration-200 w-full" 
+                        style={{ 
+                            backgroundColor: disabled ? 'var(--sidebar-edit-inputs-disabled)' : (customBackground || 'var(--searchbar-inputs)'), 
+                            border: isFocused && !disabled ? `1px solid var(--accent)` : `1px solid ${customBorder || 'var(--border-color)'}`,
+                            height: '42px',
+                            minHeight: '42px',
+                            maxHeight: '42px',
+                            overflow: 'hidden',
+                            outline: 'none',
+                            boxShadow: 'none',
+                            opacity: disabled ? 0.6 : 1,
+                            cursor: disabled ? 'not-allowed' : 'default'
+                        }}
+                        onMouseDown={() => !disabled && setIsClickingInside(true)}
+                        onMouseUp={() => !disabled && setIsClickingInside(false)}
+                    >
+                        <div className="flex items-center flex-1 min-w-0">
+                            <div className="flex-1 flex items-center min-w-0 w-full">
+                                <input
+                                    type="text"
+                                    className="flex-1 bg-transparent outline-none text-sm min-w-0 w-full"
+                                    style={{ 
+                                        color: disabled ? 'var(--sidebar-text-disabled)' : 'var(--dropdown-item-text)', 
+                                        border: 'none',
+                                        cursor: disabled ? 'not-allowed' : 'text'
+                                    }}
+                                    placeholder={placeholder}
+                                    value={displayText}
+                                    readOnly
+                                    onFocus={() => {
+                                        if (!disabled) {
+                                            setIsFocused(true);
+                                            setOpen(true);
+                                        }
+                                    }}
+                                    onClick={() => !disabled && setOpen(true)}
+                                    onBlur={() => setIsFocused(false)}
+                                    onKeyDown={(e) => {
+                                        if (disabled) return;
+                                        if (e.key === 'Escape') {
+                                            setOpen(false);
+                                            if (e.target && typeof e.target.blur === 'function') {
+                                                e.target.blur();
+                                            }
+                                        }
+                                    }}
+                                    id={id}
+                                    autoComplete="off"
+                                    disabled={disabled}
+                                />
+                                {selectedValues.length > 0 && !disabled && (
+                                    <button
+                                        type="button"
+                                        className="ml-2 p-1 transition-colors"
+                                        style={{ color: 'var(--accent)' }}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.color = 'var(--text)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.color = 'var(--accent)';
+                                        }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onChange([]);
+                                        }}
+                                        title="Clear selection"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                        {!disabled && (open ? (
+                            <ChevronDown 
+                                className="ml-2 flex-shrink-0 transition-transform duration-200 cursor-pointer" 
+                                style={{ color: 'var(--accent)' }}
+                                onClick={() => setOpen(false)}
+                                title="Close dropdown"
+                            />
+                        ) : (
+                            <ChevronUp 
+                                className="ml-2 flex-shrink-0 transition-transform duration-200 cursor-pointer" 
+                                style={{ color: 'var(--accent)' }}
+                                onClick={() => setOpen(true)}
+                                title="Open dropdown"
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                      {open && !disabled && createPortal(
+                          <ul 
+                              className={`${isSidebar ? "fixed" : "absolute"} rounded-md shadow-lg max-h-60 overflow-auto`}
+                              style={{ 
+                                  zIndex: 100000,
+                                  backgroundColor: 'var(--searchbar-dropdown)', 
+                                  border: '1px solid var(--border-color)',
+                                  scrollbarWidth: 'thin',
+                                  scrollbarColor: 'var(--accent) var(--searchbar-dropdown)',
+                                  top: isSidebar 
+                                      ? ref.current?.getBoundingClientRect().bottom + 4
+                                      : ref.current?.getBoundingClientRect().bottom + window.scrollY + 4,
+                                  left: isSidebar 
+                                      ? ref.current?.getBoundingClientRect().left
+                                      : ref.current?.getBoundingClientRect().left + window.scrollX,
+                                  width: ref.current?.getBoundingClientRect().width
+                              }} 
+                              role="listbox"
+                              onMouseDown={() => setIsClickingInside(true)}
+                              onMouseUp={() => setIsClickingInside(false)}
+                          >
+                        {options.map(opt => {
+                            const isSelected = selectedValues.includes(opt.value);
+                            return (
+                                <li
+                                    key={opt.value}
+                                    className="px-3 py-2 cursor-pointer transition-colors duration-150 dropdown-item dropdown-item-hover"
+                                    style={{
+                                        backgroundColor: 'transparent',
+                                        color: 'var(--dropdown-item-text)'
+                                    }}
+                                    onClick={() => handleToggle(opt.value)}
+                                    tabIndex={0}
+                                    role="option"
+                                >
+                                    <div className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => {}} // Handled by parent onClick
+                                            className="mr-3"
+                                            style={{ accentColor: 'var(--accent)' }}
+                                        />
+                                        <span className="truncate">{opt.name}</span>
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>,
+                    document.body
+                )}
+            </div>
+        </>
+    );
+}
 
 // Poké Ball icon, yellow
 export function PokeballIcon({ style = {}, ...props }) {
@@ -293,7 +491,7 @@ export default function SearchBar({
     
     return (
         <div className="mb-8" style={{ position: 'relative', zIndex: 100000 }}>
-            <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 p-4 rounded-lg shadow-sm max-w-[1300px] mx-auto" style={{ backgroundColor: 'var(--searchbar-bg)', border: '1px solid var(--border-color)' }} onSubmit={e => e.preventDefault()} autoComplete="off">
+            <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-4 rounded-lg shadow-sm max-w-[1300px] mx-auto" style={{ backgroundColor: 'var(--searchbar-bg)', border: '1px solid var(--border-color)' }} onSubmit={e => e.preventDefault()} autoComplete="off">
             {/* Mobile-only header */}
             <div className="md:hidden col-span-full mb-4 flex items-center justify-between">
                 <h2 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Search & Filters</h2>
@@ -307,7 +505,7 @@ export default function SearchBar({
                 </button>
             </div>
             {/* Name/Dex input */}
-            <div className="relative flex items-center" style={{ height: '42px' }}>
+            <div className="relative flex items-center md:col-span-2" style={{ height: '42px' }}>
                 <SearchIcon className="w-5 h-5 mr-2 flex-shrink-0" style={{ color: 'var(--accent)' }} />
                 <div className="relative w-full">
                     <input
@@ -415,9 +613,6 @@ export default function SearchBar({
                 />
             </div>
 
-
-
-
             {/* Mark Dropdown */}
             <div className="relative flex items-center" style={{ height: '42px' }}>
                 <Award className="w-5 h-5 mr-2 flex-shrink-0" style={{ color: 'var(--accent)' }} />
@@ -451,6 +646,18 @@ export default function SearchBar({
                 />
             </div>
 
+            {/* Category Multi-Select Dropdown */}
+            <div className="relative flex items-center" style={{ height: '42px' }}>
+                <Crown className="w-5 h-5 mr-2 flex-shrink-0" style={{ color: 'var(--accent)' }} />
+                <SearchbarMultiSelectDropdown
+                    id="searchbar-category"
+                    options={getPokemonCategories()}
+                    selectedValues={filters.categories || []}
+                    onChange={values => setFilters(f => ({ ...f, categories: values }))}
+                    placeholder="Category"
+                />
+            </div>
+
             {/* Caught/Uncaught Dropdown */}
             <div className="relative flex items-center" style={{ height: '42px' }}>
                 <Star className="w-5 h-5 mr-2 flex-shrink-0" style={{ color: 'var(--accent)' }} />
@@ -468,7 +675,7 @@ export default function SearchBar({
             </div>
                 </>
             )}
-<div className="col-span-1 md:col-span-2 lg:col-span-4 flex items-center justify-center gap-6 mt-4 pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
+<div className="col-span-1 md:col-span-2 lg:col-span-4 xl:col-span-5 flex items-center justify-center gap-6 mt-4 pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
   {/* Shiny Switch */}
   <label className="flex items-center gap-2 cursor-pointer" title="Toggle all shiny sprites">
     <div className="switch">

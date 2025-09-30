@@ -16,6 +16,7 @@ import ProgressManager from "./components/Progress/ProgressManager";
 import SearchBar from "./components/Shared/SearchBar";
 import NoResults from "./components/Shared/NoResults";
 import { formatPokemonName, getLevenshteinDistance } from "./utils";
+import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isSubLegendary, isStarter, isFossil, isBaby, isParadox, getPokemonCategory } from "./utils/pokemonCategories";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -891,6 +892,37 @@ useEffect(() => {
       const caughtKey = getCaughtKey(poke, null, isShiny);
       if (filters.caught === "caught" && !caught[caughtKey]) return false;
       if (filters.caught === "uncaught" && caught[caughtKey]) return false;
+      
+      // Category filtering
+      if (filters.categories && filters.categories.length > 0) {
+        const pokemonCategory = getPokemonCategory(poke);
+        const matchesAnyCategory = filters.categories.some(category => {
+          switch (category) {
+            case "legendary":
+              return isLegendary(poke);
+            case "mythical":
+              return isMythical(poke);
+            case "ultra-beast":
+              return isUltraBeast(poke);
+            case "pseudo-legendary":
+              return isPseudoLegendary(poke);
+            case "sub-legendary":
+              return isSubLegendary(poke);
+            case "paradox":
+              return isParadox(poke);
+            case "starter":
+              return isStarter(poke);
+            case "fossil":
+              return isFossil(poke);
+            case "baby":
+              return isBaby(poke);
+            default:
+              return false;
+          }
+        });
+        
+        if (!matchesAnyCategory) return false;
+      }
 
       return true;
     });
@@ -1220,7 +1252,7 @@ function CloseSidebarOnRouteChange() {
   let suggestion = null;
 
   // Check if we have any active search criteria
-  const hasActiveSearch = filters.searchTerm || filters.game || filters.ball || filters.mark || filters.method || filters.type || filters.gen || filters.caught;
+  const hasActiveSearch = filters.searchTerm || filters.game || filters.ball || filters.mark || filters.method || filters.type || filters.gen || filters.caught || (filters.categories && filters.categories.length > 0);
 
   if (showNoResults && hasActiveSearch) {
     // Only provide suggestions for name/dex searches, not for other filter types
