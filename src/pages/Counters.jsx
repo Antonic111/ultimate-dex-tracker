@@ -147,6 +147,27 @@ export default function Counters() {
     mark: '',
     notes: ''
   });
+
+  // Function to identify Hisuian balls
+  const isHisuianBall = (ballValue) => {
+    const hisuianBalls = [
+      "Feather Ball", "Wing Ball", "Jet Ball", "Heavy Ball (Hisui)", 
+      "Leaden Ball", "Gigaton Ball", "Poké Ball (Hisui)", 
+      "Great Ball (Hisui)", "Ultra Ball (Hisui)", "Origin Ball", "Strange Ball"
+    ];
+    return hisuianBalls.includes(ballValue);
+  };
+
+  // Filter ball options based on selected game for completion modal
+  const getCompletionBallOptions = () => {
+    if (completionModal.hunt && completionModal.hunt.game === "Legends Arceus") {
+      // Show only Hisuian balls for Legends Arceus
+      return BALL_OPTIONS.filter(ball => 
+        ball.value === "" || isHisuianBall(ball.value)
+      );
+    }
+    return BALL_OPTIONS;
+  };
   const lastPauseAction = useRef({});
   const lastSaveTime = useRef(0);
   const { username } = useContext(UserContext);
@@ -1277,7 +1298,6 @@ export default function Counters() {
                       onClick={() => handleAddCheck(hunt.id)}
                       className="add-check-btn"
                       title="Add check"
-                      disabled={pausedHunts.has(hunt.id)}
                     >
                       <Plus size={16} />
                     </button>
@@ -3029,7 +3049,7 @@ export default function Counters() {
                   <label className="sidebar-label">Ball Used:</label>
                   <SearchbarIconDropdown
                     id="completion-ball-dropdown"
-                    options={BALL_OPTIONS}
+                    options={getCompletionBallOptions()}
                     value={completionForm.ball}
                     onChange={val => setCompletionForm(prev => ({ ...prev, ball: val }))}
                     placeholder="Select a ball..."
@@ -3039,7 +3059,7 @@ export default function Counters() {
                 </div>
                 
                 {/* Only show mark field for games that support marks */}
-                {completionModal.hunt && ['Sword', 'Shield', 'Brilliant Diamond', 'Shining Pearl', 'Legends Arceus', 'Scarlet', 'Violet'].includes(completionModal.hunt.game) && (
+                {completionModal.hunt && ['Sword', 'Shield', 'Scarlet', 'Violet'].includes(completionModal.hunt.game) && (
                   <div className="sidebar-form-group">
                     <label className="sidebar-label">Mark:</label>
                     <SearchbarIconDropdown

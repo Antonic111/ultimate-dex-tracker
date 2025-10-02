@@ -54,6 +54,27 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   // Check if marks are available for the selected game
   const marksAvailable = ["Scarlet", "Violet", "Sword", "Shield"].includes(editData.game);
 
+  // Function to identify Hisuian balls
+  const isHisuianBall = (ballValue) => {
+    const hisuianBalls = [
+      "Feather Ball", "Wing Ball", "Jet Ball", "Heavy Ball (Hisui)", 
+      "Leaden Ball", "Gigaton Ball", "Poké Ball (Hisui)", 
+      "Great Ball (Hisui)", "Ultra Ball (Hisui)", "Origin Ball", "Strange Ball"
+    ];
+    return hisuianBalls.includes(ballValue);
+  };
+
+  // Filter ball options based on selected game
+  const getFilteredBallOptions = () => {
+    if (editData.game === "Legends Arceus") {
+      // Show only Hisuian balls for Legends Arceus
+      return BALL_OPTIONS.filter(ball => 
+        ball.value === "" || isHisuianBall(ball.value)
+      );
+    }
+    return BALL_OPTIONS;
+  };
+
   // Game tag mapping with colors and abbreviations
   const getGameTagInfo = (gameName) => {
     const gameMap = {
@@ -796,9 +817,16 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                   <label className="sidebar-label">Ball caught in:</label>
                                    <SearchbarIconDropdown
             id="ball-dropdown"
-            options={BALL_OPTIONS}
+            options={getFilteredBallOptions()}
             value={editData.ball}
-            onChange={val => setEditData(edit => ({ ...edit, ball: val }))}
+            onChange={val => {
+              // Auto-set game to Legends Arceus if a Hisuian ball is selected
+              if (val && isHisuianBall(val)) {
+                setEditData(edit => ({ ...edit, ball: val, game: "Legends Arceus", method: "", mark: "" }));
+              } else {
+                setEditData(edit => ({ ...edit, ball: val }));
+              }
+            }}
             placeholder="Select a ball..."
             customBackground="var(--sidebar-edit-inputs)"
             customBorder="var(--border-color)"
@@ -812,7 +840,20 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             id="game-dropdown"
             options={GAME_OPTIONS}
             value={editData.game}
-            onChange={val => setEditData(edit => ({ ...edit, game: val, method: "", mark: "" }))}
+            onChange={val => {
+              // Clear ball selection if switching away from Legends Arceus and current ball is Hisuian
+              const shouldClearBall = editData.game === "Legends Arceus" && 
+                                    val !== "Legends Arceus" && 
+                                    editData.ball && 
+                                    isHisuianBall(editData.ball);
+              setEditData(edit => ({ 
+                ...edit, 
+                game: val, 
+                method: "", 
+                mark: "",
+                ball: shouldClearBall ? "" : edit.ball
+              }));
+            }}
             placeholder="Select a game..."
             customBackground="var(--sidebar-edit-inputs)"
             customBorder="var(--border-color)"
