@@ -19,6 +19,7 @@ export default function DexPreferences() {
     };
 
     const [preferences, setPreferences] = useState(defaultPreferences);
+    const [externalLinkPreference, setExternalLinkPreference] = useState('serebii');
     const [saving, setSaving] = useState(false);
     const { showMessage } = useMessage();
 
@@ -40,6 +41,9 @@ export default function DexPreferences() {
 
         // Try to load from server
         loadPreferencesFromServer();
+        
+        // Load external link preference
+        loadExternalLinkPreference();
     }, []);
 
     const loadPreferencesFromServer = async () => {
@@ -53,6 +57,25 @@ export default function DexPreferences() {
             }
         } catch (error) {
             console.error('Failed to load dex preferences from server:', error);
+        }
+    };
+
+    const loadExternalLinkPreference = async () => {
+        // Load from localStorage first for immediate UI update
+        const savedPreference = localStorage.getItem('externalLinkPreference');
+        if (savedPreference) {
+            setExternalLinkPreference(savedPreference);
+        }
+        
+        try {
+            const profile = await profileAPI.getProfile();
+            if (profile?.externalLinkPreference) {
+                setExternalLinkPreference(profile.externalLinkPreference);
+                // Update localStorage with server value
+                localStorage.setItem('externalLinkPreference', profile.externalLinkPreference);
+            }
+        } catch (error) {
+            console.error('Failed to load external link preference from server:', error);
         }
     };
 
@@ -85,6 +108,30 @@ export default function DexPreferences() {
             localStorage.setItem('dexPreferences', JSON.stringify(previous));
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleExternalLinkChange = async (preference) => {
+        setExternalLinkPreference(preference);
+        
+        // Save to localStorage immediately for responsive UI
+        localStorage.setItem('externalLinkPreference', preference);
+        
+        try {
+            await profileAPI.updateProfile({ externalLinkPreference: preference });
+                const linkNames = {
+                    'serebii': 'Serebii',
+                    'bulbapedia': 'Bulbapedia', 
+                    'pokemondb': 'PokemonDB',
+                    'smogon': 'Smogon'
+                };
+            showMessage(`External links set to ${linkNames[preference]}`, "success");
+            
+            // Dispatch event to notify App component of external link preference change
+            window.dispatchEvent(new CustomEvent('externalLinkPreferenceChanged'));
+        } catch (error) {
+            console.error('Failed to update external link preference:', error);
+            showMessage("Couldn't update external link preference", "error");
         }
     };
 
@@ -123,6 +170,70 @@ export default function DexPreferences() {
                         </label>
                     </div>
                 ))}
+            </div>
+
+            {/* External Links Section */}
+            <div className="setting-divider" />
+            
+            <div className="external-links-section">
+                <h4 className="preference-section-header">External Links</h4>
+                <p className="setting-description">
+                    Choose which website Pokemon names link to in the sidebar.
+                </p>
+                
+                <div className="dex-preferences-grid">
+                    <div className="preference-item">
+                        <label className="preference-checkbox">
+                            <input
+                                type="radio"
+                                name="externalLink"
+                                value="serebii"
+                                checked={externalLinkPreference === 'serebii'}
+                                onChange={(e) => handleExternalLinkChange(e.target.value)}
+                            />
+                            <span className="preference-label">Serebii</span>
+                        </label>
+                    </div>
+                    
+                    <div className="preference-item">
+                        <label className="preference-checkbox">
+                            <input
+                                type="radio"
+                                name="externalLink"
+                                value="bulbapedia"
+                                checked={externalLinkPreference === 'bulbapedia'}
+                                onChange={(e) => handleExternalLinkChange(e.target.value)}
+                            />
+                            <span className="preference-label">Bulbapedia</span>
+                        </label>
+                    </div>
+                    
+        <div className="preference-item">
+            <label className="preference-checkbox">
+                <input
+                    type="radio"
+                    name="externalLink"
+                    value="pokemondb"
+                    checked={externalLinkPreference === 'pokemondb'}
+                    onChange={(e) => handleExternalLinkChange(e.target.value)}
+                />
+                <span className="preference-label">PokemonDB</span>
+            </label>
+        </div>
+        
+        <div className="preference-item">
+            <label className="preference-checkbox">
+                <input
+                    type="radio"
+                    name="externalLink"
+                    value="smogon"
+                    checked={externalLinkPreference === 'smogon'}
+                    onChange={(e) => handleExternalLinkChange(e.target.value)}
+                />
+                <span className="preference-label">Smogon</span>
+            </label>
+        </div>
+                </div>
             </div>
 
         </div>

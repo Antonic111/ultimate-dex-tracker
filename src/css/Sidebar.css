@@ -53,6 +53,16 @@
   @apply text-3xl font-bold text-[var(--accent)] drop-shadow-[0_4px_1px_rgba(0,0,0,0.8)];
 }
 
+.sidebar-pokemon-name-link {
+  text-decoration: none;
+  border-bottom: 2px solid var(--accent);
+  @apply transition-all duration-200 hover:opacity-60 hover:scale-105;
+}
+
+.sidebar-pokemon-name-link:hover .sidebar-pokemon-name {
+  @apply drop-shadow-[0_4px_1px_rgba(0,0,0,0.8)];
+}
+
 .sidebar-meta-section {
   @apply flex items-start justify-between px-6 pb-1;
 }
@@ -692,6 +702,13 @@
 .game-tag-pair {
   /* Split gradient for paired games - no bleeding */
   background-size: 200% 100%;
+  background-position: 0% 0%;
+  background-repeat: no-repeat;
+}
+
+.game-tag-quad {
+  /* Four-color gradient for RGBY games */
+  background-size: 400% 100%;
   background-position: 0% 0%;
   background-repeat: no-repeat;
 }

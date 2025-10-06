@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { getCaughtKey, migrateOldCaughtData } from './caughtStorage';
 import { fetchCaughtData, updateCaughtData } from './api/caught';
 import { migrateHuntMethods } from './utils/migrateHuntMethods';
-import { authAPI } from './utils/api';
+import { authAPI, profileAPI } from './utils/api';
 import { debugAPI } from './utils/debug';
 
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS } from "./Constants";
@@ -514,6 +514,7 @@ useEffect(() => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [toggles, setToggles] = useState(() => loadDexToggles());
+  const [externalLinkPreference, setExternalLinkPreference] = useState('serebii');
   
   // Reset modal state for grid clicks and bulk operations
   const [resetModal, setResetModal] = useState({ 
@@ -547,6 +548,49 @@ useEffect(() => {
     
     return updated;
   });
+
+  // Load external link preference when user changes
+  useEffect(() => {
+    if (user?.username) {
+      (async () => {
+        try {
+          const data = await profileAPI.getProfile();
+          const preference = data?.externalLinkPreference || 'serebii';
+          setExternalLinkPreference(preference);
+          // Also save to localStorage as backup
+          localStorage.setItem('externalLinkPreference', preference);
+        } catch (error) {
+          console.error('Failed to load external link preference:', error);
+        }
+      })();
+    }
+  }, [user?.username]);
+
+  // Load external link preference from localStorage on initial load
+  useEffect(() => {
+    const savedPreference = localStorage.getItem('externalLinkPreference');
+    if (savedPreference) {
+      setExternalLinkPreference(savedPreference);
+    }
+  }, []);
+
+  // Listen for external link preference changes
+  useEffect(() => {
+    const handleExternalLinkPreferenceChange = async () => {
+      try {
+        const data = await profileAPI.getProfile();
+        setExternalLinkPreference(data?.externalLinkPreference || 'serebii');
+      } catch (error) {
+        console.error('Failed to load external link preference:', error);
+      }
+    };
+
+    window.addEventListener('externalLinkPreferenceChanged', handleExternalLinkPreferenceChange);
+    
+    return () => {
+      window.removeEventListener('externalLinkPreferenceChanged', handleExternalLinkPreferenceChange);
+    };
+  }, []);
 
   // Listen for localStorage changes from other components (like ViewDex)
   useEffect(() => {
@@ -1487,6 +1531,8 @@ function CloseSidebarOnRouteChange() {
                               caughtInfo={caughtInfo}
                               updateCaughtInfo={updateCaughtInfo}
                               showShiny={showShiny}
+                              onPokemonSelect={setSelectedPokemon}
+                              externalLinkPreference={externalLinkPreference}
                             />
                           );
                         })()}

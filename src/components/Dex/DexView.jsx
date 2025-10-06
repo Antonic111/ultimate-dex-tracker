@@ -82,6 +82,7 @@ export default function DexView({
     // Configuration props
     readOnly = false,
     title = "Living Dex",
+    externalLinkPreference = 'serebii',
     pokemonList = null, // If provided, use this instead of filtering dexSections
     
     // Additional props for custom behavior
@@ -384,6 +385,8 @@ export default function DexView({
                     updateCaughtInfo={updateCaughtInfo || (() => {})}
                     showShiny={showShiny}
                     viewingUsername={viewingUsername}
+                    onPokemonSelect={setSelectedPokemon}
+                    externalLinkPreference={externalLinkPreference}
                 />
             )}
         </>

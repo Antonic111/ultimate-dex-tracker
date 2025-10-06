@@ -510,7 +510,20 @@ export const specialFormLabels = {
   "vivillon-pokeball": "Pokeball Forme",
   "magikarp-level-100-female": "Lvl 100 Female",
   "magikarp-level-100-male": "Lvl 100 Male",
-
+  "sneasel-gender-alphaother": "Alpha Male",
+  "typhlosion-alphaother": "Alpha Pokémon",
+  "samurott-alphaother": "Alpha Pokémon",
+  "decidueye-alphaother": "Alpha Pokémon",
+  "lilligant-alphaother": "Alpha Pokémon",
+  "sliggoo-alphaother": "Alpha Pokémon",
+  "goodra-alphaother": "Alpha Pokémon",
+  "braviary-alphaother": "Alpha Pokémon",
+  "avalugg-alphaother": "Alpha Pokémon",
+  "growlithe-alphaother": "Alpha Pokémon",
+  "arcanine-alphaother": "Alpha Pokémon",
+  "voltorb-alphaother": "Alpha Pokémon",
+  "electrode-alphaother": "Alpha Pokémon",
+  "zoroark-alphaother": "Alpha Pokémon",
 };
 
 
@@ -717,4 +730,5 @@ export const specialCases = {
   "rotom-frost-alphaother": "Rotom",
   "rotom-fan-alphaother": "Rotom",
   "rotom-mow-alphaother": "Rotom",
+  "sneasel-gender-alphaother": "Sneasel",
 };

@@ -63,14 +63,59 @@
 /* Evolution Sprites */
 .evo-sprite {
   @apply flex flex-col items-center rounded-full transition-all duration-200 bg-transparent;
+  position: relative;
 }
 
 .evo-img {
   @apply object-contain;
+  pointer-events: none;
 }
 
 .evo-sprite.blank {
   @apply border-none bg-none opacity-0;
+}
+
+/* Clickable sprites */
+.evo-sprite-clickable {
+  @apply hover:scale-105 transition-transform duration-200;
+}
+
+.evo-sprite-clickable:hover {
+  @apply shadow-lg;
+}
+
+/* Selected sprite indicator */
+.evo-sprite-selected {
+  /* Remove Tailwind ring to avoid blue color conflict */
+}
+
+.evo-sprite-selection-indicator {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  pointer-events: none;
+}
+
+.evo-sprite-selection-ring {
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  animation: subtlePulse 4s infinite;
+}
+
+@keyframes subtlePulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--accent);
+  }
+  50% {
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 var(--accent);
+  }
 }
 
 

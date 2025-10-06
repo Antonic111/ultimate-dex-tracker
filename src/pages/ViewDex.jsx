@@ -88,6 +88,15 @@ export default function ViewDex() {
     const [selectedPokemon, setSelectedPokemon] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileOwnerPreferences, setProfileOwnerPreferences] = useState(null);
+    const [externalLinkPreference, setExternalLinkPreference] = useState('serebii');
+
+    // Load external link preference from localStorage
+    useEffect(() => {
+        const savedPreference = localStorage.getItem('externalLinkPreference');
+        if (savedPreference) {
+            setExternalLinkPreference(savedPreference);
+        }
+    }, []);
 
     // fetch the public caught map your API exposes
     useEffect(() => {
@@ -395,6 +404,7 @@ export default function ViewDex() {
                         title={`${username}'s Living Dex`}
                         caught={caughtInfoMap}
                         customFilterMons={customFilterMons}
+                        externalLinkPreference={externalLinkPreference}
                     />
                 </div>
                 
@@ -411,6 +421,8 @@ export default function ViewDex() {
                     updateCaughtInfo={() => {}} // No-op for read-only mode
                     showShiny={showShiny}
                     viewingUsername={username}
+                    onPokemonSelect={setSelectedPokemon}
+                    externalLinkPreference={externalLinkPreference}
                 />
             </>
         );

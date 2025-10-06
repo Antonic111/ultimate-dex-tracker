@@ -1,7 +1,7 @@
 import "../../css/EvolutionChain.css";
 import { findPokemon } from "../../utils";
 
-export default function EvolutionChain({ pokemon, showShiny = false }) {
+export default function EvolutionChain({ pokemon, showShiny = false, onPokemonSelect = null }) {
 
   // --- MAIN LOGIC TO INHERIT CHAIN FROM BASE FORM ---
   // If the current Pokémon has no evolution chain, try to use the "main" one with same id
@@ -35,6 +35,8 @@ if (
           leaving={false}
           showShiny={showShiny}
           size={64}
+          onPokemonSelect={onPokemonSelect}
+          currentPokemon={pokemon}
         />
         <div className="evo-chain-none">No Evolutions</div>
       </div>
@@ -60,6 +62,8 @@ if (
         <EvoChainNode
           mon={base}
           showShiny={showShiny}
+          onPokemonSelect={onPokemonSelect}
+          currentPokemon={pokemon}
         />
       </div>
     </div>
@@ -77,15 +81,38 @@ function buildTree(mon) {
   };
 }
 
-function EvoSprite({ mon, size = 44, showShiny = false }) {
+function EvoSprite({ mon, size = 44, showShiny = false, onPokemonSelect = null, currentPokemon = null }) {
   if (!mon)
     return <div className="evo-sprite blank" style={{ width: size, height: size }} />;
+  
   const imgSrc =
     showShiny && mon.sprites?.front_shiny
       ? mon.sprites.front_shiny
       : mon.sprites?.front_default;
+  
+  const isSelected = currentPokemon && mon.id === currentPokemon.id && mon.name === currentPokemon.name;
+  const isClickable = onPokemonSelect !== null;
+  
+  // Check if this Pokemon has evolutions (either pre or next)
+  const hasEvolutions = mon.evolution && (
+    (mon.evolution.pre && mon.evolution.pre !== null) || 
+    (mon.evolution.next && mon.evolution.next.length > 0)
+  );
+  
+  const handleClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isClickable && onPokemonSelect) {
+      onPokemonSelect(mon);
+    }
+  };
+  
   return (
-    <div className="evo-sprite">
+    <div 
+      className={`evo-sprite ${isClickable ? 'evo-sprite-clickable' : ''} ${isSelected ? 'evo-sprite-selected' : ''}`}
+      onClick={handleClick}
+      style={{ cursor: isClickable ? 'pointer' : 'default' }}
+    >
       <img
         src={imgSrc}
         alt={mon.name}
@@ -94,6 +121,11 @@ function EvoSprite({ mon, size = 44, showShiny = false }) {
         width={size}
         height={size}
       />
+      {isSelected && hasEvolutions && (
+        <div className="evo-sprite-selection-indicator">
+          <div className="evo-sprite-selection-ring"></div>
+        </div>
+      )}
     </div>
   );
 }
@@ -111,7 +143,7 @@ function EvoArrow({ how }) {
   );
 }
 
-function EvoChainNode({ mon, showShiny }) {
+function EvoChainNode({ mon, showShiny, onPokemonSelect = null, currentPokemon = null }) {
 
   if (!mon.evolution?.next?.length) {
     return (
@@ -119,6 +151,8 @@ function EvoChainNode({ mon, showShiny }) {
         <EvoSprite
           mon={mon}
           showShiny={showShiny}
+          onPokemonSelect={onPokemonSelect}
+          currentPokemon={currentPokemon}
         />
       </div>
     );
@@ -131,6 +165,8 @@ function EvoChainNode({ mon, showShiny }) {
           <EvoSprite
             mon={mon}
             showShiny={showShiny}
+            onPokemonSelect={onPokemonSelect}
+            currentPokemon={currentPokemon}
           />
         </div>
         <div className="evo-chain-children">
@@ -143,6 +179,8 @@ function EvoChainNode({ mon, showShiny }) {
                   <EvoChainNode
                     mon={child}
                     showShiny={showShiny}
+                    onPokemonSelect={onPokemonSelect}
+                    currentPokemon={currentPokemon}
                   />
                 ) : null}
               </div>
@@ -161,6 +199,8 @@ function EvoChainNode({ mon, showShiny }) {
         <EvoSprite
           mon={mon}
           showShiny={showShiny}
+          onPokemonSelect={onPokemonSelect}
+          currentPokemon={currentPokemon}
         />
       </div>
       <EvoArrow how={next.how} />
@@ -168,6 +208,8 @@ function EvoChainNode({ mon, showShiny }) {
         <EvoChainNode
           mon={child}
           showShiny={showShiny}
+          onPokemonSelect={onPokemonSelect}
+          currentPokemon={currentPokemon}
         />
       ) : null}
     </div>

@@ -426,7 +426,7 @@ export default function Trainers() {
       {/* General notice about verified accounts only */}
       <div className="verified-notice">
         <Check size={16} />
-        <span>Only verified trainer accounts are shown in this list.</span>
+        <span>Only email verified accounts are shown in this list.</span>
       </div>
 
       {/* Fallback notice when filtering fails */}

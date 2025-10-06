@@ -13722,6 +13722,27 @@
     }
   },
   {
+    "id": 59,
+    "name": "arcanine-alphaother",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/59.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 58,
+        "name": "growlithe",
+        "how": "Use Fire Stone"
+      },
+      "next": []
+    }
+  },
+  {
     "id": 64,
     "name": "kadabra-alphaother",
     "types": [
@@ -13765,6 +13786,27 @@
         "id": 64,
         "name": "kadabra",
         "how": "Trade"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 101,
+    "name": "electrode-alphaother",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/101.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/101.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 100,
+        "name": "voltorb",
+        "how": "Level Up to 30"
       },
       "next": []
     }
@@ -13904,6 +13946,27 @@
     "formType": "alphaother",
     "evolution": {
       "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 157,
+    "name": "typhlosion-alphaother",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/157.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/157.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 156,
+        "name": "quilava",
+        "how": "Level Up to 36"
+      },
       "next": []
     }
   },
@@ -14063,6 +14126,30 @@
   },
   {
     "id": 215,
+    "name": "sneasel-gender-alphaother",
+    "types": [
+      "dark",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/215.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/215.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 461,
+          "name": "weavile-alphaother",
+          "how": "Level Up"
+        }
+      ]
+    }
+  },
+  {
+    "id": 215,
     "name": "sneasel-alphaother",
     "types": [
       "dark",
@@ -14215,6 +14302,34 @@
         "how": "Level Up"
       },
       "next": []
+    }
+  },
+  {
+    "id": 315,
+    "name": "roselia-alphaother",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/315.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/315.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 406,
+        "name": "budew",
+        "how": "level up"
+      },
+      "next": [
+        {
+          "id": 407,
+          "name": "roserade",
+          "how": "Use shiny stone"
+        }
+      ]
     }
   },
   {
@@ -14599,6 +14714,23 @@
           "how": "Level Up"
         }
       ]
+    }
+  },
+  {
+    "id": 417,
+    "name": "pachirisu-alphaother",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/417.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/417.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": []
     }
   },
   {
@@ -15136,6 +15268,182 @@
     "gen": 4,
     "evolution": {
       "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 503,
+    "name": "samurott-alphaother",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/503.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/503.png"
+    },
+    "gen": 5,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 502,
+        "name": "dewott",
+        "how": "Level Up to 36"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 549,
+    "name": "lilligant-alphaother",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/549.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/549.png"
+    },
+    "gen": 5,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 548,
+        "name": "petilil",
+        "how": "Use Sun Stone"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 571,
+    "name": "zoroark-alphaother",
+    "types": [
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/571.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/571.png"
+    },
+    "gen": 5,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 570,
+        "name": "zorua",
+        "how": "Level Up to 30"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 628,
+    "name": "braviary-alphaother",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/628.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/628.png"
+    },
+    "gen": 5,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 627,
+        "name": "rufflet",
+        "how": "Level Up to 54"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 705,
+    "name": "sliggoo-alphaother",
+    "types": [
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/705.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/705.png"
+    },
+    "gen": 6,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 704,
+        "name": "goomy",
+        "how": "Level Up to 40"
+      },
+      "next": [
+        {
+          "id": 706,
+          "name": "goodra",
+          "how": "Level Up to 50"
+        }
+      ]
+    }
+  },
+  {
+    "id": 706,
+    "name": "goodra-alphaother",
+    "types": [
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/706.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/706.png"
+    },
+    "gen": 6,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 705,
+        "name": "sliggoo",
+        "how": "Level Up to 50"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 713,
+    "name": "avalugg-alphaother",
+    "types": [
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/713.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/713.png"
+    },
+    "gen": 6,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 712,
+        "name": "bergmite",
+        "how": "Level Up to 37"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 724,
+    "name": "decidueye-alphaother",
+    "types": [
+      "grass",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/724.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/724.png"
+    },
+    "gen": 7,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 723,
+        "name": "dartrix",
+        "how": "Level Up to 34"
+      },
       "next": []
     }
   },

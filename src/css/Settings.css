@@ -62,6 +62,10 @@
   @apply text-2xl text-[var(--accent)] mb-1 mt-1;
 }
 
+.preference-section-header {
+  @apply text-2xl text-[var(--accent)] mb-3 mt-1;
+}
+
 .setting-block p {
   @apply text-base text-[var(--text)] -mt-2;
   transition: color var(--transition-speed);

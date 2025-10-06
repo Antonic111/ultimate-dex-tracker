@@ -9,21 +9,21 @@ export const GAME_MAPPING = {
   "Yellow": "Blue Red Green And Yellow",
   
   // Gen 2
-  "Gold": "Gold Silver And Crystal",
-  "Silver": "Gold Silver And Crystal",
-  "Crystal": "Gold Silver And Crystal",
+  "Gold": "Gold And Silver",
+  "Silver": "Gold And Silver",
+  "Crystal": "Crystal",
   
-  // Gen 3
-  "Ruby": "Ruby Sapphire Fire Red Leaf Green And Emerald",
-  "Sapphire": "Ruby Sapphire Fire Red Leaf Green And Emerald",
-  "Fire Red": "Ruby Sapphire Fire Red Leaf Green And Emerald",
-  "Leaf Green": "Ruby Sapphire Fire Red Leaf Green And Emerald",
-  "Emerald": "Ruby Sapphire Fire Red Leaf Green And Emerald",
+          // Gen 3
+          "Ruby": "Ruby And Sapphire",
+          "Sapphire": "Ruby And Sapphire",
+          "Emerald": "Emerald",
+  "Fire Red": "Fire Red And Leaf Green",
+  "Leaf Green": "Fire Red And Leaf Green",
   
   // Gen 4
-  "Diamond": "Diamond Pearl And Platinum",
-  "Pearl": "Diamond Pearl And Platinum", 
-  "Platinum": "Diamond Pearl And Platinum",
+  "Diamond": "Diamond And Pearl",
+  "Pearl": "Diamond And Pearl", 
+  "Platinum": "Platinum",
   "Heart Gold": "Heart Gold And Soul Silver",
   "Soul Silver": "Heart Gold And Soul Silver",
   
@@ -67,9 +67,13 @@ export const GAME_MAPPING = {
 // Reverse mapping: from merged names to individual games
 export const REVERSE_GAME_MAPPING = {
   "Blue Red Green And Yellow": ["Blue", "Red", "Green", "Yellow"],
-  "Gold Silver And Crystal": ["Gold", "Silver", "Crystal"],
-  "Ruby Sapphire Fire Red Leaf Green And Emerald": ["Ruby", "Sapphire", "Fire Red", "Leaf Green", "Emerald"],
-  "Diamond Pearl And Platinum": ["Diamond", "Pearl", "Platinum"],
+  "Gold And Silver": ["Gold", "Silver"],
+  "Crystal": ["Crystal"],
+          "Ruby And Sapphire": ["Ruby", "Sapphire"],
+          "Emerald": ["Emerald"],
+  "Fire Red And Leaf Green": ["Fire Red", "Leaf Green"],
+  "Diamond And Pearl": ["Diamond", "Pearl"],
+  "Platinum": ["Platinum"],
   "Heart Gold And Soul Silver": ["Heart Gold", "Soul Silver"],
   "Black And White": ["Black", "White"],
   "Black 2 And White 2": ["Black 2", "White 2"],

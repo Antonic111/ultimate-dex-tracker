@@ -10,13 +10,13 @@ import ContentFilterInput from "../Shared/ContentFilterInput";
 import { useMessage } from "../Shared/MessageContext";
 import { validateContent } from "../../../shared/contentFilter";
 import gamePokemonData from "../../data/gamePokemon.json";
-import { getAvailableGamesForPokemon } from "../../utils/gameMapping";
+import { getAvailableGamesForPokemon, getMergedGameName } from "../../utils/gameMapping";
 import { getMethodsForGame } from "../../utils/huntSystem";
 // import "../../css/EvolutionChain.css"; // Moved to backup folder
 import "../../css/Sidebar.css";
 
 
-export default function PokemonSidebar({ open = false, readOnly = false, pokemon, onClose, caughtInfo, updateCaughtInfo, showShiny, viewingUsername = null }) {
+export default function PokemonSidebar({ open = false, readOnly = false, pokemon, onClose, caughtInfo, updateCaughtInfo, showShiny, viewingUsername = null, onPokemonSelect = null, externalLinkPreference = 'serebii' }) {
   const [closing, setClosing] = useState(false);
   const [editing, setEditing] = useState(false);
   const [selectedEntryIndex, setSelectedEntryIndex] = useState(0);
@@ -118,14 +118,25 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       "Violet": { abbr: "V", colors: ["#9b59b6", "#9b59b6"] },
       "GO": { abbr: "GO", colors: ["#4285f4", "#4285f4"] }
     };
-    return gameMap[gameName] || { abbr: gameName.substring(0, 3), colors: ["#95a5a6", "#95a5a6"] };
+    // Try exact match first, then case-insensitive match
+    const exactMatch = gameMap[gameName];
+    if (exactMatch) return exactMatch;
+    
+    // Try case-insensitive match
+    const caseInsensitiveMatch = Object.keys(gameMap).find(key => 
+      key.toLowerCase() === gameName.toLowerCase()
+    );
+    if (caseInsensitiveMatch) return gameMap[caseInsensitiveMatch];
+    
+    // Fallback to first 3 characters
+    return { abbr: gameName.substring(0, 3), colors: ["#95a5a6", "#95a5a6"] };
   };
 
   // Get games where a Pokemon can be caught, ordered by release date
   const getAvailableGames = (pokemon) => {
     if (!pokemon || !pokemon.id) return [];
     
-    // Game release order (chronological)
+    // Game release order (chronological) - matches exact display order
     const gameReleaseOrder = [
       "Red", "Green",
       "Blue",
@@ -302,7 +313,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     
     // Define game pairs with correct abbreviations in chronological order
     const gamePairs = [
-      { games: ["Red", "Green"], abbr: "RG" },
+      { games: ["Red", "Green", "Blue", "Yellow"], abbr: "RGBY" },
       { games: ["Gold", "Silver"], abbr: "GS" },
       { games: ["Ruby", "Sapphire"], abbr: "RS" },
       { games: ["Fire Red", "Leaf Green"], abbr: "FRLG" },
@@ -320,32 +331,102 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       { games: ["Scarlet", "Violet"], abbr: "SV" }
     ];
     
+    // Define individual games with their proper abbreviations
+    const individualGames = {
+      "Blue": "B",
+      "Yellow": "Y", 
+      "Crystal": "C",
+      "Emerald": "E",
+      "Platinum": "P",
+      "Legends Arceus": "LA",
+      "GO": "GO"
+    };
+    
+    // Process games in chronological order to maintain correct display order
+    const gameReleaseOrder = [
+      "Red", "Green",
+      "Blue",
+      "Yellow",
+      "Gold", "Silver",
+      "Crystal",
+      "Ruby", "Sapphire",
+      "Emerald",
+      "Fire Red", "Leaf Green",
+      "Diamond", "Pearl",
+      "Platinum",
+      "Heart Gold", "Soul Silver",
+      "Black", "White",
+      "Black 2", "White 2",
+      "X", "Y",
+      "Omega Ruby", "Alpha Sapphire",
+      "Sun", "Moon",
+      "Ultra Sun", "Ultra Moon",
+      "Lets GO Pikachu", "Lets GO Eevee",
+      "Sword", "Shield",
+      "Brilliant Diamond", "Shining Pearl",
+      "Legends Arceus",
+      "Scarlet", "Violet",
+      "GO"
+    ];
+    
     // Process games in chronological order
-    games.forEach(game => {
-      if (processedGames.has(game)) return;
+    gameReleaseOrder.forEach(game => {
+      if (!games.includes(game) || processedGames.has(game)) return;
       
       // Check if this game is part of a pair
       const pair = gamePairs.find(p => p.games.includes(game));
       
-      if (pair && (games.includes(pair.games[0]) || games.includes(pair.games[1]))) {
-        // At least one game in the pair is available, create pair
-        const tagInfo1 = getGameTagInfo(pair.games[0]);
-        const tagInfo2 = getGameTagInfo(pair.games[1]);
-        gameGroups.push({
-          type: "pair",
-          games: pair.games,
-          displayName: pair.abbr,
-          colors: [tagInfo1.colors[0], tagInfo2.colors[0]]
-        });
-        processedGames.add(pair.games[0]);
-        processedGames.add(pair.games[1]);
+      if (pair) {
+        // Check if all games in the pair are available
+        const allGamesAvailable = pair.games.every(g => games.includes(g));
+        
+        if (allGamesAvailable) {
+          // All games in the pair are available, create pair
+          if (pair.games.length === 2) {
+            // Regular pair (2 games)
+            const tagInfo1 = getGameTagInfo(pair.games[0]);
+            const tagInfo2 = getGameTagInfo(pair.games[1]);
+            gameGroups.push({
+              type: "pair",
+              games: pair.games,
+              displayName: pair.abbr,
+              colors: [tagInfo1.colors[0], tagInfo2.colors[0]]
+            });
+          } else if (pair.games.length === 4) {
+            // RGBY case (4 games) - use a gradient with all 4 colors
+            const tagInfo1 = getGameTagInfo(pair.games[0]);
+            const tagInfo2 = getGameTagInfo(pair.games[1]);
+            const tagInfo3 = getGameTagInfo(pair.games[2]);
+            const tagInfo4 = getGameTagInfo(pair.games[3]);
+            gameGroups.push({
+              type: "quad",
+              games: pair.games,
+              displayName: pair.abbr,
+              colors: [tagInfo1.colors[0], tagInfo2.colors[0], tagInfo3.colors[0], tagInfo4.colors[0]]
+            });
+          }
+          // Mark all games in the pair as processed
+          pair.games.forEach(g => processedGames.add(g));
+        } else {
+          // Individual game
+          const tagInfo = getGameTagInfo(game);
+          const displayName = individualGames[game] || tagInfo.abbr;
+          gameGroups.push({
+            type: "single",
+            games: [game],
+            displayName: displayName,
+            colors: tagInfo.colors
+          });
+          processedGames.add(game);
+        }
       } else {
         // Individual game
         const tagInfo = getGameTagInfo(game);
+        const displayName = individualGames[game] || tagInfo.abbr;
         gameGroups.push({
           type: "single",
           games: [game],
-          displayName: tagInfo.abbr,
+          displayName: displayName,
           colors: tagInfo.colors
         });
         processedGames.add(game);
@@ -685,6 +766,355 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   const pokeName = formatPokemonName(pokemon?.name);
   const pokeTypes = pokemon?.types || [];
 
+  // Generate external link URL based on preference
+  const getExternalLink = () => {
+    if (!pokemon?.name) return '#';
+    
+    if (externalLinkPreference === 'pokemondb') {
+      // Special case for Type: Null - PokemonDB uses "type-null" format
+      if (pokemon.name.toLowerCase().includes('type-null') || pokemon.name.toLowerCase().includes('type: null') || pokemon.name.toLowerCase().includes('type null')) {
+        return `https://pokemondb.net/pokedex/type-null`;
+      }
+      
+      // Special case for Mr. Mime - PokemonDB uses "mr-mime" format
+      if (pokemon.name.toLowerCase().includes('mr-mime') || pokemon.name.toLowerCase().includes('mr. mime') || pokemon.name.toLowerCase().includes('mr mime')) {
+        return `https://pokemondb.net/pokedex/mr-mime`;
+      }
+      
+      // Special case for Mime Jr. - PokemonDB uses "mime-jr" format
+      if (pokemon.name.toLowerCase().includes('mime-jr') || pokemon.name.toLowerCase().includes('mime jr') || pokemon.name.toLowerCase().includes('mime jr.')) {
+        return `https://pokemondb.net/pokedex/mime-jr`;
+      }
+      
+      // Special case for Mr. Rime - PokemonDB uses "mr-rime" format
+      if (pokemon.name.toLowerCase().includes('mr-rime') || pokemon.name.toLowerCase().includes('mr. rime') || pokemon.name.toLowerCase().includes('mr rime')) {
+        return `https://pokemondb.net/pokedex/mr-rime`;
+      }
+      
+      // Special case for Nidoran♀ - PokemonDB uses "nidoran-f" format
+      if (pokemon.name.toLowerCase().includes('nidoran-f') || pokemon.name.toLowerCase().includes('nidoran♀') || pokemon.name.toLowerCase().includes('nidoran female')) {
+        return `https://pokemondb.net/pokedex/nidoran-f`;
+      }
+      
+      // Special case for Nidoran♂ - PokemonDB uses "nidoran-m" format
+      if (pokemon.name.toLowerCase().includes('nidoran-m') || pokemon.name.toLowerCase().includes('nidoran♂') || pokemon.name.toLowerCase().includes('nidoran male')) {
+        return `https://pokemondb.net/pokedex/nidoran-m`;
+      }
+      
+      // Special case for Farfetch'd - PokemonDB uses "farfetchd" format (no apostrophe)
+      if (pokemon.name.toLowerCase().includes('farfetch') || pokemon.name.toLowerCase().includes('farfetch\'d') || pokemon.name.toLowerCase().includes('farfetchd')) {
+        return `https://pokemondb.net/pokedex/farfetchd`;
+      }
+      
+      // Special case for Sirfetch'd - PokemonDB uses "sirfetchd" format (no apostrophe)
+      if (pokemon.name.toLowerCase().includes('sirfetch') || pokemon.name.toLowerCase().includes('sirfetch\'d') || pokemon.name.toLowerCase().includes('sirfetchd')) {
+        return `https://pokemondb.net/pokedex/sirfetchd`;
+      }
+      
+      // PokemonDB - use the display name and clean it for URL
+      let displayName = formatPokemonName(pokemon.name);
+      
+      // Special case for Unown forms - always use base "unown"
+      if (pokemon.name.toLowerCase().startsWith('unown')) {
+        displayName = 'Unown';
+      }
+      
+      // PokemonDB uses lowercase names with hyphens for spaces
+      const pokemonName = displayName.toLowerCase().replace(/\s+/g, '-');
+      return `https://pokemondb.net/pokedex/${pokemonName}`;
+    } else if (externalLinkPreference === 'bulbapedia') {
+      // Special case for Type: Null - Bulbapedia uses "Type:_Null" format
+      if (pokemon.name.toLowerCase().includes('type-null') || pokemon.name.toLowerCase().includes('type: null') || pokemon.name.toLowerCase().includes('type null')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Type:_Null_(Pokémon)`;
+      }
+      
+      // Special case for Mr. Mime - Bulbapedia uses "Mr._Mime" format
+      if (pokemon.name.toLowerCase().includes('mr-mime') || pokemon.name.toLowerCase().includes('mr. mime') || pokemon.name.toLowerCase().includes('mr mime')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Mr._Mime_(Pokémon)`;
+      }
+      
+      // Special case for Mime Jr. - Bulbapedia uses "Mime_Jr." format
+      if (pokemon.name.toLowerCase().includes('mime-jr') || pokemon.name.toLowerCase().includes('mime jr') || pokemon.name.toLowerCase().includes('mime jr.')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Mime_Jr._(Pokémon)`;
+      }
+      
+      // Special case for Mr. Rime - Bulbapedia uses "Mr._Rime" format
+      if (pokemon.name.toLowerCase().includes('mr-rime') || pokemon.name.toLowerCase().includes('mr. rime') || pokemon.name.toLowerCase().includes('mr rime')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Mr._Rime_(Pokémon)`;
+      }
+      
+      // Special case for Nidoran♀ - Bulbapedia uses URL-encoded gender symbol
+      if (pokemon.name.toLowerCase().includes('nidoran-f') || pokemon.name.toLowerCase().includes('nidoran♀') || pokemon.name.toLowerCase().includes('nidoran female')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Nidoran%E2%99%80_(Pokémon)`;
+      }
+      
+      // Special case for Nidoran♂ - Bulbapedia uses URL-encoded gender symbol
+      if (pokemon.name.toLowerCase().includes('nidoran-m') || pokemon.name.toLowerCase().includes('nidoran♂') || pokemon.name.toLowerCase().includes('nidoran male')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Nidoran%E2%99%82_(Pokémon)`;
+      }
+      
+      // Special case for Farfetch'd - Bulbapedia uses URL-encoded apostrophe
+      if (pokemon.name.toLowerCase().includes('farfetch') || pokemon.name.toLowerCase().includes('farfetch\'d') || pokemon.name.toLowerCase().includes('farfetchd')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Farfetch%27d_(Pokémon)`;
+      }
+      
+      // Special case for Sirfetch'd - Bulbapedia uses URL-encoded apostrophe
+      if (pokemon.name.toLowerCase().includes('sirfetch') || pokemon.name.toLowerCase().includes('sirfetch\'d') || pokemon.name.toLowerCase().includes('sirfetchd')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Sirfetch%27d_(Pokémon)`;
+      }
+      
+      // Special case for Ho-Oh - Bulbapedia uses "Ho-Oh" format (with hyphen)
+      if (pokemon.name.toLowerCase().includes('ho-oh') || pokemon.name.toLowerCase().includes('hooh') || pokemon.name.toLowerCase().includes('ho oh')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Ho-Oh_(Pokémon)`;
+      }
+      
+      // Special case for Porygon-Z - Bulbapedia uses "Porygon-Z" format (with hyphen)
+      if (pokemon.name.toLowerCase() === 'porygon-z' || pokemon.name.toLowerCase().includes('porygon-z') || pokemon.name.toLowerCase().includes('porygonz') || pokemon.name.toLowerCase().includes('porygon z')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Porygon-Z_(Pokémon)`;
+      }
+      
+      // Special case for Jangmo-o - Bulbapedia uses "Jangmo-o" format (with hyphen)
+      if (pokemon.name.toLowerCase() === 'jangmo-o' || pokemon.name.toLowerCase().includes('jangmo-o') || pokemon.name.toLowerCase().includes('jangmoo') || pokemon.name.toLowerCase().includes('jangmo o')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Jangmo-o_(Pokémon)`;
+      }
+      
+      // Special case for Hakamo-o - Bulbapedia uses "Hakamo-o" format (with hyphen)
+      if (pokemon.name.toLowerCase() === 'hakamo-o' || pokemon.name.toLowerCase().includes('hakamo-o') || pokemon.name.toLowerCase().includes('hakamoo') || pokemon.name.toLowerCase().includes('hakamo o')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Hakamo-o_(Pokémon)`;
+      }
+      
+      // Special case for Kommo-o - Bulbapedia uses "Kommo-o" format (with hyphen)
+      if (pokemon.name.toLowerCase() === 'kommo-o' || pokemon.name.toLowerCase().includes('kommo-o') || pokemon.name.toLowerCase().includes('kommoo') || pokemon.name.toLowerCase().includes('kommo o')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Kommo-o_(Pokémon)`;
+      }
+      
+      // Special case for Tapu Koko - Bulbapedia uses "Tapu_Koko" format (with underscore)
+      if (pokemon.name.toLowerCase() === 'tapu-koko' || pokemon.name.toLowerCase().includes('tapu koko') || pokemon.name.toLowerCase().includes('tapukoko')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Tapu_Koko_(Pokémon)`;
+      }
+      
+      // Special case for Tapu Lele - Bulbapedia uses "Tapu_Lele" format (with underscore)
+      if (pokemon.name.toLowerCase() === 'tapu-lele' || pokemon.name.toLowerCase().includes('tapu lele') || pokemon.name.toLowerCase().includes('tapulele')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Tapu_Lele_(Pokémon)`;
+      }
+      
+      // Special case for Tapu Bulu - Bulbapedia uses "Tapu_Bulu" format (with underscore)
+      if (pokemon.name.toLowerCase() === 'tapu-bulu' || pokemon.name.toLowerCase().includes('tapu bulu') || pokemon.name.toLowerCase().includes('tapubulu')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Tapu_Bulu_(Pokémon)`;
+      }
+      
+      // Special case for Tapu Fini - Bulbapedia uses "Tapu_Fini" format (with underscore)
+      if (pokemon.name.toLowerCase() === 'tapu-fini' || pokemon.name.toLowerCase().includes('tapu fini') || pokemon.name.toLowerCase().includes('tapufini')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Tapu_Fini_(Pokémon)`;
+      }
+      
+      // Special case for Great Tusk - Bulbapedia uses "Great_Tusk" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase().includes('great tusk') || pokemon.name.toLowerCase().includes('great-tusk') || pokemon.name.toLowerCase().includes('greattusk')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Great_Tusk_(Pokémon)`;
+      }
+      
+      // Special case for Scream Tail - Bulbapedia uses "Scream_Tail" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'scream-tail' || pokemon.name.toLowerCase().includes('scream tail') || pokemon.name.toLowerCase().includes('screamtail')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Scream_Tail_(Pokémon)`;
+      }
+      
+      // Special case for Brute Bonnet - Bulbapedia uses "Brute_Bonnet" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'brute-bonnet' || pokemon.name.toLowerCase().includes('brute bonnet') || pokemon.name.toLowerCase().includes('brutebonnet')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Brute_Bonnet_(Pokémon)`;
+      }
+      
+      // Special case for Flutter Mane - Bulbapedia uses "Flutter_Mane" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'flutter-mane' || pokemon.name.toLowerCase().includes('flutter mane') || pokemon.name.toLowerCase().includes('fluttermane')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Flutter_Mane_(Pokémon)`;
+      }
+      
+      // Special case for Slither Wing - Bulbapedia uses "Slither_Wing" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'slither-wing' || pokemon.name.toLowerCase().includes('slither wing') || pokemon.name.toLowerCase().includes('slitherwing')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Slither_Wing_(Pokémon)`;
+      }
+      
+      // Special case for Sandy Shocks - Bulbapedia uses "Sandy_Shocks" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'sandy-shocks' || pokemon.name.toLowerCase().includes('sandy shocks') || pokemon.name.toLowerCase().includes('sandyshocks')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Sandy_Shocks_(Pokémon)`;
+      }
+      
+      // Special case for Iron Treads - Bulbapedia uses "Iron_Treads" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'iron-treads' || pokemon.name.toLowerCase().includes('iron treads') || pokemon.name.toLowerCase().includes('irontreads')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Iron_Treads_(Pokémon)`;
+      }
+      
+      // Special case for Iron Bundle - Bulbapedia uses "Iron_Bundle" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'iron-bundle' || pokemon.name.toLowerCase().includes('iron bundle') || pokemon.name.toLowerCase().includes('ironbundle')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Iron_Bundle_(Pokémon)`;
+      }
+      
+      // Special case for Iron Hands - Bulbapedia uses "Iron_Hands" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'iron-hands' || pokemon.name.toLowerCase().includes('iron hands') || pokemon.name.toLowerCase().includes('ironhands')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Iron_Hands_(Pokémon)`;
+      }
+      
+      // Special case for Iron Jugulis - Bulbapedia uses "Iron_Jugulis" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'iron-jugulis' || pokemon.name.toLowerCase().includes('iron jugulis') || pokemon.name.toLowerCase().includes('ironjugulis')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Iron_Jugulis_(Pokémon)`;
+      }
+      
+      // Special case for Iron Moth - Bulbapedia uses "Iron_Moth" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'iron-moth' || pokemon.name.toLowerCase().includes('iron moth') || pokemon.name.toLowerCase().includes('ironmoth')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Iron_Moth_(Pokémon)`;
+      }
+      
+      // Special case for Iron Thorns - Bulbapedia uses "Iron_Thorns" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'iron-thorns' || pokemon.name.toLowerCase().includes('iron thorns') || pokemon.name.toLowerCase().includes('ironthorns')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Iron_Thorns_(Pokémon)`;
+      }
+      
+      // Special case for Wo-Chien - Bulbapedia uses "Wo-Chien" format (with hyphen and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'wo-chien' || pokemon.name.toLowerCase().includes('wo chien') || pokemon.name.toLowerCase().includes('wochien')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Wo-Chien_(Pokémon)`;
+      }
+      
+      // Special case for Chien-Pao - Bulbapedia uses "Chien-Pao" format (with hyphen and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'chien-pao' || pokemon.name.toLowerCase().includes('chien pao') || pokemon.name.toLowerCase().includes('chienpao')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Chien-Pao_(Pokémon)`;
+      }
+      
+      // Special case for Ting-Lu - Bulbapedia uses "Ting-Lu" format (with hyphen and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'ting-lu' || pokemon.name.toLowerCase().includes('ting lu') || pokemon.name.toLowerCase().includes('tinglu')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Ting-Lu_(Pokémon)`;
+      }
+      
+      // Special case for Chi-Yu - Bulbapedia uses "Chi-Yu" format (with hyphen and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'chi-yu' || pokemon.name.toLowerCase().includes('chi yu') || pokemon.name.toLowerCase().includes('chiyu')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Chi-Yu_(Pokémon)`;
+      }
+      
+      // Special case for Roaring Moon - Bulbapedia uses "Roaring_Moon" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'roaring-moon' || pokemon.name.toLowerCase().includes('roaring moon') || pokemon.name.toLowerCase().includes('roaringmoon')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Roaring_Moon_(Pokémon)`;
+      }
+      
+      // Special case for Iron Valiant - Bulbapedia uses "Iron_Valiant" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'iron-valiant' || pokemon.name.toLowerCase().includes('iron valiant') || pokemon.name.toLowerCase().includes('ironvaliant')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Iron_Valiant_(Pokémon)`;
+      }
+      
+      // Special case for Walking Wake - Bulbapedia uses "Walking_Wake" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'walking-wake' || pokemon.name.toLowerCase().includes('walking wake') || pokemon.name.toLowerCase().includes('walkingwake')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Walking_Wake_(Pokémon)`;
+      }
+      
+      // Special case for Iron Leaves - Bulbapedia uses "Iron_Leaves" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'iron-leaves' || pokemon.name.toLowerCase().includes('iron leaves') || pokemon.name.toLowerCase().includes('ironleaves')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Iron_Leaves_(Pokémon)`;
+      }
+      
+      // Special case for Gouging Fire - Bulbapedia uses "Gouging_Fire" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'gouging-fire' || pokemon.name.toLowerCase().includes('gouging fire') || pokemon.name.toLowerCase().includes('gougingfire')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Gouging_Fire_(Pokémon)`;
+      }
+      
+      // Special case for Raging Bolt - Bulbapedia uses "Raging_Bolt" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'raging-bolt' || pokemon.name.toLowerCase().includes('raging bolt') || pokemon.name.toLowerCase().includes('ragingbolt')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Raging_Bolt_(Pokémon)`;
+      }
+      
+      // Special case for Iron Boulder - Bulbapedia uses "Iron_Boulder" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'iron-boulder' || pokemon.name.toLowerCase().includes('iron boulder') || pokemon.name.toLowerCase().includes('ironboulder')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Iron_Boulder_(Pokémon)`;
+      }
+      
+      // Special case for Iron Crown - Bulbapedia uses "Iron_Crown" format (with underscore and proper capitalization)
+      if (pokemon.name.toLowerCase() === 'iron-crown' || pokemon.name.toLowerCase().includes('iron crown') || pokemon.name.toLowerCase().includes('ironcrown')) {
+        return `https://bulbapedia.bulbagarden.net/wiki/Iron_Crown_(Pokémon)`;
+      }
+      
+      // Use the display name and clean it for URL
+      let displayName = formatPokemonName(pokemon.name);
+      
+      // Special case for Unown forms - always use base "unown"
+      if (pokemon.name.toLowerCase().startsWith('unown')) {
+        displayName = 'Unown';
+      }
+      
+      const pokemonName = displayName.toLowerCase().replace(/[^a-z0-9]/g, '');
+      return `https://bulbapedia.bulbagarden.net/wiki/${pokemonName}_(Pokémon)`;
+    } else if (externalLinkPreference === 'smogon') {
+      // Smogon - use the Pokemon strategy page
+      let displayName = formatPokemonName(pokemon.name);
+      
+      // Special case for Nidoran♀ - Smogon uses "nidoran-f" format
+      if (pokemon.name.toLowerCase().includes('nidoran-f') || pokemon.name.toLowerCase().includes('nidoran♀') || pokemon.name.toLowerCase().includes('nidoran female')) {
+        return `https://www.smogon.com/dex/sv/pokemon/nidoran-f/`;
+      }
+      
+      // Special case for Nidoran♂ - Smogon uses "nidoran-m" format
+      if (pokemon.name.toLowerCase().includes('nidoran-m') || pokemon.name.toLowerCase().includes('nidoran♂') || pokemon.name.toLowerCase().includes('nidoran male')) {
+        return `https://www.smogon.com/dex/sv/pokemon/nidoran-m/`;
+      }
+      
+      // Special case for Unown forms - always use base "unown"
+      if (pokemon.name.toLowerCase().startsWith('unown')) {
+        displayName = 'Unown';
+      }
+      
+      // Smogon uses lowercase names with hyphens for spaces
+      const pokemonName = displayName.toLowerCase().replace(/\s+/g, '-');
+      return `https://www.smogon.com/dex/sv/pokemon/${pokemonName}/`;
+    } else {
+      // Serebii - use the main Pokemon hub with Pokemon name
+      let displayName = formatPokemonName(pokemon.name);
+      
+      // Special case for Unown forms - always use base "unown"
+      if (pokemon.name.toLowerCase().startsWith('unown')) {
+        displayName = 'Unown';
+      }
+      
+      // Special case for Mr. Mime - Serebii uses "mr.mime" format
+      if (pokemon.name.toLowerCase().includes('mr-mime') || pokemon.name.toLowerCase().includes('mr. mime') || pokemon.name.toLowerCase().includes('mr mime')) {
+        return `https://www.serebii.net/pokemon/mr.mime`;
+      }
+      
+      // Special case for Mime Jr. - Serebii uses "mimejr." format
+      if (pokemon.name.toLowerCase().includes('mime-jr') || pokemon.name.toLowerCase().includes('mime jr') || pokemon.name.toLowerCase().includes('mime jr.')) {
+        return `https://www.serebii.net/pokemon/mimejr.`;
+      }
+      
+      // Special case for Mr. Rime - Serebii uses "mr.rime" format
+      if (pokemon.name.toLowerCase().includes('mr-rime') || pokemon.name.toLowerCase().includes('mr. rime') || pokemon.name.toLowerCase().includes('mr rime')) {
+        return `https://www.serebii.net/pokemon/mr.rime`;
+      }
+      
+      // Special case for Type: Null - Serebii uses "type:null" format
+      if (pokemon.name.toLowerCase().includes('type-null') || pokemon.name.toLowerCase().includes('type: null') || pokemon.name.toLowerCase().includes('type null')) {
+        return `https://www.serebii.net/pokemon/type:null`;
+      }
+      
+      // Special case for Nidoran♀ - Serebii uses "nidoranf" format
+      if (pokemon.name.toLowerCase().includes('nidoran-f') || pokemon.name.toLowerCase().includes('nidoran♀') || pokemon.name.toLowerCase().includes('nidoran female')) {
+        return `https://www.serebii.net/pokemon/nidoranf`;
+      }
+      
+          // Special case for Nidoran♂ - Serebii uses "nidoranm" format
+          if (pokemon.name.toLowerCase().includes('nidoran-m') || pokemon.name.toLowerCase().includes('nidoran♂') || pokemon.name.toLowerCase().includes('nidoran male')) {
+            return `https://www.serebii.net/pokemon/nidoranm`;
+          }
+          
+          // Special case for Farfetch'd - Serebii uses "farfetch'd" format (with apostrophe)
+          if (pokemon.name.toLowerCase().includes('farfetch') || pokemon.name.toLowerCase().includes('farfetch\'d') || pokemon.name.toLowerCase().includes('farfetchd')) {
+            return `https://www.serebii.net/pokemon/farfetch'd`;
+          }
+          
+          // Special case for Sirfetch'd - Serebii uses "sirfetch'd" format (with apostrophe)
+          if (pokemon.name.toLowerCase().includes('sirfetch') || pokemon.name.toLowerCase().includes('sirfetch\'d') || pokemon.name.toLowerCase().includes('sirfetchd')) {
+            return `https://www.serebii.net/pokemon/sirfetch'd`;
+          }
+      
+      // Use cleaned name for most Pokémon - preserve hyphens and colons but remove other special characters
+      const pokemonName = displayName.toLowerCase().replace(/[^a-z0-9-:]/g, '');
+      return `https://www.serebii.net/pokemon/${pokemonName}`;
+    }
+  };
+
   return (
                                                <div 
           className={`sidebar-container ${closing ? 'sidebar-slide-out' : 'sidebar-slide-in'}`} 
@@ -731,7 +1161,15 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             )}
           </div>
                                                                                                                                                                                <div className="flex-1">
-                <span className="sidebar-pokemon-name">{pokeName}</span>
+                <a 
+                  href={getExternalLink()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="sidebar-pokemon-name-link"
+                  title={`View ${pokeName} on ${externalLinkPreference === 'serebii' ? 'Serebii' : externalLinkPreference === 'bulbapedia' ? 'Bulbapedia' : 'PokemonDB'}`}
+                >
+                  <span className="sidebar-pokemon-name">{pokeName}</span>
+                </a>
               </div>
         </div>
 
@@ -1295,10 +1733,12 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
               {getGroupedGames(getAvailableGames(pokemon)).map((gameGroup, index) => (
                 <div
                   key={`${gameGroup.displayName}-${index}`}
-                  className={`game-tag ${gameGroup.type === 'pair' ? 'game-tag-pair' : 'game-tag-single'}`}
+                  className={`game-tag ${gameGroup.type === 'pair' ? 'game-tag-pair' : gameGroup.type === 'quad' ? 'game-tag-quad' : 'game-tag-single'}`}
                   style={{
                     background: gameGroup.type === 'pair' 
                       ? `linear-gradient(90deg, ${gameGroup.colors[0]} 50%, ${gameGroup.colors[1]} 50%)`
+                      : gameGroup.type === 'quad'
+                      ? `linear-gradient(90deg, ${gameGroup.colors[0]} 25%, ${gameGroup.colors[1]} 25%, ${gameGroup.colors[1]} 50%, ${gameGroup.colors[2]} 50%, ${gameGroup.colors[2]} 75%, ${gameGroup.colors[3]} 75%)`
                       : gameGroup.colors[0]
                   }}
                 >
@@ -1309,7 +1749,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
           </div>
         )}
 
-        {pokemon && <EvolutionChain pokemon={pokemon} showShiny={showShiny} />}
+        {pokemon && <EvolutionChain pokemon={pokemon} showShiny={showShiny} onPokemonSelect={onPokemonSelect} />}
 
       </div>
 

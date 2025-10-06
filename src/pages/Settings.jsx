@@ -45,7 +45,7 @@ export default function Settings() {
         try {
             await profileAPI.updateProfile({ isProfilePublic: nextPublic });
 
-            // re-fetch to lock UI to what’s saved
+            // re-fetch to lock UI to what's saved
             const data = await profileAPI.getProfile();
             setIsPrivate(data?.isProfilePublic === false);
             showMessage(data?.isProfilePublic === false ? "Profile set to private" : "Profile set to public", "success");
@@ -58,6 +58,7 @@ export default function Settings() {
             setSavingPrivacy(false);
         }
     };
+
 
     const [deleting, setDeleting] = useState(false);
 
@@ -301,7 +302,6 @@ export default function Settings() {
                         </div>
                     </div>
 
-                    <div className="setting-divider" />
 
                     {/* Connected Accounts */}
                     {/* <div className="setting-block">
@@ -310,6 +310,8 @@ export default function Settings() {
                     </div>
 
                     <div className="setting-divider" /> */}
+
+                    <div className="setting-divider" />
 
                     {/* Delete Account */}
                     <div className="setting-block danger-zone">

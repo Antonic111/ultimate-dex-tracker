@@ -571,6 +571,14 @@ router.put("/profile", authenticateUser, async (req, res) => {
       }
     }
 
+    // Handle external link preference
+        if (req.body.externalLinkPreference !== undefined) {
+          const validPreferences = ['serebii', 'bulbapedia', 'pokemondb', 'smogon'];
+          if (validPreferences.includes(req.body.externalLinkPreference)) {
+            user.externalLinkPreference = req.body.externalLinkPreference;
+          }
+        }
+
     // Handle migration fields
     if (req.body.huntMethodMigrationCompleted !== undefined) {
       user.huntMethodMigrationCompleted = !!req.body.huntMethodMigrationCompleted;
@@ -592,6 +600,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
       switchFriendCode: user.switchFriendCode,
       isProfilePublic: user.isProfilePublic,
       dexPreferences: user.dexPreferences,
+      externalLinkPreference: user.externalLinkPreference,
       huntMethodMigrationCompleted: user.huntMethodMigrationCompleted,
       migrationVersion: user.migrationVersion,
     }});
@@ -607,7 +616,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes dexPreferences");
+    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes dexPreferences externalLinkPreference");
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -623,6 +632,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
       isProfilePublic: user.isProfilePublic,
       likeCount: user.likes ? user.likes.length : 0,
       dexPreferences: user.dexPreferences,
+      externalLinkPreference: user.externalLinkPreference,
     });
   } catch (err) {
     res.status(401).json({ error: "Invalid or expired token" });

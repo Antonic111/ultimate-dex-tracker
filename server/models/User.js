@@ -86,6 +86,8 @@ const userSchema = new mongoose.Schema({
     showAlphaForms: { type: Boolean, default: true },
     showAlphaOtherForms: { type: Boolean, default: true },
   },
+  // EXTERNAL LINK PREFERENCE ----------------------------------------- //
+  externalLinkPreference: { type: String, default: 'serebii', enum: ['serebii', 'bulbapedia', 'pokemondb', 'smogon'] },
   // DELETE ACCOUNT CODE ----------------------------------------- //
   deleteCodeHash: { type: String, default: null },
   deleteCodeExpires: { type: Date, default: null },
