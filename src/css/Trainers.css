@@ -29,17 +29,17 @@
 
 /* Search Row */
 .trainers-page .search-row {
-  @apply flex gap-2.5 mb-4 items-center;
+  @apply flex gap-2.5 mb-4 items-center w-full;
 }
 
 /* Search Controls - Desktop */
 .trainers-page .search-controls {
-  @apply flex gap-2.5 items-center;
+  @apply flex gap-2.5 items-center flex-shrink-0;
 }
 
 /* Search Input */
 .trainers-page .search-input-wrap {
-  @apply relative w-full flex items-center;
+  @apply relative flex-1 flex items-center;
 }
 
 .trainers-page .search-icon {
@@ -365,8 +365,12 @@
     @apply flex-col gap-3;
   }
   
+  .trainers-page .search-input-wrap {
+    @apply w-full;
+  }
+  
   .trainers-page .search-controls {
-    @apply flex gap-2 items-center;
+    @apply flex gap-2 items-center w-full justify-center;
   }
   
   .trainers-page .trainer-search {

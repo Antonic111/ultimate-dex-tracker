@@ -15,7 +15,7 @@
   text-align: left;
 }
 
-.search-row {
+.counters-page .search-row {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -23,7 +23,7 @@
   flex-wrap: wrap;
 }
 
-.search-input-wrap {
+.counters-page .search-input-wrap {
   position: relative;
   flex: 1;
   min-width: 300px;
@@ -2046,11 +2046,11 @@
     font-size: 1.1rem;
   }
   
-  .search-input-wrap {
+  .counters-page .search-input-wrap {
     min-width: 100%;
   }
   
-  .search-row {
+  .counters-page .search-row {
     flex-direction: column;
     align-items: stretch;
   }

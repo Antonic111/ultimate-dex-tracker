@@ -237,6 +237,7 @@ router.get("/me", authenticateUser, async (req, res) => {
       profileTrainer: user.profileTrainer,
       verified: user.verified,
       progressBars: user.progressBars || [],
+      isAdmin: user.isAdmin,
     });
 
   } catch (err) {
@@ -616,7 +617,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes dexPreferences externalLinkPreference");
+    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes dexPreferences externalLinkPreference isAdmin");
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -633,6 +634,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
       likeCount: user.likes ? user.likes.length : 0,
       dexPreferences: user.dexPreferences,
       externalLinkPreference: user.externalLinkPreference,
+      isAdmin: user.isAdmin,
     });
   } catch (err) {
     res.status(401).json({ error: "Invalid or expired token" });
@@ -1283,6 +1285,178 @@ router.post("/migrate-hunt-methods", authenticateUser, async (req, res) => {
     });
   } catch (err) {
     console.error('Error running bulk migration:', err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// ADMIN ROUTES ----------------------------------------- //
+
+// TEMPORARY: Make yourself admin (remove this after use)
+router.post("/make-me-admin", authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    
+    user.isAdmin = true;
+    await user.save();
+    
+    res.json({ 
+      message: "You are now an admin!",
+      isAdmin: user.isAdmin 
+    });
+  } catch (error) {
+    console.error('Error making user admin:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Middleware to check if user is admin
+const requireAdmin = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user || !user.isAdmin) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+    next();
+  } catch (error) {
+    console.error('Admin check error:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// POST /api/assign-admin - Assign admin status to a user
+router.post("/assign-admin", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const { username, isAdmin } = req.body;
+    
+    if (typeof isAdmin !== 'boolean') {
+      return res.status(400).json({ error: "isAdmin must be a boolean" });
+    }
+    
+    const targetUser = await User.findOne({ username });
+    if (!targetUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    
+    // Prevent removing your own admin status
+    if (targetUser._id.toString() === req.userId && !isAdmin) {
+      return res.status(400).json({ error: "Cannot remove your own admin status" });
+    }
+    
+    targetUser.isAdmin = isAdmin;
+    await targetUser.save();
+    
+    res.json({ 
+      message: `User ${username} ${isAdmin ? 'granted' : 'removed'} admin status`,
+      user: {
+        username: targetUser.username,
+        isAdmin: targetUser.isAdmin
+      }
+    });
+  } catch (error) {
+    console.error('Error assigning admin status:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// GET /api/admin/users - Get all users (admin only)
+router.get("/admin/users", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const users = await User.find({}, 'username email isAdmin verified createdAt')
+      .sort({ createdAt: -1 })
+      .limit(100); // Limit to prevent large responses
+    
+    res.json({ users });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// GET /api/admin/bug-reports - Get all bug reports (admin only)
+router.get("/admin/bug-reports", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const BugReport = (await import('../models/BugReport.js')).default;
+    const bugReports = await BugReport.find({ 
+      $or: [
+        { type: 'bug' },
+        { type: { $exists: false } } // Include old records without type field
+      ]
+    })
+      .populate('submittedBy', 'username')
+      .sort({ createdAt: -1 })
+      .limit(50); // Limit to prevent large responses
+    
+    res.json({ bugReports });
+  } catch (error) {
+    console.error('Error fetching bug reports:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.get("/admin/feature-requests", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const BugReport = (await import('../models/BugReport.js')).default;
+    const featureRequests = await BugReport.find({ type: 'feature' })
+      .populate('submittedBy', 'username')
+      .sort({ createdAt: -1 })
+      .limit(50); // Limit to prevent large responses
+    
+    res.json({ featureRequests });
+  } catch (error) {
+    console.error('Error fetching feature requests:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// PATCH /api/admin/update-report-status/:id - Update report status (admin only)
+router.patch("/admin/update-report-status/:id", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const BugReport = (await import('../models/BugReport.js')).default;
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    if (!status || !['open', 'resolved'].includes(status)) {
+      return res.status(400).json({ error: "Invalid status" });
+    }
+    
+    const updateData = { status };
+    if (status === 'resolved') {
+      updateData.resolvedAt = new Date();
+    }
+    
+    const updatedReport = await BugReport.findByIdAndUpdate(
+      id, 
+      updateData, 
+      { new: true }
+    );
+    
+    if (!updatedReport) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+    
+    res.json({ message: "Report status updated successfully", report: updatedReport });
+  } catch (error) {
+    console.error('Error updating report status:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// DELETE /api/admin/delete-report/:id - Delete a bug report or feature request (admin only)
+router.delete("/admin/delete-report/:id", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const BugReport = (await import('../models/BugReport.js')).default;
+    const { id } = req.params;
+    
+    const deletedReport = await BugReport.findByIdAndDelete(id);
+    
+    if (!deletedReport) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+    
+    res.json({ message: "Report deleted successfully" });
+  } catch (error) {
+    console.error('Error deleting report:', error);
     res.status(500).json({ error: "Server error" });
   }
 });

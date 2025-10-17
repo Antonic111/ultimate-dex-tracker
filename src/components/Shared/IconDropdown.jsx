@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export function IconDropdown({ options, value, onChange, placeholder = "Select...", id }) {
+export function IconDropdown({ options, value, onChange, placeholder = "Select...", id, showSearch = true }) {
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState("");
     const ref = useRef();
@@ -47,17 +47,19 @@ export function IconDropdown({ options, value, onChange, placeholder = "Select..
 
             {open && (
                 <div className="icon-dropdown-list">
-                    <input
-                        type="text"
-                        className="icon-dropdown-search"
-                        placeholder="Type to filter..."
-                        autoFocus
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
+                    {showSearch && (
+                        <input
+                            type="text"
+                            className="icon-dropdown-search"
+                            placeholder="Type to filter..."
+                            autoFocus
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    )}
                     {options
                         .filter(option =>
-                            option.name.toLowerCase().includes(search.toLowerCase())
+                            showSearch ? option.name.toLowerCase().includes(search.toLowerCase()) : true
                         )
                         .map(option => (
                             <button

@@ -160,6 +160,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       "Brilliant Diamond", "Shining Pearl",
       "Legends Arceus",
       "Scarlet", "Violet",
+      "Legends Z-A",
       "GO"
     ];
     
@@ -366,6 +367,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       "Brilliant Diamond", "Shining Pearl",
       "Legends Arceus",
       "Scarlet", "Violet",
+      "Legends Z-A",
       "GO"
     ];
     
@@ -384,14 +386,14 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
           // All games in the pair are available, create pair
           if (pair.games.length === 2) {
             // Regular pair (2 games)
-            const tagInfo1 = getGameTagInfo(pair.games[0]);
-            const tagInfo2 = getGameTagInfo(pair.games[1]);
-            gameGroups.push({
-              type: "pair",
-              games: pair.games,
-              displayName: pair.abbr,
-              colors: [tagInfo1.colors[0], tagInfo2.colors[0]]
-            });
+        const tagInfo1 = getGameTagInfo(pair.games[0]);
+        const tagInfo2 = getGameTagInfo(pair.games[1]);
+        gameGroups.push({
+          type: "pair",
+          games: pair.games,
+          displayName: pair.abbr,
+          colors: [tagInfo1.colors[0], tagInfo2.colors[0]]
+        });
           } else if (pair.games.length === 4) {
             // RGBY case (4 games) - use a gradient with all 4 colors
             const tagInfo1 = getGameTagInfo(pair.games[0]);
@@ -407,13 +409,13 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
           }
           // Mark all games in the pair as processed
           pair.games.forEach(g => processedGames.add(g));
-        } else {
-          // Individual game
-          const tagInfo = getGameTagInfo(game);
+      } else {
+        // Individual game
+        const tagInfo = getGameTagInfo(game);
           const displayName = individualGames[game] || tagInfo.abbr;
-          gameGroups.push({
-            type: "single",
-            games: [game],
+        gameGroups.push({
+          type: "single",
+          games: [game],
             displayName: displayName,
             colors: tagInfo.colors
           });

@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.js";
 import profileRoutes from "./routes/profiles.js";
+import bugReportRoutes from "./routes/bugReports.js";
 import session from "express-session";
 
 // Debug: Log environment variables for development
@@ -111,6 +112,7 @@ app.get("/api/iphone-test", (req, res) => {
 
 app.use("/api", authRoutes);
 app.use("/api/profiles", profileRoutes);
+app.use("/api/bug-reports", bugReportRoutes);
 
 // Global error handler for oversized payloads and other errors
 app.use((err, req, res, next) => {

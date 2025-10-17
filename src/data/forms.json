@@ -13722,27 +13722,6 @@
     }
   },
   {
-    "id": 59,
-    "name": "arcanine-alphaother",
-    "types": [
-      "fire"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/59.png"
-    },
-    "gen": 1,
-    "formType": "alphaother",
-    "evolution": {
-      "pre": {
-        "id": 58,
-        "name": "growlithe",
-        "how": "Use Fire Stone"
-      },
-      "next": []
-    }
-  },
-  {
     "id": 64,
     "name": "kadabra-alphaother",
     "types": [
@@ -15309,27 +15288,6 @@
         "id": 548,
         "name": "petilil",
         "how": "Use Sun Stone"
-      },
-      "next": []
-    }
-  },
-  {
-    "id": 571,
-    "name": "zoroark-alphaother",
-    "types": [
-      "dark"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/571.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/571.png"
-    },
-    "gen": 5,
-    "formType": "alphaother",
-    "evolution": {
-      "pre": {
-        "id": 570,
-        "name": "zorua",
-        "how": "Level Up to 30"
       },
       "next": []
     }

@@ -60,6 +60,9 @@ export const GAME_MAPPING = {
   "Scarlet": "Scarlet And Violet",
   "Violet": "Scarlet And Violet",
   
+  // Gen 9.5
+  "Legends Z-A": "Legends Z-A",
+  
   // Mobile/Spin-off
   "GO": "GO"
 };
@@ -86,6 +89,7 @@ export const REVERSE_GAME_MAPPING = {
   "Brilliant Diamond And Shining Pearl": ["Brilliant Diamond", "Shining Pearl"],
   "Legends Arceus": ["Legends Arceus"],
   "Scarlet And Violet": ["Scarlet", "Violet"],
+  "Legends Z-A": ["Legends Z-A"],
   "GO": ["GO"]
 };
 

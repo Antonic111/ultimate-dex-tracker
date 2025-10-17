@@ -482,6 +482,15 @@ export const HUNT_SYSTEM = {
       "Perfect Research": 1 // Special calculation for Legends Arceus
     }
   },
+  "Legends Z-A": {
+    methods: [
+      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
+      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" }
+    ],
+    modifiers: {
+      "Shiny Charm": 1 // Reduces odds from 4096 to 1024
+    }
+  },
   "Scarlet": {
     methods: [
       { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
@@ -670,6 +679,13 @@ export const calculateOdds = (gameName, methodName, modifiers = {}) => {
     
     // Convert rolls to odds (4096 / rolls)
     finalOdds = Math.round(4096 / rolls);
+  } else if (gameName === "Legends Z-A") {
+    // Special calculation for Legends Z-A
+    if (modifiers.shinyCharm && (methodName === "Random Encounters" || methodName === "Soft Resets")) {
+      finalOdds = 1024; // Shiny Charm reduces odds from 4096 to 1024
+    } else {
+      finalOdds = 4096; // Base odds without Shiny Charm
+    }
   } else {
     // Apply Research Level 10 modifier (for other games if needed)
     if (modifiers.researchLv10 && game.modifiers["Research Lv 10"] > 0) {

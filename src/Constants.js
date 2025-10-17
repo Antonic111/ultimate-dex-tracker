@@ -100,6 +100,9 @@ export const GAME_OPTIONS = [
   { name: "Scarlet", value: "Scarlet", image: "/data/games/scarlet.png" },
   { name: "Violet", value: "Violet", image: "/data/games/violet.png" },
 
+  // Gen 9.5 (2025)
+  { name: "Legends Z-A", value: "Legends Z-A", image: "/data/games/legends-za.png" },
+
   // Other
   { name: "GO", value: "GO", image: "/data/games/go.png" }
 ];
@@ -161,6 +164,9 @@ export const GAME_OPTIONS_TWO = [
   // Gen 9 (2022–2023)
   { name: "Scarlet", value: "Scarlet", image: "/data/games/scarlet.png" },
   { name: "Violet", value: "Violet", image: "/data/games/violet.png" },
+
+  // Gen 9.5 (2025)
+  { name: "Legends Z-A", value: "Legends Z-A", image: "/data/games/legends-za.png" },
 
   // Other
   { name: "GO", value: "GO", image: "/data/games/go.png" }

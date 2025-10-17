@@ -38,6 +38,8 @@ import Trainers from "./pages/Trainers";
 import Counters from "./pages/Counters";
 import PublicProfile from "./pages/PublicProfile";
 import ViewDex from "./pages/ViewDex.jsx";
+import Changelog from "./pages/Changelog";
+import Admin from "./pages/Admin";
 import { LoadingProvider, useLoading } from "./components/Shared/LoadingContext";
 import { LoadingSpinner } from "./components/Shared";
 import Footer from "./components/Shared/Footer";
@@ -219,7 +221,17 @@ const createDexSections = () => {
     ...FORM_TYPES.map(type => ({
       key: type,
       title: type === "alphaother" ? "Alpha Genders & Other's" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
-      getList: () => currentFilteredFormsData.filter(p => p.formType === type)
+      getList: () => {
+        const filtered = currentFilteredFormsData.filter(p => p.formType === type);
+        
+        // Special sorting for Alpha Forms - sort by Pokemon number (id)
+        if (type === "alpha") {
+          return filtered.sort((a, b) => (a.id || 0) - (b.id || 0));
+        }
+        
+        // Default sorting for other form types (by JSON order)
+        return filtered;
+      }
     }))
   ];
 };
@@ -1578,6 +1590,15 @@ function CloseSidebarOnRouteChange() {
 
                 <Route path="/trainers" element={<Trainers />} />
                 <Route path="/counters" element={<Counters />} />
+                <Route path="/changelog" element={<Changelog />} />
+                <Route 
+                  path="/admin" 
+                  element={
+                    <RequireAuth loading={loading} authReady={authReady} user={user}>
+                      <Admin />
+                    </RequireAuth>
+                  } 
+                />
                 <Route path="/u/:username" element={<PublicProfile />} />
                 <Route path="/u/:username/dex" element={<ViewDex />} />
 

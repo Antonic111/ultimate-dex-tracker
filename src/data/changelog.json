@@ -1,0 +1,26 @@
+[
+  {
+    "date": "2024-01-21",
+    "version": "v1.0.1",
+    "type": "feature",
+    "title": "Legends Z-A Mobile Fixes Admin Panels & Many Other Fixes",
+    "description": "",
+    "features": [
+        "Mobile header now uses a mobile hamburger menu instead of tabs",
+        "Changelog page added (This page) here you can see updates like you are reading and also submit bug reports or feature requests below",
+        "Admins and admin panel added (Only accessible to admins)",
+        "Legends Z-A game added as a new game option when adding information to a pokemon (ZA Alpha Pokemon coming soon)",
+        "Legends Z-A added as a game option with odds calculation when tracking a hunt"
+      ],
+    "fixes": [
+      "Fixed profile dropdown visibility and scroll issue on mobile",
+      "Fixed mobile layout issues related to the search bar on Changelog and Trainers pages"
+    ],
+    "changes": [
+      "Enhanced mobile header sizing and profile picture",
+      "Improved mobile dropdown styling",
+      "Alpha not hisuian Arcanine and Zoroark removed from Alpha Genders & Other's category",
+      "Alpha Forms is now sorted by national dex number instead of hisui dex order"
+    ]
+  }
+]

@@ -250,7 +250,17 @@ export default function ViewDex() {
             return {
                 key: type,
                 title: type === "alphaother" ? "Alpha Genders & Other's" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
-                getList: () => filteredFormsData.filter(p => p.formType === type)
+                getList: () => {
+                    const filtered = filteredFormsData.filter(p => p.formType === type);
+                    
+                    // Special sorting for Alpha Forms - sort by Pokemon number (id)
+                    if (type === "alpha") {
+                        return filtered.sort((a, b) => (a.id || 0) - (b.id || 0));
+                    }
+                    
+                    // Default sorting for other form types (by JSON order)
+                    return filtered;
+                }
             };
         }).filter(Boolean) // Remove null sections
     ];
