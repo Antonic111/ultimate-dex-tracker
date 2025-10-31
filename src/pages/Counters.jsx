@@ -279,7 +279,7 @@ export default function Counters() {
           const xhr = new XMLHttpRequest();
           xhr.open('PUT', '/api/hunts', false); // Synchronous request
           xhr.setRequestHeader('Content-Type', 'application/json');
-          xhr.setRequestHeader('Authorization', `Bearer ${localStorage.getItem('token')}`);
+          xhr.setRequestHeader('Authorization', `Bearer ${localStorage.getItem('authToken')}`);
           xhr.send(JSON.stringify(huntData));
         } catch (error) {
           console.error('Failed to save on page unload:', error);

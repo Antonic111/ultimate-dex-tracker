@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Users, Bug, Shield, Settings, Search, ChevronDown, CheckCircle, XCircle, AlertCircle, Calendar, Mail, UserCheck, Filter, Trash2, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMessage } from '../components/Shared/MessageContext';
+import { buildApiUrl } from '../config/api.js';
 import './Admin.css';
 
 const Admin = () => {
@@ -65,17 +66,24 @@ const Admin = () => {
 
   const checkAdminStatus = async () => {
     try {
-      const response = await fetch('/api/profile', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      const response = await fetch(buildApiUrl('/profile'), {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
+        credentials: 'include'
       });
       
       if (response.ok) {
-        const userData = await response.json();
-        console.log('Admin check response:', userData); // Debug log
-        if (userData.isAdmin) {
-          setIsAdmin(true);
-          loadData(); // Only load data if user is admin
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const userData = await response.json();
+          console.log('Admin check response:', userData); // Debug log
+          if (userData.isAdmin) {
+            setIsAdmin(true);
+            loadData(); // Only load data if user is admin
+          } else {
+            setIsAdmin(false);
+          }
         } else {
+          console.error('Error: Response is not JSON');
           setIsAdmin(false);
         }
       } else {
@@ -91,30 +99,42 @@ const Admin = () => {
     setLoading(true);
     try {
       const [usersRes, bugReportsRes, featureRequestsRes] = await Promise.all([
-        fetch('/api/admin/users', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        fetch(buildApiUrl('/admin/users'), {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
+          credentials: 'include'
         }),
-        fetch('/api/admin/bug-reports', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        fetch(buildApiUrl('/admin/bug-reports'), {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
+          credentials: 'include'
         }),
-        fetch('/api/admin/feature-requests', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        fetch(buildApiUrl('/admin/feature-requests'), {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
+          credentials: 'include'
         })
       ]);
 
       if (usersRes.ok) {
-        const usersData = await usersRes.json();
-        setUsers(usersData.users);
+        const contentType = usersRes.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const usersData = await usersRes.json();
+          setUsers(usersData.users);
+        }
       }
 
       if (bugReportsRes.ok) {
-        const bugReportsData = await bugReportsRes.json();
-        setBugReports(bugReportsData.bugReports);
+        const contentType = bugReportsRes.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const bugReportsData = await bugReportsRes.json();
+          setBugReports(bugReportsData.bugReports);
+        }
       }
 
       if (featureRequestsRes.ok) {
-        const featureRequestsData = await featureRequestsRes.json();
-        setFeatureRequests(featureRequestsData.featureRequests);
+        const contentType = featureRequestsRes.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const featureRequestsData = await featureRequestsRes.json();
+          setFeatureRequests(featureRequestsData.featureRequests);
+        }
       }
     } catch (err) {
       showMessage('Failed to load admin data', 'error');
@@ -125,24 +145,35 @@ const Admin = () => {
 
   const handleAssignAdmin = async (username, isAdmin) => {
     try {
-      const response = await fetch('/api/assign-admin', {
+      const response = await fetch(buildApiUrl('/assign-admin'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         },
-        body: JSON.stringify({ username, isAdmin })
+        body: JSON.stringify({ username, isAdmin }),
+        credentials: 'include'
       });
 
       if (response.ok) {
-        const result = await response.json();
-        showMessage(result.message, 'success');
-        loadData(); // Reload data
-        setSelectedUser(null);
-        setShowUserActions(false);
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const result = await response.json();
+          showMessage(result.message, 'success');
+          loadData(); // Reload data
+          setSelectedUser(null);
+          setShowUserActions(false);
+        } else {
+          showMessage('Failed to update admin status: Invalid response', 'error');
+        }
       } else {
-        const error = await response.json();
-        showMessage(error.error, 'error');
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const error = await response.json();
+          showMessage(error.error, 'error');
+        } else {
+          showMessage('Failed to update admin status', 'error');
+        }
       }
     } catch (err) {
       showMessage('Failed to update admin status', 'error');
@@ -178,11 +209,12 @@ const Admin = () => {
     if (!selectedReport) return;
 
     try {
-      const response = await fetch(`/api/admin/delete-report/${selectedReport._id}`, {
+      const response = await fetch(buildApiUrl(`/admin/delete-report/${selectedReport._id}`), {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -191,8 +223,13 @@ const Admin = () => {
         setShowDeleteModal(false);
         setSelectedReport(null);
       } else {
-        const error = await response.json();
-        showMessage(error.error || 'Failed to delete report', 'error');
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const error = await response.json();
+          showMessage(error.error || 'Failed to delete report', 'error');
+        } else {
+          showMessage('Failed to delete report', 'error');
+        }
       }
     } catch (err) {
       showMessage('Failed to delete report', 'error');
@@ -209,13 +246,14 @@ const Admin = () => {
     if (!selectedReport) return;
 
     try {
-      const response = await fetch(`/api/admin/update-report-status/${selectedReport._id}`, {
+      const response = await fetch(buildApiUrl(`/admin/update-report-status/${selectedReport._id}`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         },
-        body: JSON.stringify({ status: 'resolved' })
+        body: JSON.stringify({ status: 'resolved' }),
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -224,8 +262,13 @@ const Admin = () => {
         setShowResolveModal(false);
         setSelectedReport(null);
       } else {
-        const error = await response.json();
-        showMessage(error.error || 'Failed to update report status', 'error');
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const error = await response.json();
+          showMessage(error.error || 'Failed to update report status', 'error');
+        } else {
+          showMessage('Failed to update report status', 'error');
+        }
       }
     } catch (err) {
       showMessage('Failed to update report status', 'error');
