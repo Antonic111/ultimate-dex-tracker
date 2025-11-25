@@ -1016,12 +1016,25 @@ router.get("/caught/:username/public", async (req, res) => {
 router.get("/users/public", async (req, res) => {
   res.set("Cache-Control", "no-store");
 
-  const q = (req.query.query || "").trim();
+  let q = (req.query.query || "").trim();
+  
+  // Sanitize search query to prevent injection attacks (XSS, command injection, etc.)
+  if (q) {
+    const sanitized = sanitizeInput(q, 'general');
+    q = sanitized.sanitized;
+    
+    // Limit search query length to prevent abuse
+    if (q.length > 50) {
+      q = q.substring(0, 50);
+    }
+  }
+  
   const page = Math.max(1, parseInt(req.query.page || "1", 10));
   const pageSize = Math.min(50, Math.max(1, parseInt(req.query.pageSize || "24", 10)));
   const random = req.query.random === "1";
 
   const match = { isProfilePublic: { $ne: false } };
+  // Escape regex special characters to prevent regex injection
   if (q) match.username = { $regex: q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" };
 
   try {
@@ -1041,6 +1054,7 @@ router.get("/users/public", async (req, res) => {
           gender: 1,
           createdAt: 1,
           verified: 1,
+          isAdmin: 1,
           // count non-null entries in caughtPokemon
           shinies: {
             $size: {
@@ -1077,7 +1091,7 @@ router.get("/users/:username/public", async (req, res) => {
       username: req.params.username,
       isProfilePublic: { $ne: false }
     })
-      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes verified dexPreferences")
+      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes verified dexPreferences isAdmin")
       .lean();
       
     if (!u) return res.status(404).json({ error: "User not found or private" });
