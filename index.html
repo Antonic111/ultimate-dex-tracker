@@ -10,7 +10,19 @@
      crossorigin="anonymous"></script>
   </head>
   <body>
-    <div id="root"></div>
+    <noscript>
+      <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
+        <h1>Ultimate Dex Tracker</h1>
+        <p>JavaScript is required to use this application. Please enable JavaScript in your browser.</p>
+      </div>
+    </noscript>
+    <div id="root">
+      <!-- Initial content visible to crawlers before JavaScript loads -->
+      <div style="display: none;">
+        <h1>Ultimate Dex Tracker</h1>
+        <p>Track your Pokémon collection across all games with ease. Build your perfect living dex and never lose track of your progress again.</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

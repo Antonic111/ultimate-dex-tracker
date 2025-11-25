@@ -304,6 +304,7 @@ export default function App() {
   const userMenuRef = useRef(null);
   const [authReady, setAuthReady] = useState(false);
   const [justLoggedIn, setJustLoggedIn] = useState(false); // Add flag to track recent login
+  const [authTimeout, setAuthTimeout] = useState(false); // Timeout flag for bots/crawlers
   const [dexSections, setDexSections] = useState(() => createDexSections());
   const [currentDexPreferences, setCurrentDexPreferences] = useState(() => getDexPreferences());
 
@@ -494,7 +495,39 @@ export default function App() {
   // Initial auth check on page load
   useEffect(() => {
     setAuthReady(false);
-    checkAuth(false);
+    setAuthTimeout(false);
+    
+    // Detect if this is a bot/crawler (Google AdSense, Googlebot, etc.)
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isBot = /googlebot|adsbot|mediapartners|adsense|bingbot|slurp|duckduckbot|baiduspider|yandexbot|sogou|exabot|facebot|ia_archiver/i.test(userAgent);
+    
+    // For bots/crawlers, set a short timeout to show content quickly
+    if (isBot) {
+      // Show content after 500ms for bots (they won't wait long)
+      const botTimeout = setTimeout(() => {
+        setAuthTimeout(true);
+        setAuthReady(true);
+        setLoading(false);
+      }, 500);
+      
+      // Still try to check auth, but don't wait for it
+      checkAuth(false).finally(() => {
+        clearTimeout(botTimeout);
+        setAuthTimeout(false);
+      });
+    } else {
+      // For regular users, set a timeout so page doesn't hang forever
+      const userTimeout = setTimeout(() => {
+        setAuthTimeout(true);
+        setAuthReady(true);
+        setLoading(false);
+      }, 3000); // 3 second timeout for regular users
+      
+      checkAuth(false).finally(() => {
+        clearTimeout(userTimeout);
+        setAuthTimeout(false);
+      });
+    }
   }, []);
 
 
@@ -1364,11 +1397,12 @@ function CloseSidebarOnRouteChange() {
                     <Route
                       path="/"
                       element={
-                        (loading || !authReady) ? (
+                        // Only show loading spinner if we haven't timed out and auth isn't ready
+                        (!authTimeout && (loading || !authReady)) ? (
                           <LoadingSpinner 
                             fullScreen 
                             text="Loading..." 
-                            variant="dots"
+                            variant="spinner"
                             size="large"
                           />
                         ) : user?.username ? (

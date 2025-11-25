@@ -1,0 +1,19 @@
+# robots.txt for Ultimate Dex Tracker
+# Allow all search engines and bots to crawl the site
+
+User-agent: *
+Allow: /
+
+# Specifically allow Google AdSense and Googlebot
+User-agent: Googlebot
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: Mediapartners-Google
+Allow: /
+
+# Sitemap (if you have one, uncomment and add URL)
+# Sitemap: https://www.ultimatedextracker.com/sitemap.xml
+
