@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 // import "../css/Profile.css"; // Moved to backup folder
-import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles } from "lucide-react";
+import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles, Crown } from "lucide-react";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../data/forms.json";
@@ -634,14 +634,31 @@ export default function PublicProfile() {
             <div className="profile-header-bar">
                 <div className="profile-header-left">
                     <div className="profile-top-line">
-                        <h1 className="profile-username">{data.username}</h1>
+                        <h1 className="profile-username">
+                            <span>
+                                {data.username}
+                                {data.isAdmin && (
+                                    <span className="crown-wrapper">
+                                        <Crown 
+                                            size={22} 
+                                            strokeWidth={2.5}
+                                            style={{ 
+                                                color: "#fbbf24",
+                                                flexShrink: 0
+                                            }} 
+                                        />
+                                        <span className="crown-tooltip">Admin</span>
+                                    </span>
+                                )}
+                            </span>
+                        </h1>
                         <button
                             className="profile-copy-link"
                             onClick={handleCopyLink}
-                            title="Copy shareable link"
                             aria-label="Copy shareable link"
                         >
                             <LinkIcon size={16} />
+                            <span className="copy-tooltip">Copy shareable link</span>
                         </button>
                         {currentUsername ? (
                             <button
@@ -664,8 +681,8 @@ export default function PublicProfile() {
                                 <span className="like-count">{likeCount}</span>
                             </button>
                         ) : (
-                            <div className="profile-like-display">
-                                <Heart size={16} fill="none" />
+                            <div className="profile-like-display liked">
+                                <Heart size={20} fill="currentColor" />
                                 <span className="like-count">{likeCount}</span>
                             </div>
                         )}

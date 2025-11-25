@@ -1,6 +1,24 @@
 [
   {
-    "date": "2024-01-21",
+    "date": "2025-11-24",
+    "version": "v1.0.2",
+    "type": "feature",
+    "title": "Admin Badge, Profile Icon Cleanup & Some Other Fixes",
+    "description": "",
+    "features": [
+      "Crown icon added to admin profile pages and trainers page",
+      "Tooltips added to admin crown icon and sharable link icon",
+      "Instagram & tiktok icons added to the footer"
+    ],
+    "fixes": [
+      "Fixed loading screen visual issue where spinner and dots appeared merged together",
+      "Hovering the likes button will no longer have a background color",
+      "Likes button will now be colored red when viewing a profile not logged in",
+      "Improved sanitization of input fields to prevent XSS attacks"
+    ]
+  },
+  {
+    "date": "2025-10-17",
     "version": "v1.0.1",
     "type": "feature",
     "title": "Legends Z-A Mobile Fixes Admin Panels & Many Other Fixes",

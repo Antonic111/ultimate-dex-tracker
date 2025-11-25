@@ -5,6 +5,24 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  position: relative;
+  /* Ensure no default ring or border appears */
+  border: none;
+  background: none;
+  outline: none;
+}
+
+/* Ensure no default ring appears - only show when variant is 'spinner' */
+.loading-spinner::before,
+.loading-spinner::after {
+  content: none;
+}
+
+/* Ensure wrapper doesn't create any visual ring effect */
+.loading-fullscreen .loading-spinner,
+.loading-overlay .loading-spinner {
+  border: none;
+  background: none;
 }
 
 /* ===== SIZES ===== */
@@ -34,6 +52,13 @@
   animation: spin 1s linear infinite;
 }
 
+/* Hide spinner ring when not using spinner variant */
+.loading-dots .spinner-ring,
+.loading-pulse .spinner-ring,
+.loading-bars .spinner-ring {
+  display: none;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -41,6 +66,12 @@
 }
 
 /* ===== DOTS VARIANT ===== */
+.loading-dots .loading-spinner {
+  /* Remove any border or ring styling when using dots variant */
+  border: none;
+  background: none;
+}
+
 .dots-container {
   display: flex;
   gap: 0.2em;

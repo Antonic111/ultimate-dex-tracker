@@ -165,6 +165,34 @@
   opacity: 1;
 }
 
+.instagram-link {
+  color: var(--accent);
+}
+
+.instagram-icon {
+  fill: currentColor;
+  opacity: 0.8;
+  transition: opacity var(--transition-speed);
+}
+
+.instagram-link:hover .instagram-icon {
+  opacity: 1;
+}
+
+.tiktok-link {
+  color: var(--accent);
+}
+
+.tiktok-icon {
+  fill: currentColor;
+  opacity: 0.8;
+  transition: opacity var(--transition-speed);
+}
+
+.tiktok-link:hover .tiktok-icon {
+  opacity: 1;
+}
+
 .footer-bottom {
   max-width: 1300px;
   margin: 0 auto;

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useUser } from "../components/Shared/UserContext";
 import "../css/Profile.css";
-import { NotebookPen, Trophy, Mars, Venus, VenusAndMars, PencilLine, SquareX, Link as LinkIcon, Heart, Sparkles } from "lucide-react";
+import { NotebookPen, Trophy, Mars, Venus, VenusAndMars, PencilLine, SquareX, Link as LinkIcon, Heart, Sparkles, Crown } from "lucide-react";
 import { IconDropdown } from "../components/Shared/IconDropdown";
 import FavoriteSelectionModal from "../components/Shared/FavoriteSelectionModal";
 import "flag-icons/css/flag-icons.min.css";
@@ -183,6 +183,7 @@ export default function Profile() {
         favoritePokemonShiny: [false, false, false, false, false],
         switchFriendCode: ""
     });
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         if (!loading && (!username || !email)) {
@@ -224,6 +225,7 @@ export default function Profile() {
                     favoritePokemonShiny: Array.isArray(data.favoritePokemonShiny) ? [...data.favoritePokemonShiny] : prev.favoritePokemonShiny,
                     switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode
                 }));
+                setIsAdmin(data.isAdmin ?? false);
 
                 // Don't call setUser here - it causes infinite loops with App.jsx checkAuth
                 // The profileTrainer will be updated when the user actually edits their profile
@@ -606,14 +608,31 @@ export default function Profile() {
             <div className="profile-header-bar">
                 <div className="profile-header-left">
                     <div className="profile-top-line">
-                        <h1 className="profile-username">{username}</h1>
+                        <h1 className="profile-username">
+                            <span>
+                                {username}
+                                {isAdmin && (
+                                    <span className="crown-wrapper">
+                                        <Crown 
+                                            size={22} 
+                                            strokeWidth={2.5}
+                                            style={{ 
+                                                color: "#fbbf24",
+                                                flexShrink: 0
+                                            }} 
+                                        />
+                                        <span className="crown-tooltip">Admin</span>
+                                    </span>
+                                )}
+                            </span>
+                        </h1>
                         <button
                             className="profile-copy-link"
                             onClick={handleCopyLink}
-                            title="Copy shareable link"
                             aria-label="Copy shareable link"
                         >
                             <LinkIcon size={16} />
+                            <span className="copy-tooltip">Copy shareable link</span>
                         </button>
                         <button
                             className={`profile-like-button ${hasLiked ? 'liked' : ''}`}
