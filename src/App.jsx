@@ -18,28 +18,31 @@ import NoResults from "./components/Shared/NoResults";
 import { formatPokemonName, getLevenshteinDistance, getEvolutionChainIds, findPokemon } from "./utils";
 import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isSubLegendary, isStarter, isFossil, isBaby, isParadox, getPokemonCategory } from "./utils/pokemonCategories";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import EmailSent from "./pages/EmailSent";
+import { Suspense, lazy } from "react";
 import { MessageProvider } from "./components/Shared/MessageContext";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import EnterResetCode from "./pages/EnterResetCode";
 import { UserContext } from "./components/Shared/UserContext";
-import Profile from "./pages/Profile";
-import PublicHome from "./pages/PublicHome";
 import HeaderWithConditionalAuth from "./Header";
-import Settings from "./pages/Settings";
-import Backup from "./pages/Backup";
 import { ThemeProvider } from "./components/Shared/ThemeContext";
 import './css/theme.css';
 // import './css/pageAnimations.css'; // Moved to backup folder
-import Trainers from "./pages/Trainers";
-import Counters from "./pages/Counters";
-import PublicProfile from "./pages/PublicProfile";
-import ViewDex from "./pages/ViewDex.jsx";
-import Changelog from "./pages/Changelog";
-import Admin from "./pages/Admin";
+
+// Lazy load routes for code splitting
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const EmailSent = lazy(() => import("./pages/EmailSent"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const EnterResetCode = lazy(() => import("./pages/EnterResetCode"));
+const Profile = lazy(() => import("./pages/Profile"));
+const PublicHome = lazy(() => import("./pages/PublicHome"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Backup = lazy(() => import("./pages/Backup"));
+const Trainers = lazy(() => import("./pages/Trainers"));
+const Counters = lazy(() => import("./pages/Counters"));
+const PublicProfile = lazy(() => import("./pages/PublicProfile"));
+const ViewDex = lazy(() => import("./pages/ViewDex.jsx"));
+const Changelog = lazy(() => import("./pages/Changelog"));
+const Admin = lazy(() => import("./pages/Admin"));
 import { LoadingProvider, useLoading } from "./components/Shared/LoadingContext";
 import { LoadingSpinner } from "./components/Shared";
 import Footer from "./components/Shared/Footer";
@@ -1041,18 +1044,28 @@ useEffect(() => {
     });
   }
 
-// Function to conditionally load AdSense script only on content pages
+// Function to conditionally load AdSense script only on content pages (deferred for performance)
 const loadAdSense = () => {
   // Check if script is already loaded
   if (document.querySelector('script[src*="adsbygoogle"]')) {
     return;
   }
 
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6475589957282046';
-  script.crossOrigin = 'anonymous';
-  document.head.appendChild(script);
+  // Defer AdSense loading until after initial render to improve performance
+  // Use requestIdleCallback if available, otherwise setTimeout with a delay
+  const loadScript = () => {
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6475589957282046';
+    script.crossOrigin = 'anonymous';
+    document.head.appendChild(script);
+  };
+
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(loadScript, { timeout: 2000 });
+  } else {
+    setTimeout(loadScript, 1000); // Load after 1 second if requestIdleCallback not available
+  }
 };
 
 function CloseSidebarOnRouteChange() {
@@ -1631,63 +1644,130 @@ function CloseSidebarOnRouteChange() {
                         })()}
                       </>
                     ) : (
-                      <PublicHome />
+                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <PublicHome />
+                      </Suspense>
                     )
                   }
                 />
 
                 <Route
                   path="/login"
-                  element={user?.username ? <Navigate to="/" /> : <Login onLogin={handleUserUpdate} />}
+                  element={
+                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                      {user?.username ? <Navigate to="/" /> : <Login onLogin={handleUserUpdate} />}
+                    </Suspense>
+                  }
                 />
                 <Route
                   path="/register"
-                  element={user?.username ? <Navigate to="/" /> : <Register onRegister={handleUserUpdate} />}
+                  element={
+                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                      {user?.username ? <Navigate to="/" /> : <Register onRegister={handleUserUpdate} />}
+                    </Suspense>
+                  }
                 />
                 <Route
                   path="/email-sent"
-                  element={!user?.username ? <EmailSent /> : <Navigate to="/" />}
+                  element={
+                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                      {!user?.username ? <EmailSent /> : <Navigate to="/" />}
+                    </Suspense>
+                  }
                 />
                 <Route
                   path="/forgot-password"
-                  element={!user?.username ? <ForgotPassword /> : <Navigate to="/" />}
+                  element={
+                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                      {!user?.username ? <ForgotPassword /> : <Navigate to="/" />}
+                    </Suspense>
+                  }
                 />
                 <Route
                   path="/reset-password"
-                  element={!user?.username ? <ResetPassword /> : <Navigate to="/" />}
+                  element={
+                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                      {!user?.username ? <ResetPassword /> : <Navigate to="/" />}
+                    </Suspense>
+                  }
                 />
                 <Route
                   path="/enter-reset-code"
-                  element={!user?.username ? <EnterResetCode /> : <Navigate to="/" />}
+                  element={
+                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                      {!user?.username ? <EnterResetCode /> : <Navigate to="/" />}
+                    </Suspense>
+                  }
                 />
                 <Route
                   path="/profile"
                   element={
                     <RequireAuth loading={loading} authReady={authReady} user={user}>
-                      <Profile />
+                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Profile />
+                      </Suspense>
                     </RequireAuth>
                   }
                 />
 
-                <Route path="/trainers" element={<Trainers />} />
-                <Route path="/counters" element={<Counters />} />
-                <Route path="/changelog" element={<Changelog />} />
+                <Route 
+                  path="/trainers" 
+                  element={
+                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                      <Trainers />
+                    </Suspense>
+                  } 
+                />
+                <Route 
+                  path="/counters" 
+                  element={
+                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                      <Counters />
+                    </Suspense>
+                  } 
+                />
+                <Route 
+                  path="/changelog" 
+                  element={
+                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                      <Changelog />
+                    </Suspense>
+                  } 
+                />
                 <Route 
                   path="/admin" 
                   element={
                     <RequireAuth loading={loading} authReady={authReady} user={user}>
-                      <Admin />
+                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Admin />
+                      </Suspense>
                     </RequireAuth>
                   } 
                 />
-                <Route path="/u/:username" element={<PublicProfile />} />
-                <Route path="/u/:username/dex" element={<ViewDex />} />
+                <Route 
+                  path="/u/:username" 
+                  element={
+                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                      <PublicProfile />
+                    </Suspense>
+                  } 
+                />
+                <Route 
+                  path="/u/:username/dex" 
+                  element={
+                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                      <ViewDex />
+                    </Suspense>
+                  } 
+                />
 
                 <Route
                   path="/settings"
                   element={
                     <RequireAuth loading={loading} authReady={authReady} user={user}>
-                      <Settings />
+                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Settings />
+                      </Suspense>
                     </RequireAuth>
                   }
                 />
@@ -1696,7 +1776,9 @@ function CloseSidebarOnRouteChange() {
                   path="/backup"
                   element={
                     <RequireAuth loading={loading} authReady={authReady} user={user}>
-                      <Backup />
+                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Backup />
+                      </Suspense>
                     </RequireAuth>
                   }
                 />
