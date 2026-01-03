@@ -9327,7 +9327,7 @@
   },
   {
     "id": 412,
-    "name": "burmy-alpha",
+    "name": "burmy-plant-alpha",
     "formType": "alpha",
     "baseSpecies": "burmy",
     "types": [
@@ -13615,6 +13615,5983 @@
     }
   },
   {
+    "id": 39,
+    "name": "jigglypuff",
+    "formType": "alpha",
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/39.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 174,
+        "name": "igglybuff",
+        "how": "Level up with high friendship"
+      },
+      "next": [
+        {
+          "id": 40,
+          "name": "wigglytuff",
+          "how": "Use Moon Stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 40,
+    "name": "wigglytuff",
+    "formType": "alpha",
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/40.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/40.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 39,
+        "name": "jigglypuff",
+        "how": "Use Moon Stone"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 52,
+    "name": "meowth",
+    "formType": "alpha",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/52.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/52.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 53,
+          "name": "persian",
+          "how": "Level Up to 28"
+        }
+      ]
+    }
+  },
+  {
+    "id": 53,
+    "name": "persian",
+    "formType": "alpha",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/53.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/53.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 52,
+        "name": "meowth",
+        "how": "Level Up to 28"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 56,
+    "name": "mankey",
+    "formType": "alpha",
+    "types": [
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/56.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/56.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 57,
+          "name": "primeape",
+          "how": "Level Up to 28"
+        }
+      ]
+    }
+  },
+  {
+    "id": 57,
+    "name": "primeape",
+    "formType": "alpha",
+    "types": [
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/57.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/57.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 56,
+        "name": "mankey",
+        "how": "Level Up to 28"
+      },
+      "next": [
+        {
+          "id": 979,
+          "name": "annihilape",
+          "how": "other"
+        }
+      ]
+    }
+  },
+  {
+    "id": 83,
+    "name": "farfetchd",
+    "formType": "alpha",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/83.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/83.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 104,
+    "name": "cubone",
+    "formType": "alpha",
+    "types": [
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/104.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/104.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 105,
+          "name": "marowak",
+          "how": "Level Up to 28"
+        },
+        {
+          "id": 105,
+          "name": "marowak-alolan",
+          "how": "Level Up to 28 at night in Alola"
+        }
+      ]
+    }
+  },
+  {
+    "id": 105,
+    "name": "marowak",
+    "formType": "alpha",
+    "types": [
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/105.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/105.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 104,
+        "name": "cubone",
+        "how": "Level Up to 28"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 252,
+    "name": "treecko",
+    "formType": "alpha",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/252.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/252.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 253,
+          "name": "grovyle",
+          "how": "Level Up to 16"
+        }
+      ]
+    }
+  },
+  {
+    "id": 253,
+    "name": "grovyle",
+    "formType": "alpha",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/253.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/253.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 252,
+        "name": "treecko",
+        "how": "Level Up to 16"
+      },
+      "next": [
+        {
+          "id": 254,
+          "name": "sceptile",
+          "how": "Level Up to 36"
+        }
+      ]
+    }
+  },
+  {
+    "id": 254,
+    "name": "sceptile",
+    "formType": "alpha",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/254.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/254.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 253,
+        "name": "grovyle",
+        "how": "Level Up to 36"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 255,
+    "name": "torchic",
+    "formType": "alpha",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/255.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/255.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 256,
+          "name": "combusken",
+          "how": "Level Up to 16"
+        }
+      ]
+    }
+  },
+  {
+    "id": 256,
+    "name": "combusken",
+    "formType": "alpha",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/256.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/256.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 255,
+        "name": "torchic",
+        "how": "Level Up to 16"
+      },
+      "next": [
+        {
+          "id": 257,
+          "name": "blaziken",
+          "how": "Level Up to 36"
+        }
+      ]
+    }
+  },
+  {
+    "id": 257,
+    "name": "blaziken",
+    "formType": "alpha",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/257.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/257.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 256,
+        "name": "combusken",
+        "how": "Level Up to 36"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 258,
+    "name": "mudkip",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/258.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/258.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 259,
+          "name": "marshtomp",
+          "how": "Level Up to 16"
+        }
+      ]
+    }
+  },
+  {
+    "id": 259,
+    "name": "marshtomp",
+    "formType": "alpha",
+    "types": [
+      "water",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/259.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/259.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 258,
+        "name": "mudkip",
+        "how": "Level Up to 16"
+      },
+      "next": [
+        {
+          "id": 260,
+          "name": "swampert",
+          "how": "Level Up to 36"
+        }
+      ]
+    }
+  },
+  {
+    "id": 260,
+    "name": "swampert",
+    "formType": "alpha",
+    "types": [
+      "water",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/260.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/260.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 259,
+        "name": "marshtomp",
+        "how": "Level Up to 36"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 316,
+    "name": "gulpin",
+    "formType": "alpha",
+    "types": [
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/316.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/316.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 317,
+          "name": "swalot",
+          "how": "Level Up to 26"
+        }
+      ]
+    }
+  },
+  {
+    "id": 317,
+    "name": "swalot",
+    "formType": "alpha",
+    "types": [
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/317.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/317.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 316,
+        "name": "gulpin",
+        "how": "Level Up to 26"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 325,
+    "name": "spoink",
+    "formType": "alpha",
+    "types": [
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/325.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/325.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 326,
+          "name": "grumpig",
+          "how": "Level Up to 32"
+        }
+      ]
+    }
+  },
+  {
+    "id": 326,
+    "name": "grumpig",
+    "formType": "alpha",
+    "types": [
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/326.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/326.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 325,
+        "name": "spoink",
+        "how": "Level Up to 32"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 335,
+    "name": "zangoose",
+    "formType": "alpha",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/335.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/335.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 336,
+    "name": "seviper",
+    "formType": "alpha",
+    "types": [
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/336.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/336.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 349,
+    "name": "feebas",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/349.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/349.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 350,
+          "name": "milotic",
+          "how": "level up"
+        }
+      ]
+    }
+  },
+  {
+    "id": 350,
+    "name": "milotic",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/350.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/350.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 349,
+        "name": "feebas",
+        "how": "level up"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 352,
+    "name": "kecleon",
+    "formType": "alpha",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/352.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/352.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 509,
+    "name": "purrloin",
+    "formType": "alpha",
+    "types": [
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/509.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/509.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 510,
+          "name": "liepard",
+          "how": "Level Up to 20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 510,
+    "name": "liepard",
+    "formType": "alpha",
+    "types": [
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/510.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/510.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 509,
+        "name": "purrloin",
+        "how": "Level Up to 20"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 517,
+    "name": "munna",
+    "formType": "alpha",
+    "types": [
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/517.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/517.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 518,
+          "name": "musharna",
+          "how": "Use Moon Stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 518,
+    "name": "musharna",
+    "formType": "alpha",
+    "types": [
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/518.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/518.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 517,
+        "name": "munna",
+        "how": "Use Moon Stone"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 538,
+    "name": "throh",
+    "formType": "alpha",
+    "types": [
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/538.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/538.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 539,
+    "name": "sawk",
+    "formType": "alpha",
+    "types": [
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/539.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/539.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 562,
+    "name": "yamask",
+    "formType": "alpha",
+    "types": [
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/562.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/562.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 563,
+          "name": "cofagrigus",
+          "how": "Level 34 (Unova)"
+        }
+      ]
+    }
+  },
+  {
+    "id": 563,
+    "name": "cofagrigus",
+    "formType": "alpha",
+    "types": [
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/563.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/563.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 562,
+        "name": "yamask",
+        "how": "Level 34 (Unova)"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 590,
+    "name": "foongus",
+    "formType": "alpha",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/590.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/590.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 591,
+          "name": "amoonguss",
+          "how": "Level Up to 39"
+        }
+      ]
+    }
+  },
+  {
+    "id": 591,
+    "name": "amoonguss",
+    "formType": "alpha",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/591.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/591.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 590,
+        "name": "foongus",
+        "how": "Level Up to 39"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 615,
+    "name": "cryogonal",
+    "formType": "alpha",
+    "types": [
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/615.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/615.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 622,
+    "name": "golett",
+    "formType": "alpha",
+    "types": [
+      "ground",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/622.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/622.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 623,
+          "name": "golurk",
+          "how": "Level Up to 43"
+        }
+      ]
+    }
+  },
+  {
+    "id": 623,
+    "name": "golurk",
+    "formType": "alpha",
+    "types": [
+      "ground",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/623.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/623.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 622,
+        "name": "golett",
+        "how": "Level Up to 43"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 739,
+    "name": "crabrawler",
+    "formType": "alpha",
+    "types": [
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/739.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/739.png"
+    },
+    "gen": 7,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 740,
+          "name": "crabominable",
+          "how": "level up"
+        }
+      ]
+    }
+  },
+  {
+    "id": 740,
+    "name": "crabominable",
+    "formType": "alpha",
+    "types": [
+      "fighting",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/740.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/740.png"
+    },
+    "gen": 7,
+    "evolution": {
+      "pre": {
+        "id": 739,
+        "name": "crabrawler",
+        "how": "level up"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 767,
+    "name": "wimpod",
+    "formType": "alpha",
+    "types": [
+      "bug",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/767.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/767.png"
+    },
+    "gen": 7,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 768,
+          "name": "golisopod",
+          "how": "Level Up to 30"
+        }
+      ]
+    }
+  },
+  {
+    "id": 768,
+    "name": "golisopod",
+    "formType": "alpha",
+    "types": [
+      "bug",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/768.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/768.png"
+    },
+    "gen": 7,
+    "evolution": {
+      "pre": {
+        "id": 767,
+        "name": "wimpod",
+        "how": "Level Up to 30"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 769,
+    "name": "sandygast",
+    "formType": "alpha",
+    "types": [
+      "ghost",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/769.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/769.png"
+    },
+    "gen": 7,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 770,
+          "name": "palossand",
+          "how": "Level Up to 42"
+        }
+      ]
+    }
+  },
+  {
+    "id": 770,
+    "name": "palossand",
+    "formType": "alpha",
+    "types": [
+      "ghost",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/770.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/770.png"
+    },
+    "gen": 7,
+    "evolution": {
+      "pre": {
+        "id": 769,
+        "name": "sandygast",
+        "how": "Level Up to 42"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 778,
+    "name": "mimikyu-disguised",
+    "formType": "alpha",
+    "types": [
+      "ghost",
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/778.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/778.png"
+    },
+    "gen": 7,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 821,
+    "name": "rookidee",
+    "formType": "alpha",
+    "types": [
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/821.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/821.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 822,
+          "name": "corvisquire",
+          "how": "Level Up to 18"
+        }
+      ]
+    }
+  },
+  {
+    "id": 822,
+    "name": "corvisquire",
+    "formType": "alpha",
+    "types": [
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/822.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/822.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": {
+        "id": 821,
+        "name": "rookidee",
+        "how": "Level Up to 18"
+      },
+      "next": [
+        {
+          "id": 823,
+          "name": "corviknight",
+          "how": "Level Up to 38"
+        }
+      ]
+    }
+  },
+  {
+    "id": 823,
+    "name": "corviknight",
+    "formType": "alpha",
+    "types": [
+      "flying",
+      "steel"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/823.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/823.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": {
+        "id": 822,
+        "name": "corvisquire",
+        "how": "Level Up to 38"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 827,
+    "name": "nickit",
+    "formType": "alpha",
+    "types": [
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/827.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/827.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 828,
+          "name": "thievul",
+          "how": "Level Up to 18"
+        }
+      ]
+    }
+  },
+  {
+    "id": 828,
+    "name": "thievul",
+    "formType": "alpha",
+    "types": [
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/828.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/828.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": {
+        "id": 827,
+        "name": "nickit",
+        "how": "Level Up to 18"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 848,
+    "name": "toxel",
+    "formType": "alpha",
+    "types": [
+      "electric",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/848.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/848.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 849,
+          "name": "toxtricity",
+          "how": "Level Up to 30"
+        }
+      ]
+    }
+  },
+  {
+    "id": 849,
+    "name": "toxtricity-alpha",
+    "formType": "alpha",
+    "types": [
+      "electric",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/849.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/849.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": {
+        "id": 848,
+        "name": "toxtricity",
+        "how": "Level Up to 30"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 852,
+    "name": "clobbopus",
+    "formType": "alpha",
+    "types": [
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/852.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/852.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 853,
+          "name": "grapploct",
+          "how": "level up"
+        }
+      ]
+    }
+  },
+  {
+    "id": 853,
+    "name": "grapploct",
+    "formType": "alpha",
+    "types": [
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/853.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/853.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": {
+        "id": 852,
+        "name": "clobbopus",
+        "how": "level up"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 863,
+    "name": "perrserker",
+    "formType": "alpha",
+    "types": [
+      "steel"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/863.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/863.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": {
+        "id": 52,
+        "name": "meowth-galar",
+        "how": "Level Up to 28"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 865,
+    "name": "sirfetchd",
+    "formType": "alpha",
+    "types": [
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/865.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/865.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": {
+        "id": 83,
+        "name": "farfetchd-galar",
+        "how": "three critical hits"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 866,
+    "name": "mr-rime",
+    "formType": "alpha",
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/866.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/866.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": {
+        "id": 122,
+        "name": "mr-mime-galar",
+        "how": "Level Up to 42"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 867,
+    "name": "runerigus",
+    "formType": "alpha",
+    "types": [
+      "ground",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/867.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/867.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": {
+        "id": 562,
+        "name": "yamask-galar",
+        "how": "Take 49+ HP damage & pass under Stone Sculpture in Dusty Bowl"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 876,
+    "name": "indeedee-male",
+    "formType": "alpha",
+    "types": [
+      "psychic",
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/876.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/876.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 877,
+    "name": "morpeko-full-belly",
+    "formType": "alpha",
+    "types": [
+      "electric",
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/877.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/877.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 926,
+    "name": "fidough",
+    "formType": "alpha",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/926.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/926.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 927,
+          "name": "dachsbun",
+          "how": "Level Up to 26"
+        }
+      ]
+    }
+  },
+  {
+    "id": 927,
+    "name": "dachsbun",
+    "formType": "alpha",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/927.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/927.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 926,
+        "name": "fidough",
+        "how": "Level Up to 26"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 931,
+    "name": "squawkabilly-green-plumage-alpha",
+    "formType": "alpha",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/931.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/931.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 932,
+    "name": "nacli",
+    "formType": "alpha",
+    "types": [
+      "rock"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/932.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/932.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 933,
+          "name": "naclstack",
+          "how": "Level Up to 24"
+        }
+      ]
+    }
+  },
+  {
+    "id": 933,
+    "name": "naclstack",
+    "formType": "alpha",
+    "types": [
+      "rock"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/933.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/933.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 932,
+        "name": "nacli",
+        "how": "Level Up to 24"
+      },
+      "next": [
+        {
+          "id": 934,
+          "name": "garganacl",
+          "how": "Level Up to 38"
+        }
+      ]
+    }
+  },
+  {
+    "id": 934,
+    "name": "garganacl",
+    "formType": "alpha",
+    "types": [
+      "rock"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/934.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/934.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 933,
+        "name": "naclstack",
+        "how": "Level Up to 38"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 935,
+    "name": "charcadet",
+    "formType": "alpha",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/935.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/935.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 936,
+          "name": "armarouge",
+          "how": "Auspicious Armor"
+        },
+        {
+          "id": 937,
+          "name": "ceruledge",
+          "how": "Malicious Armor"
+        }
+      ]
+    }
+  },
+  {
+    "id": 936,
+    "name": "armarouge",
+    "formType": "alpha",
+    "types": [
+      "fire",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/936.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/936.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 935,
+        "name": "charcadet",
+        "how": "Auspicious Armor"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 937,
+    "name": "ceruledge",
+    "formType": "alpha",
+    "types": [
+      "fire",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/937.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/937.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 935,
+        "name": "charcadet",
+        "how": "Malicious Armor"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 942,
+    "name": "maschiff",
+    "formType": "alpha",
+    "types": [
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/942.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/942.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 943,
+          "name": "mabosstiff",
+          "how": "Level Up to 30"
+        }
+      ]
+    }
+  },
+  {
+    "id": 943,
+    "name": "mabosstiff",
+    "formType": "alpha",
+    "types": [
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/943.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/943.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 942,
+        "name": "maschiff",
+        "how": "Level Up to 30"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 944,
+    "name": "shroodle",
+    "formType": "alpha",
+    "types": [
+      "poison",
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/944.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/944.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 945,
+          "name": "grafaiai",
+          "how": "Level Up to 28"
+        }
+      ]
+    }
+  },
+  {
+    "id": 945,
+    "name": "grafaiai",
+    "formType": "alpha",
+    "types": [
+      "poison",
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/945.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/945.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 944,
+        "name": "shroodle",
+        "how": "Level Up to 28"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 951,
+    "name": "capsakid",
+    "formType": "alpha",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/951.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/951.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 952,
+          "name": "scovillain",
+          "how": "Use Fire Stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 952,
+    "name": "scovillain",
+    "formType": "alpha",
+    "types": [
+      "grass",
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/952.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/952.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 951,
+        "name": "capsakid",
+        "how": "Use Fire Stone"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 957,
+    "name": "tinkatink",
+    "formType": "alpha",
+    "types": [
+      "fairy",
+      "steel"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/957.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/957.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 958,
+          "name": "tinkatuff",
+          "how": "Level Up to 24"
+        }
+      ]
+    }
+  },
+  {
+    "id": 958,
+    "name": "tinkatuff",
+    "formType": "alpha",
+    "types": [
+      "fairy",
+      "steel"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/958.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/958.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 957,
+        "name": "tinkatink",
+        "how": "Level Up to 24"
+      },
+      "next": [
+        {
+          "id": 959,
+          "name": "tinkaton",
+          "how": "Level Up to 38"
+        }
+      ]
+    }
+  },
+  {
+    "id": 959,
+    "name": "tinkaton",
+    "formType": "alpha",
+    "types": [
+      "fairy",
+      "steel"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/959.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/959.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 958,
+        "name": "tinkatuff",
+        "how": "Level Up to 38"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 967,
+    "name": "cyclizar",
+    "formType": "alpha",
+    "types": [
+      "dragon",
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/967.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/967.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 969,
+    "name": "glimmet",
+    "formType": "alpha",
+    "types": [
+      "rock",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/969.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/969.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 970,
+          "name": "glimmora",
+          "how": "Level Up to 35"
+        }
+      ]
+    }
+  },
+  {
+    "id": 970,
+    "name": "glimmora",
+    "formType": "alpha",
+    "types": [
+      "rock",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/970.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/970.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 969,
+        "name": "glimmet",
+        "how": "Level Up to 35"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 971,
+    "name": "greavard",
+    "formType": "alpha",
+    "types": [
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/971.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/971.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 972,
+          "name": "houndstone",
+          "how": "Level Up to 30"
+        }
+      ]
+    }
+  },
+  {
+    "id": 972,
+    "name": "houndstone",
+    "formType": "alpha",
+    "types": [
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/972.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/972.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 971,
+        "name": "greavard",
+        "how": "Level Up to 30"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 973,
+    "name": "flamigo",
+    "formType": "alpha",
+    "types": [
+      "flying",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/973.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/973.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 977,
+    "name": "dondozo",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/977.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/977.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 978,
+    "name": "tatsugiri-curly-alpha",
+    "formType": "alpha",
+    "types": [
+      "dragon",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/978.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/978.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 979,
+    "name": "annihilape",
+    "formType": "alpha",
+    "types": [
+      "fighting",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/979.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/979.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 57,
+        "name": "primeape",
+        "how": "other"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 996,
+    "name": "frigibax",
+    "formType": "alpha",
+    "types": [
+      "dragon",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/996.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/996.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 997,
+          "name": "arctibax",
+          "how": "Level Up to 35"
+        }
+      ]
+    }
+  },
+  {
+    "id": 997,
+    "name": "arctibax",
+    "formType": "alpha",
+    "types": [
+      "dragon",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/997.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/997.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 996,
+        "name": "frigibax",
+        "how": "Level Up to 35"
+      },
+      "next": [
+        {
+          "id": 998,
+          "name": "baxcalibur",
+          "how": "Level Up to 54"
+        }
+      ]
+    }
+  },
+  {
+    "id": 998,
+    "name": "baxcalibur",
+    "formType": "alpha",
+    "types": [
+      "dragon",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/998.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/998.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 997,
+        "name": "arctibax",
+        "how": "Level Up to 54"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 999,
+    "name": "gimmighoul",
+    "formType": "alpha",
+    "types": [
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/999.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/999.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 1000,
+          "name": "gholdengo",
+          "how": "other"
+        }
+      ]
+    }
+  },
+  {
+    "id": 1000,
+    "name": "gholdengo",
+    "formType": "alpha",
+    "types": [
+      "steel",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1000.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1000.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 999,
+        "name": "gimmighoul",
+        "how": "other"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 152,
+    "name": "chikorita",
+    "formType": "alpha",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/152.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/152.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 153,
+          "name": "bayleef",
+          "how": "Level Up to 16"
+        }
+      ]
+    }
+  },
+  {
+    "id": 153,
+    "name": "bayleef",
+    "formType": "alpha",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/153.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/153.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 152,
+        "name": "chikorita",
+        "how": "Level Up to 16"
+      },
+      "next": [
+        {
+          "id": 154,
+          "name": "meganium",
+          "how": "Level Up to 32"
+        }
+      ]
+    }
+  },
+  {
+    "id": 154,
+    "name": "meganium",
+    "formType": "alpha",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/154.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/154.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 153,
+        "name": "bayleef",
+        "how": "Level Up to 32"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 498,
+    "name": "tepig",
+    "formType": "alpha",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/498.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/498.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 499,
+          "name": "pignite",
+          "how": "Level Up to 17"
+        }
+      ]
+    }
+  },
+  {
+    "id": 499,
+    "name": "pignite",
+    "formType": "alpha",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/499.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/499.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 498,
+        "name": "tepig",
+        "how": "Level Up to 17"
+      },
+      "next": [
+        {
+          "id": 500,
+          "name": "emboar",
+          "how": "Level Up to 36"
+        }
+      ]
+    }
+  },
+  {
+    "id": 500,
+    "name": "emboar",
+    "formType": "alpha",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/500.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/500.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 499,
+        "name": "pignite",
+        "how": "Level Up to 36"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 158,
+    "name": "totodile",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/158.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/158.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 159,
+          "name": "croconaw",
+          "how": "Level Up to 18"
+        }
+      ]
+    }
+  },
+  {
+    "id": 159,
+    "name": "croconaw",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/159.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/159.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 158,
+        "name": "totodile",
+        "how": "Level Up to 18"
+      },
+      "next": [
+        {
+          "id": 160,
+          "name": "feraligatr",
+          "how": "Level Up to 30"
+        }
+      ]
+    }
+  },
+  {
+    "id": 160,
+    "name": "feraligatr",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/160.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/160.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 159,
+        "name": "croconaw",
+        "how": "Level Up to 30"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 661,
+    "name": "fletchling",
+    "formType": "alpha",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/661.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/661.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 662,
+          "name": "fletchinder",
+          "how": "Level Up to 17"
+        }
+      ]
+    }
+  },
+  {
+    "id": 662,
+    "name": "fletchinder",
+    "formType": "alpha",
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/662.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/662.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 661,
+        "name": "fletchling",
+        "how": "Level Up to 17"
+      },
+      "next": [
+        {
+          "id": 663,
+          "name": "talonflame",
+          "how": "Level Up to 35"
+        }
+      ]
+    }
+  },
+  {
+    "id": 663,
+    "name": "talonflame",
+    "formType": "alpha",
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/663.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/663.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 662,
+        "name": "fletchinder",
+        "how": "Level Up to 35"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 659,
+    "name": "bunnelby",
+    "formType": "alpha",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/659.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/659.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 660,
+          "name": "diggersby",
+          "how": "Level Up to 20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 660,
+    "name": "diggersby",
+    "formType": "alpha",
+    "types": [
+      "normal",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/660.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/660.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 659,
+        "name": "bunnelby",
+        "how": "Level Up to 20"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 664,
+    "name": "scatterbug",
+    "formType": "alpha",
+    "types": [
+      "bug"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/664.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/664.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 665,
+          "name": "spewpa",
+          "how": "Level Up to 9"
+        }
+      ]
+    }
+  },
+  {
+    "id": 665,
+    "name": "spewpa",
+    "formType": "alpha",
+    "types": [
+      "bug"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/665.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/665.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 664,
+        "name": "scatterbug",
+        "how": "Level Up to 9"
+      },
+      "next": [
+        {
+          "id": 666,
+          "name": "vivillon-meadow",
+          "how": "Level Up to 12"
+        }
+      ]
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon-meadow",
+    "formType": "alpha",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+        "front_default": "/Sprites/vivillon-meadow.png",
+        "front_shiny": "/Sprites/vivillon-meadow-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 665,
+        "name": "spewpa",
+        "how": "Level Up to 12"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 13,
+    "name": "weedle",
+    "formType": "alpha",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/13.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/13.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 14,
+          "name": "kakuna",
+          "how": "Level Up to 7"
+        }
+      ]
+    }
+  },
+  {
+    "id": 14,
+    "name": "kakuna",
+    "formType": "alpha",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/14.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/14.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 13,
+        "name": "weedle",
+        "how": "Level Up to 7"
+      },
+      "next": [
+        {
+          "id": 15,
+          "name": "beedrill",
+          "how": "Level Up to 10"
+        }
+      ]
+    }
+  },
+  {
+    "id": 15,
+    "name": "beedrill",
+    "formType": "alpha",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/15.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/15.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 14,
+        "name": "kakuna",
+        "how": "Level Up to 10"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 16,
+    "name": "pidgey",
+    "formType": "alpha",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/16.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/16.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 17,
+          "name": "pidgeotto",
+          "how": "Level Up to 18"
+        }
+      ]
+    }
+  },
+  {
+    "id": 17,
+    "name": "pidgeotto",
+    "formType": "alpha",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/17.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/17.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 16,
+        "name": "pidgey",
+        "how": "Level Up to 18"
+      },
+      "next": [
+        {
+          "id": 18,
+          "name": "pidgeot",
+          "how": "Level Up to 36"
+        }
+      ]
+    }
+  },
+  {
+    "id": 18,
+    "name": "pidgeot",
+    "formType": "alpha",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/18.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/18.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 17,
+        "name": "pidgeotto",
+        "how": "Level Up to 36"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 179,
+    "name": "mareep",
+    "formType": "alpha",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/179.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/179.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 180,
+          "name": "flaaffy",
+          "how": "Level Up to 15"
+        }
+      ]
+    }
+  },
+  {
+    "id": 180,
+    "name": "flaaffy",
+    "formType": "alpha",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/180.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/180.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 179,
+        "name": "mareep",
+        "how": "Level Up to 15"
+      },
+      "next": [
+        {
+          "id": 181,
+          "name": "ampharos",
+          "how": "Level Up to 30"
+        }
+      ]
+    }
+  },
+  {
+    "id": 181,
+    "name": "ampharos",
+    "formType": "alpha",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/181.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/181.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 180,
+        "name": "flaaffy",
+        "how": "Level Up to 30"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 504,
+    "name": "patrat",
+    "formType": "alpha",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/504.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/504.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 505,
+          "name": "watchog",
+          "how": "Level Up to 20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 505,
+    "name": "watchog",
+    "formType": "alpha",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/505.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/505.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 504,
+        "name": "patrat",
+        "how": "Level Up to 20"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 688,
+    "name": "binacle",
+    "formType": "alpha",
+    "types": [
+      "rock",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/688.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/688.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 689,
+          "name": "barbaracle",
+          "how": "Level Up to 39"
+        }
+      ]
+    }
+  },
+  {
+    "id": 689,
+    "name": "barbaracle",
+    "formType": "alpha",
+    "types": [
+      "rock",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/689.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/689.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 688,
+        "name": "binacle",
+        "how": "Level Up to 39"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 120,
+    "name": "staryu",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/120.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/120.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 121,
+          "name": "starmie",
+          "how": "Use Water Stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 121,
+    "name": "starmie",
+    "formType": "alpha",
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/121.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/121.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 120,
+        "name": "staryu",
+        "how": "Use Water Stone"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 669,
+    "name": "flabebe-alpha",
+    "formType": "alpha",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/669.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/669.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 670,
+          "name": "floette",
+          "how": "Level Up to 19"
+        }
+      ]
+    }
+  },
+  {
+    "id": 670,
+    "name": "floette-alpha",
+    "formType": "alpha",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/670.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/670.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 669,
+        "name": "flabebe",
+        "how": "Level Up to 19"
+      },
+      "next": [
+        {
+          "id": 671,
+          "name": "florges",
+          "how": "Use Shiny Stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 671,
+    "name": "florges-alpha",
+    "formType": "alpha",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/671.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/671.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 670,
+        "name": "floette",
+        "how": "Use Shiny Stone"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 672,
+    "name": "skiddo",
+    "formType": "alpha",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/672.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/672.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 673,
+          "name": "gogoat",
+          "how": "Level Up to 32"
+        }
+      ]
+    }
+  },
+  {
+    "id": 673,
+    "name": "gogoat",
+    "formType": "alpha",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/673.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/673.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 672,
+        "name": "skiddo",
+        "how": "Level Up to 32"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 677,
+    "name": "espurr",
+    "formType": "alpha",
+    "types": [
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/677.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/677.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 678,
+          "name": "meowstic-male",
+          "how": "Level Up to 25 (Male)"
+        },
+        {
+          "id": 678,
+          "name": "meowstic-female",
+          "how": "Level Up to 25 (Female)"
+        }
+      ]
+    }
+  },
+  {
+    "id": 678,
+    "name": "meowstic-male",
+    "formType": "alpha",
+    "types": [
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/678.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/678.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 677,
+        "name": "espurr",
+        "how": "Level 25 (Male)"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 667,
+    "name": "litleo",
+    "formType": "alphaother",
+    "types": [
+      "fire",
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/667.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/667.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 668,
+          "name": "pyroar",
+          "how": "Level Up to 35"
+        }
+      ]
+    }
+  },
+  {
+    "id": 668,
+    "name": "pyroar",
+    "formType": "alpha",
+    "types": [
+      "fire",
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/668.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/668.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 667,
+        "name": "litleo",
+        "how": "Level Up to 35"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 674,
+    "name": "pancham",
+    "formType": "alpha",
+    "types": [
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/674.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/674.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 675,
+          "name": "pangoro",
+          "how": "Level Up to 32"
+        }
+      ]
+    }
+  },
+  {
+    "id": 675,
+    "name": "pangoro",
+    "formType": "alpha",
+    "types": [
+      "fighting",
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/675.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/675.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 674,
+        "name": "pancham",
+        "how": "Level Up to 32"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 568,
+    "name": "trubbish",
+    "formType": "alpha",
+    "types": [
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/568.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/568.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 569,
+          "name": "garbodor",
+          "how": "Level Up to 36"
+        }
+      ]
+    }
+  },
+  {
+    "id": 569,
+    "name": "garbodor",
+    "formType": "alpha",
+    "types": [
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/569.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/569.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 568,
+        "name": "trubbish",
+        "how": "Level Up to 36"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 702,
+    "name": "dedenne",
+    "formType": "alpha",
+    "types": [
+      "electric",
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/702.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/702.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 167,
+    "name": "spinarak",
+    "formType": "alpha",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/167.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/167.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 168,
+          "name": "ariados",
+          "how": "Level Up to 22"
+        }
+      ]
+    }
+  },
+  {
+    "id": 168,
+    "name": "ariados",
+    "formType": "alpha",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/168.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/168.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 167,
+        "name": "spinarak",
+        "how": "Level Up to 22"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 23,
+    "name": "ekans",
+    "formType": "alpha",
+    "types": [
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/23.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/23.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 24,
+          "name": "arbok",
+          "how": "Level Up to 22"
+        }
+      ]
+    }
+  },
+  {
+    "id": 24,
+    "name": "arbok",
+    "formType": "alpha",
+    "types": [
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/24.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/24.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 23,
+        "name": "ekans",
+        "how": "Level Up to 22"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 543,
+    "name": "venipede",
+    "formType": "alpha",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/543.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/543.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 544,
+          "name": "whirlipede",
+          "how": "Level Up to 22"
+        }
+      ]
+    }
+  },
+  {
+    "id": 544,
+    "name": "whirlipede",
+    "formType": "alpha",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/544.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/544.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 543,
+        "name": "venipede",
+        "how": "Level Up to 22"
+      },
+      "next": [
+        {
+          "id": 545,
+          "name": "scolipede",
+          "how": "Level Up to 30"
+        }
+      ]
+    }
+  },
+  {
+    "id": 545,
+    "name": "scolipede",
+    "formType": "alpha",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/545.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/545.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 544,
+        "name": "whirlipede",
+        "how": "Level Up to 30"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 679,
+    "name": "honedge",
+    "formType": "alpha",
+    "types": [
+      "steel",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/679.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/679.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 680,
+          "name": "doublade",
+          "how": "Level Up to 35"
+        }
+      ]
+    }
+  },
+  {
+    "id": 680,
+    "name": "doublade",
+    "formType": "alpha",
+    "types": [
+      "steel",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/680.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/680.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 679,
+        "name": "honedge",
+        "how": "Level Up to 35"
+      },
+      "next": [
+        {
+          "id": 681,
+          "name": "aegislash",
+          "how": "Use Dusk Stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 681,
+    "name": "aegislash",
+    "formType": "alpha",
+    "types": [
+      "steel",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/681.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/681.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 680,
+        "name": "doublade",
+        "how": "Level Up to 35"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 69,
+    "name": "bellsprout",
+    "formType": "alpha",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/69.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/69.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 70,
+          "name": "weepinbell",
+          "how": "Level Up to 21"
+        }
+      ]
+    }
+  },
+  {
+    "id": 70,
+    "name": "weepinbell",
+    "formType": "alpha",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/70.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/70.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 69,
+        "name": "bellsprout",
+        "how": "Level Up to 21"
+      },
+      "next": [
+        {
+          "id": 71,
+          "name": "victreebel",
+          "how": "Use Leaf Stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 71,
+    "name": "victreebel",
+    "formType": "alpha",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/71.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/71.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 70,
+        "name": "weepinbell",
+        "how": "Use Leaf Stone"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 511,
+    "name": "pansage",
+    "formType": "alpha",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/511.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/511.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 512,
+          "name": "simisage",
+          "how": "Use Leaf Stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 512,
+    "name": "simisage",
+    "formType": "alpha",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/512.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/512.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 511,
+        "name": "pansage",
+        "how": "Use Leaf Stone"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 513,
+    "name": "pansear",
+    "formType": "alpha",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/513.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/513.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 514,
+          "name": "simisear",
+          "how": "Use Fire Stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 514,
+    "name": "simisear",
+    "formType": "alpha",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/514.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/514.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 513,
+        "name": "pansear",
+        "how": "Use Fire Stone"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 515,
+    "name": "panpour",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/515.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/515.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 516,
+          "name": "simipour",
+          "how": "Use Water Stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 516,
+    "name": "simipour",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/516.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/516.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 515,
+        "name": "panpour",
+        "how": "Use Water Stone"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 307,
+    "name": "meditite",
+    "formType": "alpha",
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/307.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/307.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 308,
+          "name": "medicham",
+          "how": "Level Up to 37"
+        }
+      ]
+    }
+  },
+  {
+    "id": 308,
+    "name": "medicham",
+    "formType": "alpha",
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/308.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/308.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 307,
+        "name": "meditite",
+        "how": "Level Up to 37"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 309,
+    "name": "electrike",
+    "formType": "alpha",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/309.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/309.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 310,
+          "name": "manectric",
+          "how": "Level Up to 26"
+        }
+      ]
+    }
+  },
+  {
+    "id": 310,
+    "name": "manectric",
+    "formType": "alpha",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/310.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/310.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 309,
+        "name": "electrike",
+        "how": "Level Up to 26"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 228,
+    "name": "houndour",
+    "formType": "alpha",
+    "types": [
+      "dark",
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/228.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/228.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 229,
+          "name": "houndoom",
+          "how": "Level Up to 24"
+        }
+      ]
+    }
+  },
+  {
+    "id": 229,
+    "name": "houndoom",
+    "formType": "alpha",
+    "types": [
+      "dark",
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/229.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/229.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 228,
+        "name": "houndour",
+        "how": "Level Up to 24"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 333,
+    "name": "swablu",
+    "formType": "alpha",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/333.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/333.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 334,
+          "name": "altaria",
+          "how": "Level Up to 35"
+        }
+      ]
+    }
+  },
+  {
+    "id": 334,
+    "name": "altaria",
+    "formType": "alpha",
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/334.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/334.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 333,
+        "name": "swablu",
+        "how": "Level Up to 35"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 531,
+    "name": "audino",
+    "formType": "alpha",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/531.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/531.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 682,
+    "name": "spritzee",
+    "formType": "alpha",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/682.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/682.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 683,
+          "name": "aromatisse",
+          "how": "Trade"
+        }
+      ]
+    }
+  },
+  {
+    "id": 683,
+    "name": "aromatisse",
+    "formType": "alpha",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/683.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/683.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 682,
+        "name": "spritzee",
+        "how": "Trade"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 684,
+    "name": "swirlix",
+    "formType": "alpha",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/684.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/684.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 685,
+          "name": "slurpuff",
+          "how": "Trade"
+        }
+      ]
+    }
+  },
+  {
+    "id": 685,
+    "name": "slurpuff",
+    "formType": "alpha",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/685.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/685.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 684,
+        "name": "swirlix",
+        "how": "Trade"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 353,
+    "name": "shuppet",
+    "formType": "alpha",
+    "types": [
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/353.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/353.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 354,
+          "name": "banette",
+          "how": "Level Up to 37"
+        }
+      ]
+    }
+  },
+  {
+    "id": 354,
+    "name": "banette",
+    "formType": "alpha",
+    "types": [
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/354.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/354.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 353,
+        "name": "shuppet",
+        "how": "Level Up to 37"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 582,
+    "name": "vanillite",
+    "formType": "alpha",
+    "types": [
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/582.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/582.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 583,
+          "name": "vanillish",
+          "how": "Level Up to 35"
+        }
+      ]
+    }
+  },
+  {
+    "id": 583,
+    "name": "vanillish",
+    "formType": "alpha",
+    "types": [
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/583.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/583.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 582,
+        "name": "vanillite",
+        "how": "Level Up to 35"
+      },
+      "next": [
+        {
+          "id": 584,
+          "name": "vanilluxe",
+          "how": "Level Up to 47"
+        }
+      ]
+    }
+  },
+  {
+    "id": 584,
+    "name": "vanilluxe",
+    "formType": "alpha",
+    "types": [
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/584.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/584.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 583,
+        "name": "vanillish",
+        "how": "Level Up to 47"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 322,
+    "name": "numel",
+    "formType": "alpha",
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/322.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/322.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 323,
+          "name": "camerupt",
+          "how": "Level Up to 33"
+        }
+      ]
+    }
+  },
+  {
+    "id": 323,
+    "name": "camerupt",
+    "formType": "alpha",
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/323.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/323.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 322,
+        "name": "numel",
+        "how": "Level Up to 33"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 529,
+    "name": "drilbur",
+    "formType": "alpha",
+    "types": [
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/529.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/529.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 530,
+          "name": "excadrill",
+          "how": "Level Up to 31"
+        }
+      ]
+    }
+  },
+  {
+    "id": 530,
+    "name": "excadrill",
+    "formType": "alpha",
+    "types": [
+      "ground",
+      "steel"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/530.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/530.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 529,
+        "name": "drilbur",
+        "how": "Level Up to 31"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 551,
+    "name": "sandile",
+    "formType": "alpha",
+    "types": [
+      "ground",
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/551.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/551.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 552,
+          "name": "krokorok",
+          "how": "Level Up to 29"
+        }
+      ]
+    }
+  },
+  {
+    "id": 552,
+    "name": "krokorok",
+    "formType": "alpha",
+    "types": [
+      "ground",
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/552.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/552.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 551,
+        "name": "sandile",
+        "how": "Level Up to 29"
+      },
+      "next": [
+        {
+          "id": 553,
+          "name": "krookodile",
+          "how": "Level Up to 40"
+        }
+      ]
+    }
+  },
+  {
+    "id": 553,
+    "name": "krookodile",
+    "formType": "alpha",
+    "types": [
+      "ground",
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/553.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/553.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 552,
+        "name": "krokorok",
+        "how": "Level Up to 40"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 703,
+    "name": "carbink",
+    "formType": "alpha",
+    "types": [
+      "rock",
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/703.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/703.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 302,
+    "name": "sableye",
+    "formType": "alpha",
+    "types": [
+      "dark",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/302.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/302.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 303,
+    "name": "mawile",
+    "formType": "alpha",
+    "types": [
+      "steel",
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/303.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/303.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 359,
+    "name": "absol",
+    "formType": "alpha",
+    "types": [
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/359.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/359.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 79,
+    "name": "slowpoke",
+    "formType": "alpha",
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/79.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/79.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 80,
+          "name": "slowbro",
+          "how": "Level up to 37"
+        },
+        {
+          "id": 199,
+          "name": "slowking",
+          "how": "Trade"
+        }
+      ]
+    }
+  },
+  {
+    "id": 80,
+    "name": "slowbro",
+    "formType": "alpha",
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/80.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/80.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 79,
+        "name": "slowpoke",
+        "how": "Level up to 37"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 199,
+    "name": "slowking",
+    "formType": "alpha",
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/199.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/199.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 79,
+        "name": "slowpoke",
+        "how": "Trade"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 318,
+    "name": "carvanha",
+    "formType": "alpha",
+    "types": [
+      "water",
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/318.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/318.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 319,
+          "name": "sharpedo",
+          "how": "Level Up to 30"
+        }
+      ]
+    }
+  },
+  {
+    "id": 319,
+    "name": "sharpedo",
+    "formType": "alpha",
+    "types": [
+      "water",
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/319.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/319.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 318,
+        "name": "carvanha",
+        "how": "Level Up to 30"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 602,
+    "name": "tynamo",
+    "formType": "alpha",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/602.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/602.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 603,
+          "name": "eelektrik",
+          "how": "Level Up to 39"
+        }
+      ]
+    }
+  },
+  {
+    "id": 603,
+    "name": "eelektrik",
+    "formType": "alpha",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/603.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/603.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 602,
+        "name": "tynamo",
+        "how": "Level Up to 39"
+      },
+      "next": [
+        {
+          "id": 604,
+          "name": "eelektross",
+          "how": "Use Thunder Stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 604,
+    "name": "eelektross",
+    "formType": "alpha",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/604.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/604.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 603,
+        "name": "eelektrik",
+        "how": "Use Thunder Stone"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 147,
+    "name": "dratini",
+    "formType": "alpha",
+    "types": [
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/147.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/147.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 148,
+          "name": "dragonair",
+          "how": "Level Up to 30"
+        }
+      ]
+    }
+  },
+  {
+    "id": 148,
+    "name": "dragonair",
+    "formType": "alpha",
+    "types": [
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/148.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/148.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 147,
+        "name": "dratini",
+        "how": "Level Up to 30"
+      },
+      "next": [
+        {
+          "id": 149,
+          "name": "dragonite",
+          "how": "Level Up to 55"
+        }
+      ]
+    }
+  },
+  {
+    "id": 149,
+    "name": "dragonite",
+    "formType": "alpha",
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/149.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 148,
+        "name": "dragonair",
+        "how": "Level Up to 55"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 1,
+    "name": "bulbasaur",
+    "formType": "alpha",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 2,
+          "name": "ivysaur",
+          "how": "Level Up to 16"
+        }
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "name": "ivysaur",
+    "formType": "alpha",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/2.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 1,
+        "name": "bulbasaur",
+        "how": "Level Up to 16"
+      },
+      "next": [
+        {
+          "id": 3,
+          "name": "venusaur",
+          "how": "Level Up to 32"
+        }
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "name": "venusaur",
+    "formType": "alpha",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/3.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 2,
+        "name": "ivysaur",
+        "how": "Level Up to 32"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 4,
+    "name": "charmander",
+    "formType": "alpha",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/4.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 5,
+          "name": "charmeleon",
+          "how": "Level Up to 16"
+        }
+      ]
+    }
+  },
+  {
+    "id": 5,
+    "name": "charmeleon",
+    "formType": "alpha",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/5.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 4,
+        "name": "charmander",
+        "how": "Level Up to 16"
+      },
+      "next": [
+        {
+          "id": 6,
+          "name": "charizard",
+          "how": "Level Up to 36"
+        }
+      ]
+    }
+  },
+  {
+    "id": 6,
+    "name": "charizard",
+    "formType": "alpha",
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/6.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 5,
+        "name": "charmeleon",
+        "how": "Level Up to 36"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 7,
+    "name": "squirtle",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/7.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 8,
+          "name": "wartortle",
+          "how": "Level Up to 16"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8,
+    "name": "wartortle",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/8.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/8.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 7,
+        "name": "squirtle",
+        "how": "Level Up to 16"
+      },
+      "next": [
+        {
+          "id": 9,
+          "name": "blastoise",
+          "how": "Level Up to 36"
+        }
+      ]
+    }
+  },
+  {
+    "id": 9,
+    "name": "blastoise",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/9.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 8,
+        "name": "wartortle",
+        "how": "Level Up to 36"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 618,
+    "name": "stunfisk",
+    "formType": "alpha",
+    "types": [
+      "ground",
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/618.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/618.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-alpha",
+    "formType": "alpha",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/676.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/676.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 686,
+    "name": "inkay",
+    "formType": "alpha",
+    "types": [
+      "dark",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/686.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/686.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 687,
+          "name": "malamar",
+          "how": "Level Up to 30"
+        }
+      ]
+    }
+  },
+  {
+    "id": 687,
+    "name": "malamar",
+    "formType": "alpha",
+    "types": [
+      "dark",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/687.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/687.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 686,
+        "name": "inkay",
+        "how": "Level Up to 30"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 690,
+    "name": "skrelp",
+    "formType": "alpha",
+    "types": [
+      "poison",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/690.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/690.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 691,
+          "name": "dragalge",
+          "how": "Level Up to 48"
+        }
+      ]
+    }
+  },
+  {
+    "id": 691,
+    "name": "dragalge",
+    "formType": "alpha",
+    "types": [
+      "poison",
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/691.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/691.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 690,
+        "name": "skrelp",
+        "how": "Level Up to 48"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 692,
+    "name": "clauncher",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/692.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/692.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 693,
+          "name": "clawitzer",
+          "how": "Level Up to 37"
+        }
+      ]
+    }
+  },
+  {
+    "id": 693,
+    "name": "clawitzer",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/693.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/693.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 692,
+        "name": "clauncher",
+        "how": "Level Up to 37"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 225,
+    "name": "delibird",
+    "formType": "alpha",
+    "types": [
+      "ice",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/225.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/225.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 127,
+    "name": "pinsir",
+    "formType": "alpha",
+    "types": [
+      "bug"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/127.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/127.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 587,
+    "name": "emolga",
+    "formType": "alpha",
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/587.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/587.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 701,
+    "name": "hawlucha",
+    "formType": "alpha",
+    "types": [
+      "fighting",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/701.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/701.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 708,
+    "name": "phantump",
+    "formType": "alpha",
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/708.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/708.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 709,
+          "name": "trevenant",
+          "how": "Trade"
+        }
+      ]
+    }
+  },
+  {
+    "id": 709,
+    "name": "trevenant",
+    "formType": "alpha",
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/709.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/709.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 708,
+        "name": "phantump",
+        "how": "Trade"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 559,
+    "name": "scraggy",
+    "formType": "alpha",
+    "types": [
+      "dark",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/559.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/559.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 560,
+          "name": "scrafty",
+          "how": "Level Up to 39"
+        }
+      ]
+    }
+  },
+  {
+    "id": 560,
+    "name": "scrafty",
+    "formType": "alpha",
+    "types": [
+      "dark",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/560.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/560.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 559,
+        "name": "scraggy",
+        "how": "Level Up to 39"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 714,
+    "name": "noibat",
+    "formType": "alpha",
+    "types": [
+      "flying",
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/714.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/714.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 715,
+          "name": "noivern",
+          "how": "Level Up to 48"
+        }
+      ]
+    }
+  },
+  {
+    "id": 715,
+    "name": "noivern",
+    "formType": "alpha",
+    "types": [
+      "flying",
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/715.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/715.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 714,
+        "name": "noibat",
+        "how": "Level Up to 48"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 707,
+    "name": "klefki",
+    "formType": "alpha",
+    "types": [
+      "steel",
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/707.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/707.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 607,
+    "name": "litwick",
+    "formType": "alpha",
+    "types": [
+      "ghost",
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/607.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/607.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 608,
+          "name": "lampent",
+          "how": "Level Up to 41"
+        }
+      ]
+    }
+  },
+  {
+    "id": 608,
+    "name": "lampent",
+    "formType": "alpha",
+    "types": [
+      "ghost",
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/608.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/608.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 607,
+        "name": "litwick",
+        "how": "Level Up to 41"
+      },
+      "next": [
+        {
+          "id": 609,
+          "name": "chandelure",
+          "how": "Use Dusk Stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 609,
+    "name": "chandelure",
+    "formType": "alpha",
+    "types": [
+      "ghost",
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/609.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/609.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 608,
+        "name": "lampent",
+        "how": "Use Dusk Stone"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 142,
+    "name": "aerodactyl",
+    "formType": "alpha",
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/142.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/142.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 696,
+    "name": "tyrunt",
+    "formType": "alpha",
+    "types": [
+      "rock",
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/696.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/696.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 697,
+          "name": "tyrantrum",
+          "how": "Level Up to 39"
+        }
+      ]
+    }
+  },
+  {
+    "id": 697,
+    "name": "tyrantrum",
+    "formType": "alpha",
+    "types": [
+      "rock",
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/697.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/697.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 696,
+        "name": "tyrunt",
+        "how": "Level Up to 39"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 698,
+    "name": "amaura",
+    "formType": "alpha",
+    "types": [
+      "rock",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/698.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/698.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 699,
+          "name": "aurorus",
+          "how": "Level Up to 39"
+        }
+      ]
+    }
+  },
+  {
+    "id": 699,
+    "name": "aurorus",
+    "formType": "alpha",
+    "types": [
+      "rock",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/699.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/699.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 698,
+        "name": "amaura",
+        "how": "Level Up to 39"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 304,
+    "name": "aron",
+    "formType": "alpha",
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/304.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/304.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 305,
+          "name": "lairon",
+          "how": "Level Up to 32"
+        }
+      ]
+    }
+  },
+  {
+    "id": 305,
+    "name": "lairon",
+    "formType": "alpha",
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/305.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/305.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 304,
+        "name": "aron",
+        "how": "Level Up to 32"
+      },
+      "next": [
+        {
+          "id": 306,
+          "name": "aggron",
+          "how": "Level Up to 42"
+        }
+      ]
+    }
+  },
+  {
+    "id": 306,
+    "name": "aggron",
+    "formType": "alpha",
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/306.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/306.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 305,
+        "name": "lairon",
+        "how": "Level Up to 42"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 694,
+    "name": "helioptile",
+    "formType": "alpha",
+    "types": [
+      "electric",
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/694.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/694.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 695,
+          "name": "heliolisk",
+          "how": "Use Sun Stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 695,
+    "name": "heliolisk",
+    "formType": "alpha",
+    "types": [
+      "electric",
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/695.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/695.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 694,
+        "name": "helioptile",
+        "how": "Use Sun Stone"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 710,
+    "name": "pumpkaboo-alpha",
+    "formType": "alpha",
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/710.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/710.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 711,
+          "name": "gourgeist",
+          "how": "Trade"
+        }
+      ]
+    }
+  },
+  {
+    "id": 711,
+    "name": "gourgeist-alpha",
+    "formType": "alpha",
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/711.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/711.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 710,
+        "name": "pumpkaboo",
+        "how": "Trade"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 246,
+    "name": "larvitar",
+    "formType": "alpha",
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/246.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/246.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 247,
+          "name": "pupitar",
+          "how": "Level Up to 30"
+        }
+      ]
+    }
+  },
+  {
+    "id": 247,
+    "name": "pupitar",
+    "formType": "alpha",
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/247.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/247.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 246,
+        "name": "larvitar",
+        "how": "Level Up to 30"
+      },
+      "next": [
+        {
+          "id": 248,
+          "name": "tyranitar",
+          "how": "Level Up to 55"
+        }
+      ]
+    }
+  },
+  {
+    "id": 248,
+    "name": "tyranitar",
+    "formType": "alpha",
+    "types": [
+      "rock",
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/248.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/248.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 247,
+        "name": "pupitar",
+        "how": "Level Up to 55"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 656,
+    "name": "froakie",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/656.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/656.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 657,
+          "name": "frogadier",
+          "how": "Level Up to 16"
+        }
+      ]
+    }
+  },
+  {
+    "id": 657,
+    "name": "frogadier",
+    "formType": "alpha",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/657.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/657.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 656,
+        "name": "froakie",
+        "how": "Level Up to 16"
+      },
+      "next": [
+        {
+          "id": 658,
+          "name": "greninja",
+          "how": "Level Up to 36"
+        }
+      ]
+    }
+  },
+  {
+    "id": 658,
+    "name": "greninja",
+    "formType": "alpha",
+    "types": [
+      "water",
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/658.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/658.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 657,
+        "name": "frogadier",
+        "how": "Level Up to 36"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 870,
+    "name": "falinks",
+    "formType": "alpha",
+    "types": [
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/870.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/870.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 650,
+    "name": "chespin",
+    "formType": "alpha",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/650.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/650.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 651,
+          "name": "quilladin",
+          "how": "Level Up to 16"
+        }
+      ]
+    }
+  },
+  {
+    "id": 651,
+    "name": "quilladin",
+    "formType": "alpha",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/651.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/651.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 650,
+        "name": "chespin",
+        "how": "Level Up to 16"
+      },
+      "next": [
+        {
+          "id": 652,
+          "name": "chesnaught",
+          "how": "Level Up to 36"
+        }
+      ]
+    }
+  },
+  {
+    "id": 652,
+    "name": "chesnaught",
+    "formType": "alpha",
+    "types": [
+      "grass",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/652.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/652.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 651,
+        "name": "quilladin",
+        "how": "Level Up to 36"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 227,
+    "name": "skarmory",
+    "formType": "alpha",
+    "types": [
+      "steel",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/227.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/227.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 653,
+    "name": "fennekin",
+    "formType": "alpha",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/653.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/653.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 654,
+          "name": "braixen",
+          "how": "Level Up to 16"
+        }
+      ]
+    }
+  },
+  {
+    "id": 654,
+    "name": "braixen",
+    "formType": "alpha",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/654.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/654.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 653,
+        "name": "fennekin",
+        "how": "Level Up to 16"
+      },
+      "next": [
+        {
+          "id": 655,
+          "name": "delphox",
+          "how": "Level Up to 36"
+        }
+      ]
+    }
+  },
+  {
+    "id": 655,
+    "name": "delphox",
+    "formType": "alpha",
+    "types": [
+      "fire",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/655.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/655.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 654,
+        "name": "braixen",
+        "how": "Level Up to 36"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 371,
+    "name": "bagon",
+    "formType": "alpha",
+    "types": [
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/371.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/371.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 372,
+          "name": "shelgon",
+          "how": "Level Up to 30"
+        }
+      ]
+    }
+  },
+  {
+    "id": 372,
+    "name": "shelgon",
+    "formType": "alpha",
+    "types": [
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/372.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/372.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 371,
+        "name": "bagon",
+        "how": "Level Up to 30"
+      },
+      "next": [
+        {
+          "id": 373,
+          "name": "salamence",
+          "how": "Level Up to 50"
+        }
+      ]
+    }
+  },
+  {
+    "id": 373,
+    "name": "salamence",
+    "formType": "alpha",
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/373.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/373.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 372,
+        "name": "shelgon",
+        "how": "Level Up to 50"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 115,
+    "name": "kangaskhan",
+    "formType": "alpha",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/115.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/115.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 780,
+    "name": "drampa",
+    "formType": "alpha",
+    "types": [
+      "normal",
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/780.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/780.png"
+    },
+    "gen": 7,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 374,
+    "name": "beldum",
+    "formType": "alpha",
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/374.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/374.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 375,
+          "name": "metang",
+          "how": "Level Up to 20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 375,
+    "name": "metang",
+    "formType": "alpha",
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/375.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/375.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 374,
+        "name": "beldum",
+        "how": "Level Up to 20"
+      },
+      "next": [
+        {
+          "id": 376,
+          "name": "metagross",
+          "how": "Level Up to 45"
+        }
+      ]
+    }
+  },
+  {
+    "id": 376,
+    "name": "metagross",
+    "formType": "alpha",
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/376.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/376.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 375,
+        "name": "metang",
+        "how": "Level Up to 45"
+      },
+      "next": []
+    }
+  },
+  {
     "formType": "------------------------------------------------------------------------------------------- ALPHA GENDERS & OTHERS ----------------------------------------------------------------------------------------",
     "evolution": {
       "pre": null,
@@ -15426,6 +21403,1112 @@
       "how": "Use 294 HP in recoil damage without fainting (Male)"
     },
     "next": []
+    }
+  },
+  {
+    "id": 52,
+    "name": "meowth-alolan-alphaother",
+    "formType": "alphaother",
+    "types": [
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10107.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10107.png"
+    },
+    "gen": 7,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 53,
+          "name": "persian-alolan",
+          "how": "Level Up with high friendship"
+        }
+      ]
+    }
+  },
+  {
+    "id": 53,
+    "name": "persian-alolan-alphaother",
+    "formType": "alphaother",
+    "types": [
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10108.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10108.png"
+    },
+    "gen": 7,
+    "evolution": {
+      "pre": {
+        "id": 52,
+        "name": "meowth-alolan",
+        "how": "Level Up with high friendship"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 52,
+    "name": "meowth-galar-alphaother",
+    "formType": "alphaother",
+    "types": [
+      "steel"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10161.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10161.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 863,
+          "name": "perrserker",
+          "how": "Level Up to 28"
+        }
+      ]
+    }
+  },
+  {
+    "id": 83,
+    "name": "farfetchd-galar-alphaother",
+    "formType": "alphaother",
+    "types": [
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10166.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10166.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": [
+              {
+        "id": 865,
+        "name": "sirfetchd",
+        "how": "three critical hits"
+        }
+      ]
+    }
+  },
+  {
+    "id": 105,
+    "name": "marowak-alolan-alphaother",
+    "types": [
+      "fire",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10115.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10115.png"
+    },
+    "gen": 7,
+    "formType": "alphaother",
+"evolution": {
+  "pre": {
+    "id": 104,
+    "name": "cubone",
+    "how": "Level Up to 28 at night in Alola"
+  },
+  "next": []
+}
+
+  },
+  {
+    "id": 122,
+    "name": "mr-mime-galar-alphaother",
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10168.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10168.png"
+    },
+    "gen": 8,
+    "formType": "alphaother",
+  "evolution": {
+    "pre": {
+      "id": 439,
+      "name": "mime-jr",
+      "how": "Level Up with Mimic (Galar)"
+    },
+    "next": [
+      {
+        "id": 866,
+        "name": "mr-rime",
+        "how": "Level Up to 42"
+      }
+    ]
+    }
+  },
+  {
+    "id": 562,
+    "name": "yamask-galar-alphaother",
+    "types": [
+      "ground",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10179.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10179.png"
+    },
+    "gen": 8,
+    "formType": "alphaother",
+  "evolution": {
+    "pre": null,
+    "next": [
+      {
+        "id": 867,
+        "name": "runerigus",
+        "how": "Take 49+ HP damage & pass under Stone Sculpture in Dusty Bowl"
+      }
+    ]
+    }
+  },
+  {
+    "id": 849,
+    "name": "toxtricity-low-key-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "toxtricity",
+    "types": [
+      "electric",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/toxtricity-lowkey.png",
+      "front_shiny": "/Sprites/toxtricity-lowkey-shiny.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 876,
+    "name": "indeedee-female-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "indeedee",
+    "types": [
+      "psychic",
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/876.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/876.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 931,
+    "name": "squawkabilly-blue-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "squawkabilly",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/sqwuawkabilly-blue.png",
+      "front_shiny": "/Sprites/sqwuawkabilly-blue-shiny.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 931,
+    "name": "squawkabilly-yellow-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "squawkabilly",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/sqwuawkabilly-yellow.png",
+      "front_shiny": "/Sprites/sqwuawkabilly-yellow-shiny.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 931,
+    "name": "squawkabilly-white-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "squawkabilly",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/sqwuawkabilly-white.png",
+      "front_shiny": "/Sprites/sqwuawkabilly-white-shiny.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 978,
+    "name": "tatsugiri-droopy-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "tatsugiri",
+    "types": [
+      "dragon",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/tatsugiri-droopy.png",
+      "front_shiny": "/Sprites/tatsugiri-droopy-shiny.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 978,
+    "name": "tatsugiri-stretchy-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "tatsugiri",
+    "types": [
+      "dragon",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/tatsugiri-stretchy.png",
+      "front_shiny": "/Sprites/tatsugiri-stretchy-shiny.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 255,
+    "name": "torchic-alphaother",
+    "formType": "alphaother",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/255.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/255.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 256,
+          "name": "combusken",
+          "how": "Level Up to 16"
+        }
+      ]
+    }
+  },
+  {
+    "id": 256,
+    "name": "combusken-alphaother",
+    "formType": "alphaother",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/256.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/256.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 255,
+        "name": "torchic",
+        "how": "Level Up to 16"
+      },
+      "next": [
+        {
+          "id": 257,
+          "name": "blaziken",
+          "how": "Level Up to 36"
+        }
+      ]
+    }
+  },
+  {
+    "id": 257,
+    "name": "blaziken-alphaother",
+    "formType": "alphaother",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/257.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/257.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 256,
+        "name": "combusken",
+        "how": "Level Up to 36"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 307,
+    "name": "meditite-alphaother",
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/307.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/307.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 308,
+          "name": "medicham",
+          "how": "Level Up to 37"
+        }
+      ]
+    }
+  },
+  {
+    "id": 308,
+    "name": "medicham-alphaother",
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/308.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/308.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 307,
+        "name": "meditite",
+        "how": "Level Up to 37"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 154,
+    "name": "meganium-alphaother",
+    "formType": "alphaother",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/154.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/154.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 153,
+        "name": "bayleef",
+        "how": "Level Up to 32"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 678,
+    "name": "meowstic-female-alphaother",
+    "types": [
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10025.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10025.png"
+    },
+    "gen": 6,
+    "formType": "alphaother",
+  "evolution": {
+    "pre": {
+      "id": 677,
+      "name": "espurr",
+      "how": "Level 25 (Female)"
+    },
+    "next": []
+    }
+  },
+  {
+    "id": 668,
+    "name": "pyroar-alphaother",
+    "types": [
+      "fire",
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/668.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/668.png"
+    },
+    "gen": 6,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 322,
+    "name": "numel-alphaother",
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/322.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/322.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 323,
+          "name": "camerupt",
+          "how": "Level Up to 33"
+        }
+      ]
+    }
+  },
+  {
+    "id": 323,
+    "name": "camerupt-alphaother",
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/323.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/323.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 322,
+        "name": "numel",
+        "how": "Level Up to 33"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 3,
+    "name": "venusaur-alphaother",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/3.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/3.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-heart-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "furfrou",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-heart.png",
+      "front_shiny": "/Sprites/furfrou-heart-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-star-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "furfrou",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-star.png",
+      "front_shiny": "/Sprites/furfrou-star-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-diamond-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "furfrou",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-diamond.png",
+      "front_shiny": "/Sprites/furfrou-diamond-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-debutante-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "furfrou",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-debutante.png",
+      "front_shiny": "/Sprites/furfrou-debutante-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-matron-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "furfrou",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-matron.png",
+      "front_shiny": "/Sprites/furfrou-matron-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-dandy-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "furfrou",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-dandy.png",
+      "front_shiny": "/Sprites/furfrou-dandy-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-lareine-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "furfrou",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-lareine.png",
+      "front_shiny": "/Sprites/furfrou-lareine-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-kabuki-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "furfrou",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-kabuki.png",
+      "front_shiny": "/Sprites/furfrou-kabuki-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-pharaoh-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "furfrou",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-pharaoh.png",
+      "front_shiny": "/Sprites/furfrou-pharaoh-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 710,
+    "name": "pumpkaboo-small-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "pumpkaboo",
+    "types": ["ghost", "grass"],
+    "sprites": {
+      "front_default": "/Sprites/pumpkaboo-small.png",
+      "front_shiny": "/Sprites/pumpkaboo-small-shiny.png"
+    },
+    "sizeScale": 0.85,
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 710,
+    "name": "pumpkaboo-large-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "pumpkaboo",
+    "types": ["ghost", "grass"],
+    "sprites": {
+      "front_default": "/Sprites/pumpkaboo-large.png",
+      "front_shiny": "/Sprites/pumpkaboo-large-shiny.png"
+    },
+    "sizeScale": 1.15,
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 710,
+    "name": "pumpkaboo-super-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "pumpkaboo",
+    "types": ["ghost", "grass"],
+    "sprites": {
+      "front_default": "/Sprites/pumpkaboo-super.png",
+      "front_shiny": "/Sprites/pumpkaboo-super-shiny.png"
+    },
+    "sizeScale": 1.5,
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+    {
+      "id": 711,
+      "name": "gourgeist-small-alphaother",
+      "formType": "alphaother",
+      "baseSpecies": "gourgeist",
+      "types": [
+        "ghost",
+        "grass"
+      ],
+      "sprites": {
+        "front_default": "/Sprites/gourgeist-small.png",
+        "front_shiny": "/Sprites/gourgeist-small-shiny.png"
+      },
+      "gen": 6,
+      "evolution": {
+        "pre": null,
+        "next": []
+      }
+    },
+    {
+      "id": 711,
+      "name": "gourgeist-large-alphaother",
+      "formType": "alphaother",
+      "baseSpecies": "gourgeist",
+      "types": [
+        "ghost",
+        "grass"
+      ],
+      "sprites": {
+        "front_default": "/Sprites/gourgeist-large.png",
+        "front_shiny": "/Sprites/gourgeist-large-shiny.png"
+      },
+      "gen": 6,
+      "evolution": {
+        "pre": null,
+        "next": []
+      }
+    },
+    {
+      "id": 711,
+      "name": "gourgeist-super-alphaother",
+      "formType": "alphaother",
+      "baseSpecies": "gourgeist",
+      "types": [
+        "ghost",
+        "grass"
+      ],
+      "sprites": {
+        "front_default": "/Sprites/gourgeist-super.png",
+        "front_shiny": "/Sprites/gourgeist-super-shiny.png"
+      },
+      "gen": 6,
+      "evolution": {
+        "pre": null,
+        "next": []
+      }
+    },
+    {
+      "id": 229,
+      "name": "houndoom-alphaother",
+      "types": [
+        "dark",
+        "fire"
+      ],
+      "sprites": {
+        "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/229.png",
+        "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/229.png"
+      },
+      "gen": 2,
+      "formType": "alphaother",
+      "evolution": {
+        "pre": null,
+        "next": []
+      }
+    },
+    {
+      "id": 316,
+      "name": "gulpin-alphaother",
+      "types": [
+        "poison"
+      ],
+      "sprites": {
+        "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/316.png",
+        "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/316.png"
+      },
+      "gen": 3,
+      "formType": "alphaother",
+      "evolution": {
+        "pre": null,
+        "next": [
+          {
+            "id": 317,
+            "name": "swalot",
+            "how": "Level Up to 26"
+          }
+        ]
+      }
+    },
+    {
+      "id": 317,
+      "name": "swalot-alphaother",
+      "types": [
+        "poison"
+      ],
+      "sprites": {
+        "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/317.png",
+        "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/317.png"
+      },
+      "gen": 3,
+      "formType": "alphaother",
+      "evolution": {
+        "pre": {
+          "id": 316,
+          "name": "gulpin",
+          "how": "Level Up to 26"
+        },
+        "next": []
+      }
+   },
+   {
+    "id": 350,
+    "name": "milotic-alphaother",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/350.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/350.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 669,
+    "name": "flabebe-yellow-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "flabebe",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/flabebe-yellow.png",
+      "front_shiny": "/Sprites/flabebe-yellow-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 669,
+    "name": "flabebe-orange-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "flabebe",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/flabebe-orange.png",
+      "front_shiny": "/Sprites/flabebe-orange-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 669,
+    "name": "flabebe-blue-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "flabebe",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/flabebe-blue.png",
+      "front_shiny": "/Sprites/flabebe-blue-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 669,
+    "name": "flabebe-white-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "flabebe",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/flabebe-white.png",
+      "front_shiny": "/Sprites/flabebe-white-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 670,
+    "name": "floette-yellow-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "floette",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/floette-yellow.png",
+      "front_shiny": "/Sprites/floette-yellow-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 670,
+    "name": "floette-orange-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "floette",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/floette-orange.png",
+      "front_shiny": "/Sprites/floette-orange-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 670,
+    "name": "floette-blue-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "floette",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/floette-blue.png",
+      "front_shiny": "/Sprites/floette-blue-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 670,
+    "name": "floette-white-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "floette",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/floette-white.png",
+      "front_shiny": "/Sprites/floette-white-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 671,
+    "name": "florges-yellow-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "florges",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/florges-yellow.png",
+      "front_shiny": "/Sprites/florges-yellow-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 671,
+    "name": "florges-orange-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "florges",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/florges-orange.png",
+      "front_shiny": "/Sprites/florges-orange-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 671,
+    "name": "florges-blue-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "florges",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/florges-blue.png",
+      "front_shiny": "/Sprites/florges-blue-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 671,
+    "name": "florges-white-alphaother",
+    "formType": "alphaother",
+    "baseSpecies": "florges",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/florges-white.png",
+      "front_shiny": "/Sprites/florges-white-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
     }
   }
 ]

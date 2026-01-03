@@ -1,5 +1,24 @@
 [
   {
+    "date": "2026-01-02",
+    "version": "v1.0.5",
+    "type": "feature",
+    "title": "Legends Z-A Pokemon Added & Some Small Features/Fixes",
+    "description": "",
+    "features": [
+      "All Legends Z-A and Mega Dimensions DLC Pokemon added and will now show under the obtainable games section along with all the alpha forms",
+      "When searching for a Pokemon by name a new switch will appear allowing you to show that Pokemon's evolutions also in the search results",
+      "Legends Z-A added with all methods and shiny odds when tracking a hunt",
+      "Sidebar will now display how long the hunt took if you use the built-in counter on the website",
+      "Sidebar will now automatically display the shiny odds and will ask for modifiers (shiny charm, sparkling power, etc.) when tracking a hunt"
+    ],
+    "fixes": [
+      "Changed wording for some tags in the sidebar such as Male now says Male Form and Female now says Female Form",
+      "Alpha Others category now organized by dex number instead of Hisui dex order",
+      "Sidebar icons replaced with actual SVG icons instead of basic emojis"
+    ]
+  },
+  {
     "date": "2025-11-24",
     "version": "v1.0.2",
     "type": "feature",

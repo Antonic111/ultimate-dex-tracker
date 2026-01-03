@@ -50,6 +50,39 @@ export function findPokemon(id, name = null) {
   return null;
 }
 
+// Get all pokemon IDs in an evolution chain (including pre and next evolutions)
+export function getEvolutionChainIds(pokemon) {
+  if (!pokemon || !pokemon.evolution) return [pokemon?.id].filter(Boolean);
+  
+  const chainIds = new Set();
+  
+  // Find the base pokemon (walk backwards)
+  let base = pokemon;
+  while (base.evolution?.pre) {
+    const prev = findPokemon(base.evolution.pre.id, base.evolution.pre.name);
+    if (!prev) break;
+    base = prev;
+  }
+  
+  // Recursively collect all pokemon in the chain
+  function collectChain(mon) {
+    if (!mon || !mon.id) return;
+    chainIds.add(mon.id);
+    
+    if (mon.evolution?.next) {
+      mon.evolution.next.forEach(nextEvo => {
+        const nextMon = findPokemon(nextEvo.id, nextEvo.name);
+        if (nextMon) {
+          collectChain(nextMon);
+        }
+      });
+    }
+  }
+  
+  collectChain(base);
+  return Array.from(chainIds);
+}
+
 export function renderTypeBadge(type) {
   const typeColors = {
     normal: "#9fa19f",
@@ -238,7 +271,7 @@ export function getFormDisplayName(pokemon) {
     if (name.endsWith("-alpha")) {
       return "Alpha Female";
     }
-    return "Female";
+    return "Female Form";
   }
 
   // ✅ Paldean Tauros
@@ -250,7 +283,7 @@ export function getFormDisplayName(pokemon) {
 
   // ✅ Male form if baseSpecies is a gendered form
   if (!pokemon.formType && genderForms.includes(name)) {
-    return "Male";
+    return "Male Form";
   }
 
   // ✅ Alpha variants for other forms (not Unown)
@@ -259,6 +292,14 @@ export function getFormDisplayName(pokemon) {
     const baseName = name.replace("-alpha", "");
     const formattedName = formatPokemonName(baseName);
     return `Alpha ${formattedName}`;
+  }
+
+  // ✅ Alpha pokemon with gender forms - show "Alpha Male" instead of "Alpha Pokémon"
+  if (pokemon.formType === "alpha" && name) {
+    const baseName = name.replace("-alpha", "");
+    if (genderForms.includes(baseName)) {
+      return "Alpha Male";
+    }
   }
 
   const formLabels = {

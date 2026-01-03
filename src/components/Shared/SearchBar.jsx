@@ -3,6 +3,7 @@ import {
     ChevronDown,
     ChevronUp,
     CirclePlus,
+    Dna,
     Flame,
     Gamepad2,
     Hash,
@@ -699,6 +700,30 @@ export default function SearchBar({
     </span>
   </label>
   
+  {/* Show Evolutions Switch - only show when there's a search term */}
+  {filters.searchTerm && (
+    <label className="flex items-center gap-2 cursor-pointer" title="Show evolution chain members in search results">
+      <div className="switch">
+        <input
+          type="checkbox"
+          className="switch-input"
+          checked={filters.showEvolutions || false}
+          onChange={e => setFilters(f => ({ ...f, showEvolutions: e.target.checked }))}
+        />
+        <div className="switch-slider" />
+      </div>
+      <span className="text-base font-medium flex items-center gap-2" style={{ color: 'var(--text)' }}>
+        <Dna 
+          size={20} 
+          style={{ 
+            color: filters.showEvolutions ? 'var(--accent)' : '#6b7280',
+            filter: filters.showEvolutions ? 'none' : 'grayscale(100%)'
+          }} 
+        />
+        Show Evolutions
+      </span>
+    </label>
+  )}
 
   {/* Mobile tip removed here; moved below entire section */}
 

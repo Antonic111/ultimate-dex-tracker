@@ -660,8 +660,10 @@ export default function Counters() {
       game: hunt.game,
       method: hunt.method,
       checks: hunt.checks || "",
+      time: totalCheckTimes[huntId] || 0, // Store time in milliseconds
       notes: completionForm.notes || "",
-      entryId: Math.random().toString(36).substr(2, 9)
+      entryId: Math.random().toString(36).substr(2, 9),
+      modifiers: hunt.modifiers || {} // Store modifiers with the entry
     };
     
     // Get the caught key for this Pokemon - all hunts in the Counters page are shiny hunts
@@ -1024,6 +1026,21 @@ export default function Counters() {
       return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
     } else if (minutes > 0) {
       return `${minutes}m ${seconds % 60}s`;
+    } else {
+      return `${seconds}s`;
+    }
+  };
+
+  const formatTimeCompact = (milliseconds) => {
+    const seconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    
+    if (hours > 0) {
+      const mins = minutes % 60;
+      return mins > 0 ? `${hours}h${mins}m` : `${hours}h`;
+    } else if (minutes > 0) {
+      return `${minutes}m`;
     } else {
       return `${seconds}s`;
     }
@@ -1647,14 +1664,14 @@ export default function Counters() {
 
                 {/* Modifiers Section */}
                 {huntDetails.game && availableMethods.length > 0 && (
-                  (gameModifiers["Shiny Charm"] > 0 && !(huntDetails.method === "Fossil Revivals" && (huntDetails.game === "Let's Go Pikachu" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Dynamax Raids" && (huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Gift Pokemon" && (huntDetails.game === "Sword" || huntDetails.game === "Shield" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Let's Go Pikachu")) && !(huntDetails.method === "Tera Raids" && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet")) && !((huntDetails.method === "Random Encounters" || huntDetails.method === "Poke Radar" || huntDetails.method === "Soft Resets" || huntDetails.method === "Fossil Revivals" || huntDetails.method === "Gift Pokemon" || huntDetails.method === "Underground Diglett Hunt") && (huntDetails.game === "Brilliant Diamond" || huntDetails.game === "Shining Pearl")) && !(huntDetails.method === "Poke Radar" && (huntDetails.game === "X" || huntDetails.game === "Y")) && !(huntDetails.method === "Ultra Wormholes" && (huntDetails.game === "Ultra Sun" || huntDetails.game === "Ultra Moon"))) ||
+                  (gameModifiers["Shiny Charm"] > 0 && !(huntDetails.method === "Fossil Revivals" && (huntDetails.game === "Let's Go Pikachu" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Fossil Revivals" && huntDetails.game === "Legends Z-A") && !(huntDetails.method === "Dynamax Raids" && (huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Gift Pokemon" && (huntDetails.game === "Sword" || huntDetails.game === "Shield" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Let's Go Pikachu")) && !(huntDetails.method === "Tera Raids" && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet")) && !((huntDetails.method === "Random Encounters" || huntDetails.method === "Poke Radar" || huntDetails.method === "Soft Resets" || huntDetails.method === "Fossil Revivals" || huntDetails.method === "Gift Pokemon" || huntDetails.method === "Underground Diglett Hunt") && (huntDetails.game === "Brilliant Diamond" || huntDetails.game === "Shining Pearl")) && !(huntDetails.method === "Poke Radar" && (huntDetails.game === "X" || huntDetails.game === "Y")) && !(huntDetails.method === "Ultra Wormholes" && (huntDetails.game === "Ultra Sun" || huntDetails.game === "Ultra Moon"))) ||
                   (gameModifiers["Shiny Parents"] > 0 && huntDetails.method === "Breeding") ||
                   (gameModifiers["Lure Active"] > 0 && (huntDetails.method === "Catch Combo" || huntDetails.method === "Random Encounters" || (huntDetails.method === "Soft Resets" && huntDetails.game !== "Let's Go Pikachu" && huntDetails.game !== "Let's Go Eevee"))) ||
                   (gameModifiers["Research Lv 10"] > 0 && huntDetails.game === "Legends Arceus") ||
                   (gameModifiers["Perfect Research"] > 0 && huntDetails.game === "Legends Arceus") ||
-                  (gameModifiers["Sparkling Lv 1"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich")) ||
-                  (gameModifiers["Sparkling Lv 2"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich")) ||
-                  (gameModifiers["Sparkling Lv 3"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich")) ||
+                  (gameModifiers["Sparkling Lv 1"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces"))) ||
+                  (gameModifiers["Sparkling Lv 2"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces"))) ||
+                  (gameModifiers["Sparkling Lv 3"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces"))) ||
                   (gameModifiers["Event Boosted"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && huntDetails.method === "Mass Outbreaks") ||
                   (gameModifiers["Community Day"] > 0 && huntDetails.game === "GO" && (huntDetails.method === "Random Encounters" || huntDetails.method === "Daily Adventure Incense")) ||
                   (gameModifiers["Raid Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Raid Battles") ||
@@ -1665,7 +1682,7 @@ export default function Counters() {
                   <div className="hunt-form-group">
                     <label className="hunt-label">Modifiers:</label>
                     <div className="modifiers-section">
-                      {gameModifiers["Shiny Charm"] > 0 && !(huntDetails.method === "Fossil Revivals" && (huntDetails.game === "Let's Go Pikachu" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Dynamax Raids" && (huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Gift Pokemon" && (huntDetails.game === "Sword" || huntDetails.game === "Shield" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Let's Go Pikachu")) && !(huntDetails.method === "Tera Raids" && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet")) && !((huntDetails.method === "Random Encounters" || huntDetails.method === "Poke Radar" || huntDetails.method === "Soft Resets" || huntDetails.method === "Fossil Revivals" || huntDetails.method === "Gift Pokemon" || huntDetails.method === "Underground Diglett Hunt") && (huntDetails.game === "Brilliant Diamond" || huntDetails.game === "Shining Pearl")) && !(huntDetails.method === "Poke Radar" && (huntDetails.game === "X" || huntDetails.game === "Y")) && !(huntDetails.method === "Ultra Wormholes" && (huntDetails.game === "Ultra Sun" || huntDetails.game === "Ultra Moon")) && (
+                      {gameModifiers["Shiny Charm"] > 0 && !(huntDetails.method === "Fossil Revivals" && (huntDetails.game === "Let's Go Pikachu" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Fossil Revivals" && huntDetails.game === "Legends Z-A") && !(huntDetails.method === "Dynamax Raids" && (huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Gift Pokemon" && (huntDetails.game === "Sword" || huntDetails.game === "Shield" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Let's Go Pikachu")) && !(huntDetails.method === "Tera Raids" && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet")) && !((huntDetails.method === "Random Encounters" || huntDetails.method === "Poke Radar" || huntDetails.method === "Soft Resets" || huntDetails.method === "Fossil Revivals" || huntDetails.method === "Gift Pokemon" || huntDetails.method === "Underground Diglett Hunt") && (huntDetails.game === "Brilliant Diamond" || huntDetails.game === "Shining Pearl")) && !(huntDetails.method === "Poke Radar" && (huntDetails.game === "X" || huntDetails.game === "Y")) && !(huntDetails.method === "Ultra Wormholes" && (huntDetails.game === "Ultra Sun" || huntDetails.game === "Ultra Moon")) && (
                         <label className="modifier-checkbox">
                           <input
                             type="checkbox"
@@ -1750,7 +1767,7 @@ export default function Counters() {
                           <span>Perfect Research</span>
                         </label>
                       )}
-                      {gameModifiers["Sparkling Lv 1"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") && (
+                      {gameModifiers["Sparkling Lv 1"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces")) && (
                         <label className="modifier-checkbox">
                           <input
                             type="checkbox"
@@ -1777,7 +1794,7 @@ export default function Counters() {
                           <span>Sparkling Lv 1</span>
                         </label>
                       )}
-                      {gameModifiers["Sparkling Lv 2"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") && (
+                      {gameModifiers["Sparkling Lv 2"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces")) && (
                         <label className="modifier-checkbox">
                           <input
                             type="checkbox"
@@ -1804,7 +1821,7 @@ export default function Counters() {
                           <span>Sparkling Lv 2</span>
                         </label>
                       )}
-                      {gameModifiers["Sparkling Lv 3"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") && (
+                      {gameModifiers["Sparkling Lv 3"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces")) && (
                         <label className="modifier-checkbox">
                           <input
                             type="checkbox"
@@ -2651,14 +2668,14 @@ export default function Counters() {
                   const editGameModifiers = getModifiersForGame(editForm.game);
                   
                   return (
-                    (editGameModifiers["Shiny Charm"] > 0 && !(editForm.method === "Fossil Revivals" && (editForm.game === "Let's Go Pikachu" || editForm.game === "Let's Go Eevee" || editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Dynamax Raids" && (editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Gift Pokemon" && (editForm.game === "Sword" || editForm.game === "Shield" || editForm.game === "Let's Go Eevee" || editForm.game === "Let's Go Pikachu")) && !(editForm.method === "Tera Raids" && (editForm.game === "Scarlet" || editForm.game === "Violet")) && !((editForm.method === "Random Encounters" || editForm.method === "Poke Radar" || editForm.method === "Soft Resets" || editForm.method === "Fossil Revivals" || editForm.method === "Gift Pokemon" || editForm.method === "Underground Diglett Hunt") && (editForm.game === "Brilliant Diamond" || editForm.game === "Shining Pearl")) && !(editForm.method === "Poke Radar" && (editForm.game === "X" || editForm.game === "Y")) && !(editForm.method === "Ultra Wormholes" && (editForm.game === "Ultra Sun" || editForm.game === "Ultra Moon"))) ||
+                    (editGameModifiers["Shiny Charm"] > 0 && !(editForm.method === "Fossil Revivals" && (editForm.game === "Let's Go Pikachu" || editForm.game === "Let's Go Eevee" || editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Fossil Revivals" && editForm.game === "Legends Z-A") && !(editForm.method === "Dynamax Raids" && (editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Gift Pokemon" && (editForm.game === "Sword" || editForm.game === "Shield" || editForm.game === "Let's Go Eevee" || editForm.game === "Let's Go Pikachu")) && !(editForm.method === "Tera Raids" && (editForm.game === "Scarlet" || editForm.game === "Violet")) && !((editForm.method === "Random Encounters" || editForm.method === "Poke Radar" || editForm.method === "Soft Resets" || editForm.method === "Fossil Revivals" || editForm.method === "Gift Pokemon" || editForm.method === "Underground Diglett Hunt") && (editForm.game === "Brilliant Diamond" || editForm.game === "Shining Pearl")) && !(editForm.method === "Poke Radar" && (editForm.game === "X" || editForm.game === "Y")) && !(editForm.method === "Ultra Wormholes" && (editForm.game === "Ultra Sun" || editForm.game === "Ultra Moon"))) ||
                     (editGameModifiers["Shiny Parents"] > 0 && editForm.method === "Breeding") ||
                     (editGameModifiers["Lure Active"] > 0 && (editForm.method === "Catch Combo" || editForm.method === "Random Encounters" || (editForm.method === "Soft Resets" && editForm.game !== "Let's Go Pikachu" && editForm.game !== "Let's Go Eevee"))) ||
                     (editGameModifiers["Research Lv 10"] > 0 && editForm.game === "Legends Arceus") ||
                     (editGameModifiers["Perfect Research"] > 0 && editForm.game === "Legends Arceus") ||
-                    (editGameModifiers["Sparkling Lv 1"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich")) ||
-                    (editGameModifiers["Sparkling Lv 2"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich")) ||
-                    (editGameModifiers["Sparkling Lv 3"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich")) ||
+                    (editGameModifiers["Sparkling Lv 1"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces"))) ||
+                    (editGameModifiers["Sparkling Lv 2"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces"))) ||
+                    (editGameModifiers["Sparkling Lv 3"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces"))) ||
                     (editGameModifiers["Event Boosted"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && editForm.method === "Mass Outbreaks") ||
                     (editGameModifiers["Community Day"] > 0 && editForm.game === "GO" && (editForm.method === "Random Encounters" || editForm.method === "Daily Adventure Incense")) ||
                     (editGameModifiers["Raid Day"] > 0 && editForm.game === "GO" && editForm.method === "Raid Battles") ||
@@ -2669,7 +2686,7 @@ export default function Counters() {
                     <div className="hunt-form-group">
                       <label className="hunt-label">Modifiers:</label>
                       <div className="modifiers-section">
-                        {editGameModifiers["Shiny Charm"] > 0 && !(editForm.method === "Fossil Revivals" && (editForm.game === "Let's Go Pikachu" || editForm.game === "Let's Go Eevee" || editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Dynamax Raids" && (editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Gift Pokemon" && (editForm.game === "Sword" || editForm.game === "Shield" || editForm.game === "Let's Go Eevee" || editForm.game === "Let's Go Pikachu")) && !(editForm.method === "Tera Raids" && (editForm.game === "Scarlet" || editForm.game === "Violet")) && !((editForm.method === "Random Encounters" || editForm.method === "Poke Radar" || editForm.method === "Soft Resets" || editForm.method === "Fossil Revivals" || editForm.method === "Gift Pokemon" || editForm.method === "Underground Diglett Hunt") && (editForm.game === "Brilliant Diamond" || editForm.game === "Shining Pearl")) && !(editForm.method === "Poke Radar" && (editForm.game === "X" || editForm.game === "Y")) && !(editForm.method === "Ultra Wormholes" && (editForm.game === "Ultra Sun" || editForm.game === "Ultra Moon")) && (
+                        {editGameModifiers["Shiny Charm"] > 0 && !(editForm.method === "Fossil Revivals" && (editForm.game === "Let's Go Pikachu" || editForm.game === "Let's Go Eevee" || editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Fossil Revivals" && editForm.game === "Legends Z-A") && !(editForm.method === "Dynamax Raids" && (editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Gift Pokemon" && (editForm.game === "Sword" || editForm.game === "Shield" || editForm.game === "Let's Go Eevee" || editForm.game === "Let's Go Pikachu")) && !(editForm.method === "Tera Raids" && (editForm.game === "Scarlet" || editForm.game === "Violet")) && !((editForm.method === "Random Encounters" || editForm.method === "Poke Radar" || editForm.method === "Soft Resets" || editForm.method === "Fossil Revivals" || editForm.method === "Gift Pokemon" || editForm.method === "Underground Diglett Hunt") && (editForm.game === "Brilliant Diamond" || editForm.game === "Shining Pearl")) && !(editForm.method === "Poke Radar" && (editForm.game === "X" || editForm.game === "Y")) && !(editForm.method === "Ultra Wormholes" && (editForm.game === "Ultra Sun" || editForm.game === "Ultra Moon")) && (
                           <label className="modifier-checkbox">
                             <input
                               type="checkbox"
@@ -2754,7 +2771,7 @@ export default function Counters() {
                             <span>Perfect Research</span>
                           </label>
                         )}
-                        {editGameModifiers["Sparkling Lv 1"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") && (
+                        {editGameModifiers["Sparkling Lv 1"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces")) && (
                           <label className="modifier-checkbox">
                             <input
                               type="checkbox"
@@ -2781,7 +2798,7 @@ export default function Counters() {
                             <span>Sparkling Lv 1</span>
                           </label>
                         )}
-                        {editGameModifiers["Sparkling Lv 2"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") && (
+                        {editGameModifiers["Sparkling Lv 2"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces")) && (
                           <label className="modifier-checkbox">
                             <input
                               type="checkbox"
@@ -2808,7 +2825,7 @@ export default function Counters() {
                             <span>Sparkling Lv 2</span>
                           </label>
                         )}
-                        {editGameModifiers["Sparkling Lv 3"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") && (
+                        {editGameModifiers["Sparkling Lv 3"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces")) && (
                           <label className="modifier-checkbox">
                             <input
                               type="checkbox"
@@ -3037,8 +3054,10 @@ export default function Counters() {
                       <div className="font-medium text-white">{new Date().toLocaleDateString()}</div>
                     </div>
                     <div>
-                      <span className="text-gray-400">Final Checks:</span>
-                      <div className="font-medium text-white">{completionModal.hunt.checks}</div>
+                      <span className="text-gray-400">Final Check:</span>
+                      <div className="font-medium text-white">
+                        {completionModal.hunt.checks} in {formatTimeCompact(totalCheckTimes[completionModal.hunt.id] || 0)}
+                      </div>
                     </div>
                   </div>
                 </div>

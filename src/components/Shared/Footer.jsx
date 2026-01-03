@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Youtube, Twitch, Home, User, Users, Settings } from 'lucide-react';
+import { Youtube, Twitch, Home, User, Users, Settings, Tally5, FileText } from 'lucide-react';
 import '../../css/Footer.css';
 
 export default function Footer() {
@@ -23,6 +23,14 @@ export default function Footer() {
             <Link to="/trainers" className="quick-link">
               <Users size={16} />
               <span>Trainers</span>
+            </Link>
+            <Link to="/counters" className="quick-link">
+              <Tally5 size={16} style={{ transform: 'rotate(-1deg)' }} />
+              <span>Counters</span>
+            </Link>
+            <Link to="/changelog" className="quick-link">
+              <FileText size={16} />
+              <span>Changelog</span>
             </Link>
             <Link to="/settings" className="quick-link">
               <Settings size={16} />

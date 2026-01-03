@@ -15,7 +15,7 @@ import Sidebar from "./components/Dex/PokemonSidebar";
 import ProgressManager from "./components/Progress/ProgressManager";
 import SearchBar from "./components/Shared/SearchBar";
 import NoResults from "./components/Shared/NoResults";
-import { formatPokemonName, getLevenshteinDistance } from "./utils";
+import { formatPokemonName, getLevenshteinDistance, getEvolutionChainIds, findPokemon } from "./utils";
 import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isSubLegendary, isStarter, isFossil, isBaby, isParadox, getPokemonCategory } from "./utils/pokemonCategories";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
@@ -225,7 +225,7 @@ const createDexSections = () => {
         const filtered = currentFilteredFormsData.filter(p => p.formType === type);
         
         // Special sorting for Alpha Forms - sort by Pokemon number (id)
-        if (type === "alpha") {
+        if (type === "alpha" || type === "alphaother") {
           return filtered.sort((a, b) => (a.id || 0) - (b.id || 0));
         }
         
@@ -686,7 +686,8 @@ useEffect(() => {
     gen: "",
     mark: "",
     method: "",
-    caught: ""
+    caught: "",
+    showEvolutions: false
   });
 
   useEffect(() => {
@@ -963,7 +964,30 @@ useEffect(() => {
           dexMatch = poke.id.toString().padStart(4, "0").includes(term);
         }
 
-        if (!nameMatch && !dexMatch) return false;
+        // If showEvolutions is enabled, check if any pokemon in the evolution chain matches
+        if (!nameMatch && !dexMatch) {
+          if (filters.showEvolutions) {
+            const chainIds = getEvolutionChainIds(poke);
+            // Check if any pokemon in the chain matches the search
+            const chainMatches = chainIds.some(chainId => {
+              const chainPoke = findPokemon(chainId);
+              if (!chainPoke) return false;
+              const chainNameMatch = chainPoke.name.toLowerCase().includes(term);
+              let chainDexMatch = false;
+              if (!isNaN(Number(term))) {
+                chainDexMatch =
+                  chainPoke.id.toString() === term ||
+                  chainPoke.id.toString().padStart(4, "0") === term;
+              } else {
+                chainDexMatch = chainPoke.id.toString().padStart(4, "0").includes(term);
+              }
+              return chainNameMatch || chainDexMatch;
+            });
+            if (!chainMatches) return false;
+          } else {
+            return false;
+          }
+        }
       }
       // Game
       if (filters.game && firstEntry.game !== filters.game) return false;

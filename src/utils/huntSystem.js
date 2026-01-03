@@ -485,10 +485,18 @@ export const HUNT_SYSTEM = {
   "Legends Z-A": {
     methods: [
       { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" }
+      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
+      { name: "Bench Resets", baseOdds: 4096, description: "Resetting at bench encounters" },
+      { name: "Fast Travels", baseOdds: 4096, description: "Fast travel encounters" },
+      { name: "Hyperspaces", baseOdds: 4096, description: "Hyperspace encounters" },
+      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
+      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils" }
     ],
     modifiers: {
-      "Shiny Charm": 1 // Reduces odds from 4096 to 1024
+      "Shiny Charm": 3, // Available in Legends Z-A - triples odds (same as Scarlet/Violet)
+      "Sparkling Lv 1": 2, // 2x shiny rolls (1/2048 without charm, 1/1024 with charm)
+      "Sparkling Lv 2": 3, // 3x shiny rolls (1/1365 without charm, 1/819 with charm)
+      "Sparkling Lv 3": 4 // 4x shiny rolls (1/1024 without charm, 1/683 with charm)
     }
   },
   "Scarlet": {
@@ -681,10 +689,33 @@ export const calculateOdds = (gameName, methodName, modifiers = {}) => {
     finalOdds = Math.round(4096 / rolls);
   } else if (gameName === "Legends Z-A") {
     // Special calculation for Legends Z-A
-    if (modifiers.shinyCharm && (methodName === "Random Encounters" || methodName === "Soft Resets")) {
-      finalOdds = 1024; // Shiny Charm reduces odds from 4096 to 1024
+    // Fossil Revivals are always full odds (4096) regardless of Shiny Charm
+    const legendsZAMethodsWithCharm = [
+      "Random Encounters",
+      "Soft Resets",
+      "Bench Resets",
+      "Fast Travels",
+      "Gift Pokemon"
+    ];
+    
+    // Hyperspaces uses Legends Z-A specific odds (different from Scarlet/Violet)
+    if (methodName === "Hyperspaces") {
+      // Legends Z-A specific odds
+      if (modifiers.sparklingLv1) {
+        finalOdds = modifiers.shinyCharm ? 820 : 2048; // 1/819.60 with charm, 1/2048.25 without
+      } else if (modifiers.sparklingLv2) {
+        finalOdds = modifiers.shinyCharm ? 683 : 1366; // 1/683.08 with charm, 1/1365.67 without
+      } else if (modifiers.sparklingLv3) {
+        finalOdds = modifiers.shinyCharm ? 586 : 1024; // 1/585.57 with charm, 1/1024.38 without
+      } else {
+        // No sparkling power - Shiny Charm only gives 1/1024.38 (not tripling base odds like Scarlet/Violet)
+        finalOdds = modifiers.shinyCharm ? 1024 : 4096; // 1/1024.38 with charm, 1/4096 without
+      }
+    } else if (modifiers.shinyCharm && legendsZAMethodsWithCharm.includes(methodName)) {
+      // Standard methods use simple charm calculation (reduces from 4096 to 1024)
+      finalOdds = 1024;
     } else {
-      finalOdds = 4096; // Base odds without Shiny Charm
+      finalOdds = 4096; // Base odds without Shiny Charm (or Fossil Revivals which are always full odds)
     }
   } else {
     // Apply Research Level 10 modifier (for other games if needed)

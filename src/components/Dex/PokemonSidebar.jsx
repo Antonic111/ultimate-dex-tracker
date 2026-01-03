@@ -11,7 +11,7 @@ import { useMessage } from "../Shared/MessageContext";
 import { validateContent } from "../../../shared/contentFilter";
 import gamePokemonData from "../../data/gamePokemon.json";
 import { getAvailableGamesForPokemon, getMergedGameName } from "../../utils/gameMapping";
-import { getMethodsForGame } from "../../utils/huntSystem";
+import { getMethodsForGame, getCurrentHuntOdds, getModifiersForGame } from "../../utils/huntSystem";
 // import "../../css/EvolutionChain.css"; // Moved to backup folder
 import "../../css/Sidebar.css";
 
@@ -22,6 +22,28 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   const [selectedEntryIndex, setSelectedEntryIndex] = useState(0);
   const [localEntries, setLocalEntries] = useState([]);
   const { showMessage } = useMessage();
+
+  // Format time in full format (e.g., "1 Hour 5 Minutes 15 Seconds")
+  const formatTimeFull = (milliseconds) => {
+    if (!milliseconds || milliseconds === 0) return "";
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    
+    const parts = [];
+    if (hours > 0) {
+      parts.push(`${hours} Hour${hours !== 1 ? 's' : ''}`);
+    }
+    if (minutes > 0) {
+      parts.push(`${minutes} Minute${minutes !== 1 ? 's' : ''}`);
+    }
+    if (seconds > 0 || parts.length === 0) {
+      parts.push(`${seconds} Second${seconds !== 1 ? 's' : ''}`);
+    }
+    
+    return parts.join(' ');
+  };
 
   // Modal states
   const [resetModal, setResetModal] = useState({ show: false, pokemonName: '' });
@@ -37,8 +59,25 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     method: "",
     game: "",
     checks: "",
+    time: "",
     notes: "",
-    entryId: ""
+    entryId: "",
+    modifiers: {
+      shinyCharm: false,
+      shinyParents: false,
+      lureActive: false,
+      researchLv10: false,
+      perfectResearch: false,
+      sparklingLv1: false,
+      sparklingLv2: false,
+      sparklingLv3: false,
+      eventBoosted: false,
+      communityDay: false,
+      raidDay: false,
+      researchDay: false,
+      galarBirds: false,
+      hatchDay: false
+    }
   };
 
 
@@ -50,6 +89,9 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   
   // Get available methods based on selected game
   const availableMethods = getMethodsForGame(editData.game);
+  
+  // Get available modifiers for the selected game
+  const gameModifiers = editData.game ? getModifiersForGame(editData.game) : {};
   
   // Check if marks are available for the selected game
   const marksAvailable = ["Scarlet", "Violet", "Sword", "Shield"].includes(editData.game);
@@ -116,6 +158,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       "Legends Arceus": { abbr: "LA", colors: ["#6bbd8d", "#6bbd8d"] },
       "Scarlet": { abbr: "Sc", colors: ["#e74c3c", "#e74c3c"] },
       "Violet": { abbr: "V", colors: ["#9b59b6", "#9b59b6"] },
+      "Legends Z-A": { abbr: "ZA", colors: ["#fac3c8", "#fac3c8"] },
       "GO": { abbr: "GO", colors: ["#4285f4", "#4285f4"] }
     };
     // Try exact match first, then case-insensitive match
@@ -168,9 +211,25 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     const pokemonName = pokemon.name?.toLowerCase() || '';
     const formType = pokemon.formType?.toLowerCase() || '';
     
-    // Alpha Pokemon - only available in Legends Arceus
+    // Alpha Pokemon - check if available in Legends Arceus or Legends Z-A
     if (formType === 'alpha' || formType === 'alphaother') {
-      return ["Legends Arceus"];
+      const availableGames = [];
+      const formattedId = String(pokemon.id).padStart(4, '0');
+      
+      // Check if available in Legends Arceus
+      const legendsArceusIds = gamePokemonData["Legends Arceus"];
+      if (legendsArceusIds && legendsArceusIds.includes(formattedId)) {
+        availableGames.push("Legends Arceus");
+      }
+      
+      // Check if available in Legends Z-A
+      const legendsZAIds = gamePokemonData["Legends Z-A"];
+      if (legendsZAIds && legendsZAIds.includes(formattedId)) {
+        availableGames.push("Legends Z-A");
+      }
+      
+      // Return the games found, or default to Legends Arceus if neither found (backward compatibility)
+      return availableGames.length > 0 ? availableGames : ["Legends Arceus"];
     }
     
     // Therian forms - only available in Legends Arceus and GO
@@ -340,6 +399,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       "Emerald": "E",
       "Platinum": "P",
       "Legends Arceus": "LA",
+      "Legends Z-A": "ZA",
       "GO": "GO"
     };
     
@@ -453,8 +513,10 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
           method: firstEntry.method || METHOD_OPTIONS[0],
           game: firstEntry.game || GAME_OPTIONS[0].value,
           checks: firstEntry.checks || "",
+          time: firstEntry.time || "",
           notes: firstEntry.notes || "",
-          entryId: firstEntry.entryId || Math.random().toString(36).substr(2, 9)
+          entryId: firstEntry.entryId || Math.random().toString(36).substr(2, 9),
+          modifiers: firstEntry.modifiers || defaultEditData.modifiers
         });
       } else {
         // Keep current selection but update editData to show current entry
@@ -466,8 +528,10 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
           method: currentEntry.method || METHOD_OPTIONS[0],
           game: currentEntry.game || GAME_OPTIONS[0].value,
           checks: currentEntry.checks || "",
+          time: currentEntry.time || "",
           notes: currentEntry.notes || "",
-          entryId: currentEntry.entryId || Math.random().toString(36).substr(2, 9)
+          entryId: currentEntry.entryId || Math.random().toString(36).substr(2, 9),
+          modifiers: currentEntry.modifiers || defaultEditData.modifiers
         });
       }
     } else {
@@ -562,8 +626,10 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
         method: selectedEntry.method || METHOD_OPTIONS[0],
         game: selectedEntry.game || GAME_OPTIONS[0].value,
         checks: selectedEntry.checks || "",
+        time: selectedEntry.time || "",
         notes: selectedEntry.notes || "",
-        entryId: selectedEntry.entryId || Math.random().toString(36).substr(2, 9)
+        entryId: selectedEntry.entryId || Math.random().toString(36).substr(2, 9),
+        modifiers: selectedEntry.modifiers || defaultEditData.modifiers
       });
     }
   }
@@ -576,8 +642,10 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       method: METHOD_OPTIONS[0],
       game: GAME_OPTIONS[0].value,
       checks: "",
+      time: "",
       notes: "",
-      entryId: Math.random().toString(36).substr(2, 9)
+      entryId: Math.random().toString(36).substr(2, 9),
+      modifiers: { ...defaultEditData.modifiers }
     };
     
     const newInfo = {
@@ -627,8 +695,10 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             String(editData.checks).trim() === "0"
             ? ""
             : String(editData.checks).trim(),
+        time: editData.time || "",
         notes: editData.notes || "",
-        entryId: currentEntries[selectedEntryIndex].entryId // Keep the existing entryId
+        entryId: currentEntries[selectedEntryIndex].entryId, // Keep the existing entryId
+        modifiers: editData.modifiers || defaultEditData.modifiers
       };
       
              updatedEntries = currentEntries.map((entry, index) => 
@@ -648,8 +718,10 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             String(editData.checks).trim() === "0"
             ? ""
             : String(editData.checks).trim(),
+        time: editData.time || "",
         notes: editData.notes || "",
-        entryId: Math.random().toString(36).substr(2, 9) // Generate new entryId for new entries
+        entryId: Math.random().toString(36).substr(2, 9), // Generate new entryId for new entries
+        modifiers: editData.modifiers || defaultEditData.modifiers
       };
       
              updatedEntries = [...currentEntries, cleaned];
@@ -690,8 +762,10 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       method: firstEntry.method || "",
       game: firstEntry.game || "",
       checks: firstEntry.checks || "",
+      time: firstEntry.time || "",
       notes: firstEntry.notes || "",
-      entryId: firstEntry.entryId || Math.random().toString(36).substr(2, 9)
+      entryId: firstEntry.entryId || Math.random().toString(36).substr(2, 9),
+      modifiers: firstEntry.modifiers || defaultEditData.modifiers
     });
   }
 
@@ -1310,7 +1384,29 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
               ...availableMethods.map(method => ({ name: method.name, value: method.name })),
             ]}
             value={editData.method}
-            onChange={val => setEditData(edit => ({ ...edit, method: val }))}
+            onChange={val => {
+              setEditData(edit => {
+                const updatedEdit = { ...edit, method: val };
+                // Clear incompatible modifiers when method changes
+                if (!edit.modifiers) edit.modifiers = { ...defaultEditData.modifiers };
+                if (val !== "Breeding") {
+                  updatedEdit.modifiers = { ...updatedEdit.modifiers, shinyParents: false };
+                }
+                if (val !== "Catch Combo" && val !== "Random Encounters" && val !== "Soft Resets") {
+                  updatedEdit.modifiers = { ...updatedEdit.modifiers, lureActive: false };
+                }
+                // Clear sparkling levels if method changes away from ones that use them
+                if (val !== "Random Encounters" && val !== "Mass Outbreaks" && val !== "Sandwich" && val !== "Hyperspaces") {
+                  updatedEdit.modifiers = { 
+                    ...updatedEdit.modifiers, 
+                    sparklingLv1: false, 
+                    sparklingLv2: false, 
+                    sparklingLv3: false 
+                  };
+                }
+                return updatedEdit;
+              });
+            }}
             placeholder={editData.game ? "Select a method..." : "Select a game first"}
             customBackground="var(--sidebar-edit-inputs)"
             customBorder="var(--border-color)"
@@ -1318,6 +1414,244 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             isSidebar={true}
           />
       </div>
+
+             {/* Modifiers Section */}
+             {showShiny && editData.game && availableMethods.length > 0 && (
+               (gameModifiers["Shiny Charm"] > 0 && !(editData.method === "Fossil Revivals" && (editData.game === "Let's Go Pikachu" || editData.game === "Let's Go Eevee" || editData.game === "Sword" || editData.game === "Shield")) && !(editData.method === "Fossil Revivals" && editData.game === "Legends Z-A") && !(editData.method === "Dynamax Raids" && (editData.game === "Sword" || editData.game === "Shield")) && !(editData.method === "Gift Pokemon" && (editData.game === "Sword" || editData.game === "Shield" || editData.game === "Let's Go Eevee" || editData.game === "Let's Go Pikachu")) && !(editData.method === "Tera Raids" && (editData.game === "Scarlet" || editData.game === "Violet")) && !((editData.method === "Random Encounters" || editData.method === "Poke Radar" || editData.method === "Soft Resets" || editData.method === "Fossil Revivals" || editData.method === "Gift Pokemon" || editData.method === "Underground Diglett Hunt") && (editData.game === "Brilliant Diamond" || editData.game === "Shining Pearl")) && !(editData.method === "Poke Radar" && (editData.game === "X" || editData.game === "Y")) && !(editData.method === "Ultra Wormholes" && (editData.game === "Ultra Sun" || editData.game === "Ultra Moon"))) ||
+               (gameModifiers["Shiny Parents"] > 0 && editData.method === "Breeding") ||
+               (gameModifiers["Lure Active"] > 0 && (editData.method === "Catch Combo" || editData.method === "Random Encounters" || (editData.method === "Soft Resets" && editData.game !== "Let's Go Pikachu" && editData.game !== "Let's Go Eevee"))) ||
+               (gameModifiers["Research Lv 10"] > 0 && editData.game === "Legends Arceus") ||
+               (gameModifiers["Perfect Research"] > 0 && editData.game === "Legends Arceus") ||
+               (gameModifiers["Sparkling Lv 1"] > 0 && ((editData.game === "Scarlet" || editData.game === "Violet") && (editData.method === "Random Encounters" || editData.method === "Mass Outbreaks" || editData.method === "Sandwich") || (editData.game === "Legends Z-A" && editData.method === "Hyperspaces"))) ||
+               (gameModifiers["Sparkling Lv 2"] > 0 && ((editData.game === "Scarlet" || editData.game === "Violet") && (editData.method === "Random Encounters" || editData.method === "Mass Outbreaks" || editData.method === "Sandwich") || (editData.game === "Legends Z-A" && editData.method === "Hyperspaces"))) ||
+               (gameModifiers["Sparkling Lv 3"] > 0 && ((editData.game === "Scarlet" || editData.game === "Violet") && (editData.method === "Random Encounters" || editData.method === "Mass Outbreaks" || editData.method === "Sandwich") || (editData.game === "Legends Z-A" && editData.method === "Hyperspaces"))) ||
+               (gameModifiers["Event Boosted"] > 0 && editData.game === "Scarlet" && editData.method === "Mass Outbreaks") ||
+               (gameModifiers["Community Day"] > 0 && editData.game === "GO" && (editData.method === "Random Encounters" || editData.method === "Daily Adventure Incense")) ||
+               (gameModifiers["Raid Day"] > 0 && editData.game === "GO" && editData.method === "Raid Battles") ||
+               (gameModifiers["Research Day"] > 0 && editData.game === "GO" && editData.method === "Field Research") ||
+               (gameModifiers["Galar Birds"] > 0 && editData.game === "GO" && editData.method === "Daily Adventure Incense") ||
+               (gameModifiers["Hatch Day"] > 0 && editData.game === "GO" && editData.method === "Breeding")
+             ) && (
+               <div className="sidebar-form-group">
+                 <label className="sidebar-label">Modifiers:</label>
+                 <div className="flex flex-wrap gap-3">
+                   {gameModifiers["Shiny Charm"] > 0 && !(editData.method === "Fossil Revivals" && (editData.game === "Let's Go Pikachu" || editData.game === "Let's Go Eevee" || editData.game === "Sword" || editData.game === "Shield")) && !(editData.method === "Fossil Revivals" && editData.game === "Legends Z-A") && !(editData.method === "Dynamax Raids" && (editData.game === "Sword" || editData.game === "Shield")) && !(editData.method === "Gift Pokemon" && (editData.game === "Sword" || editData.game === "Shield" || editData.game === "Let's Go Eevee" || editData.game === "Let's Go Pikachu")) && !(editData.method === "Tera Raids" && (editData.game === "Scarlet" || editData.game === "Violet")) && !((editData.method === "Random Encounters" || editData.method === "Poke Radar" || editData.method === "Soft Resets" || editData.method === "Fossil Revivals" || editData.method === "Gift Pokemon" || editData.method === "Underground Diglett Hunt") && (editData.game === "Brilliant Diamond" || editData.game === "Shining Pearl")) && !(editData.method === "Poke Radar" && (editData.game === "X" || editData.game === "Y")) && !(editData.method === "Ultra Wormholes" && (editData.game === "Ultra Sun" || editData.game === "Ultra Moon")) && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.shinyCharm || false}
+                         onChange={(e) => {
+                           const newShinyCharm = e.target.checked;
+                           setEditData(edit => ({
+                             ...edit,
+                             modifiers: {
+                               ...edit.modifiers,
+                               shinyCharm: newShinyCharm,
+                               // Auto-check Research Lv 10 when Shiny Charm is checked in Legends Arceus
+                               researchLv10: newShinyCharm && editData.game === "Legends Arceus" ? true : edit.modifiers?.researchLv10 || false
+                             }
+                           }));
+                         }}
+                       />
+                       <span className="text-sm">Shiny Charm</span>
+                     </label>
+                   )}
+                   {gameModifiers["Shiny Parents"] > 0 && editData.method === "Breeding" && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.shinyParents || false}
+                         onChange={(e) => setEditData(edit => ({
+                           ...edit,
+                           modifiers: { ...edit.modifiers, shinyParents: e.target.checked }
+                         }))}
+                       />
+                       <span className="text-sm">Shiny Parents</span>
+                     </label>
+                   )}
+                   {gameModifiers["Lure Active"] > 0 && (editData.method === "Catch Combo" || editData.method === "Random Encounters" || (editData.method === "Soft Resets" && editData.game !== "Let's Go Pikachu" && editData.game !== "Let's Go Eevee")) && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.lureActive || false}
+                         onChange={(e) => setEditData(edit => ({
+                           ...edit,
+                           modifiers: { ...edit.modifiers, lureActive: e.target.checked }
+                         }))}
+                       />
+                       <span className="text-sm">Lure Active</span>
+                     </label>
+                   )}
+                   {gameModifiers["Research Lv 10"] > 0 && editData.game === "Legends Arceus" && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.researchLv10 || false}
+                         onChange={(e) => setEditData(edit => ({
+                           ...edit,
+                           modifiers: { ...edit.modifiers, researchLv10: e.target.checked }
+                         }))}
+                       />
+                       <span className="text-sm">Research Lv 10</span>
+                     </label>
+                   )}
+                   {gameModifiers["Perfect Research"] > 0 && editData.game === "Legends Arceus" && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.perfectResearch || false}
+                         onChange={(e) => setEditData(edit => ({
+                           ...edit,
+                           modifiers: { ...edit.modifiers, perfectResearch: e.target.checked }
+                         }))}
+                       />
+                       <span className="text-sm">Perfect Research</span>
+                     </label>
+                   )}
+                   {gameModifiers["Sparkling Lv 1"] > 0 && ((editData.game === "Scarlet" || editData.game === "Violet") && (editData.method === "Random Encounters" || editData.method === "Mass Outbreaks" || editData.method === "Sandwich") || (editData.game === "Legends Z-A" && editData.method === "Hyperspaces")) && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.sparklingLv1 || false}
+                         onChange={(e) => {
+                           const newSparklingLv1 = e.target.checked;
+                           setEditData(edit => ({
+                             ...edit,
+                             modifiers: {
+                               ...edit.modifiers,
+                               sparklingLv1: newSparklingLv1,
+                               sparklingLv2: newSparklingLv1 ? false : edit.modifiers?.sparklingLv2 || false,
+                               sparklingLv3: newSparklingLv1 ? false : edit.modifiers?.sparklingLv3 || false
+                             }
+                           }));
+                         }}
+                       />
+                       <span className="text-sm">Sparkling Lv 1</span>
+                     </label>
+                   )}
+                   {gameModifiers["Sparkling Lv 2"] > 0 && ((editData.game === "Scarlet" || editData.game === "Violet") && (editData.method === "Random Encounters" || editData.method === "Mass Outbreaks" || editData.method === "Sandwich") || (editData.game === "Legends Z-A" && editData.method === "Hyperspaces")) && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.sparklingLv2 || false}
+                         onChange={(e) => {
+                           const newSparklingLv2 = e.target.checked;
+                           setEditData(edit => ({
+                             ...edit,
+                             modifiers: {
+                               ...edit.modifiers,
+                               sparklingLv2: newSparklingLv2,
+                               sparklingLv1: newSparklingLv2 ? false : edit.modifiers?.sparklingLv1 || false,
+                               sparklingLv3: newSparklingLv2 ? false : edit.modifiers?.sparklingLv3 || false
+                             }
+                           }));
+                         }}
+                       />
+                       <span className="text-sm">Sparkling Lv 2</span>
+                     </label>
+                   )}
+                   {gameModifiers["Sparkling Lv 3"] > 0 && ((editData.game === "Scarlet" || editData.game === "Violet") && (editData.method === "Random Encounters" || editData.method === "Mass Outbreaks" || editData.method === "Sandwich") || (editData.game === "Legends Z-A" && editData.method === "Hyperspaces")) && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.sparklingLv3 || false}
+                         onChange={(e) => {
+                           const newSparklingLv3 = e.target.checked;
+                           setEditData(edit => ({
+                             ...edit,
+                             modifiers: {
+                               ...edit.modifiers,
+                               sparklingLv3: newSparklingLv3,
+                               sparklingLv1: newSparklingLv3 ? false : edit.modifiers?.sparklingLv1 || false,
+                               sparklingLv2: newSparklingLv3 ? false : edit.modifiers?.sparklingLv2 || false
+                             }
+                           }));
+                         }}
+                       />
+                       <span className="text-sm">Sparkling Lv 3</span>
+                     </label>
+                   )}
+                   {gameModifiers["Event Boosted"] > 0 && editData.game === "Scarlet" && editData.method === "Mass Outbreaks" && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.eventBoosted || false}
+                         onChange={(e) => setEditData(edit => ({
+                           ...edit,
+                           modifiers: { ...edit.modifiers, eventBoosted: e.target.checked }
+                         }))}
+                       />
+                       <span className="text-sm">Event Boosted</span>
+                     </label>
+                   )}
+                   {gameModifiers["Community Day"] > 0 && editData.game === "GO" && (editData.method === "Random Encounters" || editData.method === "Daily Adventure Incense") && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.communityDay || false}
+                         onChange={(e) => setEditData(edit => ({
+                           ...edit,
+                           modifiers: { ...edit.modifiers, communityDay: e.target.checked }
+                         }))}
+                       />
+                       <span className="text-sm">Community Day</span>
+                     </label>
+                   )}
+                   {gameModifiers["Raid Day"] > 0 && editData.game === "GO" && editData.method === "Raid Battles" && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.raidDay || false}
+                         onChange={(e) => setEditData(edit => ({
+                           ...edit,
+                           modifiers: { ...edit.modifiers, raidDay: e.target.checked }
+                         }))}
+                       />
+                       <span className="text-sm">Raid Day</span>
+                     </label>
+                   )}
+                   {gameModifiers["Research Day"] > 0 && editData.game === "GO" && editData.method === "Field Research" && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.researchDay || false}
+                         onChange={(e) => setEditData(edit => ({
+                           ...edit,
+                           modifiers: { ...edit.modifiers, researchDay: e.target.checked }
+                         }))}
+                       />
+                       <span className="text-sm">Research Day</span>
+                     </label>
+                   )}
+                   {gameModifiers["Galar Birds"] > 0 && editData.game === "GO" && editData.method === "Daily Adventure Incense" && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.galarBirds || false}
+                         onChange={(e) => setEditData(edit => ({
+                           ...edit,
+                           modifiers: { ...edit.modifiers, galarBirds: e.target.checked }
+                         }))}
+                       />
+                       <span className="text-sm">Galar Birds</span>
+                     </label>
+                   )}
+                   {gameModifiers["Hatch Day"] > 0 && editData.game === "GO" && editData.method === "Breeding" && (
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={editData.modifiers?.hatchDay || false}
+                         onChange={(e) => setEditData(edit => ({
+                           ...edit,
+                           modifiers: { ...edit.modifiers, hatchDay: e.target.checked }
+                         }))}
+                       />
+                       <span className="text-sm">Hatch Day</span>
+                     </label>
+                   )}
+                 </div>
+               </div>
+             )}
 
              <div className="sidebar-form-group">
                   <label className="sidebar-label">Mark:</label>
@@ -1590,7 +1924,9 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                  <div className="sidebar-display-label">Date</div>
                  <div className="sidebar-display-value">{formatDate(editData.date)}</div>
                </div>
-               <div className="sidebar-display-icon">📅</div>
+               <div className="sidebar-display-icon">
+                 <img src="/data/SidebarIcons/Date.svg" alt="Date" className="w-full h-full object-contain" />
+               </div>
              </div>
            )}
 
@@ -1624,7 +1960,9 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                  <div className="sidebar-display-label">Method</div>
                  <div className="sidebar-display-value">{editData.method}</div>
                </div>
-               <div className="sidebar-display-icon">🎯</div>
+               <div className="sidebar-display-icon">
+                 <img src="/data/SidebarIcons/Method.svg" alt="Method" className="w-full h-full object-contain" />
+               </div>
              </div>
            )}
 
@@ -1648,7 +1986,42 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                  <div className="sidebar-display-label">Checks</div>
                  <div className="sidebar-display-value">{Number(editData.checks).toLocaleString()}</div>
                </div>
-               <div className="sidebar-display-icon">✅</div>
+               <div className="sidebar-display-icon">
+                 <img src="/data/SidebarIcons/Checks.svg" alt="Checks" className="w-full h-full object-contain" />
+               </div>
+             </div>
+           )}
+
+                                                                                                                               {showShiny && editData.game && editData.method && (() => {
+               try {
+                 const checkCount = editData.checks ? Number(editData.checks) : 0;
+                 const modifiers = editData.modifiers || {};
+                 const odds = getCurrentHuntOdds(editData.game, editData.method, modifiers, checkCount);
+                 return (
+                   <div className="sidebar-display-card">
+                     <div className="sidebar-display-info">
+                       <div className="sidebar-display-label">Odds</div>
+                       <div className="sidebar-display-value">1/{odds.toLocaleString()}</div>
+                     </div>
+                     <div className="sidebar-display-icon">
+                       <img src="/data/SidebarIcons/Odds.svg" alt="Odds" className="w-full h-full object-contain" />
+                     </div>
+                   </div>
+                 );
+               } catch (e) {
+                 return null;
+               }
+             })()}
+
+                                                                                                                               {(editData.time !== undefined && editData.time !== null && editData.time !== "" && editData.time !== 0) && (
+                <div className="sidebar-display-card">
+               <div className="sidebar-display-info">
+                 <div className="sidebar-display-label">Time</div>
+                 <div className="sidebar-display-value">{formatTimeFull(typeof editData.time === 'string' ? parseInt(editData.time) || 0 : (typeof editData.time === 'number' ? editData.time : 0))}</div>
+               </div>
+               <div className="sidebar-display-icon">
+                 <img src="/data/SidebarIcons/Time.svg" alt="Time" className="w-full h-full object-contain" />
+               </div>
              </div>
            )}
 
@@ -1658,7 +2031,9 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                  <div className="sidebar-display-label">Notes</div>
                  <div className="sidebar-display-value break-words">{editData.notes}</div>
                </div>
-               <div className="sidebar-display-icon flex-shrink-0">📝</div>
+               <div className="sidebar-display-icon flex-shrink-0">
+                 <img src="/data/SidebarIcons/Notes.svg" alt="Notes" className="w-full h-full object-contain" />
+               </div>
              </div>
            )}
 

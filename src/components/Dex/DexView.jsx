@@ -54,7 +54,7 @@ const createDexSections = () => {
                 const filtered = filteredFormsData.filter(p => p.formType === type);
                 
                 // Special sorting for Alpha Forms - sort by Pokemon number (id)
-                if (type === "alpha") {
+                if (type === "alpha" || type === "alphaother") {
                     return filtered.sort((a, b) => (a.id || 0) - (b.id || 0));
                 }
                 

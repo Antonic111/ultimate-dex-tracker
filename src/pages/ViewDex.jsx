@@ -9,6 +9,7 @@ import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { useLoading } from "../components/Shared/LoadingContext";
 import { profileAPI } from "../utils/api";
 import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isSubLegendary, isStarter, isFossil, isBaby, isParadox, getPokemonCategory } from "../utils/pokemonCategories";
+import { getEvolutionChainIds, findPokemon } from "../utils";
 
 
 // Helper function to load the viewer's own dex toggle preferences
@@ -31,7 +32,8 @@ export default function ViewDex() {
         gen: "",
         mark: "",
         method: "",
-        caught: ""
+        caught: "",
+        showEvolutions: false
     });
     const [toggles, setToggles] = useState(() => loadDexToggles());
     const togglesRef = useRef(toggles);
@@ -254,7 +256,7 @@ export default function ViewDex() {
                     const filtered = filteredFormsData.filter(p => p.formType === type);
                     
                     // Special sorting for Alpha Forms - sort by Pokemon number (id)
-                    if (type === "alpha") {
+                    if (type === "alpha" || type === "alphaother") {
                         return filtered.sort((a, b) => (a.id || 0) - (b.id || 0));
                     }
                     
@@ -330,7 +332,24 @@ export default function ViewDex() {
                     const idStr = String(pokemon.id).padStart(4, "0");
                     const dexMatch = idStr.includes(term.replace(/^#/, ""));
                     
-                    if (!nameMatch && !dexMatch) return false;
+                    // If showEvolutions is enabled, check if any pokemon in the evolution chain matches
+                    if (!nameMatch && !dexMatch) {
+                        if (filters.showEvolutions) {
+                            const chainIds = getEvolutionChainIds(pokemon);
+                            // Check if any pokemon in the chain matches the search
+                            const chainMatches = chainIds.some(chainId => {
+                                const chainPoke = findPokemon(chainId);
+                                if (!chainPoke) return false;
+                                const chainNameMatch = chainPoke.name.toLowerCase().includes(term);
+                                const chainIdStr = String(chainPoke.id).padStart(4, "0");
+                                const chainDexMatch = chainIdStr.includes(term.replace(/^#/, ""));
+                                return chainNameMatch || chainDexMatch;
+                            });
+                            if (!chainMatches) return false;
+                        } else {
+                            return false;
+                        }
+                    }
                 }
 
                 // Game filter

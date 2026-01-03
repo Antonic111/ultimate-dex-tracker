@@ -275,5 +275,32 @@ export function sanitizeEntryData(entryData) {
     date: 'general',
   };
 
-  return sanitizeMultipleInputs(entryData, fieldTypes);
+  const sanitized = {};
+  const errors = {};
+  let isValid = true;
+
+  for (const [fieldName, value] of Object.entries(entryData)) {
+    // Preserve numeric fields (checks, time) and other non-string fields (entryId, modifiers, etc.)
+    if (typeof value === 'number' || typeof value === 'object' || (fieldName !== 'ball' && fieldName !== 'mark' && fieldName !== 'method' && fieldName !== 'game' && fieldName !== 'notes' && fieldName !== 'date')) {
+      sanitized[fieldName] = value;
+      continue;
+    }
+
+    // Sanitize string fields
+    const fieldType = fieldTypes[fieldName] || 'general';
+    const result = sanitizeInput(value, fieldType);
+    
+    sanitized[fieldName] = result.sanitized;
+    
+    if (!result.isValid) {
+      errors[fieldName] = result.error;
+      isValid = false;
+    }
+  }
+
+  return {
+    sanitized,
+    isValid,
+    errors: Object.keys(errors).length > 0 ? errors : null
+  };
 }

@@ -43,9 +43,26 @@ const userSchema = new mongoose.Schema({
         method: String,
         game: String,
         checks: Number,
+        time: Number,
         date: String,
         notes: String,
-        entryId: { type: String, default: () => Math.random().toString(36).substr(2, 9) }
+        entryId: { type: String, default: () => Math.random().toString(36).substr(2, 9) },
+        modifiers: {
+          shinyCharm: Boolean,
+          shinyParents: Boolean,
+          lureActive: Boolean,
+          researchLv10: Boolean,
+          perfectResearch: Boolean,
+          sparklingLv1: Boolean,
+          sparklingLv2: Boolean,
+          sparklingLv3: Boolean,
+          eventBoosted: Boolean,
+          communityDay: Boolean,
+          raidDay: Boolean,
+          researchDay: Boolean,
+          galarBirds: Boolean,
+          hatchDay: Boolean
+        }
       }]
     }, { _id: false }),
     default: new Map(),
