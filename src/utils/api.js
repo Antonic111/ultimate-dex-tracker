@@ -308,6 +308,10 @@ export const authAPI = {
     // Clear token from localStorage for all users
     localStorage.removeItem('authToken');
     
+    // Clear backup user data to prevent "half logged in" state on mobile
+    localStorage.removeItem('mobileUserBackup');
+    sessionStorage.removeItem('iosUserBackup');
+    
     return response;
   },
 

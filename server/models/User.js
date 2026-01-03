@@ -105,6 +105,8 @@ const userSchema = new mongoose.Schema({
   },
   // EXTERNAL LINK PREFERENCE ----------------------------------------- //
   externalLinkPreference: { type: String, default: 'serebii', enum: ['serebii', 'bulbapedia', 'pokemondb', 'smogon'] },
+  // SHINY CHARM GAMES ----------------------------------------- //
+  shinyCharmGames: { type: [String], default: [] },
   // ADMIN STATUS ----------------------------------------- //
   isAdmin: { type: Boolean, default: false },
   // DELETE ACCOUNT CODE ----------------------------------------- //

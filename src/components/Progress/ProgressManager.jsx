@@ -533,11 +533,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                 createPortal(
                 <div 
                     className={`progress-modal-overlay${closing ? " closing" : ""}`}
-                    onClick={(e) => {
-                        if (e.target === e.currentTarget) {
-                            handleCloseModal();
-                        }
-                    }}
+                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
                 >
                     <div 
                         className={`progress-modal-panel${closing ? " closing" : ""}`}
@@ -811,7 +807,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
             {/* Delete Confirmation Modal */}
             {deleteModal.show && createPortal(
-                <div className={`fixed inset-0 z-[20000] flex items-center justify-center ${deleteModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}>
+                <div className={`fixed inset-0 z-[20000] flex items-center justify-center ${deleteModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
                     {/* Backdrop */}
                     <div 
                         className={`absolute inset-0 bg-black/80 ${deleteModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}

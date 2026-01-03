@@ -580,6 +580,22 @@ router.put("/profile", authenticateUser, async (req, res) => {
           }
         }
 
+    // Handle shiny charm games
+    if (req.body.shinyCharmGames !== undefined) {
+      if (Array.isArray(req.body.shinyCharmGames)) {
+        // Validate that all games are strings and are valid game names
+        const validGames = [
+          "Black 2", "White 2", "X", "Y", "Omega Ruby", "Alpha Sapphire",
+          "Sun", "Moon", "Ultra Sun", "Ultra Moon", "Let's Go Pikachu", "Let's Go Eevee",
+          "Sword", "Shield", "Brilliant Diamond", "Shining Pearl", "Legends Arceus",
+          "Scarlet", "Violet", "Legends Z-A"
+        ];
+        user.shinyCharmGames = req.body.shinyCharmGames.filter(game => 
+          typeof game === 'string' && validGames.includes(game)
+        );
+      }
+    }
+
     // Handle migration fields
     if (req.body.huntMethodMigrationCompleted !== undefined) {
       user.huntMethodMigrationCompleted = !!req.body.huntMethodMigrationCompleted;
@@ -602,6 +618,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
       isProfilePublic: user.isProfilePublic,
       dexPreferences: user.dexPreferences,
       externalLinkPreference: user.externalLinkPreference,
+      shinyCharmGames: user.shinyCharmGames,
       huntMethodMigrationCompleted: user.huntMethodMigrationCompleted,
       migrationVersion: user.migrationVersion,
     }});
@@ -617,7 +634,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes dexPreferences externalLinkPreference isAdmin");
+    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes dexPreferences externalLinkPreference shinyCharmGames isAdmin");
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -634,6 +651,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
       likeCount: user.likes ? user.likes.length : 0,
       dexPreferences: user.dexPreferences,
       externalLinkPreference: user.externalLinkPreference,
+      shinyCharmGames: user.shinyCharmGames,
       isAdmin: user.isAdmin,
     });
   } catch (err) {
@@ -1091,7 +1109,7 @@ router.get("/users/:username/public", async (req, res) => {
       username: req.params.username,
       isProfilePublic: { $ne: false }
     })
-      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes verified dexPreferences isAdmin")
+      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin")
       .lean();
       
     if (!u) return res.status(404).json({ error: "User not found or private" });

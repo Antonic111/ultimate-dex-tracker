@@ -104,7 +104,8 @@ export default function DexView({
     
     // Profile viewing props
     viewingUsername = null, // Username of the profile being viewed (null if viewing own profile)
-    progressBarsOverride = null
+    progressBarsOverride = null,
+    viewedUserShinyCharmGames = [] // Shiny charm games of the viewed user
 }) {
     // Handle sidebar open/close
     const handlePokemonSelect = (pokemon) => {
@@ -264,6 +265,8 @@ export default function DexView({
                     genOptions={GEN_OPTIONS}
                     showShiny={showShiny}
                     setShowShiny={setShowShiny}
+                    viewingUsername={viewingUsername}
+                    viewedUserShinyCharmGames={viewedUserShinyCharmGames || []}
                 />
             </div>
 

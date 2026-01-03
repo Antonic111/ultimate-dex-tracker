@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Sparkles, Plus, Trash2, ChevronLeft, ChevronRight, Calendar, ChevronUp, ChevronDown, X, RotateCcw } from "lucide-react";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS } from "../../Constants";
@@ -12,6 +12,8 @@ import { validateContent } from "../../../shared/contentFilter";
 import gamePokemonData from "../../data/gamePokemon.json";
 import { getAvailableGamesForPokemon, getMergedGameName } from "../../utils/gameMapping";
 import { getMethodsForGame, getCurrentHuntOdds, getModifiersForGame } from "../../utils/huntSystem";
+import { profileAPI } from "../../utils/api";
+import { UserContext } from "../Shared/UserContext";
 // import "../../css/EvolutionChain.css"; // Moved to backup folder
 import "../../css/Sidebar.css";
 
@@ -22,6 +24,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   const [selectedEntryIndex, setSelectedEntryIndex] = useState(0);
   const [localEntries, setLocalEntries] = useState([]);
   const { showMessage } = useMessage();
+  const { username } = useContext(UserContext);
+  const [shinyCharmGames, setShinyCharmGames] = useState([]);
 
   // Format time in full format (e.g., "1 Hour 5 Minutes 15 Seconds")
   const formatTimeFull = (milliseconds) => {
@@ -95,6 +99,48 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   
   // Check if marks are available for the selected game
   const marksAvailable = ["Scarlet", "Violet", "Sword", "Shield"].includes(editData.game);
+
+  // Load user's shiny charm games
+  const loadShinyCharmGames = useCallback(async () => {
+    if (!username || readOnly) return;
+    
+    try {
+      const profile = await profileAPI.getProfile();
+      setShinyCharmGames(profile.shinyCharmGames || []);
+    } catch (error) {
+      console.error('Failed to load shiny charm games:', error);
+    }
+  }, [username, readOnly]);
+
+  useEffect(() => {
+    loadShinyCharmGames();
+    
+    // Listen for updates from ShinyCharmModal
+    const handleShinyCharmUpdate = (event) => {
+      if (readOnly) return;
+      if (event.detail?.shinyCharmGames) {
+        setShinyCharmGames(event.detail.shinyCharmGames);
+      } else {
+        // Reload from server if detail not provided
+        loadShinyCharmGames();
+      }
+    };
+    
+    window.addEventListener('shinyCharmGamesUpdated', handleShinyCharmUpdate);
+    return () => {
+      window.removeEventListener('shinyCharmGamesUpdated', handleShinyCharmUpdate);
+    };
+  }, [username, readOnly, loadShinyCharmGames]);
+
+  // Auto-check shiny charm modifier when game is selected
+  useEffect(() => {
+    if (!readOnly && editData.game && shinyCharmGames.includes(editData.game)) {
+      setEditData(prev => ({
+        ...prev,
+        modifiers: { ...prev.modifiers, shinyCharm: true }
+      }));
+    }
+  }, [editData.game, shinyCharmGames, readOnly]);
 
   // Function to identify Hisuian balls
   const isHisuianBall = (ballValue) => {
@@ -2134,6 +2180,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
        {resetModal.show && createPortal(
          <div 
            className={`fixed inset-0 z-[20000] ${resetModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
+           style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
            onClick={() => {
              setResetModalClosing(true);
              setTimeout(() => {
@@ -2190,6 +2237,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
        {deleteEntryModal.show && createPortal(
          <div 
            className={`fixed inset-0 z-[20000] ${deleteEntryModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
+           style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
            onClick={() => {
              setDeleteEntryModalClosing(true);
              setTimeout(() => {

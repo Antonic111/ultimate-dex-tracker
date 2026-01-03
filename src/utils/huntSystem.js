@@ -707,7 +707,7 @@ export const calculateOdds = (gameName, methodName, modifiers = {}) => {
         finalOdds = modifiers.shinyCharm ? 683 : 1366; // 1/683.08 with charm, 1/1365.67 without
       } else if (modifiers.sparklingLv3) {
         finalOdds = modifiers.shinyCharm ? 586 : 1024; // 1/585.57 with charm, 1/1024.38 without
-      } else {
+    } else {
         // No sparkling power - Shiny Charm only gives 1/1024.38 (not tripling base odds like Scarlet/Violet)
         finalOdds = modifiers.shinyCharm ? 1024 : 4096; // 1/1024.38 with charm, 1/4096 without
       }

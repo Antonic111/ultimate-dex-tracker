@@ -94,6 +94,10 @@ export default function PublicHome() {
           <h1>Welcome to Ultimate Dex Tracker!</h1>
           <p className="hero-subtitle">Track your Pokémon collection across all games with ease. Build your perfect living dex and never lose track of your progress again.</p>
           
+          <p className="tracking-count">
+            Tracking 2059 Pokemon!
+          </p>
+          
           {/* Creator Credit */}
           <div className="creator-credit">
             <span>Made by Antonic</span>

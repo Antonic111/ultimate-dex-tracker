@@ -102,6 +102,7 @@ export default function FavoriteSelectionModal({
             className={`favorite-modal-backdrop ${closing ? "closing" : ""}`}
             role="dialog"
             aria-modal="true"
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
         >
             <div className={`favorite-modal ${closing ? "closing" : ""}`}>
                 <div className="favorite-modal-header">

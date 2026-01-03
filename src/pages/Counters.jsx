@@ -57,7 +57,7 @@ import ContentFilterInput from "../components/Shared/ContentFilterInput";
 import { validateContent } from "../../shared/contentFilter";
 import { UserContext } from "../components/Shared/UserContext";
 import { useMessage } from "../components/Shared/MessageContext";
-import { huntAPI } from "../utils/api";
+import { huntAPI, profileAPI } from "../utils/api";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../data/forms.json";
 import gamePokemonData from "../data/gamePokemon.json";
@@ -172,6 +172,7 @@ export default function Counters() {
   const lastSaveTime = useRef(0);
   const { username } = useContext(UserContext);
   const { showMessage } = useMessage();
+  const [shinyCharmGames, setShinyCharmGames] = useState([]);
 
   // Save hunt data to server - immediate save with current state and throttling
   const saveHuntData = useCallback(async (huntDataOverride = null) => {
@@ -202,6 +203,37 @@ export default function Counters() {
     }
   }, [username, showMessage]);
 
+
+  // Load user's shiny charm games
+  const loadShinyCharmGames = useCallback(async () => {
+    if (!username) return;
+    
+    try {
+      const profile = await profileAPI.getProfile();
+      setShinyCharmGames(profile.shinyCharmGames || []);
+    } catch (error) {
+      console.error('Failed to load shiny charm games:', error);
+    }
+  }, [username]);
+
+  useEffect(() => {
+    loadShinyCharmGames();
+    
+    // Listen for updates from ShinyCharmModal
+    const handleShinyCharmUpdate = (event) => {
+      if (event.detail?.shinyCharmGames) {
+        setShinyCharmGames(event.detail.shinyCharmGames);
+      } else {
+        // Reload from server if detail not provided
+        loadShinyCharmGames();
+      }
+    };
+    
+    window.addEventListener('shinyCharmGamesUpdated', handleShinyCharmUpdate);
+    return () => {
+      window.removeEventListener('shinyCharmGamesUpdated', handleShinyCharmUpdate);
+    };
+  }, [username, loadShinyCharmGames]);
 
   // Load hunt data on component mount
   useEffect(() => {
@@ -258,7 +290,22 @@ export default function Counters() {
     loadHuntData();
   }, [username]);
 
+  // Auto-check shiny charm modifier when game is selected (new hunt)
+  useEffect(() => {
+    if (huntDetails.game && shinyCharmGames.includes(huntDetails.game)) {
+      setModifiers(prev => ({ ...prev, shinyCharm: true }));
+    }
+  }, [huntDetails.game, shinyCharmGames]);
 
+  // Auto-check shiny charm modifier when game is selected (edit modal)
+  useEffect(() => {
+    if (editForm.game && shinyCharmGames.includes(editForm.game)) {
+      setEditForm(prev => ({
+        ...prev,
+        modifiers: { ...prev.modifiers, shinyCharm: true }
+      }));
+    }
+  }, [editForm.game, shinyCharmGames]);
 
   // Save immediately on page unload
   useEffect(() => {
@@ -2577,15 +2624,6 @@ export default function Counters() {
       {editModal.show && createPortal(
         <div 
           className={`fixed inset-0 z-[20000] ${editModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setEditModalClosing(true);
-              setTimeout(() => {
-                setEditModal({ show: false, hunt: null });
-                setEditModalClosing(false);
-              }, 300);
-            }
-          }}
         >
           <div className="bg-black/80 w-full h-full flex items-center justify-center">
             <div 
@@ -3003,16 +3041,6 @@ export default function Counters() {
       {completionModal.show && createPortal(
         <div 
           className={`fixed inset-0 z-[20000] ${completionModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setCompletionModalClosing(true);
-              setTimeout(() => {
-                setCompletionModal({ show: false, hunt: null });
-                setCompletionModalClosing(false);
-                setCompletionForm({ ball: '', mark: '', notes: '' });
-              }, 300);
-            }
-          }}
         >
           <div className="bg-black/80 w-full h-full flex items-center justify-center">
             <div 

@@ -20,6 +20,7 @@ import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS } from "../../
 import { HUNT_SYSTEM } from "../../utils/huntSystem";
 import { getPokemonCategories } from "../../utils/pokemonCategories";
 import "../../css/Settings.css";
+import ShinyCharmModal from "./ShinyCharmModal";
 
 import { IconDropdown } from "../Shared/IconDropdown";
 
@@ -487,11 +488,30 @@ export default function SearchBar({
   genOptions,
   showShiny,
   setShowShiny,
+  viewingUsername = null,
+  viewedUserShinyCharmGames = []
 }) {
     const [collapsed, setCollapsed] = React.useState(true);
+    const [shinyCharmModalOpen, setShinyCharmModalOpen] = React.useState(false);
+    const [isMobile, setIsMobile] = React.useState(window.innerWidth < 768);
+    
+    React.useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
     
     return (
         <div className="mb-8" style={{ position: 'relative', zIndex: 100000 }}>
+            <ShinyCharmModal 
+              isOpen={shinyCharmModalOpen} 
+              onClose={() => setShinyCharmModalOpen(false)}
+              readOnly={!!viewingUsername}
+              viewedUserShinyCharmGames={viewedUserShinyCharmGames}
+              viewedUsername={viewingUsername}
+            />
             <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-4 rounded-lg shadow-sm max-w-[1300px] mx-auto" style={{ backgroundColor: 'var(--searchbar-bg)', border: '1px solid var(--border-color)' }} onSubmit={e => e.preventDefault()} autoComplete="off">
             {/* Mobile-only header */}
             <div className="md:hidden col-span-full mb-4 flex items-center justify-between">
@@ -676,54 +696,78 @@ export default function SearchBar({
             </div>
                 </>
             )}
-<div className="col-span-1 md:col-span-2 lg:col-span-4 xl:col-span-5 flex items-center justify-center gap-6 mt-4 pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
-  {/* Shiny Switch */}
-  <label className="flex items-center gap-2 cursor-pointer" title="Toggle all shiny sprites">
-    <div className="switch">
-      <input
-        type="checkbox"
-        className="switch-input"
-        checked={showShiny}
-        onChange={e => setShowShiny(e.target.checked)}
-      />
-      <div className="switch-slider" />
-    </div>
-    <span className="text-base font-medium flex items-center gap-2" style={{ color: 'var(--text)' }}>
-      <Sparkles 
-        size={20} 
-        style={{ 
-          color: showShiny ? '#fbbf24' : '#6b7280',
-          filter: showShiny ? 'none' : 'grayscale(100%)'
-        }} 
-      />
-      Shiny
-    </span>
-  </label>
-  
-  {/* Show Evolutions Switch - only show when there's a search term */}
-  {filters.searchTerm && (
-    <label className="flex items-center gap-2 cursor-pointer" title="Show evolution chain members in search results">
+<div className={`col-span-1 md:col-span-2 lg:col-span-4 xl:col-span-5 mt-4 pt-4 ${isMobile ? 'flex flex-col gap-3' : 'flex items-center justify-center gap-6 relative'}`} style={{ borderTop: '1px solid var(--border-color)' }}>
+  {/* Shiny Charm Button - on mobile: first row centered, on desktop: absolute left */}
+  <button
+    onClick={() => setShinyCharmModalOpen(true)}
+    className={`${isMobile ? 'self-center' : 'absolute left-0'} flex items-center justify-center transition-transform hover:scale-110`}
+    title="Manage Shiny Charm games"
+    style={{ color: 'var(--text)' }}
+  >
+    <img
+      src="/Charm.png"
+      alt="Shiny Charm"
+      className="w-10 h-10"
+      onError={(e) => {
+        e.target.style.display = 'none';
+        if (e.target.nextSibling) {
+          e.target.nextSibling.style.display = 'block';
+        }
+      }}
+    />
+    <span style={{ display: 'none' }}>✨</span>
+  </button>
+
+  {/* Centered switches */}
+  <div className={`flex items-center gap-6 ${isMobile ? 'self-center' : ''}`}>
+    {/* Shiny Switch */}
+    <label className="flex items-center gap-2 cursor-pointer" title="Toggle all shiny sprites">
       <div className="switch">
         <input
           type="checkbox"
           className="switch-input"
-          checked={filters.showEvolutions || false}
-          onChange={e => setFilters(f => ({ ...f, showEvolutions: e.target.checked }))}
+          checked={showShiny}
+          onChange={e => setShowShiny(e.target.checked)}
         />
         <div className="switch-slider" />
       </div>
       <span className="text-base font-medium flex items-center gap-2" style={{ color: 'var(--text)' }}>
-        <Dna 
+        <Sparkles 
           size={20} 
           style={{ 
-            color: filters.showEvolutions ? 'var(--accent)' : '#6b7280',
-            filter: filters.showEvolutions ? 'none' : 'grayscale(100%)'
+            color: showShiny ? '#fbbf24' : '#6b7280',
+            filter: showShiny ? 'none' : 'grayscale(100%)'
           }} 
         />
-        Show Evolutions
+        Shiny
       </span>
     </label>
-  )}
+    
+    {/* Show Evolutions Switch - only show when there's a search term */}
+    {filters.searchTerm && (
+      <label className="flex items-center gap-2 cursor-pointer" title="Show evolution chain members in search results">
+        <div className="switch">
+          <input
+            type="checkbox"
+            className="switch-input"
+            checked={filters.showEvolutions || false}
+            onChange={e => setFilters(f => ({ ...f, showEvolutions: e.target.checked }))}
+          />
+          <div className="switch-slider" />
+        </div>
+        <span className="text-base font-medium flex items-center gap-2" style={{ color: 'var(--text)' }}>
+          <Dna 
+            size={20} 
+            style={{ 
+              color: filters.showEvolutions ? 'var(--accent)' : '#6b7280',
+              filter: filters.showEvolutions ? 'none' : 'grayscale(100%)'
+            }} 
+          />
+          Show Evolutions
+        </span>
+      </label>
+    )}
+  </div>
 
   {/* Mobile tip removed here; moved below entire section */}
 

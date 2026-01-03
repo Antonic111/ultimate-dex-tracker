@@ -180,8 +180,8 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
             </Link>
           )}
           
-          {/* Only show Counters button when not on auth flow pages, but allow on public home page */}
-          {!['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
+          {/* Only show Counters button when user is logged in and not on auth flow pages */}
+          {user?.username && !['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
             <Link 
               to="/counters" 
               className={`flex items-center gap-1 md:gap-1.5 px-1 md:px-4 py-0.5 md:py-2 pb-1.5 md:pb-4 border-2 border-[var(--accent)] border-b-0 rounded-t-lg text-decoration-none cursor-pointer text-[10px] md:text-base font-medium transition-all duration-200 md:hover:bg-[var(--accent)] md:hover:text-white md:hover:pb-2.5 md:hover:pb-5 ${location.pathname === '/counters' ? 'bg-[var(--accent)] text-white pb-1.5 md:pb-5' : 'bg-[var(--header)] text-[var(--accent)]'}`}
@@ -191,8 +191,8 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
             </Link>
           )}
           
-          {/* Only show Changelog button when not on auth flow pages, but allow on public home page */}
-          {!['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
+          {/* Only show Changelog button when user is logged in and not on auth flow pages */}
+          {user?.username && !['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
             <Link 
               to="/changelog" 
               className={`flex items-center gap-1 md:gap-1.5 px-1 md:px-4 py-0.5 md:py-2 pb-1.5 md:pb-4 border-2 border-[var(--accent)] border-b-0 rounded-t-lg text-decoration-none cursor-pointer text-[10px] md:text-base font-medium transition-all duration-200 md:hover:bg-[var(--accent)] md:hover:text-white md:hover:pb-2.5 md:hover:pb-5 ${location.pathname === '/changelog' ? 'bg-[var(--accent)] text-white pb-1.5 md:pb-5' : 'bg-[var(--header)] text-[var(--accent)]'}`}
@@ -217,27 +217,31 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
               </div>
             </Link>
             
-            <Link 
-              to="/counters" 
-              className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/counters' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
-              onClick={() => setShowMobileNav(false)}
-            >
-              <div className="flex items-center gap-3">
-                <Tally5 size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
-                Counters
-              </div>
-            </Link>
-            
-            <Link 
-              to="/changelog" 
-              className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/changelog' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
-              onClick={() => setShowMobileNav(false)}
-            >
-              <div className="flex items-center gap-3">
-                <FileText size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
-                Changelog
-              </div>
-            </Link>
+            {user?.username && (
+              <>
+                <Link 
+                  to="/counters" 
+                  className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/counters' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
+                  onClick={() => setShowMobileNav(false)}
+                >
+                  <div className="flex items-center gap-3">
+                    <Tally5 size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
+                    Counters
+                  </div>
+                </Link>
+                
+                <Link 
+                  to="/changelog" 
+                  className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/changelog' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
+                  onClick={() => setShowMobileNav(false)}
+                >
+                  <div className="flex items-center gap-3">
+                    <FileText size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
+                    Changelog
+                  </div>
+                </Link>
+              </>
+            )}
           </div>
         )}
 

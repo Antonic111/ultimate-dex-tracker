@@ -1044,30 +1044,6 @@ useEffect(() => {
     });
   }
 
-// Function to conditionally load AdSense script only on content pages (deferred for performance)
-const loadAdSense = () => {
-  // Check if script is already loaded
-  if (document.querySelector('script[src*="adsbygoogle"]')) {
-    return;
-  }
-
-  // Defer AdSense loading until after initial render to improve performance
-  // Use requestIdleCallback if available, otherwise setTimeout with a delay
-  const loadScript = () => {
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6475589957282046';
-    script.crossOrigin = 'anonymous';
-    document.head.appendChild(script);
-  };
-
-  if ('requestIdleCallback' in window) {
-    requestIdleCallback(loadScript, { timeout: 2000 });
-  } else {
-    setTimeout(loadScript, 1000); // Load after 1 second if requestIdleCallback not available
-  }
-};
-
 function CloseSidebarOnRouteChange() {
   const location = useLocation();
   useEffect(() => {
@@ -1075,15 +1051,6 @@ function CloseSidebarOnRouteChange() {
     if (!isDex) {
       setSidebarOpen(false);
       setSelectedPokemon(null);
-    }
-    
-    // Conditionally load AdSense script only on content pages (not auth/navigation pages)
-    const authPages = ['/login', '/register', '/forgot-password', '/email-sent', '/enter-reset-code', '/reset-password', '/verify-email'];
-    const isAuthPage = authPages.some(page => location.pathname.startsWith(page));
-    
-    if (!isAuthPage) {
-      // Load AdSense on content pages
-      loadAdSense();
     }
   }, [location.pathname]);
   return null;
@@ -1721,17 +1688,21 @@ function CloseSidebarOnRouteChange() {
                 <Route 
                   path="/counters" 
                   element={
-                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                      <Counters />
-                    </Suspense>
+                    <RequireAuth loading={loading} authReady={authReady} user={user}>
+                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Counters />
+                      </Suspense>
+                    </RequireAuth>
                   } 
                 />
                 <Route 
                   path="/changelog" 
                   element={
-                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                      <Changelog />
-                    </Suspense>
+                    <RequireAuth loading={loading} authReady={authReady} user={user}>
+                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Changelog />
+                      </Suspense>
+                    </RequireAuth>
                   } 
                 />
                 <Route 
@@ -1797,20 +1768,7 @@ function CloseSidebarOnRouteChange() {
             {resetModal.show && createPortal(
               <div
                 className={`fixed inset-0 z-[20000] ${resetModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-                onClick={() => {
-                  setResetModalClosing(true);
-                  setTimeout(() => {
-                    setResetModal({ 
-                      show: false, 
-                      pokemon: null, 
-                      pokemonName: '', 
-                      isShiny: false, 
-                      isBulkReset: false, 
-                      box: null 
-                    });
-                    setResetModalClosing(false);
-                  }, 300);
-                }}
+                style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
               >
                 <div className="bg-black/80 w-full h-full flex items-center justify-center">
                   <div

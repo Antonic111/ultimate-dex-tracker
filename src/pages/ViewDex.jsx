@@ -90,6 +90,7 @@ export default function ViewDex() {
     const [selectedPokemon, setSelectedPokemon] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileOwnerPreferences, setProfileOwnerPreferences] = useState(null);
+    const [viewedUserShinyCharmGames, setViewedUserShinyCharmGames] = useState([]);
     const [externalLinkPreference, setExternalLinkPreference] = useState('serebii');
 
     // Load external link preference from localStorage
@@ -151,6 +152,9 @@ export default function ViewDex() {
                         showAlphaOtherForms: true,
                     });
                 }
+                
+                // Store the viewed user's shiny charm games
+                setViewedUserShinyCharmGames(user.shinyCharmGames || []);
             } catch (error) {
                 // Handle error silently
                 setProgressBars([]);
@@ -169,6 +173,8 @@ export default function ViewDex() {
                         showAlphaForms: true,
                         showAlphaOtherForms: true,
                 });
+                // Reset shiny charm games on error
+                setViewedUserShinyCharmGames([]);
             } finally {
                 setLoading('view-dex-profile', false);
             }
@@ -434,6 +440,7 @@ export default function ViewDex() {
                         caught={caughtInfoMap}
                         customFilterMons={customFilterMons}
                         externalLinkPreference={externalLinkPreference}
+                        viewedUserShinyCharmGames={viewedUserShinyCharmGames}
                     />
                 </div>
                 
