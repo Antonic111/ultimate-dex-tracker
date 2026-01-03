@@ -1041,6 +1041,20 @@ useEffect(() => {
     });
   }
 
+// Function to conditionally load AdSense script only on content pages
+const loadAdSense = () => {
+  // Check if script is already loaded
+  if (document.querySelector('script[src*="adsbygoogle"]')) {
+    return;
+  }
+
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6475589957282046';
+  script.crossOrigin = 'anonymous';
+  document.head.appendChild(script);
+};
+
 function CloseSidebarOnRouteChange() {
   const location = useLocation();
   useEffect(() => {
@@ -1048,6 +1062,15 @@ function CloseSidebarOnRouteChange() {
     if (!isDex) {
       setSidebarOpen(false);
       setSelectedPokemon(null);
+    }
+    
+    // Conditionally load AdSense script only on content pages (not auth/navigation pages)
+    const authPages = ['/login', '/register', '/forgot-password', '/email-sent', '/enter-reset-code', '/reset-password', '/verify-email'];
+    const isAuthPage = authPages.some(page => location.pathname.startsWith(page));
+    
+    if (!isAuthPage) {
+      // Load AdSense on content pages
+      loadAdSense();
     }
   }, [location.pathname]);
   return null;
