@@ -10,6 +10,8 @@ import { useLoading } from "../components/Shared/LoadingContext";
 import { profileAPI } from "../utils/api";
 import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isSubLegendary, isStarter, isFossil, isBaby, isParadox, getPokemonCategory } from "../utils/pokemonCategories";
 import { getEvolutionChainIds, findPokemon } from "../utils";
+import { UNOBTAINABLE_SHINY_DEX_NUMBERS, GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "../data/blockedShinies";
+import { getFilteredFormsData } from "../utils/dexPreferences";
 
 
 // Helper function to load the viewer's own dex toggle preferences
@@ -197,31 +199,9 @@ export default function ViewDex() {
         "alphaother"
     ];
 
-    // Get filtered forms data based on profile owner's preferences
-    const getFilteredFormsDataForProfile = (forms, preferences) => {
-        if (!preferences || !forms) return forms;
-        return forms.filter(form => {
-            const formType = form.formType;
-            switch (formType) {
-                case 'gender': return preferences.showGenderForms;
-                case 'alolan': return preferences.showAlolanForms;
-                case 'galarian': return preferences.showGalarianForms;
-                case 'hisuian': return preferences.showHisuianForms;
-                case 'paldean': return preferences.showPaldeanForms;
-                case 'gmax': return preferences.showGmaxForms;
-                case 'unown': return preferences.showUnownForms;
-                case 'other': return preferences.showOtherForms;
-                case 'alcremie': return preferences.showAlcremieForms;
-                case 'vivillon': return preferences.showVivillonForms;
-                case 'alpha': return preferences.showAlphaForms;
-                case 'alphaother': return preferences.showAlphaOtherForms;
-                default: return true;
-            }
-        });
-    };
-
+    // Use the same filtering function from dexPreferences to ensure consistency
     const filteredFormsData = profileOwnerPreferences 
-        ? getFilteredFormsDataForProfile(formsData, profileOwnerPreferences)
+        ? getFilteredFormsData(formsData, profileOwnerPreferences)
         : formsData; // Show all forms while loading preferences
 
     const allMons = [...pokemonData, ...filteredFormsData];
@@ -275,7 +255,43 @@ export default function ViewDex() {
 
             // Custom filter function for public profile view
         const customFilterMons = (list, forceShowForms = false) => {
-            return list.filter(pokemon => {
+            // First, mark Pokemon as blocked based on profile owner's preferences
+            const markedList = list.map(pokemon => {
+                // Create a copy to avoid mutating the original
+                const poke = { ...pokemon };
+                
+                // Mark shiny Pokemon as blocked based on PROFILE OWNER's preferences (not viewer's)
+                // IMPORTANT: Only apply blocking to shiny Pokemon, never to non-shiny
+                if (showShiny && profileOwnerPreferences) {
+                    // Check if Pokemon should be blocked by ID
+                    const isBlockedUnobtainableById = profileOwnerPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
+                    const isBlockedGOById = profileOwnerPreferences.blockGOAndNOOTExclusiveShinies && GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
+                    
+                    // Check if Pokemon should be blocked by form name (for forms that share the same ID)
+                    const pokemonName = poke.name?.toLowerCase() || "";
+                    const isBlockedUnobtainableByForm = profileOwnerPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+                    const isBlockedGOByForm = profileOwnerPreferences.blockGOAndNOOTExclusiveShinies && GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+                    
+                    const isBlockedUnobtainable = isBlockedUnobtainableById || isBlockedUnobtainableByForm;
+                    const isBlockedGO = isBlockedGOById || isBlockedGOByForm;
+                    
+                    if (isBlockedUnobtainable || isBlockedGO) {
+                        // Mark as blocked but don't filter out
+                        poke._isBlocked = true;
+                    } else {
+                        // Ensure not blocked if conditions aren't met
+                        poke._isBlocked = false;
+                    }
+                } else {
+                    // For non-shiny Pokemon, always ensure they are not blocked
+                    poke._isBlocked = false;
+                }
+                
+                return poke;
+            });
+            
+            // Then apply the filtering logic
+            return markedList.filter(pokemon => {
                 // When viewing someone else's dex, always show forms (respect their preferences)
                 // The current user's showForms toggle doesn't apply to viewing other people's dexes
                 if (pokemon.formType && pokemon.formType !== "main" && pokemon.formType !== "default") {
@@ -441,6 +457,7 @@ export default function ViewDex() {
                         customFilterMons={customFilterMons}
                         externalLinkPreference={externalLinkPreference}
                         viewedUserShinyCharmGames={viewedUserShinyCharmGames}
+                        profileOwnerDexPreferences={profileOwnerPreferences}
                     />
                 </div>
                 

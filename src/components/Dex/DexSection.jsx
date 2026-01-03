@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { formatPokemonName } from "../../utils";
-import { Plus, Minus, Info } from "lucide-react";
+import { Plus, Minus, Info, Lock } from "lucide-react";
 
 function formatDexNumber(num) {
   if (!num) return "????";
@@ -293,11 +293,12 @@ export default function DexSection({
                         const sprites = poke?.sprites ?? {};
                         const sprite =
                           (showShiny && sprites.front_shiny) ? sprites.front_shiny : (sprites.front_default || "");
+                        const isBlocked = poke._isBlocked === true;
 
                         return (
                           <div
                             key={key}
-                            className={`group relative flex flex-col items-center justify-center p-2 rounded-lg border cursor-pointer transition-all duration-100 pokemon-slot-hover${readOnly ? " hover:bg-gray-700 dark:hover:bg-gray-600" : ""}`}
+                            className={`group relative flex flex-col items-center justify-center p-2 rounded-lg border transition-all duration-100 pokemon-slot-hover${readOnly ? " hover:bg-gray-700 dark:hover:bg-gray-600" : ""}${isBlocked ? " cursor-not-allowed" : " cursor-pointer"}`}
                             style={{ 
                               background: safeIsCaught(poke) ? 'linear-gradient(to top, rgba(21, 128, 61, 0.4), rgba(34, 197, 94, 0.2))' : 'var(--searchbar-inputs)',
                               border: safeIsCaught(poke) ? '2px solid rgb(34, 197, 94)' : '2px solid var(--border-color)',
@@ -306,12 +307,21 @@ export default function DexSection({
                               WebkitTouchCallout: 'none',
                               WebkitUserSelect: 'none',
                               userSelect: 'none',
-                              touchAction: 'manipulation'
+                              touchAction: 'manipulation',
+                              opacity: isBlocked ? 0.5 : 1,
+                              position: 'relative'
                             }}
                             data-caught={safeIsCaught(poke)}
                             data-readonly={readOnly}
+                            data-blocked={isBlocked}
                             onContextMenu={(e) => e.preventDefault()}
                             onClick={(e) => {
+                              // Prevent interaction if blocked
+                              if (isBlocked) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                return;
+                              }
                               // On mobile, touch handlers manage behavior; prevent duplicate click
                               if (typeof window !== 'undefined' && window.innerWidth <= 768) {
                                 e.preventDefault();
@@ -324,15 +334,30 @@ export default function DexSection({
                                 onToggleCaught(poke);
                               }
                             }}
-                            onTouchStart={(e) => handleTouchStart(e, poke)}
+                            onTouchStart={(e) => {
+                              if (isBlocked) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                return;
+                              }
+                              handleTouchStart(e, poke);
+                            }}
                             onTouchMove={handleTouchMove}
                             onTouchEnd={() => {
+                              if (isBlocked) return;
                               handleTouchEnd(poke, readOnly);
                             }}
-                            title={formatPokemonName(poke.name)}
+                            title={isBlocked ? `${formatPokemonName(poke.name)} (Locked)` : formatPokemonName(poke.name)}
                           >
-                            {/* Info button - only show in edit mode if onSelect is available, hide in read-only mode */}
-                            {!readOnly && onSelect && (
+                            {/* Blocked overlay with lock icon */}
+                            {isBlocked && (
+                              <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center z-10" style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}>
+                                <Lock size={24} style={{ color: 'white', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' }} />
+                              </div>
+                            )}
+
+                            {/* Info button - only show in edit mode if onSelect is available, hide in read-only mode, hide if blocked */}
+                            {!readOnly && onSelect && !isBlocked && (
                               <button
                                 className="absolute bottom-0.5 right-0.5 p-0.25 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 z-20 hidden md:block"
                                 style={{ 
@@ -362,6 +387,7 @@ export default function DexSection({
                                 fetchPriority="low"
                                 draggable={false}
                                 onError={(e) => (e.currentTarget.style.display = "none")}
+                                style={{ filter: isBlocked ? 'grayscale(100%)' : 'none' }}
                               />
                             ) : null}
 

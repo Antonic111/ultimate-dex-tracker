@@ -12,7 +12,8 @@
       "Sidebar will now display how long the hunt took if you use the built-in counter on the website",
       "Sidebar will now automatically display the shiny odds and will ask for modifiers (shiny charm, sparkling power, etc.) when tracking a hunt",
       "Shiny Charm button added under the search that allows you to manage the games you have shiny charm so it auto sets the modifier when you add a pokemon or hunt",
-      "Shiny Charm button seconds as a display to show off what games you have shiny charm on when viewing a profile"
+      "Shiny Charm button seconds as a display to show off what games you have shiny charm on when viewing a profile",
+      "2 NEW settings added to show a lock icon over shiny locked pokemon and/or Pokemon GO & NO OT exclusive shinies"
     ],
     "fixes": [
       "Changed wording for some tags in the sidebar such as Male now says Male Form and Female now says Female Form",

@@ -79,6 +79,8 @@ export const getDexPreferences = () => {
                 showVivillonForms: true,
                 showAlphaForms: true,
                 showAlphaOtherForms: true,
+                blockUnobtainableShinies: false,
+                blockGOAndNOOTExclusiveShinies: false,
                 ...parsedPrefs // User preferences override defaults
             };
         }
@@ -99,6 +101,8 @@ export const getDexPreferences = () => {
         showVivillonForms: true,
         showAlphaForms: true,
         showAlphaOtherForms: true,
+        blockUnobtainableShinies: false,
+        blockGOAndNOOTExclusiveShinies: false,
     };
 };
 

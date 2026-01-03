@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import { getCaughtKey } from "../../caughtStorage";
 
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS } from "../../Constants";
+import { UNOBTAINABLE_SHINY_DEX_NUMBERS, GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "../../data/blockedShinies";
 import MultiSelectChips from "../Shared/MultiSelectChips";
 import ProgressBar from "./ProgressBar";
 // Removed SortableItem import - using arrow controls instead
@@ -67,7 +68,7 @@ function loadFullCaughtMap() {
     return caughtMap;
 }
 
-export default function ProgressManager({ allMons, caughtInfoMap, readOnly = false, progressBarsOverride = null, showShiny = false, dexPreferences = null }) {
+export default function ProgressManager({ allMons, caughtInfoMap, readOnly = false, progressBarsOverride = null, showShiny = false, dexPreferences = null, showLockedCheckbox = false }) {
     const { username, progressBars: contextSavedBars = [] } = useContext(UserContext);
     const { showMessage } = useMessage();
     
@@ -445,6 +446,22 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                 if (!types.some((t) => bar.filters.type.includes(t))) return false;
             }
 
+            // Exclude locked Pokemon if the option is enabled
+            if (bar.filters?.excludeLocked && showShiny && dexPreferences) {
+                // Check if this Pokemon should be blocked based on user preferences
+                const isBlockedUnobtainableById = dexPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_DEX_NUMBERS.map(Number).includes(mon.id);
+                const isBlockedGOById = dexPreferences.blockGOAndNOOTExclusiveShinies && GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(mon.id);
+                
+                // Check if Pokemon should be blocked by form name
+                const pokemonName = mon.name?.toLowerCase() || "";
+                const isBlockedUnobtainableByForm = dexPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+                const isBlockedGOByForm = dexPreferences.blockGOAndNOOTExclusiveShinies && GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+
+                if (isBlockedUnobtainableById || isBlockedGOById || isBlockedUnobtainableByForm || isBlockedGOByForm) {
+                    return false; // Exclude this locked Pokemon
+                }
+            }
+
             return true;
         });
 
@@ -723,6 +740,24 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                                                                 handleEditChange(index, 'filters', { type: val });
                                                             }}
                                                         />
+
+                                                        {showLockedCheckbox && (
+                                                            <div className="chip-filter-group">
+                                                                <label className="chip-filter-label" style={{ color: 'var(--text)' }}>Options</label>
+                                                                <label className="flex items-center gap-2 cursor-pointer" style={{ padding: '8px 12px', backgroundColor: 'var(--progressbar-input)', borderRadius: '6px', border: '2px solid #444', transition: 'all 0.2s' }}>
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={!!bar.filters?.excludeLocked}
+                                                                        onChange={(e) => {
+                                                                            handleEditChange(index, 'filters', { excludeLocked: e.target.checked });
+                                                                        }}
+                                                                        className="w-4 h-4"
+                                                                        style={{ accentColor: 'var(--accent)' }}
+                                                                    />
+                                                                    <span style={{ color: 'var(--text)', fontSize: '0.9rem' }}>Exclude Locked Pokemon</span>
+                                                                </label>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             )}

@@ -48,6 +48,7 @@ import { LoadingSpinner } from "./components/Shared";
 import Footer from "./components/Shared/Footer";
 import CustomScrollbar from "./components/Shared/CustomScrollbar";
 import { getFilteredFormsData, getDexPreferences } from "./utils/dexPreferences";
+import { UNOBTAINABLE_SHINY_DEX_NUMBERS, GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "./data/blockedShinies";
 import { createPortal } from "react-dom";
 import { RotateCcw } from "lucide-react";
 
@@ -795,9 +796,10 @@ useEffect(() => {
 
 
   // Function to get all keys for main + form Pokémon
+  // Use currentDexPreferences from state to ensure consistency with ProgressManager
   const getAllMonKeys = () => [
     ...pokemonData.map(p => getCaughtKey(p)),
-    ...getCurrentFilteredFormsData().map(p => getCaughtKey(p))
+    ...getFilteredFormsData(formsData, currentDexPreferences).map(p => getCaughtKey(p))
   ];
 
   const totalCount = getAllMonKeys().length;
@@ -945,6 +947,33 @@ useEffect(() => {
       // 🧬 Respect toggle or force flag
       if (!forceShowForms && !showForms && poke.formType && poke.formType !== "main" && poke.formType !== "default") {
         return false;
+      }
+      
+      // Mark shiny Pokemon as blocked based on user preferences (but don't filter them out)
+      // IMPORTANT: Only apply blocking to shiny Pokemon, never to non-shiny
+      if (isShiny && currentDexPreferences) {
+        // Check if Pokemon should be blocked by ID
+        const isBlockedUnobtainableById = currentDexPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
+        const isBlockedGOById = currentDexPreferences.blockGOAndNOOTExclusiveShinies && GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
+        
+        // Check if Pokemon should be blocked by form name (for forms that share the same ID)
+        const pokemonName = poke.name?.toLowerCase() || "";
+        const isBlockedUnobtainableByForm = currentDexPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+        const isBlockedGOByForm = currentDexPreferences.blockGOAndNOOTExclusiveShinies && GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+        
+        const isBlockedUnobtainable = isBlockedUnobtainableById || isBlockedUnobtainableByForm;
+        const isBlockedGO = isBlockedGOById || isBlockedGOByForm;
+        
+        if (isBlockedUnobtainable || isBlockedGO) {
+          // Mark as blocked but don't filter out
+          poke._isBlocked = true;
+        } else {
+          // Ensure not blocked if conditions aren't met
+          poke._isBlocked = false;
+        }
+      } else {
+        // For non-shiny Pokemon, always ensure they are not blocked
+        poke._isBlocked = false;
       }
       
       // Get caught info for the appropriate shiny status
@@ -1442,6 +1471,7 @@ function CloseSidebarOnRouteChange() {
                                 progressBarsOverride={user.progressBars}
                                 showShiny={showShiny}
                                 dexPreferences={currentDexPreferences}
+                                showLockedCheckbox={true}
                               />
 
                             </div>

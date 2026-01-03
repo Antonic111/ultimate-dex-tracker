@@ -102,6 +102,8 @@ const userSchema = new mongoose.Schema({
     showVivillonForms: { type: Boolean, default: true },
     showAlphaForms: { type: Boolean, default: true },
     showAlphaOtherForms: { type: Boolean, default: true },
+    blockUnobtainableShinies: { type: Boolean, default: false },
+    blockGOAndNOOTExclusiveShinies: { type: Boolean, default: false },
   },
   // EXTERNAL LINK PREFERENCE ----------------------------------------- //
   externalLinkPreference: { type: String, default: 'serebii', enum: ['serebii', 'bulbapedia', 'pokemondb', 'smogon'] },

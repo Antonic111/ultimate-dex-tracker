@@ -16,6 +16,8 @@ export default function DexPreferences() {
         showVivillonForms: true,
         showAlphaForms: true,
         showAlphaOtherForms: true,
+        blockUnobtainableShinies: false,
+        blockGOAndNOOTExclusiveShinies: false,
     };
 
     const [preferences, setPreferences] = useState(defaultPreferences);
@@ -150,6 +152,11 @@ export default function DexPreferences() {
         { key: 'showAlphaOtherForms', label: "Alpha Genders & Others" },
     ];
 
+    const shinyBlockingOptions = [
+        { key: 'blockUnobtainableShinies', label: 'Lock Unobtainable Shinies' },
+        { key: 'blockGOAndNOOTExclusiveShinies', label: 'Lock GO & NO OT Exclusive Shinies' },
+    ];
+
     return (
         <div className="setting-block">
             <h3>Dex Preferences</h3>
@@ -170,6 +177,31 @@ export default function DexPreferences() {
                         </label>
                     </div>
                 ))}
+            </div>
+
+            {/* Shiny Locking Section */}
+            <div className="setting-divider" />
+            
+            <div className="shiny-blocking-section">
+                <h4 className="preference-section-header">Shiny Locking</h4>
+                <p className="setting-description">
+                    Lock certain types of shiny Pokemon to prevent interaction in your dex.
+                </p>
+                
+                <div className="dex-preferences-grid">
+                    {shinyBlockingOptions.map(({ key, label }) => (
+                        <div key={key} className="preference-item">
+                            <label className="preference-checkbox">
+                                <input
+                                    type="checkbox"
+                                    checked={!!preferences[key]}
+                                    onChange={() => handleToggle(key)}
+                                />
+                                <span className="preference-label">{label}</span>
+                            </label>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* External Links Section */}

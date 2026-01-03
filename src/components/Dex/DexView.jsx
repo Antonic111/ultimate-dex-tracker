@@ -105,7 +105,8 @@ export default function DexView({
     // Profile viewing props
     viewingUsername = null, // Username of the profile being viewed (null if viewing own profile)
     progressBarsOverride = null,
-    viewedUserShinyCharmGames = [] // Shiny charm games of the viewed user
+    viewedUserShinyCharmGames = [], // Shiny charm games of the viewed user
+    profileOwnerDexPreferences = null // Dex preferences of the profile owner (for progress bar counts)
 }) {
     // Handle sidebar open/close
     const handlePokemonSelect = (pokemon) => {
@@ -253,6 +254,8 @@ export default function DexView({
                     readOnly={readOnly}
                     progressBarsOverride={progressBarsOverride}
                     showShiny={showShiny}
+                    dexPreferences={profileOwnerDexPreferences}
+                    showLockedCheckbox={!!profileOwnerDexPreferences && (profileOwnerDexPreferences.blockUnobtainableShinies || profileOwnerDexPreferences.blockGOAndNOOTExclusiveShinies)}
                 />
             </div>
             
