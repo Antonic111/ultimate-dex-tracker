@@ -880,6 +880,209 @@ router.put("/update-username", authenticateUser, async (req, res) => {
   }
 });
 
+// Send verification code to current email (before changing email)
+router.post("/send-current-email-verification-code", authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Generate 6-digit code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Store code with expiration (10 minutes)
+    user.emailChangeVerificationCode = code;
+    user.emailChangeVerificationExpires = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    // Send email to current email
+    await sendCodeEmail(user, "Email Change Verification", code, "email change verification");
+
+    res.json({ message: "Verification code sent to your current email" });
+  } catch (err) {
+    console.error('Error sending current email verification code:', err);
+    res.status(500).json({ error: "Failed to send verification code" });
+  }
+});
+
+// Verify current email code (before changing email)
+router.post("/verify-current-email-code", authenticateUser, async (req, res) => {
+  const { code } = req.body;
+
+  if (!code) {
+    return res.status(400).json({ error: "Verification code is required" });
+  }
+
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (!user.emailChangeVerificationCode || !user.emailChangeVerificationExpires) {
+      return res.status(400).json({ error: "No verification code found. Please request a new code." });
+    }
+
+    if (new Date() > user.emailChangeVerificationExpires) {
+      return res.status(400).json({ error: "Verification code has expired. Please request a new code." });
+    }
+
+    if (user.emailChangeVerificationCode !== code) {
+      return res.status(400).json({ error: "Invalid verification code" });
+    }
+
+    // Mark current email as verified for email change
+    user.emailChangeVerified = true;
+    await user.save();
+
+    res.json({ success: true, message: "Current email verified successfully" });
+  } catch (err) {
+    console.error('Error verifying current email code:', err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Change email (after current email is verified)
+router.put("/change-email", authenticateUser, async (req, res) => {
+  const { newEmail, currentPassword } = req.body;
+
+  if (!newEmail || !currentPassword) {
+    return res.status(400).json({ error: "Email and current password are required" });
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(newEmail)) {
+    return res.status(400).json({ error: "Invalid email format" });
+  }
+
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Check if current email was verified
+    if (!user.emailChangeVerified) {
+      return res.status(400).json({ error: "Please verify your current email first" });
+    }
+
+    // Verify current password
+    const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+    if (!isValidPassword) {
+      return res.status(400).json({ error: "Current password is incorrect" });
+    }
+
+    // Check if email is already taken
+    const existingUser = await User.findOne({ email: newEmail.toLowerCase() });
+    if (existingUser && existingUser._id.toString() !== req.userId) {
+      return res.status(400).json({ error: "Email is already in use" });
+    }
+
+    // Store new email temporarily and generate verification code for new email
+    const newEmailCode = Math.floor(100000 + Math.random() * 900000).toString();
+    user.pendingEmail = newEmail.toLowerCase();
+    user.newEmailVerificationCode = newEmailCode;
+    user.newEmailVerificationExpires = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    // Send verification code to new email
+    const tempUser = { ...user.toObject(), email: newEmail.toLowerCase() };
+    await sendCodeEmail(tempUser, "Verify Your New Email", newEmailCode, "new email verification");
+
+    res.json({ 
+      success: true, 
+      message: "Verification code sent to your new email address",
+      pendingEmail: user.pendingEmail
+    });
+  } catch (err) {
+    console.error('Error changing email:', err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Send verification code to new email (after email change initiated)
+router.post("/send-new-email-verification-code", authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (!user.pendingEmail) {
+      return res.status(400).json({ error: "No pending email change found" });
+    }
+
+    // Generate new code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    user.newEmailVerificationCode = code;
+    user.newEmailVerificationExpires = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    // Send email to new email
+    const tempUser = { ...user.toObject(), email: user.pendingEmail };
+    await sendCodeEmail(tempUser, "Verify Your New Email", code, "new email verification");
+
+    res.json({ message: "Verification code sent to your new email" });
+  } catch (err) {
+    console.error('Error sending new email verification code:', err);
+    res.status(500).json({ error: "Failed to send verification code" });
+  }
+});
+
+// Verify new email code and complete email change
+router.post("/verify-new-email-code", authenticateUser, async (req, res) => {
+  const { code } = req.body;
+
+  if (!code) {
+    return res.status(400).json({ error: "Verification code is required" });
+  }
+
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (!user.pendingEmail) {
+      return res.status(400).json({ error: "No pending email change found" });
+    }
+
+    if (!user.newEmailVerificationCode || !user.newEmailVerificationExpires) {
+      return res.status(400).json({ error: "No verification code found. Please request a new code." });
+    }
+
+    if (new Date() > user.newEmailVerificationExpires) {
+      return res.status(400).json({ error: "Verification code has expired. Please request a new code." });
+    }
+
+    if (user.newEmailVerificationCode !== code) {
+      return res.status(400).json({ error: "Invalid verification code" });
+    }
+
+    // Update email and clear verification fields
+    user.email = user.pendingEmail;
+    // Mark as verified since we've already verified both current email (ownership) and new email (access)
+    user.verified = true;
+    user.pendingEmail = undefined;
+    user.newEmailVerificationCode = undefined;
+    user.newEmailVerificationExpires = undefined;
+    user.emailChangeVerified = false; // Reset for next time
+    user.emailChangeVerificationCode = undefined;
+    user.emailChangeVerificationExpires = undefined;
+    await user.save();
+
+    res.json({ 
+      success: true, 
+      message: "Email changed successfully",
+      email: user.email,
+      verified: user.verified
+    });
+  } catch (err) {
+    console.error('Error verifying new email code:', err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 router.put("/change-password", authenticateUser, async (req, res) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
   
@@ -1090,8 +1293,9 @@ router.get("/users/public", async (req, res) => {
     ];
 
     const items = await User.aggregate(base);
-    // total is optional for random; keep it simple
-    const total = q ? await User.countDocuments(match) : items.length;
+    // Get total count of all matching documents (including verified filter)
+    // For random mode without query, we still need the total count
+    const total = await User.countDocuments(match);
 
     res.json({ items, total, page, pageSize });
   } catch (error) {

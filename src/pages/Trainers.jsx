@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "flag-icons/css/flag-icons.min.css";
 import "../css/Trainers.css";
 import { COUNTRY_OPTIONS } from "../data/countries";
-import { Mars, Venus, VenusAndMars, Search, Heart, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, RefreshCcw, MoveUp, MoveDown, Check, X, Crown } from "lucide-react";
+import { Mars, Venus, VenusAndMars, Search, Heart, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, RefreshCcw, MoveUp, MoveDown, Check, X, Crown, ChevronLeft, ChevronRight } from "lucide-react";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { profileAPI } from "../utils/api";
 import { UserContext } from "../components/Shared/UserContext";
@@ -155,58 +155,87 @@ export default function Trainers() {
     // reset paging whenever the query changes
     setPage(1);
 
-
-
     const run = async () => {
       // Prevent running if we're already making an API call
       if (isMakingApiCall.current) {
         return;
       }
       
-      // For non-logged-in users or when username is undefined (authentication still loading),
-      // we'll proceed with the API call to show public profiles
-      // This ensures the page works even if there are authentication issues
       isMakingApiCall.current = true;
       setLoading(true);
       try {
-        const data = await profileAPI.getPublicUsers(query, 1, PAGE_SIZE, false);
+        let allUsers = [];
         
-        // Use real API data and filter out current user's profile and unverified accounts
-        let filteredData = data.items || [];
-        
-        // Filter out current user's profile if logged in and unverified accounts
-        const originalCount = filteredData.length;
+        if (query) {
+          // For search queries, fetch the first page (search results are typically smaller)
+          const data = await profileAPI.getPublicUsers(query, 1, 50, false);
+          allUsers = data.items || [];
+        } else {
+          // For no search query, fetch ALL users by fetching in batches
+          // API max pageSize is 50, so we'll fetch 50 at a time
+          let currentPage = 1;
+          const batchSize = 50; // API max is 50
+          let totalUsers = null;
+          let hasMore = true;
+          
+          while (hasMore && !ignore) {
+            const data = await profileAPI.getPublicUsers('', currentPage, batchSize, false);
+            const batch = data.items || [];
+            
+            // Get total from first response - API now returns accurate total count
+            if (totalUsers === null && data.total !== undefined) {
+              totalUsers = data.total;
+            }
+            
+            if (batch.length > 0) {
+              allUsers = [...allUsers, ...batch];
+              currentPage++;
+              
+              // Check if we've fetched all users
+              if (totalUsers !== null) {
+                // Use the total count from API to know when we're done
+                hasMore = allUsers.length < totalUsers;
+              } else {
+                // Fallback: if we got fewer items than requested, we've reached the end
+                hasMore = batch.length === batchSize;
+              }
+            } else {
+              hasMore = false;
+            }
+            
+            // Safety limit: don't fetch more than 2000 users (40 batches)
+            if (currentPage > 40) {
+              hasMore = false;
+            }
+          }
+        }
         
         // Filter out current user's profile if logged in
+        let filteredData = allUsers;
         if (username) {
           filteredData = filteredData.filter(trainer => trainer.username !== username);
         }
         
-        // Now we can properly filter verified accounts since the API includes the verified field
+        // Filter verified accounts only
         const verifiedUsers = filteredData.filter(trainer => {
-          const isVerified = trainer.verified === true;
-          return isVerified;
+          return trainer.verified === true;
         });
         
-        // Use the verified users list
         filteredData = verifiedUsers;
-        
-        const filteredCount = filteredData.length;
-        const unverifiedCount = originalCount - filteredCount;
-        
-        // Set fallback mode since we can't properly filter verified accounts
-        setUsingFallback(false); // Now we're properly filtering
+        setUsingFallback(false);
 
         if (!ignore) {
           // Store all filtered data for pagination
           setAllFilteredData(filteredData);
           // Reset to first page when query changes
           setPage(1);
+          // Debug: log how many users we fetched
+          console.log(`Fetched ${allUsers.length} total users, ${filteredData.length} verified users after filtering`);
         }
       } catch (error) {
         console.error('Failed to fetch trainers:', error);
         if (!ignore) {
-          // Handle error silently
+          setAllFilteredData([]);
         }
       } finally {
         if (!ignore) setLoading(false);
@@ -530,96 +559,48 @@ export default function Trainers() {
             ))}
           </div>
 
-          {/* Pagination */}
-          {!query && sortedAndFilteredData.length > PAGE_SIZE && (
+          {/* Pagination - similar to changelog style */}
+          {sortedAndFilteredData.length > PAGE_SIZE && (
             <div className="pagination">
               <div className="pagination-info">
-                Showing {((page - 1) * PAGE_SIZE) + 1} - {Math.min(page * PAGE_SIZE, sortedAndFilteredData.length)} of {sortedAndFilteredData.length} trainers
+                Showing {((page - 1) * PAGE_SIZE) + 1}-{Math.min(page * PAGE_SIZE, sortedAndFilteredData.length)} of {sortedAndFilteredData.length} trainers
               </div>
+              
               <div className="pagination-controls">
-                <button 
-                  className="pagination-btn prev-btn" 
-                  onClick={() => {
-                    const newPage = Math.max(1, page - 1);
-                    setPage(newPage);
-                  }}
+                <button
+                  onClick={() => setPage(prev => Math.max(prev - 1, 1))}
                   disabled={page === 1}
+                  className="pagination-btn"
                 >
+                  <ChevronLeft size={16} />
                   Previous
                 </button>
                 
                 <div className="page-numbers">
-                  {(() => {
+                  {Array.from({ length: Math.min(5, Math.ceil(sortedAndFilteredData.length / PAGE_SIZE)) }, (_, i) => {
                     const totalPages = Math.ceil(sortedAndFilteredData.length / PAGE_SIZE);
-                    const currentPage = page;
-                    const pages = [];
+                    const pageNum = Math.max(1, Math.min(totalPages - 4, page - 2)) + i;
+                    if (pageNum > totalPages) return null;
                     
-                    // Always show first page
-                    pages.push(
-                      <button 
-                        key={1} 
-                        className={`page-btn ${currentPage === 1 ? 'active' : ''}`}
-                        onClick={() => {
-                          setPage(1);
-                        }}
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        className={`page-btn ${page === pageNum ? 'active' : ''}`}
                       >
-                        1
+                        {pageNum}
                       </button>
                     );
-                    
-                    // Show ellipsis if there's a gap
-                    if (currentPage > 3) {
-                      pages.push(<span key="ellipsis1" className="page-ellipsis">...</span>);
-                    }
-                    
-                    // Show current page and surrounding pages
-                    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
-                      if (i !== 1 && i !== totalPages) {
-                        pages.push(
-                          <button 
-                            key={i} 
-                            className={`page-btn ${i === currentPage ? 'active' : ''}`}
-                            onClick={() => {
-                              setPage(i);
-                            }}
-                          >
-                            {i}
-                          </button>
-                        );
-                      }
-                    }
-                    
-                    // Show ellipsis if there's a gap
-                    if (currentPage < totalPages - 2) {
-                      pages.push(<span key="ellipsis2" className="page-ellipsis">...</span>);
-                    }
-                    
-                    // Always show last page
-                    pages.push(
-                      <button 
-                        key={totalPages} 
-                        className={`page-btn ${currentPage === totalPages ? 'active' : ''}`}
-                        onClick={() => {
-                          setPage(totalPages);
-                        }}
-                      >
-                        {totalPages}
-                      </button>
-                    );
-                    
-                    return pages;
-                  })()}
+                  })}
                 </div>
                 
-                <button 
-                  className="pagination-btn next-btn" 
-                  onClick={() => {
-                    const newPage = Math.min(Math.ceil(sortedAndFilteredData.length / PAGE_SIZE), page + 1);
-                    setPage(newPage);
-                  }}
+                <button
+                  onClick={() => setPage(prev => Math.min(prev + 1, Math.ceil(sortedAndFilteredData.length / PAGE_SIZE)))}
                   disabled={page >= Math.ceil(sortedAndFilteredData.length / PAGE_SIZE)}
+                  className="pagination-btn"
                 >
                   Next
+                  <ChevronRight size={16} />
                 </button>
               </div>
             </div>

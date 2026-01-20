@@ -1,11 +1,12 @@
 import React, { useState, useContext, useEffect } from "react";
 import "../css/Settings.css";
-import { User, Lock, Eye, EyeOff, Check, X, Loader } from "lucide-react";
+import { User, Lock, Eye, EyeOff, Check, X, Loader, Mail } from "lucide-react";
 import { UserContext } from "../components/Shared/UserContext";
 import { useMessage } from "../components/Shared/MessageContext";
 import { useTheme } from "../components/Shared/ThemeContext";
 import DeleteAccountModal from "../components/Shared/DeleteAccountModal";
 import PasswordVerificationModal from "../components/Shared/PasswordVerificationModal";
+import EmailVerificationModal from "../components/Shared/EmailVerificationModal";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
 import DexPreferences from "../components/Shared/DexPreferences";
 import { validateContent } from "../../shared/contentFilter";
@@ -17,6 +18,9 @@ import { useUsernameCooldown } from "../hooks/useUsernameCooldown";
 export default function Settings() {
     const { username, email, setUser } = useContext(UserContext);
     const [newUsername, setNewUsername] = useState("");
+    const [newEmail, setNewEmail] = useState("");
+    const [emailPassword, setEmailPassword] = useState("");
+    const [showEmailPassword, setShowEmailPassword] = useState(false);
     const { theme, setTheme, accent, setAccent } = useTheme();
     const [isPrivate, setIsPrivate] = useState(false);
     const { showMessage } = useMessage();
@@ -28,9 +32,12 @@ export default function Settings() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [savingPrivacy, setSavingPrivacy] = useState(false);
     const [savingUsername, setSavingUsername] = useState(false);
+    const [savingEmail, setSavingEmail] = useState(false);
     const [savingPassword, setSavingPassword] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showPasswordVerificationModal, setShowPasswordVerificationModal] = useState(false);
+    const [showEmailVerificationModal, setShowEmailVerificationModal] = useState(false);
+    const [emailVerificationStep, setEmailVerificationStep] = useState("current"); // "current" or "new"
 
     // Username availability checking
     const usernameAvailability = useUsernameAvailability(newUsername, username);
@@ -112,6 +119,52 @@ export default function Settings() {
             showMessage(err.message, "error");
         } finally {
             setSavingUsername(false);
+        }
+    }
+
+    function handleEmailChange() {
+        // Frontend validation
+        if (!newEmail || !emailPassword) {
+            showMessage("Email and password are required", "error");
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(newEmail)) {
+            showMessage("Invalid email format", "error");
+            return;
+        }
+
+        // Open verification modal for current email
+        setEmailVerificationStep("current");
+        setShowEmailVerificationModal(true);
+    }
+
+    async function handleEmailVerification(code, result) {
+        if (emailVerificationStep === "current") {
+            // Current email verified by modal, now change email
+            try {
+                setSavingEmail(true);
+                const data = await userAPI.changeEmail(newEmail, emailPassword);
+                
+                // Switch to new email verification step
+                setEmailVerificationStep("new");
+                // Modal will stay open for new email verification
+            } catch (err) {
+                showMessage(err.message || "Failed to change email", "error");
+                setShowEmailVerificationModal(false);
+            } finally {
+                setSavingEmail(false);
+            }
+        } else {
+            // New email verified by modal, update user context with result
+            if (result && result.email) {
+                setUser(prev => ({ ...prev, email: result.email, verified: result.verified }));
+            }
+            setNewEmail("");
+            setEmailPassword("");
+            setShowEmailVerificationModal(false);
+            setEmailVerificationStep("current");
         }
     }
 
@@ -213,6 +266,46 @@ export default function Settings() {
                             disabled={savingUsername || !usernameCooldown.canChange || !usernameAvailability.available || newUsername.trim() === ""}
                         >
                             {savingUsername ? "Saving..." : "Save"}
+                        </button>
+                    </div>
+
+                    <div className="setting-divider" />
+
+                    {/* Change Email */}
+                    <div className="setting-block">
+                        <h3>Change Email</h3>
+                        <form onSubmit={(e) => { e.preventDefault(); handleEmailChange(); }}>
+                            <div className="input-icon-wrapper">
+                                <Mail className="auth-icon" size={24} />
+                                <input
+                                    type="email"
+                                    placeholder={email || "new email"}
+                                    value={newEmail}
+                                    onChange={(e) => setNewEmail(e.target.value)}
+                                    autoComplete="email"
+                                />
+                            </div>
+                            <div className="input-icon-wrapper">
+                                <Lock className="auth-icon" size={24} />
+                                <input
+                                    type={showEmailPassword ? "text" : "password"}
+                                    placeholder="Current password"
+                                    value={emailPassword}
+                                    onChange={(e) => setEmailPassword(e.target.value)}
+                                    autoComplete="current-password"
+                                />
+                                <button
+                                    type="button"
+                                    className="show-password-toggle"
+                                    onClick={() => setShowEmailPassword(prev => !prev)}
+                                    tabIndex={-1}
+                                >
+                                    {showEmailPassword ? <EyeOff className="auth-icon" size={24} /> : <Eye className="auth-icon" size={24} />}
+                                </button>
+                            </div>
+                        </form>
+                        <button onClick={handleEmailChange} disabled={savingEmail}>
+                            {savingEmail ? "Updating..." : "Update Email"}
                         </button>
                     </div>
 
@@ -374,7 +467,23 @@ export default function Settings() {
                                     key={color}
                                     className={`accent-circle ${color} ${accent === color ? "selected" : ""}`}
                                     onClick={() => setAccent(color)}
-                                />
+                                    style={{ position: 'relative' }}
+                                >
+                                    {accent === color && (
+                                        <Check 
+                                            size={18} 
+                                            className="accent-check-icon"
+                                            style={{ 
+                                                position: 'absolute',
+                                                top: '50%',
+                                                left: '50%',
+                                                transform: 'translate(-50%, -50%)',
+                                                pointerEvents: 'none',
+                                                strokeWidth: 3
+                                            }} 
+                                        />
+                                    )}
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -404,6 +513,20 @@ export default function Settings() {
                     email={email}
                     onClose={() => setShowPasswordVerificationModal(false)}
                     onVerified={handlePasswordVerification}
+                />
+            )}
+            {showEmailVerificationModal && (
+                <EmailVerificationModal
+                    isOpen={showEmailVerificationModal}
+                    currentEmail={email}
+                    newEmail={newEmail}
+                    step={emailVerificationStep}
+                    onClose={() => {
+                        setShowEmailVerificationModal(false);
+                        setEmailVerificationStep("current");
+                        setSavingEmail(false);
+                    }}
+                    onVerified={handleEmailVerification}
                 />
             )}
 

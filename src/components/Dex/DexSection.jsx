@@ -280,7 +280,8 @@ export default function DexSection({
                           }}
                           onClick={() => onMarkAll(box)}
                         >
-                          {box.every((p) => safeIsCaught(p)) ? "Unmark All" : "Mark All"}
+                          {/* Only check unlocked Pokemon when determining button text */}
+                          {box.filter(p => !p._isBlocked).every((p) => safeIsCaught(p)) ? "Unmark All" : "Mark All"}
                         </button>
                       )}
                     </div>

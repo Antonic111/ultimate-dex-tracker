@@ -119,6 +119,13 @@ const userSchema = new mongoose.Schema({
   // PASSWORD VERIFICATION ------------------------------------- //
   passwordVerificationCode: { type: String, default: null },
   passwordVerificationExpires: { type: Date, default: null },
+  // EMAIL CHANGE VERIFICATION ------------------------------------- //
+  emailChangeVerificationCode: { type: String, default: null },
+  emailChangeVerificationExpires: { type: Date, default: null },
+  emailChangeVerified: { type: Boolean, default: false },
+  pendingEmail: { type: String, default: null },
+  newEmailVerificationCode: { type: String, default: null },
+  newEmailVerificationExpires: { type: Date, default: null },
   // HUNT DATA ----------------------------------------- //
   activeHunts: {
     type: [new mongoose.Schema({

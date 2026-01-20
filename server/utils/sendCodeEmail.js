@@ -2,16 +2,20 @@
 import { Resend } from "resend";
 
 // Check if emails are disabled in development
+// Only disable if explicitly set to 'true', otherwise allow emails in development
 const emailsDisabled = process.env.NODE_ENV === 'development' && process.env.DISABLE_EMAILS === 'true';
 
-// Debug logging
-console.log('Email configuration:', {
-  NODE_ENV: process.env.NODE_ENV,
-  DISABLE_EMAILS: process.env.DISABLE_EMAILS,
-  RESEND_API_KEY: process.env.RESEND_API_KEY ? 'Set' : 'Not set',
-  EMAIL_FROM: process.env.EMAIL_FROM ? 'Set' : 'Not set',
-  emailsDisabled
-});
+// Debug logging - more detailed for localhost testing
+// Only log in development to avoid noise in production
+if (process.env.NODE_ENV !== 'production') {
+  console.log('📧 Email configuration:', {
+    NODE_ENV: process.env.NODE_ENV || 'not set',
+    DISABLE_EMAILS: process.env.DISABLE_EMAILS || 'not set',
+    RESEND_API_KEY: process.env.RESEND_API_KEY ? `Set (${process.env.RESEND_API_KEY.substring(0, 10)}...)` : '❌ Not set',
+    EMAIL_FROM: process.env.EMAIL_FROM || '❌ Not set',
+    emailsDisabled: emailsDisabled ? '⚠️ DISABLED' : '✅ ENABLED'
+  });
+}
 
 // Only initialize Resend if emails are enabled
 let resend = null;

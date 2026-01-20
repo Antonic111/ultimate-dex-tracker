@@ -1141,11 +1141,34 @@ function CloseSidebarOnRouteChange() {
   }
 
   async function handleMarkAll(box, isShiny = false) {
-    const allMarked = box.every(p => caught[getCaughtKey(p, null, isShiny)]);
+    // Helper function to check if a Pokemon is locked
+    const isPokemonLocked = (poke) => {
+      // Only check for locked Pokemon if we're in shiny mode and lock settings are enabled
+      if (!isShiny || !currentDexPreferences) return false;
+      
+      const isBlockedUnobtainableById = currentDexPreferences.blockUnobtainableShinies && 
+        UNOBTAINABLE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
+      const isBlockedGOById = currentDexPreferences.blockGOAndNOOTExclusiveShinies && 
+        GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
+      
+      const pokemonName = poke.name?.toLowerCase() || "";
+      const isBlockedUnobtainableByForm = currentDexPreferences.blockUnobtainableShinies && 
+        UNOBTAINABLE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+      const isBlockedGOByForm = currentDexPreferences.blockGOAndNOOTExclusiveShinies && 
+        GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+      
+      return isBlockedUnobtainableById || isBlockedGOById || isBlockedUnobtainableByForm || isBlockedGOByForm;
+    };
 
-    // 🔍 Check for any Pokémon that has saved info
+    // Filter out locked Pokemon from the box
+    const unlocked = box.filter(p => !isPokemonLocked(p));
+    
+    // Check if all unlocked Pokemon are marked
+    const allMarked = unlocked.every(p => caught[getCaughtKey(p, null, isShiny)]);
+
+    // 🔍 Check for any Pokémon that has saved info (only check unlocked ones)
     if (allMarked) {
-      const hasInfo = box.some(p => {
+      const hasInfo = unlocked.some(p => {
         const key = getCaughtKey(p, null, isShiny);
         const info = caughtInfoMap[key];
         return hasMeaningfulInfo(info);
@@ -1153,7 +1176,7 @@ function CloseSidebarOnRouteChange() {
 
       if (hasInfo) {
         // Show reset modal instead of old confirm dialog
-        const boxNames = box.map(p => formatPokemonName(p.name));
+        const boxNames = unlocked.map(p => formatPokemonName(p.name));
         const uniqueNames = [...new Set(boxNames)];
         const displayNames = uniqueNames.length <= 3 
           ? uniqueNames.join(', ') 
@@ -1165,7 +1188,7 @@ function CloseSidebarOnRouteChange() {
           pokemonName: displayNames, 
           isShiny: isShiny,
           isBulkReset: true,
-          box: box
+          box: unlocked // Only include unlocked Pokemon in the reset
         });
         setResetModalClosing(false);
         return;
@@ -1176,7 +1199,8 @@ function CloseSidebarOnRouteChange() {
     const newInfoMap = { ...caughtInfoMap };
     const delta = {};
 
-    box.forEach(p => {
+    // Only mark/unmark unlocked Pokemon
+    unlocked.forEach(p => {
       const key = getCaughtKey(p, null, isShiny);
       const shouldBeCaught = !allMarked;
 

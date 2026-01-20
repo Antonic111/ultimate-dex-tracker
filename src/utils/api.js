@@ -458,6 +458,31 @@ export const userAPI = {
     return api.put('/update-username', { newUsername });
   },
 
+  // Change email
+  async changeEmail(newEmail, currentPassword) {
+    return api.put('/change-email', { newEmail, currentPassword });
+  },
+
+  // Send verification code to current email
+  async sendCurrentEmailVerificationCode() {
+    return api.post('/send-current-email-verification-code');
+  },
+
+  // Verify current email code
+  async verifyCurrentEmailCode(code) {
+    return api.post('/verify-current-email-code', { code });
+  },
+
+  // Send verification code to new email
+  async sendNewEmailVerificationCode() {
+    return api.post('/send-new-email-verification-code');
+  },
+
+  // Verify new email code
+  async verifyNewEmailCode(code) {
+    return api.post('/verify-new-email-code', { code });
+  },
+
   // Change password
   async changePassword(currentPassword, newPassword, confirmPassword) {
     return api.put('/change-password', { currentPassword, newPassword, confirmPassword });
