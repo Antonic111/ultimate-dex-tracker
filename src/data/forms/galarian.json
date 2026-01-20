@@ -1,0 +1,451 @@
+[
+      {
+        "id": 52,
+        "name": "meowth-galar",
+        "stableId": "meowth-galar-0052",
+        "types": [
+          "steel"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10161.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10161.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 863,
+              "name": "perrserker",
+              "how": "Level Up to 28"
+            }
+          ]
+        }
+      },
+      {
+        "id": 77,
+        "name": "ponyta-galar",
+        "stableId": "ponyta-galar-0077",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10162.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10162.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 78,
+              "name": "rapidash-galar",
+              "how": "Level Up to 40"
+            }
+          ]
+        }
+      },
+      {
+        "id": 78,
+        "name": "rapidash-galar",
+        "stableId": "rapidash-galar-0078",
+        "types": [
+          "psychic",
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10163.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10163.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": {
+            "id": 77,
+            "name": "ponyta-galar",
+            "how": "Level Up to 40"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 79,
+        "name": "slowpoke-galarian",
+        "stableId": "slowpoke-galarian-0079",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10164.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10164.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 80,
+              "name": "slowbro-galarian",
+              "how": "Use Galarica Cuff"
+            },
+            {
+              "id": 199,
+              "name": "slowking-galarian",
+              "how": "Use Galarica Wreath"
+            }
+          ]
+        }
+      },
+      {
+        "id": 80,
+        "name": "slowbro-galarian",
+        "stableId": "slowbro-galarian-0080",
+        "types": [
+          "poison",
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10165.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10165.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": {
+            "id": 79,
+            "name": "slowpoke-galarian",
+            "formType": "galarian",
+            "how": "Use Galarica Cuff"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 83,
+        "name": "farfetchd-galar",
+        "stableId": "farfetchd-galar-0083",
+        "types": [
+          "fighting"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10166.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10166.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 865,
+              "name": "sirfetchd",
+              "how": "three critical hits"
+            }
+          ]
+        }
+      },
+      {
+        "id": 110,
+        "name": "weezing-galar",
+        "stableId": "weezing-galar-0110",
+        "types": [
+          "poison",
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10167.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10167.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": {
+            "id": 109,
+            "name": "koffing",
+            "how": "Level 35 in Galar Region"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 122,
+        "name": "mr-mime-galar",
+        "stableId": "mr-mime-galar-0122",
+        "types": [
+          "ice",
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10168.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10168.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": {
+            "id": 439,
+            "name": "mime-jr",
+            "how": "Level Up with Mimic (Galar)"
+          },
+          "next": [
+            {
+              "id": 866,
+              "name": "mr-rime",
+              "how": "Level Up to 42"
+            }
+          ]
+        }
+      },
+      {
+        "id": 144,
+        "name": "articuno-galar",
+        "stableId": "articuno-galar-0144",
+        "types": [
+          "psychic",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10169.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10169.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 145,
+        "name": "zapdos-galar",
+        "stableId": "zapdos-galar-0145",
+        "types": [
+          "fighting",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10170.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10170.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 146,
+        "name": "moltres-galar",
+        "stableId": "moltres-galar-0146",
+        "types": [
+          "dark",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10171.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10171.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 199,
+        "name": "slowking-galarian",
+        "stableId": "slowking-galar-0199",
+        "types": [
+          "poison",
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10172.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10172.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": {
+            "id": 79,
+            "name": "slowpoke-galarian",
+            "formType": "galarian",
+            "how": "Use Galarica Wreath"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 222,
+        "name": "corsola-galar",
+        "stableId": "corsola-galar-0222",
+        "types": [
+          "ghost"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10173.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10173.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 864,
+              "name": "cursola",
+              "how": "Level up to 38"
+            }
+          ]
+        }
+      },
+      {
+        "id": 263,
+        "name": "zigzagoon-galar",
+        "stableId": "zigzagoon-galar-0263",
+        "types": [
+          "dark",
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10174.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10174.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 264,
+              "name": "linoone-galar",
+              "how": "Level Up to 20"
+            }
+          ]
+        }
+      },
+      {
+        "id": 264,
+        "name": "linoone-galar",
+        "stableId": "linoone-galar-0264",
+        "types": [
+          "dark",
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10175.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10175.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": {
+            "id": 263,
+            "name": "zigzagoon-galar",
+            "how": "Level Up to 20"
+          },
+          "next": [
+            {
+              "id": 862,
+              "name": "obstagoon",
+              "how": "Level Up to 34"
+            }
+          ]
+        }
+      },
+      {
+        "id": 554,
+        "name": "darumaka-galar",
+        "stableId": "darumaka-galar-0554",
+        "types": [
+          "ice"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10176.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10176.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 555,
+              "name": "darmanitan-galar",
+              "how": "Use Ice Stone"
+            }
+          ]
+        }
+      },
+      {
+        "id": 555,
+        "name": "darmanitan-galar",
+        "stableId": "darmanitan-galar-0555",
+        "types": [
+          "ice"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10177.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10177.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": {
+            "id": 554,
+            "name": "darumaka-galar",
+            "how": "Use Ice Stone"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 562,
+        "name": "yamask-galar",
+        "stableId": "yamask-galar-0562",
+        "types": [
+          "ground",
+          "ghost"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10179.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10179.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 867,
+              "name": "runerigus",
+              "how": "Take 49+ HP damage & pass under Stone Sculpture in Dusty Bowl"
+            }
+          ]
+        }
+      },
+      {
+        "id": 618,
+        "name": "stunfisk-galar",
+        "stableId": "stunfisk-galar-0618",
+        "types": [
+          "ground",
+          "steel"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10180.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10180.png"
+        },
+        "gen": 8,
+        "formType": "galarian",
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      }
+]

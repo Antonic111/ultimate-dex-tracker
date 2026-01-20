@@ -7,7 +7,7 @@ import { debugAPI } from './utils/debug';
 
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS } from "./Constants";
 import "./css/App.css";
-import formsData from "./data/forms.json";
+import formsData from "./utils/loadFormsData";
 import detectivePikachu from "./data/pikachu.png";
 import pokemonData from "./data/pokemon.json";
 import DexSection from "./components/Dex/DexSection";
@@ -1089,16 +1089,13 @@ function CloseSidebarOnRouteChange() {
 
   function updateCaughtInfo(poke, info, isShiny = false) {
     const key = getCaughtKey(poke, null, isShiny);
-
-
+    if (!key) return;
 
   setCaughtInfoMap(prev => {
     // If we're resetting/clearing data
     if (info == null) {
-      console.log("  - Clearing data for key:", key);
       const updated = { ...prev, [key]: null };
       if (user?.username) {
-        console.log("  - Calling updateCaughtData with null");
         updateCaughtData(user.username, key, null); // persist delete
       }
       return updated;
@@ -1115,11 +1112,8 @@ function CloseSidebarOnRouteChange() {
       delete cleanedInfo.checks;
     }
 
-    console.log("  - cleanedInfo:", cleanedInfo);
-
     const updated = { ...prev, [key]: cleanedInfo };
     if (user?.username) {
-      console.log("  - Calling updateCaughtData with:", cleanedInfo);
       updateCaughtData(user.username, key, cleanedInfo); // persist update
     }
     return updated;

@@ -21,8 +21,8 @@ export default function CustomScrollbar() {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
       const totalHeight = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
       const clientHeight = document.documentElement.clientHeight || window.innerHeight || 0;
-      
-      
+
+
       setScrollPosition(scrollTop);
       setScrollHeight(totalHeight);
       setViewportHeight(clientHeight);
@@ -88,7 +88,7 @@ export default function CustomScrollbar() {
       const trackHeight = viewportHeight - thumbHeight - 16;
       const scrollRatio = deltaY / trackHeight;
       const newScrollPosition = Math.max(0, Math.min(scrollableHeight, dragStartScroll + (scrollRatio * scrollableHeight)));
-      
+
       window.scrollTo(0, newScrollPosition);
     };
 
@@ -108,7 +108,7 @@ export default function CustomScrollbar() {
   // Handle main app loading state changes for CSS control
   useEffect(() => {
     const userLoading = userContext?.loading || false;
-    
+
     if (userLoading) {
       document.body.classList.add('scrollbar-loading');
     } else {
@@ -121,33 +121,40 @@ export default function CustomScrollbar() {
     };
   }, [userContext?.loading]);
 
-  // Update scrollbar when component re-renders (page changes)
+  // Update scrollbar periodically to catch any missed content changes
+  // This is a safety net for cases where ResizeObserver might not fire
   useEffect(() => {
     if (window.innerWidth < 769) return;
-    
+
     const updateScrollbar = () => {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
       const totalHeight = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
       const clientHeight = document.documentElement.clientHeight || window.innerHeight || 0;
-      
-      setScrollPosition(scrollTop);
-      setScrollHeight(totalHeight);
-      setViewportHeight(clientHeight);
+
+      // Only update if values have actually changed to avoid unnecessary re-renders
+      setScrollPosition(prev => prev !== scrollTop ? scrollTop : prev);
+      setScrollHeight(prev => prev !== totalHeight ? totalHeight : prev);
+      setViewportHeight(prev => prev !== clientHeight ? clientHeight : prev);
     };
 
-    // Update immediately when component re-renders
-    updateScrollbar();
+    // Use requestAnimationFrame to ensure DOM is ready
+    const rafId = requestAnimationFrame(() => {
+      updateScrollbar();
+    });
     
-    // Also update after a short delay to catch any delayed content changes
+    // Also update after a delay to catch delayed content changes
     const timeoutId = setTimeout(updateScrollbar, 100);
-    
-    return () => clearTimeout(timeoutId);
-  }, [scrollHeight, viewportHeight]); // Re-run when these values change
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timeoutId);
+    };
+  }); // Run on mount and when component re-renders (no dependencies to avoid circular updates)
 
   // Toggle no-scrollbar class based on whether scrolling is needed
   useEffect(() => {
     const needsScrolling = scrollHeight > viewportHeight;
-    
+
     if (needsScrolling) {
       document.body.classList.remove('no-scrollbar');
     } else {
@@ -167,24 +174,24 @@ export default function CustomScrollbar() {
 
   // Only hide during main app loading, not component-specific loading
   const userLoading = userContext?.loading || false;
-  
+
   // Debug logging to see what's causing the scrollbar to be hidden
   if (userLoading) {
-    console.log('Scrollbar hidden due to main app loading:', { 
+    console.log('Scrollbar hidden due to main app loading:', {
       userLoading,
       userContext: userContext?.loading
     });
   }
-  
+
   if (userLoading) {
     return null;
   }
 
   // Don't show scrollbar if content doesn't require scrolling
   const needsScrolling = scrollHeight > viewportHeight;
-  
+
   return (
-    <div 
+    <div
       ref={thumbRef}
       className="custom-scrollbar-thumb"
       style={{

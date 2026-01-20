@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import DexView from "../components/Dex/DexView";
 import Sidebar from "../components/Dex/PokemonSidebar";
 import pokemonData from "../data/pokemon.json";
-import formsData from "../data/forms.json";
+import formsData from "../utils/loadFormsData";
 import { getCaughtKey, migrateOldCaughtData } from "../caughtStorage";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { useLoading } from "../components/Shared/LoadingContext";

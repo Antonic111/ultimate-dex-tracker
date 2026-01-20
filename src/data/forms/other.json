@@ -1,0 +1,1587 @@
+[
+      {
+        "id": 25,
+        "name": "pikachu-partner-cap",
+        "formType": "other",
+        "stableId": "pikachu-partner-cap-0025",
+        "types": [
+          "electric"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/partner-cap-pikachu.png",
+          "front_shiny": "/Sprites/partner-cap-pikachu-shiny.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 129,
+        "name": "magikarp-level-100-male",
+        "formType": "other",
+        "stableId": "magikarp-level-100-male-0129",
+        "types": [
+          "water"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/129.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/129.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 130,
+              "name": "gyarados",
+              "how": "Level Up to 20"
+            }
+          ]
+        }
+      },
+      {
+        "id": 129,
+        "name": "magikarp-level-100-female",
+        "formType": "other",
+        "stableId": "magikarp-level-100-female-0129",
+        "types": [
+          "water"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/129.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/129.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 130,
+              "name": "gyarados",
+              "how": "Level Up to 20"
+            }
+          ]
+        }
+      },
+      {
+        "id": 386,
+        "name": "deoxys-attack",
+        "formType": "other",
+        "stableId": "deoxys-attack-0386",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10001.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/386-attack.png"
+        },
+        "gen": 3,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 386,
+        "name": "deoxys-defense",
+        "formType": "other",
+        "stableId": "deoxys-defense-0386",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10002.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/386-defense.png"
+        },
+        "gen": 3,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 386,
+        "name": "deoxys-speed",
+        "formType": "other",
+        "stableId": "deoxys-speed-0386",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10003.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/386-speed.png"
+        },
+        "gen": 3,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 412,
+        "name": "burmy-sandy",
+        "formType": "other",
+        "stableId": "burmy-sandy-0412",
+        "types": [
+          "bug"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/412-sandy.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-sandy.png"
+        },
+        "gen": 4,
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 413,
+              "name": "wormadam-sandy",
+              "how": "Level Up to 20 (Female)"
+            },
+            {
+              "id": 414,
+              "name": "mothim",
+              "how": "Level Up to 20 (Male)"
+            }
+          ]
+        }
+      },
+      {
+        "id": 412,
+        "name": "burmy-trash",
+        "formType": "other",
+        "stableId": "burmy-trash-0412",
+        "types": [
+          "bug"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/412-trash.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-trash.png"
+        },
+        "gen": 4,
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 413,
+              "name": "wormadam-trash",
+              "how": "Level Up to 20 (Female)"
+            },
+            {
+              "id": 414,
+              "name": "mothim",
+              "how": "Level Up to 20 (Male)"
+            }
+          ]
+        }
+      },
+      {
+        "id": 413,
+        "name": "wormadam-sandy",
+        "formType": "other",
+        "stableId": "wormadam-sandy-0413",
+        "types": [
+          "bug",
+          "ground"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10004.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/413-sandy.png"
+        },
+        "gen": 4,
+        "evolution": {
+          "pre": {
+            "id": 412,
+            "name": "burmy-sandy",
+            "how": "Level Up to 20"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 413,
+        "name": "wormadam-trash",
+        "formType": "other",
+        "stableId": "wormadam-trash-0413",
+        "types": [
+          "bug",
+          "steel"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10005.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/413-trash.png"
+        },
+        "gen": 4,
+        "evolution": {
+          "pre": {
+            "id": 412,
+            "name": "burmy-trash",
+            "how": "Level Up to 20"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 422,
+        "name": "shellos-east",
+        "formType": "other",
+        "stableId": "shellos-east-0422",
+        "types": [
+          "water"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/422.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/422.png"
+        },
+        "gen": 4,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 423,
+        "name": "gastrodon-east",
+        "formType": "other",
+        "stableId": "gastrodon-east-0423",
+        "types": [
+          "water",
+          "ground"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/423.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/423.png"
+        },
+        "gen": 4,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 479,
+        "name": "rotom-heat",
+        "formType": "other",
+        "stableId": "rotom-heat-0479",
+        "types": [
+          "electric",
+          "fire"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10008.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-heat.png"
+        },
+        "gen": 4,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 479,
+        "name": "rotom-wash",
+        "formType": "other",
+        "stableId": "rotom-wash-0479",
+        "types": [
+          "electric",
+          "water"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10009.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-wash.png"
+        },
+        "gen": 4,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 479,
+        "name": "rotom-frost",
+        "formType": "other",
+        "stableId": "rotom-frost-0479",
+        "types": [
+          "electric",
+          "ice"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10010.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-frost.png"
+        },
+        "gen": 4,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 479,
+        "name": "rotom-fan",
+        "formType": "other",
+        "stableId": "rotom-fan-0479",
+        "types": [
+          "electric",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10011.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-fan.png"
+        },
+        "gen": 4,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 479,
+        "name": "rotom-mow",
+        "formType": "other",
+        "stableId": "rotom-mow-0479",
+        "types": [
+          "electric",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10012.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-mow.png"
+        },
+        "gen": 4,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 492,
+        "name": "shaymin-sky",
+        "formType": "other",
+        "stableId": "shaymin-sky-0492",
+        "types": [
+          "grass",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10006.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/492-sky.png"
+        },
+        "gen": 4,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 550,
+        "name": "basculin-blue-striped",
+        "formType": "other",
+        "stableId": "basculin-blue-striped-0550",
+        "types": [
+          "water"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10016.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/550-blue-striped.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 550,
+        "name": "basculin-white-striped",
+        "formType": "other",
+        "stableId": "basculin-white-striped-0550",
+        "types": [
+          "water"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10247.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10247.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 902,
+              "name": "basculegion-male",
+              "how": "Use 294 HP in recoil damage without fainting (Male)"
+            },
+            {
+              "id": 902,
+              "name": "basculegion-female",
+              "how": "Use 294 HP in recoil damage without fainting (Female)"
+            }
+          ]
+        }
+      },
+      {
+        "id": 585,
+        "name": "deerling-summer",
+        "formType": "other",
+        "stableId": "deerling-summer-0585",
+        "types": [
+          "normal",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/585-summer.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/585-summer.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 585,
+        "name": "deerling-autumn",
+        "formType": "other",
+        "stableId": "deerling-autumn-0585",
+        "types": [
+          "normal",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/585-autumn.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/585-autumn.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 585,
+        "name": "deerling-winter",
+        "formType": "other",
+        "stableId": "deerling-winter-0585",
+        "types": [
+          "normal",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/585-winter.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/585-winter.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 586,
+        "name": "sawsbuck-summer",
+        "formType": "other",
+        "stableId": "sawsbuck-summer-0586",
+        "types": [
+          "normal",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/586-summer.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/586-summer.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 586,
+        "name": "sawsbuck-autumn",
+        "formType": "other",
+        "stableId": "sawsbuck-autumn-0586",
+        "types": [
+          "normal",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/586-autumn.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/586-autumn.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 586,
+        "name": "sawsbuck-winter",
+        "formType": "other",
+        "stableId": "sawsbuck-winter-0586",
+        "types": [
+          "normal",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/586-winter.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/586-winter.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 641,
+        "name": "tornadus-therian",
+        "formType": "other",
+        "stableId": "tornadus-therian-0641",
+        "types": [
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10019.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/641-therian.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 642,
+        "name": "thundurus-therian",
+        "formType": "other",
+        "stableId": "thundurus-therian-0642",
+        "types": [
+          "electric",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10020.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/642-therian.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 645,
+        "name": "landorus-therian",
+        "formType": "other",
+        "stableId": "landorus-therian-0645",
+        "types": [
+          "ground",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10021.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/645-therian.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 669,
+        "name": "flabebe-yellow",
+        "formType": "other",
+        "stableId": "flabebe-yellow-0669",
+        "types": [
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/flabebe-yellow.png",
+          "front_shiny": "/Sprites/flabebe-yellow-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 669,
+        "name": "flabebe-orange",
+        "formType": "other",
+        "stableId": "flabebe-orange-0669",
+        "types": [
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/flabebe-orange.png",
+          "front_shiny": "/Sprites/flabebe-orange-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 669,
+        "name": "flabebe-blue",
+        "formType": "other",
+        "stableId": "flabebe-blue-0669",
+        "types": [
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/flabebe-blue.png",
+          "front_shiny": "/Sprites/flabebe-blue-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 669,
+        "name": "flabebe-white",
+        "formType": "other",
+        "stableId": "flabebe-white-0669",
+        "types": [
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/flabebe-white.png",
+          "front_shiny": "/Sprites/flabebe-white-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 670,
+        "name": "floette-yellow",
+        "formType": "other",
+        "stableId": "floette-yellow-0670",
+        "types": [
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/floette-yellow.png",
+          "front_shiny": "/Sprites/floette-yellow-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 670,
+        "name": "floette-orange",
+        "formType": "other",
+        "stableId": "floette-orange-0670",
+        "types": [
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/floette-orange.png",
+          "front_shiny": "/Sprites/floette-orange-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 670,
+        "name": "floette-blue",
+        "formType": "other",
+        "stableId": "floette-blue-0670",
+        "types": [
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/floette-blue.png",
+          "front_shiny": "/Sprites/floette-blue-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 670,
+        "name": "floette-white",
+        "formType": "other",
+        "stableId": "floette-white-0670",
+        "types": [
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/floette-white.png",
+          "front_shiny": "/Sprites/floette-white-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 671,
+        "name": "florges-yellow",
+        "formType": "other",
+        "stableId": "florges-yellow-0671",
+        "types": [
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/florges-yellow.png",
+          "front_shiny": "/Sprites/florges-yellow-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 671,
+        "name": "florges-orange",
+        "formType": "other",
+        "stableId": "florges-orange-0671",
+        "types": [
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/florges-orange.png",
+          "front_shiny": "/Sprites/florges-orange-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 671,
+        "name": "florges-blue",
+        "formType": "other",
+        "stableId": "florges-blue-0671",
+        "types": [
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/florges-blue.png",
+          "front_shiny": "/Sprites/florges-blue-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 671,
+        "name": "florges-white",
+        "formType": "other",
+        "stableId": "florges-white-0671",
+        "types": [
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/florges-white.png",
+          "front_shiny": "/Sprites/florges-white-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 676,
+        "name": "furfrou-heart",
+        "formType": "other",
+        "stableId": "furfrou-heart-0676",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/furfrou-heart.png",
+          "front_shiny": "/Sprites/furfrou-heart-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 676,
+        "name": "furfrou-star",
+        "formType": "other",
+        "stableId": "furfrou-star-0676",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/furfrou-star.png",
+          "front_shiny": "/Sprites/furfrou-star-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 676,
+        "name": "furfrou-diamond",
+        "formType": "other",
+        "stableId": "furfrou-diamond-0676",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/furfrou-diamond.png",
+          "front_shiny": "/Sprites/furfrou-diamond-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 676,
+        "name": "furfrou-debutante",
+        "formType": "other",
+        "stableId": "furfrou-debutante-0676",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/furfrou-debutante.png",
+          "front_shiny": "/Sprites/furfrou-debutante-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 676,
+        "name": "furfrou-matron",
+        "formType": "other",
+        "stableId": "furfrou-matron-0676",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/furfrou-matron.png",
+          "front_shiny": "/Sprites/furfrou-matron-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 676,
+        "name": "furfrou-dandy",
+        "formType": "other",
+        "stableId": "furfrou-dandy-0676",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/furfrou-dandy.png",
+          "front_shiny": "/Sprites/furfrou-dandy-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 676,
+        "name": "furfrou-lareine",
+        "formType": "other",
+        "stableId": "furfrou-lareine-0676",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/furfrou-lareine.png",
+          "front_shiny": "/Sprites/furfrou-lareine-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 676,
+        "name": "furfrou-kabuki",
+        "formType": "other",
+        "stableId": "furfrou-kabuki-0676",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/furfrou-kabuki.png",
+          "front_shiny": "/Sprites/furfrou-kabuki-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 676,
+        "name": "furfrou-pharaoh",
+        "formType": "other",
+        "stableId": "furfrou-pharaoh-0676",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/furfrou-pharaoh.png",
+          "front_shiny": "/Sprites/furfrou-pharaoh-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 710,
+        "name": "pumpkaboo-small",
+        "formType": "other",
+        "stableId": "pumpkaboo-small-0710",
+        "types": [
+          "ghost",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/pumpkaboo-small.png",
+          "front_shiny": "/Sprites/pumpkaboo-small-shiny.png"
+        },
+        "sizeScale": 0.85,
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 710,
+        "name": "pumpkaboo-large",
+        "formType": "other",
+        "stableId": "pumpkaboo-large-0710",
+        "types": [
+          "ghost",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/pumpkaboo-large.png",
+          "front_shiny": "/Sprites/pumpkaboo-large-shiny.png"
+        },
+        "sizeScale": 1.15,
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 710,
+        "name": "pumpkaboo-super",
+        "formType": "other",
+        "stableId": "pumpkaboo-super-0710",
+        "types": [
+          "ghost",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/pumpkaboo-super.png",
+          "front_shiny": "/Sprites/pumpkaboo-super-shiny.png"
+        },
+        "sizeScale": 1.5,
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 711,
+        "name": "gourgeist-small",
+        "formType": "other",
+        "stableId": "gourgeist-small-0711",
+        "types": [
+          "ghost",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/gourgeist-small.png",
+          "front_shiny": "/Sprites/gourgeist-small-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 711,
+        "name": "gourgeist-large",
+        "formType": "other",
+        "stableId": "gourgeist-large-0711",
+        "types": [
+          "ghost",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/gourgeist-large.png",
+          "front_shiny": "/Sprites/gourgeist-large-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 711,
+        "name": "gourgeist-super",
+        "formType": "other",
+        "stableId": "gourgeist-super-0711",
+        "types": [
+          "ghost",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/gourgeist-super.png",
+          "front_shiny": "/Sprites/gourgeist-super-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 718,
+        "name": "zygarde-10",
+        "formType": "other",
+        "stableId": "zygarde-10-0718",
+        "types": [
+          "dragon",
+          "ground"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/zygarde-10.png",
+          "front_shiny": "/Sprites/zygarde-10-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 741,
+        "name": "oricorio-pom-pom",
+        "formType": "other",
+        "stableId": "oricorio-pom-pom-0741",
+        "types": [
+          "electric",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/oricorio-pom-pom.png",
+          "front_shiny": "/Sprites/oricorio-pom-pom-shiny.png"
+        },
+        "gen": 7,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 741,
+        "name": "oricorio-pau",
+        "formType": "other",
+        "stableId": "oricorio-pau-0741",
+        "types": [
+          "psychic",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/oricorio-pau.png",
+          "front_shiny": "/Sprites/oricorio-pau-shiny.png"
+        },
+        "gen": 7,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 741,
+        "name": "oricorio-sensu",
+        "formType": "other",
+        "stableId": "oricorio-sensu-0741",
+        "types": [
+          "ghost",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/oricorio-sensu.png",
+          "front_shiny": "/Sprites/oricorio-sensu-shiny.png"
+        },
+        "gen": 7,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 745,
+        "name": "lycanroc-midnight",
+        "formType": "other",
+        "stableId": "lycanroc-midnight-0745",
+        "types": [
+          "rock"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/lycanroc-midnight.png",
+          "front_shiny": "/Sprites/lycanroc-midnight-shiny.png"
+        },
+        "gen": 7,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 745,
+        "name": "lycanroc-dusk",
+        "formType": "other",
+        "stableId": "lycanroc-dusk-0745",
+        "types": [
+          "rock"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/lycanroc-dusk.png",
+          "front_shiny": "/Sprites/lycanroc-dusk-shiny.png"
+        },
+        "gen": 7,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 774,
+        "name": "minior-orange-meteor",
+        "formType": "other",
+        "stableId": "minior-orange-meteor-0774",
+        "types": [
+          "rock",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/minior-orange.png",
+          "front_shiny": "/Sprites/minior-orange-shiny.png"
+        },
+        "gen": 7,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 774,
+        "name": "minior-yellow-meteor",
+        "formType": "other",
+        "stableId": "minior-yellow-meteor-0774",
+        "types": [
+          "rock",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/minior-yellow.png",
+          "front_shiny": "/Sprites/minior-yellow-shiny.png"
+        },
+        "gen": 7,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 774,
+        "name": "minior-green-meteor",
+        "formType": "other",
+        "stableId": "minior-green-meteor-0774",
+        "types": [
+          "rock",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/minior-green.png",
+          "front_shiny": "/Sprites/minior-green-shiny.png"
+        },
+        "gen": 7,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 774,
+        "name": "minior-blue-meteor",
+        "formType": "other",
+        "stableId": "minior-blue-meteor-0774",
+        "types": [
+          "rock",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/minior-blue.png",
+          "front_shiny": "/Sprites/minior-blue-shiny.png"
+        },
+        "gen": 7,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 774,
+        "name": "minior-indigo-meteor",
+        "formType": "other",
+        "stableId": "minior-indigo-meteor-0774",
+        "types": [
+          "rock",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/minior-indigo.png",
+          "front_shiny": "/Sprites/minior-indigo-shiny.png"
+        },
+        "gen": 7,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 774,
+        "name": "minior-violet-meteor",
+        "formType": "other",
+        "stableId": "minior-violet-meteor-0774",
+        "types": [
+          "rock",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/minior-violet.png",
+          "front_shiny": "/Sprites/minior-violet-shiny.png"
+        },
+        "gen": 7,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 849,
+        "name": "toxtricity-low-key",
+        "formType": "other",
+        "stableId": "toxtricity-low-key-0849",
+        "types": [
+          "electric",
+          "poison"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/toxtricity-lowkey.png",
+          "front_shiny": "/Sprites/toxtricity-lowkey-shiny.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 854,
+        "name": "sinistea-antique",
+        "formType": "other",
+        "stableId": "sinistea-antique-0854",
+        "types": [
+          "ghost"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/854.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/854.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 855,
+        "name": "polteageist-antique",
+        "formType": "other",
+        "stableId": "polteageist-antique-0855",
+        "types": [
+          "ghost"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/855.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/855.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 892,
+        "name": "urshifu-rapid-strike",
+        "formType": "other",
+        "stableId": "urshifu-rapid-strike-0892",
+        "types": [
+          "fighting",
+          "water"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10191.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10191.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 905,
+        "name": "enamorus-therian",
+        "formType": "other",
+        "stableId": "enamorus-therian-0905",
+        "types": [
+          "fairy",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10249.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10249.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 925,
+        "name": "maushold-family-of-three",
+        "formType": "other",
+        "stableId": "maushold-family-of-three-0925",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/maushold-family-of-three.png",
+          "front_shiny": "/Sprites/maushold-family-of-three-shiny.png"
+        },
+        "gen": 9,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 931,
+        "name": "squawkabilly-blue",
+        "formType": "other",
+        "stableId": "squawkabilly-blue-0931",
+        "types": [
+          "normal",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/sqwuawkabilly-blue.png",
+          "front_shiny": "/Sprites/sqwuawkabilly-blue-shiny.png"
+        },
+        "gen": 9,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 931,
+        "name": "squawkabilly-yellow",
+        "formType": "other",
+        "stableId": "squawkabilly-yellow-0931",
+        "types": [
+          "normal",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/sqwuawkabilly-yellow.png",
+          "front_shiny": "/Sprites/sqwuawkabilly-yellow-shiny.png"
+        },
+        "gen": 9,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 931,
+        "name": "squawkabilly-white",
+        "formType": "other",
+        "stableId": "squawkabilly-white-0931",
+        "types": [
+          "normal",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/sqwuawkabilly-white.png",
+          "front_shiny": "/Sprites/sqwuawkabilly-white-shiny.png"
+        },
+        "gen": 9,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 978,
+        "name": "tatsugiri-droopy",
+        "formType": "other",
+        "stableId": "tatsugiri-droopy-0978",
+        "types": [
+          "dragon",
+          "water"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/tatsugiri-droopy.png",
+          "front_shiny": "/Sprites/tatsugiri-droopy-shiny.png"
+        },
+        "gen": 9,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 978,
+        "name": "tatsugiri-stretchy",
+        "formType": "other",
+        "stableId": "tatsugiri-stretchy-0978",
+        "types": [
+          "dragon",
+          "water"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/tatsugiri-stretchy.png",
+          "front_shiny": "/Sprites/tatsugiri-stretchy-shiny.png"
+        },
+        "gen": 9,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 982,
+        "name": "dudunsparce-three-segment",
+        "formType": "other",
+        "stableId": "dudunsparce-three-segment-0982",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10255.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10255.png"
+        },
+        "gen": 9,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 1012,
+        "name": "poltchageist-masterpiece",
+        "formType": "other",
+        "stableId": "poltchageist-masterpiece-1012",
+        "types": [
+          "grass",
+          "ghost"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1012.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1012.png"
+        },
+        "gen": 9,
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 1013,
+              "name": "sinistcha-masterpiece",
+              "how": "Use the Masterpiece Teacup on an Artisan Form Poltchageist"
+            }
+          ]
+        }
+      },
+      {
+        "id": 1013,
+        "name": "sinistcha-masterpiece",
+        "formType": "other",
+        "stableId": "sinistcha-masterpiece-1013",
+        "types": [
+          "grass",
+          "ghost"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1013.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1013.png"
+        },
+        "gen": 9,
+        "evolution": {
+          "pre": {
+            "id": 1012,
+            "name": "poltchageist-masterpiece",
+            "how": "Use the Masterpiece Teacup on an Artisan Form Poltchageist"
+          },
+          "next": []
+        }
+      }
+]

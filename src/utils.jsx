@@ -1,5 +1,5 @@
 import { genderForms, specialCases, specialFormLabels } from "./Constants";
-import formsData from './data/forms.json';
+import formsData from './utils/loadFormsData';
 import pokemonData from './data/pokemon.json';
 import { getFilteredFormsData } from './utils/dexPreferences';
 

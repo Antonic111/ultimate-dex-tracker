@@ -12,7 +12,7 @@ import { formatPokemonName, getFormDisplayName } from "../utils";
 import trainerOptions from "../trainers.json";
 import { useNavigate } from "react-router-dom";
 import { useMessage } from "../components/Shared/MessageContext";
-import formsData from "../data/forms.json";
+import formsData from "../utils/loadFormsData";
 import { getCaughtKey } from "../caughtStorage";
 import { useLoading } from "../components/Shared/LoadingContext";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";

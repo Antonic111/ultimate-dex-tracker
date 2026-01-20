@@ -1,0 +1,433 @@
+[
+      {
+        "id": 19,
+        "name": "rattata-alolan",
+        "types": [
+          "dark",
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10091.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10091.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "rattata-alolan-0019",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 20,
+              "name": "raticate-alolan",
+              "how": "Level Up to 20 at night"
+            }
+          ]
+        }
+      },
+      {
+        "id": 20,
+        "name": "raticate-alolan",
+        "types": [
+          "dark",
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10092.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10092.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "raticate-alolan-0020",
+        "evolution": {
+          "pre": {
+            "id": 19,
+            "name": "rattata-alolan",
+            "how": "Level Up to 20 at night"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 26,
+        "name": "raichu-alolan",
+        "types": [
+          "electric",
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10100.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10100.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "raichu-alolan-0026",
+        "evolution": {
+          "pre": {
+            "id": 25,
+            "name": "pikachu",
+            "how": "Use Thunder Stone in Alola"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 27,
+        "name": "sandshrew-alolan",
+        "types": [
+          "ice",
+          "steel"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10101.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10101.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "sandshrew-alolan-0027",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 28,
+              "name": "sandslash-alolan",
+              "how": "Ice Stone"
+            }
+          ]
+        }
+      },
+      {
+        "id": 28,
+        "name": "sandslash-alolan",
+        "types": [
+          "ice",
+          "steel"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10102.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10102.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "sandslash-alolan-0028",
+        "evolution": {
+          "pre": {
+            "id": 27,
+            "name": "sandshrew-alolan",
+            "how": "Ice Stone"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 37,
+        "name": "vulpix-alolan",
+        "types": [
+          "ice"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10103.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10103.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "vulpix-alolan-0037",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 38,
+              "name": "ninetales-alolan",
+              "how": "Ice Stone"
+            }
+          ]
+        }
+      },
+      {
+        "id": 38,
+        "name": "ninetales-alolan",
+        "types": [
+          "ice",
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10104.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10104.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "ninetales-alolan-0038",
+        "evolution": {
+          "pre": {
+            "id": 37,
+            "name": "vulpix-alolan",
+            "how": "Ice Stone"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 50,
+        "name": "diglett-alolan",
+        "types": [
+          "ground",
+          "steel"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10105.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10105.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "diglett-alolan-0050",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 51,
+              "name": "dugtrio-alolan",
+              "how": "Level Up to 26"
+            }
+          ]
+        }
+      },
+      {
+        "id": 51,
+        "name": "dugtrio-alolan",
+        "types": [
+          "ground",
+          "steel"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10106.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10106.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "dugtrio-alolan-0051",
+        "evolution": {
+          "pre": {
+            "id": 50,
+            "name": "diglett-alolan",
+            "how": "Level Up to 26"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 52,
+        "name": "meowth-alolan",
+        "types": [
+          "dark"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10107.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10107.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "meowth-alolan-0052",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 53,
+              "name": "persian-alolan",
+              "how": "Level Up with high friendship"
+            }
+          ]
+        }
+      },
+      {
+        "id": 53,
+        "name": "persian-alolan",
+        "types": [
+          "dark"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10108.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10108.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "persian-alolan-0053",
+        "evolution": {
+          "pre": {
+            "id": 52,
+            "name": "meowth-alolan",
+            "how": "Level Up with high friendship"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 74,
+        "name": "geodude-alolan",
+        "types": [
+          "rock",
+          "electric"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10109.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10109.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "geodude-alolan-0074",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 75,
+              "name": "graveler-alolan",
+              "how": "Level Up to 25"
+            }
+          ]
+        }
+      },
+      {
+        "id": 75,
+        "name": "graveler-alolan",
+        "types": [
+          "rock",
+          "electric"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10110.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10110.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "graveler-alolan-0075",
+        "evolution": {
+          "pre": {
+            "id": 74,
+            "name": "geodude-alolan",
+            "how": "Level Up to 25"
+          },
+          "next": [
+            {
+              "id": 76,
+              "name": "golem-alolan",
+              "how": "Trade"
+            }
+          ]
+        }
+      },
+      {
+        "id": 76,
+        "name": "golem-alolan",
+        "types": [
+          "rock",
+          "electric"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10111.png ",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10111.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "golem-alolan-0076",
+        "evolution": {
+          "pre": {
+            "id": 75,
+            "name": "graveler-alolan",
+            "how": "Trade"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 88,
+        "name": "grimer-alolan",
+        "types": [
+          "poison",
+          "dark"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10112.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10112.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "grimer-alolan-0088",
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 89,
+              "name": "muk-alolan",
+              "how": "Level Up to 38"
+            }
+          ]
+        }
+      },
+      {
+        "id": 89,
+        "name": "muk-alolan",
+        "types": [
+          "poison",
+          "dark"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10113.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10113.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "muk-alolan-0089",
+        "evolution": {
+          "pre": {
+            "id": 88,
+            "name": "grimer-alolan",
+            "how": "Level Up to 38"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 103,
+        "name": "exeggutor-alolan",
+        "types": [
+          "grass",
+          "dragon"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10114.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10114.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "exeggutor-alolan-0103",
+        "evolution": {
+          "pre": {
+            "id": 102,
+            "name": "exeggcute",
+            "how": "Leaf Stone in Alola"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 105,
+        "name": "marowak-alolan",
+        "types": [
+          "fire",
+          "ghost"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10115.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10115.png"
+        },
+        "gen": 7,
+        "formType": "alolan",
+        "stableId": "marowak-alolan-0105",
+        "evolution": {
+          "pre": {
+            "id": 104,
+            "name": "cubone",
+            "how": "Level Up to 28 at night in Alola"
+          },
+          "next": []
+        }
+      }
+]

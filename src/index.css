@@ -12,14 +12,16 @@
   --site-background: linear-gradient(to right, #0a0a0a 0%, #0d0d0d 5%, #0f0f0f 10%, #111 15%, #111 85%, #0f0f0f 90%, #0d0d0d 95%, #0a0a0a 100%);
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--site-background);
   color: var(--text);
   transition: background 0.3s ease, color 0.3s ease;
-  height: auto; /* Allow body to grow with content */
+  height: auto;
+  /* Allow body to grow with content */
   min-height: 100%;
 }
 
@@ -27,7 +29,8 @@ html, body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  height: auto; /* Allow content to grow beyond viewport */
+  height: auto;
+  /* Allow content to grow beyond viewport */
 }
 
 /* Custom placeholder colors for dark theme */

@@ -1,16 +1,17 @@
 // caughtStorage.js
 import { caughtAPI } from './utils/api.js';
 
+/**
+ * Get the storage key for a Pokemon
+ * Uses stableId (never changes, even if name/formType changes)
+ */
 export function getCaughtKey(pokeOrId, fallbackFormType, isShiny = false) {
-  if (typeof pokeOrId === "object") {
-    const name = pokeOrId.name?.toLowerCase();
-    const form = pokeOrId.formType || fallbackFormType;
-    const shinySuffix = isShiny ? "_shiny" : "";
-    return form ? `${name}_${form}${shinySuffix}` : `${name}${shinySuffix}`;
-  } else {
-    const shinySuffix = isShiny ? "_shiny" : "";
-    return String(pokeOrId).toLowerCase() + (fallbackFormType ? `_${fallbackFormType}` : "") + shinySuffix;
+  if (typeof pokeOrId === "object" && pokeOrId?.stableId) {
+    return isShiny ? `${pokeOrId.stableId}_shiny` : pokeOrId.stableId;
   }
+  
+  // If no stableId, return null (shouldn't happen after migration)
+  return null;
 }
 
 // Get the entire caughtMap from the backend
@@ -35,6 +36,7 @@ export async function saveCaughtMap(caughtMap) {
 // Save or update info for one Pokémon
 export async function saveCaughtInfo(poke, info, isShiny = false) {
   const key = getCaughtKey(poke, null, isShiny);
+  if (!key) return;
   const map = await loadCaughtMap();
   map[key] = info;
   await saveCaughtMap(map);
@@ -43,20 +45,37 @@ export async function saveCaughtInfo(poke, info, isShiny = false) {
 // Load one Pokémon's data from the full map
 export async function loadCaughtInfo(poke, isShiny = false) {
   const key = getCaughtKey(poke, null, isShiny);
+  if (!key) return null;
   const map = await loadCaughtMap();
   return map[key] || null;
 }
 
+/**
+ * Get caught info using stableId key
+ * @param {Object} poke - Pokemon object
+ * @param {Object} caughtMap - The caught map from database
+ * @param {boolean} isShiny - Whether to get shiny data
+ * @returns {Object|null} - Caught info or null
+ */
+export function getCaughtInfoWithMigration(poke, caughtMap, isShiny = false) {
+  if (!poke || !caughtMap) return null;
+  
+  const key = getCaughtKey(poke, null, isShiny);
+  if (!key) return null;
+  
+  return caughtMap[key] || null;
+}
+
 // Helper function to get both regular and shiny caught status for a Pokémon
 export function getPokemonCaughtStatus(poke, caughtMap) {
-  const regularKey = getCaughtKey(poke, null, false);
-  const shinyKey = getCaughtKey(poke, null, true);
+  const regularInfo = getCaughtInfoWithMigration(poke, caughtMap, false);
+  const shinyInfo = getCaughtInfoWithMigration(poke, caughtMap, true);
   
   return {
-    regular: !!caughtMap[regularKey],
-    shiny: !!caughtMap[shinyKey],
-    regularInfo: caughtMap[regularKey] || null,
-    shinyInfo: caughtMap[shinyKey] || null
+    regular: !!regularInfo,
+    shiny: !!shinyInfo,
+    regularInfo: regularInfo || null,
+    shinyInfo: shinyInfo || null
   };
 }
 

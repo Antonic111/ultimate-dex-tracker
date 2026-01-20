@@ -59,7 +59,7 @@ import { UserContext } from "../components/Shared/UserContext";
 import { useMessage } from "../components/Shared/MessageContext";
 import { huntAPI, profileAPI } from "../utils/api";
 import pokemonData from "../data/pokemon.json";
-import formsData from "../data/forms.json";
+import formsData from "../utils/loadFormsData";
 import gamePokemonData from "../data/gamePokemon.json";
 import { getAvailableGamesForPokemon } from "../utils/gameMapping";
 import { getFilteredFormsData } from "../utils/dexPreferences";

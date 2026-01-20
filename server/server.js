@@ -1,8 +1,10 @@
 import dotenv from "dotenv";
 
-// Load environment variables from both .env and .env.local
+// Load environment variables from both .env and .env.local (and parent dir)
 dotenv.config();
 dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '../.env' });
+dotenv.config({ path: '../.env.local' });
 
 import express from "express";
 import mongoose from "mongoose";
@@ -32,7 +34,7 @@ app.use((req, res, next) => {
     'http://localhost:5173',
     'http://192.168.2.15:5173'
   ];
-  
+
   // Allow origin if it's in the allowed list
   if (origin && allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
@@ -41,14 +43,14 @@ app.use((req, res, next) => {
     console.log('🚫 CORS Blocked Origin:', origin);
     console.log('✅ Allowed Origins:', allowedOrigins);
   }
-  
+
   // Enhanced CORS headers for mobile compatibility
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control, Pragma');
   res.header('Access-Control-Expose-Headers', 'Set-Cookie');
   res.header('Access-Control-Max-Age', '86400'); // 24 hours
-  
+
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -89,7 +91,7 @@ app.get("/api/cors-test", (req, res) => {
 app.get("/api/iphone-test", (req, res) => {
   const isIOS = req.headers['user-agent'] && /iPhone|iPad|iPod/i.test(req.headers['user-agent']);
   const isMobile = req.headers['user-agent'] && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(req.headers['user-agent']);
-  
+
   // Set a test cookie
   res.cookie('iphone-test-cookie', 'test-value', {
     httpOnly: true,
@@ -98,9 +100,9 @@ app.get("/api/iphone-test", (req, res) => {
     maxAge: 1000 * 60 * 5, // 5 minutes
     path: "/",
   });
-  
-  res.json({ 
-    message: "iPhone test successful", 
+
+  res.json({
+    message: "iPhone test successful",
     timestamp: new Date().toISOString(),
     isIOS,
     isMobile,

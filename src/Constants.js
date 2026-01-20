@@ -588,6 +588,12 @@ export const specialFormLabels = {
   "toxtricity-alpha": "Alpha Amped Form",
   "squawkabilly-green-plumage-alpha": "Alpha Green Plumage",
   "tatsugiri-curly-alpha": "Alpha Curly Form",
+  "slowpoke-galarian-alphaother": "Alpha Galarian Form",
+  "slowbro-galarian-alphaother": "Alpha Galarian Form",
+  "slowking-galarian-alphaother": "Alpha Galarian Form",
+  "raichu-alolan-alphaother": "Alpha Alolan Form",
+  "stunfisk-galarian-alphaother": "Alpha Galarian Form",
+  "qwilfish-alphaother": "Alpha Pokémon",
 };
 
 
@@ -835,4 +841,10 @@ export const specialCases = {
   "flabebe-white-alphaother": "Flabébé",
   "squawkabilly-green-plumage-alpha": "Squawkabilly",
   "tatsugiri-curly-alpha": "Tatsugiri",
+  "slowpoke-galarian-alphaother": "Slowpoke",
+  "slowbro-galarian-alphaother": "Slowbro",
+  "slowking-galarian-alphaother": "Slowking",
+  "raichu-alolan-alphaother": "Raichu",
+  "stunfisk-galarian-alphaother": "Stunfisk",
+  "qwilfish-alphaother": "Qwilfish",
 };

@@ -1,9 +1,11 @@
 /* Essential styles for Ultimate Dex Tracker */
 
 /* Prevent white flash on fast scroll (mobile & desktop) */
-html, body {
+html,
+body {
   background-color: var(--main-bg);
-  overscroll-behavior: none; /* stop edge glow/flash on desktop */
+  overscroll-behavior: none;
+  /* stop edge glow/flash on desktop */
   min-height: 100%;
   /* Prevent horizontal overflow */
   overflow-x: hidden;
@@ -13,7 +15,9 @@ html, body {
 
 /* Allow pull-to-refresh on mobile */
 @media (max-width: 768px) {
-  html, body {
+
+  html,
+  body {
     overscroll-behavior: auto;
   }
 }
@@ -45,46 +49,47 @@ html, body {
 
 /* Mobile Header Styles */
 @media (max-width: 768px) {
+
   /* Increase header height and padding on mobile */
   header {
     height: 80px !important;
     max-height: 80px !important;
     padding-bottom: 42px !important;
   }
-  
+
   /* Make header container more flexible */
-  header > div {
+  header>div {
     height: 80px !important;
     max-height: 80px !important;
     padding-left: 0.5rem !important;
     padding-right: 0.5rem !important;
   }
-  
+
   /* Scale up logo on mobile */
   header img {
     height: 65px !important;
     max-width: 200px !important;
   }
-  
+
   /* Make navigation more compact but readable */
   header nav {
     gap: 0.375rem !important;
     margin-left: 0.75rem !important;
     margin-right: 0.75rem !important;
   }
-  
+
   /* Scale down navigation buttons but keep them readable */
   header nav a {
     padding: 0.25rem 0.5rem !important;
     font-size: 0.7rem !important;
   }
-  
+
   /* Scale down navigation icons */
   header nav svg {
     width: 8px !important;
     height: 8px !important;
   }
-  
+
   /* Override global SVG rules for dropdown icons */
   .admin-icon,
   .logout-icon {
@@ -94,7 +99,7 @@ html, body {
     transition: none !important;
     animation: none !important;
   }
-  
+
   /* Prevent any global animations from affecting dropdown icons */
   .admin-icon *,
   .logout-icon * {
@@ -102,7 +107,7 @@ html, body {
     transition: none !important;
     animation: none !important;
   }
-  
+
   /* Aggressive override for any hover states */
   .admin-icon:hover,
   .logout-icon:hover,
@@ -114,35 +119,35 @@ html, body {
     transition: none !important;
     animation: none !important;
   }
-  
+
   /* Make user section more compact */
   header .ml-auto {
     margin-left: 0 !important;
   }
-  
+
   /* Scale down user text but keep readable */
   header .text-\[7px\] {
     font-size: 0.6rem !important;
   }
-  
+
   header .text-\[10px\] {
     font-size: 0.7rem !important;
   }
-  
+
   /* Scale up profile image */
   header img[alt="Profile"] {
     width: 60px !important;
     height: 60px !important;
     transform: translateY(0px) !important;
   }
-  
+
   /* Adjust dropdown positioning */
   header .absolute {
     top: calc(100% + 10px) !important;
     right: 0 !important;
     min-width: 160px !important;
   }
-  
+
   /* Better mobile dropdown styling */
   header .absolute a,
   header .absolute button {
@@ -150,7 +155,7 @@ html, body {
     font-size: 0.9rem !important;
     gap: 0.75rem !important;
   }
-  
+
   /* Better icon spacing in dropdown */
   header .absolute svg {
     width: 18px !important;
@@ -161,80 +166,81 @@ html, body {
 
 /* Extra small mobile styles */
 @media (max-width: 480px) {
+
   /* More compact header but still readable */
   header {
     height: 70px !important;
     max-height: 70px !important;
     padding-bottom: 42px !important;
   }
-  
-  header > div {
+
+  header>div {
     height: 70px !important;
     max-height: 70px !important;
     padding-left: 0.375rem !important;
     padding-right: 0.375rem !important;
   }
-  
+
   /* Smaller logo */
   header img {
     height: 55px !important;
     max-width: 180px !important;
   }
-  
+
   /* Tighter navigation but still usable */
   header nav {
     gap: 0.25rem !important;
     margin-left: 0.5rem !important;
     margin-right: 0.5rem !important;
   }
-  
+
   /* Smaller navigation buttons but readable */
   header nav a {
     padding: 0.125rem 0.375rem !important;
     font-size: 0.65rem !important;
     transform: translateY(-3px) !important;
   }
-  
+
   /* Smaller navigation icons */
   header nav svg {
     width: 6px !important;
     height: 6px !important;
   }
-  
+
   /* Smaller user text but readable */
   header .text-\[7px\] {
     font-size: 0.55rem !important;
   }
-  
+
   header .text-\[10px\] {
     font-size: 0.65rem !important;
   }
-  
+
   /* Larger profile image */
   header img[alt="Profile"] {
     width: 55px !important;
     height: 55px !important;
     transform: translateY(0px) !important;
   }
-  
+
   /* Adjust user section spacing */
   header .flex.items-center.gap-3 {
     gap: 0.5rem !important;
   }
-  
+
   /* Smaller dropdown but usable */
   header .absolute {
     min-width: 150px !important;
     font-size: 0.85rem !important;
   }
-  
+
   header .absolute a,
   header .absolute button {
     padding: 0.625rem 0.875rem !important;
     font-size: 0.85rem !important;
     gap: 0.625rem !important;
   }
-  
+
   /* Better icon spacing in small mobile dropdown */
   header .absolute svg {
     width: 16px !important;
@@ -264,6 +270,7 @@ html, body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -322,12 +329,12 @@ html, body {
     margin: 0;
     padding: 0;
   }
-  
+
   .box {
     margin: 0;
     padding: 0;
   }
-  
+
   .boxes-row {
     margin: 0;
     padding: 0;
@@ -381,27 +388,31 @@ html, body {
   body {
     transition: padding-bottom 0.3s ease-out;
   }
-  
+
   /* Ensure inputs are easily tappable on mobile */
-  input, textarea, select {
-    font-size: 16px; /* Prevents iOS zoom on focus */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+    /* Prevents iOS zoom on focus */
     -webkit-appearance: none;
     border-radius: 0;
   }
-  
+
   /* Improve touch targets */
-  button, [role="button"] {
+  button,
+  [role="button"] {
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   /* Prevent scrolling when sidebar is open on mobile */
   body.sidebar-open {
     /* Only prevent scrolling of the main page, not the sidebar */
     overflow: hidden !important;
     /* Don't use touch-action: none as it's too aggressive */
   }
-  
+
   /* Smooth scrolling for keyboard adjustments */
   html {
     scroll-behavior: smooth;
@@ -410,25 +421,32 @@ html, body {
 
 /* Custom scrollbar system for desktop only */
 @media (min-width: 769px) {
+
   /* Hide default scrollbars on desktop */
   html {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
   }
-  
+
   html::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
+    /* Chrome, Safari, Opera */
   }
-  
+
   body {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
   }
-  
+
   body::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
+    /* Chrome, Safari, Opera */
   }
-  
+
   /* Custom scrollbar track (theme-aware) */
   body::after {
     content: '';
@@ -455,7 +473,7 @@ html, body {
     opacity: 0;
     visibility: hidden;
   }
-  
+
   /* Scrollbar background - always visible (theme-aware) */
   body::before {
     content: '';
@@ -481,7 +499,7 @@ html, body {
     opacity: 0;
     visibility: hidden;
   }
-  
+
   /* Custom scrollbar thumb - will be positioned by JavaScript (theme-aware) */
   .custom-scrollbar-thumb {
     position: fixed;
@@ -497,18 +515,18 @@ html, body {
     transition: opacity 0.15s ease, transform 0.1s ease, visibility 0.15s ease;
     user-select: none;
   }
-  
+
   /* Show scrollbar thumb on hover */
   body:hover .custom-scrollbar-thumb {
     opacity: 1;
   }
-  
+
   /* Hover effect on thumb */
   .custom-scrollbar-thumb:hover {
     opacity: 1;
     transform: scaleX(1.2);
   }
-  
+
   /* Active/dragging state */
   .custom-scrollbar-thumb:active {
     opacity: 1;
@@ -528,4 +546,3 @@ html, body {
   transform: scale(1.05);
   z-index: 50;
 }
-

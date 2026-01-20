@@ -1,5 +1,23 @@
 [
   {
+    "date": "2026-01-16",
+    "version": "v1.0.6",
+    "type": "fix",
+    "title": "Alpha Regional Forms added & Removed Kantonian Electrode",
+    "description": "",
+    "features": [
+      "Alpha Alolan Raichu added.",
+      "Galarian Alpha Slowpoke line added.",
+      "Galarian Alpha Stunfisk added.",
+      "Alpha Johto Qwilfish added."
+    ],
+    "fixes": [
+      "Alpha Kantonian Electrode removed from Alpha Genders & Other's category",
+      "Fixed scrollbar not appearing in certain situations",
+      "Unique IDs added to all Pokemon, Forms, and other data for future proofing, performance and stability"
+    ]
+  },
+  {
     "date": "2026-01-02",
     "version": "v1.0.5",
     "type": "feature",
@@ -19,7 +37,6 @@
       "Changed wording for some tags in the sidebar such as Male now says Male Form and Female now says Female Form",
       "Alpha Others category now organized by dex number instead of Hisui dex order",
       "Sidebar icons replaced with actual SVG icons instead of basic emojis",
-
       "Many performance improvements and code cleanup"
     ]
   },
@@ -48,12 +65,12 @@
     "title": "Legends Z-A Mobile Fixes Admin Panels & Many Other Fixes",
     "description": "",
     "features": [
-        "Mobile header now uses a mobile hamburger menu instead of tabs",
-        "Changelog page added (This page) here you can see updates like you are reading and also submit bug reports or feature requests below",
-        "Admins and admin panel added (Only accessible to admins)",
-        "Legends Z-A game added as a new game option when adding information to a pokemon (ZA Alpha Pokemon coming soon)",
-        "Legends Z-A added as a game option with odds calculation when tracking a hunt"
-      ],
+      "Mobile header now uses a mobile hamburger menu instead of tabs",
+      "Changelog page added (This page) here you can see updates like you are reading and also submit bug reports or feature requests below",
+      "Admins and admin panel added (Only accessible to admins)",
+      "Legends Z-A game added as a new game option when adding information to a pokemon (ZA Alpha Pokemon coming soon)",
+      "Legends Z-A added as a game option with odds calculation when tracking a hunt"
+    ],
     "fixes": [
       "Fixed profile dropdown visibility and scroll issue on mobile",
       "Fixed mobile layout issues related to the search bar on Changelog and Trainers pages"

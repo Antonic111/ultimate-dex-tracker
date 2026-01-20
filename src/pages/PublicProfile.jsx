@@ -4,7 +4,7 @@ import "../css/Profile.css";
 import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles, Crown } from "lucide-react";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import pokemonData from "../data/pokemon.json";
-import formsData from "../data/forms.json";
+import formsData from "../utils/loadFormsData";
 import { formatPokemonName } from "../utils";
 import { getCaughtKey } from "../caughtStorage";
 import { COUNTRY_OPTIONS } from "../data/countries";

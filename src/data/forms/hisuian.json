@@ -1,0 +1,386 @@
+[
+      {
+        "id": 58,
+        "name": "growlithe-hisui",
+        "formType": "hisuian",
+        "stableId": "growlithe-hisui-0058",
+        "types": [
+          "fire",
+          "rock"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10229.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10229.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 59,
+              "name": "arcanine-hisui",
+              "how": "Use Fire Stone"
+            }
+          ]
+        }
+      },
+      {
+        "id": 59,
+        "name": "arcanine-hisui",
+        "formType": "hisuian",
+        "stableId": "arcanine-hisui-0059",
+        "types": [
+          "fire",
+          "rock"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10230.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10230.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": {
+            "id": 58,
+            "name": "growlithe-hisui",
+            "how": "Use Fire Stone"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 100,
+        "name": "voltorb-hisui",
+        "formType": "hisuian",
+        "stableId": "voltorb-hisui-0100",
+        "types": [
+          "electric",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10231.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10231.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 101,
+              "name": "electrode-hisui",
+              "how": "Use Leaf Stone"
+            }
+          ]
+        }
+      },
+      {
+        "id": 101,
+        "name": "electrode-hisui",
+        "formType": "hisuian",
+        "stableId": "electrode-hisui-0101",
+        "types": [
+          "electric",
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10232.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10232.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": {
+            "id": 100,
+            "name": "voltorb-hisui",
+            "how": "Use Leaf Stone"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 157,
+        "name": "typhlosion-hisui",
+        "formType": "hisuian",
+        "stableId": "typhlosion-hisui-0157",
+        "types": [
+          "fire",
+          "ghost"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10233.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10233.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": {
+            "id": 155,
+            "name": "quilava",
+            "how": "Level Up to 14"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 211,
+        "name": "qwilfish-hisui",
+        "formType": "hisuian",
+        "stableId": "qwilfish-hisui-0211",
+        "types": [
+          "dark",
+          "poison"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10234.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10234.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 904,
+              "name": "overqwil",
+              "how": "strong style move"
+            }
+          ]
+        }
+      },
+      {
+        "id": 215,
+        "name": "sneasel-hisui",
+        "formType": "hisuian",
+        "stableId": "sneasel-hisui-0215",
+        "types": [
+          "fighting",
+          "poison"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10235.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10235.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 903,
+              "name": "sneasler",
+              "how": "Use the Razer Claw item on Sneasel"
+            }
+          ]
+        }
+      },
+      {
+        "id": 503,
+        "name": "samurott-hisui",
+        "formType": "hisuian",
+        "stableId": "samurott-hisui-0503",
+        "types": [
+          "water",
+          "dark"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10236.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10236.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": {
+            "id": 502,
+            "name": "dewott",
+            "how": "Level Up to 36"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 549,
+        "name": "lilligant-hisui",
+        "formType": "hisuian",
+        "stableId": "lilligant-hisui-0549",
+        "types": [
+          "grass",
+          "fighting"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10237.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10237.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": {
+            "id": 548,
+            "name": "petilil",
+            "how": "sun stone"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 570,
+        "name": "zorua-hisui",
+        "formType": "hisuian",
+        "stableId": "zorua-hisui-0570",
+        "types": [
+          "normal",
+          "ghost"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10238.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10238.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 571,
+              "name": "zoroark-hisui",
+              "how": "Level 30"
+            }
+          ]
+        }
+      },
+      {
+        "id": 571,
+        "name": "zoroark-hisui",
+        "formType": "hisuian",
+        "stableId": "zoroark-hisui-0571",
+        "types": [
+          "normal",
+          "ghost"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10239.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10239.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": {
+            "id": 570,
+            "name": "zorua-hisui",
+            "how": "Level 30"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 628,
+        "name": "braviary-hisui",
+        "formType": "hisuian",
+        "stableId": "braviary-hisui-0628",
+        "types": [
+          "psychic",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10240.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10240.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": {
+            "id": 627,
+            "name": "rufflet",
+            "how": "Level Up to 54"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 705,
+        "name": "sliggoo-hisui",
+        "formType": "hisuian",
+        "stableId": "sliggoo-hisui-0705",
+        "types": [
+          "steel",
+          "dragon"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10241.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10241.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": {
+            "id": 704,
+            "name": "goomy",
+            "how": "Level Up to 40"
+          },
+          "next": [
+            {
+              "id": 706,
+              "name": "goodra-hisui",
+              "how": "Level Up to 40"
+            }
+          ]
+        }
+      },
+      {
+        "id": 706,
+        "name": "goodra-hisui",
+        "formType": "hisuian",
+        "stableId": "goodra-hisui-0706",
+        "types": [
+          "steel",
+          "dragon"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10242.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10242.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": {
+            "id": 705,
+            "name": "sliggoo-hisui",
+            "how": "Level Up to 40"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 713,
+        "name": "avalugg-hisui",
+        "formType": "hisuian",
+        "stableId": "avalugg-hisui-0713",
+        "types": [
+          "ice",
+          "rock"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10243.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10243.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": {
+            "id": 712,
+            "name": "bergmite",
+            "how": "Level Up to 37"
+          },
+          "next": []
+        }
+      },
+      {
+        "id": 724,
+        "name": "decidueye-hisui",
+        "formType": "hisuian",
+        "stableId": "decidueye-hisui-0724",
+        "types": [
+          "grass",
+          "fighting"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10244.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10244.png"
+        },
+        "gen": 7,
+        "evolution": {
+          "pre": {
+            "id": 723,
+            "name": "dartrix",
+            "how": "Level Up to 17"
+          },
+          "next": []
+        }
+      }
+]

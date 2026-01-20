@@ -1,0 +1,363 @@
+[
+    {
+        "id": 666,
+        "name": "vivillon-archipelago",
+        "formType": "vivillon",
+        "stableId": "vivillon-archipelago-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-archipelago.png",
+          "front_shiny": "/Sprites/vivillon-archipelago-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-continental",
+        "formType": "vivillon",
+        "stableId": "vivillon-continental-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-continental.png",
+          "front_shiny": "/Sprites/vivillon-continental-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-elegant",
+        "formType": "vivillon",
+        "stableId": "vivillon-elegant-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-elegant.png",
+          "front_shiny": "/Sprites/vivillon-elegant-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-garden",
+        "formType": "vivillon",
+        "stableId": "vivillon-garden-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-garden.png",
+          "front_shiny": "/Sprites/vivillon-garden-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-high-plains",
+        "formType": "vivillon",
+        "stableId": "vivillon-high-plains-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-high-plains.png",
+          "front_shiny": "/Sprites/vivillon-high-plains-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-icy-snow",
+        "formType": "vivillon",
+        "stableId": "vivillon-icy-snow-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-icy-snow.png",
+          "front_shiny": "/Sprites/vivillon-icy-snow-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-jungle",
+        "formType": "vivillon",
+        "stableId": "vivillon-jungle-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-jungle.png",
+          "front_shiny": "/Sprites/vivillon-jungle-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-marine",
+        "formType": "vivillon",
+        "stableId": "vivillon-marine-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-marine.png",
+          "front_shiny": "/Sprites/vivillon-marine-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-modern",
+        "formType": "vivillon",
+        "stableId": "vivillon-modern-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-modern.png",
+          "front_shiny": "/Sprites/vivillon-modern-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-monsoon",
+        "formType": "vivillon",
+        "stableId": "vivillon-monsoon-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-monsoon.png",
+          "front_shiny": "/Sprites/vivillon-monsoon-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-ocean",
+        "formType": "vivillon",
+        "stableId": "vivillon-ocean-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-ocean.png",
+          "front_shiny": "/Sprites/vivillon-ocean-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-polar",
+        "formType": "vivillon",
+        "stableId": "vivillon-polar-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-polar.png",
+          "front_shiny": "/Sprites/vivillon-polar-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-river",
+        "formType": "vivillon",
+        "stableId": "vivillon-river-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-river.png",
+          "front_shiny": "/Sprites/vivillon-river-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-sandstorm",
+        "formType": "vivillon",
+        "stableId": "vivillon-sandstorm-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-sandstorm.png",
+          "front_shiny": "/Sprites/vivillon-sandstorm-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-savanna",
+        "formType": "vivillon",
+        "stableId": "vivillon-savanna-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-savanna.png",
+          "front_shiny": "/Sprites/vivillon-savanna-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-sun",
+        "formType": "vivillon",
+        "stableId": "vivillon-sun-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-sun.png",
+          "front_shiny": "/Sprites/vivillon-sun-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-tundra",
+        "formType": "vivillon",
+        "stableId": "vivillon-tundra-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-tundra.png",
+          "front_shiny": "/Sprites/vivillon-tundra-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-fancy",
+        "formType": "vivillon",
+        "stableId": "vivillon-fancy-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-fancy.png",
+          "front_shiny": "/Sprites/vivillon-fancy-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 666,
+        "name": "vivillon-pokeball",
+        "formType": "vivillon",
+        "stableId": "vivillon-pokeball-0666",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "/Sprites/vivillon-pokeball.png",
+          "front_shiny": "/Sprites/vivillon-pokeball-shiny.png"
+        },
+        "gen": 6,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      }
+]

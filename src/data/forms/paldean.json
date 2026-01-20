@@ -1,0 +1,83 @@
+[
+    {
+        "id": 128,
+        "name": "tauros-paldea-combat-breed",
+        "formType": "paldean",
+        "stableId": "tauros-paldea-combat-breed-0128",
+        "types": [
+          "fighting"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10250.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10250.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 128,
+        "name": "tauros-paldea-blaze-breed",
+        "formType": "paldean",
+        "stableId": "tauros-paldea-blaze-breed-0128",
+        "types": [
+          "fighting",
+          "fire"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10251.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10251.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 128,
+        "name": "tauros-paldea-aqua-breed",
+        "formType": "paldean",
+        "stableId": "tauros-paldea-aqua-breed-0128",
+        "types": [
+          "fighting",
+          "water"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10252.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10252.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 194,
+        "name": "wooper-paldea",
+        "formType": "paldean",
+        "stableId": "wooper-paldea-0194",
+        "types": [
+          "poison",
+          "ground"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10253.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10253.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": [
+            {
+              "id": 980,
+              "name": "clodsire",
+              "how": "Level Up to 20"
+            }
+          ]
+        }
+      }
+    ]

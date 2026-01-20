@@ -7,7 +7,7 @@ import { getCaughtKey } from "../../caughtStorage";
 import { getLevenshteinDistance } from "../../utils";
 import noResultsImg from "../../data/pikachu.png";
 import pokemonData from "../../data/pokemon.json";
-import formsData from "../../data/forms.json";
+import formsData from "../../utils/loadFormsData";
 import { getFilteredFormsData } from "../../utils/dexPreferences";
 import "../../css/PublicDex.css";
 

@@ -1,0 +1,614 @@
+[
+      {
+        "id": 3,
+        "name": "venusaur-gmax",
+        "formType": "gmax",
+        "stableId": "venusaur-gmax-0003",
+        "types": [
+          "grass",
+          "poison"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10195.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10195.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 6,
+        "name": "charizard-gmax",
+        "formType": "gmax",
+        "stableId": "charizard-gmax-0006",
+        "types": [
+          "fire",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10196.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10196.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 9,
+        "name": "blastoise-gmax",
+        "formType": "gmax",
+        "stableId": "blastoise-gmax-0009",
+        "types": [
+          "water"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10197.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10197.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 12,
+        "name": "butterfree-gmax",
+        "formType": "gmax",
+        "stableId": "butterfree-gmax-0012",
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10198.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10198.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 25,
+        "name": "pikachu-gmax",
+        "formType": "gmax",
+        "stableId": "pikachu-gmax-0025",
+        "types": [
+          "electric"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10199.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10199.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 52,
+        "name": "meowth-gmax",
+        "formType": "gmax",
+        "stableId": "meowth-gmax-0052",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10200.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10200.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 68,
+        "name": "machamp-gmax",
+        "formType": "gmax",
+        "stableId": "machamp-gmax-0068",
+        "types": [
+          "fighting"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10201.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10201.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 94,
+        "name": "gengar-gmax",
+        "formType": "gmax",
+        "stableId": "gengar-gmax-0094",
+        "types": [
+          "ghost",
+          "poison"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10202.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10202.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 99,
+        "name": "kingler-gmax",
+        "formType": "gmax",
+        "stableId": "kingler-gmax-0099",
+        "types": [
+          "water"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10203.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10203.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 131,
+        "name": "lapras-gmax",
+        "formType": "gmax",
+        "stableId": "lapras-gmax-0131",
+        "types": [
+          "water",
+          "ice"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10204.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10204.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 133,
+        "name": "eevee-gmax",
+        "formType": "gmax",
+        "stableId": "eevee-gmax-0133",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10205.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10205.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 143,
+        "name": "snorlax-gmax",
+        "formType": "gmax",
+        "stableId": "snorlax-gmax-0143",
+        "types": [
+          "normal"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10206.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10206.png"
+        },
+        "gen": 1,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 569,
+        "name": "garbodor-gmax",
+        "formType": "gmax",
+        "stableId": "garbodor-gmax-0569",
+        "types": [
+          "poison"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10207.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10207.png"
+        },
+        "gen": 5,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 809,
+        "name": "melmetal-gmax",
+        "formType": "gmax",
+        "stableId": "melmetal-gmax-0809",
+        "types": [
+          "steel"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10208.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10208.png"
+        },
+        "gen": 7,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 812,
+        "name": "rillaboom-gmax",
+        "formType": "gmax",
+        "stableId": "rillaboom-gmax-0812",
+        "types": [
+          "grass"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10209.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10209.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 815,
+        "name": "cinderace-gmax",
+        "formType": "gmax",
+        "stableId": "cinderace-gmax-0815",
+        "types": [
+          "fire"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10210.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10210.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 818,
+        "name": "inteleon-gmax",
+        "formType": "gmax",
+        "stableId": "inteleon-gmax-0818",
+        "types": [
+          "water"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10211.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10211.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 823,
+        "name": "corviknight-gmax",
+        "formType": "gmax",
+        "stableId": "corviknight-gmax-0823",
+        "types": [
+          "flying",
+          "steel"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10212.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10212.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 826,
+        "name": "orbeetle-gmax",
+        "formType": "gmax",
+        "stableId": "orbeetle-gmax-0826",
+        "types": [
+          "bug",
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10213.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10213.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 834,
+        "name": "drednaw-gmax",
+        "formType": "gmax",
+        "stableId": "drednaw-gmax-0834",
+        "types": [
+          "water",
+          "rock"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10214.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10214.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 839,
+        "name": "coalossal-gmax",
+        "formType": "gmax",
+        "stableId": "coalossal-gmax-0839",
+        "types": [
+          "rock",
+          "fire"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10215.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10215.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 841,
+        "name": "flapple-gmax",
+        "formType": "gmax",
+        "stableId": "flapple-gmax-0841",
+        "types": [
+          "grass",
+          "dragon"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10216.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10216.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 842,
+        "name": "appletun-gmax",
+        "formType": "gmax",
+        "stableId": "appletun-gmax-0842",
+        "types": [
+          "grass",
+          "dragon"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10217.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10217.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 844,
+        "name": "sandaconda-gmax",
+        "formType": "gmax",
+        "stableId": "sandaconda-gmax-0844",
+        "types": [
+          "ground"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10218.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10218.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 849,
+        "name": "toxtricity-amped-gmax",
+        "formType": "gmax",
+        "stableId": "toxtricity-amped-gmax-0849",
+        "types": [
+          "electric",
+          "poison"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10219.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10219.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 851,
+        "name": "centiskorch-gmax",
+        "formType": "gmax",
+        "stableId": "centiskorch-gmax-0851",
+        "types": [
+          "fire",
+          "bug"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10220.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10220.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 858,
+        "name": "hatterene-gmax",
+        "formType": "gmax",
+        "stableId": "hatterene-gmax-0858",
+        "types": [
+          "psychic",
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10221.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10221.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 861,
+        "name": "grimmsnarl-gmax",
+        "formType": "gmax",
+        "stableId": "grimmsnarl-gmax-0861",
+        "types": [
+          "dark",
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10222.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10222.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 869,
+        "name": "alcremie-gmax",
+        "formType": "gmax",
+        "stableId": "alcremie-gmax-0869",
+        "types": [
+          "fairy"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10223.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10223.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 879,
+        "name": "copperajah-gmax",
+        "formType": "gmax",
+        "stableId": "copperajah-gmax-0879",
+        "types": [
+          "steel"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10224.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10224.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 884,
+        "name": "duraludon-gmax",
+        "formType": "gmax",
+        "stableId": "duraludon-gmax-0884",
+        "types": [
+          "steel",
+          "dragon"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10225.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10225.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 892,
+        "name": "urshifu-single-strike-gmax",
+        "formType": "gmax",
+        "stableId": "urshifu-single-strike-gmax-0892",
+        "types": [
+          "fighting",
+          "dark"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10226.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10226.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 892,
+        "name": "urshifu-rapid-strike-gmax",
+        "formType": "gmax",
+        "stableId": "urshifu-rapid-strike-gmax-0892",
+        "types": [
+          "fighting",
+          "water"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10227.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10227.png"
+        },
+        "gen": 8,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      }
+]

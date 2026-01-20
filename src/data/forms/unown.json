@@ -1,0 +1,974 @@
+[
+    {
+        "id": 201,
+        "name": "unown-b",
+        "formType": "unown",
+        "stableId": "unown-b-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-b.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-b.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-c",
+        "formType": "unown",
+        "stableId": "unown-c-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-c.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-c.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-d",
+        "formType": "unown",
+        "stableId": "unown-d-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-d.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-d.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-e",
+        "formType": "unown",
+        "stableId": "unown-e-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-e.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-e.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-f",
+        "formType": "unown",
+        "stableId": "unown-f-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-f.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-f.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-g",
+        "formType": "unown",
+        "stableId": "unown-g-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-g.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-g.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-h",
+        "formType": "unown",
+        "stableId": "unown-h-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-h.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-h.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-i",
+        "formType": "unown",
+        "stableId": "unown-i-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-i.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-i.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-j",
+        "formType": "unown",
+        "stableId": "unown-j-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-j.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-j.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-k",
+        "formType": "unown",
+        "stableId": "unown-k-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-k.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-k.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-l",
+        "formType": "unown",
+        "stableId": "unown-l-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-l.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-l.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-m",
+        "formType": "unown",
+        "stableId": "unown-m-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-m.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-m.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-n",
+        "formType": "unown",
+        "stableId": "unown-n-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-n.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-n.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-o",
+        "formType": "unown",
+        "stableId": "unown-o-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-o.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-o.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-p",
+        "formType": "unown",
+        "stableId": "unown-p-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-p.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-p.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-q",
+        "formType": "unown",
+        "stableId": "unown-q-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-q.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-q.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-r",
+        "formType": "unown",
+        "stableId": "unown-r-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-r.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-r.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-s",
+        "formType": "unown",
+        "stableId": "unown-s-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-s.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-s.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-t",
+        "formType": "unown",
+        "stableId": "unown-t-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-t.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-t.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-u",
+        "formType": "unown",
+        "stableId": "unown-u-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-u.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-u.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-v",
+        "formType": "unown",
+        "stableId": "unown-v-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-v.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-v.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-w",
+        "formType": "unown",
+        "stableId": "unown-w-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-w.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-w.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-x",
+        "formType": "unown",
+        "stableId": "unown-x-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-x.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-x.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-y",
+        "formType": "unown",
+        "stableId": "unown-y-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-y.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-y.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-z",
+        "formType": "unown",
+        "stableId": "unown-z-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-z.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-z.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-!",
+        "formType": "unown",
+        "stableId": "unown-!-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-exclamation.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-exclamation.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-?",
+        "formType": "unown",
+        "stableId": "unown-?-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-question.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-question.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-b-alpha",
+        "formType": "unown",
+        "stableId": "unown-b-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-b.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-b.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-c-alpha",
+        "formType": "unown",
+        "stableId": "unown-c-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-c.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-c.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-d-alpha",
+        "formType": "unown",
+        "stableId": "unown-d-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-d.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-d.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-e-alpha",
+        "formType": "unown",
+        "stableId": "unown-e-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-e.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-e.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-f-alpha",
+        "formType": "unown",
+        "stableId": "unown-f-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-f.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-f.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-g-alpha",
+        "formType": "unown",
+        "stableId": "unown-g-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-g.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-g.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-h-alpha",
+        "formType": "unown",
+        "stableId": "unown-h-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-h.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-h.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-i-alpha",
+        "formType": "unown",
+        "stableId": "unown-i-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-i.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-i.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-j-alpha",
+        "formType": "unown",
+        "stableId": "unown-j-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-j.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-j.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-k-alpha",
+        "formType": "unown",
+        "stableId": "unown-k-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-k.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-k.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-l-alpha",
+        "formType": "unown",
+        "stableId": "unown-l-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-l.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-l.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-m-alpha",
+        "formType": "unown",
+        "stableId": "unown-m-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-m.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-m.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-n-alpha",
+        "formType": "unown",
+        "stableId": "unown-n-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-n.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-n.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-o-alpha",
+        "formType": "unown",
+        "stableId": "unown-o-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-o.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-o.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-p-alpha",
+        "formType": "unown",
+        "stableId": "unown-p-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-p.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-p.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-q-alpha",
+        "formType": "unown",
+        "stableId": "unown-q-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-q.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-q.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-r-alpha",
+        "formType": "unown",
+        "stableId": "unown-r-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-r.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-r.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-s-alpha",
+        "formType": "unown",
+        "stableId": "unown-s-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-s.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-s.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-t-alpha",
+        "formType": "unown",
+        "stableId": "unown-t-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-t.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-t.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-u-alpha",
+        "formType": "unown",
+        "stableId": "unown-u-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-u.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-u.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-v-alpha",
+        "formType": "unown",
+        "stableId": "unown-v-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-v.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-v.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-w-alpha",
+        "formType": "unown",
+        "stableId": "unown-w-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-w.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-w.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-x-alpha",
+        "formType": "unown",
+        "stableId": "unown-x-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-x.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-x.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-y-alpha",
+        "formType": "unown",
+        "stableId": "unown-y-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-y.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-y.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-z-alpha",
+        "formType": "unown",
+        "stableId": "unown-z-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-z.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-z.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-!-alpha",
+        "formType": "unown",
+        "stableId": "unown-!-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-exclamation.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-exclamation.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      },
+      {
+        "id": 201,
+        "name": "unown-?-alpha",
+        "formType": "unown",
+        "stableId": "unown-?-alpha-0201",
+        "types": [
+          "psychic"
+        ],
+        "sprites": {
+          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-question.png",
+          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-question.png"
+        },
+        "gen": 2,
+        "evolution": {
+          "pre": null,
+          "next": []
+        }
+      }
+]
