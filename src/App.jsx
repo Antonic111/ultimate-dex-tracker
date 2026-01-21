@@ -57,16 +57,16 @@ const useMobileKeyboardHandler = () => {
   useEffect(() => {
     // Only run on mobile devices
     const isMobile = () => window.innerWidth <= 768;
-    
+
     if (!isMobile()) return;
 
     let initialViewportHeight = window.innerHeight;
     let isSidebarOpen = false;
     let savedScrollY = 0;
-    
+
     const handleResize = () => {
       const newHeight = window.innerHeight;
-      
+
       // If height decreased significantly, keyboard likely appeared
       if (newHeight < initialViewportHeight * 0.8) {
         // Add padding to bottom to account for keyboard
@@ -126,9 +126,9 @@ const useMobileKeyboardHandler = () => {
 // Global Loading Indicator Component
 const GlobalLoadingIndicator = () => {
   const { globalLoading } = useLoading();
-  
+
   if (!globalLoading) return null;
-  
+
   return (
     <div style={{
       position: 'fixed',
@@ -155,20 +155,20 @@ const GlobalLoadingIndicator = () => {
 const LocationListener = ({ onNavigateToHome }) => {
   const location = useLocation();
   const prevLocationRef = useRef(location.pathname);
-  
+
   useEffect(() => {
     const prevPath = prevLocationRef.current;
     const currentPath = location.pathname;
-    
+
     // Only trigger if we're navigating TO the home page (not already on it)
     if (currentPath === '/' && prevPath !== '/') {
       onNavigateToHome();
     }
-    
+
     // Update the previous location
     prevLocationRef.current = currentPath;
   }, [location.pathname, onNavigateToHome]);
-  
+
   return null; // This component doesn't render anything
 };
 
@@ -215,7 +215,7 @@ const getCurrentFilteredFormsData = () => getFilteredFormsData(formsData);
 // Function to create dex sections with current filtered forms data
 const createDexSections = () => {
   const currentFilteredFormsData = getCurrentFilteredFormsData();
-  
+
   return [
     {
       key: "main",
@@ -227,12 +227,12 @@ const createDexSections = () => {
       title: type === "alphaother" ? "Alpha Genders & Other's" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
       getList: () => {
         const filtered = currentFilteredFormsData.filter(p => p.formType === type);
-        
+
         // Special sorting for Alpha Forms - sort by Pokemon number (id)
         if (type === "alpha" || type === "alphaother") {
           return filtered.sort((a, b) => (a.id || 0) - (b.id || 0));
         }
-        
+
         // Default sorting for other form types (by JSON order)
         return filtered;
       }
@@ -257,12 +257,12 @@ function loadDexToggles() {
 
 function hasMeaningfulInfo(info) {
   if (!info) return false;
-  
+
   // Handle new entries format
   if (info.entries && Array.isArray(info.entries)) {
     return info.entries.some(entry => hasMeaningfulInfo(entry));
   }
-  
+
   // Handle old format (direct fields)
   const { date, ball, mark, method, game, checks, notes } = info;
 
@@ -366,11 +366,11 @@ export default function App() {
         // Preserve existing progress bars if the server response doesn't include them
         const existingProgressBars = user.progressBars || [];
         const serverProgressBars = userData.progressBars || [];
-        
-        const finalProgressBars = serverProgressBars.length > 0 
-          ? serverProgressBars 
+
+        const finalProgressBars = serverProgressBars.length > 0
+          ? serverProgressBars
           : existingProgressBars;
-        
+
         setUser({
           ...userData,
           progressBars: finalProgressBars
@@ -378,18 +378,18 @@ export default function App() {
       } else if (authError) {
         // Handle authentication failure
         console.log('Auth check failed:', authError.message);
-        
+
         // For mobile devices, try a more robust fallback approach
         if (isMobile) {
           try {
             let backupData = null;
-            
+
             // Try localStorage first
             const mobileBackup = localStorage.getItem('mobileUserBackup');
             if (mobileBackup) {
               backupData = JSON.parse(mobileBackup);
             }
-            
+
             // iOS fallback: Try sessionStorage if localStorage failed
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             if (!backupData && isIOS) {
@@ -398,15 +398,15 @@ export default function App() {
                 backupData = JSON.parse(iosBackup);
               }
             }
-            
+
             if (backupData) {
               const isRecent = (Date.now() - backupData.timestamp) < (2 * 60 * 60 * 1000); // 2 hours instead of 24
-              
+
               // Only use backup if it has essential fields and is recent
               if (isRecent && backupData.username && backupData.verified !== undefined) {
                 console.log('Using mobile backup data');
                 setUser(backupData);
-                
+
                 // Try to refresh the data in the background
                 setTimeout(async () => {
                   try {
@@ -419,7 +419,7 @@ export default function App() {
                     console.log('Background refresh failed, keeping backup data');
                   }
                 }, 1000);
-                
+
                 return; // Don't clear user data, use backup instead
               }
             }
@@ -427,7 +427,7 @@ export default function App() {
             console.log('Mobile backup failed:', backupError.message);
           }
         }
-        
+
         // Clear user data if no valid backup or not mobile
         setUser(null);
       } else {
@@ -447,18 +447,18 @@ export default function App() {
 
   // Custom setUser function that handles login properly
   const handleUserUpdate = (newUserData) => {
-    
+
     // If this is a login (has username and progressBars), set the flag
     if (newUserData.username && newUserData.progressBars) {
       setJustLoggedIn(true);
     }
-    
+
     setUser(newUserData);
-    
+
     // Mobile fallback: Store user data in localStorage as backup
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    
+
     if (isMobile && newUserData && newUserData.username) {
       try {
         // Ensure we have all essential fields for backup
@@ -472,21 +472,21 @@ export default function App() {
           timestamp: Date.now(),
           isIOS: isIOS
         };
-        
+
         localStorage.setItem('mobileUserBackup', JSON.stringify(backupData));
-        
+
         // iOS-specific: Also store in sessionStorage as additional fallback
         if (isIOS) {
           sessionStorage.setItem('iosUserBackup', JSON.stringify(backupData));
         }
-        
+
         console.log('Mobile backup data stored successfully');
-        
+
       } catch (error) {
         console.log('Mobile backup storage failed:', error.message);
       }
     }
-    
+
     // Clear the flag after a short delay
     if (newUserData.username && newUserData.progressBars) {
       setTimeout(() => {
@@ -500,11 +500,11 @@ export default function App() {
   useEffect(() => {
     setAuthReady(false);
     setAuthTimeout(false);
-    
+
     // Detect if this is a bot/crawler (Google AdSense, Googlebot, etc.)
     const userAgent = navigator.userAgent.toLowerCase();
     const isBot = /googlebot|adsbot|mediapartners|adsense|bingbot|slurp|duckduckbot|baiduspider|yandexbot|sogou|exabot|facebot|ia_archiver/i.test(userAgent);
-    
+
     // For bots/crawlers, set a short timeout to show content quickly
     if (isBot) {
       // Show content after 500ms for bots (they won't wait long)
@@ -513,7 +513,7 @@ export default function App() {
         setAuthReady(true);
         setLoading(false);
       }, 500);
-      
+
       // Still try to check auth, but don't wait for it
       checkAuth(false).finally(() => {
         clearTimeout(botTimeout);
@@ -526,7 +526,7 @@ export default function App() {
         setAuthReady(true);
         setLoading(false);
       }, 3000); // 3 second timeout for regular users
-      
+
       checkAuth(false).finally(() => {
         clearTimeout(userTimeout);
         setAuthTimeout(false);
@@ -536,27 +536,27 @@ export default function App() {
 
 
 
-useEffect(() => {
-  // close sidebar on login/logout
-  setSidebarOpen(false);
-  setSelectedPokemon(null);
-}, [user?.username]);
+  useEffect(() => {
+    // close sidebar on login/logout
+    setSidebarOpen(false);
+    setSelectedPokemon(null);
+  }, [user?.username]);
 
-useEffect(() => {
-  const onPageShow = (e) => {
-    // Skip auth refresh if user just logged in or if we have valid user data
-    if (justLoggedIn) {
-      return;
-    }
-    
-    // Only refresh auth if the page was restored from cache AND we don't have valid user data
-    if ((e.persisted || document.wasDiscarded) && (!user?.username || !user?.verified)) {
-      checkAuth(true); // silent refresh: does NOT set loading/authReady
-    }
-  };
-  window.addEventListener("pageshow", onPageShow);
-  return () => window.removeEventListener("pageshow", onPageShow);
-}, [user?.username, user?.verified, justLoggedIn]);
+  useEffect(() => {
+    const onPageShow = (e) => {
+      // Skip auth refresh if user just logged in or if we have valid user data
+      if (justLoggedIn) {
+        return;
+      }
+
+      // Only refresh auth if the page was restored from cache AND we don't have valid user data
+      if ((e.persisted || document.wasDiscarded) && (!user?.username || !user?.verified)) {
+        checkAuth(true); // silent refresh: does NOT set loading/authReady
+      }
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, [user?.username, user?.verified, justLoggedIn]);
 
 
   const [caught, setCaught] = useState({});
@@ -564,17 +564,18 @@ useEffect(() => {
   const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [toggles, setToggles] = useState(() => loadDexToggles());
   const [externalLinkPreference, setExternalLinkPreference] = useState('serebii');
-  
+
   // Reset modal state for grid clicks and bulk operations
-  const [resetModal, setResetModal] = useState({ 
-    show: false, 
-    pokemon: null, 
-    pokemonName: '', 
-    isShiny: false, 
-    isBulkReset: false, 
-    box: null 
+  const [resetModal, setResetModal] = useState({
+    show: false,
+    pokemon: null,
+    pokemonName: '',
+    isShiny: false,
+    isBulkReset: false,
+    box: null
   });
   const [resetModalClosing, setResetModalClosing] = useState(false);
+  const [resetModalReady, setResetModalReady] = useState(false); // Prevents ghost clicks on modal buttons
   const showShiny = toggles.showShiny;
   const showForms = toggles.showForms;
 
@@ -582,19 +583,19 @@ useEffect(() => {
   const setShowShiny = val => setToggles(prev => {
     const updated = { ...prev, showShiny: val };
     saveDexToggles(updated);
-    
+
     // Dispatch custom event to notify ViewDex component
     window.dispatchEvent(new CustomEvent('dexTogglesChanged', { detail: updated }));
-    
+
     return updated;
   });
   const setShowForms = val => setToggles(prev => {
     const updated = { ...prev, showForms: val };
     saveDexToggles(updated);
-    
+
     // Dispatch event to notify ViewDex component
     window.dispatchEvent(new CustomEvent('dexTogglesChanged', { detail: updated }));
-    
+
     return updated;
   });
 
@@ -635,7 +636,7 @@ useEffect(() => {
     };
 
     window.addEventListener('externalLinkPreferenceChanged', handleExternalLinkPreferenceChange);
-    
+
     return () => {
       window.removeEventListener('externalLinkPreferenceChanged', handleExternalLinkPreferenceChange);
     };
@@ -653,15 +654,15 @@ useEffect(() => {
         }
       }
     };
-    
+
     // Listen for custom events from ViewDex
     const handleToggleChange = (e) => {
       setToggles(prev => ({ ...prev, ...e.detail }));
     };
-    
+
     // Listen for dex preferences refresh event (from logo click)
     const handleRefreshDexPreferences = refreshDexPreferences;
-    
+
     // Listen for dex preferences changes
     const handleDexPreferencesChanged = () => {
       const newPreferences = getDexPreferences();
@@ -672,7 +673,7 @@ useEffect(() => {
     window.addEventListener('dexTogglesChanged', handleToggleChange);
     window.addEventListener('refreshDexPreferences', handleRefreshDexPreferences);
     window.addEventListener('dexPreferencesChanged', handleDexPreferencesChanged);
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('dexTogglesChanged', handleToggleChange);
@@ -700,18 +701,18 @@ useEffect(() => {
       // Check if user needs migration - be more explicit about the check
       let migratedData;
       const needsMigration = user.huntMethodMigrationCompleted === false || user.huntMethodMigrationCompleted === undefined;
-      
+
       // Additional check: prevent migration if already done in this session
       const migrationKey = `migration_completed_${user.username}`;
       const alreadyMigratedThisSession = localStorage.getItem(migrationKey);
-      
+
       console.log(`Migration check for ${user.username}:`, {
         huntMethodMigrationCompleted: user.huntMethodMigrationCompleted,
         migrationVersion: user.migrationVersion,
         needsMigration,
         alreadyMigratedThisSession
       });
-      
+
       if (alreadyMigratedThisSession) {
         console.log(`User ${user.username} already migrated in this session - skipping`);
         migratedData = data || {};
@@ -721,7 +722,7 @@ useEffect(() => {
         localStorage.setItem(migrationKey, 'true');
         // Migrate hunt methods to new system if needed
         migratedData = migrateHuntMethods(data || {});
-        
+
         // Save migrated data back to database if changes were made
         if (migratedData !== data) {
           updateCaughtData(user.username, null, migratedData).then(() => {
@@ -759,7 +760,7 @@ useEffect(() => {
         console.log(`User ${user.username} already migrated (version: ${user.migrationVersion})`);
         migratedData = data || {};
       }
-      
+
       setCaughtInfoMap(migratedData);
       const caughtMap = {};
       for (const key in migratedData) {
@@ -835,7 +836,7 @@ useEffect(() => {
           setCaught(prev => (Object.keys(prev).length ? prev : caughtMap));
         }
       }
-    } catch {}
+    } catch { }
   }, [user?.username]);
 
   // Persist caught info to cache on change
@@ -843,14 +844,14 @@ useEffect(() => {
     if (!user?.username) return;
     try {
       localStorage.setItem(`caughtInfoMap:${user.username}`, JSON.stringify(caughtInfoMap));
-    } catch {}
+    } catch { }
   }, [caughtInfoMap, user?.username]);
 
   // Migration: Convert old caught data to new format when component mounts
   useEffect(() => {
     if (Object.keys(caughtInfoMap).length > 0 && user?.username) {
       const migratedData = migrateOldCaughtData(caughtInfoMap);
-      
+
       if (JSON.stringify(migratedData) !== JSON.stringify(caughtInfoMap)) {
         setCaughtInfoMap(migratedData);
         // Save migrated data to backend
@@ -888,7 +889,7 @@ useEffect(() => {
     const handleCaughtDataChanged = (event) => {
       const { pokemon, caughtInfo, caughtKey } = event.detail;
       console.log('App.jsx - Received caughtDataChanged event:', { pokemon, caughtInfo, caughtKey });
-      
+
       // Update the caughtInfoMap with the new data
       setCaughtInfoMap(prev => {
         const updated = {
@@ -898,7 +899,7 @@ useEffect(() => {
         console.log('App.jsx - Updated caughtInfoMap:', updated);
         return updated;
       });
-      
+
       // Update the caught boolean map
       setCaught(prev => {
         const updated = {
@@ -911,7 +912,7 @@ useEffect(() => {
     };
 
     window.addEventListener('caughtDataChanged', handleCaughtDataChanged);
-    
+
     return () => {
       window.removeEventListener('caughtDataChanged', handleCaughtDataChanged);
     };
@@ -934,12 +935,27 @@ useEffect(() => {
       document.removeEventListener('wheel', preventScroll);
       document.removeEventListener('touchmove', preventScroll);
     }
-    
+
     return () => {
       document.body.style.overflow = '';
       document.removeEventListener('wheel', preventScroll);
       document.removeEventListener('touchmove', preventScroll);
     };
+  }, [resetModal.show]);
+
+  // Delay enabling modal buttons to prevent ghost clicks on mobile
+  // Ghost clicks occur when the browser fires a synthetic click event ~300ms after touchend
+  // If the modal appears quickly and a button is positioned where the finger was, it can be accidentally triggered
+  useEffect(() => {
+    if (resetModal.show) {
+      setResetModalReady(false);
+      const timer = setTimeout(() => {
+        setResetModalReady(true);
+      }, 400); // Wait 400ms before enabling buttons (longer than the ~300ms ghost click delay)
+      return () => clearTimeout(timer);
+    } else {
+      setResetModalReady(false);
+    }
   }, [resetModal.show]);
 
   function filterMons(list, forceShowForms = false, isShiny = false) {
@@ -948,22 +964,22 @@ useEffect(() => {
       if (!forceShowForms && !showForms && poke.formType && poke.formType !== "main" && poke.formType !== "default") {
         return false;
       }
-      
+
       // Mark shiny Pokemon as blocked based on user preferences (but don't filter them out)
       // IMPORTANT: Only apply blocking to shiny Pokemon, never to non-shiny
       if (isShiny && currentDexPreferences) {
         // Check if Pokemon should be blocked by ID
         const isBlockedUnobtainableById = currentDexPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
         const isBlockedGOById = currentDexPreferences.blockGOAndNOOTExclusiveShinies && GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
-        
+
         // Check if Pokemon should be blocked by form name (for forms that share the same ID)
         const pokemonName = poke.name?.toLowerCase() || "";
         const isBlockedUnobtainableByForm = currentDexPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
         const isBlockedGOByForm = currentDexPreferences.blockGOAndNOOTExclusiveShinies && GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
-        
+
         const isBlockedUnobtainable = isBlockedUnobtainableById || isBlockedUnobtainableByForm;
         const isBlockedGO = isBlockedGOById || isBlockedGOByForm;
-        
+
         if (isBlockedUnobtainable || isBlockedGO) {
           // Mark as blocked but don't filter out
           poke._isBlocked = true;
@@ -975,10 +991,10 @@ useEffect(() => {
         // For non-shiny Pokemon, always ensure they are not blocked
         poke._isBlocked = false;
       }
-      
+
       // Get caught info for the appropriate shiny status
       const info = caughtInfoMap[getCaughtKey(poke, null, isShiny)] || {};
-      
+
       // Get the first entry for filtering (or use old structure for backward compatibility)
       const firstEntry = info.entries?.[0] || info;
 
@@ -1037,7 +1053,7 @@ useEffect(() => {
       const caughtKey = getCaughtKey(poke, null, isShiny);
       if (filters.caught === "caught" && !caught[caughtKey]) return false;
       if (filters.caught === "uncaught" && caught[caughtKey]) return false;
-      
+
       // Category filtering
       if (filters.categories && filters.categories.length > 0) {
         const pokemonCategory = getPokemonCategory(poke);
@@ -1065,7 +1081,7 @@ useEffect(() => {
               return false;
           }
         });
-        
+
         if (!matchesAnyCategory) return false;
       }
 
@@ -1073,17 +1089,17 @@ useEffect(() => {
     });
   }
 
-function CloseSidebarOnRouteChange() {
-  const location = useLocation();
-  useEffect(() => {
-    const isDex = location.pathname === "/" || location.pathname.startsWith("/dex");
-    if (!isDex) {
-      setSidebarOpen(false);
-      setSelectedPokemon(null);
-    }
-  }, [location.pathname]);
-  return null;
-}
+  function CloseSidebarOnRouteChange() {
+    const location = useLocation();
+    useEffect(() => {
+      const isDex = location.pathname === "/" || location.pathname.startsWith("/dex");
+      if (!isDex) {
+        setSidebarOpen(false);
+        setSelectedPokemon(null);
+      }
+    }, [location.pathname]);
+    return null;
+  }
 
 
 
@@ -1091,49 +1107,49 @@ function CloseSidebarOnRouteChange() {
     const key = getCaughtKey(poke, null, isShiny);
     if (!key) return;
 
-  setCaughtInfoMap(prev => {
-    // If we're resetting/clearing data
-    if (info == null) {
-      const updated = { ...prev, [key]: null };
+    setCaughtInfoMap(prev => {
+      // If we're resetting/clearing data
+      if (info == null) {
+        const updated = { ...prev, [key]: null };
+        if (user?.username) {
+          updateCaughtData(user.username, key, null); // persist delete
+        }
+        return updated;
+      }
+
+      // Normalize data for backend schema (checks is Number or omitted)
+      const checksStr = info.checks == null ? "" : String(info.checks).trim();
+      const cleanedInfo = { ...info };
+      if (checksStr === "" || checksStr === "0") {
+        delete cleanedInfo.checks;
+      } else if (!Number.isNaN(Number(checksStr))) {
+        cleanedInfo.checks = Number(checksStr);
+      } else {
+        delete cleanedInfo.checks;
+      }
+
+      const updated = { ...prev, [key]: cleanedInfo };
       if (user?.username) {
-        updateCaughtData(user.username, key, null); // persist delete
+        updateCaughtData(user.username, key, cleanedInfo); // persist update
       }
       return updated;
-    }
+    });
 
-    // Normalize data for backend schema (checks is Number or omitted)
-    const checksStr = info.checks == null ? "" : String(info.checks).trim();
-    const cleanedInfo = { ...info };
-    if (checksStr === "" || checksStr === "0") {
-      delete cleanedInfo.checks;
-    } else if (!Number.isNaN(Number(checksStr))) {
-      cleanedInfo.checks = Number(checksStr);
-    } else {
-      delete cleanedInfo.checks;
-    }
+    // caught = true if we have info, false if we cleared it
+    setCaught(prev => ({ ...prev, [key]: !!info }));
 
-    const updated = { ...prev, [key]: cleanedInfo };
-    if (user?.username) {
-      updateCaughtData(user.username, key, cleanedInfo); // persist update
-    }
-    return updated;
-  });
+    // keep sidebar in sync - only switch when caught status actually changes
+    if (sidebarOpen && selectedPokemon) {
+      // Check if it's a different Pokémon (different ID) or different form (same ID but different name/formType)
+      const isDifferentPokemon = selectedPokemon.id !== poke.id;
+      const isDifferentForm = selectedPokemon.id === poke.id && selectedPokemon.name !== poke.name;
 
-  // caught = true if we have info, false if we cleared it
-  setCaught(prev => ({ ...prev, [key]: !!info }));
-
-  // keep sidebar in sync - only switch when caught status actually changes
-  if (sidebarOpen && selectedPokemon) {
-    // Check if it's a different Pokémon (different ID) or different form (same ID but different name/formType)
-    const isDifferentPokemon = selectedPokemon.id !== poke.id;
-    const isDifferentForm = selectedPokemon.id === poke.id && selectedPokemon.name !== poke.name;
-    
-    if (isDifferentPokemon || isDifferentForm) {
-      console.log("Sidebar is open, switching to newly caught pokemon:", poke.name, "form:", poke.formType);
-      setSelectedPokemon(poke);
+      if (isDifferentPokemon || isDifferentForm) {
+        console.log("Sidebar is open, switching to newly caught pokemon:", poke.name, "form:", poke.formType);
+        setSelectedPokemon(poke);
+      }
     }
   }
-}
 
   function handleSelectPokemon(poke) {
     setSidebarOpen(true);
@@ -1145,24 +1161,24 @@ function CloseSidebarOnRouteChange() {
     const isPokemonLocked = (poke) => {
       // Only check for locked Pokemon if we're in shiny mode and lock settings are enabled
       if (!isShiny || !currentDexPreferences) return false;
-      
-      const isBlockedUnobtainableById = currentDexPreferences.blockUnobtainableShinies && 
+
+      const isBlockedUnobtainableById = currentDexPreferences.blockUnobtainableShinies &&
         UNOBTAINABLE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
-      const isBlockedGOById = currentDexPreferences.blockGOAndNOOTExclusiveShinies && 
+      const isBlockedGOById = currentDexPreferences.blockGOAndNOOTExclusiveShinies &&
         GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
-      
+
       const pokemonName = poke.name?.toLowerCase() || "";
-      const isBlockedUnobtainableByForm = currentDexPreferences.blockUnobtainableShinies && 
+      const isBlockedUnobtainableByForm = currentDexPreferences.blockUnobtainableShinies &&
         UNOBTAINABLE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
-      const isBlockedGOByForm = currentDexPreferences.blockGOAndNOOTExclusiveShinies && 
+      const isBlockedGOByForm = currentDexPreferences.blockGOAndNOOTExclusiveShinies &&
         GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
-      
+
       return isBlockedUnobtainableById || isBlockedGOById || isBlockedUnobtainableByForm || isBlockedGOByForm;
     };
 
     // Filter out locked Pokemon from the box
     const unlocked = box.filter(p => !isPokemonLocked(p));
-    
+
     // Check if all unlocked Pokemon are marked
     const allMarked = unlocked.every(p => caught[getCaughtKey(p, null, isShiny)]);
 
@@ -1178,14 +1194,14 @@ function CloseSidebarOnRouteChange() {
         // Show reset modal instead of old confirm dialog
         const boxNames = unlocked.map(p => formatPokemonName(p.name));
         const uniqueNames = [...new Set(boxNames)];
-        const displayNames = uniqueNames.length <= 3 
-          ? uniqueNames.join(', ') 
+        const displayNames = uniqueNames.length <= 3
+          ? uniqueNames.join(', ')
           : `${uniqueNames.slice(0, 2).join(', ')} and ${uniqueNames.length - 2} others`;
-        
-        setResetModal({ 
-          show: true, 
+
+        setResetModal({
+          show: true,
           pokemon: null, // Special case for bulk reset
-          pokemonName: displayNames, 
+          pokemonName: displayNames,
           isShiny: isShiny,
           isBulkReset: true,
           box: unlocked // Only include unlocked Pokemon in the reset
@@ -1219,12 +1235,12 @@ function CloseSidebarOnRouteChange() {
             notes: "",
             entryId: Math.random().toString(36).substr(2, 9)
           };
-          
+
           const freshInfo = {
             caught: true,
             entries: [newEntry]
           };
-          
+
           newInfoMap[key] = freshInfo;
           delta[key] = freshInfo;
         }
@@ -1266,11 +1282,11 @@ function CloseSidebarOnRouteChange() {
       const info = caughtInfoMap[key];
       if (hasMeaningfulInfo(info)) {
         // Show reset modal instead of old confirm dialog
-        setResetModal({ 
-          show: true, 
-          pokemon: poke, 
-          pokemonName: formatPokemonName(poke?.name), 
-          isShiny: isShiny 
+        setResetModal({
+          show: true,
+          pokemon: poke,
+          pokemonName: formatPokemonName(poke?.name),
+          isShiny: isShiny
         });
         setResetModalClosing(false);
         return;
@@ -1323,7 +1339,7 @@ function CloseSidebarOnRouteChange() {
       // Check if it's a different Pokémon (different ID) or different form (same ID but different name/formType)
       const isDifferentPokemon = selectedPokemon.id !== poke.id;
       const isDifferentForm = selectedPokemon.id === poke.id && selectedPokemon.name !== poke.name;
-      
+
       if (isDifferentPokemon || isDifferentForm) {
         console.log("Sidebar is open, switching to newly toggled pokemon:", poke.name, "form:", poke.formType);
         setSelectedPokemon(poke);
@@ -1336,33 +1352,33 @@ function CloseSidebarOnRouteChange() {
     // Close modal with animation
     setResetModalClosing(true);
     setTimeout(() => {
-      setResetModal({ 
-        show: false, 
-        pokemon: null, 
-        pokemonName: '', 
-        isShiny: false, 
-        isBulkReset: false, 
-        box: null 
+      setResetModal({
+        show: false,
+        pokemon: null,
+        pokemonName: '',
+        isShiny: false,
+        isBulkReset: false,
+        box: null
       });
       setResetModalClosing(false);
     }, 300);
-    
+
     if (resetModal.isBulkReset && resetModal.box) {
       // Handle bulk reset (Unmark All)
       const newCaughtMap = { ...caught };
       const newInfoMap = { ...caughtInfoMap };
       const delta = {};
-      
+
       resetModal.box.forEach(p => {
         const key = getCaughtKey(p, null, resetModal.isShiny);
         newCaughtMap[key] = false;
         newInfoMap[key] = null;
         delta[key] = null;
       });
-      
+
       setCaught(newCaughtMap);
       setCaughtInfoMap(newInfoMap);
-      
+
       // Send changes to server
       if (user?.username) {
         try {
@@ -1373,7 +1389,7 @@ function CloseSidebarOnRouteChange() {
           updateCaughtData(user.username, null, newInfoMap);
         }
       }
-      
+
       // Close sidebar if any of these Pokémon were selected
       if (selectedPokemon && resetModal.box.some(p => getCaughtKey(p, null, resetModal.isShiny) === getCaughtKey(selectedPokemon, null, showShiny))) {
         setSelectedPokemon(null);
@@ -1382,14 +1398,14 @@ function CloseSidebarOnRouteChange() {
     } else if (resetModal.pokemon) {
       // Handle individual reset (grid click)
       const key = getCaughtKey(resetModal.pokemon, null, resetModal.isShiny);
-      
+
       // Actually reset the Pokémon data
       setCaught(prev => ({ ...prev, [key]: false }));
       setCaughtInfoMap(prev => ({ ...prev, [key]: null }));
       if (user?.username) {
         updateCaughtData(user.username, key, null);
       }
-      
+
       // Close sidebar if this Pokémon was selected
       if (selectedPokemon && getCaughtKey(selectedPokemon, null, showShiny) === key) {
         setSelectedPokemon(null);
@@ -1401,10 +1417,10 @@ function CloseSidebarOnRouteChange() {
   let mergedMons = [];
   const seen = new Set();
 
-     // Use current shiny state for search suggestions
-   mergedMons = dexSections
-     .flatMap(section => filterMons(section.getList(), showForms, showShiny))
-     .filter(mon => {
+  // Use current shiny state for search suggestions
+  mergedMons = dexSections
+    .flatMap(section => filterMons(section.getList(), showForms, showShiny))
+    .filter(mon => {
       const key = getCaughtKey(mon, null, showShiny);
       if (seen.has(key)) return false;
       seen.add(key);
@@ -1458,10 +1474,10 @@ function CloseSidebarOnRouteChange() {
                   setShowMenu={setShowMenu}
                   userMenuRef={userMenuRef}
                 />
-                
+
                 {/* Global Loading Indicator */}
                 <GlobalLoadingIndicator />
-                
+
                 {/* Location Listener for detecting navigation to home page */}
                 <LocationListener onNavigateToHome={refreshDexPreferences} />
 
@@ -1473,9 +1489,9 @@ function CloseSidebarOnRouteChange() {
                       element={
                         // Only show loading spinner if we haven't timed out and auth isn't ready
                         (!authTimeout && (loading || !authReady)) ? (
-                          <LoadingSpinner 
-                            fullScreen 
-                            text="Loading..." 
+                          <LoadingSpinner
+                            fullScreen
+                            text="Loading..."
                             variant="spinner"
                             size="large"
                           />
@@ -1523,295 +1539,295 @@ function CloseSidebarOnRouteChange() {
                             </div>
 
                             <div className="main-bg page-container fade-in-up">
-                           {/* Dynamic Dex Grid based on showShiny toggle */}
-                           {showShiny ? (
-                             // Show Shiny Pokémon Grid
-                             <div className="dex-grid-section">
-                               {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
-                                                                 ? dexSections.map(section => {
-                                  const filteredMons = filterMons(section.getList(), showForms, true)
-                                    .sort((a, b) => a.id - b.id);
-                                  if (!filteredMons.length) return null;
+                              {/* Dynamic Dex Grid based on showShiny toggle */}
+                              {showShiny ? (
+                                // Show Shiny Pokémon Grid
+                                <div className="dex-grid-section">
+                                  {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
+                                    ? dexSections.map(section => {
+                                      const filteredMons = filterMons(section.getList(), showForms, true)
+                                        .sort((a, b) => a.id - b.id);
+                                      if (!filteredMons.length) return null;
 
-                                   return (
-                                     <DexSection
-                                       readOnly={false}
-                                       caughtInfoMap={caughtInfoMap}
-                                       updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
-                                       key={`shiny_${section.key}`}
-                                       sidebarOpen={sidebarOpen}
-                                       title={section.title}
-                                       pokemonList={filteredMons}
-                                       caught={caught}
-                                       isCaught={(poke) => caught[getCaughtKey(poke, null, true)] || false}
-                                       onMarkAll={(box) => handleMarkAll(box, true)}
-                                       onToggleCaught={(poke) => handleToggleCaught(poke, true)}
-                                       onSelect={handleSelectPokemon}
-                                       showShiny={true}
-                                       showForms={showForms}
-                                     />
-                                   );
-                                 })
-                                                                   : dexSections.map(section => {
-                                    const filteredMons = filterMons(section.getList(), false, true);
-                                    if (!filteredMons.length) return null;
+                                      return (
+                                        <DexSection
+                                          readOnly={false}
+                                          caughtInfoMap={caughtInfoMap}
+                                          updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
+                                          key={`shiny_${section.key}`}
+                                          sidebarOpen={sidebarOpen}
+                                          title={section.title}
+                                          pokemonList={filteredMons}
+                                          caught={caught}
+                                          isCaught={(poke) => caught[getCaughtKey(poke, null, true)] || false}
+                                          onMarkAll={(box) => handleMarkAll(box, true)}
+                                          onToggleCaught={(poke) => handleToggleCaught(poke, true)}
+                                          onSelect={handleSelectPokemon}
+                                          showShiny={true}
+                                          showForms={showForms}
+                                        />
+                                      );
+                                    })
+                                    : dexSections.map(section => {
+                                      const filteredMons = filterMons(section.getList(), false, true);
+                                      if (!filteredMons.length) return null;
 
-                                   return (
-                                     <DexSection
-                                       readOnly={false}
-                                       caughtInfoMap={caughtInfoMap}
-                                       updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
-                                       key={`shiny_${section.key}`}
-                                       sidebarOpen={sidebarOpen}
-                                       title={section.title}
-                                       pokemonList={filteredMons}
-                                       caught={caught}
-                                       isCaught={(poke) => caught[getCaughtKey(poke, null, true)] || false}
-                                       onMarkAll={(box) => handleMarkAll(box, true)}
-                                       onToggleCaught={(poke) => handleToggleCaught(poke, true)}
-                                       onSelect={handleSelectPokemon}
-                                       showShiny={true}
-                                       showForms={showForms}
-                                     />
-                                   );
-                                 })}
-                             </div>
-                           ) : (
-                             // Show Regular Pokémon Grid
-                             <div className="dex-grid-section">
-                               {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
-                                                                 ? dexSections.map(section => {
-                                  const filteredMons = filterMons(section.getList(), showForms, false)
-                                    .sort((a, b) => a.id - b.id);
-                                  if (!filteredMons.length) return null;
+                                      return (
+                                        <DexSection
+                                          readOnly={false}
+                                          caughtInfoMap={caughtInfoMap}
+                                          updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
+                                          key={`shiny_${section.key}`}
+                                          sidebarOpen={sidebarOpen}
+                                          title={section.title}
+                                          pokemonList={filteredMons}
+                                          caught={caught}
+                                          isCaught={(poke) => caught[getCaughtKey(poke, null, true)] || false}
+                                          onMarkAll={(box) => handleMarkAll(box, true)}
+                                          onToggleCaught={(poke) => handleToggleCaught(poke, true)}
+                                          onSelect={handleSelectPokemon}
+                                          showShiny={true}
+                                          showForms={showForms}
+                                        />
+                                      );
+                                    })}
+                                </div>
+                              ) : (
+                                // Show Regular Pokémon Grid
+                                <div className="dex-grid-section">
+                                  {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
+                                    ? dexSections.map(section => {
+                                      const filteredMons = filterMons(section.getList(), showForms, false)
+                                        .sort((a, b) => a.id - b.id);
+                                      if (!filteredMons.length) return null;
 
-                                   return (
-                                     <DexSection
-                                       readOnly={false}
-                                       caughtInfoMap={caughtInfoMap}
-                                       updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
-                                       key={`regular_${section.key}`}
-                                       sidebarOpen={sidebarOpen}
-                                       title={section.title}
-                                       pokemonList={filteredMons}
-                                       caught={caught}
-                                       isCaught={(poke) => caught[getCaughtKey(poke, null, false)] || false}
-                                       onMarkAll={(box) => handleMarkAll(box, false)}
-                                       onToggleCaught={(poke) => handleToggleCaught(poke, false)}
-                                       onSelect={handleSelectPokemon}
-                                       showShiny={false}
-                                       showForms={showForms}
-                                     />
-                                   );
-                                 })
-                                                                 : dexSections.map(section => {
-                                  const filteredMons = filterMons(section.getList(), false, false);
-                                  if (!filteredMons.length) return null;
+                                      return (
+                                        <DexSection
+                                          readOnly={false}
+                                          caughtInfoMap={caughtInfoMap}
+                                          updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
+                                          key={`regular_${section.key}`}
+                                          sidebarOpen={sidebarOpen}
+                                          title={section.title}
+                                          pokemonList={filteredMons}
+                                          caught={caught}
+                                          isCaught={(poke) => caught[getCaughtKey(poke, null, false)] || false}
+                                          onMarkAll={(box) => handleMarkAll(box, false)}
+                                          onToggleCaught={(poke) => handleToggleCaught(poke, false)}
+                                          onSelect={handleSelectPokemon}
+                                          showShiny={false}
+                                          showForms={showForms}
+                                        />
+                                      );
+                                    })
+                                    : dexSections.map(section => {
+                                      const filteredMons = filterMons(section.getList(), false, false);
+                                      if (!filteredMons.length) return null;
 
-                                   return (
-                                     <DexSection
-                                       readOnly={false}
-                                       caughtInfoMap={caughtInfoMap}
-                                       updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
-                                       key={`regular_${section.key}`}
-                                       sidebarOpen={sidebarOpen}
-                                       title={section.title}
-                                       pokemonList={filteredMons}
-                                       caught={caught}
-                                       isCaught={(poke) => caught[getCaughtKey(poke, null, false)] || false}
-                                       onMarkAll={(box) => handleMarkAll(box, false)}
-                                       onToggleCaught={(poke) => handleToggleCaught(poke, false)}
-                                       onSelect={handleSelectPokemon}
-                                       showShiny={false}
-                                       showForms={showForms}
-                                     />
-                                   );
-                                 })}
-                             </div>
-                           )}
-                         </div>
-
-
-                          {showNoResults && hasActiveSearch && (
-                           <NoResults
-                             searchTerm={filters.searchTerm || "your search filters"}
-                             suggestion={suggestion}
-                             onSuggestionClick={(suggestion) => setFilters(f => ({ ...f, searchTerm: suggestion }))}
-                           />
-                          )}
+                                      return (
+                                        <DexSection
+                                          readOnly={false}
+                                          caughtInfoMap={caughtInfoMap}
+                                          updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
+                                          key={`regular_${section.key}`}
+                                          sidebarOpen={sidebarOpen}
+                                          title={section.title}
+                                          pokemonList={filteredMons}
+                                          caught={caught}
+                                          isCaught={(poke) => caught[getCaughtKey(poke, null, false)] || false}
+                                          onMarkAll={(box) => handleMarkAll(box, false)}
+                                          onToggleCaught={(poke) => handleToggleCaught(poke, false)}
+                                          onSelect={handleSelectPokemon}
+                                          showShiny={false}
+                                          showForms={showForms}
+                                        />
+                                      );
+                                    })}
+                                </div>
+                              )}
+                            </div>
 
 
-                        {selectedPokemon && (() => {
-                          const key = getCaughtKey(selectedPokemon, null, showShiny);
-                          const caughtInfo = caughtInfoMap[key];
-                          return (
-                            <Sidebar
-                              open={!!selectedPokemon}
-                              pokemon={selectedPokemon}
-                              onClose={() => setSelectedPokemon(null)}
-                              caughtInfo={caughtInfo}
-                              updateCaughtInfo={updateCaughtInfo}
-                              showShiny={showShiny}
-                              onPokemonSelect={setSelectedPokemon}
-                              externalLinkPreference={externalLinkPreference}
-                            />
-                          );
-                        })()}
-                      </>
-                    ) : (
-                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                        <PublicHome />
-                      </Suspense>
-                    )
-                  }
-                />
+                            {showNoResults && hasActiveSearch && (
+                              <NoResults
+                                searchTerm={filters.searchTerm || "your search filters"}
+                                suggestion={suggestion}
+                                onSuggestionClick={(suggestion) => setFilters(f => ({ ...f, searchTerm: suggestion }))}
+                              />
+                            )}
 
-                <Route
-                  path="/login"
-                  element={
-                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                      {user?.username ? <Navigate to="/" /> : <Login onLogin={handleUserUpdate} />}
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="/register"
-                  element={
-                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                      {user?.username ? <Navigate to="/" /> : <Register onRegister={handleUserUpdate} />}
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="/email-sent"
-                  element={
-                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                      {!user?.username ? <EmailSent /> : <Navigate to="/" />}
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="/forgot-password"
-                  element={
-                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                      {!user?.username ? <ForgotPassword /> : <Navigate to="/" />}
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="/reset-password"
-                  element={
-                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                      {!user?.username ? <ResetPassword /> : <Navigate to="/" />}
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="/enter-reset-code"
-                  element={
-                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                      {!user?.username ? <EnterResetCode /> : <Navigate to="/" />}
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    <RequireAuth loading={loading} authReady={authReady} user={user}>
-                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                        <Profile />
-                      </Suspense>
-                    </RequireAuth>
-                  }
-                />
 
-                <Route 
-                  path="/trainers" 
-                  element={
-                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                      <Trainers />
-                    </Suspense>
-                  } 
-                />
-                <Route 
-                  path="/counters" 
-                  element={
-                    <RequireAuth loading={loading} authReady={authReady} user={user}>
-                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                        <Counters />
-                      </Suspense>
-                    </RequireAuth>
-                  } 
-                />
-                <Route 
-                  path="/changelog" 
-                  element={
-                    <RequireAuth loading={loading} authReady={authReady} user={user}>
-                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                        <Changelog />
-                      </Suspense>
-                    </RequireAuth>
-                  } 
-                />
-                <Route 
-                  path="/admin" 
-                  element={
-                    <RequireAuth loading={loading} authReady={authReady} user={user}>
-                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                        <Admin />
-                      </Suspense>
-                    </RequireAuth>
-                  } 
-                />
-                <Route 
-                  path="/u/:username" 
-                  element={
-                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                      <PublicProfile />
-                    </Suspense>
-                  } 
-                />
-                <Route 
-                  path="/u/:username/dex" 
-                  element={
-                    <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                      <ViewDex />
-                    </Suspense>
-                  } 
-                />
+                            {selectedPokemon && (() => {
+                              const key = getCaughtKey(selectedPokemon, null, showShiny);
+                              const caughtInfo = caughtInfoMap[key];
+                              return (
+                                <Sidebar
+                                  open={!!selectedPokemon}
+                                  pokemon={selectedPokemon}
+                                  onClose={() => setSelectedPokemon(null)}
+                                  caughtInfo={caughtInfo}
+                                  updateCaughtInfo={updateCaughtInfo}
+                                  showShiny={showShiny}
+                                  onPokemonSelect={setSelectedPokemon}
+                                  externalLinkPreference={externalLinkPreference}
+                                />
+                              );
+                            })()}
+                          </>
+                        ) : (
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                            <PublicHome />
+                          </Suspense>
+                        )
+                      }
+                    />
 
-                <Route
-                  path="/settings"
-                  element={
-                    <RequireAuth loading={loading} authReady={authReady} user={user}>
-                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                        <Settings />
-                      </Suspense>
-                    </RequireAuth>
-                  }
-                />
+                    <Route
+                      path="/login"
+                      element={
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          {user?.username ? <Navigate to="/" /> : <Login onLogin={handleUserUpdate} />}
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/register"
+                      element={
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          {user?.username ? <Navigate to="/" /> : <Register onRegister={handleUserUpdate} />}
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/email-sent"
+                      element={
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          {!user?.username ? <EmailSent /> : <Navigate to="/" />}
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/forgot-password"
+                      element={
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          {!user?.username ? <ForgotPassword /> : <Navigate to="/" />}
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/reset-password"
+                      element={
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          {!user?.username ? <ResetPassword /> : <Navigate to="/" />}
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/enter-reset-code"
+                      element={
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          {!user?.username ? <EnterResetCode /> : <Navigate to="/" />}
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/profile"
+                      element={
+                        <RequireAuth loading={loading} authReady={authReady} user={user}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                            <Profile />
+                          </Suspense>
+                        </RequireAuth>
+                      }
+                    />
 
-                <Route
-                  path="/backup"
-                  element={
-                    <RequireAuth loading={loading} authReady={authReady} user={user}>
-                      <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
-                        <Backup />
-                      </Suspense>
-                    </RequireAuth>
-                  }
-                />
+                    <Route
+                      path="/trainers"
+                      element={
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          <Trainers />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/counters"
+                      element={
+                        <RequireAuth loading={loading} authReady={authReady} user={user}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                            <Counters />
+                          </Suspense>
+                        </RequireAuth>
+                      }
+                    />
+                    <Route
+                      path="/changelog"
+                      element={
+                        <RequireAuth loading={loading} authReady={authReady} user={user}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                            <Changelog />
+                          </Suspense>
+                        </RequireAuth>
+                      }
+                    />
+                    <Route
+                      path="/admin"
+                      element={
+                        <RequireAuth loading={loading} authReady={authReady} user={user}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                            <Admin />
+                          </Suspense>
+                        </RequireAuth>
+                      }
+                    />
+                    <Route
+                      path="/u/:username"
+                      element={
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          <PublicProfile />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/u/:username/dex"
+                      element={
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          <ViewDex />
+                        </Suspense>
+                      }
+                    />
+
+                    <Route
+                      path="/settings"
+                      element={
+                        <RequireAuth loading={loading} authReady={authReady} user={user}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                            <Settings />
+                          </Suspense>
+                        </RequireAuth>
+                      }
+                    />
+
+                    <Route
+                      path="/backup"
+                      element={
+                        <RequireAuth loading={loading} authReady={authReady} user={user}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                            <Backup />
+                          </Suspense>
+                        </RequireAuth>
+                      }
+                    />
 
                   </Routes>
                 </main>
-                
+
                 <Footer />
-                
+
                 {/* Custom Scrollbar for Desktop */}
                 <CustomScrollbar />
               </div>
             </Router>
-            
+
             {/* Reset Modal for Grid Clicks */}
             {resetModal.show && createPortal(
               <div
@@ -1849,26 +1865,34 @@ function CloseSidebarOnRouteChange() {
                     <div className="flex gap-3 justify-end">
                       <button
                         onClick={() => {
+                          if (!resetModalReady) return; // Prevent ghost clicks
                           setResetModalClosing(true);
                           setTimeout(() => {
-                            setResetModal({ 
-                              show: false, 
-                              pokemon: null, 
-                              pokemonName: '', 
-                              isShiny: false, 
-                              isBulkReset: false, 
-                              box: null 
+                            setResetModal({
+                              show: false,
+                              pokemon: null,
+                              pokemonName: '',
+                              isShiny: false,
+                              isBulkReset: false,
+                              box: null
                             });
                             setResetModalClosing(false);
                           }, 300);
                         }}
-                        className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
+                        disabled={!resetModalReady}
+                        className={`px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold ${!resetModalReady ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        style={{ pointerEvents: resetModalReady ? 'auto' : 'none' }}
                       >
                         Cancel
                       </button>
                       <button
-                        onClick={handleResetConfirm}
-                        className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
+                        onClick={() => {
+                          if (!resetModalReady) return; // Prevent ghost clicks
+                          handleResetConfirm();
+                        }}
+                        disabled={!resetModalReady}
+                        className={`px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold ${!resetModalReady ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        style={{ pointerEvents: resetModalReady ? 'auto' : 'none' }}
                       >
                         {resetModal.isBulkReset ? 'Unmark All' : 'Reset Pokémon'}
                       </button>

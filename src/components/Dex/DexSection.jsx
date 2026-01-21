@@ -31,6 +31,7 @@ export default function DexSection({
   const longPressTriggeredRef = useRef(false);
   const touchStartXRef = useRef(0);
   const touchStartYRef = useRef(0);
+  const touchStartTimeRef = useRef(0);
 
   // Ensure isCaught is always a function and gets fresh data
   const safeIsCaught = useCallback((poke) => {
@@ -93,6 +94,7 @@ export default function DexSection({
     if (typeof window !== 'undefined' && window.innerWidth > 768) return; // desktop: ignore
     touchMovedRef.current = false;
     longPressTriggeredRef.current = false;
+    touchStartTimeRef.current = Date.now();
     if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
     const t = e.touches && e.touches[0];
     if (t) {
@@ -131,13 +133,31 @@ export default function DexSection({
     if (longPressTriggeredRef.current) return;
     // If the finger moved significantly, treat as cancel
     if (touchMovedRef.current) return;
-    // Short tap behavior on mobile
+
+    // Check touch duration - must be a genuine tap (>50ms to filter accidental touches, <350ms to not be a long-press)
+    const touchDuration = Date.now() - touchStartTimeRef.current;
+    if (touchDuration >= 350) {
+      // This was long enough to be a long-press, but timer didn't fire - could be a race condition
+      // Don't trigger tap action
+      return;
+    }
+
+    // Short tap behavior on mobile (only for taps that are clearly quick)
     if (readOnlyFlag) {
       if (onSelect) onSelect(poke);
     } else if (onToggleCaught) {
       onToggleCaught(poke);
     }
   }, [onSelect, onToggleCaught]);
+
+  const handleTouchCancel = useCallback(() => {
+    if (touchTimerRef.current) {
+      clearTimeout(touchTimerRef.current);
+      touchTimerRef.current = null;
+    }
+    touchMovedRef.current = false;
+    longPressTriggeredRef.current = false;
+  }, []);
 
   if (filteredList.length === 0) {
     return null;
@@ -171,14 +191,14 @@ export default function DexSection({
             </button>
           )}
         </div>
-        
+
         {/* Divider below header */}
-        <div className={`w-full h-1 rounded-full ${collapsed ? "mb-2" : "mb-6"}`} style={{ 
+        <div className={`w-full h-1 rounded-full ${collapsed ? "mb-2" : "mb-6"}`} style={{
           background: `linear-gradient(to right, var(--border-color) 35%, var(--accent))`
         }}></div>
 
 
-        <div 
+        <div
           ref={contentRef}
           className={transitionReady ? "transition-all duration-300 ease-in-out" : ""}
           style={{
@@ -224,7 +244,7 @@ export default function DexSection({
                           if (title === "Alpha Genders & Other's") {
                             return `Alpha Genders & Other's Box 1`;
                           }
-                          
+
                           const tstr = String(title || "").toLowerCase();
                           const match = FORM_TYPES.find((type) => tstr.includes(type));
                           if (match) {
@@ -232,7 +252,7 @@ export default function DexSection({
                               match.charAt(0).toUpperCase() +
                               match.slice(1).toLowerCase();
                             let label;
-                            
+
                             if (match === "alcremie") {
                               label = "Alcremie's Box";
                             } else if (match === "vivillon") {
@@ -249,7 +269,7 @@ export default function DexSection({
                             } else {
                               label = `${capitalized} Forms Box`;
                             }
-                            
+
                             // For Unown boxes, always display Box 1 visually
                             if (match === "unown") {
                               return `${label} 1`;
@@ -263,8 +283,8 @@ export default function DexSection({
 
                       {/* hide mark-all in read-only */}
                       {!readOnly && onMarkAll && (
-                        <button 
-                          className="px-4 py-0.5 rounded-full text-base font-medium transition-all duration-100 self-center md:hover:scale-105 md:hover:shadow-lg" 
+                        <button
+                          className="px-4 py-0.5 rounded-full text-base font-medium transition-all duration-100 self-center md:hover:scale-105 md:hover:shadow-lg"
                           style={{ backgroundColor: 'var(--accent)', color: '#000000' }}
                           onMouseEnter={(e) => {
                             if (window.innerWidth >= 768) { // PC only
@@ -300,7 +320,7 @@ export default function DexSection({
                           <div
                             key={key}
                             className={`group relative flex flex-col items-center justify-center p-2 rounded-lg border transition-all duration-100 pokemon-slot-hover${readOnly ? " hover:bg-gray-700 dark:hover:bg-gray-600" : ""}${isBlocked ? " cursor-not-allowed" : " cursor-pointer"}`}
-                            style={{ 
+                            style={{
                               background: safeIsCaught(poke) ? 'linear-gradient(to top, rgba(21, 128, 61, 0.4), rgba(34, 197, 94, 0.2))' : 'var(--searchbar-inputs)',
                               border: safeIsCaught(poke) ? '2px solid rgb(34, 197, 94)' : '2px solid var(--border-color)',
                               width: 'clamp(60px, 15vw, 100px)',
@@ -344,10 +364,14 @@ export default function DexSection({
                               handleTouchStart(e, poke);
                             }}
                             onTouchMove={handleTouchMove}
-                            onTouchEnd={() => {
+                            onTouchEnd={(e) => {
+                              // Prevent synthetic click event that browsers fire after touchend
+                              // This prevents "ghost clicks" that can trigger modal buttons
+                              e.preventDefault();
                               if (isBlocked) return;
                               handleTouchEnd(poke, readOnly);
                             }}
+                            onTouchCancel={handleTouchCancel}
                             title={isBlocked ? `${formatPokemonName(poke.name)} (Locked)` : formatPokemonName(poke.name)}
                           >
                             {/* Blocked overlay with lock icon */}
@@ -361,7 +385,7 @@ export default function DexSection({
                             {!readOnly && onSelect && !isBlocked && (
                               <button
                                 className="absolute bottom-0.5 right-0.5 p-0.25 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 z-20 hidden md:block"
-                                style={{ 
+                                style={{
                                   color: 'white',
                                   backgroundColor: 'var(--accent)',
                                   border: 'none'
@@ -414,16 +438,16 @@ export default function DexSection({
 
 function getCaughtKey(poke) {
   if (!poke) return "unknown";
-  
+
   let key = poke.id?.toString() || "unknown";
-  
+
   if (poke.form && poke.form !== "normal") {
     key += `-${poke.form}`;
   }
-  
+
   if (poke.gender && poke.gender !== "unknown") {
     key += `-${poke.gender}`;
   }
-  
+
   return key;
 }
