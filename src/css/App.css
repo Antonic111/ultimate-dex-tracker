@@ -288,7 +288,13 @@ body {
 /* Category Collapse Animation */
 .category-content {
   transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  -webkit-transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
   overflow: hidden;
+  /* Force GPU acceleration for smoother animations on iOS */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .category-content.collapsed {
@@ -297,8 +303,33 @@ body {
 }
 
 .category-content.expanded {
-  max-height: none;
+  /* Use a very large value instead of 'none' for iOS Safari compatibility */
+  max-height: 99999px;
   opacity: 1;
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+
+  /* iOS Safari only */
+  .category-content,
+  .transition-all {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  /* Ensure proper rendering of collapsed sections on iOS */
+  .category-content.collapsed {
+    visibility: hidden;
+    height: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .category-content.expanded {
+    visibility: visible;
+    height: auto;
+  }
 }
 
 /* Main background container with responsive spacing */
@@ -396,6 +427,7 @@ body {
     font-size: 16px;
     /* Prevents iOS zoom on focus */
     -webkit-appearance: none;
+    appearance: none;
     border-radius: 0;
   }
 

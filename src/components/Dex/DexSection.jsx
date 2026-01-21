@@ -76,15 +76,52 @@ export default function DexSection({
   const filteredList = pokemonList || [];
 
   // Calculate content height for smooth animation
+  // Use ResizeObserver for better cross-browser support including iOS Safari
   useEffect(() => {
     if (!contentRef.current) return;
-    const height = contentRef.current.scrollHeight;
-    setContentHeight(height);
-  }, [filteredList]);
+
+    // Function to update height
+    const updateHeight = () => {
+      if (contentRef.current) {
+        // iOS Safari sometimes reports 0 initially, so we check and retry
+        const newHeight = contentRef.current.scrollHeight;
+        if (newHeight > 0) {
+          setContentHeight(newHeight);
+        }
+      }
+    };
+
+    // Initial height calculation with retries for iOS Safari
+    updateHeight();
+    // Retry after a short delay in case iOS Safari hasn't finished layout
+    const timer1 = setTimeout(updateHeight, 100);
+    const timer2 = setTimeout(updateHeight, 300);
+
+    // Use ResizeObserver for dynamic updates
+    let resizeObserver = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        updateHeight();
+      });
+      resizeObserver.observe(contentRef.current);
+    }
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      if (resizeObserver && contentRef.current) {
+        resizeObserver.disconnect();
+      }
+    };
+  }, [filteredList, collapsed]);
 
   // Enable transitions only after initial mount so first paint is natural height
   useEffect(() => {
-    const raf = requestAnimationFrame(() => setTransitionReady(true));
+    // Delay transition enabling for iOS Safari
+    const raf = requestAnimationFrame(() => {
+      // Additional delay for iOS Safari to finish initial layout
+      setTimeout(() => setTransitionReady(true), 50);
+    });
     return () => cancelAnimationFrame(raf);
   }, []);
 
@@ -202,9 +239,13 @@ export default function DexSection({
           ref={contentRef}
           className={transitionReady ? "transition-all duration-300 ease-in-out" : ""}
           style={{
-            maxHeight: transitionReady ? (collapsed ? '0px' : `${contentHeight}px`) : 'none',
+            // iOS Safari doesn't handle max-height: none well, use a very large value instead
+            maxHeight: collapsed ? '0px' : (transitionReady ? `${contentHeight || 99999}px` : '99999px'),
             opacity: collapsed ? 0 : 1,
-            overflow: collapsed ? 'hidden' : 'visible'
+            overflow: collapsed ? 'hidden' : 'visible',
+            // WebKit-specific properties for smoother animations
+            WebkitTransform: 'translateZ(0)',
+            transform: 'translateZ(0)'
           }}
         >
           <div className={`${boxes.length === 1 ? 'grid grid-cols-1 justify-items-center' : 'grid grid-cols-1 lg:grid-cols-2'} gap-0 md:gap-6`}>

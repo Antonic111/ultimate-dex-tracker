@@ -1,3129 +1,3129 @@
 [
-      {
+  {
+    "id": 25,
+    "name": "pikachu-alphaother",
+    "stableId": "pikachu-female-alpha-0025",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/25.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/25.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 172,
+        "name": "pichu-gender",
+        "how": "level up"
+      },
+      "next": [
+        {
+          "id": 26,
+          "name": "raichu-gender",
+          "how": "Use thunder stone"
+        }
+      ]
+    }
+  },
+  {
+    "id": 26,
+    "name": "raichu-alphaother",
+    "stableId": "raichu-female-alpha-0026",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/26.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/26.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 25,
-        "name": "pikachu-alphaother",
-        "stableId": "pikachu-female-alpha-0025",
-        "types": [
-          "electric"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/25.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/25.png"
-        },
-        "gen": 1,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 172,
-            "name": "pichu-gender",
-            "how": "level up"
-          },
-          "next": [
-            {
-              "id": 26,
-              "name": "raichu-gender",
-              "how": "Use thunder stone"
-            }
-          ]
-        }
+        "name": "pikachu-gender",
+        "how": "Use Thunder Stone"
       },
-      {
-        "id": 26,
-        "name": "raichu-alphaother",
-        "stableId": "raichu-female-alpha-0026",
-        "types": [
-          "electric"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/26.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/26.png"
-        },
-        "gen": 1,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 25,
-            "name": "pikachu-gender",
-            "how": "Use Thunder Stone"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 41,
+    "name": "zubat-alphaother",
+    "stableId": "zubat-female-alpha-0041",
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/41.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/41.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 42,
+          "name": "golbat",
+          "how": "Level Up to 22"
         }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 42,
+    "name": "golbat-alphaother",
+    "stableId": "golbat-female-alpha-0042",
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/42.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/42.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 41,
-        "name": "zubat-alphaother",
-        "stableId": "zubat-female-alpha-0041",
-        "types": [
-          "poison",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/41.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/41.png"
-        },
-        "gen": 1,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 42,
-              "name": "golbat",
-              "how": "Level Up to 22"
-            }
-          ]
-        }
+        "name": "zubat",
+        "how": "Level Up to 22"
       },
-      {
-        "id": 42,
-        "name": "golbat-alphaother",
-        "stableId": "golbat-female-alpha-0042",
-        "types": [
-          "poison",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/42.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/42.png"
-        },
-        "gen": 1,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 41,
-            "name": "zubat",
-            "how": "Level Up to 22"
-          },
-          "next": [
-            {
-              "id": 169,
-              "name": "crobat",
-              "how": "level up"
-            }
-          ]
+      "next": [
+        {
+          "id": 169,
+          "name": "crobat",
+          "how": "level up"
         }
+      ]
+    }
+  },
+  {
+    "id": 64,
+    "name": "kadabra-alphaother",
+    "stableId": "kadabra-female-alpha-0064",
+    "types": [
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/64.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/64.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 63,
+        "name": "abra",
+        "how": "Level Up to 16"
       },
-      {
+      "next": [
+        {
+          "id": 65,
+          "name": "alakazam-alphaother",
+          "how": "Trade"
+        }
+      ]
+    }
+  },
+  {
+    "id": 65,
+    "name": "alakazam-alphaother",
+    "stableId": "alakazam-female-alpha-0065",
+    "types": [
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/65.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/65.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 64,
-        "name": "kadabra-alphaother",
-        "stableId": "kadabra-female-alpha-0064",
-        "types": [
-          "psychic"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/64.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/64.png"
-        },
-        "gen": 1,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 63,
-            "name": "abra",
-            "how": "Level Up to 16"
-          },
-          "next": [
-            {
-              "id": 65,
-              "name": "alakazam-alphaother",
-              "how": "Trade"
-            }
-          ]
-        }
+        "name": "kadabra",
+        "how": "Trade"
       },
-      {
-        "id": 65,
-        "name": "alakazam-alphaother",
-        "stableId": "alakazam-female-alpha-0065",
-        "types": [
-          "psychic"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/65.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/65.png"
-        },
-        "gen": 1,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 64,
-            "name": "kadabra",
-            "how": "Trade"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 111,
+    "name": "rhyhorn-alphaother",
+    "stableId": "rhyhorn-female-alpha-0111",
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/111.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/111.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 112,
+          "name": "rhydon-alphaother",
+          "how": "Level Up to 42"
         }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 112,
+    "name": "rhydon-alphaother",
+    "stableId": "rhydon-female-alpha-0112",
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/112.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/112.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 111,
         "name": "rhyhorn-alphaother",
-        "stableId": "rhyhorn-female-alpha-0111",
-        "types": [
-          "ground",
-          "rock"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/111.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/111.png"
-        },
-        "gen": 1,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 112,
-              "name": "rhydon-alphaother",
-              "how": "Level Up to 42"
-            }
-          ]
-        }
+        "how": "Level Up to 42"
       },
-      {
-        "id": 112,
-        "name": "rhydon-alphaother",
-        "stableId": "rhydon-female-alpha-0112",
-        "types": [
-          "ground",
-          "rock"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/112.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/112.png"
-        },
-        "gen": 1,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 111,
-            "name": "rhyhorn-alphaother",
-            "how": "Level Up to 42"
-          },
-          "next": [
-            {
-              "id": 464,
-              "name": "rhyperior-alphaother",
-              "how": "Trade"
-            }
-          ]
+      "next": [
+        {
+          "id": 464,
+          "name": "rhyperior-alphaother",
+          "how": "Trade"
         }
-      },
-      {
-        "id": 123,
-        "name": "scyther-alphaother",
-        "stableId": "scyther-female-alpha-0123",
-        "types": [
-          "bug",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/123.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/123.png"
-        },
-        "gen": 1,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 212,
-              "name": "scizor-alphaother",
-              "how": "Trade"
-            }
-          ]
+      ]
+    }
+  },
+  {
+    "id": 123,
+    "name": "scyther-alphaother",
+    "stableId": "scyther-female-alpha-0123",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/123.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/123.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 212,
+          "name": "scizor-alphaother",
+          "how": "Trade"
         }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 129,
+    "name": "magikarp-alphaother",
+    "stableId": "magikarp-female-alpha-0129",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/129.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/129.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 130,
+          "name": "gyarados-alphaother",
+          "how": "Level Up to 20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 130,
+    "name": "gyarados-alphaother",
+    "stableId": "gyarados-female-alpha-0130",
+    "types": [
+      "water",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/130.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/130.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 129,
         "name": "magikarp-alphaother",
-        "stableId": "magikarp-female-alpha-0129",
-        "types": [
-          "water"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/129.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/129.png"
-        },
-        "gen": 1,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 130,
-              "name": "gyarados-alphaother",
-              "how": "Level Up to 20"
-            }
-          ]
-        }
+        "how": "Level Up to 20"
       },
-      {
-        "id": 130,
-        "name": "gyarados-alphaother",
-        "stableId": "gyarados-female-alpha-0130",
-        "types": [
-          "water",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/130.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/130.png"
-        },
-        "gen": 1,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 129,
-            "name": "magikarp-alphaother",
-            "how": "Level Up to 20"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 133,
+    "name": "eevee-alphaother",
+    "stableId": "eevee-female-alpha-0133",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/133.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/133.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 157,
+    "name": "typhlosion-alphaother",
+    "stableId": "typhlosion-johto-alpha-0157",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/157.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/157.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 156,
+        "name": "quilava",
+        "how": "Level Up to 36"
       },
-      {
-        "id": 133,
-        "name": "eevee-alphaother",
-        "stableId": "eevee-female-alpha-0133",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/133.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/133.png"
-        },
-        "gen": 1,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 185,
+    "name": "sudowoodo-alphaother",
+    "stableId": "sudowoodo-female-alpha-0185",
+    "types": [
+      "rock"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/185.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/185.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 438,
+        "name": "bonsly",
+        "how": "Level Up"
       },
-      {
-        "id": 157,
-        "name": "typhlosion-alphaother",
-        "stableId": "typhlosion-johto-alpha-0157",
-        "types": [
-          "fire"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/157.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/157.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 156,
-            "name": "quilava",
-            "how": "Level Up to 36"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 190,
+    "name": "aipom-alphaother",
+    "stableId": "aipom-female-alpha-0190",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/190.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/190.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 424,
+          "name": "ambipom-alphaother",
+          "how": "Level Up"
         }
-      },
-      {
-        "id": 185,
-        "name": "sudowoodo-alphaother",
-        "stableId": "sudowoodo-female-alpha-0185",
-        "types": [
-          "rock"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/185.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/185.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 438,
-            "name": "bonsly",
-            "how": "Level Up"
-          },
-          "next": []
+      ]
+    }
+  },
+  {
+    "id": 198,
+    "name": "murkrow-alphaother",
+    "stableId": "murkrow-female-alpha-0198",
+    "types": [
+      "dark",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/198.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/198.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 430,
+          "name": "honchkrow",
+          "how": "Use Dusk Stone"
         }
-      },
-      {
-        "id": 190,
-        "name": "aipom-alphaother",
-        "stableId": "aipom-female-alpha-0190",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/190.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/190.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 424,
-              "name": "ambipom-alphaother",
-              "how": "Level Up"
-            }
-          ]
+      ]
+    }
+  },
+  {
+    "id": 207,
+    "name": "gligar-alphaother",
+    "stableId": "gligar-female-alpha-0207",
+    "types": [
+      "ground",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/207.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/207.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 472,
+          "name": "gliscor",
+          "how": "Level Up"
         }
+      ]
+    }
+  },
+  {
+    "id": 208,
+    "name": "steelix-alphaother",
+    "stableId": "steelix-female-alpha-0208",
+    "types": [
+      "steel",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/208.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/208.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 95,
+        "name": "onix",
+        "how": "Trade"
       },
-      {
-        "id": 198,
-        "name": "murkrow-alphaother",
-        "stableId": "murkrow-female-alpha-0198",
-        "types": [
-          "dark",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/198.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/198.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 430,
-              "name": "honchkrow",
-              "how": "Use Dusk Stone"
-            }
-          ]
+      "next": []
+    }
+  },
+  {
+    "id": 212,
+    "name": "scizor-alphaother",
+    "stableId": "scizor-female-alpha-0212",
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/212.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/212.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 123,
+        "name": "scyther-alphaother",
+        "how": "Trade"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 214,
+    "name": "heracross-alphaother",
+    "stableId": "heracross-female-alpha-0214",
+    "types": [
+      "bug",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/214.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/214.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 215,
+    "name": "sneasel-gender-alphaother",
+    "stableId": "sneasel-male-alpha-0215",
+    "types": [
+      "dark",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/215.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/215.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 461,
+          "name": "weavile-alphaother",
+          "how": "Level Up"
         }
-      },
-      {
-        "id": 207,
-        "name": "gligar-alphaother",
-        "stableId": "gligar-female-alpha-0207",
-        "types": [
-          "ground",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/207.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/207.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 472,
-              "name": "gliscor",
-              "how": "Level Up"
-            }
-          ]
+      ]
+    }
+  },
+  {
+    "id": 215,
+    "name": "sneasel-alphaother",
+    "stableId": "sneasel-female-alpha-0215",
+    "types": [
+      "dark",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/215.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/215.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 461,
+          "name": "weavile-alphaother",
+          "how": "Level Up"
         }
+      ]
+    }
+  },
+  {
+    "id": 215,
+    "name": "sneasel-hisui-alphaother",
+    "stableId": "sneasel-hisui-female-alpha-0215",
+    "types": [
+      "fighting",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10235.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10235.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 217,
+    "name": "ursaring-alphaother",
+    "stableId": "ursaring-female-alpha-0217",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/217.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/217.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 216,
+        "name": "teddiursa",
+        "how": "Level Up"
       },
-      {
-        "id": 208,
-        "name": "steelix-alphaother",
-        "stableId": "steelix-female-alpha-0208",
-        "types": [
-          "steel",
-          "ground"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/208.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/208.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 95,
-            "name": "onix",
-            "how": "Trade"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 221,
+    "name": "piloswine-alphaother",
+    "stableId": "piloswine-female-alpha-0221",
+    "types": [
+      "ice",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/221.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/221.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 220,
+        "name": "swinub",
+        "how": "Level Up"
+      },
+      "next": [
+        {
+          "id": 473,
+          "name": "mamoswine-alphaother",
+          "how": "Level Up"
         }
+      ]
+    }
+  },
+  {
+    "id": 224,
+    "name": "octillery-alphaother",
+    "stableId": "octillery-female-alpha-0224",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/224.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/224.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 223,
+        "name": "remoraid",
+        "how": "Level Up"
       },
-      {
-        "id": 212,
-        "name": "scizor-alphaother",
-        "stableId": "scizor-female-alpha-0212",
-        "types": [
-          "bug",
-          "steel"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/212.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/212.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 123,
-            "name": "scyther-alphaother",
-            "how": "Trade"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 267,
+    "name": "beautifly-alphaother",
+    "stableId": "beautifly-female-alpha-0267",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/267.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/267.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 265,
+        "name": "wurmple",
+        "how": "Level Up"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 269,
+    "name": "dustox-alphaother",
+    "stableId": "dustox-female-alpha-0269",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/269.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/269.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 265,
+        "name": "wurmple",
+        "how": "Level Up"
+      },
+      "next": []
+    }
+  },
+  {
+    "id": 315,
+    "name": "roselia-alphaother",
+    "stableId": "roselia-female-alpha-0315",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/315.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/315.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 406,
+        "name": "budew",
+        "how": "level up"
+      },
+      "next": [
+        {
+          "id": 407,
+          "name": "roserade",
+          "how": "Use shiny stone"
         }
-      },
-      {
-        "id": 214,
-        "name": "heracross-alphaother",
-        "stableId": "heracross-female-alpha-0214",
-        "types": [
-          "bug",
-          "fighting"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/214.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/214.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": []
+      ]
+    }
+  },
+  {
+    "id": 396,
+    "name": "starly-alphaother",
+    "stableId": "starly-female-alpha-0396",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/396.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/396.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 397,
+          "name": "staravia-alphaother",
+          "how": "Level Up to 14"
         }
-      },
-      {
-        "id": 215,
-        "name": "sneasel-gender-alphaother",
-        "stableId": "sneasel-female-alpha-0215",
-        "types": [
-          "dark",
-          "ice"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/215.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/215.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 461,
-              "name": "weavile-alphaother",
-              "how": "Level Up"
-            }
-          ]
-        }
-      },
-      {
-        "id": 215,
-        "name": "sneasel-alphaother",
-        "stableId": "sneasel-female-alpha-0215",
-        "types": [
-          "dark",
-          "ice"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/215.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/215.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 461,
-              "name": "weavile-alphaother",
-              "how": "Level Up"
-            }
-          ]
-        }
-      },
-      {
-        "id": 215,
-        "name": "sneasel-hisui-alphaother",
-        "stableId": "sneasel-hisui-female-alpha-0215",
-        "types": [
-          "fighting",
-          "poison"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10235.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10235.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 217,
-        "name": "ursaring-alphaother",
-        "stableId": "ursaring-female-alpha-0217",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/217.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/217.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 216,
-            "name": "teddiursa",
-            "how": "Level Up"
-          },
-          "next": []
-        }
-      },
-      {
-        "id": 221,
-        "name": "piloswine-alphaother",
-        "stableId": "piloswine-female-alpha-0221",
-        "types": [
-          "ice",
-          "ground"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/221.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/221.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 220,
-            "name": "swinub",
-            "how": "Level Up"
-          },
-          "next": [
-            {
-              "id": 473,
-              "name": "mamoswine-alphaother",
-              "how": "Level Up"
-            }
-          ]
-        }
-      },
-      {
-        "id": 224,
-        "name": "octillery-alphaother",
-        "stableId": "octillery-female-alpha-0224",
-        "types": [
-          "water"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/224.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/224.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 223,
-            "name": "remoraid",
-            "how": "Level Up"
-          },
-          "next": []
-        }
-      },
-      {
-        "id": 267,
-        "name": "beautifly-alphaother",
-        "stableId": "beautifly-female-alpha-0267",
-        "types": [
-          "bug",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/267.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/267.png"
-        },
-        "gen": 3,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 265,
-            "name": "wurmple",
-            "how": "Level Up"
-          },
-          "next": []
-        }
-      },
-      {
-        "id": 269,
-        "name": "dustox-alphaother",
-        "stableId": "dustox-female-alpha-0269",
-        "types": [
-          "bug",
-          "poison"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/269.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/269.png"
-        },
-        "gen": 3,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 265,
-            "name": "wurmple",
-            "how": "Level Up"
-          },
-          "next": []
-        }
-      },
-      {
-        "id": 315,
-        "name": "roselia-alphaother",
-        "stableId": "roselia-female-alpha-0315",
-        "types": [
-          "grass",
-          "poison"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/315.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/315.png"
-        },
-        "gen": 3,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 406,
-            "name": "budew",
-            "how": "level up"
-          },
-          "next": [
-            {
-              "id": 407,
-              "name": "roserade",
-              "how": "Use shiny stone"
-            }
-          ]
-        }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 397,
+    "name": "staravia-alphaother",
+    "stableId": "staravia-female-alpha-0397",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/397.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/397.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 396,
         "name": "starly-alphaother",
-        "stableId": "starly-female-alpha-0396",
-        "types": [
-          "normal",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/396.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/396.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 397,
-              "name": "staravia-alphaother",
-              "how": "Level Up to 14"
-            }
-          ]
-        }
+        "how": "Level Up to 14"
       },
-      {
+      "next": [
+        {
+          "id": 398,
+          "name": "staraptor-alphaother",
+          "how": "Level Up to 34"
+        }
+      ]
+    }
+  },
+  {
+    "id": 398,
+    "name": "staraptor-alphaother",
+    "stableId": "staraptor-female-alpha-0398",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/398.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/398.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 397,
         "name": "staravia-alphaother",
-        "stableId": "staravia-female-alpha-0397",
-        "types": [
-          "normal",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/397.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/397.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 396,
-            "name": "starly-alphaother",
-            "how": "Level Up to 14"
-          },
-          "next": [
-            {
-              "id": 398,
-              "name": "staraptor-alphaother",
-              "how": "Level Up to 34"
-            }
-          ]
-        }
+        "how": "Level Up to 34"
       },
-      {
-        "id": 398,
-        "name": "staraptor-alphaother",
-        "stableId": "staraptor-female-alpha-0398",
-        "types": [
-          "normal",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/398.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/398.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 397,
-            "name": "staravia-alphaother",
-            "how": "Level Up to 34"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 399,
+    "name": "bidoof-alphaother",
+    "stableId": "bidoof-female-alpha-0399",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/399.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/399.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 400,
+          "name": "bibarel-alphaother",
+          "how": "Level Up to 15"
         }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 400,
+    "name": "bibarel-alphaother",
+    "stableId": "bibarel-female-alpha-0400",
+    "types": [
+      "normal",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/400.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/400.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 399,
         "name": "bidoof-alphaother",
-        "stableId": "bidoof-female-alpha-0399",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/399.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/399.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 400,
-              "name": "bibarel-alphaother",
-              "how": "Level Up to 15"
-            }
-          ]
-        }
+        "how": "Level Up to 15"
       },
-      {
-        "id": 400,
-        "name": "bibarel-alphaother",
-        "stableId": "bibarel-female-alpha-0400",
-        "types": [
-          "normal",
-          "water"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/400.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/400.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 399,
-            "name": "bidoof-alphaother",
-            "how": "Level Up to 15"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 401,
+    "name": "kricketot-alphaother",
+    "stableId": "kricketot-female-alpha-0401",
+    "types": [
+      "bug"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/401.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/401.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 402,
+          "name": "kricketune-alphaother",
+          "how": "Level Up to 10"
         }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 402,
+    "name": "kricketune-alphaother",
+    "stableId": "kricketune-female-alpha-0402",
+    "types": [
+      "bug"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/402.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/402.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 401,
         "name": "kricketot-alphaother",
-        "stableId": "kricketot-female-alpha-0401",
-        "types": [
-          "bug"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/401.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/401.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 402,
-              "name": "kricketune-alphaother",
-              "how": "Level Up to 10"
-            }
-          ]
-        }
+        "how": "Level Up"
       },
-      {
-        "id": 402,
-        "name": "kricketune-alphaother",
-        "stableId": "kricketune-female-alpha-0402",
-        "types": [
-          "bug"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/402.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/402.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 401,
-            "name": "kricketot-alphaother",
-            "how": "Level Up"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 403,
+    "name": "shinx-alphaother",
+    "stableId": "shinx-female-alpha-0403",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/403.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/403.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 404,
+          "name": "luxio-alphaother",
+          "how": "Level Up to 15"
         }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 404,
+    "name": "luxio-alphaother",
+    "stableId": "luxio-female-alpha-0404",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/404.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/404.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 403,
         "name": "shinx-alphaother",
-        "stableId": "shinx-female-alpha-0403",
-        "types": [
-          "electric"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/403.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/403.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 404,
-              "name": "luxio-alphaother",
-              "how": "Level Up to 15"
-            }
-          ]
-        }
+        "how": "Level Up to 15"
       },
-      {
+      "next": [
+        {
+          "id": 405,
+          "name": "luxray-alphaother",
+          "how": "Level Up to 30"
+        }
+      ]
+    }
+  },
+  {
+    "id": 405,
+    "name": "luxray-alphaother",
+    "stableId": "luxray-female-alpha-0405",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/405.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/405.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 404,
         "name": "luxio-alphaother",
-        "stableId": "luxio-female-alpha-0404",
-        "types": [
-          "electric"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/404.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/404.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 403,
-            "name": "shinx-alphaother",
-            "how": "Level Up to 15"
-          },
-          "next": [
-            {
-              "id": 405,
-              "name": "luxray-alphaother",
-              "how": "Level Up to 30"
-            }
-          ]
-        }
+        "how": "Level Up to 30"
       },
-      {
-        "id": 405,
-        "name": "luxray-alphaother",
-        "stableId": "luxray-female-alpha-0405",
-        "types": [
-          "electric"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/405.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/405.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 404,
-            "name": "luxio-alphaother",
-            "how": "Level Up to 30"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 407,
+    "name": "roserade-alphaother",
+    "stableId": "roserade-female-alpha-0407",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/407.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/407.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 406,
+        "name": "budew",
+        "how": "Level Up"
       },
-      {
-        "id": 407,
-        "name": "roserade-alphaother",
-        "stableId": "roserade-female-alpha-0407",
-        "types": [
-          "grass",
-          "poison"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/407.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/407.png"
+      "next": []
+    }
+  },
+  {
+    "id": 412,
+    "name": "burmy-sandy-alphaother",
+    "stableId": "burmy-sandy-alpha-0412",
+    "formType": "alphaother",
+    "types": [
+      "bug"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/412-sandy.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-sandy.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 413,
+          "name": "wormadam-sandy",
+          "how": "Level Up to 20 (Female)"
         },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 406,
-            "name": "budew",
-            "how": "Level Up"
-          },
-          "next": []
+        {
+          "id": 414,
+          "name": "mothim",
+          "how": "Level Up to 20 (Male)"
         }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 412,
+    "name": "burmy-trash-alphaother",
+    "stableId": "burmy-trash-alpha-0412",
+    "formType": "alphaother",
+    "types": [
+      "bug"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/412-trash.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-trash.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 413,
+          "name": "wormadam-trash",
+          "how": "Level Up to 20 (Female)"
+        },
+        {
+          "id": 414,
+          "name": "mothim",
+          "how": "Level Up to 20 (Male)"
+        }
+      ]
+    }
+  },
+  {
+    "id": 413,
+    "name": "wormadam-sandy-alphaother",
+    "stableId": "wormadam-sandy-alpha-0413",
+    "formType": "alphaother",
+    "types": [
+      "bug",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10004.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/413-sandy.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": {
         "id": 412,
-        "name": "burmy-sandy-alphaother",
-        "stableId": "burmy-sandy-alpha-0412",
-        "formType": "alphaother",
-        "types": [
-          "bug"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/412-sandy.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-sandy.png"
-        },
-        "gen": 4,
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 413,
-              "name": "wormadam-sandy",
-              "how": "Level Up to 20 (Female)"
-            },
-            {
-              "id": 414,
-              "name": "mothim",
-              "how": "Level Up to 20 (Male)"
-            }
-          ]
-        }
+        "name": "burmy-sandy",
+        "how": "Level Up to 20"
       },
-      {
+      "next": []
+    }
+  },
+  {
+    "id": 413,
+    "name": "wormadam-trash-alphaother",
+    "stableId": "wormadam-trash-alpha-0413",
+    "formType": "alphaother",
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10005.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/413-trash.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": {
         "id": 412,
-        "name": "burmy-trash-alphaother",
-        "stableId": "burmy-trash-alpha-0412",
-        "formType": "alphaother",
-        "types": [
-          "bug"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/412-trash.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-trash.png"
-        },
-        "gen": 4,
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 413,
-              "name": "wormadam-trash",
-              "how": "Level Up to 20 (Female)"
-            },
-            {
-              "id": 414,
-              "name": "mothim",
-              "how": "Level Up to 20 (Male)"
-            }
-          ]
-        }
+        "name": "burmy-trash",
+        "how": "Level Up to 20"
       },
-      {
-        "id": 413,
-        "name": "wormadam-sandy-alphaother",
-        "stableId": "wormadam-sandy-alpha-0413",
-        "formType": "alphaother",
-        "types": [
-          "bug",
-          "ground"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10004.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/413-sandy.png"
-        },
-        "gen": 4,
-        "evolution": {
-          "pre": {
-            "id": 412,
-            "name": "burmy-sandy",
-            "how": "Level Up to 20"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 415,
+    "name": "combee-alphaother",
+    "stableId": "combee-female-alpha-0415",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/415.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/415.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 416,
+          "name": "vespiquen",
+          "how": "Level Up"
         }
-      },
-      {
-        "id": 413,
-        "name": "wormadam-trash-alphaother",
-        "stableId": "wormadam-trash-alpha-0413",
-        "formType": "alphaother",
-        "types": [
-          "bug",
-          "steel"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10005.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/413-trash.png"
-        },
-        "gen": 4,
-        "evolution": {
-          "pre": {
-            "id": 412,
-            "name": "burmy-trash",
-            "how": "Level Up to 20"
-          },
-          "next": []
+      ]
+    }
+  },
+  {
+    "id": 417,
+    "name": "pachirisu-alphaother",
+    "stableId": "pachirisu-female-alpha-0417",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/417.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/417.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 418,
+    "name": "buizel-alphaother",
+    "stableId": "buizel-female-alpha-0418",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/418.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/418.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 419,
+          "name": "floatzel-alphaother",
+          "how": "Level Up to 26"
         }
-      },
-      {
-        "id": 415,
-        "name": "combee-alphaother",
-        "stableId": "combee-female-alpha-0415",
-        "types": [
-          "bug",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/415.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/415.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 416,
-              "name": "vespiquen",
-              "how": "Level Up"
-            }
-          ]
-        }
-      },
-      {
-        "id": 417,
-        "name": "pachirisu-alphaother",
-        "stableId": "pachirisu-female-alpha-0417",
-        "types": [
-          "electric"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/417.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/417.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 419,
+    "name": "floatzel-alphaother",
+    "stableId": "floatzel-female-alpha-0419",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/419.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/419.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 418,
         "name": "buizel-alphaother",
-        "stableId": "buizel-female-alpha-0418",
-        "types": [
-          "water"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/418.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/418.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 419,
-              "name": "floatzel-alphaother",
-              "how": "Level Up to 26"
-            }
-          ]
-        }
+        "how": "Level Up to 26"
       },
-      {
-        "id": 419,
-        "name": "floatzel-alphaother",
-        "stableId": "floatzel-female-alpha-0419",
-        "types": [
-          "water"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/419.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/419.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 418,
-            "name": "buizel-alphaother",
-            "how": "Level Up to 26"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 422,
+    "name": "shellos-alphaother",
+    "stableId": "shellos-west-alpha-0422",
+    "formType": "alphaother",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/422.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/422.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 423,
+    "name": "gastrodon-alphaother",
+    "stableId": "gastrodon-west-alpha-0423",
+    "formType": "alphaother",
+    "types": [
+      "water",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/423.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/423.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 424,
+    "name": "ambipom-alphaother",
+    "stableId": "ambipom-female-alpha-0424",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/424.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/424.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 190,
+        "name": "aipom-alphaother",
+        "how": "Level Up"
       },
-      {
-        "id": 422,
-        "name": "shellos-alphaother",
-        "stableId": "shellos-west-alpha-0422",
-        "formType": "alphaother",
-        "types": [
-          "water"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/422.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/422.png"
-        },
-        "gen": 4,
-        "evolution": {
-          "pre": null,
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 443,
+    "name": "gible-alphaother",
+    "stableId": "gible-female-alpha-0443",
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/443.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/443.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 444,
+          "name": "gabite-alphaother",
+          "how": "Level Up to 24"
         }
-      },
-      {
-        "id": 423,
-        "name": "gastrodon-alphaother",
-        "stableId": "gastrodon-west-alpha-0423",
-        "formType": "alphaother",
-        "types": [
-          "water",
-          "ground"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/423.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/423.png"
-        },
-        "gen": 4,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 424,
-        "name": "ambipom-alphaother",
-        "stableId": "ambipom-female-alpha-0424",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/424.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/424.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 190,
-            "name": "aipom-alphaother",
-            "how": "Level Up"
-          },
-          "next": []
-        }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 444,
+    "name": "gabite-alphaother",
+    "stableId": "gabite-female-alpha-0444",
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/444.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/444.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 443,
         "name": "gible-alphaother",
-        "stableId": "gible-female-alpha-0443",
-        "types": [
-          "dragon",
-          "ground"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/443.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/443.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 444,
-              "name": "gabite-alphaother",
-              "how": "Level Up to 24"
-            }
-          ]
-        }
+        "how": "Level Up to 24"
       },
-      {
+      "next": [
+        {
+          "id": 445,
+          "name": "garchomp-alphaother",
+          "how": "Level Up to 48"
+        }
+      ]
+    }
+  },
+  {
+    "id": 445,
+    "name": "garchomp-alphaother",
+    "stableId": "garchomp-female-alpha-0445",
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/445.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/445.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 444,
         "name": "gabite-alphaother",
-        "stableId": "gabite-female-alpha-0444",
-        "types": [
-          "dragon",
-          "ground"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/444.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/444.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 443,
-            "name": "gible-alphaother",
-            "how": "Level Up to 24"
-          },
-          "next": [
-            {
-              "id": 445,
-              "name": "garchomp-alphaother",
-              "how": "Level Up to 48"
-            }
-          ]
-        }
+        "how": "Level Up to 48"
       },
-      {
-        "id": 445,
-        "name": "garchomp-alphaother",
-        "stableId": "garchomp-female-alpha-0445",
-        "types": [
-          "dragon",
-          "ground"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/445.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/445.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 444,
-            "name": "gabite-alphaother",
-            "how": "Level Up to 48"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 449,
+    "name": "hippopotas-alphaother",
+    "stableId": "hippopotas-female-alpha-0449",
+    "types": [
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/449.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/449.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 450,
+          "name": "hippowdon-alphaother",
+          "how": "Level Up to 34"
         }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 450,
+    "name": "hippowdon-alphaother",
+    "stableId": "hippowdon-female-alpha-0450",
+    "types": [
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/450.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/450.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 449,
         "name": "hippopotas-alphaother",
-        "stableId": "hippopotas-female-alpha-0449",
-        "types": [
-          "ground"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/449.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/449.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 450,
-              "name": "hippowdon-alphaother",
-              "how": "Level Up to 34"
-            }
-          ]
-        }
+        "how": "Level Up to 34"
       },
-      {
-        "id": 450,
-        "name": "hippowdon-alphaother",
-        "stableId": "hippowdon-female-alpha-0450",
-        "types": [
-          "ground"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/450.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/450.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 449,
-            "name": "hippopotas-alphaother",
-            "how": "Level Up to 34"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 453,
+    "name": "croagunk-alphaother",
+    "stableId": "croagunk-female-alpha-0453",
+    "types": [
+      "poison",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/453.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/453.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 454,
+          "name": "toxicroak-alphaother",
+          "how": "Level Up to 37"
         }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 454,
+    "name": "toxicroak-alphaother",
+    "stableId": "toxicroak-female-alpha-0454",
+    "types": [
+      "poison",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/454.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/454.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 453,
         "name": "croagunk-alphaother",
-        "stableId": "croagunk-female-alpha-0453",
-        "types": [
-          "poison",
-          "fighting"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/453.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/453.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 454,
-              "name": "toxicroak-alphaother",
-              "how": "Level Up to 37"
-            }
-          ]
-        }
+        "how": "Level Up to 37"
       },
-      {
-        "id": 454,
-        "name": "toxicroak-alphaother",
-        "stableId": "toxicroak-female-alpha-0454",
-        "types": [
-          "poison",
-          "fighting"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/454.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/454.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 453,
-            "name": "croagunk-alphaother",
-            "how": "Level Up to 37"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 456,
+    "name": "finneon-alphaother",
+    "stableId": "finneon-female-alpha-0456",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/456.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/456.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 457,
+          "name": "lumineon-alphaother",
+          "how": "Level Up to 31"
         }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 457,
+    "name": "lumineon-alphaother",
+    "stableId": "lumineon-female-alpha-0457",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/457.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/457.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 456,
         "name": "finneon-alphaother",
-        "stableId": "finneon-female-alpha-0456",
-        "types": [
-          "water"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/456.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/456.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 457,
-              "name": "lumineon-alphaother",
-              "how": "Level Up to 31"
-            }
-          ]
-        }
+        "how": "Level Up to 31"
       },
-      {
-        "id": 457,
-        "name": "lumineon-alphaother",
-        "stableId": "lumineon-female-alpha-0457",
-        "types": [
-          "water"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/457.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/457.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 456,
-            "name": "finneon-alphaother",
-            "how": "Level Up to 31"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 459,
+    "name": "snover-alphaother",
+    "stableId": "snover-female-alpha-0459",
+    "types": [
+      "grass",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/459.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/459.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 460,
+          "name": "abomasnow-alphaother",
+          "how": "Level Up to 40"
         }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 460,
+    "name": "abomasnow-alphaother",
+    "stableId": "abomasnow-female-alpha-0460",
+    "types": [
+      "grass",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/460.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/460.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 459,
         "name": "snover-alphaother",
-        "stableId": "snover-female-alpha-0459",
-        "types": [
-          "grass",
-          "ice"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/459.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/459.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 460,
-              "name": "abomasnow-alphaother",
-              "how": "Level Up to 40"
-            }
-          ]
-        }
+        "how": "Level Up to 40"
       },
-      {
-        "id": 460,
-        "name": "abomasnow-alphaother",
-        "stableId": "abomasnow-female-alpha-0460",
-        "types": [
-          "grass",
-          "ice"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/460.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/460.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 459,
-            "name": "snover-alphaother",
-            "how": "Level Up to 40"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 461,
+    "name": "weavile-alphaother",
+    "stableId": "weavile-female-alpha-0461",
+    "types": [
+      "dark",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/461.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/461.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 215,
+        "name": "sneasel-alphaother",
+        "how": "Level Up"
       },
-      {
-        "id": 461,
-        "name": "weavile-alphaother",
-        "stableId": "weavile-female-alpha-0461",
-        "types": [
-          "dark",
-          "ice"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/461.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/461.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 215,
-            "name": "sneasel-alphaother",
-            "how": "Level Up"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 464,
+    "name": "rhyperior-alphaother",
+    "stableId": "rhyperior-female-alpha-0464",
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/464.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/464.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 112,
+        "name": "rhydon-alphaother",
+        "how": "Trade"
       },
-      {
-        "id": 464,
-        "name": "rhyperior-alphaother",
-        "stableId": "rhyperior-female-alpha-0464",
-        "types": [
-          "ground",
-          "rock"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/464.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/464.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 112,
-            "name": "rhydon-alphaother",
-            "how": "Trade"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 465,
+    "name": "tangrowth-alphaother",
+    "stableId": "tangrowth-female-alpha-0465",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/465.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/465.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 114,
+        "name": "tangela",
+        "how": "Level Up"
       },
-      {
-        "id": 465,
-        "name": "tangrowth-alphaother",
-        "stableId": "tangrowth-female-alpha-0465",
-        "types": [
-          "grass"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/465.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/465.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 114,
-            "name": "tangela",
-            "how": "Level Up"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 473,
+    "name": "mamoswine-alphaother",
+    "stableId": "mamoswine-female-alpha-0473",
+    "types": [
+      "ice",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/473.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/473.png"
+    },
+    "gen": 4,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 221,
+        "name": "piloswine-alphaother",
+        "how": "Level Up"
       },
-      {
-        "id": 473,
-        "name": "mamoswine-alphaother",
-        "stableId": "mamoswine-female-alpha-0473",
-        "types": [
-          "ice",
-          "ground"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/473.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/473.png"
-        },
-        "gen": 4,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 221,
-            "name": "piloswine-alphaother",
-            "how": "Level Up"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 479,
+    "name": "rotom-heat-alphaother",
+    "stableId": "rotom-heat-alpha-0479",
+    "formType": "alphaother",
+    "types": [
+      "electric",
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10008.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-heat.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 479,
+    "name": "rotom-wash-alphaother",
+    "stableId": "rotom-wash-alpha-0479",
+    "formType": "alphaother",
+    "types": [
+      "electric",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10009.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-wash.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 479,
+    "name": "rotom-frost-alphaother",
+    "stableId": "rotom-frost-alpha-0479",
+    "formType": "alphaother",
+    "types": [
+      "electric",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10010.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-frost.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 479,
+    "name": "rotom-fan-alphaother",
+    "stableId": "rotom-fan-alpha-0479",
+    "formType": "alphaother",
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10011.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-fan.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 479,
+    "name": "rotom-mow-alphaother",
+    "stableId": "rotom-mow-alpha-0479",
+    "formType": "alphaother",
+    "types": [
+      "electric",
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10012.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-mow.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 503,
+    "name": "samurott-alphaother",
+    "stableId": "samurott-unova-alpha-0503",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/503.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/503.png"
+    },
+    "gen": 5,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 502,
+        "name": "dewott",
+        "how": "Level Up to 36"
       },
-      {
-        "id": 479,
-        "name": "rotom-heat-alphaother",
-        "stableId": "rotom-heat-alpha-0479",
-        "formType": "alphaother",
-        "types": [
-          "electric",
-          "fire"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10008.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-heat.png"
-        },
-        "gen": 4,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 549,
+    "name": "lilligant-alphaother",
+    "stableId": "lilligant-female-alpha-0549",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/549.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/549.png"
+    },
+    "gen": 5,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 548,
+        "name": "petilil",
+        "how": "Use Sun Stone"
       },
-      {
-        "id": 479,
-        "name": "rotom-wash-alphaother",
-        "stableId": "rotom-wash-alpha-0479",
-        "formType": "alphaother",
-        "types": [
-          "electric",
-          "water"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10009.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-wash.png"
-        },
-        "gen": 4,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 628,
+    "name": "braviary-alphaother",
+    "stableId": "braviary-unova-alpha-0628",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/628.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/628.png"
+    },
+    "gen": 5,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 627,
+        "name": "rufflet",
+        "how": "Level Up to 54"
       },
-      {
-        "id": 479,
-        "name": "rotom-frost-alphaother",
-        "stableId": "rotom-frost-alpha-0479",
-        "formType": "alphaother",
-        "types": [
-          "electric",
-          "ice"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10010.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-frost.png"
-        },
-        "gen": 4,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 705,
+    "name": "sliggoo-alphaother",
+    "stableId": "sliggoo-kalos-alpha-0705",
+    "types": [
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/705.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/705.png"
+    },
+    "gen": 6,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 704,
+        "name": "goomy",
+        "how": "Level Up to 40"
       },
-      {
-        "id": 479,
-        "name": "rotom-fan-alphaother",
-        "stableId": "rotom-fan-alpha-0479",
-        "formType": "alphaother",
-        "types": [
-          "electric",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10011.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-fan.png"
-        },
-        "gen": 4,
-        "evolution": {
-          "pre": null,
-          "next": []
+      "next": [
+        {
+          "id": 706,
+          "name": "goodra",
+          "how": "Level Up to 50"
         }
-      },
-      {
-        "id": 479,
-        "name": "rotom-mow-alphaother",
-        "stableId": "rotom-mow-alpha-0479",
-        "formType": "alphaother",
-        "types": [
-          "electric",
-          "grass"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10012.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-mow.png"
-        },
-        "gen": 4,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 503,
-        "name": "samurott-alphaother",
-        "stableId": "samurott-unova-alpha-0503",
-        "types": [
-          "water"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/503.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/503.png"
-        },
-        "gen": 5,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 502,
-            "name": "dewott",
-            "how": "Level Up to 36"
-          },
-          "next": []
-        }
-      },
-      {
-        "id": 549,
-        "name": "lilligant-alphaother",
-        "stableId": "lilligant-female-alpha-0549",
-        "types": [
-          "grass"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/549.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/549.png"
-        },
-        "gen": 5,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 548,
-            "name": "petilil",
-            "how": "Use Sun Stone"
-          },
-          "next": []
-        }
-      },
-      {
-        "id": 628,
-        "name": "braviary-alphaother",
-        "stableId": "braviary-unova-alpha-0628",
-        "types": [
-          "normal",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/628.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/628.png"
-        },
-        "gen": 5,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 627,
-            "name": "rufflet",
-            "how": "Level Up to 54"
-          },
-          "next": []
-        }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 706,
+    "name": "goodra-alphaother",
+    "stableId": "goodra-kalos-alpha-0706",
+    "types": [
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/706.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/706.png"
+    },
+    "gen": 6,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 705,
-        "name": "sliggoo-alphaother",
-        "stableId": "sliggoo-kalos-alpha-0705",
-        "types": [
-          "dragon"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/705.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/705.png"
-        },
-        "gen": 6,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 704,
-            "name": "goomy",
-            "how": "Level Up to 40"
-          },
-          "next": [
-            {
-              "id": 706,
-              "name": "goodra",
-              "how": "Level Up to 50"
-            }
-          ]
-        }
+        "name": "sliggoo",
+        "how": "Level Up to 50"
       },
-      {
-        "id": 706,
-        "name": "goodra-alphaother",
-        "stableId": "goodra-kalos-alpha-0706",
-        "types": [
-          "dragon"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/706.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/706.png"
-        },
-        "gen": 6,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 705,
-            "name": "sliggoo",
-            "how": "Level Up to 50"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 713,
+    "name": "avalugg-alphaother",
+    "stableId": "avalugg-kalos-alpha-0713",
+    "types": [
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/713.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/713.png"
+    },
+    "gen": 6,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 712,
+        "name": "bergmite",
+        "how": "Level Up to 37"
       },
-      {
-        "id": 713,
-        "name": "avalugg-alphaother",
-        "stableId": "avalugg-kalos-alpha-0713",
-        "types": [
-          "ice"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/713.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/713.png"
-        },
-        "gen": 6,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 712,
-            "name": "bergmite",
-            "how": "Level Up to 37"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 724,
+    "name": "decidueye-alphaother",
+    "stableId": "decidueye-alola-alpha-0724",
+    "types": [
+      "grass",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/724.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/724.png"
+    },
+    "gen": 7,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 723,
+        "name": "dartrix",
+        "how": "Level Up to 34"
       },
-      {
-        "id": 724,
-        "name": "decidueye-alphaother",
-        "stableId": "decidueye-alola-alpha-0724",
-        "types": [
-          "grass",
-          "ghost"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/724.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/724.png"
-        },
-        "gen": 7,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 723,
-            "name": "dartrix",
-            "how": "Level Up to 34"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 902,
+    "name": "basculegion-alphaother",
+    "stableId": "basculegion-female-alpha-0902",
+    "types": [
+      "water",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10248.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10248.png"
+    },
+    "gen": 8,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 550,
+        "name": "basculin-white-striped",
+        "how": "Use 294 HP in recoil damage without fainting (Male)"
       },
-      {
-        "id": 902,
-        "name": "basculegion-alphaother",
-        "stableId": "basculegion-female-alpha-0902",
-        "types": [
-          "water",
-          "ghost"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10248.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10248.png"
-        },
-        "gen": 8,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 550,
-            "name": "basculin-white-striped",
-            "how": "Use 294 HP in recoil damage without fainting (Male)"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 52,
+    "name": "meowth-alolan-alphaother",
+    "stableId": "meowth-alolan-alpha-052",
+    "formType": "alphaother",
+    "types": [
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10107.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10107.png"
+    },
+    "gen": 7,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 53,
+          "name": "persian-alolan",
+          "how": "Level Up with high friendship"
         }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 53,
+    "name": "persian-alolan-alphaother",
+    "stableId": "persian-alolan-alpha-053",
+    "formType": "alphaother",
+    "types": [
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10108.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10108.png"
+    },
+    "gen": 7,
+    "evolution": {
+      "pre": {
         "id": 52,
-        "name": "meowth-alolan-alphaother",
-        "stableId": "meowth-alolan-alpha-052",
-        "formType": "alphaother",
-        "types": [
-          "dark"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10107.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10107.png"
-        },
-        "gen": 7,
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 53,
-              "name": "persian-alolan",
-              "how": "Level Up with high friendship"
-            }
-          ]
-        }
+        "name": "meowth-alolan",
+        "how": "Level Up with high friendship"
       },
-      {
-        "id": 53,
-        "name": "persian-alolan-alphaother",
-        "stableId": "persian-alolan-alpha-053",
-        "formType": "alphaother",
-        "types": [
-          "dark"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10108.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10108.png"
-        },
-        "gen": 7,
-        "evolution": {
-          "pre": {
-            "id": 52,
-            "name": "meowth-alolan",
-            "how": "Level Up with high friendship"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 52,
+    "name": "meowth-galar-alphaother",
+    "stableId": "meowth-galar-alpha-052",
+    "formType": "alphaother",
+    "types": [
+      "steel"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10161.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10161.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 863,
+          "name": "perrserker",
+          "how": "Level Up to 28"
         }
-      },
-      {
-        "id": 52,
-        "name": "meowth-galar-alphaother",
-        "stableId": "meowth-galar-alpha-052",
-        "formType": "alphaother",
-        "types": [
-          "steel"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10161.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10161.png"
-        },
-        "gen": 8,
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 863,
-              "name": "perrserker",
-              "how": "Level Up to 28"
-            }
-          ]
+      ]
+    }
+  },
+  {
+    "id": 83,
+    "name": "farfetchd-galar-alphaother",
+    "stableId": "farfetchd-galar-alpha-083",
+    "formType": "alphaother",
+    "types": [
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10166.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10166.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 865,
+          "name": "sirfetchd",
+          "how": "three critical hits"
         }
+      ]
+    }
+  },
+  {
+    "id": 105,
+    "name": "marowak-alolan-alphaother",
+    "stableId": "marowak-alolan-alpha-105",
+    "types": [
+      "fire",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10115.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10115.png"
+    },
+    "gen": 7,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 104,
+        "name": "cubone",
+        "how": "Level Up to 28 at night in Alola"
       },
-      {
-        "id": 83,
-        "name": "farfetchd-galar-alphaother",
-        "stableId": "farfetchd-galar-alpha-083",
-        "formType": "alphaother",
-        "types": [
-          "fighting"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10166.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10166.png"
-        },
-        "gen": 8,
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 865,
-              "name": "sirfetchd",
-              "how": "three critical hits"
-            }
-          ]
+      "next": []
+    }
+  },
+  {
+    "id": 122,
+    "name": "mr-mime-galar-alphaother",
+    "stableId": "mr-mime-galar-alpha-122",
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10168.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10168.png"
+    },
+    "gen": 8,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 439,
+        "name": "mime-jr",
+        "how": "Level Up with Mimic (Galar)"
+      },
+      "next": [
+        {
+          "id": 866,
+          "name": "mr-rime",
+          "how": "Level Up to 42"
         }
-      },
-      {
-        "id": 105,
-        "name": "marowak-alolan-alphaother",
-        "stableId": "marowak-alolan-alpha-105",
-        "types": [
-          "fire",
-          "ghost"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10115.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10115.png"
-        },
-        "gen": 7,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 104,
-            "name": "cubone",
-            "how": "Level Up to 28 at night in Alola"
-          },
-          "next": []
+      ]
+    }
+  },
+  {
+    "id": 562,
+    "name": "yamask-galar-alphaother",
+    "stableId": "yamask-galar-alpha-562",
+    "types": [
+      "ground",
+      "ghost"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10179.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10179.png"
+    },
+    "gen": 8,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 867,
+          "name": "runerigus",
+          "how": "Take 49+ HP damage & pass under Stone Sculpture in Dusty Bowl"
         }
-      },
-      {
-        "id": 122,
-        "name": "mr-mime-galar-alphaother",
-        "stableId": "mr-mime-galar-alpha-122",
-        "types": [
-          "ice",
-          "psychic"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10168.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10168.png"
-        },
-        "gen": 8,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 439,
-            "name": "mime-jr",
-            "how": "Level Up with Mimic (Galar)"
-          },
-          "next": [
-            {
-              "id": 866,
-              "name": "mr-rime",
-              "how": "Level Up to 42"
-            }
-          ]
+      ]
+    }
+  },
+  {
+    "id": 849,
+    "name": "toxtricity-low-key-alphaother",
+    "stableId": "toxtricity-low-key-alpha-849",
+    "formType": "alphaother",
+    "types": [
+      "electric",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/toxtricity-lowkey.png",
+      "front_shiny": "/Sprites/toxtricity-lowkey-shiny.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 876,
+    "name": "indeedee-female-alphaother",
+    "stableId": "indeedee-female-alpha-0876",
+    "formType": "alphaother",
+    "types": [
+      "psychic",
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/876.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/876.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 931,
+    "name": "squawkabilly-blue-alphaother",
+    "stableId": "squawkabilly-blue-alpha-0931",
+    "formType": "alphaother",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/sqwuawkabilly-blue.png",
+      "front_shiny": "/Sprites/sqwuawkabilly-blue-shiny.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 931,
+    "name": "squawkabilly-yellow-alphaother",
+    "stableId": "squawkabilly-yellow-alpha-0931",
+    "formType": "alphaother",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/sqwuawkabilly-yellow.png",
+      "front_shiny": "/Sprites/sqwuawkabilly-yellow-shiny.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 931,
+    "name": "squawkabilly-white-alphaother",
+    "stableId": "squawkabilly-white-alpha-0931",
+    "formType": "alphaother",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/sqwuawkabilly-white.png",
+      "front_shiny": "/Sprites/sqwuawkabilly-white-shiny.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 978,
+    "name": "tatsugiri-droopy-alphaother",
+    "stableId": "tatsugiri-droopy-alpha-0978",
+    "formType": "alphaother",
+    "types": [
+      "dragon",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/tatsugiri-droopy.png",
+      "front_shiny": "/Sprites/tatsugiri-droopy-shiny.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 978,
+    "name": "tatsugiri-stretchy-alphaother",
+    "stableId": "tatsugiri-stretchy-alpha-0978",
+    "formType": "alphaother",
+    "types": [
+      "dragon",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/tatsugiri-stretchy.png",
+      "front_shiny": "/Sprites/tatsugiri-stretchy-shiny.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 255,
+    "name": "torchic-alphaother",
+    "stableId": "torchic-female-alpha-0255",
+    "formType": "alphaother",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/255.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/255.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 256,
+          "name": "combusken",
+          "how": "Level Up to 16"
         }
-      },
-      {
-        "id": 562,
-        "name": "yamask-galar-alphaother",
-        "stableId": "yamask-galar-alpha-562",
-        "types": [
-          "ground",
-          "ghost"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10179.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10179.png"
-        },
-        "gen": 8,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 867,
-              "name": "runerigus",
-              "how": "Take 49+ HP damage & pass under Stone Sculpture in Dusty Bowl"
-            }
-          ]
-        }
-      },
-      {
-        "id": 849,
-        "name": "toxtricity-low-key-alphaother",
-        "stableId": "toxtricity-low-key-alpha-849",
-        "formType": "alphaother",
-        "types": [
-          "electric",
-          "poison"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/toxtricity-lowkey.png",
-          "front_shiny": "/Sprites/toxtricity-lowkey-shiny.png"
-        },
-        "gen": 8,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 876,
-        "name": "indeedee-female-alphaother",
-        "stableId": "indeedee-female-alpha-0876",
-        "formType": "alphaother",
-        "types": [
-          "psychic",
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/876.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/876.png"
-        },
-        "gen": 8,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 931,
-        "name": "squawkabilly-blue-alphaother",
-        "stableId": "squawkabilly-blue-alpha-0931",
-        "formType": "alphaother",
-        "types": [
-          "normal",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/sqwuawkabilly-blue.png",
-          "front_shiny": "/Sprites/sqwuawkabilly-blue-shiny.png"
-        },
-        "gen": 9,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 931,
-        "name": "squawkabilly-yellow-alphaother",
-        "stableId": "squawkabilly-yellow-alpha-0931",
-        "formType": "alphaother",
-        "types": [
-          "normal",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/sqwuawkabilly-yellow.png",
-          "front_shiny": "/Sprites/sqwuawkabilly-yellow-shiny.png"
-        },
-        "gen": 9,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 931,
-        "name": "squawkabilly-white-alphaother",
-        "stableId": "squawkabilly-white-alpha-0931",
-        "formType": "alphaother",
-        "types": [
-          "normal",
-          "flying"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/sqwuawkabilly-white.png",
-          "front_shiny": "/Sprites/sqwuawkabilly-white-shiny.png"
-        },
-        "gen": 9,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 978,
-        "name": "tatsugiri-droopy-alphaother",
-        "stableId": "tatsugiri-droopy-alpha-0978",
-        "formType": "alphaother",
-        "types": [
-          "dragon",
-          "water"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/tatsugiri-droopy.png",
-          "front_shiny": "/Sprites/tatsugiri-droopy-shiny.png"
-        },
-        "gen": 9,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 978,
-        "name": "tatsugiri-stretchy-alphaother",
-        "stableId": "tatsugiri-stretchy-alpha-0978",
-        "formType": "alphaother",
-        "types": [
-          "dragon",
-          "water"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/tatsugiri-stretchy.png",
-          "front_shiny": "/Sprites/tatsugiri-stretchy-shiny.png"
-        },
-        "gen": 9,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 256,
+    "name": "combusken-alphaother",
+    "stableId": "combusken-female-alpha-0256",
+    "formType": "alphaother",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/256.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/256.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
         "id": 255,
-        "name": "torchic-alphaother",
-        "stableId": "torchic-female-alpha-0255",
-        "formType": "alphaother",
-        "types": [
-          "fire"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/255.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/255.png"
-        },
-        "gen": 3,
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 256,
-              "name": "combusken",
-              "how": "Level Up to 16"
-            }
-          ]
-        }
+        "name": "torchic",
+        "how": "Level Up to 16"
       },
-      {
+      "next": [
+        {
+          "id": 257,
+          "name": "blaziken",
+          "how": "Level Up to 36"
+        }
+      ]
+    }
+  },
+  {
+    "id": 257,
+    "name": "blaziken-alphaother",
+    "stableId": "blaziken-female-alpha-0257",
+    "formType": "alphaother",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/257.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/257.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
         "id": 256,
-        "name": "combusken-alphaother",
-        "stableId": "combusken-female-alpha-0256",
-        "formType": "alphaother",
-        "types": [
-          "fire",
-          "fighting"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/256.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/256.png"
-        },
-        "gen": 3,
-        "evolution": {
-          "pre": {
-            "id": 255,
-            "name": "torchic",
-            "how": "Level Up to 16"
-          },
-          "next": [
-            {
-              "id": 257,
-              "name": "blaziken",
-              "how": "Level Up to 36"
-            }
-          ]
-        }
+        "name": "combusken",
+        "how": "Level Up to 36"
       },
-      {
-        "id": 257,
-        "name": "blaziken-alphaother",
-        "stableId": "blaziken-female-alpha-0257",
-        "formType": "alphaother",
-        "types": [
-          "fire",
-          "fighting"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/257.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/257.png"
-        },
-        "gen": 3,
-        "evolution": {
-          "pre": {
-            "id": 256,
-            "name": "combusken",
-            "how": "Level Up to 36"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 307,
+    "name": "meditite-alphaother",
+    "stableId": "meditite-female-alpha-0307",
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/307.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/307.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 308,
+          "name": "medicham",
+          "how": "Level Up to 37"
         }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 308,
+    "name": "medicham-alphaother",
+    "stableId": "medicham-female-alpha-0308",
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/308.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/308.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 307,
-        "name": "meditite-alphaother",
-        "stableId": "meditite-female-alpha-0307",
-        "types": [
-          "fighting",
-          "psychic"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/307.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/307.png"
-        },
-        "gen": 3,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 308,
-              "name": "medicham",
-              "how": "Level Up to 37"
-            }
-          ]
-        }
+        "name": "meditite",
+        "how": "Level Up to 37"
       },
-      {
-        "id": 308,
-        "name": "medicham-alphaother",
-        "stableId": "medicham-female-alpha-0308",
-        "types": [
-          "fighting",
-          "psychic"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/308.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/308.png"
-        },
-        "gen": 3,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 307,
-            "name": "meditite",
-            "how": "Level Up to 37"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 154,
+    "name": "meganium-alphaother",
+    "stableId": "meganium-female-alpha-0154",
+    "formType": "alphaother",
+    "types": [
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/154.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/154.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 153,
+        "name": "bayleef",
+        "how": "Level Up to 32"
       },
-      {
-        "id": 154,
-        "name": "meganium-alphaother",
-        "stableId": "meganium-female-alpha-0154",
-        "formType": "alphaother",
-        "types": [
-          "grass"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/154.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/154.png"
-        },
-        "gen": 2,
-        "evolution": {
-          "pre": {
-            "id": 153,
-            "name": "bayleef",
-            "how": "Level Up to 32"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 678,
+    "name": "meowstic-female-alphaother",
+    "stableId": "meowstic-female-alpha-0678",
+    "types": [
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10025.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10025.png"
+    },
+    "gen": 6,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 677,
+        "name": "espurr",
+        "how": "Level 25 (Female)"
       },
-      {
-        "id": 678,
-        "name": "meowstic-female-alphaother",
-        "stableId": "meowstic-female-alpha-0678",
-        "types": [
-          "psychic"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10025.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10025.png"
-        },
-        "gen": 6,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 677,
-            "name": "espurr",
-            "how": "Level 25 (Female)"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 668,
+    "name": "pyroar-alphaother",
+    "stableId": "pyroar-female-alpha-0668",
+    "types": [
+      "fire",
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/668.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/668.png"
+    },
+    "gen": 6,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 322,
+    "name": "numel-alphaother",
+    "stableId": "numel-female-alpha-0322",
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/322.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/322.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 323,
+          "name": "camerupt",
+          "how": "Level Up to 33"
         }
-      },
-      {
-        "id": 668,
-        "name": "pyroar-alphaother",
-        "stableId": "pyroar-female-alpha-0668",
-        "types": [
-          "fire",
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/668.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/668.png"
-        },
-        "gen": 6,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 323,
+    "name": "camerupt-alphaother",
+    "stableId": "camerupt-female-alpha-0323",
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/323.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/323.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 322,
-        "name": "numel-alphaother",
-        "stableId": "numel-female-alpha-0322",
-        "types": [
-          "fire",
-          "ground"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/322.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/322.png"
-        },
-        "gen": 3,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 323,
-              "name": "camerupt",
-              "how": "Level Up to 33"
-            }
-          ]
-        }
+        "name": "numel",
+        "how": "Level Up to 33"
       },
-      {
-        "id": 323,
-        "name": "camerupt-alphaother",
-        "stableId": "camerupt-female-alpha-0323",
-        "types": [
-          "fire",
-          "ground"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/323.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/323.png"
-        },
-        "gen": 3,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 322,
-            "name": "numel",
-            "how": "Level Up to 33"
-          },
-          "next": []
+      "next": []
+    }
+  },
+  {
+    "id": 3,
+    "name": "venusaur-alphaother",
+    "stableId": "venusaur-female-alpha-0003",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/3.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/3.png"
+    },
+    "gen": 1,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-heart-alphaother",
+    "stableId": "furfrou-heart-alpha-0676",
+    "formType": "alphaother",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-heart.png",
+      "front_shiny": "/Sprites/furfrou-heart-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-star-alphaother",
+    "stableId": "furfrou-star-alpha-0676",
+    "formType": "alphaother",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-star.png",
+      "front_shiny": "/Sprites/furfrou-star-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-diamond-alphaother",
+    "stableId": "furfrou-diamond-alpha-0676",
+    "formType": "alphaother",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-diamond.png",
+      "front_shiny": "/Sprites/furfrou-diamond-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-debutante-alphaother",
+    "stableId": "furfrou-debutante-alpha-0676",
+    "formType": "alphaother",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-debutante.png",
+      "front_shiny": "/Sprites/furfrou-debutante-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-matron-alphaother",
+    "stableId": "furfrou-matron-alpha-0676",
+    "formType": "alphaother",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-matron.png",
+      "front_shiny": "/Sprites/furfrou-matron-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-dandy-alphaother",
+    "stableId": "furfrou-dandy-alpha-0676",
+    "formType": "alphaother",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-dandy.png",
+      "front_shiny": "/Sprites/furfrou-dandy-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-lareine-alphaother",
+    "stableId": "furfrou-lareine-alpha-0676",
+    "formType": "alphaother",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-lareine.png",
+      "front_shiny": "/Sprites/furfrou-lareine-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-kabuki-alphaother",
+    "stableId": "furfrou-kabuki-alpha-0676",
+    "formType": "alphaother",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-kabuki.png",
+      "front_shiny": "/Sprites/furfrou-kabuki-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 676,
+    "name": "furfrou-pharaoh-alphaother",
+    "stableId": "furfrou-pharaoh-alpha-0676",
+    "formType": "alphaother",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/furfrou-pharaoh.png",
+      "front_shiny": "/Sprites/furfrou-pharaoh-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 710,
+    "name": "pumpkaboo-small-alphaother",
+    "stableId": "pumpkaboo-small-alpha-0710",
+    "formType": "alphaother",
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/pumpkaboo-small.png",
+      "front_shiny": "/Sprites/pumpkaboo-small-shiny.png"
+    },
+    "sizeScale": 0.85,
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 710,
+    "name": "pumpkaboo-large-alphaother",
+    "stableId": "pumpkaboo-large-alpha-0710",
+    "formType": "alphaother",
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/pumpkaboo-large.png",
+      "front_shiny": "/Sprites/pumpkaboo-large-shiny.png"
+    },
+    "sizeScale": 1.15,
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 710,
+    "name": "pumpkaboo-super-alphaother",
+    "stableId": "pumpkaboo-super-alpha-0710",
+    "formType": "alphaother",
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/pumpkaboo-super.png",
+      "front_shiny": "/Sprites/pumpkaboo-super-shiny.png"
+    },
+    "sizeScale": 1.5,
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 711,
+    "name": "gourgeist-small-alphaother",
+    "stableId": "gourgeist-small-alpha-0711",
+    "formType": "alphaother",
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/gourgeist-small.png",
+      "front_shiny": "/Sprites/gourgeist-small-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 711,
+    "name": "gourgeist-large-alphaother",
+    "stableId": "gourgeist-large-alpha-0711",
+    "formType": "alphaother",
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/gourgeist-large.png",
+      "front_shiny": "/Sprites/gourgeist-large-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 711,
+    "name": "gourgeist-super-alphaother",
+    "stableId": "gourgeist-super-alpha-0711",
+    "formType": "alphaother",
+    "types": [
+      "ghost",
+      "grass"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/gourgeist-super.png",
+      "front_shiny": "/Sprites/gourgeist-super-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 229,
+    "name": "houndoom-alphaother",
+    "stableId": "houndoom-female-alpha-0229",
+    "types": [
+      "dark",
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/229.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/229.png"
+    },
+    "gen": 2,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 316,
+    "name": "gulpin-alphaother",
+    "stableId": "gulpin-female-alpha-0316",
+    "types": [
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/316.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/316.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 317,
+          "name": "swalot",
+          "how": "Level Up to 26"
         }
-      },
-      {
-        "id": 3,
-        "name": "venusaur-alphaother",
-        "stableId": "venusaur-female-alpha-0003",
-        "types": [
-          "grass",
-          "poison"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/3.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/3.png"
-        },
-        "gen": 1,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 676,
-        "name": "furfrou-heart-alphaother",
-        "stableId": "furfrou-heart-alpha-0676",
-        "formType": "alphaother",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/furfrou-heart.png",
-          "front_shiny": "/Sprites/furfrou-heart-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 676,
-        "name": "furfrou-star-alphaother",
-        "stableId": "furfrou-star-alpha-0676",
-        "formType": "alphaother",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/furfrou-star.png",
-          "front_shiny": "/Sprites/furfrou-star-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 676,
-        "name": "furfrou-diamond-alphaother",
-        "stableId": "furfrou-diamond-alpha-0676",
-        "formType": "alphaother",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/furfrou-diamond.png",
-          "front_shiny": "/Sprites/furfrou-diamond-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 676,
-        "name": "furfrou-debutante-alphaother",
-        "stableId": "furfrou-debutante-alpha-0676",
-        "formType": "alphaother",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/furfrou-debutante.png",
-          "front_shiny": "/Sprites/furfrou-debutante-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 676,
-        "name": "furfrou-matron-alphaother",
-        "stableId": "furfrou-matron-alpha-0676",
-        "formType": "alphaother",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/furfrou-matron.png",
-          "front_shiny": "/Sprites/furfrou-matron-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 676,
-        "name": "furfrou-dandy-alphaother",
-        "stableId": "furfrou-dandy-alpha-0676",
-        "formType": "alphaother",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/furfrou-dandy.png",
-          "front_shiny": "/Sprites/furfrou-dandy-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 676,
-        "name": "furfrou-lareine-alphaother",
-        "stableId": "furfrou-lareine-alpha-0676",
-        "formType": "alphaother",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/furfrou-lareine.png",
-          "front_shiny": "/Sprites/furfrou-lareine-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 676,
-        "name": "furfrou-kabuki-alphaother",
-        "stableId": "furfrou-kabuki-alpha-0676",
-        "formType": "alphaother",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/furfrou-kabuki.png",
-          "front_shiny": "/Sprites/furfrou-kabuki-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 676,
-        "name": "furfrou-pharaoh-alphaother",
-        "stableId": "furfrou-pharaoh-alpha-0676",
-        "formType": "alphaother",
-        "types": [
-          "normal"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/furfrou-pharaoh.png",
-          "front_shiny": "/Sprites/furfrou-pharaoh-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 710,
-        "name": "pumpkaboo-small-alphaother",
-        "stableId": "pumpkaboo-small-alpha-0710",
-        "formType": "alphaother",
-        "types": [
-          "ghost",
-          "grass"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/pumpkaboo-small.png",
-          "front_shiny": "/Sprites/pumpkaboo-small-shiny.png"
-        },
-        "sizeScale": 0.85,
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 710,
-        "name": "pumpkaboo-large-alphaother",
-        "stableId": "pumpkaboo-large-alpha-0710",
-        "formType": "alphaother",
-        "types": [
-          "ghost",
-          "grass"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/pumpkaboo-large.png",
-          "front_shiny": "/Sprites/pumpkaboo-large-shiny.png"
-        },
-        "sizeScale": 1.15,
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 710,
-        "name": "pumpkaboo-super-alphaother",
-        "stableId": "pumpkaboo-super-alpha-0710",
-        "formType": "alphaother",
-        "types": [
-          "ghost",
-          "grass"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/pumpkaboo-super.png",
-          "front_shiny": "/Sprites/pumpkaboo-super-shiny.png"
-        },
-        "sizeScale": 1.5,
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 711,
-        "name": "gourgeist-small-alphaother",
-        "stableId": "gourgeist-small-alpha-0711",
-        "formType": "alphaother",
-        "types": [
-          "ghost",
-          "grass"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/gourgeist-small.png",
-          "front_shiny": "/Sprites/gourgeist-small-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 711,
-        "name": "gourgeist-large-alphaother",
-        "stableId": "gourgeist-large-alpha-0711",
-        "formType": "alphaother",
-        "types": [
-          "ghost",
-          "grass"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/gourgeist-large.png",
-          "front_shiny": "/Sprites/gourgeist-large-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 711,
-        "name": "gourgeist-super-alphaother",
-        "stableId": "gourgeist-super-alpha-0711",
-        "formType": "alphaother",
-        "types": [
-          "ghost",
-          "grass"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/gourgeist-super.png",
-          "front_shiny": "/Sprites/gourgeist-super-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 229,
-        "name": "houndoom-alphaother",
-        "stableId": "houndoom-female-alpha-0229",
-        "types": [
-          "dark",
-          "fire"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/229.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/229.png"
-        },
-        "gen": 2,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 317,
+    "name": "swalot-alphaother",
+    "stableId": "swalot-female-alpha-0317",
+    "types": [
+      "poison"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/317.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/317.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 316,
-        "name": "gulpin-alphaother",
-        "stableId": "gulpin-female-alpha-0316",
-        "types": [
-          "poison"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/316.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/316.png"
-        },
-        "gen": 3,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 317,
-              "name": "swalot",
-              "how": "Level Up to 26"
-            }
-          ]
-        }
+        "name": "gulpin",
+        "how": "Level Up to 26"
       },
-      {
-        "id": 317,
-        "name": "swalot-alphaother",
-        "stableId": "swalot-female-alpha-0317",
-        "types": [
-          "poison"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/317.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/317.png"
+      "next": []
+    }
+  },
+  {
+    "id": 350,
+    "name": "milotic-alphaother",
+    "stableId": "milotic-female-alpha-0350",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/350.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/350.png"
+    },
+    "gen": 3,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 669,
+    "name": "flabebe-yellow-alphaother",
+    "stableId": "flabebe-yellow-alpha-0669",
+    "formType": "alphaother",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/flabebe-yellow.png",
+      "front_shiny": "/Sprites/flabebe-yellow-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 669,
+    "name": "flabebe-orange-alphaother",
+    "stableId": "flabebe-orange-alpha-0669",
+    "formType": "alphaother",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/flabebe-orange.png",
+      "front_shiny": "/Sprites/flabebe-orange-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 669,
+    "name": "flabebe-blue-alphaother",
+    "stableId": "flabebe-blue-alpha-0669",
+    "formType": "alphaother",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/flabebe-blue.png",
+      "front_shiny": "/Sprites/flabebe-blue-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 669,
+    "name": "flabebe-white-alphaother",
+    "stableId": "flabebe-white-alpha-0669",
+    "formType": "alphaother",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/flabebe-white.png",
+      "front_shiny": "/Sprites/flabebe-white-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 670,
+    "name": "floette-yellow-alphaother",
+    "stableId": "floette-yellow-alpha-0670",
+    "formType": "alphaother",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/floette-yellow.png",
+      "front_shiny": "/Sprites/floette-yellow-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 670,
+    "name": "floette-orange-alphaother",
+    "stableId": "floette-orange-alpha-0670",
+    "formType": "alphaother",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/floette-orange.png",
+      "front_shiny": "/Sprites/floette-orange-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 670,
+    "name": "floette-blue-alphaother",
+    "stableId": "floette-blue-alpha-0670",
+    "formType": "alphaother",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/floette-blue.png",
+      "front_shiny": "/Sprites/floette-blue-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 670,
+    "name": "floette-white-alphaother",
+    "stableId": "floette-white-alpha-0670",
+    "formType": "alphaother",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/floette-white.png",
+      "front_shiny": "/Sprites/floette-white-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 671,
+    "name": "florges-yellow-alphaother",
+    "stableId": "florges-yellow-alpha-0671",
+    "formType": "alphaother",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/florges-yellow.png",
+      "front_shiny": "/Sprites/florges-yellow-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 671,
+    "name": "florges-orange-alphaother",
+    "stableId": "florges-orange-alpha-0671",
+    "formType": "alphaother",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/florges-orange.png",
+      "front_shiny": "/Sprites/florges-orange-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 671,
+    "name": "florges-blue-alphaother",
+    "stableId": "florges-blue-alpha-0671",
+    "formType": "alphaother",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/florges-blue.png",
+      "front_shiny": "/Sprites/florges-blue-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 671,
+    "name": "florges-white-alphaother",
+    "stableId": "florges-white-alpha-0671",
+    "formType": "alphaother",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/florges-white.png",
+      "front_shiny": "/Sprites/florges-white-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 79,
+    "name": "slowpoke-galarian-alphaother",
+    "stableId": "slowpoke-galar-alpha-0079",
+    "types": [
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10164.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10164.png"
+    },
+    "gen": 8,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 80,
+          "name": "slowbro-galarian-alphaother",
+          "how": "Use Galarica Cuff"
         },
-        "gen": 3,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 316,
-            "name": "gulpin",
-            "how": "Level Up to 26"
-          },
-          "next": []
+        {
+          "id": 199,
+          "name": "slowking-galarian-alphaother",
+          "how": "Use Galarica Wreath"
         }
-      },
-      {
-        "id": 350,
-        "name": "milotic-alphaother",
-        "stableId": "milotic-female-alpha-0350",
-        "types": [
-          "water"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/350.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/350.png"
-        },
-        "gen": 3,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 669,
-        "name": "flabebe-yellow-alphaother",
-        "stableId": "flabebe-yellow-alpha-0669",
-        "formType": "alphaother",
-        "types": [
-          "fairy"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/flabebe-yellow.png",
-          "front_shiny": "/Sprites/flabebe-yellow-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 669,
-        "name": "flabebe-orange-alphaother",
-        "stableId": "flabebe-orange-alpha-0669",
-        "formType": "alphaother",
-        "types": [
-          "fairy"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/flabebe-orange.png",
-          "front_shiny": "/Sprites/flabebe-orange-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 669,
-        "name": "flabebe-blue-alphaother",
-        "stableId": "flabebe-blue-alpha-0669",
-        "formType": "alphaother",
-        "types": [
-          "fairy"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/flabebe-blue.png",
-          "front_shiny": "/Sprites/flabebe-blue-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 669,
-        "name": "flabebe-white-alphaother",
-        "stableId": "flabebe-white-alpha-0669",
-        "formType": "alphaother",
-        "types": [
-          "fairy"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/flabebe-white.png",
-          "front_shiny": "/Sprites/flabebe-white-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 670,
-        "name": "floette-yellow-alphaother",
-        "stableId": "floette-yellow-alpha-0670",
-        "formType": "alphaother",
-        "types": [
-          "fairy"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/floette-yellow.png",
-          "front_shiny": "/Sprites/floette-yellow-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 670,
-        "name": "floette-orange-alphaother",
-        "stableId": "floette-orange-alpha-0670",
-        "formType": "alphaother",
-        "types": [
-          "fairy"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/floette-orange.png",
-          "front_shiny": "/Sprites/floette-orange-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 670,
-        "name": "floette-blue-alphaother",
-        "stableId": "floette-blue-alpha-0670",
-        "formType": "alphaother",
-        "types": [
-          "fairy"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/floette-blue.png",
-          "front_shiny": "/Sprites/floette-blue-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 670,
-        "name": "floette-white-alphaother",
-        "stableId": "floette-white-alpha-0670",
-        "formType": "alphaother",
-        "types": [
-          "fairy"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/floette-white.png",
-          "front_shiny": "/Sprites/floette-white-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 671,
-        "name": "florges-yellow-alphaother",
-        "stableId": "florges-yellow-alpha-0671",
-        "formType": "alphaother",
-        "types": [
-          "fairy"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/florges-yellow.png",
-          "front_shiny": "/Sprites/florges-yellow-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 671,
-        "name": "florges-orange-alphaother",
-        "stableId": "florges-orange-alpha-0671",
-        "formType": "alphaother",
-        "types": [
-          "fairy"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/florges-orange.png",
-          "front_shiny": "/Sprites/florges-orange-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 671,
-        "name": "florges-blue-alphaother",
-        "stableId": "florges-blue-alpha-0671",
-        "formType": "alphaother",
-        "types": [
-          "fairy"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/florges-blue.png",
-          "front_shiny": "/Sprites/florges-blue-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 671,
-        "name": "florges-white-alphaother",
-        "stableId": "florges-white-alpha-0671",
-        "formType": "alphaother",
-        "types": [
-          "fairy"
-        ],
-        "sprites": {
-          "front_default": "/Sprites/florges-white.png",
-          "front_shiny": "/Sprites/florges-white-shiny.png"
-        },
-        "gen": 6,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
+      ]
+    }
+  },
+  {
+    "id": 80,
+    "name": "slowbro-galarian-alphaother",
+    "stableId": "slowbro-galar-alpha-0080",
+    "types": [
+      "poison",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10165.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10165.png"
+    },
+    "gen": 8,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
         "id": 79,
         "name": "slowpoke-galarian-alphaother",
-        "stableId": "slowpoke-galar-alpha-0079",
-        "types": [
-          "psychic"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10164.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10164.png"
-        },
-        "gen": 8,
         "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": [
-            {
-              "id": 80,
-              "name": "slowbro-galarian-alphaother",
-              "how": "Use Galarica Cuff"
-            },
-            {
-              "id": 199,
-              "name": "slowking-galarian-alphaother",
-              "how": "Use Galarica Wreath"
-            }
-          ]
-        }
+        "how": "Use Galarica Cuff"
       },
-      {
-        "id": 80,
-        "name": "slowbro-galarian-alphaother",
-        "stableId": "slowbro-galar-alpha-0080",
-        "types": [
-          "poison",
-          "psychic"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10165.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10165.png"
-        },
-        "gen": 8,
+      "next": []
+    }
+  },
+  {
+    "id": 199,
+    "name": "slowking-galarian-alphaother",
+    "stableId": "slowking-galar-alpha-0199",
+    "types": [
+      "poison",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10172.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10172.png"
+    },
+    "gen": 8,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 79,
+        "name": "slowpoke-galarian-alphaother",
         "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 79,
-            "name": "slowpoke-galarian-alphaother",
-            "formType": "alphaother",
-            "how": "Use Galarica Cuff"
-          },
-          "next": []
-        }
+        "how": "Use Galarica Wreath"
       },
-      {
-        "id": 199,
-        "name": "slowking-galarian-alphaother",
-        "stableId": "slowking-galar-alpha-0199",
-        "types": [
-          "poison",
-          "psychic"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10172.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10172.png"
-        },
-        "gen": 8,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 79,
-            "name": "slowpoke-galarian-alphaother",
-            "formType": "alphaother",
-            "how": "Use Galarica Wreath"
-          },
-          "next": []
-        }
+      "next": []
+    }
+  },
+  {
+    "id": 26,
+    "name": "raichu-alolan-alphaother",
+    "stableId": "raichu-alolan-alpha-0026",
+    "types": [
+      "electric",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10100.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10100.png"
+    },
+    "gen": 7,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": {
+        "id": 25,
+        "name": "pikachu",
+        "how": "Use Thunder Stone in Alola"
       },
-      {
-        "id": 26,
-        "name": "raichu-alolan-alphaother",
-        "stableId": "raichu-alolan-alpha-0026",
-        "types": [
-          "electric",
-          "psychic"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10100.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10100.png"
-        },
-        "gen": 7,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": {
-            "id": 25,
-            "name": "pikachu",
-            "how": "Use Thunder Stone in Alola"
-          },
-          "next": []
-        }
-      },
-      {
-        "id": 618,
-        "name": "stunfisk-galarian-alphaother",
-        "stableId": "stunfisk-galar-alpha-0618",
-        "types": [
-          "ground",
-          "steel"
-        ],
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10180.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10180.png"
-        },
-        "gen": 8,
-        "formType": "alphaother",
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      },
-      {
-        "id": 211,
-        "name": "qwilfish-alphaother",
-        "stableId": "qwilfish-johto-alpha-0211",
-        "types": [
-          "water",
-          "poison"
-        ],
-        "formType": "alphaother",
-        "sprites": {
-          "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/211.png",
-          "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/211.png"
-        },
-        "gen": 2,
-        "evolution": {
-          "pre": null,
-          "next": []
-        }
-      }
+      "next": []
+    }
+  },
+  {
+    "id": 618,
+    "name": "stunfisk-galarian-alphaother",
+    "stableId": "stunfisk-galar-alpha-0618",
+    "types": [
+      "ground",
+      "steel"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10180.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10180.png"
+    },
+    "gen": 8,
+    "formType": "alphaother",
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 211,
+    "name": "qwilfish-alphaother",
+    "stableId": "qwilfish-johto-alpha-0211",
+    "types": [
+      "water",
+      "poison"
+    ],
+    "formType": "alphaother",
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/211.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/211.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  }
 ]

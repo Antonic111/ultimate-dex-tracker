@@ -10,7 +10,7 @@ import { useLoading } from "../components/Shared/LoadingContext";
 import { profileAPI } from "../utils/api";
 import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isSubLegendary, isStarter, isFossil, isBaby, isParadox, getPokemonCategory } from "../utils/pokemonCategories";
 import { getEvolutionChainIds, findPokemon } from "../utils";
-import { UNOBTAINABLE_SHINY_DEX_NUMBERS, GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "../data/blockedShinies";
+import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "../data/blockedShinies";
 import { getFilteredFormsData } from "../utils/dexPreferences";
 
 
@@ -40,30 +40,30 @@ export default function ViewDex() {
     const [toggles, setToggles] = useState(() => loadDexToggles());
     const togglesRef = useRef(toggles);
     togglesRef.current = toggles;
-    
+
     const showShiny = toggles.showShiny;
     const showForms = toggles.showForms;
-    
+
     // Debug logging for toggle state
-    
+
     const setShowShiny = useCallback(val => {
         const updated = { ...togglesRef.current, showShiny: val };
         setToggles(updated);
         localStorage.setItem("dexToggles", JSON.stringify(updated));
-        
+
         // Dispatch custom event to notify App component
         window.dispatchEvent(new CustomEvent('dexTogglesChanged', { detail: updated }));
     }, []);
-    
+
     const setShowForms = useCallback(val => {
         const updated = { ...togglesRef.current, showForms: val };
         setToggles(updated);
         localStorage.setItem("dexToggles", JSON.stringify(updated));
-        
+
         // Dispatch custom event to notify App component
         window.dispatchEvent(new CustomEvent('dexTogglesChanged', { detail: updated }));
     }, []);
-    
+
     // Sync localStorage changes from other tabs/windows and custom events from App
     useEffect(() => {
         const handleStorageChange = (e) => {
@@ -76,14 +76,14 @@ export default function ViewDex() {
                 }
             }
         };
-        
+
         const handleToggleChange = (e) => {
             setToggles(prev => ({ ...prev, ...e.detail }));
         };
-        
+
         window.addEventListener('storage', handleStorageChange);
         window.addEventListener('dexTogglesChanged', handleToggleChange);
-        
+
         return () => {
             window.removeEventListener('storage', handleStorageChange);
             window.removeEventListener('dexTogglesChanged', handleToggleChange);
@@ -110,7 +110,7 @@ export default function ViewDex() {
             try {
                 const data = await profileAPI.getPublicCaughtData(username);
                 const caughtData = data?.caughtPokemon || {};
-                
+
                 // Migrate old data format to new entries format if needed
                 const migratedData = migrateOldCaughtData(caughtData);
                 setCaughtInfoMap(migratedData);
@@ -133,7 +133,7 @@ export default function ViewDex() {
                 if (bars && bars.length > 0) {
                     setProgressBars(bars);
                 }
-                
+
                 // Store the profile owner's dex preferences
                 if (user.dexPreferences) {
                     setProfileOwnerPreferences(user.dexPreferences);
@@ -154,7 +154,7 @@ export default function ViewDex() {
                         showAlphaOtherForms: true,
                     });
                 }
-                
+
                 // Store the viewed user's shiny charm games
                 setViewedUserShinyCharmGames(user.shinyCharmGames || []);
             } catch (error) {
@@ -170,10 +170,10 @@ export default function ViewDex() {
                     showGmaxForms: true,
                     showUnownForms: true,
                     showOtherForms: true,
-                        showAlcremieForms: true,
-                        showVivillonForms: true,
-                        showAlphaForms: true,
-                        showAlphaOtherForms: true,
+                    showAlcremieForms: true,
+                    showVivillonForms: true,
+                    showAlphaForms: true,
+                    showAlphaOtherForms: true,
                 });
                 // Reset shiny charm games on error
                 setViewedUserShinyCharmGames([]);
@@ -200,7 +200,7 @@ export default function ViewDex() {
     ];
 
     // Use the same filtering function from dexPreferences to ensure consistency
-    const filteredFormsData = profileOwnerPreferences 
+    const filteredFormsData = profileOwnerPreferences
         ? getFilteredFormsData(formsData, profileOwnerPreferences)
         : formsData; // Show all forms while loading preferences
 
@@ -230,22 +230,22 @@ export default function ViewDex() {
                     case 'alphaother': shouldShow = profileOwnerPreferences.showAlphaOtherForms; break;
                     default: shouldShow = true;
                 }
-                
+
                 // Only create section if this form type should be shown
                 if (!shouldShow) return null;
             }
-            
+
             return {
                 key: type,
                 title: type === "alphaother" ? "Alpha Genders & Other's" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
                 getList: () => {
                     const filtered = filteredFormsData.filter(p => p.formType === type);
-                    
+
                     // Special sorting for Alpha Forms - sort by Pokemon number (id)
                     if (type === "alpha" || type === "alphaother") {
                         return filtered.sort((a, b) => (a.id || 0) - (b.id || 0));
                     }
-                    
+
                     // Default sorting for other form types (by JSON order)
                     return filtered;
                 }
@@ -253,230 +253,237 @@ export default function ViewDex() {
         }).filter(Boolean) // Remove null sections
     ];
 
-            // Custom filter function for public profile view
-        const customFilterMons = (list, forceShowForms = false) => {
-            // First, mark Pokemon as blocked based on profile owner's preferences
-            const markedList = list.map(pokemon => {
-                // Create a copy to avoid mutating the original
-                const poke = { ...pokemon };
-                
-                // Mark shiny Pokemon as blocked based on PROFILE OWNER's preferences (not viewer's)
-                // IMPORTANT: Only apply blocking to shiny Pokemon, never to non-shiny
-                if (showShiny && profileOwnerPreferences) {
-                    // Check if Pokemon should be blocked by ID
-                    const isBlockedUnobtainableById = profileOwnerPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
-                    const isBlockedGOById = profileOwnerPreferences.blockGOAndNOOTExclusiveShinies && GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
-                    
-                    // Check if Pokemon should be blocked by form name (for forms that share the same ID)
-                    const pokemonName = poke.name?.toLowerCase() || "";
-                    const isBlockedUnobtainableByForm = profileOwnerPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
-                    const isBlockedGOByForm = profileOwnerPreferences.blockGOAndNOOTExclusiveShinies && GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
-                    
-                    const isBlockedUnobtainable = isBlockedUnobtainableById || isBlockedUnobtainableByForm;
-                    const isBlockedGO = isBlockedGOById || isBlockedGOByForm;
-                    
-                    if (isBlockedUnobtainable || isBlockedGO) {
-                        // Mark as blocked but don't filter out
-                        poke._isBlocked = true;
-                    } else {
-                        // Ensure not blocked if conditions aren't met
-                        poke._isBlocked = false;
+    // Custom filter function for public profile view
+    const customFilterMons = (list, forceShowForms = false) => {
+        // First, mark Pokemon as blocked based on profile owner's preferences
+        const markedList = list.map(pokemon => {
+            // Create a copy to avoid mutating the original
+            const poke = { ...pokemon };
+
+            // Mark shiny Pokemon as blocked based on PROFILE OWNER's preferences (not viewer's)
+            // IMPORTANT: Only apply blocking to shiny Pokemon, never to non-shiny
+            if (showShiny && profileOwnerPreferences) {
+                // Check if Pokemon should be blocked by ID
+                const isBlockedUnobtainableById = profileOwnerPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
+                const isBlockedGOById = profileOwnerPreferences.blockGOExclusiveShinies && GO_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
+                const isBlockedNOOTById = profileOwnerPreferences.blockNOOTExclusiveShinies && NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
+
+                // Check if Pokemon should be blocked by form name (for forms that share the same ID)
+                const pokemonName = poke.name?.toLowerCase() || "";
+                const isBlockedUnobtainableByForm = profileOwnerPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+                const isBlockedGOByForm = profileOwnerPreferences.blockGOExclusiveShinies && GO_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+                const isBlockedNOOTByForm = profileOwnerPreferences.blockNOOTExclusiveShinies && NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+
+                const isBlockedUnobtainable = isBlockedUnobtainableById || isBlockedUnobtainableByForm;
+                const isBlockedGO = isBlockedGOById || isBlockedGOByForm;
+                const isBlockedNOOT = isBlockedNOOTById || isBlockedNOOTByForm;
+
+                if (isBlockedUnobtainable || isBlockedGO || isBlockedNOOT) {
+                    // If profile owner has hideLockedShinies enabled, filter out this Pokemon
+                    if (profileOwnerPreferences.hideLockedShinies) {
+                        return null; // Will be filtered out below
                     }
+                    // Mark as blocked but don't filter out
+                    poke._isBlocked = true;
                 } else {
-                    // For non-shiny Pokemon, always ensure they are not blocked
+                    // Ensure not blocked if conditions aren't met
                     poke._isBlocked = false;
                 }
-                
-                return poke;
-            });
-            
-            // Then apply the filtering logic
-            return markedList.filter(pokemon => {
-                // When viewing someone else's dex, always show forms (respect their preferences)
-                // The current user's showForms toggle doesn't apply to viewing other people's dexes
-                if (pokemon.formType && pokemon.formType !== "main" && pokemon.formType !== "default") {
-                    // Check if this form type is enabled in the profile owner's preferences
-                    const formType = pokemon.formType;
-                    if (profileOwnerPreferences) {
-                        switch (formType) {
-                            case 'gender': 
-                                if (!profileOwnerPreferences.showGenderForms) return false;
-                                break;
-                            case 'alolan': 
-                                if (!profileOwnerPreferences.showAlolanForms) return false;
-                                break;
-                            case 'galarian': 
-                                if (!profileOwnerPreferences.showGalarianForms) return false;
-                                break;
-                            case 'hisuian': 
-                                if (!profileOwnerPreferences.showHisuianForms) return false;
-                                break;
-                            case 'paldean': 
-                                if (!profileOwnerPreferences.showPaldeanForms) return false;
-                                break;
-                            case 'gmax': 
-                                if (!profileOwnerPreferences.showGmaxForms) return false;
-                                break;
-                            case 'unown': 
-                                if (!profileOwnerPreferences.showUnownForms) return false;
-                                break;
-                            case 'other': 
-                                if (!profileOwnerPreferences.showOtherForms) return false;
-                                break;
-                            case 'alcremie': 
-                                if (!profileOwnerPreferences.showAlcremieForms) return false;
-                                break;
-                            case 'vivillon': 
-                                if (!profileOwnerPreferences.showVivillonForms) return false;
-                                break;
-                            case 'alpha': 
-                                if (!profileOwnerPreferences.showAlphaForms) return false;
-                                break;
-                            case 'alphaother': 
-                                if (!profileOwnerPreferences.showAlphaOtherForms) return false;
-                                break;
-                            default: 
-                                break;
-                        }
+            } else {
+                // For non-shiny Pokemon, always ensure they are not blocked
+                poke._isBlocked = false;
+            }
+
+            return poke;
+        }).filter(poke => poke !== null);
+
+        // Then apply the filtering logic
+        return markedList.filter(pokemon => {
+            // When viewing someone else's dex, always show forms (respect their preferences)
+            // The current user's showForms toggle doesn't apply to viewing other people's dexes
+            if (pokemon.formType && pokemon.formType !== "main" && pokemon.formType !== "default") {
+                // Check if this form type is enabled in the profile owner's preferences
+                const formType = pokemon.formType;
+                if (profileOwnerPreferences) {
+                    switch (formType) {
+                        case 'gender':
+                            if (!profileOwnerPreferences.showGenderForms) return false;
+                            break;
+                        case 'alolan':
+                            if (!profileOwnerPreferences.showAlolanForms) return false;
+                            break;
+                        case 'galarian':
+                            if (!profileOwnerPreferences.showGalarianForms) return false;
+                            break;
+                        case 'hisuian':
+                            if (!profileOwnerPreferences.showHisuianForms) return false;
+                            break;
+                        case 'paldean':
+                            if (!profileOwnerPreferences.showPaldeanForms) return false;
+                            break;
+                        case 'gmax':
+                            if (!profileOwnerPreferences.showGmaxForms) return false;
+                            break;
+                        case 'unown':
+                            if (!profileOwnerPreferences.showUnownForms) return false;
+                            break;
+                        case 'other':
+                            if (!profileOwnerPreferences.showOtherForms) return false;
+                            break;
+                        case 'alcremie':
+                            if (!profileOwnerPreferences.showAlcremieForms) return false;
+                            break;
+                        case 'vivillon':
+                            if (!profileOwnerPreferences.showVivillonForms) return false;
+                            break;
+                        case 'alpha':
+                            if (!profileOwnerPreferences.showAlphaForms) return false;
+                            break;
+                        case 'alphaother':
+                            if (!profileOwnerPreferences.showAlphaOtherForms) return false;
+                            break;
+                        default:
+                            break;
                     }
                 }
+            }
 
-                // Get caught info based on the current shiny toggle state
-                const caughtInfo = caughtInfoMap[getCaughtKey(pokemon, null, showShiny)];
-                
-                // Get the first entry for filtering (or use old structure for backward compatibility)
-                const firstEntry = caughtInfo?.entries?.[0] || caughtInfo;
+            // Get caught info based on the current shiny toggle state
+            const caughtInfo = caughtInfoMap[getCaughtKey(pokemon, null, showShiny)];
 
-                // Search by name/dex
-                if (filters.searchTerm) {
-                    const term = filters.searchTerm.toLowerCase();
-                    const nameMatch = pokemon.name.toLowerCase().includes(term);
-                    const idStr = String(pokemon.id).padStart(4, "0");
-                    const dexMatch = idStr.includes(term.replace(/^#/, ""));
-                    
-                    // If showEvolutions is enabled, check if any pokemon in the evolution chain matches
-                    if (!nameMatch && !dexMatch) {
-                        if (filters.showEvolutions) {
-                            const chainIds = getEvolutionChainIds(pokemon);
-                            // Check if any pokemon in the chain matches the search
-                            const chainMatches = chainIds.some(chainId => {
-                                const chainPoke = findPokemon(chainId);
-                                if (!chainPoke) return false;
-                                const chainNameMatch = chainPoke.name.toLowerCase().includes(term);
-                                const chainIdStr = String(chainPoke.id).padStart(4, "0");
-                                const chainDexMatch = chainIdStr.includes(term.replace(/^#/, ""));
-                                return chainNameMatch || chainDexMatch;
-                            });
-                            if (!chainMatches) return false;
-                        } else {
+            // Get the first entry for filtering (or use old structure for backward compatibility)
+            const firstEntry = caughtInfo?.entries?.[0] || caughtInfo;
+
+            // Search by name/dex
+            if (filters.searchTerm) {
+                const term = filters.searchTerm.toLowerCase();
+                const nameMatch = pokemon.name.toLowerCase().includes(term);
+                const idStr = String(pokemon.id).padStart(4, "0");
+                const dexMatch = idStr.includes(term.replace(/^#/, ""));
+
+                // If showEvolutions is enabled, check if any pokemon in the evolution chain matches
+                if (!nameMatch && !dexMatch) {
+                    if (filters.showEvolutions) {
+                        const chainIds = getEvolutionChainIds(pokemon);
+                        // Check if any pokemon in the chain matches the search
+                        const chainMatches = chainIds.some(chainId => {
+                            const chainPoke = findPokemon(chainId);
+                            if (!chainPoke) return false;
+                            const chainNameMatch = chainPoke.name.toLowerCase().includes(term);
+                            const chainIdStr = String(chainPoke.id).padStart(4, "0");
+                            const chainDexMatch = chainIdStr.includes(term.replace(/^#/, ""));
+                            return chainNameMatch || chainDexMatch;
+                        });
+                        if (!chainMatches) return false;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+
+            // Game filter
+            if (filters.game && firstEntry?.game !== filters.game) return false;
+
+            // Ball filter
+            if (filters.ball && firstEntry?.ball !== filters.ball) return false;
+
+            // Mark filter
+            if (filters.mark && firstEntry?.mark !== filters.mark) return false;
+
+            // Method filter
+            if (filters.method && firstEntry?.method !== filters.method) return false;
+
+            // Type filter
+            if (filters.type && !pokemon.types?.includes(filters.type)) return false;
+
+            // Generation filter
+            if (filters.gen && String(pokemon.gen) !== String(filters.gen)) return false;
+
+            // Caught/uncaught filter
+            const isCaught = !!caughtInfo;
+            if (filters.caught === "caught" && !isCaught) return false;
+            if (filters.caught === "uncaught" && isCaught) return false;
+
+            // Category filtering
+            if (filters.categories && filters.categories.length > 0) {
+                const pokemonCategory = getPokemonCategory(pokemon);
+                const matchesAnyCategory = filters.categories.some(category => {
+                    switch (category) {
+                        case "legendary":
+                            return isLegendary(pokemon);
+                        case "mythical":
+                            return isMythical(pokemon);
+                        case "ultra-beast":
+                            return isUltraBeast(pokemon);
+                        case "pseudo-legendary":
+                            return isPseudoLegendary(pokemon);
+                        case "sub-legendary":
+                            return isSubLegendary(pokemon);
+                        case "paradox":
+                            return isParadox(pokemon);
+                        case "starter":
+                            return isStarter(pokemon);
+                        case "fossil":
+                            return isFossil(pokemon);
+                        case "baby":
+                            return isBaby(pokemon);
+                        default:
                             return false;
-                        }
                     }
-                }
+                });
 
-                // Game filter
-                if (filters.game && firstEntry?.game !== filters.game) return false;
-                
-                // Ball filter
-                if (filters.ball && firstEntry?.ball !== filters.ball) return false;
-                
-                // Mark filter
-                if (filters.mark && firstEntry?.mark !== filters.mark) return false;
-                
-                // Method filter
-                if (filters.method && firstEntry?.method !== filters.method) return false;
-                
-                // Type filter
-                if (filters.type && !pokemon.types?.includes(filters.type)) return false;
-                
-                // Generation filter
-                if (filters.gen && String(pokemon.gen) !== String(filters.gen)) return false;
-                
-                // Caught/uncaught filter
-                const isCaught = !!caughtInfo;
-                if (filters.caught === "caught" && !isCaught) return false;
-                if (filters.caught === "uncaught" && isCaught) return false;
-                
-                // Category filtering
-                if (filters.categories && filters.categories.length > 0) {
-                    const pokemonCategory = getPokemonCategory(pokemon);
-                    const matchesAnyCategory = filters.categories.some(category => {
-                        switch (category) {
-                            case "legendary":
-                                return isLegendary(pokemon);
-                            case "mythical":
-                                return isMythical(pokemon);
-                            case "ultra-beast":
-                                return isUltraBeast(pokemon);
-                            case "pseudo-legendary":
-                                return isPseudoLegendary(pokemon);
-                            case "sub-legendary":
-                                return isSubLegendary(pokemon);
-                            case "paradox":
-                                return isParadox(pokemon);
-                            case "starter":
-                                return isStarter(pokemon);
-                            case "fossil":
-                                return isFossil(pokemon);
-                            case "baby":
-                                return isBaby(pokemon);
-                            default:
-                                return false;
-                        }
-                    });
-                    
-                    if (!matchesAnyCategory) return false;
-                }
-                
-                return true;
-            });
-        };
+                if (!matchesAnyCategory) return false;
+            }
 
-        return (
-            <>
-                <div className="page-container">
-                    <DexView
-                        viewingUsername={username}
-                        allMons={allMons}
-                        caughtInfoMap={caughtInfoMap}
-                        dexSections={dexSections}
-                        progressBarsOverride={progressBars}
-                        filters={filters}
-                        setFilters={setFilters}
-                        showShiny={showShiny}
-                        setShowShiny={setShowShiny}
-                        showForms={showForms}
-                        setShowForms={setShowForms}
-                        selectedPokemon={selectedPokemon}
-                        setSelectedPokemon={setSelectedPokemon}
-                        sidebarOpen={sidebarOpen}
-                        setSidebarOpen={setSidebarOpen}
-                        readOnly={true}
-                        title={`${username}'s Living Dex`}
-                        caught={caughtInfoMap}
-                        customFilterMons={customFilterMons}
-                        externalLinkPreference={externalLinkPreference}
-                        viewedUserShinyCharmGames={viewedUserShinyCharmGames}
-                        profileOwnerDexPreferences={profileOwnerPreferences}
-                    />
-                </div>
-                
-                {/* Sidebar - rendered outside page container to avoid stacking context issues */}
-                <Sidebar
-                    open={sidebarOpen}
-                    readOnly={true}
-                    pokemon={selectedPokemon}
-                    onClose={() => {
-                        setSidebarOpen(false);
-                        setSelectedPokemon(null);
-                    }}
-                    caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon, null, showShiny)] : null}
-                    updateCaughtInfo={() => {}} // No-op for read-only mode
-                    showShiny={showShiny}
+            return true;
+        });
+    };
+
+    return (
+        <>
+            <div className="page-container">
+                <DexView
                     viewingUsername={username}
-                    onPokemonSelect={setSelectedPokemon}
+                    allMons={allMons}
+                    caughtInfoMap={caughtInfoMap}
+                    dexSections={dexSections}
+                    progressBarsOverride={progressBars}
+                    filters={filters}
+                    setFilters={setFilters}
+                    showShiny={showShiny}
+                    setShowShiny={setShowShiny}
+                    showForms={showForms}
+                    setShowForms={setShowForms}
+                    selectedPokemon={selectedPokemon}
+                    setSelectedPokemon={setSelectedPokemon}
+                    sidebarOpen={sidebarOpen}
+                    setSidebarOpen={setSidebarOpen}
+                    readOnly={true}
+                    title={`${username}'s Living Dex`}
+                    caught={caughtInfoMap}
+                    customFilterMons={customFilterMons}
                     externalLinkPreference={externalLinkPreference}
+                    viewedUserShinyCharmGames={viewedUserShinyCharmGames}
+                    profileOwnerDexPreferences={profileOwnerPreferences}
                 />
-            </>
-        );
+            </div>
+
+            {/* Sidebar - rendered outside page container to avoid stacking context issues */}
+            <Sidebar
+                open={sidebarOpen}
+                readOnly={true}
+                pokemon={selectedPokemon}
+                onClose={() => {
+                    setSidebarOpen(false);
+                    setSelectedPokemon(null);
+                }}
+                caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon, null, showShiny)] : null}
+                updateCaughtInfo={() => { }} // No-op for read-only mode
+                showShiny={showShiny}
+                viewingUsername={username}
+                onPokemonSelect={setSelectedPokemon}
+                externalLinkPreference={externalLinkPreference}
+            />
+        </>
+    );
 }

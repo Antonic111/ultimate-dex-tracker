@@ -34,6 +34,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -135,7 +136,8 @@
 }
 
 .trainers-page .sort-section-title {
-  @apply py-2 px-4 text-xs font-semibold text-[var(--trainer-search-placeholder)] uppercase tracking-wider bg-[rgba(255,255,255,0.02)] flex items-center gap-1.5;
+  @apply py-2 px-4 text-xs font-semibold text-[var(--trainer-search-placeholder)] uppercase tracking-wider flex items-center gap-1.5;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .trainers-page .sort-section-title svg {
@@ -173,8 +175,13 @@
 
 /* Rotating animation for refresh icon */
 @keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .trainers-page .direction-toggle-button .refresh-icon.rotate {
@@ -198,7 +205,8 @@
 
 /* Trainer Grid */
 .trainers-page .trainer-grid {
-  @apply grid gap-3.5 grid-cols-[repeat(auto-fill,minmax(280px,1fr))] items-stretch;
+  @apply grid gap-3.5 items-stretch;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 }
 
 /* Trainer Cards */
@@ -266,7 +274,8 @@
 
 /* Trainer Badges */
 .trainers-page .trainer-badge {
-  @apply absolute top-2.5 right-2.5 inline-flex items-center gap-1.5 py-0.5 px-1.5 border border-[var(--dividers)] rounded-md text-xs bg-[rgba(0,0,0,0.35)] backdrop-blur-sm text-white;
+  @apply absolute top-2.5 right-2.5 inline-flex items-center gap-1.5 py-0.5 px-1.5 border border-[var(--dividers)] rounded-md text-xs backdrop-blur-sm text-white;
+  background: rgba(0, 0, 0, 0.35);
 }
 
 .trainers-page .trainer-badge svg {
@@ -274,7 +283,9 @@
 }
 
 .trainers-page .trainer-likes {
-  @apply top-10 bg-[rgba(255,71,87,0.8)] border-[rgba(255,71,87,0.9)];
+  @apply top-10;
+  background: rgba(255, 71, 87, 0.8);
+  border-color: rgba(255, 71, 87, 0.9);
 }
 
 .trainers-page .trainer-likes svg {
@@ -291,11 +302,11 @@
 }
 
 .trainers-page .pagination-controls {
-  @apply flex items-center gap-3 min-w-[400px] justify-between relative;
+  @apply flex items-center gap-2 justify-center;
 }
 
 .trainers-page .pagination-btn {
-  @apply bg-[var(--accent)] text-[#1a1a1a] border-0 py-2 px-4 rounded-md font-semibold cursor-pointer transition-all duration-200 text-sm min-w-[80px] text-center;
+  @apply flex items-center justify-center gap-1.5 bg-[var(--accent)] text-[#1a1a1a] border-0 py-2.5 px-5 rounded-lg font-semibold cursor-pointer transition-all duration-200 text-sm min-w-[100px];
 }
 
 .trainers-page .pagination-btn:hover:not(:disabled) {
@@ -306,16 +317,20 @@
   @apply opacity-40 cursor-not-allowed;
 }
 
+.trainers-page .pagination-btn svg {
+  @apply w-4 h-4;
+}
+
 .trainers-page .page-numbers {
-  @apply flex items-center gap-1 min-w-[200px] justify-center;
+  @apply flex items-center gap-1;
 }
 
 .trainers-page .page-btn {
-  @apply bg-transparent text-[var(--text-color)] border border-[var(--dividers)] py-1.5 px-3 rounded cursor-pointer transition-all duration-200 text-sm min-w-[36px];
+  @apply bg-[#1a1a1a] text-[var(--text-color)] border-2 border-[var(--accent)] py-2 px-3.5 rounded-lg cursor-pointer transition-all duration-200 text-sm font-semibold min-w-[40px] text-center;
 }
 
-.trainers-page .page-btn:hover {
-  @apply bg-[var(--dividers)] text-[var(--text-color)];
+.trainers-page .page-btn:hover:not(.active) {
+  @apply bg-[var(--accent)] text-[#1a1a1a];
 }
 
 .trainers-page .page-btn.active {
@@ -324,11 +339,6 @@
 
 .trainers-page .page-ellipsis {
   @apply text-[var(--text-color)] opacity-60 px-2 text-sm;
-}
-
-.trainers-page .prev-btn,
-.trainers-page .next-btn {
-  @apply flex-shrink-0 w-20;
 }
 
 /* Skeleton Cards */
@@ -370,8 +380,13 @@
 }
 
 @keyframes skeleton-loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* Mobile Responsiveness */
@@ -379,43 +394,43 @@
   .trainers-page {
     @apply px-3 py-2 pb-6;
   }
-  
+
   .trainers-page .page-title {
     @apply text-3xl my-8;
   }
-  
+
   .trainers-page .search-row {
     @apply flex-col gap-3;
   }
-  
+
   .trainers-page .search-input-wrap {
     @apply w-full;
   }
-  
+
   .trainers-page .search-controls {
     @apply flex gap-2 items-center w-full justify-center;
   }
-  
+
   .trainers-page .trainer-search {
     @apply h-10 text-sm;
   }
-  
+
   .trainers-page .sort-button {
     @apply h-10 w-full text-xs;
   }
-  
+
   .trainers-page .direction-toggle-button {
     @apply w-10 h-10;
   }
-  
+
   .trainers-page .verified-notice {
     @apply py-2 px-3 text-xs gap-1;
   }
-  
+
   .trainers-page .toggle-text {
     @apply text-xs;
   }
-  
+
   .trainers-page .toggle-checkbox {
     @apply w-5 h-5;
     appearance: auto !important;
@@ -424,51 +439,51 @@
     visibility: visible !important;
     display: inline-block !important;
   }
-  
+
   .trainers-page .trainer-grid {
     @apply grid-cols-1 gap-3;
   }
-  
+
   .trainers-page .trainer-card {
     @apply h-32 min-h-32 p-3;
   }
-  
+
   .trainers-page .trainer-avatar {
     @apply w-10 h-10;
   }
-  
+
   .trainers-page .trainer-name {
     @apply text-sm;
   }
-  
+
   .trainers-page .trainer-bio {
     @apply text-xs;
   }
-  
+
   .trainers-page .pagination-controls {
     @apply min-w-0 flex-col gap-2;
   }
-  
+
   .trainers-page .page-numbers {
     @apply min-w-0;
   }
-  
+
   .skeleton-card {
     @apply h-20 p-3;
   }
-  
+
   .skeleton-avatar {
     @apply w-8 h-8;
   }
-  
+
   .skeleton-name {
     @apply h-3;
   }
-  
+
   .skeleton-meta {
     @apply h-2.5;
   }
-  
+
   .skeleton-bio {
     @apply h-3;
   }
@@ -478,27 +493,27 @@
   .trainers-page {
     @apply px-2 py-1 pb-4;
   }
-  
+
   .trainers-page .page-title {
     @apply text-2xl my-6;
   }
-  
+
   .trainers-page .trainer-search {
     @apply h-9 text-xs;
   }
-  
+
   .trainers-page .sort-button {
     @apply h-9 w-full text-xs;
   }
-  
+
   .trainers-page .direction-toggle-button {
     @apply w-9 h-9;
   }
-  
+
   .trainers-page .verified-notice {
     @apply py-1.5 px-2 text-xs gap-1;
   }
-  
+
   .trainers-page .toggle-checkbox {
     @apply w-5 h-5;
     appearance: auto !important;
@@ -507,39 +522,39 @@
     visibility: visible !important;
     display: inline-block !important;
   }
-  
+
   .trainers-page .trainer-card {
     @apply h-28 min-h-28 p-2.5;
   }
-  
+
   .trainers-page .trainer-avatar {
     @apply w-9 h-9;
   }
-  
+
   .trainers-page .trainer-name {
     @apply text-xs;
   }
-  
+
   .trainers-page .trainer-bio {
     @apply text-xs;
   }
-  
+
   .skeleton-card {
     @apply h-16 p-2.5;
   }
-  
+
   .skeleton-avatar {
     @apply w-7 h-7;
   }
-  
+
   .skeleton-name {
     @apply h-2.5;
   }
-  
+
   .skeleton-meta {
     @apply h-2;
   }
-  
+
   .skeleton-bio {
     @apply h-2.5;
   }

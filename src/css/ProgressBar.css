@@ -115,23 +115,23 @@ body {
     margin: 12px 16px;
     padding: 0px 8px 2px 8px;
   }
-  
+
   .progress-title {
     font-size: 1rem;
     margin: 8px 0px;
   }
-  
+
   .progress-header-row {
     flex-direction: row;
     gap: 8px;
     align-items: center;
     justify-content: space-between;
   }
-  
+
   .progress-settings-btn {
     transform: scale(0.8);
   }
-  
+
   /* Scale progress bars for mobile */
   .progress-bar {
     min-height: 24px;
@@ -139,63 +139,63 @@ body {
     margin-bottom: 6px;
     font-size: 0.75rem;
   }
-  
+
   .progress-bar-label {
     font-size: 0.7rem;
     font-weight: 600;
     line-height: 1.2;
   }
-  
+
   .progress-bar-text {
     font-size: 0.65rem;
     line-height: 1.2;
   }
-  
+
   .progress-bar-percentage {
     font-size: 0.65rem;
     font-weight: 600;
   }
-  
+
   .bar-filter-editor {
     grid-template-columns: 1fr;
     gap: 4px;
     margin-top: 8px;
   }
-  
+
   /* Ensure progress bars fit mobile width */
   .progress-bar {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
   }
-  
+
   .progress-bar-fill {
     max-width: 100%;
     height: 4px;
     border-radius: 2px;
   }
-  
+
   .progress-bar-content {
     flex-wrap: wrap;
     gap: 4px;
   }
-  
+
   /* Make progress bar elements more compact */
   .progress-bar-header {
     margin-bottom: 2px;
   }
-  
+
   .progress-bar-stats {
     gap: 6px;
     flex-wrap: wrap;
   }
-  
+
   /* Compact chip filters */
   .chip-filter-chips {
     min-height: 24px;
     padding: 2px 4px;
   }
-  
+
   .chip {
     font-size: 0.65rem;
     padding: 2px 6px;
@@ -208,16 +208,16 @@ body {
     margin: 8px 12px;
     padding: 0px 4px 4px 4px;
   }
-  
+
   .progress-title {
     font-size: 0.9rem;
     margin: 6px 0px;
   }
-  
+
   .progress-settings-btn {
     transform: scale(0.7);
   }
-  
+
   /* Ultra-compact progress bars for very small screens */
   .progress-bar {
     min-height: 20px;
@@ -225,48 +225,48 @@ body {
     margin-bottom: 4px;
     font-size: 0.7rem;
   }
-  
+
   .progress-bar-label {
     font-size: 0.65rem;
     line-height: 1.1;
   }
-  
+
   .progress-bar-text {
     font-size: 0.6rem;
     line-height: 1.1;
   }
-  
+
   .progress-bar-percentage {
     font-size: 0.6rem;
   }
-  
+
   .progress-bar-fill {
     height: 3px;
     border-radius: 1.5px;
   }
-  
+
   .progress-bar-content {
     gap: 3px;
   }
-  
+
   .progress-bar-stats {
     gap: 4px;
   }
-  
+
   .progress-bar-header {
     margin-bottom: 1px;
   }
-  
+
   .chip-filter-chips {
     min-height: 20px;
     padding: 2px 3px;
   }
-  
+
   .chip {
     font-size: 0.6rem;
     padding: 1px 4px;
   }
-  
+
   .bar-filter-editor {
     gap: 3px;
     margin-top: 6px;
@@ -343,7 +343,8 @@ html.modal-open {
 /* Prevent layout shift by keeping scrollbar space - PC only */
 @media (min-width: 769px) {
   body.modal-open {
-    padding-right: 16px; /* Standard scrollbar width */
+    padding-right: 16px;
+    /* Standard scrollbar width */
   }
 }
 
@@ -380,8 +381,10 @@ html.dragging {
   border-radius: 20px;
   box-shadow: 0 4px 12px #0006;
   max-height: 80vh;
-  min-height: auto; /* Allow modal to shrink to content */
-  height: auto; /* Let height be determined by content */
+  min-height: auto;
+  /* Allow modal to shrink to content */
+  height: auto;
+  /* Let height be determined by content */
   overflow: visible;
   animation: slideIn 0.3s ease-out;
   position: relative;
@@ -408,6 +411,7 @@ html.dragging {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -417,6 +421,7 @@ html.dragging {
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
@@ -427,6 +432,7 @@ html.dragging {
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -438,6 +444,7 @@ html.dragging {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+
   to {
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
@@ -536,8 +543,10 @@ html.dragging {
 .bar-controls {
   display: flex;
   align-items: center;
-  gap: 4px; /* Tighter spacing between icons */
-  margin-left: 4px; /* Optional: align better with input */
+  gap: 4px;
+  /* Tighter spacing between icons */
+  margin-left: 4px;
+  /* Optional: align better with input */
 }
 
 .bar-controls button svg {
@@ -666,18 +675,18 @@ html.dragging {
     margin-right: 4px;
     gap: 1px;
   }
-  
+
   .arrow-btn {
     padding: 2px;
     min-width: 20px;
     min-height: 20px;
   }
-  
+
   .arrow-btn svg {
     width: 12px;
     height: 12px;
   }
-  
+
   /* Completely static buttons on mobile - no effects at all */
   .arrow-btn,
   .arrow-btn:hover,
@@ -695,7 +704,7 @@ html.dragging {
     transition: none;
     box-shadow: none;
   }
-  
+
   .arrow-btn:disabled {
     opacity: 0.3;
     cursor: not-allowed;
@@ -776,6 +785,7 @@ html.dragging {
     opacity: 0;
     transform: scaleY(0.95);
   }
+
   to {
     opacity: 1;
     transform: scaleY(1);
@@ -1097,14 +1107,18 @@ html.dragging {
 .drag-container {
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: 50vh; /* Keep max height for when there are many bars */
-  min-height: auto; /* Allow container to shrink to content */
-  height: auto; /* Let height be determined by content */
+  max-height: 50vh;
+  /* Keep max height for when there are many bars */
+  min-height: auto;
+  /* Allow container to shrink to content */
+  height: auto;
+  /* Let height be determined by content */
   position: relative;
   padding: 4px 15px 15px 15px;
   margin-bottom: 15px;
   border-bottom: 1px solid #444;
-  flex: 0 1 auto; /* Don't grow, allow shrinking, auto basis */
+  flex: 0 1 auto;
+  /* Don't grow, allow shrinking, auto basis */
   scroll-behavior: smooth;
   /* Ensure no horizontal scrolling can occur */
   width: 100%;
@@ -1147,8 +1161,10 @@ html.dragging {
   overflow: visible;
   display: flex;
   flex-direction: column;
-  height: auto; /* Let height be determined by content */
-  min-height: 0; /* Allow shrinking */
+  height: auto;
+  /* Let height be determined by content */
+  min-height: 0;
+  /* Allow shrinking */
   /* Ensure vertical scrolling works in child elements */
   overflow-y: visible;
   overflow-x: hidden;
@@ -1327,5 +1343,62 @@ html.dragging {
 
   .chip-filter-label {
     font-size: 0.7rem;
+  }
+}
+
+/* ================================
+   iOS SAFARI SPECIFIC FIXES
+==================================*/
+
+/* iOS Safari compatibility fixes */
+@supports (-webkit-touch-callout: none) {
+
+  /* GPU acceleration for smoother rendering on iOS */
+  .progress-manager-wrapper,
+  .progress-bar-wrapper,
+  .progress-bar-fill,
+  .bar-settings-group {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* Fix for flex display issues on iOS Safari */
+  .progress-header-row,
+  .bar-settings-row,
+  .modal-header,
+  .modal-actions {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+  }
+
+  /* Ensure progress bars are visible on iOS */
+  .progress-bar-wrapper {
+    -webkit-overflow-scrolling: touch;
+    overflow: visible;
+  }
+
+  /* Fix transition animations on iOS Safari */
+  .progress-bar-fill {
+    -webkit-transition: width 0.3s ease-in-out;
+    transition: width 0.3s ease-in-out;
+  }
+
+  /* Ensure proper button tap targets on iOS */
+  .progress-settings-btn,
+  .arrow-btn,
+  .modal-save-btn,
+  .modal-cancel-btn {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Fix for filter expansion on iOS */
+  .bar-settings-filters {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 }

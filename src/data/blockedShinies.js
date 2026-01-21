@@ -15,7 +15,7 @@ export const UNOBTAINABLE_SHINY_DEX_NUMBERS = [
     "0789",
     "0790",
     "0801",
-    "0802", 
+    "0802",
     "0891",
     "0892",
     "0893",
@@ -41,30 +41,54 @@ export const UNOBTAINABLE_SHINY_FORM_NAMES = [
     "vivillon-pokeball"
 ];
 
-// Pokemon dex numbers that are GO & NO OT exclusive shinies
-export const GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS = [
-    "0648",
-    "0647",
-    "0649",
-    "0807",
-    "0808",
-    "0809",
-    "0888",
-    "0889",
-    "0890",
-    "0905",
-    "1001",
-    "1002",
-    "1003",
-    "1004",
-    "1007",
-    "1008"
+// Pokemon dex numbers that are GO exclusive shinies (only obtainable through Pokemon GO)
+// genesect, keldeo, meloetta, meltan, melmetal, zamazenta, zacian
+export const GO_EXCLUSIVE_SHINY_DEX_NUMBERS = [
+    "0647",  // keldeo
+    "0648",  // meloetta
+    "0649",  // genesect
+    "0808",  // meltan
+    "0809",  // melmetal
+    "0888",  // zacian
+    "0889"   // zamazenta
 ];
 
-// Pokemon form names that are GO & NO OT exclusive shinies (for forms that share the same ID)
-export const GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES = [
+// Pokemon form names that are GO exclusive shinies
+// GMAX Melmetal, Galarian birds
+export const GO_EXCLUSIVE_SHINY_FORM_NAMES = [
+    "melmetal-gmax",
     "zapdos-galar",
     "articuno-galar",
     "moltres-galar"
 ];
 
+// Pokemon dex numbers that are NO OT exclusive shinies (only obtainable without original trainer)
+// zeraora, eternatus, enamorus, wo-chien, chien-pao, ting-lu, chi-yu, koraidon, miraidon
+export const NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS = [
+    "0807",  // zeraora
+    "0890",  // eternatus
+    "0905",  // enamorus (both forms share ID)
+    "1001",  // wo-chien
+    "1002",  // chien-pao
+    "1003",  // ting-lu
+    "1004",  // chi-yu
+    "1007",  // koraidon
+    "1008"   // miraidon
+];
+
+// Pokemon form names that are NO OT exclusive shinies
+// therian enamorus is handled by the dex number since both forms share ID 905
+export const NO_OT_EXCLUSIVE_SHINY_FORM_NAMES = [
+    "enamorus-therian"
+];
+
+// Legacy combined exports for backward compatibility (if needed)
+export const GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS = [
+    ...GO_EXCLUSIVE_SHINY_DEX_NUMBERS,
+    ...NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS
+];
+
+export const GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES = [
+    ...GO_EXCLUSIVE_SHINY_FORM_NAMES,
+    ...NO_OT_EXCLUSIVE_SHINY_FORM_NAMES
+];

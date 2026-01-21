@@ -1,5 +1,25 @@
 [
   {
+    "date": "2026-01-21",
+    "version": "v1.0.8",
+    "type": "feature",
+    "title": "Mobile fixes & Dex Preferences expansion",
+    "description": "",
+    "features": [
+      "Split up the options to block GO and NO OT exclusive shinies into two separate options.",
+      "Added a option to completly hide all locked pokemon.",
+      "Added new Dex Preferences to change the view mode of the dex to categorized or alphabetical."
+    ],
+    "fixes": [
+      "Resolved a critical mobile bug where clicking a caught Pokémon slot in the main grid caused data loss.",
+      "Fixed a issue on certain mobile devices where the sidebar would appear on all taps instead of holds.",
+      "Fixed Alpha Male Sneasel in the Alpha Genders & Other's category having a wrong Id causing issues with the numbers. (Anyone who had data on this pokemon will need to re-add it (sorry!)).",
+      "Bug fixes & compatibility improvements for iOS devices. (Needs Testing)",
+      "Adjusted the trainer page buttons to change pages to be more in uniform and cleaner looking.",
+      "Fixed a bug where people could not submit bug reports or feature requests."
+    ]
+  },
+  {
     "date": "2026-01-19",
     "version": "v1.0.7",
     "type": "fix",

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { profileAPI } from "../../utils/api";
 import { useMessage } from "./MessageContext";
+import { Info } from "lucide-react";
 
 export default function DexPreferences() {
     const defaultPreferences = {
@@ -17,7 +18,10 @@ export default function DexPreferences() {
         showAlphaForms: true,
         showAlphaOtherForms: true,
         blockUnobtainableShinies: false,
-        blockGOAndNOOTExclusiveShinies: false,
+        blockGOExclusiveShinies: false,
+        blockNOOTExclusiveShinies: false,
+        hideLockedShinies: false,
+        dexViewMode: 'categorized', // 'categorized' = separate sections, 'unified' = all Pokemon in one list sorted by dex number
     };
 
     const [preferences, setPreferences] = useState(defaultPreferences);
@@ -30,7 +34,19 @@ export default function DexPreferences() {
         const savedPrefs = localStorage.getItem('dexPreferences');
         if (savedPrefs) {
             try {
-                const parsedPrefs = JSON.parse(savedPrefs) || {};
+                let parsedPrefs = JSON.parse(savedPrefs) || {};
+
+                // Migration: Convert old blockGOAndNOOTExclusiveShinies to new separate preferences
+                if (parsedPrefs.blockGOAndNOOTExclusiveShinies === true) {
+                    if (parsedPrefs.blockGOExclusiveShinies === undefined) {
+                        parsedPrefs.blockGOExclusiveShinies = true;
+                    }
+                    if (parsedPrefs.blockNOOTExclusiveShinies === undefined) {
+                        parsedPrefs.blockNOOTExclusiveShinies = true;
+                    }
+                    delete parsedPrefs.blockGOAndNOOTExclusiveShinies;
+                }
+
                 // Merge with defaults to ensure all preferences are present
                 const mergedPrefs = { ...defaultPreferences, ...parsedPrefs };
                 setPreferences(mergedPrefs);
@@ -43,7 +59,7 @@ export default function DexPreferences() {
 
         // Try to load from server
         loadPreferencesFromServer();
-        
+
         // Load external link preference
         loadExternalLinkPreference();
     }, []);
@@ -52,10 +68,44 @@ export default function DexPreferences() {
         try {
             const profile = await profileAPI.getProfile();
             if (profile?.dexPreferences) {
-                const merged = { ...defaultPreferences, ...profile.dexPreferences };
+                let prefs = { ...profile.dexPreferences };
+                let needsMigration = false;
+
+                // Migration: Convert old blockGOAndNOOTExclusiveShinies to new separate preferences
+                // Only migrate if the old preference exists AND the new ones don't
+                if (prefs.blockGOAndNOOTExclusiveShinies !== undefined &&
+                    prefs.blockGOExclusiveShinies === undefined &&
+                    prefs.blockNOOTExclusiveShinies === undefined) {
+
+                    needsMigration = true;
+
+                    // If the old preference was enabled, enable both new ones
+                    if (prefs.blockGOAndNOOTExclusiveShinies === true) {
+                        prefs.blockGOExclusiveShinies = true;
+                        prefs.blockNOOTExclusiveShinies = true;
+                    } else {
+                        prefs.blockGOExclusiveShinies = false;
+                        prefs.blockNOOTExclusiveShinies = false;
+                    }
+
+                    // Remove the old preference
+                    delete prefs.blockGOAndNOOTExclusiveShinies;
+                }
+
+                const merged = { ...defaultPreferences, ...prefs };
                 setPreferences(merged);
                 // Also save to localStorage as backup
                 localStorage.setItem('dexPreferences', JSON.stringify(merged));
+
+                // If we migrated, save the new preferences to the server
+                if (needsMigration) {
+                    try {
+                        await profileAPI.updateDexPreferences(merged);
+                        console.log('Migrated old shiny locking preferences to new format');
+                    } catch (error) {
+                        console.error('Failed to save migrated preferences:', error);
+                    }
+                }
             }
         } catch (error) {
             console.error('Failed to load dex preferences from server:', error);
@@ -68,7 +118,7 @@ export default function DexPreferences() {
         if (savedPreference) {
             setExternalLinkPreference(savedPreference);
         }
-        
+
         try {
             const profile = await profileAPI.getProfile();
             if (profile?.externalLinkPreference) {
@@ -88,18 +138,18 @@ export default function DexPreferences() {
             ...preferences,
             [key]: !preferences[key]
         };
-        
+
         setPreferences(newPreferences);
-        
+
         // Save to localStorage immediately for responsive UI
         localStorage.setItem('dexPreferences', JSON.stringify(newPreferences));
-        
+
         // Save to server
         try {
             setSaving(true);
             await profileAPI.updateDexPreferences(newPreferences);
             showMessage("Dex preferences updated!", "success");
-            
+
             // Dispatch event to notify App component of preference changes
             window.dispatchEvent(new CustomEvent('dexPreferencesChanged'));
         } catch (error) {
@@ -115,25 +165,61 @@ export default function DexPreferences() {
 
     const handleExternalLinkChange = async (preference) => {
         setExternalLinkPreference(preference);
-        
+
         // Save to localStorage immediately for responsive UI
         localStorage.setItem('externalLinkPreference', preference);
-        
+
         try {
             await profileAPI.updateProfile({ externalLinkPreference: preference });
-                const linkNames = {
-                    'serebii': 'Serebii',
-                    'bulbapedia': 'Bulbapedia', 
-                    'pokemondb': 'PokemonDB',
-                    'smogon': 'Smogon'
-                };
+            const linkNames = {
+                'serebii': 'Serebii',
+                'bulbapedia': 'Bulbapedia',
+                'pokemondb': 'PokemonDB',
+                'smogon': 'Smogon'
+            };
             showMessage(`External links set to ${linkNames[preference]}`, "success");
-            
+
             // Dispatch event to notify App component of external link preference change
             window.dispatchEvent(new CustomEvent('externalLinkPreferenceChanged'));
         } catch (error) {
             console.error('Failed to update external link preference:', error);
             showMessage("Couldn't update external link preference", "error");
+        }
+    };
+
+    const handleViewModeChange = async (mode) => {
+        const previous = preferences;
+        const newPreferences = {
+            ...defaultPreferences,
+            ...preferences,
+            dexViewMode: mode
+        };
+
+        setPreferences(newPreferences);
+
+        // Save to localStorage immediately for responsive UI
+        localStorage.setItem('dexPreferences', JSON.stringify(newPreferences));
+
+        // Save to server
+        try {
+            setSaving(true);
+            await profileAPI.updateDexPreferences(newPreferences);
+            const modeNames = {
+                'categorized': 'Categorized View',
+                'unified': 'Unified View'
+            };
+            showMessage(`Dex view set to ${modeNames[mode]}`, "success");
+
+            // Dispatch event to notify App component of preference changes
+            window.dispatchEvent(new CustomEvent('dexPreferencesChanged'));
+        } catch (error) {
+            console.error('Failed to save dex view mode:', error);
+            showMessage("Failed to save view mode", "error");
+            // Revert on error
+            setPreferences(previous);
+            localStorage.setItem('dexPreferences', JSON.stringify(previous));
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -154,16 +240,64 @@ export default function DexPreferences() {
 
     const shinyBlockingOptions = [
         { key: 'blockUnobtainableShinies', label: 'Lock Unobtainable Shinies' },
-        { key: 'blockGOAndNOOTExclusiveShinies', label: 'Lock GO & NO OT Exclusive Shinies' },
+        { key: 'blockGOExclusiveShinies', label: 'Lock GO Exclusive Shinies' },
+        { key: 'blockNOOTExclusiveShinies', label: 'Lock NO OT Exclusive Shinies' },
+        { key: 'hideLockedShinies', label: 'Hide Locked Shinies from Grid' },
     ];
 
     return (
         <div className="setting-block">
-            <h3>Dex Preferences</h3>
+            {/* Dex View Mode Section */}
+            <div className="dex-view-mode-section">
+                <h4 className="preference-section-header">Dex View Mode</h4>
+                <p className="setting-description">
+                    Choose how your Pokédex is organized.
+                </p>
+
+                <div className="dex-preferences-grid">
+                    <div className="preference-item">
+                        <label className="preference-checkbox">
+                            <input
+                                type="radio"
+                                name="dexViewMode"
+                                value="categorized"
+                                checked={preferences.dexViewMode === 'categorized' || !preferences.dexViewMode}
+                                onChange={(e) => handleViewModeChange(e.target.value)}
+                            />
+                            <span className="preference-label">Categorized</span>
+                            <span className="preference-info-wrapper">
+                                <Info size={18} className="preference-info-icon" />
+                                <span className="preference-tooltip">Separate sections for Living Dex, Regional Forms, Alpha Forms, etc.</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div className="preference-item">
+                        <label className="preference-checkbox">
+                            <input
+                                type="radio"
+                                name="dexViewMode"
+                                value="unified"
+                                checked={preferences.dexViewMode === 'unified'}
+                                onChange={(e) => handleViewModeChange(e.target.value)}
+                            />
+                            <span className="preference-label">Unified</span>
+                            <span className="preference-info-wrapper">
+                                <Info size={18} className="preference-info-icon" />
+                                <span className="preference-tooltip">All Pokémon in one list, sorted by National Dex number.</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div className="setting-divider" />
+
+            <h4 className="preference-section-header">Form Types</h4>
             <p className="setting-description">
                 Choose which form types to display in your Pokédex.
             </p>
-            
+
             <div className="dex-preferences-grid">
                 {preferenceOptions.map(({ key, label }) => (
                     <div key={key} className="preference-item">
@@ -181,13 +315,13 @@ export default function DexPreferences() {
 
             {/* Shiny Locking Section */}
             <div className="setting-divider" />
-            
+
             <div className="shiny-blocking-section">
                 <h4 className="preference-section-header">Shiny Locking</h4>
                 <p className="setting-description">
                     Lock certain types of shiny Pokemon to prevent interaction in your dex.
                 </p>
-                
+
                 <div className="dex-preferences-grid">
                     {shinyBlockingOptions.map(({ key, label }) => (
                         <div key={key} className="preference-item">
@@ -206,13 +340,13 @@ export default function DexPreferences() {
 
             {/* External Links Section */}
             <div className="setting-divider" />
-            
+
             <div className="external-links-section">
                 <h4 className="preference-section-header">External Links</h4>
                 <p className="setting-description">
                     Choose which website Pokemon names link to in the sidebar.
                 </p>
-                
+
                 <div className="dex-preferences-grid">
                     <div className="preference-item">
                         <label className="preference-checkbox">
@@ -226,7 +360,7 @@ export default function DexPreferences() {
                             <span className="preference-label">Serebii</span>
                         </label>
                     </div>
-                    
+
                     <div className="preference-item">
                         <label className="preference-checkbox">
                             <input
@@ -239,32 +373,32 @@ export default function DexPreferences() {
                             <span className="preference-label">Bulbapedia</span>
                         </label>
                     </div>
-                    
-        <div className="preference-item">
-            <label className="preference-checkbox">
-                <input
-                    type="radio"
-                    name="externalLink"
-                    value="pokemondb"
-                    checked={externalLinkPreference === 'pokemondb'}
-                    onChange={(e) => handleExternalLinkChange(e.target.value)}
-                />
-                <span className="preference-label">PokemonDB</span>
-            </label>
-        </div>
-        
-        <div className="preference-item">
-            <label className="preference-checkbox">
-                <input
-                    type="radio"
-                    name="externalLink"
-                    value="smogon"
-                    checked={externalLinkPreference === 'smogon'}
-                    onChange={(e) => handleExternalLinkChange(e.target.value)}
-                />
-                <span className="preference-label">Smogon</span>
-            </label>
-        </div>
+
+                    <div className="preference-item">
+                        <label className="preference-checkbox">
+                            <input
+                                type="radio"
+                                name="externalLink"
+                                value="pokemondb"
+                                checked={externalLinkPreference === 'pokemondb'}
+                                onChange={(e) => handleExternalLinkChange(e.target.value)}
+                            />
+                            <span className="preference-label">PokemonDB</span>
+                        </label>
+                    </div>
+
+                    <div className="preference-item">
+                        <label className="preference-checkbox">
+                            <input
+                                type="radio"
+                                name="externalLink"
+                                value="smogon"
+                                checked={externalLinkPreference === 'smogon'}
+                                onChange={(e) => handleExternalLinkChange(e.target.value)}
+                            />
+                            <span className="preference-label">Smogon</span>
+                        </label>
+                    </div>
                 </div>
             </div>
 

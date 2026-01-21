@@ -6,25 +6,25 @@
  */
 export const filterFormsByPreferences = (forms, preferences) => {
     if (!preferences || !forms) return forms;
-    
+
     return forms.filter(form => {
         const formType = form.formType;
-        
+
         // Skip separator headers (they start with dashes)
         if (typeof formType === 'string' && formType.startsWith('-')) {
             return false;
         }
-        
+
         // Skip forms without a valid formType
         if (!formType || typeof formType !== 'string') {
             return false;
         }
-        
+
         // Special case: Pokemon with "-alpha" in their name should be treated as Alpha forms
         if (form.name && form.name.toLowerCase().includes('-alpha')) {
             return preferences.showAlphaForms;
         }
-        
+
         switch (formType) {
             case 'gender':
                 return preferences.showGenderForms;
@@ -80,14 +80,17 @@ export const getDexPreferences = () => {
                 showAlphaForms: true,
                 showAlphaOtherForms: true,
                 blockUnobtainableShinies: false,
-                blockGOAndNOOTExclusiveShinies: false,
+                blockGOExclusiveShinies: false,
+                blockNOOTExclusiveShinies: false,
+                hideLockedShinies: false,
+                dexViewMode: 'categorized',
                 ...parsedPrefs // User preferences override defaults
             };
         }
     } catch (error) {
         console.error('Failed to parse saved dex preferences:', error);
     }
-    
+
     return {
         showGenderForms: true,
         showAlolanForms: true,
@@ -102,7 +105,10 @@ export const getDexPreferences = () => {
         showAlphaForms: true,
         showAlphaOtherForms: true,
         blockUnobtainableShinies: false,
-        blockGOAndNOOTExclusiveShinies: false,
+        blockGOExclusiveShinies: false,
+        blockNOOTExclusiveShinies: false,
+        hideLockedShinies: false,
+        dexViewMode: 'categorized',
     };
 };
 
@@ -128,25 +134,25 @@ export const testFiltering = () => {
         { id: 3, name: 'test-galarian', formType: 'galarian' },
         { id: 4, name: 'test-other', formType: 'other' },
     ];
-    
+
     const testPreferences = {
         showGenderForms: false,
         showAlolanForms: true,
         showGalarianForms: false,
         showOtherForms: true,
     };
-    
+
     const filtered = filterFormsByPreferences(testForms, testPreferences);
-    
+
     return {
         original: testForms.length,
         filtered: filtered.length,
         shouldShow: [testForms[1], testForms[3]], // alolan and other
         actual: filtered,
-        working: filtered.length === 2 && 
-                 filtered.some(f => f.formType === 'alolan') && 
-                 filtered.some(f => f.formType === 'other') &&
-                 !filtered.some(f => f.formType === 'gender') &&
-                 !filtered.some(f => f.formType === 'galarian')
+        working: filtered.length === 2 &&
+            filtered.some(f => f.formType === 'alolan') &&
+            filtered.some(f => f.formType === 'other') &&
+            !filtered.some(f => f.formType === 'gender') &&
+            !filtered.some(f => f.formType === 'galarian')
     };
 };

@@ -48,7 +48,7 @@ import { LoadingSpinner } from "./components/Shared";
 import Footer from "./components/Shared/Footer";
 import CustomScrollbar from "./components/Shared/CustomScrollbar";
 import { getFilteredFormsData, getDexPreferences } from "./utils/dexPreferences";
-import { UNOBTAINABLE_SHINY_DEX_NUMBERS, GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "./data/blockedShinies";
+import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "./data/blockedShinies";
 import { createPortal } from "react-dom";
 import { RotateCcw } from "lucide-react";
 
@@ -970,18 +970,25 @@ export default function App() {
       if (isShiny && currentDexPreferences) {
         // Check if Pokemon should be blocked by ID
         const isBlockedUnobtainableById = currentDexPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
-        const isBlockedGOById = currentDexPreferences.blockGOAndNOOTExclusiveShinies && GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
+        const isBlockedGOById = currentDexPreferences.blockGOExclusiveShinies && GO_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
+        const isBlockedNOOTById = currentDexPreferences.blockNOOTExclusiveShinies && NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
 
         // Check if Pokemon should be blocked by form name (for forms that share the same ID)
         const pokemonName = poke.name?.toLowerCase() || "";
         const isBlockedUnobtainableByForm = currentDexPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
-        const isBlockedGOByForm = currentDexPreferences.blockGOAndNOOTExclusiveShinies && GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+        const isBlockedGOByForm = currentDexPreferences.blockGOExclusiveShinies && GO_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+        const isBlockedNOOTByForm = currentDexPreferences.blockNOOTExclusiveShinies && NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
 
         const isBlockedUnobtainable = isBlockedUnobtainableById || isBlockedUnobtainableByForm;
         const isBlockedGO = isBlockedGOById || isBlockedGOByForm;
+        const isBlockedNOOT = isBlockedNOOTById || isBlockedNOOTByForm;
 
-        if (isBlockedUnobtainable || isBlockedGO) {
-          // Mark as blocked but don't filter out
+        if (isBlockedUnobtainable || isBlockedGO || isBlockedNOOT) {
+          // If hideLockedShinies is enabled, completely filter out this Pokemon
+          if (currentDexPreferences.hideLockedShinies) {
+            return false;
+          }
+          // Otherwise, mark as blocked but don't filter out
           poke._isBlocked = true;
         } else {
           // Ensure not blocked if conditions aren't met
@@ -1164,16 +1171,20 @@ export default function App() {
 
       const isBlockedUnobtainableById = currentDexPreferences.blockUnobtainableShinies &&
         UNOBTAINABLE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
-      const isBlockedGOById = currentDexPreferences.blockGOAndNOOTExclusiveShinies &&
-        GO_NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
+      const isBlockedGOById = currentDexPreferences.blockGOExclusiveShinies &&
+        GO_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
+      const isBlockedNOOTById = currentDexPreferences.blockNOOTExclusiveShinies &&
+        NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
 
       const pokemonName = poke.name?.toLowerCase() || "";
       const isBlockedUnobtainableByForm = currentDexPreferences.blockUnobtainableShinies &&
         UNOBTAINABLE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
-      const isBlockedGOByForm = currentDexPreferences.blockGOAndNOOTExclusiveShinies &&
-        GO_NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+      const isBlockedGOByForm = currentDexPreferences.blockGOExclusiveShinies &&
+        GO_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
+      const isBlockedNOOTByForm = currentDexPreferences.blockNOOTExclusiveShinies &&
+        NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokemonName === formName.toLowerCase());
 
-      return isBlockedUnobtainableById || isBlockedGOById || isBlockedUnobtainableByForm || isBlockedGOByForm;
+      return isBlockedUnobtainableById || isBlockedGOById || isBlockedNOOTById || isBlockedUnobtainableByForm || isBlockedGOByForm || isBlockedNOOTByForm;
     };
 
     // Filter out locked Pokemon from the box
@@ -1414,6 +1425,31 @@ export default function App() {
     }
   };
 
+  // Helper function to get unified pokemon list for unified view mode
+  const getUnifiedPokemonList = (isShiny = false, applyFilters = false) => {
+    // Collect all Pokemon from all sections
+    const allMons = dexSections.flatMap(section => section.getList());
+
+    // Remove duplicates by using getCaughtKey
+    const seenKeys = new Set();
+    const uniqueMons = allMons.filter(mon => {
+      const key = getCaughtKey(mon, null, isShiny);
+      if (seenKeys.has(key)) return false;
+      seenKeys.add(key);
+      return true;
+    });
+
+    // Sort by dex number (id)
+    const sorted = uniqueMons.sort((a, b) => (a.id || 0) - (b.id || 0));
+
+    // Apply filters if requested
+    if (applyFilters) {
+      return filterMons(sorted, showForms, isShiny);
+    }
+
+    return sorted;
+  };
+
   let mergedMons = [];
   const seen = new Set();
 
@@ -1539,9 +1575,36 @@ export default function App() {
                             </div>
 
                             <div className="main-bg page-container fade-in-up">
-                              {/* Dynamic Dex Grid based on showShiny toggle */}
-                              {showShiny ? (
-                                // Show Shiny Pokémon Grid
+                              {/* Dynamic Dex Grid based on showShiny toggle and dexViewMode */}
+                              {currentDexPreferences?.dexViewMode === 'unified' ? (
+                                // UNIFIED VIEW - All Pokemon in one list sorted by dex number
+                                <div className="dex-grid-section">
+                                  {(() => {
+                                    const unifiedList = getUnifiedPokemonList(showShiny, true);
+                                    if (!unifiedList.length) return null;
+
+                                    return (
+                                      <DexSection
+                                        readOnly={false}
+                                        caughtInfoMap={caughtInfoMap}
+                                        updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, showShiny)}
+                                        key={`unified_${showShiny ? 'shiny' : 'regular'}`}
+                                        sidebarOpen={sidebarOpen}
+                                        title={showShiny ? "Complete Shiny Dex" : "Complete Living Dex"}
+                                        pokemonList={unifiedList}
+                                        caught={caught}
+                                        isCaught={(poke) => caught[getCaughtKey(poke, null, showShiny)] || false}
+                                        onMarkAll={(box) => handleMarkAll(box, showShiny)}
+                                        onToggleCaught={(poke) => handleToggleCaught(poke, showShiny)}
+                                        onSelect={handleSelectPokemon}
+                                        showShiny={showShiny}
+                                        showForms={showForms}
+                                      />
+                                    );
+                                  })()}
+                                </div>
+                              ) : showShiny ? (
+                                // CATEGORIZED VIEW - Show Shiny Pokémon Grid
                                 <div className="dex-grid-section">
                                   {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
                                     ? dexSections.map(section => {
@@ -1593,7 +1656,7 @@ export default function App() {
                                     })}
                                 </div>
                               ) : (
-                                // Show Regular Pokémon Grid
+                                // CATEGORIZED VIEW - Show Regular Pokémon Grid
                                 <div className="dex-grid-section">
                                   {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
                                     ? dexSections.map(section => {

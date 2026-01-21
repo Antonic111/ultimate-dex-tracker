@@ -103,7 +103,10 @@ const userSchema = new mongoose.Schema({
     showAlphaForms: { type: Boolean, default: true },
     showAlphaOtherForms: { type: Boolean, default: true },
     blockUnobtainableShinies: { type: Boolean, default: false },
-    blockGOAndNOOTExclusiveShinies: { type: Boolean, default: false },
+    blockGOExclusiveShinies: { type: Boolean, default: false },
+    blockNOOTExclusiveShinies: { type: Boolean, default: false },
+    hideLockedShinies: { type: Boolean, default: false },
+    dexViewMode: { type: String, default: 'categorized', enum: ['categorized', 'unified'] },
   },
   // EXTERNAL LINK PREFERENCE ----------------------------------------- //
   externalLinkPreference: { type: String, default: 'serebii', enum: ['serebii', 'bulbapedia', 'pokemondb', 'smogon'] },
