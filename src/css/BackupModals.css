@@ -36,13 +36,23 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes slideIn {
@@ -50,6 +60,7 @@
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -61,6 +72,7 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+
   to {
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
@@ -164,20 +176,20 @@
     margin: 20px;
     width: calc(100% - 40px);
   }
-  
+
   .modal-title {
     font-size: 1.25rem;
   }
-  
+
   .modal-desc {
     font-size: 0.9rem;
   }
-  
+
   .modal-row {
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .modal-btn {
     padding: 8px 16px;
     font-size: 0.85rem;
@@ -190,7 +202,7 @@
     margin: 16px;
     width: calc(100% - 32px);
   }
-  
+
   .modal-btn {
     padding: 6px 12px;
     font-size: 0.8rem;

@@ -2,7 +2,7 @@
 
 :root {
   --transition-speed: 0.3s;
-  
+
   /* Z-Index System */
   --z-dropdown: 1000;
   --z-modal-overlay: 10050;
@@ -124,12 +124,12 @@
   --trainer-search-placeholder: #8a8a8a;
   --trainer-card-bg: #151515;
   --trainer-card-border: #333333;
-  --trainer-card-shadow: 0 10px 28px rgba(0,0,0,.35);
-  --trainer-card-hover-shadow: 0 10px 28px rgba(0,0,0,.45);
+  --trainer-card-shadow: 0 10px 28px rgba(0, 0, 0, .35);
+  --trainer-card-hover-shadow: 0 10px 28px rgba(0, 0, 0, .45);
   --trainer-avatar-border: #555555;
   --trainer-avatar-bg: radial-gradient(circle at center, #3b3b3f 0%, #1e1e20 100%);
 
-  --skeleton-bg: linear-gradient(90deg,#141414 25%,#1b1b1b 37%,#141414 63%);
+  --skeleton-bg: linear-gradient(90deg, #141414 25%, #1b1b1b 37%, #141414 63%);
 
   /* SCROLLBAR VARIABLES */
   --scrollbar-bg: #333333;
@@ -139,120 +139,198 @@
 
 [data-theme="light"] {
   /* GLOBALS - Improved light mode with better blending */
-  --accent: #fbbf24; /* amber-400 */
-  --accent-hover: #f59e0b; /* amber-500 */
-  --dividers: #d1d5db; /* gray-300 - softer */
-  --main-bg: #fafafa; /* slightly off-white for better blending */
-  --main-bg2: #f3f4f6; /* gray-100 */
-  --text: #1f2937; /* gray-800 - better contrast than gray-900 */
-  --header-hello: #4b5563; /* gray-600 - softer */
+  --accent: #fbbf24;
+  /* amber-400 */
+  --accent-hover: #f59e0b;
+  /* amber-500 */
+  --dividers: #d1d5db;
+  /* gray-300 - softer */
+  --main-bg: #fafafa;
+  /* slightly off-white for better blending */
+  --main-bg2: #f3f4f6;
+  /* gray-100 */
+  --text: #1f2937;
+  /* gray-800 - better contrast than gray-900 */
+  --header-hello: #4b5563;
+  /* gray-600 - softer */
 
   /* APP.CSS */
-  --header: #f8fafc; /* slate-50 - softer than gray-100 */
-  --grid-headers: #1f2937; /* gray-800 */
-  --grid-desc: #4b5563; /* gray-600 */
-  --main-grid-divider: #9ca3af; /* gray-400 */
-  --pokemon-box-bg: #ffffff; /* white */
-  --pokemon-box-bg2: #f8fafc; /* slate-50 */
-  --border-color: #d1d5db; /* gray-300 - more visible than gray-200 */
-  --pokeslot: #f3f4f6; /* gray-100 */
-  --pokename: #1f2937; /* gray-800 */
-  --collapse-btn: #4b5563; /* gray-600 */
-  --collapse-icon: #ffffff; /* white */
+  --header: #f8fafc;
+  /* slate-50 - softer than gray-100 */
+  --grid-headers: #1f2937;
+  /* gray-800 */
+  --grid-desc: #4b5563;
+  /* gray-600 */
+  --main-grid-divider: #9ca3af;
+  /* gray-400 */
+  --pokemon-box-bg: #ffffff;
+  /* white */
+  --pokemon-box-bg2: #f8fafc;
+  /* slate-50 */
+  --border-color: #d1d5db;
+  /* gray-300 - more visible than gray-200 */
+  --pokeslot: #f3f4f6;
+  /* gray-100 */
+  --pokename: #1f2937;
+  /* gray-800 */
+  --collapse-btn: #4b5563;
+  /* gray-600 */
+  --collapse-icon: #ffffff;
+  /* white */
 
   /* AUTH.CSS */
-  --auth-boxes: #ffffff; /* white */
-  --text-color: #1f2937; /* gray-800 */
-  --remember-me-text: #4b5563; /* gray-600 */
-  --svg-icons: #6b7280; /* gray-500 */
-  --user-dropdown: #ffffff; /* white */
+  --auth-boxes: #ffffff;
+  /* white */
+  --text-color: #1f2937;
+  /* gray-800 */
+  --remember-me-text: #4b5563;
+  /* gray-600 */
+  --svg-icons: #6b7280;
+  /* gray-500 */
+  --user-dropdown: #ffffff;
+  /* white */
   --nav-link-bg: rgba(0, 0, 0, 0.04);
   --nav-link-border: rgba(0, 0, 0, 0.08);
   --nav-link-hover-bg: rgba(0, 0, 0, 0.06);
-  --nav-link-text: #4b5563; /* gray-600 */
-  --nav-link-hover-text: #1f2937; /* gray-800 */
+  --nav-link-text: #4b5563;
+  /* gray-600 */
+  --nav-link-hover-text: #1f2937;
+  /* gray-800 */
   --nav-link-shadow: rgba(0, 0, 0, 0.08);
-  --dropdown-bg: #ffffff; /* white */
-  --dropdown-border: #d1d5db; /* gray-300 */
-  --dropdown-item-text: #4b5563; /* gray-600 */
-  --dropdown-item-hover-bg: #f8fafc; /* slate-50 */
-  --dropdown-item-hover-text: #1f2937; /* gray-800 */
-  --dropdown-icon: #6b7280; /* gray-500 */
+  --dropdown-bg: #ffffff;
+  /* white */
+  --dropdown-border: #d1d5db;
+  /* gray-300 */
+  --dropdown-item-text: #4b5563;
+  /* gray-600 */
+  --dropdown-item-hover-bg: #f8fafc;
+  /* slate-50 */
+  --dropdown-item-hover-text: #1f2937;
+  /* gray-800 */
+  --dropdown-icon: #6b7280;
+  /* gray-500 */
   --dropdown-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
   --dropdown-inset-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.04);
 
   /* SCROLLBAR VARIABLES */
-  --scrollbar-bg: #e5e7eb; /* neutral-200 */
-  --scrollbar-track: rgba(0,0,0,0.06);
+  --scrollbar-bg: #e5e7eb;
+  /* neutral-200 */
+  --scrollbar-track: rgba(0, 0, 0, 0.06);
   --scrollbar-thumb: var(--accent);
 
   /* CONFIRMDIALOG.CSS */
-  --confirm-panel: #ffffff; /* white */
-  --confirm-panel-text: #111827; /* gray-900 */
+  --confirm-panel: #ffffff;
+  /* white */
+  --confirm-panel-text: #111827;
+  /* gray-900 */
 
   /* SIDEBAR.CSS */
-  --sidebar-bg: #f8fafc; /* slate-50 */
-  --sidebar-pokemon-bg: #ffffff; /* white */
-  --sidebar-text: #1f2937; /* gray-800 */
-  --sidebar-edit-inputs: #ffffff; /* white */
-  --sidebar-display: #ffffff; /* white */
+  --sidebar-bg: #f8fafc;
+  /* slate-50 */
+  --sidebar-pokemon-bg: #ffffff;
+  /* white */
+  --sidebar-text: #1f2937;
+  /* gray-800 */
+  --sidebar-edit-inputs: #ffffff;
+  /* white */
+  --sidebar-display: #ffffff;
+  /* white */
 
   /* EVOLUTIONCHAIN.CSS */
-  --evo-arrow: #6b7280; /* gray-500 */
-  --evo-bg: #ffffff; /* white */
-  --evo-text: #1f2937; /* gray-800 */
+  --evo-arrow: #6b7280;
+  /* gray-500 */
+  --evo-bg: #ffffff;
+  /* white */
+  --evo-text: #1f2937;
+  /* gray-800 */
 
   /* PROFILE.CSS */
-  --profile-card-bg: #ffffff; /* white */
-  --profile-top-bg: #f8fafc; /* slate-50 */
-  --profile-text: #1f2937; /* gray-800 */
-  --profile-labels: #6b7280; /* gray-500 */
-  --profile-fields: #f8fafc; /* slate-50 */
+  --profile-card-bg: #ffffff;
+  /* white */
+  --profile-top-bg: #f8fafc;
+  /* slate-50 */
+  --profile-text: #1f2937;
+  /* gray-800 */
+  --profile-labels: #6b7280;
+  /* gray-500 */
+  --profile-fields: #f8fafc;
+  /* slate-50 */
 
   /* FAVORITESELECTIONMODAL.CSS */
-  --profile-modal-bg: #ffffff; /* white */
-  --profile-modal-boxes: #f8fafc; /* slate-50 */
-  --profile-modal-search-bg: #ffffff; /* white */
+  --profile-modal-bg: #ffffff;
+  /* white */
+  --profile-modal-boxes: #f8fafc;
+  /* slate-50 */
+  --profile-modal-search-bg: #ffffff;
+  /* white */
 
   /* SEARCHBAR.CSS */
-  --searchbar-bg: #ffffff; /* white */
-  --searchbar-inputs: #f8fafc; /* slate-50 */
-  --searchbar-dropdown: #f8fafc; /* slate-50 */
-  --searchbar-dropdown-selected: #d1d5db; /* gray-300 */
-  --searchbar-placeholder-text: #9ca3af; /* gray-400 */
+  --searchbar-bg: #ffffff;
+  /* white */
+  --searchbar-inputs: #f8fafc;
+  /* slate-50 */
+  --searchbar-dropdown: #f8fafc;
+  /* slate-50 */
+  --searchbar-dropdown-selected: #d1d5db;
+  /* gray-300 */
+  --searchbar-placeholder-text: #9ca3af;
+  /* gray-400 */
 
   /* PROGRESSBARS.CSS */
-  --progressbar-info: #6b7280; /* gray-500 */
-  --progressbar-bg: #f8fafc; /* slate-50 */
-  --progressbar-track: #d1d5db; /* gray-300 */
-  --progress-bg: #ffffff; /* white */
-  --progress-icons: #4b5563; /* gray-600 */
-  --progressbar-input: #f8fafc; /* slate-50 */
-  --modal-buttons: #f8fafc; /* slate-50 */
-  --modal-buttons-hover: #d1d5db; /* gray-300 */
-  --modal-buttons-hover-text: #4b5563; /* gray-600 */
-  --modal-inputs: #f8fafc; /* slate-50 */
-  --modal-dropdown: #ffffff; /* white */
-  --template-buttons: #f8fafc; /* slate-50 */
+  --progressbar-info: #6b7280;
+  /* gray-500 */
+  --progressbar-bg: #f8fafc;
+  /* slate-50 */
+  --progressbar-track: #d1d5db;
+  /* gray-300 */
+  --progress-bg: #ffffff;
+  /* white */
+  --progress-icons: #4b5563;
+  /* gray-600 */
+  --progressbar-input: #f8fafc;
+  /* slate-50 */
+  --modal-buttons: #f8fafc;
+  /* slate-50 */
+  --modal-buttons-hover: #d1d5db;
+  /* gray-300 */
+  --modal-buttons-hover-text: #4b5563;
+  /* gray-600 */
+  --modal-inputs: #f8fafc;
+  /* slate-50 */
+  --modal-dropdown: #ffffff;
+  /* white */
+  --template-buttons: #f8fafc;
+  /* slate-50 */
 
   /* WELCOMEPAGE.CSS */
-  --welcome-text: #4b5563; /* gray-600 */
+  --welcome-text: #4b5563;
+  /* gray-600 */
 
   /* SETTINGS.CSS */
-  --settings-bg: #ffffff; /* white */
-  --settings-input: #f8fafc; /* slate-50 */
+  --settings-bg: #ffffff;
+  /* white */
+  --settings-input: #f8fafc;
+  /* slate-50 */
 
   /* TRAINERS.CSS */
-  --trainer-search-bg: #f8fafc; /* slate-50 */
-  --trainer-search-border: #d1d5db; /* gray-300 */
-  --trainer-search-text: #4b5563; /* gray-600 */
-  --trainer-search-placeholder: #9ca3af; /* gray-400 */
-  --trainer-card-bg: #ffffff; /* white */
-  --trainer-card-border: #e5e7eb; /* gray-200 */
+  --trainer-search-bg: #f8fafc;
+  /* slate-50 */
+  --trainer-search-border: #d1d5db;
+  /* gray-300 */
+  --trainer-search-text: #4b5563;
+  /* gray-600 */
+  --trainer-search-placeholder: #9ca3af;
+  /* gray-400 */
+  --trainer-card-bg: #ffffff;
+  /* white */
+  --trainer-card-border: #e5e7eb;
+  /* gray-200 */
   --trainer-card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --trainer-card-hover-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --trainer-avatar-border: #d1d5db; /* gray-300 */
-  --trainer-avatar-bg: #f3f4f6; /* gray-100 */
+  --trainer-avatar-border: #d1d5db;
+  /* gray-300 */
+  --trainer-avatar-bg: #f3f4f6;
+  /* gray-100 */
 
   --skeleton-bg: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
 
@@ -271,6 +349,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -286,8 +365,10 @@
 
   /* Caught Pokémon get green hover effects */
   [data-caught="true"][data-readonly="false"]:hover {
-    border-color: #22c55e !important; /* green-500 */
-    box-shadow: 0 0 6px #22c55e !important; /* green-500 */
+    border-color: #22c55e !important;
+    /* green-500 */
+    box-shadow: 0 0 6px #22c55e !important;
+    /* green-500 */
   }
 
   /* Reset styles when not hovering */
@@ -304,13 +385,23 @@
 
 /* Sidebar animation keyframes */
 @keyframes slideInSidebar {
-  from { transform: translateX(115%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(115%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
 
 @keyframes slideOutSidebar {
-  from { transform: translateX(0); }
-  to { transform: translateX(115%); }
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(115%);
+  }
 }
 
 /* Input placeholder styling for better visibility */

@@ -69,7 +69,8 @@ function loadFullCaughtMap() {
 }
 
 export default function ProgressManager({ allMons, caughtInfoMap, readOnly = false, progressBarsOverride = null, showShiny = false, dexPreferences = null, showLockedCheckbox = false }) {
-    const { username, progressBars: contextSavedBars = [] } = useContext(UserContext);
+    const userContext = useContext(UserContext);
+    const { username, progressBars: contextSavedBars = [] } = userContext;
     const { showMessage } = useMessage();
 
     // Use refs to track previous values and prevent infinite loops
@@ -232,6 +233,18 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
         try {
             await progressAPI.updateProgressBars(cleanBars);
+
+            // ✅ UPDATE USER CONTEXT so progress bars persist during SPA navigation
+            // This fixes the iOS Safari issue where bars reset after navigating away and back
+            // Note: We need to pass a full user object since handleUserUpdate doesn't support functional updates
+            setUser({
+                username: userContext.username,
+                email: userContext.email,
+                createdAt: userContext.createdAt,
+                profileTrainer: userContext.profileTrainer,
+                verified: userContext.verified,
+                progressBars: cleanBars,
+            });
         } catch (err) {
             console.error("❌ Error saving bars:", err);
         }
@@ -247,35 +260,46 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
 
     useEffect(() => {
+        const html = document.documentElement;
         const body = document.body;
+
         if (showSettings) {
             // Store current scroll position
             const scrollY = window.scrollY;
+            body.dataset.scrollY = scrollY;
 
-            // Prevent scrolling
+            // Prevent scrolling without using position:fixed on body
+            // This avoids breaking fixed-position modals during page transitions
+            html.style.overflow = 'hidden';
             body.style.overflow = 'hidden';
-            body.style.position = 'fixed';
-            body.style.top = `-${scrollY}px`;
-            body.style.width = '100%';
+            html.style.height = '100vh';
+            body.style.height = '100vh';
+            // Use margin-top instead of position:fixed to maintain scroll position appearance
+            body.style.marginTop = `-${scrollY}px`;
+            body.style.paddingTop = `${scrollY}px`;
         } else {
             // Restore scrolling
-            const scrollY = body.style.top;
+            const scrollY = parseInt(body.dataset.scrollY || '0', 10);
+            html.style.overflow = '';
             body.style.overflow = '';
-            body.style.position = '';
-            body.style.top = '';
-            body.style.width = '';
+            html.style.height = '';
+            body.style.height = '';
+            body.style.marginTop = '';
+            body.style.paddingTop = '';
 
             // Restore scroll position
             if (scrollY) {
-                window.scrollTo(0, parseInt(scrollY || '0') * -1);
+                window.scrollTo(0, scrollY);
             }
         }
         return () => {
             // Cleanup
+            html.style.overflow = '';
             body.style.overflow = '';
-            body.style.position = '';
-            body.style.top = '';
-            body.style.width = '';
+            html.style.height = '';
+            body.style.height = '';
+            body.style.marginTop = '';
+            body.style.paddingTop = '';
         };
     }, [showSettings]);
 

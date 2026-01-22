@@ -16,7 +16,8 @@
       "Fixed Alpha Male Sneasel in the Alpha Genders & Other's category having a wrong Id causing issues with the numbers. (Anyone who had data on this pokemon will need to re-add it (sorry!)).",
       "Bug fixes & compatibility improvements for iOS devices. (Needs Testing)",
       "Adjusted the trainer page buttons to change pages to be more in uniform and cleaner looking.",
-      "Fixed a bug where people could not submit bug reports or feature requests."
+      "Fixed a bug where people could not submit bug reports or feature requests.",
+      "Fixed an issue where modal animations would break upon a fresh login."
     ]
   },
   {

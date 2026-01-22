@@ -56,20 +56,28 @@ export default function ShinyCharmModal({ isOpen, onClose, readOnly = false, vie
   // Prevent body scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
+      const html = document.documentElement;
       const body = document.body;
       const scrollY = window.scrollY;
-      
+
+      // Prevent scrolling without using position:fixed on body
+      // This avoids breaking fixed-position modals during page transitions
+      html.style.overflow = 'hidden';
       body.style.overflow = 'hidden';
-      body.style.position = 'fixed';
-      body.style.top = `-${scrollY}px`;
-      body.style.width = '100%';
-      
+      html.style.height = '100vh';
+      body.style.height = '100vh';
+      body.style.marginTop = `-${scrollY}px`;
+      body.style.paddingTop = `${scrollY}px`;
+      body.dataset.scrollY = scrollY;
+
       return () => {
+        html.style.overflow = '';
         body.style.overflow = '';
-        body.style.position = '';
-        body.style.top = '';
-        body.style.width = '';
-        
+        html.style.height = '';
+        body.style.height = '';
+        body.style.marginTop = '';
+        body.style.paddingTop = '';
+
         // Restore scroll position
         window.scrollTo(0, scrollY);
       };
@@ -112,12 +120,12 @@ export default function ShinyCharmModal({ isOpen, onClose, readOnly = false, vie
     try {
       await profileAPI.updateProfile({ shinyCharmGames: selectedGames });
       showMessage('Shiny Charm preferences saved!', 'success');
-      
+
       // Dispatch event to notify other components of the update
       window.dispatchEvent(new CustomEvent('shinyCharmGamesUpdated', {
         detail: { shinyCharmGames: selectedGames }
       }));
-      
+
       handleClose();
     } catch (error) {
       console.error('Error saving shiny charm games:', error);
@@ -172,7 +180,7 @@ export default function ShinyCharmModal({ isOpen, onClose, readOnly = false, vie
           ) : (
             <>
               <p className="mb-4 text-sm" style={{ color: 'var(--text)' }}>
-                {readOnly && viewedUsername 
+                {readOnly && viewedUsername
                   ? (
                     <>
                       <span style={{ color: 'var(--accent)' }}>{viewedUsername}</span>
@@ -186,7 +194,7 @@ export default function ShinyCharmModal({ isOpen, onClose, readOnly = false, vie
                 {SHINY_CHARM_GAMES.map((gameName) => {
                   const gameOption = GAME_OPTIONS.find(g => g.name === gameName);
                   const isSelected = selectedGames.includes(gameName);
-                  
+
                   return (
                     <div
                       key={gameName}
@@ -194,8 +202,8 @@ export default function ShinyCharmModal({ isOpen, onClose, readOnly = false, vie
                       style={{
                         backgroundColor: isSelected ? 'var(--accent)' : 'var(--pokemon-box-bg2)',
                         border: `1px solid ${isSelected ? 'var(--accent)' : 'var(--border-color)'}`,
-                        boxShadow: isSelected 
-                          ? '0 3px 5px rgba(0, 0, 0, 0.8)' 
+                        boxShadow: isSelected
+                          ? '0 3px 5px rgba(0, 0, 0, 0.8)'
                           : '0 3px 5px rgba(0, 0, 0, 0.6)',
                         cursor: readOnly ? 'default' : 'pointer',
                         opacity: readOnly && !isSelected ? 0.6 : 1,
@@ -210,7 +218,7 @@ export default function ShinyCharmModal({ isOpen, onClose, readOnly = false, vie
                           onError={(e) => (e.target.style.display = 'none')}
                         />
                       )}
-                      <span className="text-sm md:text-base" style={{ 
+                      <span className="text-sm md:text-base" style={{
                         color: 'var(--text)',
                         fontWeight: isSelected ? 'bold' : 'normal'
                       }}>

@@ -251,37 +251,42 @@ body {
 
 /* Page Animation Classes */
 .page-animate-1 {
-  opacity: 0;
   animation: componentFadeInUp 0.8s ease-out forwards;
 }
 
 .page-animate-2 {
-  opacity: 0;
   animation: componentFadeInUp 0.8s ease-out forwards;
 }
 
 .page-animate-3 {
-  opacity: 0;
   animation: componentFadeInUp 0.8s ease-out forwards;
 }
 
 @keyframes componentFadeInUp {
-  from {
+  0% {
     opacity: 0;
     transform: translateY(20px);
   }
 
-  to {
+  99.9% {
     opacity: 1;
     transform: translateY(0);
   }
+
+  100% {
+    opacity: 1;
+    /* IMPORTANT: Clear transform at the end to avoid creating a containing block
+       for fixed-position elements like modal backdrops. Any element with a transform
+       becomes a containing block, breaking position:fixed for child elements. */
+    transform: none;
+  }
 }
 
-/* Animation Performance Optimizations */
+/* Animation Performance Optimizations - removed will-change: transform to prevent containing block issues */
 .page-animate-1,
 .page-animate-2,
 .page-animate-3 {
-  will-change: opacity, transform;
+  will-change: opacity;
   backface-visibility: hidden;
 }
 

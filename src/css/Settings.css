@@ -4,7 +4,6 @@
 .page-container {
   @apply mb-12;
   animation: pageFadeIn 0.8s ease-out forwards;
-  opacity: 0;
 }
 
 .page-container.fade-in-up {
@@ -12,26 +11,36 @@
 }
 
 @keyframes pageFadeIn {
-  from {
+  0% {
     opacity: 0;
     transform: translateY(20px);
   }
 
-  to {
+  99.9% {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: none;
   }
 }
 
 @keyframes componentFadeInUp {
-  from {
+  0% {
     opacity: 0;
     transform: translateY(30px);
   }
 
-  to {
+  99.9% {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: none;
   }
 }
 

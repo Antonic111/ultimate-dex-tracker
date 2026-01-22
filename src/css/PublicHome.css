@@ -173,7 +173,7 @@
 .random-card {
   @apply absolute rounded-xl flex items-center justify-center;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  animation: float 6s ease-in-out infinite, fadeIn 0.8s ease-out;
+  animation: float 6s ease-in-out infinite, cardFadeIn 0.8s ease-out;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid rgba(255, 255, 255, 0.2);
   opacity: 0;
@@ -205,15 +205,15 @@
     @apply w-64 h-64;
     min-height: 256px;
   }
-  
+
   .random-card.large {
     @apply w-16 h-16;
   }
-  
+
   .random-card.medium {
     @apply w-14 h-14;
   }
-  
+
   .random-card.small {
     @apply w-12 h-12;
   }
@@ -224,15 +224,15 @@
     @apply w-56 h-56;
     min-height: 224px;
   }
-  
+
   .random-card.large {
     @apply w-14 h-14;
   }
-  
+
   .random-card.medium {
     @apply w-12 h-12;
   }
-  
+
   .random-card.small {
     @apply w-10 h-10;
   }
@@ -370,6 +370,7 @@
     opacity: 0;
     transform: translateY(0px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -377,25 +378,31 @@
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(-50%, -50%) translateY(0px) rotate(var(--rotation, 0deg));
   }
+
   25% {
     transform: translate(-50%, -50%) translateY(-8px) rotate(calc(var(--rotation, 0deg) + 2deg));
   }
+
   50% {
     transform: translate(-50%, -50%) translateY(-12px) rotate(var(--rotation, 0deg));
   }
+
   75% {
     transform: translate(-50%, -50%) translateY(-6px) rotate(calc(var(--rotation, 0deg) - 1deg));
   }
 }
 
-@keyframes fadeIn {
+@keyframes cardFadeIn {
   from {
     opacity: 0;
     transform: translate(-50%, -50%) translateY(30px) scale(0.8);
   }
+
   to {
     opacity: 1;
     transform: translate(-50%, -50%) translateY(0px) scale(1);
@@ -403,9 +410,12 @@
 }
 
 @keyframes sparkle {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1) rotate(0deg);
   }
+
   50% {
     transform: scale(1.1) rotate(180deg);
   }
@@ -416,86 +426,86 @@
   .hero-section {
     @apply flex-col text-center py-8 gap-6;
   }
-  
+
   .hero-content h1 {
     @apply text-3xl md:text-4xl;
   }
-  
+
   .hero-subtitle {
     @apply text-base md:text-lg;
   }
-  
+
   .random-cards-container {
     @apply w-64 h-64;
   }
-  
+
   .hero-navigation {
     @apply justify-center;
   }
-  
+
   .trainers-nav-card {
     @apply pl-3 pr-6 py-3 text-base w-full;
     max-width: 195px;
     min-height: 50px;
   }
-  
+
   .nav-card-icon {
     @apply w-8 h-8;
   }
-  
+
   .nav-card-title {
     @apply text-xs;
   }
-  
+
   .nav-card-subtitle {
     @apply text-xs;
   }
-  
+
   .nav-card-arrow svg {
     @apply w-5 h-5;
   }
-  
+
   .hero-content h1 {
     @apply text-3xl md:text-4xl;
   }
-  
+
   .hero-subtitle {
     @apply text-base md:text-lg;
   }
-  
+
   .tracking-count {
     @apply text-xl md:text-2xl mt-4;
   }
-  
+
   .public-home-buttons {
     @apply flex-col gap-3;
   }
-  
+
   .primary-btn,
   .secondary-btn {
     @apply px-6 py-3 text-base;
   }
-  
+
   .pokemon-cards {
     @apply w-64 h-64;
   }
-  
+
   .pokemon-card {
     @apply w-16 h-16 text-2xl;
   }
-  
+
   .features-grid {
     @apply grid-cols-1 md:grid-cols-2 gap-6;
   }
-  
+
   .feature-card {
     @apply p-4;
   }
-  
+
   .cta-content h2 {
     @apply text-2xl md:text-3xl;
   }
-  
+
   .cta-button {
     @apply px-6 py-4 text-lg;
   }
@@ -505,44 +515,44 @@
   .hero-section {
     @apply px-4 py-6;
   }
-  
+
   .hero-content h1 {
     @apply text-2xl;
   }
-  
+
   .hero-subtitle {
     @apply text-sm;
   }
-  
+
   .random-cards-container {
     @apply w-48 h-48;
   }
-  
+
   .primary-btn,
   .secondary-btn {
     @apply px-4 py-2.5 text-sm;
   }
-  
+
   .pokemon-cards {
     @apply w-48 h-48;
   }
-  
+
   .pokemon-card {
     @apply w-12 h-12 text-xl;
   }
-  
+
   .features-grid {
     @apply grid-cols-1 gap-4;
   }
-  
+
   .feature-card {
     @apply p-3;
   }
-  
+
   .cta-content h2 {
     @apply text-xl;
   }
-  
+
   .cta-button {
     @apply px-5 py-3 text-base w-full;
   }
