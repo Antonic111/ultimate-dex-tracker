@@ -95,12 +95,17 @@ export default function PublicHome() {
           <p className="hero-subtitle">Track your Pokémon collection across all games with ease. Build your perfect living dex and never lose track of your progress again.</p>
           
           <p className="tracking-count">
-            Tracking 2059 Pokemon!
+            Tracking 2064 Pokemon!
           </p>
           
           {/* Creator Credit */}
           <div className="creator-credit">
-            <span>Made by Antonic</span>
+            <span>
+              Made by{" "}
+              <a href="https://solo.to/antonic" target="_blank" rel="noopener noreferrer">
+                Antonic
+              </a>
+            </span>
           </div>
           
           <div className="public-home-buttons">

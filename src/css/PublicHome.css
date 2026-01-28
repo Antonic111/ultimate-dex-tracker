@@ -355,13 +355,18 @@
   opacity: 0.6;
   font-size: 0.875rem;
   font-weight: 400;
-  font-style: italic;
+  font-style: normal;
 }
 
 .creator-credit span {
   @apply inline-block px-3 py-1.5 rounded-full;
   background: var(--auth-boxes);
   border: 1px solid var(--border-color);
+}
+
+.creator-credit a {
+  text-decoration: underline;
+  color: inherit;
 }
 
 /* Animations */

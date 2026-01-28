@@ -1,3 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://www.ultimatedextracker.com/sitemap.xml
 # robots.txt for Ultimate Dex Tracker
 # Allow all search engines and bots to crawl the site
 

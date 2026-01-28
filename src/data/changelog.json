@@ -1,5 +1,19 @@
 [
   {
+    "date": "2026-01-28",
+    "version": "v1.0.9",
+    "type": "fix",
+    "title": "Scrollbar fixes, SEO improvements & Performance improvements",
+    "description": "",
+    "features": [
+      "Scrollbar now works correctly on all pages and devices.",
+      "SEO improvements to help with Google AdSense verification & search engine results.",
+      "Performance improvements to the website to help with lag on the main dex display.",
+      "Tracking 2059 Pokemon on home page changed to Tracking 2064 Pokemon to be correct lol.",
+      "Made the Made by Antonic text on the public home page clickable leading to my solo.to profile."
+    ]
+  },
+  {
     "date": "2026-01-21",
     "version": "v1.0.8",
     "type": "feature",

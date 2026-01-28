@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import DexView from "../components/Dex/DexView";
 import Sidebar from "../components/Dex/PokemonSidebar";
@@ -200,13 +200,15 @@ export default function ViewDex() {
     ];
 
     // Use the same filtering function from dexPreferences to ensure consistency
-    const filteredFormsData = profileOwnerPreferences
-        ? getFilteredFormsData(formsData, profileOwnerPreferences)
-        : formsData; // Show all forms while loading preferences
+    const filteredFormsData = useMemo(() => {
+        return profileOwnerPreferences
+            ? getFilteredFormsData(formsData, profileOwnerPreferences)
+            : formsData; // Show all forms while loading preferences
+    }, [profileOwnerPreferences]);
 
-    const allMons = [...pokemonData, ...filteredFormsData];
+    const allMons = useMemo(() => [...pokemonData, ...filteredFormsData], [filteredFormsData]);
 
-    const dexSections = [
+    const dexSections = useMemo(() => [
         {
             key: "main",
             title: "Main Living Dex",
@@ -251,10 +253,10 @@ export default function ViewDex() {
                 }
             };
         }).filter(Boolean) // Remove null sections
-    ];
+    ], [filteredFormsData, profileOwnerPreferences]);
 
     // Custom filter function for public profile view
-    const customFilterMons = (list, forceShowForms = false) => {
+    const customFilterMons = useCallback((list, forceShowForms = false) => {
         // First, mark Pokemon as blocked based on profile owner's preferences
         const markedList = list.map(pokemon => {
             // Create a copy to avoid mutating the original
@@ -437,7 +439,7 @@ export default function ViewDex() {
 
             return true;
         });
-    };
+    }, [filters, profileOwnerPreferences, showShiny]);
 
     return (
         <>

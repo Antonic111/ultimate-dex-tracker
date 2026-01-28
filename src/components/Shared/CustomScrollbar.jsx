@@ -175,14 +175,6 @@ export default function CustomScrollbar() {
   // Only hide during main app loading, not component-specific loading
   const userLoading = userContext?.loading || false;
 
-  // Debug logging to see what's causing the scrollbar to be hidden
-  if (userLoading) {
-    console.log('Scrollbar hidden due to main app loading:', {
-      userLoading,
-      userContext: userContext?.loading
-    });
-  }
-
   if (userLoading) {
     return null;
   }

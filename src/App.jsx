@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { getCaughtKey, migrateOldCaughtData } from './caughtStorage';
 import { fetchCaughtData, updateCaughtData } from './api/caught';
 import { migrateHuntMethods } from './utils/migrateHuntMethods';
@@ -706,18 +706,9 @@ export default function App() {
       const migrationKey = `migration_completed_${user.username}`;
       const alreadyMigratedThisSession = localStorage.getItem(migrationKey);
 
-      console.log(`Migration check for ${user.username}:`, {
-        huntMethodMigrationCompleted: user.huntMethodMigrationCompleted,
-        migrationVersion: user.migrationVersion,
-        needsMigration,
-        alreadyMigratedThisSession
-      });
-
       if (alreadyMigratedThisSession) {
-        console.log(`User ${user.username} already migrated in this session - skipping`);
         migratedData = data || {};
       } else if (needsMigration) {
-        console.log(`Migrating hunt methods for user: ${user.username} (migration status: ${user.huntMethodMigrationCompleted})`);
         // Set localStorage flag immediately to prevent multiple runs
         localStorage.setItem(migrationKey, 'true');
         // Migrate hunt methods to new system if needed
@@ -729,7 +720,6 @@ export default function App() {
             // Mark migration as completed
             authAPI.updateUser({ huntMethodMigrationCompleted: true, migrationVersion: "1.1" })
               .then(() => {
-                console.log(`Migration completed for user: ${user.username}`);
                 localStorage.setItem(migrationKey, 'true');
                 // Update local user state to prevent re-migration
                 setUser(prevUser => ({
@@ -744,7 +734,6 @@ export default function App() {
           // No data changes needed, but mark as migrated
           authAPI.updateUser({ huntMethodMigrationCompleted: true, migrationVersion: "1.1" })
             .then(() => {
-              console.log(`Migration marked as completed for user: ${user.username} (no data changes needed)`);
               localStorage.setItem(migrationKey, 'true');
               // Update local user state to prevent re-migration
               setUser(prevUser => ({
@@ -757,7 +746,6 @@ export default function App() {
         }
       } else {
         // User already migrated, use existing data
-        console.log(`User ${user.username} already migrated (version: ${user.migrationVersion})`);
         migratedData = data || {};
       }
 
@@ -958,7 +946,7 @@ export default function App() {
     }
   }, [resetModal.show]);
 
-  function filterMons(list, forceShowForms = false, isShiny = false) {
+  const filterMons = useCallback((list, forceShowForms = false, isShiny = false) => {
     return list.filter(poke => {
       // 🧬 Respect toggle or force flag
       if (!forceShowForms && !showForms && poke.formType && poke.formType !== "main" && poke.formType !== "default") {
@@ -1094,7 +1082,7 @@ export default function App() {
 
       return true;
     });
-  }
+  }, [caught, caughtInfoMap, currentDexPreferences, filters, showForms]);
 
   function CloseSidebarOnRouteChange() {
     const location = useLocation();
@@ -1110,7 +1098,7 @@ export default function App() {
 
 
 
-  function updateCaughtInfo(poke, info, isShiny = false) {
+  const updateCaughtInfo = useCallback((poke, info, isShiny = false) => {
     const key = getCaughtKey(poke, null, isShiny);
     if (!key) return;
 
@@ -1156,14 +1144,14 @@ export default function App() {
         setSelectedPokemon(poke);
       }
     }
-  }
+  }, [user?.username, sidebarOpen, selectedPokemon]);
 
-  function handleSelectPokemon(poke) {
+  const handleSelectPokemon = useCallback((poke) => {
     setSidebarOpen(true);
     setSelectedPokemon(poke);
-  }
+  }, []);
 
-  async function handleMarkAll(box, isShiny = false) {
+  const handleMarkAll = useCallback(async (box, isShiny = false) => {
     // Helper function to check if a Pokemon is locked
     const isPokemonLocked = (poke) => {
       // Only check for locked Pokemon if we're in shiny mode and lock settings are enabled
@@ -1280,13 +1268,13 @@ export default function App() {
 
 
 
-  }
+  }, [caught, caughtInfoMap, currentDexPreferences, selectedPokemon, showShiny, user?.username]);
 
 
 
 
   // App.jsx
-  async function handleToggleCaught(poke, isShiny = false) {
+  const handleToggleCaught = useCallback(async (poke, isShiny = false) => {
     const key = getCaughtKey(poke, null, isShiny);
 
     if (caught[key]) {
@@ -1356,7 +1344,7 @@ export default function App() {
         setSelectedPokemon(poke);
       }
     }
-  }
+  }, [caught, caughtInfoMap, sidebarOpen, selectedPokemon, showShiny, user?.username]);
 
   // Handle reset confirmation from grid click or bulk operations
   const handleResetConfirm = () => {
@@ -1426,7 +1414,7 @@ export default function App() {
   };
 
   // Helper function to get unified pokemon list for unified view mode
-  const getUnifiedPokemonList = (isShiny = false, applyFilters = false) => {
+  const getUnifiedPokemonList = useCallback((isShiny = false, applyFilters = false) => {
     // Collect all Pokemon from all sections
     const allMons = dexSections.flatMap(section => section.getList());
 
@@ -1448,7 +1436,7 @@ export default function App() {
     }
 
     return sorted;
-  };
+  }, [dexSections, filterMons, showForms]);
 
   let mergedMons = [];
   const seen = new Set();
@@ -1465,6 +1453,49 @@ export default function App() {
 
   const showNoResults = mergedMons.length === 0;
   let suggestion = null;
+
+  const unifiedList = useMemo(() => getUnifiedPokemonList(showShiny, true), [getUnifiedPokemonList, showShiny]);
+  const hasSearchFilters = filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught;
+
+  const shinySectionsWithFilters = useMemo(() => {
+    return dexSections
+      .map(section => {
+        const filteredMons = filterMons(section.getList(), showForms, true).sort((a, b) => a.id - b.id);
+        if (!filteredMons.length) return null;
+        return { section, filteredMons };
+      })
+      .filter(Boolean);
+  }, [dexSections, filterMons, showForms]);
+
+  const shinySectionsNoFilters = useMemo(() => {
+    return dexSections
+      .map(section => {
+        const filteredMons = filterMons(section.getList(), false, true);
+        if (!filteredMons.length) return null;
+        return { section, filteredMons };
+      })
+      .filter(Boolean);
+  }, [dexSections, filterMons]);
+
+  const regularSectionsWithFilters = useMemo(() => {
+    return dexSections
+      .map(section => {
+        const filteredMons = filterMons(section.getList(), showForms, false).sort((a, b) => a.id - b.id);
+        if (!filteredMons.length) return null;
+        return { section, filteredMons };
+      })
+      .filter(Boolean);
+  }, [dexSections, filterMons, showForms]);
+
+  const regularSectionsNoFilters = useMemo(() => {
+    return dexSections
+      .map(section => {
+        const filteredMons = filterMons(section.getList(), false, false);
+        if (!filteredMons.length) return null;
+        return { section, filteredMons };
+      })
+      .filter(Boolean);
+  }, [dexSections, filterMons]);
 
   // Check if we have any active search criteria
   const hasActiveSearch = filters.searchTerm || filters.game || filters.ball || filters.mark || filters.method || filters.type || filters.gen || filters.caught || (filters.categories && filters.categories.length > 0);
@@ -1579,133 +1610,68 @@ export default function App() {
                               {currentDexPreferences?.dexViewMode === 'unified' ? (
                                 // UNIFIED VIEW - All Pokemon in one list sorted by dex number
                                 <div className="dex-grid-section">
-                                  {(() => {
-                                    const unifiedList = getUnifiedPokemonList(showShiny, true);
-                                    if (!unifiedList.length) return null;
-
-                                    return (
-                                      <DexSection
-                                        readOnly={false}
-                                        caughtInfoMap={caughtInfoMap}
-                                        updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, showShiny)}
-                                        key={`unified_${showShiny ? 'shiny' : 'regular'}`}
-                                        sidebarOpen={sidebarOpen}
-                                        title={showShiny ? "Complete Shiny Dex" : "Complete Living Dex"}
-                                        pokemonList={unifiedList}
-                                        caught={caught}
-                                        isCaught={(poke) => caught[getCaughtKey(poke, null, showShiny)] || false}
-                                        onMarkAll={(box) => handleMarkAll(box, showShiny)}
-                                        onToggleCaught={(poke) => handleToggleCaught(poke, showShiny)}
-                                        onSelect={handleSelectPokemon}
-                                        showShiny={showShiny}
-                                        showForms={showForms}
-                                      />
-                                    );
-                                  })()}
+                                  {!unifiedList.length ? null : (
+                                    <DexSection
+                                      readOnly={false}
+                                      caughtInfoMap={caughtInfoMap}
+                                      updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, showShiny)}
+                                      key={`unified_${showShiny ? 'shiny' : 'regular'}`}
+                                      sidebarOpen={sidebarOpen}
+                                      title={showShiny ? "Complete Shiny Dex" : "Complete Living Dex"}
+                                      pokemonList={unifiedList}
+                                      caught={caught}
+                                      isCaught={(poke) => caught[getCaughtKey(poke, null, showShiny)] || false}
+                                      onMarkAll={(box) => handleMarkAll(box, showShiny)}
+                                      onToggleCaught={(poke) => handleToggleCaught(poke, showShiny)}
+                                      onSelect={handleSelectPokemon}
+                                      showShiny={showShiny}
+                                      showForms={showForms}
+                                    />
+                                  )}
                                 </div>
                               ) : showShiny ? (
                                 // CATEGORIZED VIEW - Show Shiny Pokémon Grid
                                 <div className="dex-grid-section">
-                                  {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
-                                    ? dexSections.map(section => {
-                                      const filteredMons = filterMons(section.getList(), showForms, true)
-                                        .sort((a, b) => a.id - b.id);
-                                      if (!filteredMons.length) return null;
-
-                                      return (
-                                        <DexSection
-                                          readOnly={false}
-                                          caughtInfoMap={caughtInfoMap}
-                                          updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
-                                          key={`shiny_${section.key}`}
-                                          sidebarOpen={sidebarOpen}
-                                          title={section.title}
-                                          pokemonList={filteredMons}
-                                          caught={caught}
-                                          isCaught={(poke) => caught[getCaughtKey(poke, null, true)] || false}
-                                          onMarkAll={(box) => handleMarkAll(box, true)}
-                                          onToggleCaught={(poke) => handleToggleCaught(poke, true)}
-                                          onSelect={handleSelectPokemon}
-                                          showShiny={true}
-                                          showForms={showForms}
-                                        />
-                                      );
-                                    })
-                                    : dexSections.map(section => {
-                                      const filteredMons = filterMons(section.getList(), false, true);
-                                      if (!filteredMons.length) return null;
-
-                                      return (
-                                        <DexSection
-                                          readOnly={false}
-                                          caughtInfoMap={caughtInfoMap}
-                                          updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
-                                          key={`shiny_${section.key}`}
-                                          sidebarOpen={sidebarOpen}
-                                          title={section.title}
-                                          pokemonList={filteredMons}
-                                          caught={caught}
-                                          isCaught={(poke) => caught[getCaughtKey(poke, null, true)] || false}
-                                          onMarkAll={(box) => handleMarkAll(box, true)}
-                                          onToggleCaught={(poke) => handleToggleCaught(poke, true)}
-                                          onSelect={handleSelectPokemon}
-                                          showShiny={true}
-                                          showForms={showForms}
-                                        />
-                                      );
-                                    })}
+                                  {(hasSearchFilters ? shinySectionsWithFilters : shinySectionsNoFilters).map(({ section, filteredMons }) => (
+                                    <DexSection
+                                      readOnly={false}
+                                      caughtInfoMap={caughtInfoMap}
+                                      updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
+                                      key={`shiny_${section.key}`}
+                                      sidebarOpen={sidebarOpen}
+                                      title={section.title}
+                                      pokemonList={filteredMons}
+                                      caught={caught}
+                                      isCaught={(poke) => caught[getCaughtKey(poke, null, true)] || false}
+                                      onMarkAll={(box) => handleMarkAll(box, true)}
+                                      onToggleCaught={(poke) => handleToggleCaught(poke, true)}
+                                      onSelect={handleSelectPokemon}
+                                      showShiny={true}
+                                      showForms={showForms}
+                                    />
+                                  ))}
                                 </div>
                               ) : (
                                 // CATEGORIZED VIEW - Show Regular Pokémon Grid
                                 <div className="dex-grid-section">
-                                  {(filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
-                                    ? dexSections.map(section => {
-                                      const filteredMons = filterMons(section.getList(), showForms, false)
-                                        .sort((a, b) => a.id - b.id);
-                                      if (!filteredMons.length) return null;
-
-                                      return (
-                                        <DexSection
-                                          readOnly={false}
-                                          caughtInfoMap={caughtInfoMap}
-                                          updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
-                                          key={`regular_${section.key}`}
-                                          sidebarOpen={sidebarOpen}
-                                          title={section.title}
-                                          pokemonList={filteredMons}
-                                          caught={caught}
-                                          isCaught={(poke) => caught[getCaughtKey(poke, null, false)] || false}
-                                          onMarkAll={(box) => handleMarkAll(box, false)}
-                                          onToggleCaught={(poke) => handleToggleCaught(poke, false)}
-                                          onSelect={handleSelectPokemon}
-                                          showShiny={false}
-                                          showForms={showForms}
-                                        />
-                                      );
-                                    })
-                                    : dexSections.map(section => {
-                                      const filteredMons = filterMons(section.getList(), false, false);
-                                      if (!filteredMons.length) return null;
-
-                                      return (
-                                        <DexSection
-                                          readOnly={false}
-                                          caughtInfoMap={caughtInfoMap}
-                                          updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
-                                          key={`regular_${section.key}`}
-                                          sidebarOpen={sidebarOpen}
-                                          title={section.title}
-                                          pokemonList={filteredMons}
-                                          caught={caught}
-                                          isCaught={(poke) => caught[getCaughtKey(poke, null, false)] || false}
-                                          onMarkAll={(box) => handleMarkAll(box, false)}
-                                          onToggleCaught={(poke) => handleToggleCaught(poke, false)}
-                                          onSelect={handleSelectPokemon}
-                                          showShiny={false}
-                                          showForms={showForms}
-                                        />
-                                      );
-                                    })}
+                                  {(hasSearchFilters ? regularSectionsWithFilters : regularSectionsNoFilters).map(({ section, filteredMons }) => (
+                                    <DexSection
+                                      readOnly={false}
+                                      caughtInfoMap={caughtInfoMap}
+                                      updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
+                                      key={`regular_${section.key}`}
+                                      sidebarOpen={sidebarOpen}
+                                      title={section.title}
+                                      pokemonList={filteredMons}
+                                      caught={caught}
+                                      isCaught={(poke) => caught[getCaughtKey(poke, null, false)] || false}
+                                      onMarkAll={(box) => handleMarkAll(box, false)}
+                                      onToggleCaught={(poke) => handleToggleCaught(poke, false)}
+                                      onSelect={handleSelectPokemon}
+                                      showShiny={false}
+                                      showForms={showForms}
+                                    />
+                                  ))}
                                 </div>
                               )}
                             </div>
