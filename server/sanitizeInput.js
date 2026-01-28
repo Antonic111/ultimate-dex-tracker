@@ -1,16 +1,10 @@
-import DOMPurify from 'isomorphic-dompurify';
-
 /**
  * Comprehensive input sanitization utility
  * Handles XSS prevention, length limits, and content validation
  */
 
-// HTML sanitization options
-const SANITIZE_OPTIONS = {
-  ALLOWED_TAGS: [], // No HTML tags allowed
-  ALLOWED_ATTR: [], // No attributes allowed
-  KEEP_CONTENT: true, // Keep text content, remove tags
-};
+// Basic HTML tag stripping to avoid serverless ESM issues
+const stripHtml = (value) => value.replace(/<[^>]*>/g, '');
 
 // Field-specific sanitization rules
 export const SANITIZATION_RULES = {
@@ -114,7 +108,7 @@ export function sanitizeInput(input, fieldType = 'general') {
 
   // 4. Remove HTML/script tags (XSS prevention)
   if (!rules.allowHtml) {
-    sanitized = DOMPurify.sanitize(sanitized, SANITIZE_OPTIONS);
+    sanitized = stripHtml(sanitized);
   }
 
   // 5. Check length limits
