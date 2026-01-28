@@ -47,6 +47,28 @@ const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const gen6 = () => Math.floor(100000 + Math.random() * 900000).toString(); // "123456"
 
+const sendEmailWithTimeout = async (sendPromise, timeoutMs = 7000) => {
+  let timeoutId;
+  const timeoutPromise = new Promise(resolve => {
+    timeoutId = setTimeout(() => resolve({ timedOut: true }), timeoutMs);
+  });
+
+  try {
+    const result = await Promise.race([
+      sendPromise.then((data) => ({ data })),
+      timeoutPromise
+    ]);
+
+    if (result && result.timedOut) {
+      return { timedOut: true };
+    }
+
+    return { timedOut: false, data: result?.data };
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+};
+
 // auth.js
 async function issueDeleteCode(user) {
   const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -921,10 +943,15 @@ router.post("/send-current-email-verification-code", authenticateUser, async (re
     user.emailChangeVerificationExpires = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
 
-    // Send email to current email
-    await sendCodeEmail(user, "Email Change Verification", code, "email change verification");
+    // Send email to current email (avoid timeouts in serverless)
+    const sendPromise = sendCodeEmail(user, "Email Change Verification", code, "email change verification");
+    const { timedOut } = await sendEmailWithTimeout(sendPromise);
+    if (timedOut) {
+      sendPromise.catch(err => console.error('Email send failed after timeout:', err));
+      return res.json({ message: "Verification email is being sent. If it doesn't arrive, resend.", emailQueued: true });
+    }
 
-    res.json({ message: "Verification code sent to your current email" });
+    res.json({ message: "Verification code sent to your current email", emailQueued: false });
   } catch (err) {
     console.error('Error sending current email verification code:', err);
     res.status(500).json({ error: "Failed to send verification code" });
@@ -1010,14 +1037,25 @@ router.put("/change-email", authenticateUser, async (req, res) => {
     user.newEmailVerificationExpires = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
 
-    // Send verification code to new email
+    // Send verification code to new email (avoid timeouts in serverless)
     const tempUser = { ...user.toObject(), email: newEmail.toLowerCase() };
-    await sendCodeEmail(tempUser, "Verify Your New Email", newEmailCode, "new email verification");
+    const sendPromise = sendCodeEmail(tempUser, "Verify Your New Email", newEmailCode, "new email verification");
+    const { timedOut } = await sendEmailWithTimeout(sendPromise);
+    if (timedOut) {
+      sendPromise.catch(err => console.error('Email send failed after timeout:', err));
+      return res.json({
+        success: true,
+        message: "Verification email is being sent. If it doesn't arrive, resend.",
+        pendingEmail: user.pendingEmail,
+        emailQueued: true
+      });
+    }
 
     res.json({
       success: true,
       message: "Verification code sent to your new email address",
-      pendingEmail: user.pendingEmail
+      pendingEmail: user.pendingEmail,
+      emailQueued: false
     });
   } catch (err) {
     console.error('Error changing email:', err);
@@ -1043,11 +1081,16 @@ router.post("/send-new-email-verification-code", authenticateUser, async (req, r
     user.newEmailVerificationExpires = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
 
-    // Send email to new email
+    // Send email to new email (avoid timeouts in serverless)
     const tempUser = { ...user.toObject(), email: user.pendingEmail };
-    await sendCodeEmail(tempUser, "Verify Your New Email", code, "new email verification");
+    const sendPromise = sendCodeEmail(tempUser, "Verify Your New Email", code, "new email verification");
+    const { timedOut } = await sendEmailWithTimeout(sendPromise);
+    if (timedOut) {
+      sendPromise.catch(err => console.error('Email send failed after timeout:', err));
+      return res.json({ message: "Verification email is being sent. If it doesn't arrive, resend.", emailQueued: true });
+    }
 
-    res.json({ message: "Verification code sent to your new email" });
+    res.json({ message: "Verification code sent to your new email", emailQueued: false });
   } catch (err) {
     console.error('Error sending new email verification code:', err);
     res.status(500).json({ error: "Failed to send verification code" });
