@@ -2,15 +2,16 @@
 import jwt from "jsonwebtoken";
 
 export function authenticateUser(req, res, next) {
-  // Check for token in cookies first (normal flow)
-  let token = req.cookies.token;
-  
-  // If no cookie token, check Authorization header (iPhone fallback)
+  // Prefer Authorization header to avoid stale cookies
+  let token = null;
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.substring(7); // Remove 'Bearer ' prefix
+  }
+
+  // Fallback to cookie token if no header provided
   if (!token) {
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    }
+    token = req.cookies.token;
   }
   
   if (!token) return res.status(401).json({ error: "Missing token" });
