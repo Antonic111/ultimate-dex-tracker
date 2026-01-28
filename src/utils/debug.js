@@ -1,21 +1,21 @@
+import { buildApiUrl } from '../config/api.js';
+
 // Simple debug utility to test API connectivity
 export const testAPI = async () => {
   // removed console logs
   
   try {
     // Test basic CORS
-    const corsResponse = await fetch('https://ultimate-dex-tracker-backend.onrender.com/api/cors-test', {
+    const corsResponse = await fetch(buildApiUrl('/cors-test'), {
       method: 'GET',
       credentials: 'include'
     });
-    
     
     // Test health endpoint
-    const healthResponse = await fetch('https://ultimate-dex-tracker-backend.onrender.com/api/health', {
+    const healthResponse = await fetch(buildApiUrl('/health'), {
       method: 'GET',
       credentials: 'include'
     });
-    
     
     return { success: true, cors: corsResponse.status, health: healthResponse.status };
   } catch (error) {
@@ -26,7 +26,7 @@ export const testAPI = async () => {
 
 // Test specific endpoints
 export const testEndpoint = async (endpoint, method = 'GET', data = null) => {
-  const url = `https://ultimate-dex-tracker-backend.onrender.com/api${endpoint}`;
+  const url = buildApiUrl(endpoint);
   
   try {
     const response = await fetch(url, {
@@ -36,15 +36,11 @@ export const testEndpoint = async (endpoint, method = 'GET', data = null) => {
       body: data ? JSON.stringify(data) : undefined
     });
     
-    
-    
     if (response.ok) {
       const result = await response.json();
-      
       return { success: true, data: result };
     } else {
       const errorText = await response.text();
-      
       return { success: false, status: response.status, error: errorText };
     }
   } catch (error) {
