@@ -51,14 +51,18 @@ export default function Register() {
     }
 
     try {
-      await authAPI.register({
+      const result = await authAPI.register({
         username: form.username,
         email: form.email,
         password: form.password,
         profileTrainer: "ash.png",
       });
 
+      if (result?.emailSent === false) {
+              showMessage("Account created, but email failed to send. Please use Resend Email on the verify page.", "warning");
+      } else {
               showMessage("Account created! Please verify your email.", "success");
+      }
       setTimeout(() => navigate(`/email-sent?email=${encodeURIComponent(form.email)}`), 1000);
 
     } catch (err) {

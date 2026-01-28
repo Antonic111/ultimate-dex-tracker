@@ -138,13 +138,18 @@ router.post("/register", corsMiddleware, authLimiter, async (req, res) => {
       verificationCodeExpires: Date.now() + 1000 * 60 * 10 // 10 minutes
     });
 
-    // Send response first, then send email (so email errors don't crash registration)
-    res.json({ message: "Account created. Please check your email to verify your account." });
+    let emailSent = true;
+    try {
+      // Await in serverless so the function doesn't exit early
+      await sendCodeEmail(user, "Verify Your Account", code, "email verification");
+    } catch (err) {
+      emailSent = false;
+      console.error("❌ Email sending failed (account created):", err);
+    }
 
-    // Send verification email after response (don't await - let it run in background)
-    sendCodeEmail(user, "Verify Your Account", code, "email verification").catch(err => {
-      console.error("❌ Email sending failed (but account was created):", err);
-      // Don't throw error - account creation was successful
+    res.json({
+      message: "Account created. Please check your email to verify your account.",
+      emailSent,
     });
 
   } catch (err) {
@@ -390,6 +395,7 @@ router.post("/verify-code", corsMiddleware, async (req, res) => {
           profileTrainer: user.profileTrainer,
           createdAt: user.createdAt,
         },
+        token,
       });
   } catch (err) {
     console.error(err);

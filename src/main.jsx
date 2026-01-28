@@ -4,9 +4,11 @@ import './index.css'
 import App from './App.jsx'
 import { Analytics } from '@vercel/analytics/react'
 
+const enableAnalytics = import.meta.env.VITE_ENABLE_VERCEL_ANALYTICS === 'true';
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
-    <Analytics debug={false} />
+    {enableAnalytics ? <Analytics debug={false} /> : null}
   </StrictMode>,
 )

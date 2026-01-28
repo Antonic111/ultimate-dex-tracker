@@ -317,7 +317,11 @@ export const authAPI = {
 
   // Verify email code
   async verifyCode(email, code) {
-    return api.post('/verify-code', { email, code });
+    const response = await api.post('/verify-code', { email, code });
+    if (response?.token) {
+      localStorage.setItem('authToken', response.token);
+    }
+    return response;
   },
 
   // Resend verification code
