@@ -19,12 +19,21 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'lucide-icons': ['lucide-react'],
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'react-vendor';
+            }
+            if (id.includes('lucide-react')) {
+              return 'lucide-icons';
+            }
+          }
+          if (id.includes('/src/data/') || id.includes('\\src\\data\\') || id.endsWith('/src/trainers.json') || id.endsWith('\\src\\trainers.json') || id.endsWith('/src/utils/keyMappings.json') || id.endsWith('\\src\\utils\\keyMappings.json')) {
+            return 'data';
+          }
         },
       },
     },
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 1500,
   },
 });
