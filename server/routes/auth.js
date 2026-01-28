@@ -335,13 +335,15 @@ router.get("/username-cooldown", authenticateUser, async (req, res) => {
 // Verify signup code
 router.post("/verify-code", corsMiddleware, async (req, res) => {
   const { email, code } = req.body;
+  const trimmedCode = String(code || "").trim();
+  const normalizedEmail = String(email || "").trim().toLowerCase();
 
-  if (!email || !code) {
+  if (!normalizedEmail || !trimmedCode) {
     return res.status(400).json({ error: "Email and code are required" });
   }
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -349,20 +351,23 @@ router.post("/verify-code", corsMiddleware, async (req, res) => {
 
     if (user.verified) return res.json({ message: "Already verified" });
 
-    if (
-      user.verificationCode !== code ||
-      user.verificationCodeExpires < Date.now()
-    ) {
-      if (user.verificationCode !== code) {
-        return res.status(400).json({ error: "Invalid verification code" });
-      } else {
+    const now = Date.now();
+    const isCurrentMatch = user.verificationCode === trimmedCode && user.verificationCodeExpires && user.verificationCodeExpires > now;
+    const isPreviousMatch = user.previousVerificationCode === trimmedCode && user.previousVerificationCodeExpires && user.previousVerificationCodeExpires > now;
+
+    if (!isCurrentMatch && !isPreviousMatch) {
+      if ((user.verificationCode && user.verificationCodeExpires && user.verificationCodeExpires <= now) ||
+          (user.previousVerificationCode && user.previousVerificationCodeExpires && user.previousVerificationCodeExpires <= now)) {
         return res.status(400).json({ error: "Verification code has expired. Please request a new one." });
       }
+      return res.status(400).json({ error: "Invalid verification code" });
     }
 
     user.verified = true;
     user.verificationCode = undefined;
     user.verificationCodeExpires = undefined;
+    user.previousVerificationCode = undefined;
+    user.previousVerificationCodeExpires = undefined;
     await user.save();
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
@@ -396,10 +401,11 @@ router.post("/verify-code", corsMiddleware, async (req, res) => {
 router.post("/resend-code", corsMiddleware, async (req, res) => {
   const { email } = req.body;
 
-  if (!email) return res.status(400).json({ error: "Email is required" });
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!normalizedEmail) return res.status(400).json({ error: "Email is required" });
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -410,6 +416,9 @@ router.post("/resend-code", corsMiddleware, async (req, res) => {
     }
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
+    // Keep the previous code valid briefly in case emails arrive out of order
+    user.previousVerificationCode = user.verificationCode;
+    user.previousVerificationCodeExpires = Date.now() + 1000 * 60 * 10; // 10 minutes
     user.verificationCode = code;
     user.verificationCodeExpires = Date.now() + 1000 * 60 * 10; // 10 minutes
 

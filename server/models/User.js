@@ -73,6 +73,8 @@ const userSchema = new mongoose.Schema({
   },
   verificationCode: String,
   verificationCodeExpires: Date,
+  previousVerificationCode: String,
+  previousVerificationCodeExpires: Date,
   resetCode: String,
   resetCodeExpires: Date,
   // PROFILE STUFF ----------------------------------------- //
