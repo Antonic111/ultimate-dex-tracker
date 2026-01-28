@@ -127,18 +127,16 @@ router.post("/register", corsMiddleware, authLimiter, async (req, res) => {
       return res.status(400).json({ error: "Username or email already taken" });
     }
 
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
     const user = await User.create({
       username: usernameResult.sanitized,
       email: emailResult.sanitized,
       password,
       verified: false,
       profileTrainer: trainerResult.sanitized,
+      verificationCode: code,
+      verificationCodeExpires: Date.now() + 1000 * 60 * 10 // 10 minutes
     });
-
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    user.verificationCode = code;
-    user.verificationCodeExpires = Date.now() + 1000 * 60 * 10; // 10 minutes
-    await user.save();
 
     // Send response first, then send email (so email errors don't crash registration)
     res.json({ message: "Account created. Please check your email to verify your account." });
