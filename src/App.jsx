@@ -51,6 +51,7 @@ import { getFilteredFormsData, getDexPreferences } from "./utils/dexPreferences"
 import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "./data/blockedShinies";
 import { createPortal } from "react-dom";
 import { RotateCcw } from "lucide-react";
+import { getAvailableGamesForPokemonSidebar, normalizeGameName } from "./utils/pokemonAvailability";
 
 // Mobile Keyboard Handler Hook
 const useMobileKeyboardHandler = () => {
@@ -686,6 +687,7 @@ export default function App() {
   const [filters, setFilters] = useState({
     searchTerm: "",
     game: "",
+    gameObtainable: [],
     ball: "",
     type: "",
     gen: "",
@@ -1034,6 +1036,15 @@ export default function App() {
       }
       // Game
       if (filters.game && firstEntry.game !== filters.game) return false;
+      // Game obtainable in (multi-select)
+      if (filters.gameObtainable && filters.gameObtainable.length > 0) {
+        const availableGames = getAvailableGamesForPokemonSidebar(poke);
+        const normalizedAvailable = new Set(availableGames.map(normalizeGameName));
+        const matchesGame = filters.gameObtainable.some(game =>
+          normalizedAvailable.has(normalizeGameName(game))
+        );
+        if (!matchesGame) return false;
+      }
       // Ball
       if (filters.ball && firstEntry.ball !== filters.ball) return false;
       // Mark
@@ -1455,7 +1466,7 @@ export default function App() {
   let suggestion = null;
 
   const unifiedList = useMemo(() => getUnifiedPokemonList(showShiny, true), [getUnifiedPokemonList, showShiny]);
-  const hasSearchFilters = filters.searchTerm || filters.game || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught;
+  const hasSearchFilters = filters.searchTerm || filters.game || (filters.gameObtainable && filters.gameObtainable.length > 0) || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught;
 
   const shinySectionsWithFilters = useMemo(() => {
     return dexSections
@@ -1498,7 +1509,7 @@ export default function App() {
   }, [dexSections, filterMons]);
 
   // Check if we have any active search criteria
-  const hasActiveSearch = filters.searchTerm || filters.game || filters.ball || filters.mark || filters.method || filters.type || filters.gen || filters.caught || (filters.categories && filters.categories.length > 0);
+  const hasActiveSearch = filters.searchTerm || filters.game || (filters.gameObtainable && filters.gameObtainable.length > 0) || filters.ball || filters.mark || filters.method || filters.type || filters.gen || filters.caught || (filters.categories && filters.categories.length > 0);
 
   if (showNoResults && hasActiveSearch) {
     // Only provide suggestions for name/dex searches, not for other filter types

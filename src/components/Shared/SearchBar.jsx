@@ -445,6 +445,19 @@ export function SearchbarMultiSelectDropdown({ id, options, selectedValues = [],
                                             className="mr-3"
                                             style={{ accentColor: 'var(--accent)' }}
                                         />
+                                        {opt.image && (
+                                            <img
+                                                src={opt.image}
+                                                alt=""
+                                                className="w-6 h-6 mr-2 rounded"
+                                                onError={e => (e.target.style.display = "none")}
+                                            />
+                                        )}
+                                        {!opt.image && opt.icon && (
+                                            <span className="w-6 h-6 mr-2 flex items-center justify-center">
+                                                {opt.icon}
+                                            </span>
+                                        )}
                                         <span className="truncate">{opt.name}</span>
                                     </div>
                                 </li>
@@ -526,16 +539,32 @@ export default function SearchBar({
                 </button>
             </div>
             {/* Name/Dex input */}
-            <div className="relative flex items-center md:col-span-2" style={{ height: '42px' }}>
+            <div className="relative flex items-center" style={{ height: '42px' }}>
                 <SearchIcon className="w-5 h-5 mr-2 flex-shrink-0" style={{ color: 'var(--accent)' }} />
-                <div className="relative w-full">
+                <div
+                    className="relative w-full flex items-center rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-[var(--accent)] focus-within:border-[var(--accent)] transition-colors duration-200"
+                    style={{ 
+                        backgroundColor: 'var(--searchbar-inputs)', 
+                        border: '1px solid var(--border-color)',
+                        height: '42px',
+                        minHeight: '42px',
+                        maxHeight: '42px',
+                        padding: '6px 10px',
+                        boxSizing: 'border-box',
+                        overflow: 'hidden'
+                    }}
+                >
                     <input
                         type="text"
-                        className="w-full bg-transparent outline-none text-sm px-3 py-2 pr-4 md:pr-10 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-[var(--accent)] focus-within:border-[var(--accent)] transition-colors duration-200"
+                        className="w-full bg-transparent outline-none text-sm pr-4 md:pr-10 transition-colors duration-200"
                         style={{ 
-                            backgroundColor: 'var(--searchbar-inputs)', 
-                            border: '1px solid var(--border-color)',
-                            color: 'var(--sidebar-text)' 
+                            color: 'var(--sidebar-text)',
+                            height: '32px',
+                            minHeight: '32px',
+                            maxHeight: '32px',
+                            lineHeight: '32px',
+                            padding: 0,
+                            margin: 0
                         }}
                         placeholder="Name or Dex #"
                         value={filters.searchTerm}
@@ -579,6 +608,18 @@ export default function SearchBar({
                         value={filters.game}
                         onChange={val => setFilters(f => ({ ...f, game: val }))}
                         placeholder="Game Caught"
+                    />
+                </div>
+
+                {/* Game Obtainable In Multi-Select Dropdown */}
+                <div className="relative flex items-center" style={{ height: '42px' }}>
+                    <Gamepad2 className="w-5 h-5 mr-2 flex-shrink-0" style={{ color: 'var(--accent)' }} />
+                    <SearchbarMultiSelectDropdown
+                        id="searchbar-game-obtainable"
+                        options={GAME_OPTIONS.filter(opt => opt.value !== "")}
+                        selectedValues={filters.gameObtainable || []}
+                        onChange={values => setFilters(f => ({ ...f, gameObtainable: values }))}
+                        placeholder="Game Obtainable In"
                     />
                 </div>
 

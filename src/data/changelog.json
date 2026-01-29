@@ -6,6 +6,10 @@
     "title": "Scrollbar fixes, SEO improvements & Performance improvements",
     "description": "",
     "features": [
+      "Added a search option for game obtainable in.",
+      "Advanced the obtainable in data to also include version exclusives."
+    ],
+    "fixes": [
       "Switched to new backend server to help with performance and stability !!!BIG CHANGE HOPEFULLY DOESNT BREAK ANYTHING!!!.",
       "Cloudflare removed and hopefully logins/registers will be quicker now.",
       "Scrollbar now works correctly on all pages and devices.",

@@ -12,6 +12,7 @@ import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isSubLegendar
 import { getEvolutionChainIds, findPokemon } from "../utils";
 import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "../data/blockedShinies";
 import { getFilteredFormsData } from "../utils/dexPreferences";
+import { getAvailableGamesForPokemonSidebar, normalizeGameName } from "../utils/pokemonAvailability";
 
 
 // Helper function to load the viewer's own dex toggle preferences
@@ -29,6 +30,7 @@ export default function ViewDex() {
     const [filters, setFilters] = useState({
         searchTerm: "",
         game: "",
+        gameObtainable: [],
         ball: "",
         type: "",
         gen: "",
@@ -385,6 +387,15 @@ export default function ViewDex() {
 
             // Game filter
             if (filters.game && firstEntry?.game !== filters.game) return false;
+            // Game obtainable in (multi-select)
+            if (filters.gameObtainable && filters.gameObtainable.length > 0) {
+                const availableGames = getAvailableGamesForPokemonSidebar(pokemon);
+                const normalizedAvailable = new Set(availableGames.map(normalizeGameName));
+                const matchesGame = filters.gameObtainable.some(game =>
+                    normalizedAvailable.has(normalizeGameName(game))
+                );
+                if (!matchesGame) return false;
+            }
 
             // Ball filter
             if (filters.ball && firstEntry?.ball !== filters.ball) return false;
