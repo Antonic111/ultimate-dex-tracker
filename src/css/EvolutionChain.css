@@ -110,9 +110,11 @@
   0% {
     box-shadow: 0 0 0 0 var(--accent);
   }
+
   50% {
     box-shadow: 0 0 0 1px var(--accent);
   }
+
   100% {
     box-shadow: 0 0 0 0 var(--accent);
   }
@@ -156,15 +158,15 @@
   .evolution-chain-section {
     @apply p-2;
   }
-  
+
   .evo-chain-title {
     @apply text-base mb-2;
   }
-  
+
   .evo-arrow-symbol {
     @apply text-2xl;
   }
-  
+
   .evo-tooltip {
     @apply max-w-80 min-w-32 text-sm px-2 py-1;
   }

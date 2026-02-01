@@ -686,13 +686,14 @@ export default function App() {
 
   const [filters, setFilters] = useState({
     searchTerm: "",
-    game: "",
+    game: [],
     gameObtainable: [],
-    ball: "",
-    type: "",
-    gen: "",
-    mark: "",
-    method: "",
+    ball: [],
+    type: [],
+    gen: [],
+    mark: [],
+    method: [],
+    categories: [],
     caught: "",
     showEvolutions: false
   });
@@ -1034,8 +1035,11 @@ export default function App() {
           }
         }
       }
-      // Game
-      if (filters.game && firstEntry.game !== filters.game) return false;
+      // Game (multi-select)
+      if (filters.game && filters.game.length > 0) {
+        const matchesGame = filters.game.some(game => firstEntry.game === game);
+        if (!matchesGame) return false;
+      }
       // Game obtainable in (multi-select)
       if (filters.gameObtainable && filters.gameObtainable.length > 0) {
         const availableGames = getAvailableGamesForPokemonSidebar(poke);
@@ -1045,16 +1049,31 @@ export default function App() {
         );
         if (!matchesGame) return false;
       }
-      // Ball
-      if (filters.ball && firstEntry.ball !== filters.ball) return false;
-      // Mark
-      if (filters.mark && firstEntry.mark !== filters.mark) return false;
-      // Method
-      if (filters.method && firstEntry.method !== filters.method) return false;
-      // Type (must match at least one)
-      if (filters.type && !(poke.types || []).includes(filters.type)) return false;
-      // Gen
-      if (filters.gen && String(poke.gen) !== String(filters.gen)) return false;
+      // Ball (multi-select)
+      if (filters.ball && filters.ball.length > 0) {
+        const matchesBall = filters.ball.some(ball => firstEntry.ball === ball);
+        if (!matchesBall) return false;
+      }
+      // Mark (multi-select)
+      if (filters.mark && filters.mark.length > 0) {
+        const matchesMark = filters.mark.some(mark => firstEntry.mark === mark);
+        if (!matchesMark) return false;
+      }
+      // Method (multi-select)
+      if (filters.method && filters.method.length > 0) {
+        const matchesMethod = filters.method.some(method => firstEntry.method === method);
+        if (!matchesMethod) return false;
+      }
+      // Type (multi-select - must match at least one)
+      if (filters.type && filters.type.length > 0) {
+        const matchesType = filters.type.some(type => (poke.types || []).includes(type));
+        if (!matchesType) return false;
+      }
+      // Gen (multi-select)
+      if (filters.gen && filters.gen.length > 0) {
+        const matchesGen = filters.gen.some(gen => String(poke.gen) === String(gen));
+        if (!matchesGen) return false;
+      }
       // Caught/uncaught - check the appropriate shiny status
       const caughtKey = getCaughtKey(poke, null, isShiny);
       if (filters.caught === "caught" && !caught[caughtKey]) return false;
@@ -1466,7 +1485,7 @@ export default function App() {
   let suggestion = null;
 
   const unifiedList = useMemo(() => getUnifiedPokemonList(showShiny, true), [getUnifiedPokemonList, showShiny]);
-  const hasSearchFilters = filters.searchTerm || filters.game || (filters.gameObtainable && filters.gameObtainable.length > 0) || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught;
+  const hasSearchFilters = filters.searchTerm || (filters.game && filters.game.length > 0) || (filters.gameObtainable && filters.gameObtainable.length > 0) || (filters.ball && filters.ball.length > 0) || (filters.type && filters.type.length > 0) || (filters.gen && filters.gen.length > 0) || (filters.mark && filters.mark.length > 0) || (filters.method && filters.method.length > 0) || filters.caught || (filters.categories && filters.categories.length > 0);
 
   const shinySectionsWithFilters = useMemo(() => {
     return dexSections
@@ -1509,7 +1528,7 @@ export default function App() {
   }, [dexSections, filterMons]);
 
   // Check if we have any active search criteria
-  const hasActiveSearch = filters.searchTerm || filters.game || (filters.gameObtainable && filters.gameObtainable.length > 0) || filters.ball || filters.mark || filters.method || filters.type || filters.gen || filters.caught || (filters.categories && filters.categories.length > 0);
+  const hasActiveSearch = filters.searchTerm || (filters.game && filters.game.length > 0) || (filters.gameObtainable && filters.gameObtainable.length > 0) || (filters.ball && filters.ball.length > 0) || (filters.mark && filters.mark.length > 0) || (filters.method && filters.method.length > 0) || (filters.type && filters.type.length > 0) || (filters.gen && filters.gen.length > 0) || filters.caught || (filters.categories && filters.categories.length > 0);
 
   if (showNoResults && hasActiveSearch) {
     // Only provide suggestions for name/dex searches, not for other filter types
@@ -1569,9 +1588,6 @@ export default function App() {
                         (!authTimeout && (loading || !authReady)) ? (
                           <LoadingSpinner
                             fullScreen
-                            text="Loading..."
-                            variant="spinner"
-                            size="large"
                           />
                         ) : user?.username ? (
 
@@ -1715,7 +1731,7 @@ export default function App() {
                             })()}
                           </>
                         ) : (
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." />}>
                             <PublicHome />
                           </Suspense>
                         )
@@ -1725,7 +1741,7 @@ export default function App() {
                     <Route
                       path="/login"
                       element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading login..." />}>
                           {user?.username ? <Navigate to="/" /> : <Login onLogin={handleUserUpdate} />}
                         </Suspense>
                       }
@@ -1733,7 +1749,7 @@ export default function App() {
                     <Route
                       path="/register"
                       element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading registration..." />}>
                           {user?.username ? <Navigate to="/" /> : <Register onRegister={handleUserUpdate} />}
                         </Suspense>
                       }
@@ -1741,7 +1757,7 @@ export default function App() {
                     <Route
                       path="/email-sent"
                       element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." />}>
                           {!user?.username ? <EmailSent /> : <Navigate to="/" />}
                         </Suspense>
                       }
@@ -1749,7 +1765,7 @@ export default function App() {
                     <Route
                       path="/forgot-password"
                       element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." />}>
                           {!user?.username ? <ForgotPassword /> : <Navigate to="/" />}
                         </Suspense>
                       }
@@ -1757,7 +1773,7 @@ export default function App() {
                     <Route
                       path="/reset-password"
                       element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." />}>
                           {!user?.username ? <ResetPassword /> : <Navigate to="/" />}
                         </Suspense>
                       }
@@ -1765,7 +1781,7 @@ export default function App() {
                     <Route
                       path="/enter-reset-code"
                       element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." />}>
                           {!user?.username ? <EnterResetCode /> : <Navigate to="/" />}
                         </Suspense>
                       }
@@ -1774,7 +1790,7 @@ export default function App() {
                       path="/profile"
                       element={
                         <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading your profile..." />}>
                             <Profile />
                           </Suspense>
                         </RequireAuth>
@@ -1784,7 +1800,7 @@ export default function App() {
                     <Route
                       path="/trainers"
                       element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading trainers..." />}>
                           <Trainers />
                         </Suspense>
                       }
@@ -1793,7 +1809,7 @@ export default function App() {
                       path="/counters"
                       element={
                         <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading counters..." />}>
                             <Counters />
                           </Suspense>
                         </RequireAuth>
@@ -1803,7 +1819,7 @@ export default function App() {
                       path="/changelog"
                       element={
                         <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading changelog..." />}>
                             <Changelog />
                           </Suspense>
                         </RequireAuth>
@@ -1813,7 +1829,7 @@ export default function App() {
                       path="/admin"
                       element={
                         <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading admin panel..." />}>
                             <Admin />
                           </Suspense>
                         </RequireAuth>
@@ -1822,7 +1838,7 @@ export default function App() {
                     <Route
                       path="/u/:username"
                       element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading trainer profile..." />}>
                           <PublicProfile />
                         </Suspense>
                       }
@@ -1830,7 +1846,7 @@ export default function App() {
                     <Route
                       path="/u/:username/dex"
                       element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading Pokédex..." />}>
                           <ViewDex />
                         </Suspense>
                       }
@@ -1840,7 +1856,7 @@ export default function App() {
                       path="/settings"
                       element={
                         <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading settings..." />}>
                             <Settings />
                           </Suspense>
                         </RequireAuth>
@@ -1851,11 +1867,17 @@ export default function App() {
                       path="/backup"
                       element={
                         <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." variant="spinner" size="large" />}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading backup..." />}>
                             <Backup />
                           </Suspense>
                         </RequireAuth>
                       }
+                    />
+
+                    {/* Temporary route to preview loading screen - REMOVE BEFORE PRODUCTION */}
+                    <Route
+                      path="/loading"
+                      element={<LoadingSpinner fullScreen />}
                     />
 
                   </Routes>

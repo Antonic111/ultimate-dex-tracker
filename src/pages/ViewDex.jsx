@@ -29,13 +29,14 @@ export default function ViewDex() {
     const [progressBars, setProgressBars] = useState([]);
     const [filters, setFilters] = useState({
         searchTerm: "",
-        game: "",
+        game: [],
         gameObtainable: [],
-        ball: "",
-        type: "",
-        gen: "",
-        mark: "",
-        method: "",
+        ball: [],
+        type: [],
+        gen: [],
+        mark: [],
+        method: [],
+        categories: [],
         caught: "",
         showEvolutions: false
     });
@@ -385,8 +386,11 @@ export default function ViewDex() {
                 }
             }
 
-            // Game filter
-            if (filters.game && firstEntry?.game !== filters.game) return false;
+            // Game filter (multi-select)
+            if (filters.game && filters.game.length > 0) {
+                const matchesGame = filters.game.some(game => firstEntry?.game === game);
+                if (!matchesGame) return false;
+            }
             // Game obtainable in (multi-select)
             if (filters.gameObtainable && filters.gameObtainable.length > 0) {
                 const availableGames = getAvailableGamesForPokemonSidebar(pokemon);
@@ -397,20 +401,35 @@ export default function ViewDex() {
                 if (!matchesGame) return false;
             }
 
-            // Ball filter
-            if (filters.ball && firstEntry?.ball !== filters.ball) return false;
+            // Ball filter (multi-select)
+            if (filters.ball && filters.ball.length > 0) {
+                const matchesBall = filters.ball.some(ball => firstEntry?.ball === ball);
+                if (!matchesBall) return false;
+            }
 
-            // Mark filter
-            if (filters.mark && firstEntry?.mark !== filters.mark) return false;
+            // Mark filter (multi-select)
+            if (filters.mark && filters.mark.length > 0) {
+                const matchesMark = filters.mark.some(mark => firstEntry?.mark === mark);
+                if (!matchesMark) return false;
+            }
 
-            // Method filter
-            if (filters.method && firstEntry?.method !== filters.method) return false;
+            // Method filter (multi-select)
+            if (filters.method && filters.method.length > 0) {
+                const matchesMethod = filters.method.some(method => firstEntry?.method === method);
+                if (!matchesMethod) return false;
+            }
 
-            // Type filter
-            if (filters.type && !pokemon.types?.includes(filters.type)) return false;
+            // Type filter (multi-select)
+            if (filters.type && filters.type.length > 0) {
+                const matchesType = filters.type.some(type => pokemon.types?.includes(type));
+                if (!matchesType) return false;
+            }
 
-            // Generation filter
-            if (filters.gen && String(pokemon.gen) !== String(filters.gen)) return false;
+            // Generation filter (multi-select)
+            if (filters.gen && filters.gen.length > 0) {
+                const matchesGen = filters.gen.some(gen => String(pokemon.gen) === String(gen));
+                if (!matchesGen) return false;
+            }
 
             // Caught/uncaught filter
             const isCaught = !!caughtInfo;

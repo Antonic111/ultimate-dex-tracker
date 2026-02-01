@@ -45,10 +45,10 @@ const BASE_POKEMON_OPTIONS = pokemonData.map((p) => ({
 
 function getTimeAgo(dateString) {
     if (!dateString) return '';
-    
+
     const now = new Date();
     let joined;
-    
+
     // Handle different date formats
     if (typeof dateString === 'string') {
         // Try parsing as ISO string first
@@ -65,14 +65,14 @@ function getTimeAgo(dateString) {
     } else {
         joined = new Date(dateString);
     }
-    
+
     // Validate the date
     if (isNaN(joined.getTime())) {
         return 'Unknown date';
     }
-    
+
     const diff = now - joined;
-    
+
     // Handle future dates (shouldn't happen but just in case)
     if (diff < 0) {
         return 'Just now';
@@ -259,7 +259,7 @@ export default function Profile() {
                 const totalShiny = shinyKeys.length;
 
                 const caughtInfos = Object.values(map).filter(Boolean);
-                
+
                 // Extract all entries from the new data structure
                 const allEntries = [];
                 caughtInfos.forEach(info => {
@@ -275,14 +275,14 @@ export default function Profile() {
                         allEntries.push(info);
                     }
                 });
-                
+
                 // Count regular and shiny Pokémon separately
                 const regularCaught = regularKeys.filter(key => map[key]).length;
                 const shinyCaught = shinyKeys.filter(key => map[key]).length;
-                
+
                 const regularCompletion = totalRegular ? Math.round((regularCaught / totalRegular) * 100) : 0;
                 const shinyCompletion = totalShiny ? Math.round((shinyCaught / totalShiny) * 100) : 0;
-                
+
                 // For backward compatibility, keep the old stats structure
                 const shinies = regularCaught; // This was actually regular Pokémon count
                 const completion = regularCompletion;
@@ -330,68 +330,68 @@ export default function Profile() {
                 const topMark = fromOptionsOrTitle(MARK_OPTIONS, topMarkKey, " Mark");
                 const topGame = fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey);
 
-                if (!ignore) setStats({ 
-                    shinies, 
-                    completion, 
-                    regularCaught, 
-                    regularCompletion, 
-                    shinyCaught, 
-                    shinyCompletion, 
-                    gamesPlayed, 
-                    topBall, 
-                    topMark, 
-                    topGame 
+                if (!ignore) setStats({
+                    shinies,
+                    completion,
+                    regularCaught,
+                    regularCompletion,
+                    shinyCaught,
+                    shinyCompletion,
+                    gamesPlayed,
+                    topBall,
+                    topMark,
+                    topGame
                 });
 
                 // Build recent 5 added list (newest by date first)
                 try {
                     const allMonsList = [...pokemonData, ...filteredFormsData];
                     const keyToMon = new Map(allMonsList.map(m => [getCaughtKey(m), m]));
-                                                              // First, separate Pokemon with and without caughtAt timestamps
-                     const withTimestamps = [];
-                     const withoutTimestamps = [];
-                     
-                     Object.entries(map).forEach(([key, info]) => {
-                         if (!info) return;
-                         
-                         // Check if this is a shiny Pokémon by looking for _shiny suffix in the key
-                         const isShiny = key.includes('_shiny');
-                         
-                         // Get the base key (without _shiny suffix) to find the Pokémon data
-                         const baseKey = isShiny ? key.replace('_shiny', '') : key;
-                         const mon = keyToMon.get(baseKey);
-                         if (!mon) return;
-                         
-                         // Add shiny status to the info object
-                         const infoWithShiny = { ...info, isShiny };
-                         
-                         if (info.caughtAt) {
-                             const parsedDate = new Date(info.caughtAt);
-                             if (!isNaN(parsedDate.getTime())) {
-                                 withTimestamps.push({ key, mon, info: infoWithShiny, ts: parsedDate.getTime() });
-                             }
-                         } else {
-                             withoutTimestamps.push({ key, mon, info: infoWithShiny });
-                         }
-                     });
-                     
-                     // Sort Pokemon with timestamps by newest first
-                     withTimestamps.sort((a, b) => b.ts - a.ts);
-                     
-                     // Add fallback timestamps to Pokemon without caughtAt (older than any with timestamps)
-                     // Reverse the order so the first Pokemon without timestamp gets the oldest fallback
-                     const baseTime = withTimestamps.length > 0 ? withTimestamps[withTimestamps.length - 1].ts - 86400000 : Date.now();
-                     withoutTimestamps.forEach((item, idx) => {
-                         // Reverse the index so first Pokemon gets oldest timestamp
-                         const reverseIdx = withoutTimestamps.length - 1 - idx;
-                         item.ts = baseTime - (reverseIdx * 86400000);
-                     });
-                     
-                     // Combine and sort all Pokemon by timestamp
-                     const allPokemon = [...withTimestamps, ...withoutTimestamps];
-                     allPokemon.sort((a, b) => b.ts - a.ts);
-                     
-                     const recentList = allPokemon.slice(0, 5).map(({ mon, info }) => ({ mon, info }));
+                    // First, separate Pokemon with and without caughtAt timestamps
+                    const withTimestamps = [];
+                    const withoutTimestamps = [];
+
+                    Object.entries(map).forEach(([key, info]) => {
+                        if (!info) return;
+
+                        // Check if this is a shiny Pokémon by looking for _shiny suffix in the key
+                        const isShiny = key.includes('_shiny');
+
+                        // Get the base key (without _shiny suffix) to find the Pokémon data
+                        const baseKey = isShiny ? key.replace('_shiny', '') : key;
+                        const mon = keyToMon.get(baseKey);
+                        if (!mon) return;
+
+                        // Add shiny status to the info object
+                        const infoWithShiny = { ...info, isShiny };
+
+                        if (info.caughtAt) {
+                            const parsedDate = new Date(info.caughtAt);
+                            if (!isNaN(parsedDate.getTime())) {
+                                withTimestamps.push({ key, mon, info: infoWithShiny, ts: parsedDate.getTime() });
+                            }
+                        } else {
+                            withoutTimestamps.push({ key, mon, info: infoWithShiny });
+                        }
+                    });
+
+                    // Sort Pokemon with timestamps by newest first
+                    withTimestamps.sort((a, b) => b.ts - a.ts);
+
+                    // Add fallback timestamps to Pokemon without caughtAt (older than any with timestamps)
+                    // Reverse the order so the first Pokemon without timestamp gets the oldest fallback
+                    const baseTime = withTimestamps.length > 0 ? withTimestamps[withTimestamps.length - 1].ts - 86400000 : Date.now();
+                    withoutTimestamps.forEach((item, idx) => {
+                        // Reverse the index so first Pokemon gets oldest timestamp
+                        const reverseIdx = withoutTimestamps.length - 1 - idx;
+                        item.ts = baseTime - (reverseIdx * 86400000);
+                    });
+
+                    // Combine and sort all Pokemon by timestamp
+                    const allPokemon = [...withTimestamps, ...withoutTimestamps];
+                    allPokemon.sort((a, b) => b.ts - a.ts);
+
+                    const recentList = allPokemon.slice(0, 5).map(({ mon, info }) => ({ mon, info }));
                     if (!ignore) {
                         setRecentAdded(recentList);
                     }
@@ -405,8 +405,8 @@ export default function Profile() {
         }
 
         loadStats();
-        return () => { 
-            ignore = true; 
+        return () => {
+            ignore = true;
             setLoading('profile-stats', false);
         };
     }, [setLoading, username, refreshKey]); // Add refreshKey dependency to allow manual refresh
@@ -430,7 +430,7 @@ export default function Profile() {
 
     useEffect(() => {
         if (!username) return;
-        
+
         const interval = setInterval(async () => {
             try {
                 const { hasLiked: userHasLiked, likeCount: count } = await profileAPI.getProfileLikes(username);
@@ -451,7 +451,7 @@ export default function Profile() {
 
     const handleCopyLink = async () => {
         const url = `${window.location.origin}/u/${encodeURIComponent(username)}`;
-        
+
         // Try modern clipboard API first (requires HTTPS or localhost)
         if (navigator.clipboard && window.isSecureContext) {
             try {
@@ -462,7 +462,7 @@ export default function Profile() {
                 console.warn("Clipboard API failed, trying fallback:", err);
             }
         }
-        
+
         // Fallback for HTTP or when clipboard API fails
         try {
             const textArea = document.createElement('textarea');
@@ -473,10 +473,10 @@ export default function Profile() {
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            
+
             const successful = document.execCommand('copy');
             document.body.removeChild(textArea);
-            
+
             if (successful) {
                 showMessage("Share link copied", "success");
             } else {
@@ -491,16 +491,16 @@ export default function Profile() {
     const handleLike = async () => {
         if (likeLoading) return;
         setLikeLoading(true);
-        
+
         const wasLiked = hasLiked;
         const previousCount = likeCount;
-        
+
         setHasLiked(!wasLiked);
         setLikeCount(wasLiked ? previousCount - 1 : previousCount + 1);
         if (!wasLiked) {
             setLikeBurst((n) => n + 1);
         }
-        
+
         try {
             const { hasLiked: liked, likeCount: newCount } = await profileAPI.toggleProfileLike(username);
             setHasLiked(liked);
@@ -593,11 +593,8 @@ export default function Profile() {
     if (loading || !username || !email || isLoading('profile-data')) {
         return (
             <div className="profile-wrapper">
-                <LoadingSpinner 
-                    fullScreen 
-                    text="Loading your profile..." 
-                    variant="dots"
-                    size="large"
+                <LoadingSpinner
+                    fullScreen
                 />
             </div>
         );
@@ -613,13 +610,13 @@ export default function Profile() {
                                 {username}
                                 {isAdmin && (
                                     <span className="crown-wrapper">
-                                        <Crown 
-                                            size={22} 
+                                        <Crown
+                                            size={22}
                                             strokeWidth={2.5}
-                                            style={{ 
+                                            style={{
                                                 color: "#fbbf24",
                                                 flexShrink: 0
-                                            }} 
+                                            }}
                                         />
                                         <span className="crown-tooltip">Admin</span>
                                     </span>
@@ -646,8 +643,8 @@ export default function Profile() {
                                 {likeBurst > 0 && (
                                     <span key={likeBurst} aria-hidden="true">
                                         <span className="like-heart">❤</span>
-                                        <span className="like-heart" style={{"--tx":"-26px","--ty":"-38px","--rot":"-18deg"}}>❤</span>
-                                        <span className="like-heart" style={{"--tx":"22px","--ty":"-44px","--rot":"14deg"}}>❤</span>
+                                        <span className="like-heart" style={{ "--tx": "-26px", "--ty": "-38px", "--rot": "-18deg" }}>❤</span>
+                                        <span className="like-heart" style={{ "--tx": "22px", "--ty": "-44px", "--rot": "14deg" }}>❤</span>
                                     </span>
                                 )}
                             </span>
@@ -841,29 +838,29 @@ export default function Profile() {
                             )}
                         </div>
 
-                                                         <div className="profile-field">
-                                     <label>Gender</label>
-                                     {isEditing ? (
-                                         <SearchbarIconDropdown
-                                             options={[
-                                                 { name: "Male", value: "Male", icon: <Mars size={18} color="#4aaaff" /> },
-                                                 { name: "Female", value: "Female", icon: <Venus size={18} color="#ff6ec7" /> },
-                                                 { name: "Other", value: "Other", icon: <VenusAndMars size={18} color="#ffffff" /> },
-                                             ]}
-                                             value={form.gender}
-                                             onChange={(value) => setForm({ ...form, gender: value })}
-                                             placeholder="Select gender"
-                                             hideClearButton
-                                         />
-                                     ) : (
-                                         <div className="field-display">
-                                             {form.gender === "Male" && <Mars size={16} color="#4aaaff" style={{ marginRight: "6px" }} />}
-                                             {form.gender === "Female" && <Venus size={16} color="#ff6ec7" style={{ marginRight: "6px" }} />}
-                                             {form.gender === "Other" && <VenusAndMars size={16} color="#ffffff" style={{ marginRight: "6px" }} />}
-                                             {form.gender === "Other" ? "Female" : (form.gender || "N/A")}
-                                         </div>
-                                     )}
-                                 </div>
+                        <div className="profile-field">
+                            <label>Gender</label>
+                            {isEditing ? (
+                                <SearchbarIconDropdown
+                                    options={[
+                                        { name: "Male", value: "Male", icon: <Mars size={18} color="#4aaaff" /> },
+                                        { name: "Female", value: "Female", icon: <Venus size={18} color="#ff6ec7" /> },
+                                        { name: "Other", value: "Other", icon: <VenusAndMars size={18} color="#ffffff" /> },
+                                    ]}
+                                    value={form.gender}
+                                    onChange={(value) => setForm({ ...form, gender: value })}
+                                    placeholder="Select gender"
+                                    hideClearButton
+                                />
+                            ) : (
+                                <div className="field-display">
+                                    {form.gender === "Male" && <Mars size={16} color="#4aaaff" style={{ marginRight: "6px" }} />}
+                                    {form.gender === "Female" && <Venus size={16} color="#ff6ec7" style={{ marginRight: "6px" }} />}
+                                    {form.gender === "Other" && <VenusAndMars size={16} color="#ffffff" style={{ marginRight: "6px" }} />}
+                                    {form.gender === "Other" ? "Female" : (form.gender || "N/A")}
+                                </div>
+                            )}
+                        </div>
 
                         <div className="profile-field full-span">
                             <label>Nintendo Switch Friend Code</label>
@@ -1027,52 +1024,52 @@ export default function Profile() {
                             <label>Top Game</label>
                             <div className="field-display">{stats.topGame ? stats.topGame : "—"}</div>
                         </div>
-                                                 <div className="profile-field full-span recent-field">
-                             <label>Recent Entries</label>
-                             <div className="field-display recent-field-box">
-                                 {recentAdded.length === 0 ? (
-                                     <div className="no-recent-pokemon">
-                                         <p>No recent entries yet</p>
-                                     </div>
-                                 ) : (
-                                     <div className="profile-rank-row recent-pokemon-row">
-                                         {recentAdded.map((pokemon, idx) => {
-                                             const { mon, info } = pokemon;
-                                             const isNewest = idx === 0;
-                                             const isShiny = info?.isShiny;
-                                             
-                                             return (
-                                                 <div key={idx} className={`profile-rank-item recent-pokemon-item ${isNewest ? 'newest' : ''}`}>
-                                                     {isNewest && (
-                                                         <div className="newest-badge">LATEST</div>
-                                                     )}
-                                                     <div className="profile-pokemon-box recent-pokemon-box">
-                                                         <img
-                                                             src={isShiny ? mon?.sprites?.front_shiny : mon?.sprites?.front_default}
-                                                             alt={formatPokemonName(mon?.name)}
-                                                             className="pokemon-img"
-                                                         />
-                                                         {isShiny && (
-                                                             <div className="shiny-indicator">
-                                                                 <Sparkles size={20} className="shiny-sparkles-icon" />
-                                                             </div>
-                                                         )}
-                                                     </div>
-                                                     <div className="rank-label recent-pokemon-name" data-order={idx + 1}>
-                                                         {formatPokemonName(mon?.name)}
-                                                         {mon?.formType && !['alcremie', 'other', 'unown'].includes(mon.formType.toLowerCase()) && (
-                                                             <div className="form-type-tag">
-                                                                 {mon.formType.charAt(0).toUpperCase() + mon.formType.slice(1)}
-                                                             </div>
-                                                         )}
-                                                     </div>
-                                                 </div>
-                                             );
-                                         })}
-                                     </div>
-                                 )}
-                             </div>
-                         </div>
+                        <div className="profile-field full-span recent-field">
+                            <label>Recent Entries</label>
+                            <div className="field-display recent-field-box">
+                                {recentAdded.length === 0 ? (
+                                    <div className="no-recent-pokemon">
+                                        <p>No recent entries yet</p>
+                                    </div>
+                                ) : (
+                                    <div className="profile-rank-row recent-pokemon-row">
+                                        {recentAdded.map((pokemon, idx) => {
+                                            const { mon, info } = pokemon;
+                                            const isNewest = idx === 0;
+                                            const isShiny = info?.isShiny;
+
+                                            return (
+                                                <div key={idx} className={`profile-rank-item recent-pokemon-item ${isNewest ? 'newest' : ''}`}>
+                                                    {isNewest && (
+                                                        <div className="newest-badge">LATEST</div>
+                                                    )}
+                                                    <div className="profile-pokemon-box recent-pokemon-box">
+                                                        <img
+                                                            src={isShiny ? mon?.sprites?.front_shiny : mon?.sprites?.front_default}
+                                                            alt={formatPokemonName(mon?.name)}
+                                                            className="pokemon-img"
+                                                        />
+                                                        {isShiny && (
+                                                            <div className="shiny-indicator">
+                                                                <Sparkles size={20} className="shiny-sparkles-icon" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="rank-label recent-pokemon-name" data-order={idx + 1}>
+                                                        {formatPokemonName(mon?.name)}
+                                                        {mon?.formType && !['alcremie', 'other', 'unown'].includes(mon.formType.toLowerCase()) && (
+                                                            <div className="form-type-tag">
+                                                                {mon.formType.charAt(0).toUpperCase() + mon.formType.slice(1)}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

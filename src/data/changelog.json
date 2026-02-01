@@ -1,7 +1,26 @@
 [
   {
-    "date": "2026-01-28",
+    "date": "2026-02-01",
     "version": "v1.0.9",
+    "type": "feature",
+    "title": "Search Improvements",
+    "description": "",
+    "features": [
+      "Added the ability to multi-search across all categories. For example, you can now search for Pokémon with both the Mighty Mark and the Common Mark."
+    ],
+    "fixes": [
+      "Improved the sites loading screen with added animations and better visuals.",
+      "Removed the sparkle animation from the title on the public home page.",
+      "Added a shimmer animation to the title on the public home page.",
+      "Updated registration button icons to a pen and paper design for a more professional appearance.",
+      "Resolved layout shifts caused by Pokémon displays on the landing page.",
+      "Fixed a issue that would not allow users to open the Caught/Uncaught search dropdown.",
+      "Fixed an issue where autofilling an email in the settings would cause the field to appear white instead of the site's theme color."
+    ]
+  },
+  {
+    "date": "2026-01-28",
+    "version": "v1.0.8",
     "type": "fix",
     "title": "Scrollbar fixes, SEO improvements & Performance improvements",
     "description": "",
@@ -21,7 +40,7 @@
   },
   {
     "date": "2026-01-21",
-    "version": "v1.0.8",
+    "version": "v1.0.7",
     "type": "feature",
     "title": "Mobile fixes & Dex Preferences expansion",
     "description": "",
@@ -42,7 +61,7 @@
   },
   {
     "date": "2026-01-19",
-    "version": "v1.0.7",
+    "version": "v1.0.6",
     "type": "fix",
     "title": "Alpha Regional Forms added & Removed Kantonian Electrode",
     "description": "",

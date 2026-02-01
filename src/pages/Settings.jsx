@@ -41,7 +41,7 @@ export default function Settings() {
 
     // Username availability checking
     const usernameAvailability = useUsernameAvailability(newUsername, username);
-    
+
     // Username cooldown checking
     const usernameCooldown = useUsernameCooldown();
 
@@ -87,32 +87,32 @@ export default function Settings() {
     async function handleUsernameSave() {
         try {
             setSavingUsername(true);
-            
+
             // Check cooldown first
             if (!usernameCooldown.canChange) {
                 showMessage(usernameCooldown.message, "error");
                 setSavingUsername(false);
                 return;
             }
-            
+
             // Check if username is available
             if (!usernameAvailability.available) {
                 showMessage("Username is not available", "error");
                 setSavingUsername(false);
                 return;
             }
-            
+
             const validation = validateContent(String(newUsername || ''), 'username');
             if (!validation.isValid) {
                 showMessage(`${validation.error}`, 'error');
                 setSavingUsername(false);
                 return;
             }
-            
+
             const data = await userAPI.updateUsername(newUsername);
             setUser(prev => ({ ...prev, username: data.username }));
             showMessage("Username updated successfully!", "success");
-            
+
             // Refresh cooldown status
             usernameCooldown.refreshCooldown();
         } catch (err) {
@@ -146,7 +146,7 @@ export default function Settings() {
             try {
                 setSavingEmail(true);
                 const data = await userAPI.changeEmail(newEmail, emailPassword);
-                
+
                 // Switch to new email verification step
                 setEmailVerificationStep("new");
                 // Modal will stay open for new email verification
@@ -206,10 +206,10 @@ export default function Settings() {
 
 
     return (
-            <div className="settings-page page-container fade-in-up">
-      <h1 className="page-title">Settings</h1>
-      <div className="app-divider" />
-      <div className="settings-container">
+        <div className="settings-page page-container fade-in-up">
+            <h1 className="page-title">Settings</h1>
+            <div className="app-divider" />
+            <div className="settings-container">
                 {/* Left Column - Account Settings */}
                 <div className="settings-column">
 
@@ -261,8 +261,8 @@ export default function Settings() {
                                 </div>
                             )}
                         </div>
-                        <button 
-                            onClick={handleUsernameSave} 
+                        <button
+                            onClick={handleUsernameSave}
                             disabled={savingUsername || !usernameCooldown.canChange || !usernameAvailability.available || newUsername.trim() === ""}
                         >
                             {savingUsername ? "Saving..." : "Save"}
@@ -278,6 +278,8 @@ export default function Settings() {
                             <div className="input-icon-wrapper">
                                 <Mail className="auth-icon" size={24} />
                                 <input
+                                    id="settings-new-email"
+                                    name="email"
                                     type="email"
                                     placeholder={email || "new email"}
                                     value={newEmail}
@@ -288,6 +290,8 @@ export default function Settings() {
                             <div className="input-icon-wrapper">
                                 <Lock className="auth-icon" size={24} />
                                 <input
+                                    id="settings-email-password"
+                                    name="current-password"
                                     type={showEmailPassword ? "text" : "password"}
                                     placeholder="Current password"
                                     value={emailPassword}
@@ -318,6 +322,8 @@ export default function Settings() {
                             <div className="input-icon-wrapper">
                                 <Lock className="auth-icon" size={24} />
                                 <input
+                                    id="settings-current-password"
+                                    name="current-password"
                                     type={showCurrentPassword ? "text" : "password"}
                                     placeholder="Current password"
                                     value={currentPassword}
@@ -336,6 +342,8 @@ export default function Settings() {
                             <div className="input-icon-wrapper">
                                 <Lock className="auth-icon" size={24} />
                                 <input
+                                    id="settings-new-password"
+                                    name="new-password"
                                     type={showNewPassword ? "text" : "password"}
                                     placeholder="New password"
                                     value={newPassword}
@@ -354,6 +362,8 @@ export default function Settings() {
                             <div className="input-icon-wrapper">
                                 <Lock className="auth-icon" size={24} />
                                 <input
+                                    id="settings-confirm-password"
+                                    name="confirm-password"
                                     type={showConfirmPassword ? "text" : "password"}
                                     placeholder="Confirm new password"
                                     value={confirmPassword}
@@ -470,17 +480,17 @@ export default function Settings() {
                                     style={{ position: 'relative' }}
                                 >
                                     {accent === color && (
-                                        <Check 
-                                            size={18} 
+                                        <Check
+                                            size={18}
                                             className="accent-check-icon"
-                                            style={{ 
+                                            style={{
                                                 position: 'absolute',
                                                 top: '50%',
                                                 left: '50%',
                                                 transform: 'translate(-50%, -50%)',
                                                 pointerEvents: 'none',
                                                 strokeWidth: 3
-                                            }} 
+                                            }}
                                         />
                                     )}
                                 </div>

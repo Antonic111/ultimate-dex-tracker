@@ -91,16 +91,27 @@
 
 .sparkle-icon {
   @apply w-4 h-4;
-  animation: sparkle 2s ease-in-out infinite;
 }
 
 .hero-content h1 {
   @apply text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-6;
   color: var(--welcome-text);
-  background: linear-gradient(135deg, var(--welcome-text) 0%, var(--accent) 100%);
+  background: linear-gradient(90deg, var(--welcome-text) 0%, var(--accent) 25%, var(--welcome-text) 50%, var(--accent) 75%, var(--welcome-text) 100%);
+  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: gradientShimmer 4s linear infinite;
+}
+
+@keyframes gradientShimmer {
+  0% {
+    background-position: 0% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
 }
 
 .hero-subtitle {

@@ -947,3 +947,15 @@ form .input-icon-wrapper:last-of-type {
     @apply min-h-0 min-w-0;
   }
 }
+
+/* Transparent autofill styling - maintains site theme */
+.settings-page input:-webkit-autofill,
+.settings-page input:-webkit-autofill:hover,
+.settings-page input:-webkit-autofill:focus,
+.settings-page input:-internal-autofill-selected {
+  background-color: transparent !important;
+  color: var(--text) !important;
+  transition: background-color 9999s ease-in-out 0s;
+  -webkit-text-fill-color: var(--text) !important;
+  box-shadow: none !important;
+}

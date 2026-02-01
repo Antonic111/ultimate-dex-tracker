@@ -212,7 +212,7 @@ export default function DexView({
     const finalSuggestion = suggestion || getSuggestion();
 
     // Check if we have any active search criteria
-    const hasActiveSearch = filters.searchTerm || filters.game || (filters.gameObtainable && filters.gameObtainable.length > 0) || filters.ball || filters.mark || filters.method || filters.type || filters.gen || filters.caught;
+    const hasActiveSearch = filters.searchTerm || (filters.game && filters.game.length > 0) || (filters.gameObtainable && filters.gameObtainable.length > 0) || (filters.ball && filters.ball.length > 0) || (filters.mark && filters.mark.length > 0) || (filters.method && filters.method.length > 0) || (filters.type && filters.type.length > 0) || (filters.gen && filters.gen.length > 0) || filters.caught || (filters.categories && filters.categories.length > 0);
 
     // Show no results when there are no results found for any active search criteria
     // For ViewDex mode, check if all sections have no results using customFilterMons
@@ -324,7 +324,7 @@ export default function DexView({
                 ) : (
                     // Main App mode - multiple sections with filtering and collapsing
                     <>
-                        {(filters.searchTerm || filters.game || (filters.gameObtainable && filters.gameObtainable.length > 0) || filters.ball || filters.type || filters.gen || filters.mark || filters.method || filters.caught)
+                        {(filters.searchTerm || (filters.game && filters.game.length > 0) || (filters.gameObtainable && filters.gameObtainable.length > 0) || (filters.ball && filters.ball.length > 0) || (filters.type && filters.type.length > 0) || (filters.gen && filters.gen.length > 0) || (filters.mark && filters.mark.length > 0) || (filters.method && filters.method.length > 0) || filters.caught || (filters.categories && filters.categories.length > 0))
                             ? dexSections.map(section => {
                                 const filteredMons = customFilterMons
                                     ? customFilterMons(section.getList(), showForms)

@@ -1,21 +1,38 @@
 import { Link } from "react-router-dom";
-import { Sparkles, BarChart3, Filter, Users, Zap, Star, ArrowRight } from "lucide-react";
+import { Sparkles, BarChart3, Filter, Users, SquarePen, Star, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import pokemonData from "../data/pokemon.json";
 import "../css/PublicHome.css";
 
 export default function PublicHome() {
-  const [randomCards, setRandomCards] = useState([]);
+  // Pre-define card positions to prevent CLS - these are fixed and known at render time
+  const cardPositions = [
+    { top: 10, left: 20, size: 'large', rotation: -8 },
+    { top: 25, left: 70, size: 'medium', rotation: 12 },
+    { top: 45, left: 5, size: 'small', rotation: -15 },
+    { top: 60, left: 80, size: 'large', rotation: 6 },
+    { top: 85, left: 35, size: 'medium', rotation: -10 }
+  ];
+
+  // Initialize with placeholder cards to prevent CLS
+  const [randomCards, setRandomCards] = useState(() => {
+    return cardPositions.map((position, i) => ({
+      id: i,
+      pokemon: { name: 'loading' },
+      spriteUrl: '/Sprites/pikachu.png', // Default sprite that's likely cached
+      color: 'var(--accent)',
+      delay: i * 0.1,
+      position
+    }));
+  });
 
   useEffect(() => {
     // Scroll to top on page load
     window.scrollTo(0, 0);
-    
-    // Fixed number of cards for clean display
-    const cardCount = 5;
+
     // Use the full Pokémon database
     const allPokemon = pokemonData;
-    
+
     // Local special forms sprites
     const localSprites = [
       'flabebe-blue', 'flabebe-orange', 'flabebe-red', 'flabebe-white', 'flabebe-yellow',
@@ -38,45 +55,36 @@ export default function PublicHome() {
     // Use site accent color for all cards
     const accentColor = 'var(--accent)';
 
-    // Dynamic, eye-catching asymmetrical layout
-    const positions = [
-      { top: 10, left: 20, size: 'large', rotation: -8 },
-      { top: 25, left: 70, size: 'medium', rotation: 12 },
-      { top: 45, left: 5, size: 'small', rotation: -15 },
-      { top: 60, left: 80, size: 'large', rotation: 6 },
-      { top: 85, left: 35, size: 'medium', rotation: -10 }
-    ];
-    
     const cards = [];
-    for (let i = 0; i < cardCount; i++) {
+    for (let i = 0; i < cardPositions.length; i++) {
       // 90% chance for database Pokémon, 10% chance for local special forms
       const useLocalSprite = Math.random() < 0.1;
-      
+
       if (useLocalSprite) {
         // Use local special form sprite
         const localSprite = localSprites[Math.floor(Math.random() * localSprites.length)];
         const spriteName = localSprite;
-        
+
         cards.push({
           id: i,
           pokemon: { name: localSprite },
           spriteUrl: `/Sprites/${spriteName}.png`,
           color: accentColor,
           delay: i * 0.1,
-          position: positions[i]
+          position: cardPositions[i]
         });
       } else {
         // Use database Pokémon
         const randomPokemon = allPokemon[Math.floor(Math.random() * allPokemon.length)];
         const spriteUrl = randomPokemon.sprites.front_default;
-        
+
         cards.push({
           id: i,
           pokemon: randomPokemon,
           spriteUrl: spriteUrl,
           color: accentColor,
           delay: i * 0.1,
-          position: positions[i]
+          position: cardPositions[i]
         });
       }
     }
@@ -93,11 +101,11 @@ export default function PublicHome() {
           </div>
           <h1>Welcome to Ultimate Dex Tracker!</h1>
           <p className="hero-subtitle">Track your Pokémon collection across all games with ease. Build your perfect living dex and never lose track of your progress again.</p>
-          
+
           <p className="tracking-count">
             Tracking 2064 Pokemon!
           </p>
-          
+
           {/* Creator Credit */}
           <div className="creator-credit">
             <span>
@@ -107,10 +115,10 @@ export default function PublicHome() {
               </a>
             </span>
           </div>
-          
+
           <div className="public-home-buttons">
             <Link to="/register" className="home-signup-btn primary-btn">
-              <Zap className="btn-icon" />
+              <SquarePen className="btn-icon" />
               Get Started Free
             </Link>
             <Link to="/login" className="home-login-btn secondary-btn">
@@ -137,25 +145,35 @@ export default function PublicHome() {
         </div>
         <div className="hero-visual">
           <div className="random-cards-container">
-            {randomCards.map((card) => (
-              <div
-                key={card.id}
-                className={`random-card ${card.position.size}`}
-                style={{
-                  background: card.color,
-                  top: `${card.position.top}%`,
-                  left: `${card.position.left}%`,
-                  animationDelay: `${card.delay}s`,
-                  '--rotation': `${card.position.rotation}deg`
-                }}
-              >
-                <img 
-                  src={card.spriteUrl} 
-                  alt={card.pokemon.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
+            {randomCards.map((card) => {
+              // Get image dimensions based on card size
+              const sizeMap = { large: 96, medium: 80, small: 64 };
+              const imgSize = sizeMap[card.position.size] || 80;
+
+              return (
+                <div
+                  key={card.id}
+                  className={`random-card ${card.position.size}`}
+                  style={{
+                    background: card.color,
+                    top: `${card.position.top}%`,
+                    left: `${card.position.left}%`,
+                    animationDelay: `${card.delay}s`,
+                    '--rotation': `${card.position.rotation}deg`
+                  }}
+                >
+                  <img
+                    src={card.spriteUrl}
+                    alt={card.pokemon.name}
+                    width={imgSize}
+                    height={imgSize}
+                    loading="eager"
+                    decoding="async"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -201,7 +219,7 @@ export default function PublicHome() {
         <div className="cta-content">
           <h2>Ready to start tracking?</h2>
           <Link to="/register" className="cta-button">
-            <Zap className="btn-icon" />
+            <SquarePen className="btn-icon" />
             Register
           </Link>
         </div>
