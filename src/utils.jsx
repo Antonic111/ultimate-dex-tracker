@@ -36,6 +36,9 @@ export function formatFormType(type) {
 
 const allSources = [pokemonData, getFilteredFormsData(formsData)]; // Add more arrays here if you have them separately
 
+// All sources including unfiltered forms - for finding ALL related forms
+const allSourcesUnfiltered = [pokemonData, formsData];
+
 export function findPokemon(id, name = null) {
   // First try exact id + name in all sources
   for (const arr of allSources) {
@@ -50,25 +53,89 @@ export function findPokemon(id, name = null) {
   return null;
 }
 
+// Get all related forms for a pokemon (all variants with the same ID)
+// Uses UNFILTERED forms data to find ALL variants regardless of user preferences
+export function getRelatedForms(pokemon) {
+  if (!pokemon) return [];
+
+  const relatedForms = [];
+  const seenStableIds = new Set();
+  // Search ALL forms (unfiltered) for pokemon with the same ID
+  for (const arr of allSourcesUnfiltered) {
+    for (const p of arr) {
+      if (p.id === pokemon.id) {
+        // Skip different duplicates
+        const uniqueKey = p.stableId || `${p.name}-${p.formType}`;
+
+        // Skip if it's the current pokemon
+        const currentKey = pokemon.stableId || `${pokemon.name}-${pokemon.formType}`;
+        if (uniqueKey === currentKey) continue;
+
+        if (!seenStableIds.has(uniqueKey)) {
+          relatedForms.push(p);
+          seenStableIds.add(uniqueKey);
+        }
+      }
+    }
+  }
+
+  // Sort forms by formType priority for consistent ordering
+  const formTypePriority = {
+    undefined: 0,  // Base form (no formType)
+    null: 0,
+    'gender': 1,
+    'alpha': 2,
+    'alphaother': 3,
+    'gmax': 4,
+    'alolan': 5,
+    'galarian': 6,
+    'hisuian': 7,
+    'paldean': 8,
+    'other': 9
+  };
+
+  relatedForms.sort((a, b) => {
+    const priorityA = formTypePriority[a.formType] ?? 10;
+    const priorityB = formTypePriority[b.formType] ?? 10;
+    return priorityA - priorityB;
+  });
+
+  return relatedForms;
+}
+
 // Get all pokemon IDs in an evolution chain (including pre and next evolutions)
 export function getEvolutionChainIds(pokemon) {
-  if (!pokemon || !pokemon.evolution) return [pokemon?.id].filter(Boolean);
-  
+  if (!pokemon) return [];
+
+  // Use the pokemon itself, or fallback to the base form if current form lacks evolution data
+  // This helps with cosmetic forms (like Shellos East) that share the base form's evolution
+  let startMon = pokemon;
+  const hasEvoData = pokemon.evolution && (pokemon.evolution.pre || (pokemon.evolution.next && pokemon.evolution.next.length > 0));
+
+  if (!hasEvoData && pokemon.id) {
+    const baseForm = findPokemon(pokemon.id);
+    if (baseForm && baseForm !== pokemon) {
+      startMon = baseForm;
+    }
+  }
+
+  if (!startMon || !startMon.evolution) return [pokemon?.id].filter(Boolean);
+
   const chainIds = new Set();
-  
+
   // Find the base pokemon (walk backwards)
-  let base = pokemon;
+  let base = startMon;
   while (base.evolution?.pre) {
     const prev = findPokemon(base.evolution.pre.id, base.evolution.pre.name);
     if (!prev) break;
     base = prev;
   }
-  
+
   // Recursively collect all pokemon in the chain
   function collectChain(mon) {
     if (!mon || !mon.id) return;
     chainIds.add(mon.id);
-    
+
     if (mon.evolution?.next) {
       mon.evolution.next.forEach(nextEvo => {
         const nextMon = findPokemon(nextEvo.id, nextEvo.name);
@@ -78,7 +145,7 @@ export function getEvolutionChainIds(pokemon) {
       });
     }
   }
-  
+
   collectChain(base);
   return Array.from(chainIds);
 }
@@ -130,11 +197,11 @@ export function renderTypeBadge(type) {
   const borderColor = typeBorders[type.toLowerCase()] || "#545554";
 
   return (
-         <span 
-       key={type}
-       className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-full text-white font-semibold text-xs border-2 w-20"
-       style={{ backgroundColor: bgColor, borderColor: borderColor, borderStyle: 'solid' }}
-     >
+    <span
+      key={type}
+      className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-full text-white font-semibold text-xs border-2 w-20"
+      style={{ backgroundColor: bgColor, borderColor: borderColor, borderStyle: 'solid' }}
+    >
       <img
         src={`/type-icons/${type.toLowerCase()}.png`}
         alt={type}
@@ -190,7 +257,7 @@ export function formatPokemonName(name) {
 
   // Split by remaining hyphens and format each part
   const parts = name.split("-").filter(part => part.trim() !== "");
-  
+
   return parts
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
@@ -300,6 +367,11 @@ export function getFormDisplayName(pokemon) {
     if (genderForms.includes(baseName)) {
       return "Alpha Male";
     }
+  }
+
+  // ✅ Generic Alpha Forms
+  if (pokemon.formType === "alpha" && name) {
+    return `Alpha ${formatPokemonName(name)}`;
   }
 
   const formLabels = {

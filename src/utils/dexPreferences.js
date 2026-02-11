@@ -15,10 +15,13 @@ export const filterFormsByPreferences = (forms, preferences) => {
             return false;
         }
 
-        // Skip forms without a valid formType
-        if (!formType || typeof formType !== 'string') {
+        // Skip forms without a valid formType only if they are not base forms (i.e. if formType is present but invalid)
+        // Base forms often have undefined/null formType, so we should keep them.
+        if (formType !== undefined && formType !== null && typeof formType !== 'string') {
             return false;
         }
+
+
 
         // Special case: Pokemon with "-alpha" in their name should be treated as Alpha forms
         if (form.name && form.name.toLowerCase().includes('-alpha')) {

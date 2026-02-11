@@ -290,20 +290,44 @@ export default function Counters() {
     loadHuntData();
   }, [username]);
 
-  // Auto-check shiny charm modifier when game is selected (new hunt)
+  // Auto-check/uncheck shiny charm modifier when game is selected or shinyCharmGames changes (new hunt)
   useEffect(() => {
-    if (huntDetails.game && shinyCharmGames.includes(huntDetails.game)) {
-      setModifiers(prev => ({ ...prev, shinyCharm: true }));
+    if (huntDetails.game) {
+      const shouldHaveCharm = shinyCharmGames.includes(huntDetails.game);
+      setModifiers(prev => {
+        // Only update if the value actually needs to change
+        if (prev.shinyCharm !== shouldHaveCharm) {
+          return { ...prev, shinyCharm: shouldHaveCharm };
+        }
+        return prev;
+      });
     }
   }, [huntDetails.game, shinyCharmGames]);
 
-  // Auto-check shiny charm modifier when game is selected (edit modal)
+  // Track the previous game in edit modal to detect manual game changes (not modal open)
+  const prevEditGameRef = useRef(editForm.game);
+  const editModalJustOpenedRef = useRef(false);
+
+  // Auto-check shiny charm modifier ONLY when user manually changes the game in edit modal
   useEffect(() => {
-    if (editForm.game && shinyCharmGames.includes(editForm.game)) {
-      setEditForm(prev => ({
-        ...prev,
-        modifiers: { ...prev.modifiers, shinyCharm: true }
-      }));
+    // Skip if this is from the modal opening (not a manual game change)
+    if (editModalJustOpenedRef.current) {
+      editModalJustOpenedRef.current = false;
+      prevEditGameRef.current = editForm.game;
+      return;
+    }
+
+    // Only auto-check if the game actually changed (user action, not data load)
+    if (prevEditGameRef.current !== editForm.game && editForm.game) {
+      prevEditGameRef.current = editForm.game;
+
+      // Only auto-check shiny charm if user has this game in their shiny charm list
+      if (shinyCharmGames.includes(editForm.game)) {
+        setEditForm(prev => ({
+          ...prev,
+          modifiers: { ...prev.modifiers, shinyCharm: true }
+        }));
+      }
     }
   }, [editForm.game, shinyCharmGames]);
 
@@ -901,12 +925,30 @@ export default function Counters() {
       const now = Date.now();
       const huntId = resetModal.hunt.id;
 
-      setActiveHunts(prev => prev.map(hunt =>
+      // Compute updated values before setting state
+      const updatedActiveHunts = activeHunts.map(hunt =>
         hunt.id === huntId ? { ...hunt, checks: 0 } : hunt
-      ));
-      setTotalCheckTimes(prev => ({ ...prev, [huntId]: 0 }));
+      );
+      const updatedTotalCheckTimes = { ...totalCheckTimes, [huntId]: 0 };
+      const updatedLastCheckTimes = { ...lastCheckTimes, [huntId]: now };
+
+      setActiveHunts(updatedActiveHunts);
+      setTotalCheckTimes(updatedTotalCheckTimes);
       setCurrentBottomTimers(prev => ({ ...prev, [huntId]: 0 }));
-      setLastCheckTimes(prev => ({ ...prev, [huntId]: now })); // Force timer reset
+      setLastCheckTimes(updatedLastCheckTimes);
+
+      // Save immediately with the updated data
+      if (username) {
+        const huntData = {
+          activeHunts: updatedActiveHunts,
+          huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
+          lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
+          totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
+          pausedHunts: Array.from(pausedHunts),
+          huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
+        };
+        saveHuntData(huntData);
+      }
 
       setResetModal({ show: false, hunt: null });
       setResetModalClosing(false);
@@ -931,6 +973,8 @@ export default function Counters() {
   const handleEditHunt = (huntId) => {
     const hunt = activeHunts.find(h => h.id === huntId);
     setEditModal({ show: true, hunt });
+    // Mark that we're opening the modal (not a manual game change)
+    editModalJustOpenedRef.current = true;
     setEditForm({
       game: hunt.game || '',
       method: hunt.method || '',
@@ -975,16 +1019,29 @@ export default function Counters() {
     // Parse and apply manual increments (default to 1 if invalid)
     const newIncrements = parseInt(settingsForm.manualIncrements) || 1;
 
-    // Apply changes immediately
-    setActiveHunts(prev => prev.map(hunt =>
+    // Compute updated values before setting state
+    const updatedActiveHunts = activeHunts.map(hunt =>
       hunt.id === huntId ? { ...hunt, checks: newChecks } : hunt
-    ));
-    setTotalCheckTimes(prev => ({ ...prev, [huntId]: totalMs }));
-    setHuntIncrements(prev => ({ ...prev, [huntId]: newIncrements }));
+    );
+    const updatedTotalCheckTimes = { ...totalCheckTimes, [huntId]: totalMs };
+    const updatedHuntIncrements = { ...huntIncrements, [huntId]: newIncrements };
 
-    // Save immediately after settings changes
+    // Apply changes to state
+    setActiveHunts(updatedActiveHunts);
+    setTotalCheckTimes(updatedTotalCheckTimes);
+    setHuntIncrements(updatedHuntIncrements);
+
+    // Save immediately with the updated data (must pass explicitly to avoid stale closure values)
     if (username) {
-      saveHuntData();
+      const huntData = {
+        activeHunts: updatedActiveHunts,
+        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
+        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes).map(([k, v]) => [k, v])),
+        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
+        pausedHunts: Array.from(pausedHunts),
+        huntIncrements: Object.fromEntries(Object.entries(updatedHuntIncrements).map(([k, v]) => [k, v]))
+      };
+      saveHuntData(huntData);
     }
 
     // Close modal with animation
@@ -2562,14 +2619,36 @@ export default function Counters() {
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Adjust Encounter Count
                   </label>
-                  <input
-                    type="number"
-                    value={settingsForm.manualChecks}
-                    onChange={(e) => setSettingsForm(prev => ({ ...prev, manualChecks: e.target.value }))}
-                    className="w-full px-3 py-2 bg-[var(--searchbar-bg)] border border-[var(--border-color)] rounded-lg text-white focus:outline-none focus:border-[var(--accent)]"
-                    placeholder="Enter encounter count"
-                    min="0"
-                  />
+                  <div className="settings-number-input-wrapper">
+                    <input
+                      type="number"
+                      value={settingsForm.manualChecks}
+                      onChange={(e) => setSettingsForm(prev => ({ ...prev, manualChecks: e.target.value }))}
+                      className="settings-number-input"
+                      placeholder="Enter encounter count"
+                      min="0"
+                    />
+                    <div className="settings-number-buttons">
+                      <button
+                        type="button"
+                        className="settings-number-btn settings-number-btn-up"
+                        onClick={() => setSettingsForm(prev => ({ ...prev, manualChecks: String(Math.max(0, (parseInt(prev.manualChecks) || 0) + 1)) }))}
+                      >
+                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
+                          <path d="M5 0L10 6H0L5 0Z" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        className="settings-number-btn settings-number-btn-down"
+                        onClick={() => setSettingsForm(prev => ({ ...prev, manualChecks: String(Math.max(0, (parseInt(prev.manualChecks) || 0) - 1)) }))}
+                      >
+                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
+                          <path d="M5 6L0 0H10L5 6Z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <div>
@@ -2589,14 +2668,36 @@ export default function Counters() {
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Adjust Increments
                   </label>
-                  <input
-                    type="number"
-                    value={settingsForm.manualIncrements}
-                    onChange={(e) => setSettingsForm(prev => ({ ...prev, manualIncrements: e.target.value }))}
-                    className="w-full px-3 py-2 bg-[var(--searchbar-bg)] border border-[var(--border-color)] rounded-lg text-white focus:outline-none focus:border-[var(--accent)]"
-                    placeholder="Enter increment value (default: 1)"
-                    min="1"
-                  />
+                  <div className="settings-number-input-wrapper">
+                    <input
+                      type="number"
+                      value={settingsForm.manualIncrements}
+                      onChange={(e) => setSettingsForm(prev => ({ ...prev, manualIncrements: e.target.value }))}
+                      className="settings-number-input"
+                      placeholder="Enter increment value (default: 1)"
+                      min="1"
+                    />
+                    <div className="settings-number-buttons">
+                      <button
+                        type="button"
+                        className="settings-number-btn settings-number-btn-up"
+                        onClick={() => setSettingsForm(prev => ({ ...prev, manualIncrements: String(Math.max(1, (parseInt(prev.manualIncrements) || 1) + 1)) }))}
+                      >
+                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
+                          <path d="M5 0L10 6H0L5 0Z" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        className="settings-number-btn settings-number-btn-down"
+                        onClick={() => setSettingsForm(prev => ({ ...prev, manualIncrements: String(Math.max(1, (parseInt(prev.manualIncrements) || 1) - 1)) }))}
+                      >
+                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
+                          <path d="M5 6L0 0H10L5 6Z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
                   <p className="text-xs text-gray-400 mt-1">
                     How many encounters to add each time you click the + button
                   </p>

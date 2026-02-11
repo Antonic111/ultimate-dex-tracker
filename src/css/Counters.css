@@ -179,7 +179,8 @@
 }
 
 .hunt-reset-btn {
-  background: #f59e0b; /* Orange color for reset button */
+  background: #f59e0b;
+  /* Orange color for reset button */
   color: white;
   border: none;
   border-radius: 6px;
@@ -197,7 +198,8 @@
 }
 
 .hunt-settings-btn {
-  background: #8b5cf6; /* Purple color for settings button */
+  background: #8b5cf6;
+  /* Purple color for settings button */
   color: white;
   border: none;
   border-radius: 6px;
@@ -651,7 +653,7 @@
   font-weight: bold;
   color: var(--accent);
   margin: 0;
-  text-shadow: 0 4px 1px rgba(0,0,0,0.8);
+  text-shadow: 0 4px 1px rgba(0, 0, 0, 0.8);
 }
 
 .hunt-pokemon-number {
@@ -1515,6 +1517,7 @@
   --fav-size: 90px;
   --fav-gap: 10px;
 }
+
 /* Backdrop */
 .pokemon-modal-backdrop {
   position: fixed;
@@ -1541,7 +1544,7 @@
   width: 85%;
   max-width: 650px;
   background-color: var(--profile-modal-bg);
-  transition: background-color var(--transition-speed );
+  transition: background-color var(--transition-speed);
   border-radius: 12px;
   padding: 18px;
   position: relative;
@@ -1560,6 +1563,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -1569,6 +1573,7 @@
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
@@ -1579,6 +1584,7 @@
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -1590,6 +1596,7 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+
   to {
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
@@ -1602,7 +1609,8 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  position: relative; /* for hover preview positioning */
+  position: relative;
+  /* for hover preview positioning */
 }
 
 .pokemon-modal-header {
@@ -1627,7 +1635,7 @@
 }
 
 .close-btn .sidebar-close-icon svg {
-  
+
   transition: transform 0.18s, filter 0.18s;
 }
 
@@ -1690,7 +1698,7 @@
 
 .pokemon-item {
   background: var(--profile-modal-boxes);
-  transition: background var(--transition-speed );
+  transition: background var(--transition-speed);
   box-shadow: 0 3px 5px #000b;
   border: 2px solid transparent;
   border-radius: 6px;
@@ -1728,7 +1736,7 @@
 .pokemon-label {
   font-size: 0.75rem;
   color: var(--profile-text);
-  transition: color var(--transition-speed );
+  transition: color var(--transition-speed);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1785,7 +1793,7 @@
     max-height: 80vh;
     padding: 15px;
   }
-  
+
   .pokemon-grid {
     grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
     gap: 8px;
@@ -1793,23 +1801,23 @@
     margin-left: 0;
     grid-auto-rows: 70px;
   }
-  
+
   .pokemon-item {
     height: 70px;
     max-height: 70px;
     width: 70px;
     min-width: 70px;
   }
-  
+
   .pokemon-img {
     width: 36px;
     height: 36px;
   }
-  
+
   .pokemon-label {
     font-size: 0.55rem;
   }
-  
+
   .pokemon-form {
     font-size: 0.4rem;
   }
@@ -1821,7 +1829,7 @@
     max-width: 98vw;
     padding: 12px;
   }
-  
+
   .pokemon-grid {
     grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
     gap: 6px;
@@ -1829,23 +1837,23 @@
     margin-left: 0;
     grid-auto-rows: 65px;
   }
-  
+
   .pokemon-item {
     height: 65px;
     max-height: 65px;
     width: 65px;
     min-width: 65px;
   }
-  
+
   .pokemon-img {
     width: 32px;
     height: 32px;
   }
-  
+
   .pokemon-label {
     font-size: 0.5rem;
   }
-  
+
   .pokemon-form {
     font-size: 0.35rem;
   }
@@ -1887,6 +1895,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -1897,6 +1906,7 @@
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -1916,42 +1926,42 @@
   .counters-page {
     padding: 15px;
   }
-  
+
   .page-title {
     font-size: 2rem;
   }
-  
+
   .pokemon-card {
     padding: 0.75rem;
   }
-  
-  
+
+
   .hunts-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .hunt-card {
     padding: 1rem;
   }
-  
+
   .hunt-header {
     flex-direction: row;
     align-items: center;
     gap: 0.75rem;
     flex-wrap: wrap;
   }
-  
+
   .hunt-pokemon {
     flex: 1;
     min-width: 200px;
   }
-  
+
   .hunt-actions {
     flex: 0 0 auto;
     transform: scale(0.9);
   }
-  
+
   /* Mobile styles for expanded hunt view (info mode) */
   .hunt-header .hunt-actions.expanded-view {
     display: grid;
@@ -1960,18 +1970,18 @@
     transform: scale(0.9);
     flex: 0 0 auto;
   }
-  
+
   .hunt-pokemon-image {
     width: 90px;
     height: 90px;
   }
-  
+
   /* Ensure hunt details don't interfere with button layout */
   .hunt-details {
     margin: 0;
     flex: 1;
   }
-  
+
   /* Mobile hunt-checks adjustments */
   .hunt-checks {
     flex-direction: row;
@@ -1981,19 +1991,19 @@
     padding: 0.75rem;
     flex-wrap: wrap;
   }
-  
+
   .checks-display {
     width: auto;
     flex-shrink: 0;
     order: 1;
   }
-  
+
   .checks-count {
     font-size: 1.6rem;
     width: 3.5rem;
     padding: 0.2rem 0.4rem;
   }
-  
+
   .timer-display {
     width: auto;
     margin-left: 0;
@@ -2003,7 +2013,7 @@
     min-width: 4rem;
     order: 2;
   }
-  
+
   .checks-buttons {
     min-width: auto;
     flex-shrink: 0;
@@ -2011,87 +2021,87 @@
     order: 3;
     margin-left: auto;
   }
-  
+
   .pause-btn,
   .add-check-btn {
     padding: 0.4rem 0.8rem;
     font-size: 0.85rem;
   }
-  
+
   .hunt-complete {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .hunt-odds-display {
     width: 100%;
     justify-content: center;
   }
-  
+
   .complete-hunt-btn {
     width: 100%;
   }
-  
+
   /* Mobile add-hunt-card adjustments */
   .add-hunt-card {
     min-height: 280px;
   }
-  
+
   .add-hunt-icon {
     width: 60px;
     height: 60px;
   }
-  
+
   .add-hunt-content h3 {
     font-size: 1.1rem;
   }
-  
+
   .counters-page .search-input-wrap {
     min-width: 100%;
   }
-  
+
   .counters-page .search-row {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .modal-overlay {
     padding: 0.5rem;
   }
-  
+
   .hunt-modal {
     max-height: 95vh;
   }
-  
+
   .modal-header,
   .modal-content,
   .modal-footer {
     padding: 1rem;
   }
-  
-  
+
+
   .pokemon-modal {
     width: 95%;
     height: 70vh;
     max-height: 70vh;
     padding: 15px;
   }
-  
-  
-  
+
+
+
   .empty-state {
     min-height: 300px;
     padding: 1rem;
   }
-  
+
   .empty-state-content h3 {
     font-size: 1.25rem;
   }
-  
+
   .empty-state-content p {
     font-size: 0.9rem;
   }
-  
+
   /* Mobile hunt modal Pokemon name */
   .hunt-pokemon-name {
     font-size: 1.8rem;
@@ -2105,17 +2115,17 @@
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
-  
+
   .hunt-pokemon {
     min-width: 100px;
     max-width: 120px;
   }
-  
+
   .hunt-pokemon-image {
     width: 50px;
     height: 50px;
   }
-  
+
   .hunt-pokemon-name {
     font-size: 1.8rem !important;
     line-height: 1.2 !important;
@@ -2124,7 +2134,7 @@
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
   }
-  
+
   .hunt-pokemon-info h3 {
     font-size: 0.95rem !important;
     line-height: 1.1 !important;
@@ -2133,12 +2143,12 @@
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
   }
-  
+
   .hunt-actions {
     gap: 0.25rem;
     transform: scale(0.85) !important;
   }
-  
+
   /* Extra small screen styles for expanded hunt view */
   .hunt-actions.expanded-view {
     display: grid;
@@ -2146,7 +2156,7 @@
     grid-template-rows: 1fr 1fr;
     transform: scale(0.85) !important;
   }
-  
+
   .hunt-delete-btn,
   .hunt-reset-btn,
   .hunt-settings-btn,
@@ -2158,7 +2168,7 @@
     min-width: 32px !important;
     min-height: 32px !important;
   }
-  
+
   .hunt-delete-btn svg,
   .hunt-reset-btn svg,
   .hunt-settings-btn svg,
@@ -2167,34 +2177,34 @@
     width: 16px !important;
     height: 16px !important;
   }
-  
+
   /* Extra small screen hunt-checks adjustments */
   .hunt-checks {
     padding: 0.5rem;
     gap: 0.25rem;
   }
-  
+
   .checks-count {
     font-size: 1.4rem;
     width: 3rem;
     padding: 0.15rem 0.3rem;
   }
-  
+
   .timer-display {
     min-width: 3.5rem;
     font-size: 0.7rem;
   }
-  
+
   .pause-btn,
   .add-check-btn {
     padding: 0.3rem 0.6rem;
     font-size: 0.75rem;
   }
-  
+
   .checks-buttons {
     gap: 0.25rem;
   }
-  
+
   .decrease-check-btn {
     display: flex;
     background: #ef4444;
@@ -2216,38 +2226,38 @@
     z-index: auto;
     box-shadow: none;
   }
-  
+
   .decrease-check-btn svg {
     width: 12px;
     height: 12px;
     stroke-width: 2;
   }
-  
+
   .decrease-check-btn:hover {
     transform: translateY(-2px) scale(1.05);
   }
-  
+
   .decrease-check-btn:disabled {
     background: #6b7280;
     cursor: not-allowed;
     transform: none;
   }
-  
+
   .decrease-check-btn:disabled:hover {
     transform: none;
     background: #6b7280;
   }
-  
+
   /* Extra small screen add-hunt-card adjustments */
   .add-hunt-card {
     min-height: 240px;
   }
-  
+
   .add-hunt-icon {
     width: 50px;
     height: 50px;
   }
-  
+
   .add-hunt-content h3 {
     font-size: 1rem;
   }
@@ -2255,13 +2265,16 @@
 
 /* Active Hunt Styling */
 .pokemon-item.hunt-active {
-  background: linear-gradient(135deg, #00d4aa 0%, #00a8cc 100%); /* Teal gradient for active hunts */
-  border-color: #00a8cc; /* Teal border */
+  background: linear-gradient(135deg, #00d4aa 0%, #00a8cc 100%);
+  /* Teal gradient for active hunts */
+  border-color: #00a8cc;
+  /* Teal border */
   box-shadow: 0 4px 12px rgba(0, 212, 170, 0.3);
 }
 
 .pokemon-item.hunt-active:hover {
-  background: linear-gradient(135deg, #00a8cc 0%, #00d4aa 100%); /* Reversed teal gradient on hover */
+  background: linear-gradient(135deg, #00a8cc 0%, #00d4aa 100%);
+  /* Reversed teal gradient on hover */
   box-shadow: 0 6px 16px rgba(0, 212, 170, 0.4);
 }
 
@@ -2310,4 +2323,84 @@
 .hunt-actions .hunt-info-btn {
   grid-column: 2;
   grid-row: 2;
+}
+
+/* Custom Number Input for Settings Modal */
+.settings-number-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.settings-number-input {
+  width: 100%;
+  padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+  background: var(--searchbar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+  /* Hide default spinner buttons */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.settings-number-input::-webkit-outer-spin-button,
+.settings-number-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.settings-number-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.settings-number-input::placeholder {
+  color: #6b7280;
+}
+
+.settings-number-buttons {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  height: calc(100% - 8px);
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.settings-number-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  flex: 1;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+  color: black;
+  transition: background-color 0.1s ease;
+  padding: 0;
+}
+
+.settings-number-btn:hover {
+  background: var(--accent-hover);
+  color: white;
+}
+
+.settings-number-btn:active {
+  background: var(--accent);
+  filter: brightness(0.7);
+}
+
+.settings-number-btn svg {
+  width: 8px;
+  height: 5px;
+  pointer-events: none;
 }

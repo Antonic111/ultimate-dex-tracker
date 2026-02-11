@@ -158,8 +158,9 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
     // Sync bars when saved bars updates
     useEffect(() => {
         // Only update if the actual data has changed
-        const progressBarsChanged = prevProgressBarsOverride.current !== progressBarsOverride;
-        const contextBarsChanged = prevContextSavedBars.current !== contextSavedBars;
+        // Use JSON.stringify for deep comparison to avoid infinite loops when parent passes new array references with same content
+        const progressBarsChanged = JSON.stringify(prevProgressBarsOverride.current) !== JSON.stringify(progressBarsOverride);
+        const contextBarsChanged = JSON.stringify(prevContextSavedBars.current) !== JSON.stringify(contextSavedBars);
 
         if (!progressBarsChanged && !contextBarsChanged) {
             return; // No changes, skip update

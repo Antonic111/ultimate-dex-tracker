@@ -295,6 +295,20 @@ function RequireAuth({ loading, authReady, user, children }) {
 }
 
 
+// Component to handle sidebar closing on route change
+// Defined outside App to prevent remounting/infinite loops
+function CloseSidebarOnRouteChange({ setSidebarOpen, setSelectedPokemon, sidebarOpen, selectedPokemon }) {
+  const location = useLocation();
+  useEffect(() => {
+    const isDex = location.pathname === "/" || location.pathname.startsWith("/dex");
+    if (!isDex) {
+      if (sidebarOpen) setSidebarOpen(false);
+      if (selectedPokemon) setSelectedPokemon(null);
+    }
+  }, [location.pathname, setSidebarOpen, setSelectedPokemon, sidebarOpen, selectedPokemon]);
+  return null;
+}
+
 export default function App() {
   const [user, setUser] = useState({
     username: null,
@@ -600,7 +614,7 @@ export default function App() {
     return updated;
   });
 
-  // Load external link preference when user changes
+  // Load external link preference and dex preferences from server when user changes
   useEffect(() => {
     if (user?.username) {
       (async () => {
@@ -610,8 +624,37 @@ export default function App() {
           setExternalLinkPreference(preference);
           // Also save to localStorage as backup
           localStorage.setItem('externalLinkPreference', preference);
+
+          // Load dex preferences from server and update state
+          // This ensures lock settings (Lock Unobtainable Shinies, Lock GO Exclusive Shinies,
+          // Lock NO OT Exclusive Shinies) are applied on initial page load
+          if (data?.dexPreferences) {
+            let serverPrefs = { ...data.dexPreferences };
+
+            // Migration: Convert old blockGOAndNOOTExclusiveShinies to new separate preferences
+            if (serverPrefs.blockGOAndNOOTExclusiveShinies !== undefined &&
+              serverPrefs.blockGOExclusiveShinies === undefined &&
+              serverPrefs.blockNOOTExclusiveShinies === undefined) {
+              if (serverPrefs.blockGOAndNOOTExclusiveShinies === true) {
+                serverPrefs.blockGOExclusiveShinies = true;
+                serverPrefs.blockNOOTExclusiveShinies = true;
+              } else {
+                serverPrefs.blockGOExclusiveShinies = false;
+                serverPrefs.blockNOOTExclusiveShinies = false;
+              }
+              delete serverPrefs.blockGOAndNOOTExclusiveShinies;
+            }
+
+            const defaultPrefs = getDexPreferences(); // Get defaults merged with localStorage
+            const mergedPrefs = { ...defaultPrefs, ...serverPrefs };
+            setCurrentDexPreferences(mergedPrefs);
+            // Update localStorage so it stays in sync with server
+            localStorage.setItem('dexPreferences', JSON.stringify(mergedPrefs));
+            // Also refresh dex sections in case form preferences changed
+            setDexSections(createDexSections());
+          }
         } catch (error) {
-          console.error('Failed to load external link preference:', error);
+          console.error('Failed to load profile preferences:', error);
         }
       })();
     }
@@ -1112,19 +1155,11 @@ export default function App() {
 
       return true;
     });
+
+
+
   }, [caught, caughtInfoMap, currentDexPreferences, filters, showForms]);
 
-  function CloseSidebarOnRouteChange() {
-    const location = useLocation();
-    useEffect(() => {
-      const isDex = location.pathname === "/" || location.pathname.startsWith("/dex");
-      if (!isDex) {
-        setSidebarOpen(false);
-        setSelectedPokemon(null);
-      }
-    }, [location.pathname]);
-    return null;
-  }
 
 
 
@@ -1562,7 +1597,12 @@ export default function App() {
           <MessageProvider>
             <Router>
               <div className="flex flex-col min-h-screen">
-                <CloseSidebarOnRouteChange />
+                <CloseSidebarOnRouteChange
+                  setSidebarOpen={setSidebarOpen}
+                  setSelectedPokemon={setSelectedPokemon}
+                  sidebarOpen={sidebarOpen}
+                  selectedPokemon={selectedPokemon}
+                />
 
                 <HeaderWithConditionalAuth
                   user={user}
@@ -1726,6 +1766,7 @@ export default function App() {
                                   showShiny={showShiny}
                                   onPokemonSelect={setSelectedPokemon}
                                   externalLinkPreference={externalLinkPreference}
+                                  dexPreferences={currentDexPreferences}
                                 />
                               );
                             })()}

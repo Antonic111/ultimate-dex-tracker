@@ -1,9 +1,9 @@
-import { useEffect, useState, useContext, useCallback } from "react";
+import { useEffect, useState, useContext, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Sparkles, Plus, Trash2, ChevronLeft, ChevronRight, Calendar, ChevronUp, ChevronDown, X, RotateCcw } from "lucide-react";
-import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS } from "../../Constants";
+import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS, genderForms } from "../../Constants";
 import EvolutionChain from "../Dex/EvolutionChain";
-import { formatPokemonName, getFormDisplayName, renderTypeBadge } from "../../utils";
+import { formatPokemonName, getFormDisplayName, renderTypeBadge, getRelatedForms } from "../../utils";
 
 import { SearchbarIconDropdown } from "../Shared/SearchBar";
 import ContentFilterInput from "../Shared/ContentFilterInput";
@@ -14,11 +14,104 @@ import { getAvailableGamesForPokemonSidebar } from "../../utils/pokemonAvailabil
 import { getMethodsForGame, getCurrentHuntOdds, getModifiersForGame } from "../../utils/huntSystem";
 import { profileAPI } from "../../utils/api";
 import { UserContext } from "../Shared/UserContext";
+import { filterFormsByPreferences } from "../../utils/dexPreferences";
+import {
+  UNOBTAINABLE_SHINY_DEX_NUMBERS,
+  UNOBTAINABLE_SHINY_FORM_NAMES,
+  GO_EXCLUSIVE_SHINY_DEX_NUMBERS,
+  GO_EXCLUSIVE_SHINY_FORM_NAMES,
+  NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS,
+  NO_OT_EXCLUSIVE_SHINY_FORM_NAMES
+} from "../../data/blockedShinies";
 // import "../../css/EvolutionChain.css"; // Moved to backup folder
 import "../../css/Sidebar.css";
 
 
-export default function PokemonSidebar({ open = false, readOnly = false, pokemon, onClose, caughtInfo, updateCaughtInfo, showShiny, viewingUsername = null, onPokemonSelect = null, externalLinkPreference = 'serebii' }) {
+
+// Helper component for game tags with tooltips using Portal to avoid clipping
+// Helper component for game tags with tooltips using Portal to avoid clipping
+function GameTag({ gameGroup }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const tagRef = useRef(null);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+
+  const updatePosition = () => {
+    if (tagRef.current) {
+      const rect = tagRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.top,
+        left: rect.left + rect.width / 2
+      });
+    }
+  };
+
+  const handleMouseEnter = () => {
+    updatePosition();
+    setShowTooltip(true);
+  };
+
+  return (
+    <>
+      <div
+        ref={tagRef}
+        className={`game-tag ${gameGroup.type === 'pair' ? 'game-tag-pair' : gameGroup.type === 'quad' ? 'game-tag-quad' : 'game-tag-single'} ${showTooltip ? 'show-tooltip' : ''}`}
+        style={{
+          background: gameGroup.type === 'pair'
+            ? `linear-gradient(90deg, ${gameGroup.colors[0]} 50%, ${gameGroup.colors[1]} 50%)`
+            : gameGroup.type === 'quad'
+              ? `linear-gradient(90deg, ${gameGroup.colors[0]} 25%, ${gameGroup.colors[1]} 25%, ${gameGroup.colors[1]} 50%, ${gameGroup.colors[2]} 50%, ${gameGroup.colors[2]} 75%, ${gameGroup.colors[3]} 75%)`
+              : gameGroup.colors[0]
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!showTooltip) updatePosition();
+          setShowTooltip(!showTooltip);
+        }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={() => setShowTooltip(false)}
+      >
+        {gameGroup.displayName}
+      </div>
+      {showTooltip && createPortal(
+        <div
+          style={{
+            position: 'fixed',
+            top: Math.round(coords.top - 10),
+            left: Math.round(coords.left),
+            transform: 'translate(-50%, -100%)',
+            zIndex: 99999,
+            pointerEvents: 'none',
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            color: 'white',
+            padding: '6px 10px',
+            borderRadius: '6px',
+            fontSize: '12px',
+            fontWeight: 500,
+            whiteSpace: 'nowrap',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+            textShadow: 'none',
+            fontFamily: 'sans-serif'
+          }}
+        >
+          {gameGroup.games.join(", ")}
+          {/* Manual Arrow */}
+          <div style={{
+            position: 'absolute',
+            top: '100%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            borderLeft: '6px solid transparent',
+            borderRight: '6px solid transparent',
+            borderTop: '6px solid rgba(0, 0, 0, 0.95)'
+          }} />
+        </div>,
+        document.body
+      )}
+    </>
+  );
+}
+
+export default function PokemonSidebar({ open = false, readOnly = false, pokemon, onClose, caughtInfo, updateCaughtInfo, showShiny, viewingUsername = null, onPokemonSelect = null, externalLinkPreference = 'serebii', dexPreferences = null }) {
   const [closing, setClosing] = useState(false);
   const [editing, setEditing] = useState(false);
   const [selectedEntryIndex, setSelectedEntryIndex] = useState(0);
@@ -132,13 +225,36 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     };
   }, [username, readOnly, loadShinyCharmGames]);
 
-  // Auto-check shiny charm modifier when game is selected
+  // Track the previous game to detect when user manually changes the game selection
+  const prevGameRef = useRef(null);
+  const isLoadingDataRef = useRef(true);
+
+  // Reset refs when pokemon or caughtInfo changes (new sidebar opened or new entry created)
   useEffect(() => {
-    if (!readOnly && editData.game && shinyCharmGames.includes(editData.game)) {
-      setEditData(prev => ({
-        ...prev,
-        modifiers: { ...prev.modifiers, shinyCharm: true }
-      }));
+    prevGameRef.current = null;
+    isLoadingDataRef.current = true;
+  }, [pokemon, caughtInfo]);
+
+  // Auto-check shiny charm when user manually changes the game (not when loading data)
+  useEffect(() => {
+    // If we're loading data, just record the current value and mark as done loading
+    if (isLoadingDataRef.current) {
+      prevGameRef.current = editData.game;
+      isLoadingDataRef.current = false;
+      return;
+    }
+
+    // If the game changed, this is a user action - apply auto-check
+    if (prevGameRef.current !== editData.game && editData.game) {
+      prevGameRef.current = editData.game;
+
+      // Auto-check shiny charm if user has this game in their shiny charm list
+      if (!readOnly && shinyCharmGames.includes(editData.game)) {
+        setEditData(prev => ({
+          ...prev,
+          modifiers: { ...prev.modifiers, shinyCharm: true }
+        }));
+      }
     }
   }, [editData.game, shinyCharmGames, readOnly]);
 
@@ -406,25 +522,31 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   // The sidebar now works naturally with page scrolling
 
   // Lightweight mobile scroll prevention - only when sidebar is fully open
+  // Lightweight mobile scroll prevention - only when sidebar is fully open
   useEffect(() => {
-    if (window.innerWidth <= 768) {
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
       if (open && !closing) {
         // Only prevent scrolling when sidebar is fully open (not during animations)
         document.body.classList.add('sidebar-open');
+        document.documentElement.classList.add('sidebar-open');
       } else {
         // Allow scrolling during closing animation and when closed
         document.body.classList.remove('sidebar-open');
+        document.documentElement.classList.remove('sidebar-open');
       }
+    } else {
+      // Ensure classes are removed if resized to desktop or not mobile
+      document.body.classList.remove('sidebar-open');
+      document.documentElement.classList.remove('sidebar-open');
     }
   }, [open, closing]);
 
   // Cleanup effect to ensure CSS class is removed on unmount
   useEffect(() => {
     return () => {
-      // Clean up if component unmounts while sidebar is open
-      if (window.innerWidth <= 768) {
-        document.body.classList.remove('sidebar-open');
-      }
+      document.body.classList.remove('sidebar-open');
+      document.documentElement.classList.remove('sidebar-open');
     };
   }, []);
 
@@ -1966,25 +2088,154 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             <div className="available-games-divider"></div>
             <div className="available-games-grid">
               {getGroupedGames(getAvailableGames(pokemon)).map((gameGroup, index) => (
-                <div
+                <GameTag
                   key={`${gameGroup.displayName}-${index}`}
-                  className={`game-tag ${gameGroup.type === 'pair' ? 'game-tag-pair' : gameGroup.type === 'quad' ? 'game-tag-quad' : 'game-tag-single'}`}
-                  style={{
-                    background: gameGroup.type === 'pair'
-                      ? `linear-gradient(90deg, ${gameGroup.colors[0]} 50%, ${gameGroup.colors[1]} 50%)`
-                      : gameGroup.type === 'quad'
-                        ? `linear-gradient(90deg, ${gameGroup.colors[0]} 25%, ${gameGroup.colors[1]} 25%, ${gameGroup.colors[1]} 50%, ${gameGroup.colors[2]} 50%, ${gameGroup.colors[2]} 75%, ${gameGroup.colors[3]} 75%)`
-                        : gameGroup.colors[0]
-                  }}
-                >
-                  {gameGroup.displayName}
-                </div>
+                  gameGroup={gameGroup}
+                />
               ))}
             </div>
           </div>
         )}
 
         {pokemon && <EvolutionChain pokemon={pokemon} showShiny={showShiny} onPokemonSelect={onPokemonSelect} />}
+
+        {/* Related Forms Section */}
+        {pokemon && (() => {
+          let relatedForms = getRelatedForms(pokemon);
+
+          // Apply filtering based on preferences
+          if (dexPreferences) {
+            // Filter by form types (Gender, Alolan, etc.)
+            relatedForms = filterFormsByPreferences(relatedForms, dexPreferences);
+
+            // Filter by locked shinies if showing shiny
+            if (showShiny) {
+              const {
+                blockUnobtainableShinies,
+                blockGOExclusiveShinies,
+                blockNOOTExclusiveShinies
+              } = dexPreferences;
+
+              relatedForms = relatedForms.filter(form => {
+                const paddedId = String(form.id).padStart(4, '0');
+                const formName = form.name;
+
+                // Check Unobtainable Shinies
+                if (blockUnobtainableShinies) {
+                  if (UNOBTAINABLE_SHINY_DEX_NUMBERS.includes(paddedId)) return false;
+                  if (UNOBTAINABLE_SHINY_FORM_NAMES.includes(formName)) return false;
+                }
+
+                // Check GO Exclusive Shinies
+                if (blockGOExclusiveShinies) {
+                  if (GO_EXCLUSIVE_SHINY_DEX_NUMBERS.includes(paddedId)) return false;
+                  if (GO_EXCLUSIVE_SHINY_FORM_NAMES.includes(formName)) return false;
+                }
+
+                // Check NO OT Exclusive Shinies
+                if (blockNOOTExclusiveShinies) {
+                  if (NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.includes(paddedId)) return false;
+                  if (NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.includes(formName)) return false;
+                }
+
+                return true;
+              });
+            }
+          }
+
+          if (relatedForms.length === 0) return null;
+
+          return (
+            <div className="related-forms-section">
+              <div className="related-forms-title">Related Forms</div>
+              <div className="related-forms-divider"></div>
+              <div className="related-forms-grid">
+                {relatedForms.map((form, index) => {
+                  const imgSrc = showShiny && form.sprites?.front_shiny
+                    ? form.sprites.front_shiny
+                    : form.sprites?.front_default;
+
+                  const formLabel = getFormDisplayName(form) || formatPokemonName(form.name);
+                  const isClickable = onPokemonSelect !== null;
+
+                  // Determine overlay icon (Single Priority)
+                  let iconSrc = null;
+                  let iconColor = "#6b7280";
+                  let iconPadding = "2px";
+
+                  // Check attributes
+                  const isAlpha = form.formType === 'alpha' || form.formType === 'alphaother' || (form.name && form.name.includes('-alpha'));
+                  const isGmax = form.formType === 'gmax' || (form.name && form.name.includes('-gmax'));
+
+                  let nameToCheck = form.name || "";
+                  if (nameToCheck.includes("-alpha")) nameToCheck = nameToCheck.replace("-alpha", "");
+
+                  const isFemale = form.formType === 'gender' || (form.formType === 'alphaother' && form.stableId && form.stableId.includes('female')) || (form.name && form.name.includes('-female'));
+                  const isMale = !isFemale && ((form.name && form.name.includes('-male')) || (form.stableId && form.stableId.includes('male')) || genderForms.includes(nameToCheck));
+
+                  if (isAlpha) {
+                    if (isFemale) {
+                      iconSrc = "/data/SidebarIcons/Alpha_Mark_Female.png";
+                      iconColor = "#ef6491";
+                      iconPadding = "2px";
+                    } else if (isMale) {
+                      iconSrc = "/data/SidebarIcons/Alpha_Mark_Male.png";
+                      iconColor = "#316497";
+                      iconPadding = "2px";
+                    } else {
+                      iconSrc = "/data/SidebarIcons/Alpha_Mark.png";
+                      iconColor = "#e05555";
+                      iconPadding = "2px";
+                    }
+                  } else {
+                    if (isFemale) {
+                      iconSrc = "/data/SidebarIcons/Female.svg";
+                      iconColor = "#ef6491";
+                      iconPadding = "5px";
+                    } else if (isMale) {
+                      iconSrc = "/data/SidebarIcons/Male.svg";
+                      iconColor = "#316497";
+                      iconPadding = "5px";
+                    }
+                  }
+
+                  return (
+                    <div
+                      key={form.stableId || `${form.id}-${form.name}`}
+                      className={`evo-sprite ${isClickable ? 'evo-sprite-clickable' : ''}`}
+                      onClick={() => isClickable && onPokemonSelect(form)}
+                      style={{ cursor: isClickable ? 'pointer' : 'default' }}
+                    >
+                      <img
+                        src={imgSrc}
+                        alt={form.name}
+                        title={formLabel}
+                        className="evo-img"
+                        width={44}
+                        height={44}
+                        style={{ padding: isGmax ? '5px' : '0', objectFit: 'contain' }}
+                      />
+                      {iconSrc && (
+                        <div
+                          className="form-icon-overlay"
+                          style={{
+                            borderColor: iconColor,
+                            padding: iconPadding,
+                            top: '-6px',
+                            right: '-6px'
+                          }}
+                        >
+                          <img src={iconSrc} alt="Form Icon" />
+                        </div>
+                      )}
+                      <span className="related-form-tooltip">{formLabel}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
 
       </div>
 

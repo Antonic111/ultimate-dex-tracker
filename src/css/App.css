@@ -451,9 +451,12 @@ body {
   }
 
   /* Prevent scrolling when sidebar is open on mobile */
+  /* Prevent scrolling when sidebar is open on mobile */
+  html.sidebar-open,
   body.sidebar-open {
     /* Only prevent scrolling of the main page, not the sidebar */
     overflow: hidden !important;
+    overscroll-behavior: none !important;
     /* Don't use touch-action: none as it's too aggressive */
   }
 

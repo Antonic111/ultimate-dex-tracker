@@ -1,8 +1,10 @@
 /* Sidebar Styles using Tailwind @apply */
 
 .sidebar-container {
-  @apply fixed right-0 top-0 h-full w-full md:w-80 lg:w-96 z-50 overflow-y-auto shadow-[-6px_0_24px_rgba(0,0,0,0.75)];
+  @apply fixed right-0 top-0 h-full w-full md:w-80 lg:w-96 overflow-y-auto;
+  z-index: 2000 !important;
   background-color: var(--sidebar-bg);
+  box-shadow: -6px 0 24px rgba(0, 0, 0, 0.75);
 }
 
 /* Desktop: Start sidebar after scrollbar background */
@@ -17,7 +19,25 @@
 }
 
 .sidebar-close-icon {
-  @apply hover:drop-shadow-[0_0_2px_rgba(255,255,255,0.9)] md:hover:drop-shadow-[0_0_3px_rgba(255,255,255,1)] md:hover:-rotate-[30deg] md:hover:scale-110 lg:hover:drop-shadow-[0_0_4px_rgba(255,255,255,1)] lg:hover:-rotate-[30deg] lg:hover:scale-110 transition-all duration-200;
+  @apply transition-all duration-200;
+}
+
+.sidebar-close-icon:hover {
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.9));
+}
+
+@media (min-width: 768px) {
+  .sidebar-close-icon:hover {
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 1));
+    transform: rotate(-30deg) scale(1.1);
+  }
+}
+
+@media (min-width: 1024px) {
+  .sidebar-close-icon:hover {
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 1));
+    transform: rotate(-30deg) scale(1.1);
+  }
 }
 
 .sidebar-header {
@@ -50,7 +70,8 @@
 }
 
 .sidebar-pokemon-name {
-  @apply text-3xl font-bold text-[var(--accent)] drop-shadow-[0_4px_1px_rgba(0,0,0,0.8)];
+  @apply text-3xl font-bold text-[var(--accent)];
+  filter: drop-shadow(0 4px 1px rgba(0, 0, 0, 0.8));
 }
 
 .sidebar-pokemon-name-link {
@@ -60,7 +81,7 @@
 }
 
 .sidebar-pokemon-name-link:hover .sidebar-pokemon-name {
-  @apply drop-shadow-[0_4px_1px_rgba(0,0,0,0.8)];
+  filter: drop-shadow(0 4px 1px rgba(0, 0, 0, 0.8));
 }
 
 .sidebar-meta-section {
@@ -116,17 +137,17 @@
 }
 
 .sidebar-input {
-    @apply w-full px-3 rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-opacity-50 transition-all duration-200;
-    background-color: var(--sidebar-edit-inputs);
-    border: 1px solid var(--border-color);
-    color: var(--sidebar-text);
-    height: 36px;
-    min-height: 36px;
-    max-height: 36px;
-    padding: 8px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
+  @apply w-full px-3 rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-opacity-50 transition-all duration-200;
+  background-color: var(--sidebar-edit-inputs);
+  border: 1px solid var(--border-color);
+  color: var(--sidebar-text);
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  padding: 8px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 
 .sidebar-input::placeholder {
@@ -151,7 +172,7 @@
     max-height: 36px !important;
     padding: 4px 8px !important;
   }
-  
+
   .sidebar-container .mobile-dropdown-field input {
     height: 24px !important;
     min-height: 24px !important;
@@ -159,12 +180,12 @@
     line-height: 24px !important;
     font-size: 13px !important;
   }
-  
+
   .sidebar-container .mobile-dropdown-field img {
     width: 16px !important;
     height: 16px !important;
   }
-  
+
   .sidebar-container .mobile-dropdown-field button {
     padding: 2px !important;
   }
@@ -335,7 +356,7 @@
 
 /* Animation classes */
 .sidebar-slide-in {
-  @apply animate-[slideInSidebar_0.37s_cubic-bezier(.65,0,.35,1)_both];
+  animation: slideInSidebar 0.37s cubic-bezier(.65, 0, .35, 1) both;
 }
 
 /* Checks arrows spacing - make them closer vertically */
@@ -362,7 +383,7 @@
 }
 
 .sidebar-slide-out {
-  @apply animate-[slideOutSidebar_0.37s_cubic-bezier(.65,0,.35,1)_both];
+  animation: slideOutSidebar 0.37s cubic-bezier(.65, 0, .35, 1) both;
 }
 
 /* Override placeholder colors for all sidebar form elements */
@@ -543,6 +564,7 @@
 
 /* Mobile-specific styling */
 @media (max-width: 768px) {
+
   /* Make all sidebar inputs 48px on mobile to match dropdowns */
   .sidebar-container .sidebar-input {
     height: 48px !important;
@@ -550,7 +572,7 @@
     max-height: 48px !important;
     padding: 12px !important;
   }
-  
+
   /* Align checks arrows with other field icons on mobile */
   .sidebar-container .checks-arrows,
   .sidebar-container .flex.flex-col.gap-0 {
@@ -563,7 +585,7 @@
     top: 0 !important;
     transform: none !important;
   }
-  
+
   .sidebar-container .checks-arrows button,
   .sidebar-container .flex.flex-col.gap-0 button {
     height: 20px !important;
@@ -578,18 +600,18 @@
     align-items: center !important;
     justify-content: center !important;
   }
-  
+
   /* Mobile-specific date input styling */
   .sidebar-container input[type="date"] {
     /* Remove appearance override to let mobile browsers handle it naturally */
     /* -webkit-appearance: none; */
     /* -moz-appearance: none; */
     /* appearance: none; */
-    
-      /* Ensure consistent height with other fields */
-  height: 48px;
-  min-height: 48px;
-  max-height: 48px;
+
+    /* Ensure consistent height with other fields */
+    height: 48px;
+    min-height: 48px;
+    max-height: 48px;
     /* Make sure the input is visible */
     background-color: var(--sidebar-bg) !important;
     color: var(--searchbar-placeholder-text) !important;
@@ -597,42 +619,43 @@
     border: 2px solid var(--border-color);
     border-radius: 8px;
     padding: 12px;
-    font-size: 16px; /* Prevent zoom on iOS */
+    font-size: 16px;
+    /* Prevent zoom on iOS */
     /* Ensure the input is visible on mobile */
     opacity: 1 !important;
     visibility: visible !important;
     display: block !important;
   }
-  
-        /* Mobile calendar picker styling - keep functionality but hide indicator */
-    .sidebar-container input[type="date"]::-webkit-calendar-picker-indicator {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    
-    .sidebar-container input[type="date"]::-moz-calendar-picker-indicator {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    
-    .sidebar-container input[type="date"]::-ms-calendar-picker-indicator {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-  
-     /* Additional mobile-specific overrides */
-   .sidebar-container input[type="date"] {
-     /* Keep natural appearance on mobile for better functionality */
-   }
-  
+
+  /* Mobile calendar picker styling - keep functionality but hide indicator */
+  .sidebar-container input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .sidebar-container input[type="date"]::-moz-calendar-picker-indicator {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .sidebar-container input[type="date"]::-ms-calendar-picker-indicator {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  /* Additional mobile-specific overrides */
+  .sidebar-container input[type="date"] {
+    /* Keep natural appearance on mobile for better functionality */
+  }
+
   /* Ensure the date input shows placeholder-like behavior on mobile */
   .sidebar-container input[type="date"]:not([value]) {
     color: var(--searchbar-placeholder-text) !important;
   }
-  
+
   /* Force mobile browsers to show the date input */
   .sidebar-container input[type="date"] {
     -webkit-user-select: text;
@@ -640,7 +663,7 @@
     -ms-user-select: text;
     user-select: text;
   }
-  
+
   /* Make textarea inputs bigger on mobile */
   .sidebar-container textarea,
   .sidebar-container .sidebar-input[type="textarea"] {
@@ -649,7 +672,7 @@
     max-height: 120px !important;
     padding: 16px !important;
   }
-  
+
   /* Ensure checkboxes are visible and properly sized on mobile */
   .sidebar-container input[type="checkbox"] {
     width: 20px !important;
@@ -708,7 +731,7 @@
   min-width: 2rem;
   text-align: center;
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; Removed to allow tooltip to extend outside */
   color: white !important;
 }
 
@@ -736,6 +759,42 @@
   background-size: 100% 100%;
 }
 
+.game-tag-tooltip {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.95);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.375rem 0.625rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  text-transform: none;
+  text-shadow: none;
+  line-height: 1.4;
+}
+
+.game-tag-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.95);
+}
+
+.game-tag:hover .game-tag-tooltip,
+.game-tag.show-tooltip .game-tag-tooltip {
+  display: block;
+}
+
 /* Fix for black text on light backgrounds */
 .game-tag[style*="color: black"] {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 1), 0 2px 4px rgba(0, 0, 0, 1), 0 3px 8px rgba(0, 0, 0, 1), 0 -1px 2px rgba(0, 0, 0, 1), 0 -2px 4px rgba(0, 0, 0, 1), 0 -3px 8px rgba(0, 0, 0, 1);
@@ -746,26 +805,137 @@
   .available-games-section {
     padding: 1rem 1rem 0.75rem 1rem;
   }
-  
+
   .available-games-title {
     font-size: 0.875rem;
     margin-bottom: 0.5rem;
   }
-  
+
   .available-games-divider {
     margin-bottom: 0.75rem;
   }
-  
-  .game-tag { 
-    padding: 0.2rem 0.4rem; 
+
+  .game-tag {
+    padding: 0.2rem 0.4rem;
     font-size: 0.7rem;
     font-weight: 800;
-    min-width: 1.75rem; 
+    min-width: 1.75rem;
     color: white !important;
     border-radius: 5px;
   }
-  
+
   .available-games-grid {
+    gap: 0.375rem;
+  }
+}
+
+/* Related Forms Section */
+.related-forms-section {
+  padding: 0.5rem 0.75rem 0rem 0.75rem;
+}
+
+.related-forms-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-color);
+  text-align: center;
+  margin: 0 0 0.75rem 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.related-forms-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--border-color) 20%, var(--border-color) 80%, transparent 100%);
+  margin-bottom: 1rem;
+  margin-top: 0.75rem;
+}
+
+.related-forms-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Related Forms use the evo-sprite classes but with a custom tooltip */
+.related-forms-grid .evo-sprite {
+  position: relative;
+}
+
+.form-icon-overlay {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 24px;
+  height: 24px;
+  background: #000;
+  border: 1.5px solid;
+  border-radius: 50%;
+  padding: 2px;
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.form-icon-overlay img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.related-form-tooltip {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.95);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.375rem 0.625rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+.related-form-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.95);
+}
+
+.related-forms-grid .evo-sprite:hover .related-form-tooltip {
+  display: block;
+}
+
+/* Mobile responsive adjustments for Related Forms */
+@media (max-width: 768px) {
+  .related-forms-section {
+    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  }
+
+  .related-forms-title {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .related-forms-divider {
+    margin-bottom: 0.75rem;
+  }
+
+  .related-forms-grid {
     gap: 0.375rem;
   }
 }

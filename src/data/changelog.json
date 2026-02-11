@@ -1,7 +1,33 @@
 [
   {
+    "date": "2026-02-09",
+    "version": "v1.0.8",
+    "type": "feature",
+    "title": "",
+    "description": "",
+    "features": [
+      "Added a 'Related Forms' section to the Pokemon sidebar that shows all variant forms (GMAX, Alpha, Gender, Regional, etc.) for the selected Pokemon.",
+      "Evolution chains in the sidebar now display Alpha forms when an Alpha Pokemon is selected.",
+      "Added tooltips to the 'Obtainable In' game icons in the sidebar to display full game names on hover.",
+      "Added sorting by oldest and newest accounts to the trainers page."
+    ],
+    "fixes": [
+      "Fixed an issue where manually adjusting a counter's value would delete the entire hunt.",
+      "Improved styling in the Hunt Settings modal for encounter count and increment adjustments.",
+      "Resolved inconsistencies where the Shiny Charm modifier was not applied when starting a new hunt.",
+      "Fixed female hippopotas ID being 450 instead of 459, (Anyone who had data on this pokemon will need to re-add it (sorry!)).",
+      "Fixed alpha unova lilligant ID since I am a idiot and wrote it incorrectly.",
+      "Fixed some forms not showing when searching with the 'Show Evolutions' toggle on.",
+      "Fixed an issue where shiny locks were not correctly displayed on Pokémon that should have been locked.",
+      "Fixed a aligment issue with the quick links in the footer on mobile devices.",
+      "Fixed an issue where guest users were unable to navigate back to the home page after viewing a profile.",
+      "Fixed an issue on mobile where the background remained scrollable while the sidebar was open.",
+      "Fixed the hamburger menu overlapping the sidebar on mobile devices."
+    ]
+  },
+  {
     "date": "2026-02-01",
-    "version": "v1.0.9",
+    "version": "v1.0.7",
     "type": "feature",
     "title": "Search Improvements",
     "description": "",
@@ -20,7 +46,7 @@
   },
   {
     "date": "2026-01-28",
-    "version": "v1.0.8",
+    "version": "v1.0.6",
     "type": "fix",
     "title": "Scrollbar fixes, SEO improvements & Performance improvements",
     "description": "",
@@ -40,7 +66,7 @@
   },
   {
     "date": "2026-01-21",
-    "version": "v1.0.7",
+    "version": "v1.0.5",
     "type": "feature",
     "title": "Mobile fixes & Dex Preferences expansion",
     "description": "",
@@ -61,7 +87,7 @@
   },
   {
     "date": "2026-01-19",
-    "version": "v1.0.6",
+    "version": "v1.0.4",
     "type": "fix",
     "title": "Alpha Regional Forms added & Removed Kantonian Electrode",
     "description": "",
@@ -83,7 +109,7 @@
   },
   {
     "date": "2026-01-02",
-    "version": "v1.0.5",
+    "version": "v1.0.3",
     "type": "feature",
     "title": "Legends Z-A Pokemon Added & Some Small Features/Fixes",
     "description": "",
