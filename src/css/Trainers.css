@@ -465,7 +465,7 @@
   }
 
   .trainers-page .pagination-controls {
-    @apply min-w-0 flex-col gap-2;
+    @apply min-w-0 flex-row gap-2;
   }
 
   .trainers-page .page-numbers {

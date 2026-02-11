@@ -10,6 +10,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -124,7 +125,8 @@
 
 .changelog-controls .search-input-wrap {
   position: relative;
-  /* display: flex; */ /* Commented out to fix flexbox layout */
+  /* display: flex; */
+  /* Commented out to fix flexbox layout */
   align-items: center;
   width: 100% !important;
 }
@@ -174,7 +176,7 @@
 
 /* Try to hide the grey outline with a negative box-shadow */
 .changelog-controls .search-input:focus {
-  box-shadow: 
+  box-shadow:
     0 0 0 1px var(--accent),
     0 0 0 3px rgba(var(--accent-rgb), 0.1),
     inset 0 0 0 1px var(--accent) !important;
@@ -459,9 +461,9 @@
 
 /* Pagination Controls */
 .pagination-controls {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -539,50 +541,50 @@
   .changelog-container {
     padding: 0 0.5rem;
   }
-  
+
   .changelog-section,
   .bug-report-section {
     padding: 1.5rem;
   }
-  
+
   .changelog-page h1 {
     @apply text-3xl my-8;
   }
-  
+
   .changelog-meta {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .changelog-controls {
     display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 1rem;
   }
-  
+
   .changelog-controls .search-controls {
     width: 100% !important;
     min-width: auto;
   }
-  
+
   .changelog-controls .filter-controls {
     width: 100% !important;
     display: flex;
     justify-content: center;
   }
-  
+
   .changelog-controls .filter-button {
     width: auto !important;
     min-width: 200px;
     justify-content: center;
   }
-  
+
   .changelog-controls .search-input {
     @apply h-10 text-sm;
   }
-  
+
   /* Mobile styling for report headers */
   .report-headers {
     flex-direction: column;
@@ -590,7 +592,7 @@
     border-bottom: none;
     padding-bottom: 0;
   }
-  
+
   .report-header {
     flex: none;
     width: 100%;
@@ -601,12 +603,12 @@
     justify-content: flex-start;
     text-align: left;
   }
-  
+
   .report-header:first-child,
   .report-header:last-child {
     border-radius: 8px;
   }
-  
+
   .pagination-buttons {
     flex-direction: row;
     flex-wrap: wrap;
@@ -614,7 +616,7 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   .page-numbers {
     order: -1;
     width: 100%;
@@ -623,13 +625,13 @@
     gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
-  
+
   .pagination-btn {
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
     min-width: 120px;
   }
-  
+
   .page-btn {
     padding: 0.75rem 1rem;
     font-size: 1rem;
@@ -641,7 +643,7 @@
   .changelog-page h1 {
     @apply text-2xl my-6;
   }
-  
+
   .changelog-controls .search-input {
     @apply h-9 text-xs;
   }
