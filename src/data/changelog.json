@@ -9,7 +9,10 @@
       "BINGO page added! plan and track the hunts you wanna do throughout the year and share your progress with friends.",
       "Added a button on public profile views to also view the persons BINGO sheet if there is any data set."
     ],
-    "fixes": []
+    "fixes": [
+      "Added a back button to the public profile dex and bingo pages so you dont get stuck on the page.",
+      "Added the ability to hover over game icons on the BINGO page on PC to view the games full name."
+    ]
   },
   {
     "date": "2026-02-09",

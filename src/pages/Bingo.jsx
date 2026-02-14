@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { createPortal } from "react-dom";
-import { X, Search, Edit2, Check, RotateCcw, Link as LinkIcon } from "lucide-react";
+import { X, Search, Edit2, Check, RotateCcw, Link as LinkIcon, ArrowBigLeft } from "lucide-react";
 import { GAME_OPTIONS, genderForms } from "../Constants";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
@@ -344,15 +344,28 @@ const Bingo = () => {
                     <h1 className="bingo-page-title !m-0">
                         {readOnly ? `${username}'s ` : ''}2026 Shiny BINGO
                     </h1>
-                    {!readOnly && currentUsername && (
-                        <button
-                            onClick={handleShare}
-                            className="bingo-copy-btn p-2 rounded-full hover:bg-[var(--bg-secondary)] transition-colors text-[var(--accent)]"
-                            aria-label="Copy shareable link"
+
+                    {readOnly ? (
+                        <Link
+                            to={`/u/${username}`}
+                            className="flex items-center gap-2 px-3.5 py-2 bg-[var(--accent)] text-black font-bold border-none rounded-lg cursor-pointer transition-colors duration-200 hover:bg-[var(--accent-hover)] hover:text-[var(--text)]"
+                            title="Back to Profile"
+                            style={{ textDecoration: 'none' }}
                         >
-                            <LinkIcon size={32} />
-                            <span className="copy-tooltip">Copy Link</span>
-                        </button>
+                            <ArrowBigLeft size={20} />
+                            <span>Back to Profile</span>
+                        </Link>
+                    ) : (
+                        currentUsername && (
+                            <button
+                                onClick={handleShare}
+                                className="bingo-copy-btn p-2 rounded-full hover:bg-[var(--bg-secondary)] transition-colors text-[var(--accent)]"
+                                aria-label="Copy shareable link"
+                            >
+                                <LinkIcon size={32} />
+                                <span className="copy-tooltip">Copy Link</span>
+                            </button>
+                        )
                     )}
                 </div>
                 <div className="app-divider" />
@@ -393,11 +406,14 @@ const Bingo = () => {
                                             className="bingo-pokemon-img"
                                         />
                                         {cell.game && getGameIcon(cell.game) && (
-                                            <img
-                                                src={getGameIcon(cell.game)}
-                                                alt={cell.game}
-                                                className="bingo-game-overlay-icon"
-                                            />
+                                            <div className="bingo-game-icon-container">
+                                                <img
+                                                    src={getGameIcon(cell.game)}
+                                                    alt={cell.game}
+                                                    className="bingo-game-overlay-icon"
+                                                />
+                                                <span className="game-tooltip">{cell.game}</span>
+                                            </div>
                                         )}
                                         {getFormIconInfo(cell.pokemon) && (
                                             <div className="bingo-form-overlay-icon">

@@ -9,6 +9,8 @@ import noResultsImg from "../../data/pikachu.png";
 import pokemonData from "../../data/pokemon.json";
 import formsData from "../../utils/loadFormsData";
 import { getFilteredFormsData } from "../../utils/dexPreferences";
+import { Link } from "react-router-dom";
+import { ArrowBigLeft } from "lucide-react";
 import "../../css/PublicDex.css";
 
 const typeOptions = [
@@ -242,7 +244,18 @@ export default function DexView({
             {/* Profile Header - Only show when viewing someone else's profile */}
             {viewingUsername && (
                 <div className="profile-viewing-header page-animate-1">
-                    <h1>Viewing <span className="username">{viewingUsername}'s</span> Profile</h1>
+                    <div style={{ maxWidth: '1300px', margin: '0 auto', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <h1>Viewing <span className="username">{viewingUsername}'s</span> Profile</h1>
+                        <Link
+                            to={`/u/${viewingUsername}`}
+                            className="absolute right-0 flex items-center gap-2 px-3.5 py-2 bg-[var(--accent)] text-black font-bold border-none rounded-lg cursor-pointer transition-colors duration-200 hover:bg-[var(--accent-hover)] hover:text-[var(--text)]"
+                            title="Back to Profile"
+                            style={{ textDecoration: 'none' }}
+                        >
+                            <ArrowBigLeft size={16} />
+                            <span>Back to Profile</span>
+                        </Link>
+                    </div>
                 </div>
             )}
 
