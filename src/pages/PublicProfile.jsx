@@ -24,7 +24,7 @@ const POKEMON_OPTIONS = pokemonData.map((p) => ({
 // Create a comprehensive Pokémon lookup that includes forms
 const createPokemonLookup = () => {
     const lookup = new Map();
-    
+
     // Add base forms
     pokemonData.forEach(p => {
         lookup.set(p.name, {
@@ -34,7 +34,7 @@ const createPokemonLookup = () => {
             shinyImage: p.sprites.front_shiny,
         });
     });
-    
+
     // Add form-specific entries
     formsData.forEach(form => {
         if (form.sprites && form.sprites.front_default) {
@@ -46,7 +46,7 @@ const createPokemonLookup = () => {
             });
         }
     });
-    
+
     return lookup;
 };
 
@@ -69,10 +69,10 @@ const guessISOFromLocation = (loc) => {
 
 function getTimeAgo(dateString) {
     if (!dateString) return '';
-    
+
     const now = new Date();
     let joined;
-    
+
     // Handle different date formats
     if (typeof dateString === 'string') {
         // Try parsing as ISO string first
@@ -89,14 +89,14 @@ function getTimeAgo(dateString) {
     } else {
         joined = new Date(dateString);
     }
-    
+
     // Validate the date
     if (isNaN(joined.getTime())) {
         return 'Unknown date';
     }
-    
+
     const diff = now - joined;
-    
+
     // Handle future dates (shouldn't happen but just in case)
     if (diff < 0) {
         return 'Just now';
@@ -108,7 +108,7 @@ function getTimeAgo(dateString) {
     const d = Math.floor(diff / 86400000);
     const mo = Math.floor(d / 30.44);
     const y = Math.floor(d / 365.25);
-    
+
     if (y >= 1) return `${y} year${y > 1 ? "s" : ""} ago`;
     if (mo >= 1) return `${mo} month${mo > 1 ? "s" : ""} ago`;
     if (d >= 1) return `${d} day${d > 1 ? "s" : ""} ago`;
@@ -159,7 +159,7 @@ export default function PublicProfile() {
 
     const handleCopyLink = async () => {
         const url = `${window.location.origin}/u/${encodeURIComponent(username)}`;
-        
+
         // Try modern clipboard API first (requires HTTPS or localhost)
         if (navigator.clipboard && window.isSecureContext) {
             try {
@@ -170,7 +170,7 @@ export default function PublicProfile() {
                 console.warn("Clipboard API failed, trying fallback:", err);
             }
         }
-        
+
         // Fallback for HTTP or when clipboard API fails
         try {
             const textArea = document.createElement('textarea');
@@ -181,10 +181,10 @@ export default function PublicProfile() {
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            
+
             const successful = document.execCommand('copy');
             document.body.removeChild(textArea);
-            
+
             if (successful) {
                 showMessage("Share link copied", "success");
             } else {
@@ -224,17 +224,17 @@ export default function PublicProfile() {
     const handleLike = async () => {
         if (likeLoading || !currentUsername) return;
         setLikeLoading(true);
-        
+
         // Optimistically update the UI immediately for better user experience
         const wasLiked = hasLiked;
         const previousCount = likeCount;
-        
+
         setHasLiked(!wasLiked);
         setLikeCount(wasLiked ? previousCount - 1 : previousCount + 1);
         if (!wasLiked) {
             setLikeBurst(n => n + 1);
         }
-        
+
         try {
             // Use the authenticated likes endpoint
             const { hasLiked: newHasLiked, likeCount: newCount } = await profileAPI.toggleProfileLike(username);
@@ -262,8 +262,8 @@ export default function PublicProfile() {
                 const j = await profileAPI.getPublicProfile(username);
                 if (!ignore) {
                     setData(j);
-                    
-                    
+
+
                     // Store the profile owner's dex preferences
                     if (j?.dexPreferences) {
                         setProfileOwnerPreferences(j.dexPreferences);
@@ -312,20 +312,20 @@ export default function PublicProfile() {
     // Custom filtering function that uses profile owner's preferences
     const getFilteredFormsDataForProfile = (forms, preferences) => {
         if (!preferences || !forms) return forms;
-        
+
         return forms.filter(form => {
             const formType = form.formType;
-            
+
             // Skip separator headers (they start with dashes)
             if (typeof formType === 'string' && formType.startsWith('-')) {
                 return false;
             }
-            
+
             // Skip forms without a valid formType
             if (!formType || typeof formType !== 'string') {
                 return false;
             }
-            
+
             switch (formType) {
                 case 'gender': return preferences.showGenderForms;
                 case 'alolan': return preferences.showAlolanForms;
@@ -351,33 +351,33 @@ export default function PublicProfile() {
         (async () => {
             try {
                 const response = await profileAPI.getPublicCaughtData(username); // { username: string, caughtPokemon: { [key]: info|null } }
-                
+
                 // Extract the actual caughtPokemon data from the response
                 const map = response?.caughtPokemon || {};
-                
+
                 // Only calculate stats if we have the profile owner's preferences
                 if (!profileOwnerPreferences) {
                     if (!ignore) setStats({ regularCaught: 0, regularCompletion: 0, shinyCaught: 0, shinyCompletion: 0, gamesPlayed: 0, topBall: null, topMark: null, topGame: null });
                     return;
                 }
-                
+
                 const allKeys = [
                     ...pokemonData.map(p => getCaughtKey(p)),
                     ...getFilteredFormsDataForProfile(formsData, profileOwnerPreferences).map(p => getCaughtKey(p)),
                 ];
                 const total = allKeys.length;
-                
+
                 // Separate regular and shiny counts
                 const regularEntries = Object.entries(map).filter(([key, info]) => info && !key.includes('_shiny'));
                 const shinyEntries = Object.entries(map).filter(([key, info]) => info && key.includes('_shiny'));
-                
+
                 const regularCaught = regularEntries.length;
                 const shinyCaught = shinyEntries.length;
                 const regularCompletion = total ? Math.round((regularCaught / total) * 100) : 0;
                 const shinyCompletion = total ? Math.round((shinyCaught / total) * 100) : 0;
-                
+
                 const allCaughtInfos = [...regularEntries.map(([, info]) => info), ...shinyEntries.map(([, info]) => info)];
-                
+
                 // Extract all entries from the new data structure
                 const allEntries = [];
                 allCaughtInfos.forEach(info => {
@@ -393,7 +393,7 @@ export default function PublicProfile() {
                         allEntries.push(info);
                     }
                 });
-                
+
                 const gamesPlayed = new Set(allEntries.map(i => i.game).filter(Boolean)).size;
 
                 const topBallKey = countTop(allEntries, "ball");
@@ -412,61 +412,61 @@ export default function PublicProfile() {
                         if (!ignore) setRecentAdded([]);
                         return;
                     }
-                    
+
                     const allMonsList = [...pokemonData, ...getFilteredFormsDataForProfile(formsData, profileOwnerPreferences)];
                     const keyToMon = new Map(allMonsList.map(m => [getCaughtKey(m), m]));
-                                                              // First, separate Pokemon with and without caughtAt timestamps
-                     const withTimestamps = [];
-                     const withoutTimestamps = [];
-                     
-                     Object.entries(map).forEach(([key, info]) => {
-                         if (!info) return;
-                         
-                         // Check if this is a shiny Pokémon by looking for _shiny suffix in the key
-                         const isShiny = key.includes('_shiny');
-                         
-                         // Get the base key (without _shiny suffix) to find the Pokémon data
-                         const baseKey = isShiny ? key.replace('_shiny', '') : key;
-                         const mon = keyToMon.get(baseKey);
-                         if (!mon) return;
-                         
-                         // Add shiny status to the info object
-                         const infoWithShiny = { ...info, isShiny };
-                         
-                         if (info.caughtAt) {
-                             const parsedDate = new Date(info.caughtAt);
-                             if (!isNaN(parsedDate.getTime())) {
-                                 withTimestamps.push({ key, mon, info: infoWithShiny, ts: parsedDate.getTime() });
-                             }
-                         } else {
-                             withoutTimestamps.push({ key, mon, info: infoWithShiny });
-                         }
-                     });
-                     
-                     // Sort Pokemon with timestamps by newest first
-                     withTimestamps.sort((a, b) => b.ts - a.ts);
-                     
-                     // Add fallback timestamps to Pokemon without caughtAt (older than any with timestamps)
-                     // Reverse the order so the first Pokemon without timestamp gets the oldest fallback
-                     const baseTime = withTimestamps.length > 0 ? withTimestamps[withTimestamps.length - 1].ts - 86400000 : Date.now();
-                     withoutTimestamps.forEach((item, idx) => {
-                         // Reverse the index so first Pokemon gets oldest timestamp
-                         const reverseIdx = withoutTimestamps.length - 1 - idx;
-                         item.ts = baseTime - (reverseIdx * 86400000);
-                     });
-                     
-                     // Combine and sort all Pokemon by timestamp
-                     const allPokemon = [...withTimestamps, ...withoutTimestamps];
-                     allPokemon.sort((a, b) => b.ts - a.ts);
-                     
-                     const recentList = allPokemon.slice(0, 5).map(({ mon, info }) => ({ mon, info }));
+                    // First, separate Pokemon with and without caughtAt timestamps
+                    const withTimestamps = [];
+                    const withoutTimestamps = [];
+
+                    Object.entries(map).forEach(([key, info]) => {
+                        if (!info) return;
+
+                        // Check if this is a shiny Pokémon by looking for _shiny suffix in the key
+                        const isShiny = key.includes('_shiny');
+
+                        // Get the base key (without _shiny suffix) to find the Pokémon data
+                        const baseKey = isShiny ? key.replace('_shiny', '') : key;
+                        const mon = keyToMon.get(baseKey);
+                        if (!mon) return;
+
+                        // Add shiny status to the info object
+                        const infoWithShiny = { ...info, isShiny };
+
+                        if (info.caughtAt) {
+                            const parsedDate = new Date(info.caughtAt);
+                            if (!isNaN(parsedDate.getTime())) {
+                                withTimestamps.push({ key, mon, info: infoWithShiny, ts: parsedDate.getTime() });
+                            }
+                        } else {
+                            withoutTimestamps.push({ key, mon, info: infoWithShiny });
+                        }
+                    });
+
+                    // Sort Pokemon with timestamps by newest first
+                    withTimestamps.sort((a, b) => b.ts - a.ts);
+
+                    // Add fallback timestamps to Pokemon without caughtAt (older than any with timestamps)
+                    // Reverse the order so the first Pokemon without timestamp gets the oldest fallback
+                    const baseTime = withTimestamps.length > 0 ? withTimestamps[withTimestamps.length - 1].ts - 86400000 : Date.now();
+                    withoutTimestamps.forEach((item, idx) => {
+                        // Reverse the index so first Pokemon gets oldest timestamp
+                        const reverseIdx = withoutTimestamps.length - 1 - idx;
+                        item.ts = baseTime - (reverseIdx * 86400000);
+                    });
+
+                    // Combine and sort all Pokemon by timestamp
+                    const allPokemon = [...withTimestamps, ...withoutTimestamps];
+                    allPokemon.sort((a, b) => b.ts - a.ts);
+
+                    const recentList = allPokemon.slice(0, 5).map(({ mon, info }) => ({ mon, info }));
                     if (!ignore) {
                         setRecentAdded(recentList);
                     }
                 } catch {
                     if (!ignore) setRecentAdded([]);
                 }
-                            } catch { }
+            } catch { }
         })();
         return () => { ignore = true; };
     }, [username, refreshKey, profileOwnerPreferences, loading]); // Add profileOwnerPreferences and loading dependencies
@@ -507,7 +507,7 @@ export default function PublicProfile() {
     // Initial load of likes
     useEffect(() => {
         if (!username) return;
-        
+
         const loadInitialLikes = async () => {
             try {
                 if (currentUsername) {
@@ -525,14 +525,14 @@ export default function PublicProfile() {
                 // Silently handle errors
             }
         };
-        
+
         loadInitialLikes();
     }, [username, currentUsername]);
 
     // Poll for like updates every 5 seconds to keep like count real-time (reduced from 2 seconds)
     useEffect(() => {
         if (!username) return;
-        
+
         const interval = setInterval(async () => {
             try {
                 if (currentUsername) {
@@ -606,10 +606,10 @@ export default function PublicProfile() {
     if (!data) {
         return (
             <div className="profile-wrapper">
-                <div style={{ 
-                    maxWidth: '1300px', 
-                    width: '100%', 
-                    margin: '0 auto', 
+                <div style={{
+                    maxWidth: '1300px',
+                    width: '100%',
+                    margin: '0 auto',
                     padding: '16px',
                     textAlign: 'center',
                     display: 'flex',
@@ -639,13 +639,13 @@ export default function PublicProfile() {
                                 {data.username}
                                 {data.isAdmin && (
                                     <span className="crown-wrapper">
-                                        <Crown 
-                                            size={22} 
+                                        <Crown
+                                            size={22}
                                             strokeWidth={2.5}
-                                            style={{ 
+                                            style={{
                                                 color: "#fbbf24",
                                                 flexShrink: 0
-                                            }} 
+                                            }}
                                         />
                                         <span className="crown-tooltip">Admin</span>
                                     </span>
@@ -673,8 +673,8 @@ export default function PublicProfile() {
                                     {likeBurst > 0 && (
                                         <span key={likeBurst} aria-hidden="true">
                                             <span className="like-heart">❤</span>
-                                            <span className="like-heart" style={{"--tx":"-26px","--ty":"-38px","--rot":"-18deg"}}>❤</span>
-                                            <span className="like-heart" style={{"--tx":"22px","--ty":"-44px","--rot":"14deg"}}>❤</span>
+                                            <span className="like-heart" style={{ "--tx": "-26px", "--ty": "-38px", "--rot": "-18deg" }}>❤</span>
+                                            <span className="like-heart" style={{ "--tx": "22px", "--ty": "-44px", "--rot": "14deg" }}>❤</span>
                                         </span>
                                     )}
                                 </span>
@@ -744,15 +744,15 @@ export default function PublicProfile() {
 
                         </div>
 
-                                                 <div className="profile-field">
-                             <label>Gender</label>
-                             <div className="field-display">
-                                 {data.gender === "Male" && <Mars size={16} color="#4aaaff" style={{ marginRight: 6 }} />}
-                                 {data.gender === "Female" && <Venus size={16} color="#ff6ec7" style={{ marginRight: 6 }} />}
-                                 {data.gender === "Other" && <VenusAndMars size={16} color="#ffffff" style={{ marginRight: 6 }} />}
-                                 {data.gender === "Other" ? "Female" : (data.gender || "N/A")}
-                             </div>
-                         </div>
+                        <div className="profile-field">
+                            <label>Gender</label>
+                            <div className="field-display">
+                                {data.gender === "Male" && <Mars size={16} color="#4aaaff" style={{ marginRight: 6 }} />}
+                                {data.gender === "Female" && <Venus size={16} color="#ff6ec7" style={{ marginRight: 6 }} />}
+                                {data.gender === "Other" && <VenusAndMars size={16} color="#ffffff" style={{ marginRight: 6 }} />}
+                                {data.gender === "Other" ? "Female" : (data.gender || "N/A")}
+                            </div>
+                        </div>
                     </div>
 
                     <div className="profile-field full-span">
@@ -806,13 +806,13 @@ export default function PublicProfile() {
                                     {Array.from({ length: 5 }).map((_, index) => {
                                         const poke = data.favoritePokemon[index];
                                         const shiny = Array.isArray(data.favoritePokemonShiny) ? data.favoritePokemonShiny[index] : false;
-                                        
-                                        
-                                        const p = poke && poke.trim() !== '' ? POKEMON_LOOKUP.get(poke) || 
+
+
+                                        const p = poke && poke.trim() !== '' ? POKEMON_LOOKUP.get(poke) ||
                                             // Fallback: try to find base form for special forms like gmax, alolan, etc.
                                             POKEMON_LOOKUP.get(poke.split('-')[0]) : null;
                                         const isEmpty = !p || !poke || poke.trim() === '';
-                                        
+
                                         return (
                                             <div key={index} className="profile-rank-item">
                                                 {index < 3 && !isEmpty && (
@@ -876,61 +876,69 @@ export default function PublicProfile() {
                             <label>Top Game</label>
                             <div className="field-display">{stats.topGame || "—"}</div>
                         </div>
-                                                 <div className="profile-field full-span recent-field">
-                             <label>Recent Entries</label>
-                             <div className="field-display recent-field-box">
-                                 {recentAdded.length === 0 ? (
-                                     <div className="no-recent-pokemon">
-                                         <p>No recent entries yet</p>
-                                     </div>
-                                 ) : (
-                                     <div className="profile-rank-row recent-pokemon-row">
-                                         {recentAdded.map((pokemon, idx) => {
-                                             const { mon, info } = pokemon;
-                                             const isNewest = idx === 0;
-                                             const isShiny = info?.isShiny;
-                                             
-                                             return (
-                                                 <div key={idx} className={`profile-rank-item recent-pokemon-item ${isNewest ? 'newest' : ''}`}>
-                                                     {isNewest && (
-                                                         <div className="newest-badge">LATEST</div>
-                                                     )}
-                                                     <div className="profile-pokemon-box recent-pokemon-box">
-                                                         <img
-                                                             src={isShiny ? mon?.sprites?.front_shiny : mon?.sprites?.front_default}
-                                                             alt={formatPokemonName(mon?.name)}
-                                                             className="pokemon-img"
-                                                         />
-                                                         {isShiny && (
-                                                             <div className="shiny-indicator">
-                                                                 <Sparkles size={20} className="shiny-sparkles-icon" />
-                                                             </div>
-                                                         )}
-                                                     </div>
-                                                     <div className="rank-label recent-pokemon-name" data-order={idx + 1}>
-                                                         {formatPokemonName(mon?.name)}
-                                                         {mon?.formType && !['alcremie', 'other', 'unown'].includes(mon.formType.toLowerCase()) && (
-                                                             <div className="form-type-tag">
-                                                                 {mon.formType.charAt(0).toUpperCase() + mon.formType.slice(1)}
-                                                             </div>
-                                                         )}
-                                                     </div>
-                                                 </div>
-                                             );
-                                         })}
-                                     </div>
-                                 )}
-                             </div>
-                         </div>
+                        <div className="profile-field full-span recent-field">
+                            <label>Recent Entries</label>
+                            <div className="field-display recent-field-box">
+                                {recentAdded.length === 0 ? (
+                                    <div className="no-recent-pokemon">
+                                        <p>No recent entries yet</p>
+                                    </div>
+                                ) : (
+                                    <div className="profile-rank-row recent-pokemon-row">
+                                        {recentAdded.map((pokemon, idx) => {
+                                            const { mon, info } = pokemon;
+                                            const isNewest = idx === 0;
+                                            const isShiny = info?.isShiny;
+
+                                            return (
+                                                <div key={idx} className={`profile-rank-item recent-pokemon-item ${isNewest ? 'newest' : ''}`}>
+                                                    {isNewest && (
+                                                        <div className="newest-badge">LATEST</div>
+                                                    )}
+                                                    <div className="profile-pokemon-box recent-pokemon-box">
+                                                        <img
+                                                            src={isShiny ? mon?.sprites?.front_shiny : mon?.sprites?.front_default}
+                                                            alt={formatPokemonName(mon?.name)}
+                                                            className="pokemon-img"
+                                                        />
+                                                        {isShiny && (
+                                                            <div className="shiny-indicator">
+                                                                <Sparkles size={20} className="shiny-sparkles-icon" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="rank-label recent-pokemon-name" data-order={idx + 1}>
+                                                        {formatPokemonName(mon?.name)}
+                                                        {mon?.formType && !['alcremie', 'other', 'unown'].includes(mon.formType.toLowerCase()) && (
+                                                            <div className="form-type-tag">
+                                                                {mon.formType.charAt(0).toUpperCase() + mon.formType.slice(1)}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                     {/* Full Dex button - place below the recent section */}
-                    <div className="profile-full-dex-button">
+                    <div className="profile-full-dex-button" style={{ gap: '1rem' }}>
                         <Link
                             to={`/u/${encodeURIComponent(username)}/dex`}
                             className="profile-full-dex-link"
                         >
                             View Full Dex
                         </Link>
+                        {data.hasBingoData && (
+                            <Link
+                                to={`/u/${encodeURIComponent(username)}/bingo`}
+                                className="profile-full-dex-link"
+                            >
+                                View BINGO
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>

@@ -1,5 +1,17 @@
 [
   {
+    "date": "2026-02-14",
+    "version": "v1.1.0",
+    "type": "feature",
+    "title": "",
+    "description": "",
+    "features": [
+      "BINGO page added! plan and track the hunts you wanna do throughout the year and share your progress with friends.",
+      "Added a button on public profile views to also view the persons BINGO sheet if there is any data set."
+    ],
+    "fixes": []
+  },
+  {
     "date": "2026-02-09",
     "version": "v1.0.8",
     "type": "feature",

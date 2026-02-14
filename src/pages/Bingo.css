@@ -1,0 +1,454 @@
+.bingo-page {
+    min-height: 100vh;
+    padding: 2rem 0;
+    animation: pageFadeIn 0.8s ease-out forwards;
+}
+
+.bingo-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* Removed .bingo-page h1 rule in favor of .bingo-page-title from previous edits, or merged them */
+.bingo-page-title {
+    @apply mt-12 mb-6 text-5xl font-extrabold tracking-wide relative text-[var(--text-color)];
+    /* Removed text-align: center to match Trainers page */
+}
+
+.app-divider {
+    background: linear-gradient(90deg, var(--dividers) 30%, var(--accent) 100%);
+}
+
+.bingo-info-box {
+    display: none;
+}
+
+.bingo-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin: 2rem auto;
+    background: var(--pokemon-box-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    max-width: 700px;
+}
+
+.bingo-header-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    color: var(--main-bg);
+    font-size: 2rem;
+    font-weight: 800;
+    border-radius: 8px;
+    padding: 0.25rem;
+    user-select: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    height: 60px;
+    /* Fixed height for consistency */
+}
+
+.bingo-cell-wrapper {
+    position: relative;
+    aspect-ratio: 1;
+}
+
+.bingo-cell {
+    width: 100%;
+    height: 100%;
+    background: var(--pokemon-box-bg2);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-color);
+    color: var(--text-color);
+    cursor: default;
+    transition: all 0.2s ease;
+    padding: 0.25rem;
+    text-align: center;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.bingo-cell:hover {
+    border-color: var(--accent);
+    border-color: var(--accent);
+    /* transform removed */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.bingo-cell.completed {
+    background: var(--accent);
+    color: var(--main-bg);
+    border-color: var(--accent);
+}
+
+.bingo-cell.completed .bingo-pokemon-name {
+    color: var(--main-bg);
+}
+
+/* Removed .bingo-cell.completed .edit-cell-btn styles to prevent box on hover */
+
+.bingo-cell.center {
+    background: var(--accent);
+    color: var(--main-bg);
+    font-size: 1.2rem;
+    font-weight: 800;
+    border-color: var(--accent);
+}
+
+.bingo-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    position: relative;
+    /* Context for absolute positioning of overlay */
+}
+
+.bingo-pokemon-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    padding: 2px;
+    /* Slight buffer from edge */
+}
+
+/* Removed bingo-pokemon-name styles */
+
+.bingo-game-overlay-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    z-index: 2;
+}
+
+.bingo-form-overlay-icon {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 32px;
+    height: 32px;
+    z-index: 5;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Removed circle background/border to match game icon style */
+}
+
+.bingo-form-overlay-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Removed bingo-game-badge styles */
+
+.edit-cell-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    /* Large clickable area in top right */
+    height: 50%;
+    padding: 6px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    color: var(--text-color);
+    z-index: 10;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    border-top-right-radius: 8px;
+    /* Match cell border radius */
+}
+
+.bingo-cell-wrapper:hover .edit-cell-btn {
+    opacity: 1;
+}
+
+/* No background change on hover for filled cells */
+/* No background change on hover for filled cells */
+.edit-cell-btn:hover {
+    background: transparent;
+    color: var(--text-color);
+}
+
+.bingo-check-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 50%;
+    padding: 6px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    transition: opacity 0.2s;
+    /* Default color when incomplete */
+    z-index: 10;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    border-top-left-radius: 8px;
+    color: #4ade80;
+}
+
+.bingo-cell-wrapper:hover .bingo-check-btn {
+    opacity: 1;
+}
+
+.bingo-check-btn.completed {
+    opacity: 1;
+    /* Always show if completed? or just on hover? Stick to hover behavior or maybe show active state */
+    color: #4ade80;
+    /* Green checkmark when active */
+}
+
+.bingo-check-btn:hover {
+    /* Preview green on hover */
+}
+
+.bingo-completed-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    /* Grey out */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    /* Match cell radius minus borders */
+    z-index: 8;
+    /* Below buttons but above content */
+    color: #4ade80;
+    /* Green big checkmark */
+    pointer-events: none;
+    /* Let clicks pass through to buttons */
+}
+
+.bingo-cell.empty .edit-cell-btn {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-hover);
+}
+
+.bingo-cell.empty .edit-cell-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-color);
+}
+
+.bingo-cell.empty .edit-cell-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Ensure input styling matches if missing */
+.pokemon-modal-search-row input.search-input {
+    background-color: var(--sidebar-edit-inputs);
+    color: var(--text-color);
+    border: 1px solid var(--sidebar-edit-inputs);
+    padding: 0 12px;
+    height: 42px;
+    border-radius: 8px;
+}
+
+/* Fix for Bingo Game Dropdown input background */
+#bingo-game-dropdown {
+    background-color: transparent !important;
+}
+
+/* Ensure the container matches the requested style if not handled by inline props */
+.mobile-dropdown-field {
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .bingo-container {
+        padding: 0 1rem;
+    }
+
+    .bingo-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.25rem;
+        padding: 0.5rem;
+        width: 100%;
+    }
+
+    .bingo-cell {
+        font-size: 0.7rem;
+        border-width: 1px;
+        border-radius: 4px;
+        padding: 0.1rem;
+    }
+
+    .bingo-content {
+        gap: 0;
+    }
+
+    /* Mobile adjustments for overlay/image */
+    .bingo-pokemon-img {
+        width: 100%;
+        height: 100%;
+    }
+
+    .bingo-game-overlay-icon {
+        width: 20px;
+        height: 20px;
+        bottom: 0;
+        right: 0;
+    }
+
+    .bingo-form-overlay-icon {
+        width: 20px;
+        height: 20px;
+        bottom: 0;
+        left: 0;
+    }
+
+    .edit-cell-btn {
+        width: 50%;
+        height: 50%;
+        padding: 2px;
+        top: 0;
+        right: 0;
+    }
+
+    .bingo-check-btn {
+        width: 50%;
+        height: 50%;
+        padding: 2px;
+        top: 0;
+        left: 0;
+    }
+
+    .bingo-completed-overlay svg {
+        width: 32px;
+        height: 32px;
+    }
+
+
+    .bingo-header-cell {
+        font-size: 1.2rem;
+        height: 40px;
+        border-radius: 4px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .bingo-info-box {
+        display: block;
+        background-color: var(--searchbar-dropdown);
+        border: 1px solid #27272a;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin: 0 0 1.5rem 0;
+        color: #e4e4e7;
+        font-size: 0.85rem;
+        text-align: left;
+        line-height: 1.5;
+    }
+
+    .bingo-info-box ul {
+        list-style-type: disc;
+        padding-left: 1.25rem;
+        margin: 0;
+    }
+
+    .bingo-info-box li {
+        margin-bottom: 0.25rem;
+    }
+
+    .bingo-page-title {
+        @apply text-3xl my-8;
+    }
+}
+
+/* Custom modal override to remove padding around header */
+.bingo-custom-modal {
+    padding: 0 !important;
+}
+
+.bingo-custom-modal .pokemon-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1rem 0rem 1rem !important;
+    margin-bottom: 0;
+}
+
+.bingo-custom-modal .pokemon-modal-header h2 {
+    margin: 0;
+    line-height: 1;
+}
+
+.bingo-custom-modal .pokemon-modal-header .close-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: static !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    margin: 0 !important;
+}
+
+.bingo-custom-modal .pokemon-modal-content {
+    padding: 0 1rem 1rem 1rem;
+}
+
+/* Copy link button tooltip - mirrored from Profile.css */
+.bingo-copy-btn {
+    position: relative;
+    /* Other styles are applied by inline classes in JSX */
+}
+
+.bingo-copy-btn .copy-tooltip {
+    @apply hidden absolute left-1/2 bottom-full mb-2 transform -translate-x-1/2 bg-black bg-opacity-95 text-white text-xs font-medium px-2 py-1 rounded whitespace-nowrap z-50;
+    pointer-events: none;
+}
+
+.bingo-copy-btn:hover .copy-tooltip {
+    @apply block;
+}
+
+.bingo-copy-btn .copy-tooltip::after {
+    content: '';
+    @apply absolute top-full left-1/2 transform -translate-x-1/2;
+    border: 4px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.95);
+}

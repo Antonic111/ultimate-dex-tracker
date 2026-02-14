@@ -384,7 +384,7 @@ router.post("/verify-code", corsMiddleware, async (req, res) => {
 
     if (!isCurrentMatch && !isPreviousMatch) {
       if ((user.verificationCode && user.verificationCodeExpires && user.verificationCodeExpires <= now) ||
-          (user.previousVerificationCode && user.previousVerificationCodeExpires && user.previousVerificationCodeExpires <= now)) {
+        (user.previousVerificationCode && user.previousVerificationCodeExpires && user.previousVerificationCodeExpires <= now)) {
         return res.status(400).json({ error: "Verification code has expired. Please request a new one." });
       }
       return res.status(400).json({ error: "Invalid verification code" });
@@ -798,6 +798,46 @@ router.patch("/caught", authenticateUser, async (req, res) => {
   } catch (err) {
     console.error('Error patching caught data:', err);
     return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// GET /api/bingo
+router.get("/bingo", authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Fallback if field doesn't exist yet
+    const grid = user.bingoGrid || [];
+    res.json({ grid });
+  } catch (err) {
+    console.error('Error getting bingo data:', err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// PUT /api/bingo
+router.put("/bingo", authenticateUser, async (req, res) => {
+  try {
+    const { bingoData } = req.body;
+    if (!Array.isArray(bingoData)) {
+      return res.status(400).json({ error: "Invalid bingo data format" });
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Basic sanitization/validation could go here if needed
+    // But since it's a fixed grid of objects, we can trust the schema validation mostly
+    // We just ensure we save it.
+
+    user.bingoGrid = bingoData;
+    await user.save();
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error updating bingo data:', err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -1381,14 +1421,20 @@ router.get("/users/:username/public", async (req, res) => {
       username: req.params.username,
       isProfilePublic: { $ne: false }
     })
-      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin")
+      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin bingoGrid")
       .lean();
 
     if (!u) return res.status(404).json({ error: "User not found or private" });
 
+    // Safely check if bingo grid has any data
+    const hasBingoData = u.bingoGrid && Array.isArray(u.bingoGrid) && u.bingoGrid.length > 0 && u.bingoGrid.some(cell => cell.pokemon);
+
+    // Remove bingoGrid from response to avoid sending the whole grid here
+    delete u.bingoGrid;
+
     // Add like count - safely handle undefined likes
     const likeCount = Array.isArray(u.likes) ? u.likes.length : 0;
-    res.json({ ...u, likeCount });
+    res.json({ ...u, likeCount, hasBingoData });
   } catch (error) {
     console.error('Error getting public profile:', error);
     res.status(500).json({ error: "Server error" });
@@ -1472,6 +1518,21 @@ router.get("/public/dex/:username", async (req, res) => {
     : (user.caughtPokemon || {});
 
   res.json({ username: user.username, caughtPokemon });
+});
+
+// GET /public/bingo/:username
+router.get("/public/bingo/:username", async (req, res) => {
+  const user = await User.findOne({ username: req.params.username });
+  if (!user) return res.status(404).json({ error: "User not found" });
+
+  // Check if profile is public (optional, but good practice to respect privacy if global setting exists)
+  // The user prompt implies sharing, but usually respects the profile visibility.
+  if (user.isProfilePublic === false) return res.status(403).json({ error: "This profile is private." });
+
+  res.json({
+    username: user.username,
+    grid: user.bingoGrid || []
+  });
 });
 
 // GET /api/hunts

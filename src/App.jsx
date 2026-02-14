@@ -42,6 +42,7 @@ const Counters = lazy(() => import("./pages/Counters"));
 const PublicProfile = lazy(() => import("./pages/PublicProfile"));
 const ViewDex = lazy(() => import("./pages/ViewDex.jsx"));
 const Changelog = lazy(() => import("./pages/Changelog"));
+const Bingo = lazy(() => import("./pages/Bingo"));
 const Admin = lazy(() => import("./pages/Admin"));
 import { LoadingProvider, useLoading } from "./components/Shared/LoadingContext";
 import { LoadingSpinner } from "./components/Shared";
@@ -1857,6 +1858,16 @@ export default function App() {
                       }
                     />
                     <Route
+                      path="/bingo"
+                      element={
+                        <RequireAuth loading={loading} authReady={authReady} user={user}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading bingo..." />}>
+                            <Bingo />
+                          </Suspense>
+                        </RequireAuth>
+                      }
+                    />
+                    <Route
                       path="/changelog"
                       element={
                         <RequireAuth loading={loading} authReady={authReady} user={user}>
@@ -1889,6 +1900,14 @@ export default function App() {
                       element={
                         <Suspense fallback={<LoadingSpinner fullScreen text="Loading Pokédex..." />}>
                           <ViewDex />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/u/:username/bingo"
+                      element={
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading Bingo..." />}>
+                          <Bingo />
                         </Suspense>
                       }
                     />
