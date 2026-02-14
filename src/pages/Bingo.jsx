@@ -6,7 +6,8 @@ import { GAME_OPTIONS, genderForms } from "../Constants";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
 import { getFilteredFormsData } from "../utils/dexPreferences";
-import { getAvailableGamesForPokemonSidebar, normalizeGameName } from "../utils/pokemonAvailability";
+import { getAvailableGamesForPokemonSidebar, normalizeGameName, GAME_COUNTERPARTS } from "../utils/pokemonAvailability";
+import versionExclusives from "../data/versionExclusives.json";
 import { formatPokemonName, getFormDisplayName } from "../utils";
 import './Bingo.css';
 import '../css/Counters.css'; // Import Counters styles for the modal
@@ -213,11 +214,31 @@ const Bingo = () => {
     const filteredPokemon = useMemo(() => {
         if (!selectedGame) return [];
 
-        // First filter by game availability
+        // First filter by game availability including counterpart exclusives
         let candidates = allPokemon.filter(p => {
             const availableGames = getAvailableGamesForPokemonSidebar(p);
             const targetGame = normalizeGameName(selectedGame);
-            return availableGames.some(g => normalizeGameName(g) === targetGame);
+
+            // 1. Is it natively available in the selected game?
+            const isAvailable = availableGames.some(g => normalizeGameName(g) === targetGame);
+            if (isAvailable) return true;
+
+            // 2. Is it exclusive to a counterpart game? (e.g. show Sword exclusives in Shield)
+            const counterparts = GAME_COUNTERPARTS[selectedGame];
+            if (counterparts) {
+                const counterpartsList = Array.isArray(counterparts) ? counterparts : [counterparts];
+
+                for (const counterpart of counterpartsList) {
+                    const exclusives = versionExclusives[counterpart];
+                    const formattedId = String(p.id).padStart(4, "0");
+
+                    // Check if exclusive to the counterpart
+                    if (exclusives && (exclusives.includes(p.name) || exclusives.includes(formattedId))) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         });
 
         // Then filter by search term if present

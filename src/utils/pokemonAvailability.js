@@ -29,7 +29,7 @@ const GAME_RELEASE_ORDER = [
   "GO"
 ];
 
-const GAME_COUNTERPARTS = {
+export const GAME_COUNTERPARTS = {
   "Red": ["Blue", "Green", "Yellow"],
   "Blue": ["Red", "Green", "Yellow"],
   "Green": ["Red", "Blue", "Yellow"],
