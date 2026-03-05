@@ -150,6 +150,7 @@ const userSchema = new mongoose.Schema({
         id: { type: Number, required: true },
         name: { type: String, required: true },
         formType: { type: String, default: "main" },
+        stableId: { type: String },
         sprites: {
           front_default: String,
           front_shiny: String

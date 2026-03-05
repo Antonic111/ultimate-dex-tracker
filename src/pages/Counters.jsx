@@ -732,6 +732,18 @@ export default function Counters() {
     const hunt = currentHunt;
     const huntId = hunt.id;
 
+    // Ensure pokemon object has stableId for users with older activeHunts that lack it
+    let workingPokemon = hunt.pokemon;
+    if (!workingPokemon.stableId) {
+      const fullPokemon = allPokemon.find(p => p.id === workingPokemon.id && p.name === workingPokemon.name);
+      if (fullPokemon && fullPokemon.stableId) {
+        workingPokemon = { ...workingPokemon, stableId: fullPokemon.stableId };
+      } else {
+        showMessage('Error: Could not determine stable ID for this Pokemon', 'error');
+        return;
+      }
+    }
+
     // Create the caught entry with completion details
     const caughtEntry = {
       date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
@@ -747,8 +759,8 @@ export default function Counters() {
     };
 
     // Get the caught key for this Pokemon - all hunts in the Counters page are shiny hunts
-    const caughtKey = getCaughtKey(hunt.pokemon, null, true); // Always true since this is a shiny hunting tracker
-    console.log('Completion - Pokemon:', hunt.pokemon);
+    const caughtKey = getCaughtKey(workingPokemon, null, true); // Always true since this is a shiny hunting tracker
+    console.log('Completion - Pokemon:', workingPokemon);
     console.log('Completion - Caught Key:', caughtKey);
     console.log('Completion - Username:', username);
 
@@ -788,7 +800,7 @@ export default function Counters() {
       // Dispatch custom event to notify other components of caught data change
       window.dispatchEvent(new CustomEvent('caughtDataChanged', {
         detail: {
-          pokemon: hunt.pokemon,
+          pokemon: workingPokemon,
           caughtInfo: updatedCaughtInfo,
           caughtKey: caughtKey
         }
