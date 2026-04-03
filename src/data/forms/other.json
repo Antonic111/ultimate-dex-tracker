@@ -74,8 +74,8 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10001.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/386-attack.png"
+      "front_default": "/Sprites/deoxys-attack.png",
+      "front_shiny": "/Sprites/deoxys-attack-shiny.png"
     },
     "gen": 3,
     "evolution": {
@@ -92,8 +92,8 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10002.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/386-defense.png"
+      "front_default": "/Sprites/deoxys-defense.png",
+      "front_shiny": "/Sprites/deoxys-defense-shiny.png"
     },
     "gen": 3,
     "evolution": {
@@ -110,8 +110,8 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10003.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/386-speed.png"
+      "front_default": "/Sprites/deoxys-speed.png",
+      "front_shiny": "/Sprites/deoxys-speed-shiny.png"
     },
     "gen": 3,
     "evolution": {
@@ -187,8 +187,8 @@
       "ground"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10004.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/413-sandy.png"
+      "front_default": "/Sprites/wormadam-sandy.png",
+      "front_shiny": "/Sprites/wormadam-sandy-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -210,8 +210,8 @@
       "steel"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10005.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/413-trash.png"
+      "front_default": "/Sprites/wormadam-trash.png",
+      "front_shiny": "/Sprites/wormadam-trash-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -270,8 +270,8 @@
       "fire"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10008.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-heat.png"
+      "front_default": "/Sprites/rotom-heat.png",
+      "front_shiny": "/Sprites/rotom-heat-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -289,8 +289,8 @@
       "water"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10009.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-wash.png"
+      "front_default": "/Sprites/rotom-wash.png",
+      "front_shiny": "/Sprites/rotom-wash-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -308,8 +308,8 @@
       "ice"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10010.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-frost.png"
+      "front_default": "/Sprites/rotom-frost.png",
+      "front_shiny": "/Sprites/rotom-frost-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -327,8 +327,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10011.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-fan.png"
+      "front_default": "/Sprites/rotom-fan.png",
+      "front_shiny": "/Sprites/rotom-fan-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -346,8 +346,8 @@
       "grass"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10012.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/479-mow.png"
+      "front_default": "/Sprites/rotom-mow.png",
+      "front_shiny": "/Sprites/rotom-mow-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -365,8 +365,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10006.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/492-sky.png"
+      "front_default": "/Sprites/shaymin-sky.png",
+      "front_shiny": "/Sprites/shaymin-sky-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -383,8 +383,8 @@
       "water"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10016.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/550-blue-striped.png"
+      "front_default": "/Sprites/basculin-bluestriped.png",
+      "front_shiny": "/Sprites/basculin-bluestriped-shiny.png"
     },
     "gen": 5,
     "evolution": {
@@ -544,8 +544,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10019.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/641-therian.png"
+      "front_default": "/Sprites/tornadus-therian.png",
+      "front_shiny": "/Sprites/tornadus-therian-shiny.png"
     },
     "gen": 5,
     "evolution": {
@@ -563,8 +563,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10020.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/642-therian.png"
+      "front_default": "/Sprites/thundurus-therian.png",
+      "front_shiny": "/Sprites/thundurus-therian-shiny.png"
     },
     "gen": 5,
     "evolution": {
@@ -582,8 +582,8 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10021.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/645-therian.png"
+      "front_default": "/Sprites/landorus-therian.png",
+      "front_shiny": "/Sprites/landorus-therian-shiny.png"
     },
     "gen": 5,
     "evolution": {

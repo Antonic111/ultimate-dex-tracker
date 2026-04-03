@@ -8,7 +8,7 @@ import { getCaughtKey, migrateOldCaughtData } from "../caughtStorage";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { useLoading } from "../components/Shared/LoadingContext";
 import { profileAPI } from "../utils/api";
-import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isSubLegendary, isStarter, isFossil, isBaby, isParadox, getPokemonCategory } from "../utils/pokemonCategories";
+import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isPseudoLegendaryEvo, isSubLegendary, isStarter, isStarterEvo, isFossil, isFossilEvo, isBaby, isBabyEvo, isParadox, getPokemonCategory } from "../utils/pokemonCategories";
 import { getEvolutionChainIds, findPokemon } from "../utils";
 import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "../data/blockedShinies";
 import { getFilteredFormsData } from "../utils/dexPreferences";
@@ -448,17 +448,17 @@ export default function ViewDex() {
                         case "ultra-beast":
                             return isUltraBeast(pokemon);
                         case "pseudo-legendary":
-                            return isPseudoLegendary(pokemon);
+                            return isPseudoLegendary(pokemon) || (filters.showEvolutions && isPseudoLegendaryEvo(pokemon));
                         case "sub-legendary":
                             return isSubLegendary(pokemon);
                         case "paradox":
                             return isParadox(pokemon);
                         case "starter":
-                            return isStarter(pokemon);
+                            return isStarter(pokemon) || (filters.showEvolutions && isStarterEvo(pokemon));
                         case "fossil":
-                            return isFossil(pokemon);
+                            return isFossil(pokemon) || (filters.showEvolutions && isFossilEvo(pokemon));
                         case "baby":
-                            return isBaby(pokemon);
+                            return isBaby(pokemon) || (filters.showEvolutions && isBabyEvo(pokemon));
                         default:
                             return false;
                     }

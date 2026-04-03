@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import "../css/Profile.css";
-import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles, Crown } from "lucide-react";
+import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight } from "lucide-react";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
@@ -130,22 +130,38 @@ const fromOptionsOrTitle = (opts, key, suffixIfMissing = "") => {
     const t = toTitle(k);
     return suffixIfMissing && !new RegExp(`${suffixIfMissing}$`, "i").test(t) ? t + suffixIfMissing : t;
 };
-const countTop = (list, key) => {
+const countAll = (list, key) => {
     const counts = {};
     for (const it of list) {
         const v = String(it?.[key] ?? "").trim().toLowerCase();
         if (!v || v === "none" || v === "unknown") continue;
         counts[v] = (counts[v] || 0) + 1;
     }
-    let top = null, topCount = 0;
-    for (const [k, c] of Object.entries(counts)) if (c > topCount) { top = k; topCount = c; }
-    return top;
+    return Object.entries(counts)
+        .map(([k, count]) => ({ key: k, count }))
+        .sort((a, b) => b.count - a.count);
+};
+
+const buildRankedList = (ranked, options, suffix = "") => {
+    return ranked.map(({ key: k, count }) => {
+        const kLower = String(k).toLowerCase();
+        const hit = options.find(o =>
+            String(o.value).toLowerCase() === kLower ||
+            String(o.label ?? o.name ?? "").toLowerCase() === kLower
+        );
+        return {
+            key: k,
+            name: hit ? (hit.label ?? hit.name ?? hit.value) : toTitle(k) + suffix,
+            image: hit?.image || null,
+            count
+        };
+    });
 };
 
 export default function PublicProfile() {
     const { username } = useParams();
     const [data, setData] = useState(null);
-    const [stats, setStats] = useState({ regularCaught: 0, regularCompletion: 0, shinyCaught: 0, shinyCompletion: 0, gamesPlayed: 0, topBall: null, topMark: null, topGame: null });
+    const [stats, setStats] = useState({ regularCaught: 0, regularCompletion: 0, shinyCaught: 0, shinyCompletion: 0, gamesPlayed: 0, topBall: null, topMark: null, topGame: null, allBalls: [], allMarks: [], allGames: [] });
     const [loading, setLoading] = useState(true);
     const [recentAdded, setRecentAdded] = useState([]);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -154,6 +170,8 @@ export default function PublicProfile() {
     const [likeLoading, setLikeLoading] = useState(false);
     const [likeBurst, setLikeBurst] = useState(0);
     const [profileOwnerPreferences, setProfileOwnerPreferences] = useState(null);
+    const [statPage, setStatPage] = useState({ games: 0, balls: 0, marks: 0 });
+    const STAT_PAGE_SIZE = 8;
     const { showMessage } = useMessage();
     const { username: currentUsername, loading: userLoading } = useContext(UserContext);
 
@@ -357,7 +375,7 @@ export default function PublicProfile() {
 
                 // Only calculate stats if we have the profile owner's preferences
                 if (!profileOwnerPreferences) {
-                    if (!ignore) setStats({ regularCaught: 0, regularCompletion: 0, shinyCaught: 0, shinyCompletion: 0, gamesPlayed: 0, topBall: null, topMark: null, topGame: null });
+                    if (!ignore) setStats({ regularCaught: 0, regularCompletion: 0, shinyCaught: 0, shinyCompletion: 0, gamesPlayed: 0, topBall: null, topMark: null, topGame: null, allBalls: [], allMarks: [], allGames: [] });
                     return;
                 }
 
@@ -396,14 +414,22 @@ export default function PublicProfile() {
 
                 const gamesPlayed = new Set(allEntries.map(i => i.game).filter(Boolean)).size;
 
-                const topBallKey = countTop(allEntries, "ball");
-                const topMarkKey = countTop(allEntries, "mark");
-                const topGameKey = countTop(allEntries, "game");
+                const rankedBalls = countAll(allEntries, "ball");
+                const rankedMarks = countAll(allEntries, "mark");
+                const rankedGames = countAll(allEntries, "game");
+
+                const topBallKey = rankedBalls[0]?.key || null;
+                const topMarkKey = rankedMarks[0]?.key || null;
+                const topGameKey = rankedGames[0]?.key || null;
                 const topBall = fromOptionsOrTitle(BALL_OPTIONS, topBallKey, " Ball");
                 const topMark = fromOptionsOrTitle(MARK_OPTIONS, topMarkKey, " Mark");
                 const topGame = fromOptionsOrTitle(GAME_OPTIONS_TWO, topGameKey);
 
-                if (!ignore) setStats({ regularCaught, regularCompletion, shinyCaught, shinyCompletion, gamesPlayed, topBall, topMark, topGame });
+                const allBalls = buildRankedList(rankedBalls, BALL_OPTIONS, " Ball");
+                const allMarks = buildRankedList(rankedMarks, MARK_OPTIONS, " Mark");
+                const allGames = buildRankedList(rankedGames, GAME_OPTIONS_TWO);
+
+                if (!ignore) setStats({ regularCaught, regularCompletion, shinyCaught, shinyCompletion, gamesPlayed, topBall, topMark, topGame, allBalls, allMarks, allGames });
 
                 // Build recent 5 added list (newest by date first)
                 try {
@@ -433,11 +459,34 @@ export default function PublicProfile() {
                         // Add shiny status to the info object
                         const infoWithShiny = { ...info, isShiny };
 
-                        if (info.caughtAt) {
-                            const parsedDate = new Date(info.caughtAt);
-                            if (!isNaN(parsedDate.getTime())) {
-                                withTimestamps.push({ key, mon, info: infoWithShiny, ts: parsedDate.getTime() });
-                            }
+                        let bestTimestamp = null;
+
+                        // Parse helper
+                        const getTs = (d) => {
+                            if (!d) return null;
+                            const t = new Date(d).getTime();
+                            return isNaN(t) ? null : t;
+                        };
+
+                        if (info.entries && Array.isArray(info.entries)) {
+                            info.entries.forEach(entry => {
+                                if (entry) {
+                                    const ts = getTs(entry.caughtAt) || getTs(entry.date);
+                                    if (ts && (!bestTimestamp || ts > bestTimestamp)) {
+                                        bestTimestamp = ts;
+                                    }
+                                }
+                            });
+                        }
+
+                        // Also check root level
+                        const rootTs = getTs(info.caughtAt) || getTs(info.date);
+                        if (rootTs && (!bestTimestamp || rootTs > bestTimestamp)) {
+                            bestTimestamp = rootTs;
+                        }
+
+                        if (bestTimestamp) {
+                            withTimestamps.push({ key, mon, info: infoWithShiny, ts: bestTimestamp });
                         } else {
                             withoutTimestamps.push({ key, mon, info: infoWithShiny });
                         }
@@ -860,21 +909,98 @@ export default function PublicProfile() {
                             <label>Shiny Completion</label>
                             <div className="field-display">{stats.shinyCompletion}%</div>
                         </div>
-                        <div className="profile-field">
-                            <label>Games Hunted In</label>
-                            <div className="field-display">{stats.gamesPlayed}</div>
+                        {/* --- Games Hunted In --- */}
+                        <div className="profile-field full-span">
+                            <div className="stat-section-header">
+                                <label>Games Hunted In ({stats.gamesPlayed}/{GAME_OPTIONS_TWO.length})</label>
+                                {stats.allGames && stats.allGames.length > STAT_PAGE_SIZE && (
+                                    <div className="stat-page-controls">
+                                        <button className="stat-page-btn" disabled={statPage.games === 0} onClick={() => setStatPage(p => ({ ...p, games: p.games - 1 }))}>
+                                            <ChevronLeft size={14} />
+                                        </button>
+                                        <span className="stat-page-info">{statPage.games + 1}/{Math.ceil(stats.allGames.length / STAT_PAGE_SIZE)}</span>
+                                        <button className="stat-page-btn" disabled={(statPage.games + 1) * STAT_PAGE_SIZE >= stats.allGames.length} onClick={() => setStatPage(p => ({ ...p, games: p.games + 1 }))}>
+                                            <ChevronRight size={14} />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                            <div className={`field-display stat-icon-row${(() => { const s = stats.allGames.slice(statPage.games * STAT_PAGE_SIZE, (statPage.games + 1) * STAT_PAGE_SIZE); return s.length === STAT_PAGE_SIZE ? ' stat-icon-row--full' : ''; })()}`}>
+                                {stats.allGames && stats.allGames.length > 0 ? (
+                                    stats.allGames.slice(statPage.games * STAT_PAGE_SIZE, (statPage.games + 1) * STAT_PAGE_SIZE).map((g, i) => (
+                                        <div key={i} className="stat-icon-item" title={`${g.name}: ${g.count}`}>
+                                            {g.image ? (
+                                                <img src={g.image} alt={g.name} className="stat-icon-img" />
+                                            ) : (
+                                                <span className="stat-icon-text">{g.name}</span>
+                                            )}
+                                            <span className="stat-icon-count">{g.count}</span>
+                                        </div>
+                                    ))
+                                ) : "—"}
+                            </div>
                         </div>
-                        <div className="profile-field">
-                            <label>Most Used Ball</label>
-                            <div className="field-display">{stats.topBall || "—"}</div>
+                        {/* --- Poké Balls Used --- */}
+                        <div className="profile-field full-span">
+                            <div className="stat-section-header">
+                                <label>Poké Balls Used ({stats.allBalls.length}/{BALL_OPTIONS.length - 1})</label>
+                                {stats.allBalls && stats.allBalls.length > STAT_PAGE_SIZE && (
+                                    <div className="stat-page-controls">
+                                        <button className="stat-page-btn" disabled={statPage.balls === 0} onClick={() => setStatPage(p => ({ ...p, balls: p.balls - 1 }))}>
+                                            <ChevronLeft size={14} />
+                                        </button>
+                                        <span className="stat-page-info">{statPage.balls + 1}/{Math.ceil(stats.allBalls.length / STAT_PAGE_SIZE)}</span>
+                                        <button className="stat-page-btn" disabled={(statPage.balls + 1) * STAT_PAGE_SIZE >= stats.allBalls.length} onClick={() => setStatPage(p => ({ ...p, balls: p.balls + 1 }))}>
+                                            <ChevronRight size={14} />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                            <div className={`field-display stat-icon-row${(() => { const s = stats.allBalls.slice(statPage.balls * STAT_PAGE_SIZE, (statPage.balls + 1) * STAT_PAGE_SIZE); return s.length === STAT_PAGE_SIZE ? ' stat-icon-row--full' : ''; })()}`}>
+                                {stats.allBalls && stats.allBalls.length > 0 ? (
+                                    stats.allBalls.slice(statPage.balls * STAT_PAGE_SIZE, (statPage.balls + 1) * STAT_PAGE_SIZE).map((b, i) => (
+                                        <div key={i} className="stat-icon-item" title={`${b.name}: ${b.count}`}>
+                                            {b.image ? (
+                                                <img src={b.image} alt={b.name} className="stat-icon-img" />
+                                            ) : (
+                                                <span className="stat-icon-text">{b.name}</span>
+                                            )}
+                                            <span className="stat-icon-count">{b.count}</span>
+                                        </div>
+                                    ))
+                                ) : "—"}
+                            </div>
                         </div>
-                        <div className="profile-field">
-                            <label>Top Mark</label>
-                            <div className="field-display">{stats.topMark || "—"}</div>
-                        </div>
-                        <div className="profile-field">
-                            <label>Top Game</label>
-                            <div className="field-display">{stats.topGame || "—"}</div>
+                        {/* --- Marks Obtained --- */}
+                        <div className="profile-field full-span">
+                            <div className="stat-section-header">
+                                <label>Marks Obtained ({stats.allMarks.length}/{MARK_OPTIONS.length - 1})</label>
+                                {stats.allMarks && stats.allMarks.length > STAT_PAGE_SIZE && (
+                                    <div className="stat-page-controls">
+                                        <button className="stat-page-btn" disabled={statPage.marks === 0} onClick={() => setStatPage(p => ({ ...p, marks: p.marks - 1 }))}>
+                                            <ChevronLeft size={14} />
+                                        </button>
+                                        <span className="stat-page-info">{statPage.marks + 1}/{Math.ceil(stats.allMarks.length / STAT_PAGE_SIZE)}</span>
+                                        <button className="stat-page-btn" disabled={(statPage.marks + 1) * STAT_PAGE_SIZE >= stats.allMarks.length} onClick={() => setStatPage(p => ({ ...p, marks: p.marks + 1 }))}>
+                                            <ChevronRight size={14} />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                            <div className={`field-display stat-icon-row${(() => { const s = stats.allMarks.slice(statPage.marks * STAT_PAGE_SIZE, (statPage.marks + 1) * STAT_PAGE_SIZE); return s.length === STAT_PAGE_SIZE ? ' stat-icon-row--full' : ''; })()}`}>
+                                {stats.allMarks && stats.allMarks.length > 0 ? (
+                                    stats.allMarks.slice(statPage.marks * STAT_PAGE_SIZE, (statPage.marks + 1) * STAT_PAGE_SIZE).map((m, i) => (
+                                        <div key={i} className="stat-icon-item" title={`${m.name}: ${m.count}`}>
+                                            {m.image ? (
+                                                <img src={m.image} alt={m.name} className="stat-icon-img" />
+                                            ) : (
+                                                <span className="stat-icon-text">{m.name}</span>
+                                            )}
+                                            <span className="stat-icon-count">{m.count}</span>
+                                        </div>
+                                    ))
+                                ) : "—"}
+                            </div>
                         </div>
                         <div className="profile-field full-span recent-field">
                             <label>Recent Entries</label>

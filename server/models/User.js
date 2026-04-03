@@ -37,6 +37,7 @@ const userSchema = new mongoose.Schema({
     type: Map,
     of: new mongoose.Schema({
       caught: Boolean,
+      caughtAt: Number,
       entries: [{
         ball: String,
         mark: String,

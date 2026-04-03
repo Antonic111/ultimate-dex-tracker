@@ -128,7 +128,6 @@ const PSEUDO_LEGENDARY_IDS = new Set([
   
   // Gen 6
   706, // Goodra
-  715, // Noivern
   
   // Gen 7
   784, // Kommo-o
@@ -138,6 +137,49 @@ const PSEUDO_LEGENDARY_IDS = new Set([
   
   // Gen 9
   998, // Baxcalibur
+]);
+
+// Pre-evolutions of each pseudo-legendary line (for "Show Evolutions" toggle)
+const PSEUDO_LEGENDARY_EVOLUTION_IDS = new Set([
+  // Dragonite line
+  147, // Dratini
+  148, // Dragonair
+
+  // Tyranitar line
+  246, // Larvitar
+  247, // Pupitar
+
+  // Salamence line
+  371, // Bagon
+  372, // Shelgon
+
+  // Metagross line
+  374, // Beldum
+  375, // Metang
+
+  // Garchomp line
+  443, // Gible
+  444, // Gabite
+
+  // Hydreigon line
+  633, // Deino
+  634, // Zweilous
+
+  // Goodra line
+  704, // Goomy
+  705, // Sliggoo
+
+  // Kommo-o line
+  782, // Jangmo-o
+  783, // Hakamo-o
+
+  // Dragapult line
+  885, // Dreepy
+  886, // Drakloak
+
+  // Baxcalibur line
+  996, // Frigibax
+  997, // Arctibax
 ]);
 
 // Sub-Legendary Pokemon (lower-tier legendary Pokemon)
@@ -203,150 +245,139 @@ const SUB_LEGENDARY_IDS = new Set([
   1017, // Ogerpon
 ]);
 
-// Starter Pokemon IDs (all starter Pokemon from all generations)
-const STARTER_POKEMON_IDS = new Set([
+// Starter Pokemon base forms only (stage 1)
+const STARTER_BASE_IDS = new Set([
   // Gen 1
-  1, // Bulbasaur
-  2, // Ivysaur
-  3, // Venusaur
-  4, // Charmander
-  5, // Charmeleon
-  6, // Charizard
-  7, // Squirtle
-  8, // Wartortle
-  9, // Blastoise
-  
+  1,   // Bulbasaur
+  4,   // Charmander
+  7,   // Squirtle
   // Gen 2
   152, // Chikorita
-  153, // Bayleef
-  154, // Meganium
   155, // Cyndaquil
-  156, // Quilava
-  157, // Typhlosion
   158, // Totodile
-  159, // Croconaw
-  160, // Feraligatr
-  
   // Gen 3
   252, // Treecko
-  253, // Grovyle
-  254, // Sceptile
   255, // Torchic
-  256, // Combusken
-  257, // Blaziken
   258, // Mudkip
-  259, // Marshtomp
-  260, // Swampert
-  
   // Gen 4
   387, // Turtwig
-  388, // Grotle
-  389, // Torterra
   390, // Chimchar
-  391, // Monferno
-  392, // Infernape
   393, // Piplup
-  394, // Prinplup
-  395, // Empoleon
-  
   // Gen 5
   495, // Snivy
-  496, // Servine
-  497, // Serperior
   498, // Tepig
-  499, // Pignite
-  500, // Emboar
   501, // Oshawott
-  502, // Dewott
-  503, // Samurott
-  
   // Gen 6
   650, // Chespin
-  651, // Quilladin
-  652, // Chesnaught
   653, // Fennekin
-  654, // Braixen
-  655, // Delphox
   656, // Froakie
-  657, // Frogadier
-  658, // Greninja
-  
   // Gen 7
   722, // Rowlet
-  723, // Dartrix
-  724, // Decidueye
   725, // Litten
-  726, // Torracat
-  727, // Incineroar
   728, // Popplio
-  729, // Brionne
-  730, // Primarina
-  
   // Gen 8
   810, // Grookey
-  811, // Thwackey
-  812, // Rillaboom
   813, // Scorbunny
-  814, // Raboot
-  815, // Cinderace
   816, // Sobble
-  817, // Drizzile
-  818, // Inteleon
-  
   // Gen 9
   906, // Sprigatito
-  907, // Floragato
-  908, // Meowscarada
   909, // Fuecoco
-  910, // Crocalor
-  911, // Skeledirge
   912, // Quaxly
-  913, // Quaxwell
-  914, // Quaquaval
 ]);
 
+// Starter evolutions (stage 2 & 3) — shown when "Show Evolutions" is toggled
+const STARTER_EVOLUTION_IDS = new Set([
+  // Gen 1
+  2, 3,   // Ivysaur, Venusaur
+  5, 6,   // Charmeleon, Charizard
+  8, 9,   // Wartortle, Blastoise
+  // Gen 2
+  153, 154, // Bayleef, Meganium
+  156, 157, // Quilava, Typhlosion
+  159, 160, // Croconaw, Feraligatr
+  // Gen 3
+  253, 254, // Grovyle, Sceptile
+  256, 257, // Combusken, Blaziken
+  259, 260, // Marshtomp, Swampert
+  // Gen 4
+  388, 389, // Grotle, Torterra
+  391, 392, // Monferno, Infernape
+  394, 395, // Prinplup, Empoleon
+  // Gen 5
+  496, 497, // Servine, Serperior
+  499, 500, // Pignite, Emboar
+  502, 503, // Dewott, Samurott
+  // Gen 6
+  651, 652, // Quilladin, Chesnaught
+  654, 655, // Braixen, Delphox
+  657, 658, // Frogadier, Greninja
+  // Gen 7
+  723, 724, // Dartrix, Decidueye
+  726, 727, // Torracat, Incineroar
+  729, 730, // Brionne, Primarina
+  // Gen 8
+  811, 812, // Thwackey, Rillaboom
+  814, 815, // Raboot, Cinderace
+  817, 818, // Drizzile, Inteleon
+  // Gen 9
+  907, 908, // Floragato, Meowscarada
+  910, 911, // Crocalor, Skeledirge
+  913, 914, // Quaxwell, Quaquaval
+]);
+
+// Keep for backward compatibility (anything that needs the full set)
+const STARTER_POKEMON_IDS = new Set([...STARTER_BASE_IDS, ...STARTER_EVOLUTION_IDS]);
+
 // Fossil Pokemon IDs (all fossil Pokemon from all generations)
-const FOSSIL_POKEMON_IDS = new Set([
+const FOSSIL_BASE_IDS = new Set([
   // Gen 1
   138, // Omanyte
-  139, // Omastar
   140, // Kabuto
-  141, // Kabutops
-  142, // Aerodactyl
-  
+  142, // Aerodactyl (no standard evolution)
   // Gen 3
   345, // Lileep
-  346, // Cradily
   347, // Anorith
-  348, // Armaldo
-  
   // Gen 4
   408, // Cranidos
-  409, // Rampardos
   410, // Shieldon
-  411, // Bastiodon
-  
   // Gen 5
   564, // Tirtouga
-  565, // Carracosta
   566, // Archen
-  567, // Archeops
-  
   // Gen 6
   696, // Tyrunt
-  697, // Tyrantrum
   698, // Amaura
-  699, // Aurorus
-  
-  // Gen 8
+  // Gen 8 (no evolutions)
   880, // Dracozolt
   881, // Arctozolt
   882, // Dracovish
   883, // Arctovish
 ]);
 
+// Fossil evolutions (shown when "Show Evolutions" is toggled)
+const FOSSIL_EVOLUTION_IDS = new Set([
+  // Gen 1
+  139, // Omastar
+  141, // Kabutops
+  // Gen 3
+  346, // Cradily
+  348, // Armaldo
+  // Gen 4
+  409, // Rampardos
+  411, // Bastiodon
+  // Gen 5
+  565, // Carracosta
+  567, // Archeops
+  // Gen 6
+  697, // Tyrantrum
+  699, // Aurorus
+]);
+
+// Keep for backward compatibility
+const FOSSIL_POKEMON_IDS = new Set([...FOSSIL_BASE_IDS, ...FOSSIL_EVOLUTION_IDS]);
+
 // Baby Pokemon IDs (all baby Pokemon from all generations)
-const BABY_POKEMON_IDS = new Set([
+// Baby forms only
+const BABY_BASE_IDS = new Set([
   // Gen 2
   172, // Pichu
   173, // Cleffa
@@ -356,11 +387,9 @@ const BABY_POKEMON_IDS = new Set([
   238, // Smoochum
   239, // Elekid
   240, // Magby
-  
   // Gen 3
   298, // Azurill
   360, // Wynaut
-  
   // Gen 4
   406, // Budew
   433, // Chingling
@@ -370,10 +399,54 @@ const BABY_POKEMON_IDS = new Set([
   446, // Munchlax
   447, // Riolu
   458, // Mantyke
-  
   // Gen 8
   848, // Toxel
 ]);
+
+// Evolutions of baby Pokemon (shown when "Show Evolutions" is toggled)
+const BABY_EVOLUTION_IDS = new Set([
+  // Pichu → Pikachu → Raichu
+  25, 26,
+  // Cleffa → Clefairy → Clefable
+  35, 36,
+  // Igglybuff → Jigglypuff → Wigglytuff
+  39, 40,
+  // Togepi → Togetic → Togekiss
+  176, 468,
+  // Tyrogue → Hitmonlee / Hitmonchan / Hitmontop
+  106, 107, 237,
+  // Smoochum → Jynx
+  124,
+  // Elekid → Electabuzz → Electivire
+  125, 466,
+  // Magby → Magmar → Magmortar
+  126, 467,
+  // Azurill → Marill → Azumarill
+  183, 184,
+  // Wynaut → Wobbuffet
+  202,
+  // Budew → Roselia → Roserade
+  315, 407,
+  // Chingling → Chimecho
+  358,
+  // Bonsly → Sudowoodo
+  185,
+  // Mime Jr. → Mr. Mime → Mr. Rime
+  122, 866,
+  // Happiny → Chansey → Blissey
+  113, 242,
+  // Munchlax → Snorlax
+  143,
+  // Riolu → Lucario
+  448,
+  // Mantyke → Mantine
+  226,
+  // Toxel → Toxtricity
+  849,
+]);
+
+// Keep for backward compatibility
+const BABY_POKEMON_IDS = new Set([...BABY_BASE_IDS, ...BABY_EVOLUTION_IDS]);
 
 // Paradox Pokemon IDs (all Paradox Pokemon from Gen 9)
 const PARADOX_POKEMON_IDS = new Set([
@@ -441,6 +514,16 @@ export function isPseudoLegendary(pokemon) {
 }
 
 /**
+ * Check if a Pokemon is a pre-evolution of a pseudo-legendary
+ * @param {Object} pokemon - Pokemon object with id property
+ * @returns {boolean}
+ */
+export function isPseudoLegendaryEvo(pokemon) {
+  if (!pokemon || !pokemon.id) return false;
+  return PSEUDO_LEGENDARY_EVOLUTION_IDS.has(pokemon.id);
+}
+
+/**
  * Check if a Pokemon is sub-legendary
  * @param {Object} pokemon - Pokemon object with id property
  * @returns {boolean}
@@ -457,7 +540,17 @@ export function isSubLegendary(pokemon) {
  */
 export function isStarter(pokemon) {
   if (!pokemon || !pokemon.id) return false;
-  return STARTER_POKEMON_IDS.has(pokemon.id);
+  return STARTER_BASE_IDS.has(pokemon.id);
+}
+
+/**
+ * Check if a Pokemon is an evolution of a starter
+ * @param {Object} pokemon - Pokemon object with id property
+ * @returns {boolean}
+ */
+export function isStarterEvo(pokemon) {
+  if (!pokemon || !pokemon.id) return false;
+  return STARTER_EVOLUTION_IDS.has(pokemon.id);
 }
 
 /**
@@ -467,7 +560,17 @@ export function isStarter(pokemon) {
  */
 export function isFossil(pokemon) {
   if (!pokemon || !pokemon.id) return false;
-  return FOSSIL_POKEMON_IDS.has(pokemon.id);
+  return FOSSIL_BASE_IDS.has(pokemon.id);
+}
+
+/**
+ * Check if a Pokemon is an evolution of a fossil Pokemon
+ * @param {Object} pokemon - Pokemon object with id property
+ * @returns {boolean}
+ */
+export function isFossilEvo(pokemon) {
+  if (!pokemon || !pokemon.id) return false;
+  return FOSSIL_EVOLUTION_IDS.has(pokemon.id);
 }
 
 /**
@@ -477,7 +580,17 @@ export function isFossil(pokemon) {
  */
 export function isBaby(pokemon) {
   if (!pokemon || !pokemon.id) return false;
-  return BABY_POKEMON_IDS.has(pokemon.id);
+  return BABY_BASE_IDS.has(pokemon.id);
+}
+
+/**
+ * Check if a Pokemon is an evolution of a baby Pokemon
+ * @param {Object} pokemon - Pokemon object with id property
+ * @returns {boolean}
+ */
+export function isBabyEvo(pokemon) {
+  if (!pokemon || !pokemon.id) return false;
+  return BABY_EVOLUTION_IDS.has(pokemon.id);
 }
 
 /**
@@ -532,7 +645,7 @@ export function getPokemonCategories() {
     { name: "Ultra Beast", value: "ultra-beast" },
     { name: "Pseudo Legendary", value: "pseudo-legendary" },
     { name: "Paradox Mons", value: "paradox" },
-    { name: "Starter Lines", value: "starter" },
+    { name: "Starters", value: "starter" },
     { name: "Fossil Mons", value: "fossil" },
     { name: "Baby Mons", value: "baby" }
   ];

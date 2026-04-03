@@ -779,6 +779,7 @@ export default function Counters() {
         updatedCaughtInfo = {
           ...existingCaughtInfo,
           caught: true,
+          caughtAt: Date.now(),
           entries: [...existingCaughtInfo.entries, caughtEntry]
         };
         console.log('Completion - Adding to existing entries:', updatedCaughtInfo);
@@ -786,6 +787,7 @@ export default function Counters() {
         // Pokemon is not caught yet, create new caught info
         updatedCaughtInfo = {
           caught: true,
+          caughtAt: Date.now(),
           entries: [caughtEntry]
         };
         console.log('Completion - Creating new caught info:', updatedCaughtInfo);

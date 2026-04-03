@@ -1,5 +1,23 @@
 [
   {
+    "date": "2026-04-02",
+    "version": "v1.1.1",
+    "type": "feature",
+    "title": "",
+    "description": "",
+    "features": [
+      "Updated profile pages to display more collection statistics and uses visual icons instead of plain numbers.",
+      "Added the Show Evolutions toggle when searching in the Pseudo Legendary, Starters, Fossil Mons & Baby Mons categories."
+    ],
+    "fixes": [
+      "Refined the recent entries on the profile page to improve what mons get displayed and include entries from the counters page.",
+      "Fixed Alpha Litleo showing as a female gender form instead of just Alpha Litleo.",
+      "Fixed Noivern appearing under Pseudo Legendary search filter.",
+      "Renamed Starter Lines search category to now just Staters to match the new Show Evolution toggle related to it.",
+      "Fixed a bunch of broken sprites in the Other Forms category."
+    ]
+  },
+  {
     "date": "2026-02-14",
     "version": "v1.1.0",
     "type": "feature",

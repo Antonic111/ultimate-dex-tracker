@@ -16,7 +16,7 @@ import ProgressManager from "./components/Progress/ProgressManager";
 import SearchBar from "./components/Shared/SearchBar";
 import NoResults from "./components/Shared/NoResults";
 import { formatPokemonName, getLevenshteinDistance, getEvolutionChainIds, findPokemon } from "./utils";
-import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isSubLegendary, isStarter, isFossil, isBaby, isParadox, getPokemonCategory } from "./utils/pokemonCategories";
+import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isPseudoLegendaryEvo, isSubLegendary, isStarter, isStarterEvo, isFossil, isFossilEvo, isBaby, isBabyEvo, isParadox, getPokemonCategory } from "./utils/pokemonCategories";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { MessageProvider } from "./components/Shared/MessageContext";
@@ -1135,17 +1135,17 @@ export default function App() {
             case "ultra-beast":
               return isUltraBeast(poke);
             case "pseudo-legendary":
-              return isPseudoLegendary(poke);
+              return isPseudoLegendary(poke) || (filters.showEvolutions && isPseudoLegendaryEvo(poke));
             case "sub-legendary":
               return isSubLegendary(poke);
             case "paradox":
               return isParadox(poke);
             case "starter":
-              return isStarter(poke);
+              return isStarter(poke) || (filters.showEvolutions && isStarterEvo(poke));
             case "fossil":
-              return isFossil(poke);
+              return isFossil(poke) || (filters.showEvolutions && isFossilEvo(poke));
             case "baby":
-              return isBaby(poke);
+              return isBaby(poke) || (filters.showEvolutions && isBabyEvo(poke));
             default:
               return false;
           }
@@ -1303,6 +1303,7 @@ export default function App() {
 
           const freshInfo = {
             caught: true,
+            caughtAt: Date.now(),
             entries: [newEntry]
           };
 
@@ -1375,6 +1376,7 @@ export default function App() {
 
         const freshInfo = {
           caught: true,
+          caughtAt: Date.now(),
           entries: [newEntry]
         };
 

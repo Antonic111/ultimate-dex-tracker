@@ -779,8 +779,8 @@ export default function SearchBar({
                             </span>
                         </label>
 
-                        {/* Show Evolutions Switch - only show when there's a search term */}
-                        {filters.searchTerm && (
+                        {/* Show Evolutions Switch - show when there's a search term OR a category that supports evolutions is selected */}
+                        {(filters.searchTerm || ['pseudo-legendary', 'starter', 'fossil', 'baby'].some(c => (filters.categories || []).includes(c))) && (
                             <label className="flex items-center gap-2 cursor-pointer" title="Show evolution chain members in search results">
                                 <div className="switch">
                                     <input
