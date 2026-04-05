@@ -279,7 +279,11 @@ export default function DexSection({
                   : 'w-full mb-8';
               return (
                 <div className={containerClassName} key={`box-${box[0]?.id ?? i}-${i}`}>
-                  <div className="rounded-lg p-2 md:p-3 shadow-lg overflow-visible" style={{ backgroundColor: 'var(--searchbar-bg)', border: '1px solid var(--border-color)', contentVisibility: 'auto', containIntrinsicSize: '400px' }}>
+                  <div className="rounded-lg p-2 md:p-3 shadow-lg overflow-visible" style={{ 
+                    backgroundColor: 'var(--searchbar-bg)', 
+                    border: '1px solid var(--border-color)', 
+                    ...(boxIndex > 0 ? { contentVisibility: 'auto', containIntrinsicSize: 'auto 400px' } : {}) 
+                  }}>
                     {/* Box Header */}
                     <div className="flex items-center justify-between py-0">
                       <span className="text-lg font-semibold leading-none self-center m-0 p-0" style={{ color: 'var(--accent)', margin: 0, padding: 0 }}>
@@ -373,6 +377,7 @@ export default function DexSection({
                         const isBlocked = poke._isBlocked === true;
                         const isCaught = safeIsCaught(poke);
                         const displayName = getDisplayName(poke.name);
+                        const absoluteIndex = i * 30 + idx;
 
                         return (
                           <PokemonGridItem
@@ -384,6 +389,7 @@ export default function DexSection({
                             readOnly={readOnly}
                             displayName={displayName}
                             dexNumber={getDexNumber(poke?.id)}
+                            priorityLoad={absoluteIndex < 30}
                             onSelect={onSelect}
                             onToggleCaught={onToggleCaught}
                             handleTouchStart={handleTouchStart}

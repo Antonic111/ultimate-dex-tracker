@@ -15,6 +15,7 @@ function PokemonGridItem({
   readOnly,
   displayName,
   dexNumber,
+  priorityLoad = false,
   onSelect,
   onToggleCaught,
   handleTouchStart,
@@ -110,9 +111,9 @@ function PokemonGridItem({
           className="w-12 h-12 md:w-16 md:h-16 object-contain"
           width={64}
           height={64}
-          loading="lazy"
+          loading={priorityLoad ? "eager" : "lazy"}
           decoding="async"
-          fetchPriority="low"
+          fetchPriority={priorityLoad ? "high" : "low"}
           draggable={false}
           onError={(e) => (e.currentTarget.style.display = "none")}
           style={{ filter: isBlocked ? "grayscale(100%)" : "none" }}
@@ -145,7 +146,6 @@ export default memo(PokemonGridItem, (prev, next) => {
     prev.readOnly === next.readOnly &&
     prev.displayName === next.displayName &&
     prev.dexNumber === next.dexNumber &&
-    prev.onSelect === next.onSelect &&
-    prev.onToggleCaught === next.onToggleCaught
+    prev.priorityLoad === next.priorityLoad
   );
 });

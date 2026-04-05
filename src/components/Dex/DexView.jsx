@@ -111,10 +111,10 @@ export default function DexView({
     profileOwnerDexPreferences = null // Dex preferences of the profile owner (for progress bar counts)
 }) {
     // Handle sidebar open/close
-    const handlePokemonSelect = (pokemon) => {
+    const handlePokemonSelect = React.useCallback((pokemon) => {
         setSelectedPokemon(pokemon);
         setSidebarOpen(true);
-    };
+    }, [setSelectedPokemon, setSidebarOpen]);
 
     const handleSidebarClose = () => {
         setSidebarOpen(false);
@@ -168,7 +168,8 @@ export default function DexView({
     const shouldUseCustomListUpdated = pokemonList !== null || customFilterMons !== null;
 
     // Get suggestion for no results - using the EXACT same logic as App.jsx
-    const getSuggestion = () => {
+    const finalSuggestion = React.useMemo(() => {
+        if (suggestion) return suggestion;
         if (!filters.searchTerm?.trim()) return "";
 
         const searchTerm = filters.searchTerm.toLowerCase();
@@ -209,9 +210,7 @@ export default function DexView({
         }
 
         return "";
-    };
-
-    const finalSuggestion = suggestion || getSuggestion();
+    }, [suggestion, filters.searchTerm, shouldUseCustomListUpdated, allMons, dexSections]);
 
     // Check if we have any active search criteria
     const hasActiveSearch = filters.searchTerm || (filters.game && filters.game.length > 0) || (filters.gameObtainable && filters.gameObtainable.length > 0) || (filters.ball && filters.ball.length > 0) || (filters.mark && filters.mark.length > 0) || (filters.method && filters.method.length > 0) || (filters.type && filters.type.length > 0) || (filters.gen && filters.gen.length > 0) || filters.caught || (filters.categories && filters.categories.length > 0);

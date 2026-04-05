@@ -13,7 +13,8 @@
       "Fixed a issue where all the Alpha Genders & Other's Box's were showing number 1 instead of increasing each box.",
       "Fixed a issue where Pokemon that should be locked were becoming unlocked while adding new data to the site.",
       "Fixed a issue where the recent entries on the profile page were not updating when a new entry was added.",
-      "Multiple admin related fixes."
+      "Multiple admin related fixes.",
+      "Many page shift fixes and interaction speed fixes for improved user experience."
     ]
   },
   {
