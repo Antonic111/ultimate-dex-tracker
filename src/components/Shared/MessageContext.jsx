@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useLayoutEffect } from "react";
 import { SquareCheck, SquareX, TriangleAlert, Info, Trash2, Heart, HeartCrack, Camera, Link, Send, Lock } from "lucide-react";
 
 const MessageContext = createContext();
@@ -42,7 +42,18 @@ export const MessageProvider = ({ children }) => {
     startExit(id);
   };
 
+  useLayoutEffect(() => {
+    const handleGlobalToast = (e) => {
+      const { text, type, duration } = e.detail;
+      showMessage(text, type, duration);
+    };
+
+    window.addEventListener("GLOBAL_TOAST", handleGlobalToast);
+    return () => window.removeEventListener("GLOBAL_TOAST", handleGlobalToast);
+  }, []);
+
   return (
+
     <MessageContext.Provider value={{ showMessage }}>
       {children}
        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[99999] flex flex-col gap-3 pointer-events-none max-w-[90vw]">

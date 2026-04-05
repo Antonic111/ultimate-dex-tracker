@@ -12,6 +12,10 @@
   padding: 0 1rem;
 }
 
+.admin-page .page-title {
+  @apply mt-12 mb-6 text-5xl font-extrabold tracking-wide relative text-[var(--text-color)];
+}
+
 
 .admin-message {
   display: flex;
@@ -714,6 +718,10 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .admin-page .page-title {
+    @apply text-4xl my-8;
+  }
+
   .admin-container {
     padding: 0 0.5rem;
   }
@@ -761,5 +769,11 @@
     right: 1rem;
     transform: none;
     min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-page .page-title {
+    @apply text-3xl my-6;
   }
 }

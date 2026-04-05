@@ -299,7 +299,7 @@ export default function DexSection({
                           ];
                           // Check for specific titles first before doing form type matching
                           if (title === "Alpha Genders & Other's") {
-                            return `Alpha Genders & Other's Box 1`;
+                            return `Alpha Genders & Other's Box ${boxIndex + 1}`;
                           }
 
                           const tstr = String(title || "").toLowerCase();

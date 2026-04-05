@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Users, Bug, Shield, Settings, Search, ChevronDown, CheckCircle, XCircle, AlertCircle, Calendar, Mail, UserCheck, Filter, Trash2, Check } from 'lucide-react';
+import { Users, Bug, Shield, Settings, Search, ChevronDown, CheckCircle, XCircle, AlertCircle, Calendar, Mail, UserCheck, Filter, Trash2, Check, ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMessage } from '../components/Shared/MessageContext';
 import { buildApiUrl } from '../config/api.js';
@@ -14,11 +14,18 @@ const Admin = () => {
   const [featureRequests, setFeatureRequests] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(null); // null = checking, true = admin, false = not admin
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
   
   // User management
   const [userSearch, setUserSearch] = useState('');
+  const [userPage, setUserPage] = useState(1);
+  const [userSortField, setUserSortField] = useState('joined'); // 'username', 'admin', 'joined'
+  const [userSortDir, setUserSortDir] = useState('desc'); // 'asc', 'desc'
   const [selectedUser, setSelectedUser] = useState(null);
   const [showUserActions, setShowUserActions] = useState(false);
+  const [editingBio, setEditingBio] = useState('');
+  const [editingUsername, setEditingUsername] = useState('');
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
   
   // Bug report management
   const [bugReportSearch, setBugReportSearch] = useState('');
@@ -56,6 +63,21 @@ const Admin = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Handle body overflow when modals are open
+  useEffect(() => {
+    if (showUserActions || showDeleteModal || showResolveModal) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [showUserActions, showDeleteModal, showResolveModal]);
 
   // Redirect if not admin (only after we've checked)
   useEffect(() => {
@@ -98,7 +120,7 @@ const Admin = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [usersRes, bugReportsRes, featureRequestsRes] = await Promise.all([
+      const [usersRes, bugReportsRes, featureRequestsRes, settingsRes] = await Promise.all([
         fetch(buildApiUrl('/admin/users'), {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
           credentials: 'include'
@@ -110,7 +132,8 @@ const Admin = () => {
         fetch(buildApiUrl('/admin/feature-requests'), {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
           credentials: 'include'
-        })
+        }),
+        fetch(buildApiUrl('/site-settings'))
       ]);
 
       if (usersRes.ok) {
@@ -135,6 +158,11 @@ const Admin = () => {
           const featureRequestsData = await featureRequestsRes.json();
           setFeatureRequests(featureRequestsData.featureRequests);
         }
+      }
+
+      if (settingsRes.ok) {
+        const settingsData = await settingsRes.json();
+        setMaintenanceMode(settingsData.maintenanceMode || false);
       }
     } catch (err) {
       showMessage('Failed to load admin data', 'error');
@@ -180,10 +208,120 @@ const Admin = () => {
     }
   };
 
+  const handleToggleMaintenance = async (mode, minutesDelay = null) => {
+    try {
+      const payload = { maintenanceMode: mode };
+      
+      if (minutesDelay !== null) {
+        // Calculate future time in milliseconds
+        payload.maintenanceStartTime = Date.now() + (minutesDelay * 60 * 1000);
+      } else {
+        payload.maintenanceStartTime = null;
+      }
+
+      const response = await fetch(buildApiUrl('/admin/site-settings'), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        body: JSON.stringify(payload),
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setMaintenanceMode(result.settings.maintenanceMode);
+        
+        if (result.settings.maintenanceStartTime) {
+          showMessage(`Maintenance mode scheduled for ${minutesDelay} minutes from now`, 'success');
+        } else {
+          showMessage(`Maintenance mode ${result.settings.maintenanceMode ? 'enabled' : 'disabled'}`, 'success');
+        }
+      } else {
+        const error = await response.json();
+        showMessage(error.error || 'Failed to update maintenance mode', 'error');
+      }
+    } catch (err) {
+      showMessage('Failed to update maintenance mode', 'error');
+    }
+  };
+
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.username.toLowerCase().includes(userSearch.toLowerCase());
     return matchesSearch;
+  }).sort((a, b) => {
+    let comparison = 0;
+    if (userSortField === 'username') {
+      comparison = a.username.localeCompare(b.username);
+    } else if (userSortField === 'admin') {
+      // sort admin=true before admin=false usually, so logic here:
+      comparison = (a.isAdmin === b.isAdmin) ? 0 : (a.isAdmin ? -1 : 1);
+    } else if (userSortField === 'joined') {
+      comparison = new Date(a.createdAt) - new Date(b.createdAt);
+    }
+    
+    return userSortDir === 'desc' ? -comparison : comparison;
   });
+
+  const handleUserSort = (field) => {
+    if (userSortField === field) {
+      setUserSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setUserSortField(field);
+      setUserSortDir('desc');
+    }
+  };
+
+  const USERS_PER_PAGE = 20;
+  const paginatedUsers = filteredUsers.slice((userPage - 1) * USERS_PER_PAGE, userPage * USERS_PER_PAGE);
+  const totalUserPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
+
+  useEffect(() => {
+    setUserPage(1);
+  }, [userSearch]);
+
+  useEffect(() => {
+    if (selectedUser) {
+      setEditingBio(selectedUser.bio || '');
+      setEditingUsername(selectedUser.username || '');
+    }
+  }, [selectedUser]);
+
+  const handleSaveProfile = async () => {
+    if (!selectedUser) return;
+    setIsSavingProfile(true);
+    try {
+      const response = await fetch(buildApiUrl(`/admin/users/${selectedUser._id}/profile`), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        body: JSON.stringify({ 
+          bio: editingBio,
+          username: editingUsername 
+        }),
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        showMessage(result.message, 'success');
+        setUsers(users.map(u => 
+          u._id === selectedUser._id ? { ...u, bio: result.bio, username: result.username } : u
+        ));
+        setSelectedUser({ ...selectedUser, bio: result.bio, username: result.username });
+      } else {
+        const error = await response.json();
+        showMessage(error.error || 'Failed to update profile', 'error');
+      }
+    } catch (err) {
+      showMessage('Failed to update profile', 'error');
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
 
   const filteredBugReports = bugReports.filter(report => {
     const matchesSearch = report.title.toLowerCase().includes(bugReportSearch.toLowerCase()) ||
@@ -363,6 +501,13 @@ const Admin = () => {
             <Shield size={18} />
             Feature Requests ({featureRequests.length})
           </button>
+          <button 
+            className={`admin-tab ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            <Settings size={18} />
+            Site Settings
+          </button>
         </div>
 
         {/* Users Tab */}
@@ -386,13 +531,31 @@ const Admin = () => {
 
             <div className="users-table">
               <div className="table-header">
-                <div className="col-username">Username</div>
-                <div className="col-admin">Admin</div>
-                <div className="col-joined">Joined</div>
+                <div 
+                  className="col-username" 
+                  onClick={() => handleUserSort('username')}
+                  style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  Username {userSortField === 'username' && (userSortDir === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                </div>
+                <div 
+                  className="col-admin" 
+                  onClick={() => handleUserSort('admin')}
+                  style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  Admin {userSortField === 'admin' && (userSortDir === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                </div>
+                <div 
+                  className="col-joined" 
+                  onClick={() => handleUserSort('joined')}
+                  style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  Joined {userSortField === 'joined' && (userSortDir === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                </div>
                 <div className="col-actions">Actions</div>
               </div>
               
-              {filteredUsers.map((user) => (
+              {paginatedUsers.map((user) => (
                 <div key={user._id} className="table-row">
                   <div className="col-username">
                     <span className="username">{user.username}</span>
@@ -423,6 +586,54 @@ const Admin = () => {
               ))}
             </div>
 
+            {filteredUsers.length > USERS_PER_PAGE && (
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px', marginTop: '20px' }}>
+                <button
+                  onClick={() => setUserPage(prev => Math.max(prev - 1, 1))}
+                  disabled={userPage === 1}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-color)',
+                    background: userPage === 1 ? 'var(--bg-secondary)' : 'var(--accent)',
+                    color: userPage === 1 ? 'var(--text-secondary)' : 'var(--bg-primary)',
+                    cursor: userPage === 1 ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    fontWeight: 'bold',
+                    opacity: userPage === 1 ? 0.5 : 1
+                  }}
+                >
+                  <ChevronLeft size={16} /> Prev
+                </button>
+                
+                <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>
+                  Page {userPage} of {totalUserPages}
+                </span>
+
+                <button
+                  onClick={() => setUserPage(prev => Math.min(prev + 1, totalUserPages))}
+                  disabled={userPage >= totalUserPages}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-color)',
+                    background: userPage >= totalUserPages ? 'var(--bg-secondary)' : 'var(--accent)',
+                    color: userPage >= totalUserPages ? 'var(--text-secondary)' : 'var(--bg-primary)',
+                    cursor: userPage >= totalUserPages ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    fontWeight: 'bold',
+                    opacity: userPage >= totalUserPages ? 0.5 : 1
+                  }}
+                >
+                  Next <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
+
             {/* User Actions Modal */}
             {selectedUser && showUserActions && (
               <div className="user-actions-dropdown">
@@ -447,13 +658,114 @@ const Admin = () => {
                       </span>
                     </button>
                   </div>
-                  <div className="user-actions-content">
+                  <div className="user-actions-content" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    
+                    <div style={{ padding: '12px', background: 'var(--bg-primary)', borderRadius: '8px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold', marginBottom: '4px' }}>Email Address</div>
+                        <div style={{ color: 'var(--text-primary)', fontWeight: '500', wordBreak: 'break-all' }}>{selectedUser.email || 'N/A'}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold', marginBottom: '4px' }}>Member Since</div>
+                        <div style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{new Date(selectedUser.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                      </div>
+                    </div>
+
                     <div className="action-item">
-                      <label>Admin Status:</label>
-                      <span className={`status-badge ${selectedUser.isAdmin ? 'admin' : 'user'}`}>
-                        {selectedUser.isAdmin ? 'Admin' : 'User'}
+                      <label>Verification Status</label>
+                      <span className={`status-badge ${selectedUser.verified ? 'verified' : 'unverified'}`}>
+                        {selectedUser.verified ? 'Verified' : 'Pending'}
                       </span>
                     </div>
+
+                    <div className="action-item">
+                      <label>Role</label>
+                      <span className={`status-badge ${selectedUser.isAdmin ? 'admin' : 'user'}`}>
+                        {selectedUser.isAdmin ? 'Administrator' : 'Standard User'}
+                      </span>
+                    </div>
+
+                    <div style={{ padding: '12px', background: 'var(--bg-primary)', borderRadius: '8px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold' }}>Username</label>
+                        <input
+                          type="text"
+                          value={editingUsername}
+                          onChange={(e) => setEditingUsername(e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '8px',
+                            borderRadius: '6px',
+                            background: 'var(--bg-secondary)',
+                            border: '1px solid var(--border-color)',
+                            color: 'var(--text-primary)',
+                            fontFamily: 'inherit',
+                            fontSize: '0.9rem'
+                          }}
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold' }}>User Bio</label>
+                        <textarea
+                          value={editingBio}
+                          onChange={(e) => setEditingBio(e.target.value)}
+                          placeholder="Write something about this user..."
+                          style={{
+                            width: '100%',
+                            minHeight: '80px',
+                            padding: '8px',
+                            borderRadius: '6px',
+                            background: 'var(--bg-secondary)',
+                            border: '1px solid var(--border-color)',
+                            color: 'var(--text-primary)',
+                            resize: 'vertical',
+                            fontFamily: 'inherit',
+                            fontSize: '0.9rem'
+                          }}
+                        />
+                      </div>
+                      <button 
+                        onClick={handleSaveProfile}
+                        disabled={isSavingProfile || (editingBio === (selectedUser.bio || '') && editingUsername === selectedUser.username)}
+                        style={{
+                          alignSelf: 'flex-end',
+                          padding: '6px 12px',
+                          background: (isSavingProfile || (editingBio === (selectedUser.bio || '') && editingUsername === selectedUser.username)) ? 'var(--bg-secondary)' : 'var(--accent)',
+                          color: (isSavingProfile || (editingBio === (selectedUser.bio || '') && editingUsername === selectedUser.username)) ? 'var(--text-secondary)' : '#1a1a1a',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: '6px',
+                          fontWeight: 'bold',
+                          cursor: (isSavingProfile || (editingBio === (selectedUser.bio || '') && editingUsername === selectedUser.username)) ? 'not-allowed' : 'pointer',
+                          fontSize: '0.85rem',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        {isSavingProfile ? 'Saving...' : 'Save Profile Changes'}
+                      </button>
+                    </div>
+
+                    <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
+                      <button 
+                        onClick={() => navigate(`/u/${selectedUser.username}`)}
+                        style={{
+                          flex: 1,
+                          padding: '10px',
+                          background: 'var(--accent)',
+                          color: '#1a1a1a',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <UserCheck size={18} /> View Public Profile
+                      </button>
+                    </div>
+
                   </div>
                 </div>
               </div>
@@ -697,6 +1009,110 @@ const Admin = () => {
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Settings Tab */}
+        {activeTab === 'settings' && (
+          <div className="admin-section">
+            <div className="section-header">
+              <h2>Site Settings</h2>
+            </div>
+            
+            <div className="settings-container" style={{ padding: '20px', backgroundColor: 'var(--progress-bg)', borderRadius: '12px', border: '1px solid #444', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h3 style={{ margin: 0, color: 'var(--accent)', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <AlertCircle size={20} /> Maintenance Mode
+                  </h3>
+                  <p style={{ margin: '8px 0 0 0', color: 'var(--progressbar-info)', fontSize: '0.9rem' }}>
+                    When active, only admins can access the site. Other users will see a maintenance screen.
+                  </p>
+                </div>
+                
+                {maintenanceMode ? (
+                  <button
+                    onClick={() => handleToggleMaintenance(false)}
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      border: 'none',
+                      backgroundColor: '#ef4444',
+                      color: 'white',
+                      transition: 'background-color 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <XCircle size={18} />
+                    Disable Maintenance
+                  </button>
+                ) : (
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                      onClick={() => handleToggleMaintenance(true, 5)}
+                      style={{
+                        padding: '10px 15px',
+                        borderRadius: '8px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        border: 'none',
+                        backgroundColor: '#f59e0b',
+                        color: 'white',
+                        transition: 'background-color 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <AlertCircle size={18} />
+                      In 5 Mins
+                    </button>
+                    <button
+                      onClick={() => handleToggleMaintenance(true, 15)}
+                      style={{
+                        padding: '10px 15px',
+                        borderRadius: '8px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        border: 'none',
+                        backgroundColor: '#f59e0b',
+                        color: 'white',
+                        transition: 'background-color 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <AlertCircle size={18} />
+                      In 15 Mins
+                    </button>
+                    <button
+                      onClick={() => handleToggleMaintenance(true)}
+                      style={{
+                        padding: '10px 20px',
+                        borderRadius: '8px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        border: 'none',
+                        backgroundColor: '#10b981',
+                        color: 'white',
+                        transition: 'background-color 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <CheckCircle size={18} />
+                      Enable Now
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

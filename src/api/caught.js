@@ -23,6 +23,9 @@ export async function updateCaughtData(username, key, infoMap) {
     }
   } catch (err) {
     console.error("updateCaughtData error:", err);
+    window.dispatchEvent(new CustomEvent("GLOBAL_TOAST", {
+      detail: { text: "Error: Could not save to server. Please check your connection or wait a moment.", type: "error" }
+    }));
     throw err;
   }
 }

@@ -48,6 +48,8 @@ import { LoadingProvider, useLoading } from "./components/Shared/LoadingContext"
 import { LoadingSpinner } from "./components/Shared";
 import Footer from "./components/Shared/Footer";
 import CustomScrollbar from "./components/Shared/CustomScrollbar";
+import MaintenanceScreen from "./components/Shared/MaintenanceScreen";
+import { buildApiUrl } from "./config/api.js";
 import { getFilteredFormsData, getDexPreferences } from "./utils/dexPreferences";
 import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "./data/blockedShinies";
 import { createPortal } from "react-dom";
@@ -327,6 +329,8 @@ export default function App() {
   const [authTimeout, setAuthTimeout] = useState(false); // Timeout flag for bots/crawlers
   const [dexSections, setDexSections] = useState(() => createDexSections());
   const [currentDexPreferences, setCurrentDexPreferences] = useState(() => getDexPreferences());
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [maintenanceStartTime, setMaintenanceStartTime] = useState(null);
 
   // Mobile keyboard handling
   useMobileKeyboardHandler();
@@ -358,8 +362,21 @@ export default function App() {
         // Try up to 3 times on mobile with delays
         for (let attempt = 1; attempt <= 3; attempt++) {
           try {
-            userData = await authAPI.getCurrentUser();
-            break; // Success, exit retry loop
+            const [userRes, settingsRes] = await Promise.allSettled([
+              authAPI.getCurrentUser(),
+              fetch(buildApiUrl('/site-settings')).then(res => res.json())
+            ]);
+            
+            if (settingsRes.status === 'fulfilled' && settingsRes.value) {
+              setMaintenanceMode(settingsRes.value.maintenanceMode || false);
+              setMaintenanceStartTime(settingsRes.value.maintenanceStartTime || null);
+            }
+            if (userRes.status === 'fulfilled') {
+              userData = userRes.value;
+              break; // Success, exit retry loop
+            } else {
+              throw userRes.reason;
+            }
           } catch (error) {
             authError = error;
             if (attempt < 3) {
@@ -371,7 +388,19 @@ export default function App() {
       } else {
         // Desktop: single attempt
         try {
-          userData = await authAPI.getCurrentUser();
+          // Fetch settings and auth in parallel on Desktop to save time
+          const [userRes, settingsRes] = await Promise.allSettled([
+            authAPI.getCurrentUser(),
+            fetch(buildApiUrl('/site-settings')).then(res => res.json())
+          ]);
+          
+          if (userRes.status === 'fulfilled') userData = userRes.value;
+          else authError = userRes.reason;
+          
+          if (settingsRes.status === 'fulfilled' && settingsRes.value) {
+            setMaintenanceMode(settingsRes.value.maintenanceMode || false);
+            setMaintenanceStartTime(settingsRes.value.maintenanceStartTime || null);
+          }
         } catch (error) {
           authError = error;
         }
@@ -551,6 +580,32 @@ export default function App() {
   }, []);
 
 
+
+  useEffect(() => {
+    // Poll maintenance mode every 60 seconds
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(buildApiUrl('/site-settings'));
+        if (response.ok) {
+          const settings = await response.json();
+          setMaintenanceMode(settings.maintenanceMode || false);
+          setMaintenanceStartTime(settings.maintenanceStartTime || null);
+        }
+      } catch (error) {
+        // Silently fail, could be offline or deployed
+      }
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const [currentTime, setCurrentTime] = useState(Date.now());
+  useEffect(() => {
+    if (maintenanceStartTime) {
+      const timer = setInterval(() => setCurrentTime(Date.now()), 10000); // 10 second updates
+      return () => clearInterval(timer);
+    }
+  }, [maintenanceStartTime]);
 
   useEffect(() => {
     // close sidebar on login/logout
@@ -922,6 +977,11 @@ export default function App() {
   // Listen for caught data changes from other components (like Counters page)
   useEffect(() => {
     const handleCaughtDataChanged = (event) => {
+      // Skip events that App.jsx itself dispatched — those handlers already update
+      // state directly (setCaught / setCaughtInfoMap). Re-processing them here would
+      // overwrite uncatch operations back to caught=true.
+      if (event.detail?.source === 'app') return;
+
       const { pokemon, caughtInfo, caughtKey } = event.detail;
       console.log('App.jsx - Received caughtDataChanged event:', { pokemon, caughtInfo, caughtKey });
 
@@ -994,14 +1054,17 @@ export default function App() {
   }, [resetModal.show]);
 
   const filterMons = useCallback((list, forceShowForms = false, isShiny = false) => {
-    return list.filter(poke => {
+    return list.flatMap(poke => {
       // 🧬 Respect toggle or force flag
       if (!forceShowForms && !showForms && poke.formType && poke.formType !== "main" && poke.formType !== "default") {
-        return false;
+        return [];
       }
 
-      // Mark shiny Pokemon as blocked based on user preferences (but don't filter them out)
-      // IMPORTANT: Only apply blocking to shiny Pokemon, never to non-shiny
+      // Compute blocked state without mutating the shared source object.
+      // Previously poke._isBlocked was set directly on the original object, which
+      // caused flickering: multiple useMemo passes (shiny vs non-shiny) ran in the
+      // same render cycle and overwrote each other's mutations on the same reference.
+      let blocked = false;
       if (isShiny && currentDexPreferences) {
         // Check if Pokemon should be blocked by ID
         const isBlockedUnobtainableById = currentDexPreferences.blockUnobtainableShinies && UNOBTAINABLE_SHINY_DEX_NUMBERS.map(Number).includes(poke.id);
@@ -1021,18 +1084,14 @@ export default function App() {
         if (isBlockedUnobtainable || isBlockedGO || isBlockedNOOT) {
           // If hideLockedShinies is enabled, completely filter out this Pokemon
           if (currentDexPreferences.hideLockedShinies) {
-            return false;
+            return [];
           }
-          // Otherwise, mark as blocked but don't filter out
-          poke._isBlocked = true;
-        } else {
-          // Ensure not blocked if conditions aren't met
-          poke._isBlocked = false;
+          blocked = true;
         }
-      } else {
-        // For non-shiny Pokemon, always ensure they are not blocked
-        poke._isBlocked = false;
       }
+
+      // Return a shallow copy with _isBlocked set — never mutate the source object.
+      const poke2 = blocked === poke._isBlocked ? poke : { ...poke, _isBlocked: blocked };
 
       // Get caught info for the appropriate shiny status
       const info = caughtInfoMap[getCaughtKey(poke, null, isShiny)] || {};
@@ -1073,16 +1132,16 @@ export default function App() {
               }
               return chainNameMatch || chainDexMatch;
             });
-            if (!chainMatches) return false;
+            if (!chainMatches) return [];
           } else {
-            return false;
+            return [];
           }
         }
       }
       // Game (multi-select)
       if (filters.game && filters.game.length > 0) {
         const matchesGame = filters.game.some(game => firstEntry.game === game);
-        if (!matchesGame) return false;
+        if (!matchesGame) return [];
       }
       // Game obtainable in (multi-select)
       if (filters.gameObtainable && filters.gameObtainable.length > 0) {
@@ -1091,37 +1150,37 @@ export default function App() {
         const matchesGame = filters.gameObtainable.some(game =>
           normalizedAvailable.has(normalizeGameName(game))
         );
-        if (!matchesGame) return false;
+        if (!matchesGame) return [];
       }
       // Ball (multi-select)
       if (filters.ball && filters.ball.length > 0) {
         const matchesBall = filters.ball.some(ball => firstEntry.ball === ball);
-        if (!matchesBall) return false;
+        if (!matchesBall) return [];
       }
       // Mark (multi-select)
       if (filters.mark && filters.mark.length > 0) {
         const matchesMark = filters.mark.some(mark => firstEntry.mark === mark);
-        if (!matchesMark) return false;
+        if (!matchesMark) return [];
       }
       // Method (multi-select)
       if (filters.method && filters.method.length > 0) {
         const matchesMethod = filters.method.some(method => firstEntry.method === method);
-        if (!matchesMethod) return false;
+        if (!matchesMethod) return [];
       }
       // Type (multi-select - must match at least one)
       if (filters.type && filters.type.length > 0) {
         const matchesType = filters.type.some(type => (poke.types || []).includes(type));
-        if (!matchesType) return false;
+        if (!matchesType) return [];
       }
       // Gen (multi-select)
       if (filters.gen && filters.gen.length > 0) {
         const matchesGen = filters.gen.some(gen => String(poke.gen) === String(gen));
-        if (!matchesGen) return false;
+        if (!matchesGen) return [];
       }
       // Caught/uncaught - check the appropriate shiny status
       const caughtKey = getCaughtKey(poke, null, isShiny);
-      if (filters.caught === "caught" && !caught[caughtKey]) return false;
-      if (filters.caught === "uncaught" && caught[caughtKey]) return false;
+      if (filters.caught === "caught" && !caught[caughtKey]) return [];
+      if (filters.caught === "uncaught" && caught[caughtKey]) return [];
 
       // Category filtering
       if (filters.categories && filters.categories.length > 0) {
@@ -1151,10 +1210,10 @@ export default function App() {
           }
         });
 
-        if (!matchesAnyCategory) return false;
+        if (!matchesAnyCategory) return [];
       }
 
-      return true;
+      return [poke2];
     });
 
 
@@ -1333,7 +1392,9 @@ export default function App() {
       // swallow; UI already updated optimistically
     }
 
-
+    // Notify other pages (e.g. Profile's Recent Entries) that caught data changed.
+    // Tag with source:'app' so App.jsx's own listener skips it.
+    window.dispatchEvent(new CustomEvent('caughtDataChanged', { detail: { source: 'app' } }));
 
   }, [caught, caughtInfoMap, currentDexPreferences, selectedPokemon, showShiny, user?.username]);
 
@@ -1359,47 +1420,45 @@ export default function App() {
       }
     }
 
-    setCaught(prev => {
-      const newState = { ...prev, [key]: !prev[key] };
+    // Determine what will happen before touching state so we can pass data in the event.
+    const wasAlreadyCaught = !!caught[key];
+    let freshInfo = null;
 
-      if (!prev[key]) {
-        const newEntry = {
-          date: "",
-          ball: BALL_OPTIONS[0].value,
-          mark: MARK_OPTIONS[0].value,
-          method: METHOD_OPTIONS[0],
-          game: GAME_OPTIONS[0].value,
-          checks: "",
-          notes: "",
-          entryId: Math.random().toString(36).substr(2, 9)
-        };
-
-        const freshInfo = {
-          caught: true,
-          caughtAt: Date.now(),
-          entries: [newEntry]
-        };
-
-        setCaughtInfoMap(prevInfoMap => ({
-          ...prevInfoMap,
-          [key]: freshInfo
-        }));
-        if (user?.username) {
-          updateCaughtData(user.username, key, freshInfo);
-        }
-      } else {
-        setCaughtInfoMap(prevInfoMap => {
-          const updated = { ...prevInfoMap };
-          delete updated[key];
-          return updated;
-        });
-        if (user?.username) {
-          updateCaughtData(user.username, key, null);
-        }
+    if (!wasAlreadyCaught) {
+      const newEntry = {
+        date: "",
+        ball: BALL_OPTIONS[0].value,
+        mark: MARK_OPTIONS[0].value,
+        method: METHOD_OPTIONS[0],
+        game: GAME_OPTIONS[0].value,
+        checks: "",
+        notes: "",
+        entryId: Math.random().toString(36).substr(2, 9)
+      };
+      freshInfo = {
+        caught: true,
+        caughtAt: Date.now(),
+        entries: [newEntry]
+      };
+      setCaughtInfoMap(prevInfoMap => ({
+        ...prevInfoMap,
+        [key]: freshInfo
+      }));
+      if (user?.username) {
+        updateCaughtData(user.username, key, freshInfo);
       }
+    } else {
+      setCaughtInfoMap(prevInfoMap => {
+        const updated = { ...prevInfoMap };
+        delete updated[key];
+        return updated;
+      });
+      if (user?.username) {
+        updateCaughtData(user.username, key, null);
+      }
+    }
 
-      return newState;
-    });
+    setCaught(prev => ({ ...prev, [key]: !wasAlreadyCaught }));
 
     // keep sidebar in sync - switch to newly caught pokemon
     if (sidebarOpen && selectedPokemon) {
@@ -1412,6 +1471,38 @@ export default function App() {
         setSelectedPokemon(poke);
       }
     }
+
+    // Persist the most-recent-catch order to sessionStorage so Profile.jsx can read it on
+    // mount even when it was unmounted during the catch (e.g. user was on the dex page).
+    try {
+      const existing = JSON.parse(sessionStorage.getItem('recentCatchOrder') || '[]');
+      let updated;
+      if (!wasAlreadyCaught) {
+        // Prepend the new catch, remove duplicates, keep top 5
+        updated = [
+          { stableId: poke.stableId, isShiny },
+          ...existing.filter(c => !(c.stableId === poke.stableId && !!c.isShiny === !!isShiny))
+        ].slice(0, 5);
+      } else {
+        // Remove the uncaught Pokémon from the order
+        updated = existing.filter(c => !(c.stableId === poke.stableId && !!c.isShiny === !!isShiny));
+      }
+      sessionStorage.setItem('recentCatchOrder', JSON.stringify(updated));
+    } catch { /* sessionStorage unavailable — silently ignore */ }
+
+    // Notify other pages (e.g. Profile's Recent Entries) that caught data changed.
+    // Pass freshInfo so Profile can optimistically prepend without a server fetch race.
+    // Tag with source:'app' so App.jsx's own listener skips it.
+    window.dispatchEvent(new CustomEvent('caughtDataChanged', {
+      detail: {
+        pokemon: poke,
+        caughtKey: key,
+        caughtInfo: wasAlreadyCaught ? null : freshInfo,
+        wasCaught: wasAlreadyCaught,
+        isShiny,
+        source: 'app'
+      }
+    }));
   }, [caught, caughtInfoMap, sidebarOpen, selectedPokemon, showShiny, user?.username]);
 
   // Handle reset confirmation from grid click or bulk operations
@@ -1479,6 +1570,10 @@ export default function App() {
         setSidebarOpen(false);
       }
     }
+
+    // Notify other pages (e.g. Profile's Recent Entries) that caught data changed.
+    // Tag with source:'app' so App.jsx's own listener skips it.
+    window.dispatchEvent(new CustomEvent('caughtDataChanged', { detail: { source: 'app' } }));
   };
 
   // Helper function to get unified pokemon list for unified view mode
@@ -1593,6 +1688,18 @@ export default function App() {
   }
 
 
+  const isMaintenanceTime = !maintenanceStartTime || new Date(maintenanceStartTime).getTime() <= currentTime;
+  if (maintenanceMode && (!user || !user.isAdmin) && isMaintenanceTime) {
+    return <MaintenanceScreen />;
+  }
+
+  // Pre-calculate warning state for banner
+  const isMaintenancePending = maintenanceMode && maintenanceStartTime && new Date(maintenanceStartTime).getTime() > currentTime;
+  let maintenanceMinutesLeft = 0;
+  if (isMaintenancePending) {
+    maintenanceMinutesLeft = Math.max(1, Math.ceil((new Date(maintenanceStartTime).getTime() - currentTime) / 60000));
+  }
+
   return (
     <ThemeProvider>
       <LoadingProvider>
@@ -1606,6 +1713,26 @@ export default function App() {
                   sidebarOpen={sidebarOpen}
                   selectedPokemon={selectedPokemon}
                 />
+                
+                {isMaintenancePending && (
+                  <div style={{
+                    backgroundColor: '#ef4444',
+                    color: 'white',
+                    padding: '8px 16px',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    position: 'fixed',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 1500,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    boxShadow: '0 -2px 10px rgba(0,0,0,0.5)'
+                  }}>
+                    ⚠️ SCHEDULED MAINTENANCE: The site will go into maintenance mode in {maintenanceMinutesLeft} minute{maintenanceMinutesLeft !== 1 && 's'}. Please save your work immediately.
+                  </div>
+                )}
 
                 <HeaderWithConditionalAuth
                   user={user}

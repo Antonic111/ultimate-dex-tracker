@@ -1,5 +1,22 @@
 [
   {
+    "date": "2026-04-06",
+    "version": "v1.1.2",
+    "type": "feature",
+    "title": "",
+    "description": "",
+    "features": [
+      "Added a new Maintenance screen that will now warn people and remind them to save when the website is about to go down for future updates etc."
+    ],
+    "fixes": [
+      "Fixed broken sprites for Alpha Rotoms and Alpha Wormadams.",
+      "Fixed a issue where all the Alpha Genders & Other's Box's were showing number 1 instead of increasing each box.",
+      "Fixed a issue where Pokemon that should be locked were becoming unlocked while adding new data to the site.",
+      "Fixed a issue where the recent entries on the profile page were not updating when a new entry was added.",
+      "Multiple admin related fixes."
+    ]
+  },
+  {
     "date": "2026-04-02",
     "version": "v1.1.1",
     "type": "feature",

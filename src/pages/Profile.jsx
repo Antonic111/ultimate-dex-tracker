@@ -177,6 +177,9 @@ export default function Profile() {
     const STAT_PAGE_SIZE = 8;
     const [recentAdded, setRecentAdded] = useState([]);
     const [refreshKey, setRefreshKey] = useState(0);
+    // Tracks the order of items set by optimistic updates so that server refetches
+    // don't overwrite the correct slot-1 item. Each element is { stableId, isShiny }.
+    const optimisticOrderRef = useRef(null);
 
     const [form, setForm] = useState({
         bio: "",
@@ -249,7 +252,36 @@ export default function Profile() {
 
         async function loadStats() {
             try {
-                const map = await caughtAPI.getCaughtData();
+                const serverMap = await caughtAPI.getCaughtData();
+
+                // The server save is async — newly toggled Pok\u00e9mon may not be persisted yet.
+                // App.jsx always writes the optimistic state to localStorage before the server
+                // responds, so we merge that cache over the server data to get the latest picture.
+                let map = serverMap;
+                try {
+                    const raw = localStorage.getItem(`caughtInfoMap:${username}`);
+                    if (raw) {
+                        const localCache = JSON.parse(raw);
+                        if (localCache && typeof localCache === 'object') {
+                            // Local cache wins for any key it has, giving us instant updates
+                            map = { ...serverMap, ...localCache };
+                        }
+                    }
+                } catch {
+                    // localStorage unavailable or parse error — use server data as-is
+                }
+
+                // Seed optimisticOrderRef from sessionStorage if it hasn't been set yet.
+                // App.jsx writes to sessionStorage on every catch, so this survives Profile
+                // being unmounted (e.g. user was on the dex page when they caught something).
+                if (!optimisticOrderRef.current) {
+                    try {
+                        const stored = JSON.parse(sessionStorage.getItem('recentCatchOrder') || '[]');
+                        if (stored.length > 0) {
+                            optimisticOrderRef.current = stored;
+                        }
+                    } catch { /* sessionStorage unavailable */ }
+                }
 
                 // Count regular and shiny Pokémon separately
                 const regularKeys = [
@@ -377,7 +409,15 @@ export default function Profile() {
                 // Build recent 5 added list (newest by date first)
                 try {
                     const allMonsList = [...pokemonData, ...filteredFormsData];
-                    const keyToMon = new Map(allMonsList.map(m => [getCaughtKey(m), m]));
+                    // Build a lookup map for both regular and shiny keys so shiny
+                    // entries resolve correctly to their Pokémon data.
+                    const keyToMon = new Map();
+                    allMonsList.forEach(m => {
+                        const regularKey = getCaughtKey(m, null, false);
+                        const shinyKey = getCaughtKey(m, null, true);
+                        if (regularKey) keyToMon.set(regularKey, m);
+                        if (shinyKey) keyToMon.set(shinyKey, m);
+                    });
                     // First, separate Pokemon with and without caughtAt timestamps
                     const withTimestamps = [];
                     const withoutTimestamps = [];
@@ -388,9 +428,8 @@ export default function Profile() {
                         // Check if this is a shiny Pokémon by looking for _shiny suffix in the key
                         const isShiny = key.includes('_shiny');
 
-                        // Get the base key (without _shiny suffix) to find the Pokémon data
-                        const baseKey = isShiny ? key.replace('_shiny', '') : key;
-                        const mon = keyToMon.get(baseKey);
+                        // Look up by the full key (map contains both regular and shiny keys)
+                        const mon = keyToMon.get(key);
                         if (!mon) return;
 
                         // Add shiny status to the info object
@@ -445,7 +484,33 @@ export default function Profile() {
                     const allPokemon = [...withTimestamps, ...withoutTimestamps];
                     allPokemon.sort((a, b) => b.ts - a.ts);
 
-                    const recentList = allPokemon.slice(0, 5).map(({ mon, info }) => ({ mon, info }));
+                    const serverRecentList = allPokemon.slice(0, 5).map(({ mon, info }) => ({ mon, info }));
+
+                    // If we have an optimistic order from a recent catch, re-apply it so the
+                    // server fetch (which may be stale) doesn't overwrite the correct slot-1 item.
+                    let recentList = serverRecentList;
+                    if (optimisticOrderRef.current) {
+                        const order = optimisticOrderRef.current;
+                        // Build a map of stableId+isShiny -> item from the server list
+                        const serverMap = new Map();
+                        serverRecentList.forEach(item => {
+                            const k = (item.mon?.stableId || '') + '|' + !!item.info?.isShiny;
+                            serverMap.set(k, item);
+                        });
+                        // Rebuild in optimistic order, falling back to server items not in the order
+                        const ordered = [];
+                        order.forEach(({ stableId, isShiny }) => {
+                            const k = stableId + '|' + isShiny;
+                            if (serverMap.has(k)) {
+                                ordered.push(serverMap.get(k));
+                                serverMap.delete(k);
+                            }
+                        });
+                        // Append any server items not covered by the optimistic order
+                        serverMap.forEach(item => ordered.push(item));
+                        recentList = ordered.slice(0, 5);
+                    }
+
                     if (!ignore) {
                         setRecentAdded(recentList);
                     }
@@ -635,12 +700,43 @@ export default function Profile() {
             refreshRecentPokemon();
         };
 
+        // When a Pok\u00e9mon is caught from the dex, App.jsx fires 'caughtDataChanged' with the
+        // full data in the event detail. We can immediately update recentAdded without waiting
+        // for a server fetch (which would be stale due to async save timing).
+        const handleCaughtDataChanged = (e) => {
+            const { pokemon, caughtInfo, wasCaught, isShiny } = e?.detail || {};
+
+            if (pokemon && caughtInfo && !wasCaught) {
+                // Newly caught: prepend to recentAdded immediately
+                setRecentAdded(prev => {
+                    const newEntry = { mon: pokemon, info: { ...caughtInfo, isShiny: !!isShiny } };
+                    // Remove any existing entry for the same Pokémon (same stableId), then prepend
+                    const filtered = prev.filter(p => p.mon?.stableId !== pokemon.stableId || !!p.info?.isShiny !== !!isShiny);
+                    const next = [newEntry, ...filtered].slice(0, 5);
+                    // Record order so server refetches respect it
+                    optimisticOrderRef.current = next.map(p => ({ stableId: p.mon?.stableId, isShiny: !!p.info?.isShiny }));
+                    return next;
+                });
+            } else if (pokemon && wasCaught) {
+                // Uncaught: remove from recentAdded
+                setRecentAdded(prev => {
+                    const next = prev.filter(p => !(p.mon?.stableId === pokemon.stableId && !!p.info?.isShiny === !!isShiny));
+                    optimisticOrderRef.current = next.map(p => ({ stableId: p.mon?.stableId, isShiny: !!p.info?.isShiny }));
+                    return next;
+                });
+            }
+            // Note: no refreshRecentPokemon() here — that would re-fetch from the still-stale
+            // server and immediately overwrite the correct optimistic order above.
+        };
+
         document.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('focus', handleFocus);
+        window.addEventListener('caughtDataChanged', handleCaughtDataChanged);
 
         return () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('focus', handleFocus);
+            window.removeEventListener('caughtDataChanged', handleCaughtDataChanged);
         };
     }, []);
 

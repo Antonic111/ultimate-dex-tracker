@@ -234,6 +234,7 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
         createdAt: user.createdAt,
         profileTrainer: user.profileTrainer,
         verified: true,
+        isAdmin: user.isAdmin,
       },
       token: token, // Return token for all users (needed for Authorization header)
     };
@@ -1656,24 +1657,6 @@ router.post("/migrate-hunt-methods", authenticateUser, async (req, res) => {
 
 // ADMIN ROUTES ----------------------------------------- //
 
-// TEMPORARY: Make yourself admin (remove this after use)
-router.post("/make-me-admin", authenticateUser, async (req, res) => {
-  try {
-    const user = await User.findById(req.userId);
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    user.isAdmin = true;
-    await user.save();
-
-    res.json({
-      message: "You are now an admin!",
-      isAdmin: user.isAdmin
-    });
-  } catch (error) {
-    console.error('Error making user admin:', error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
 
 // Middleware to check if user is admin
 const requireAdmin = async (req, res, next) => {
@@ -1727,13 +1710,60 @@ router.post("/assign-admin", authenticateUser, requireAdmin, async (req, res) =>
 // GET /api/admin/users - Get all users (admin only)
 router.get("/admin/users", authenticateUser, requireAdmin, async (req, res) => {
   try {
-    const users = await User.find({}, 'username email isAdmin verified createdAt')
+    const users = await User.find({}, 'username email isAdmin verified createdAt bio')
       .sort({ createdAt: -1 })
       .limit(100); // Limit to prevent large responses
 
     res.json({ users });
   } catch (error) {
     console.error('Error fetching users:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// PATCH /api/admin/users/:id/profile - Update a user's profile info (admin only)
+router.patch("/admin/users/:id/profile", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { bio, username } = req.body;
+    const updates = {};
+
+    if (typeof bio === 'string') {
+      updates.bio = bio;
+    }
+
+    if (typeof username === 'string' && username.trim() !== '') {
+      const trimmedUsername = username.trim();
+      
+      // Check if another user already has this username (case-insensitive)
+      const existingUser = await User.findOne({ 
+        username: { $regex: new RegExp(`^${trimmedUsername}$`, 'i') }, 
+        _id: { $ne: id } 
+      });
+
+      if (existingUser) {
+        return res.status(400).json({ error: "Username is already taken" });
+      }
+      updates.username = trimmedUsername;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: "No valid fields to update" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      updates,
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({ message: "Profile updated successfully", bio: updatedUser.bio, username: updatedUser.username });
+  } catch (error) {
+    console.error("Error updating user profile:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -1822,6 +1852,71 @@ router.delete("/admin/delete-report/:id", authenticateUser, requireAdmin, async 
     res.json({ message: "Report deleted successfully" });
   } catch (error) {
     console.error('Error deleting report:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+let cachedSettings = null;
+let lastSettingsFetch = 0;
+
+// GET /api/site-settings - Fetches global site settings (public)
+router.get("/site-settings", async (req, res) => {
+  try {
+    const now = Date.now();
+    if (cachedSettings && now - lastSettingsFetch < 10000) {
+      return res.json(cachedSettings);
+    }
+    
+    const SiteSettings = (await import('../models/SiteSettings.js')).default;
+    let settings = await SiteSettings.findOne();
+    if (!settings) {
+      settings = await SiteSettings.create({ maintenanceMode: false });
+    }
+    
+    cachedSettings = settings;
+    lastSettingsFetch = now;
+    
+    res.json(settings);
+  } catch (error) {
+    console.error('Error fetching site settings:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// PUT /api/admin/site-settings - Updates global site settings (admin only)
+router.put("/admin/site-settings", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const { maintenanceMode, maintenanceStartTime } = req.body;
+    const SiteSettings = (await import('../models/SiteSettings.js')).default;
+    
+    let settings = await SiteSettings.findOne();
+    if (!settings) {
+      settings = new SiteSettings();
+    }
+    
+    if (typeof maintenanceMode !== 'undefined') {
+      settings.maintenanceMode = !!maintenanceMode;
+      // When disabling maintenance mode, clear the trigger time.
+      if (!maintenanceMode) {
+         settings.maintenanceStartTime = null;
+      }
+    }
+    
+    if (typeof maintenanceStartTime !== 'undefined') {
+      settings.maintenanceStartTime = maintenanceStartTime;
+      // If we are setting a future time, we should also set maintenanceMode to true
+      // It acts as a scheduled mode.
+      if (maintenanceStartTime !== null) {
+          settings.maintenanceMode = true;
+      }
+    }
+    
+    await settings.save();
+    cachedSettings = settings;
+    lastSettingsFetch = Date.now();
+    res.json({ message: "Site settings updated", settings });
+  } catch (error) {
+    console.error('Error updating site settings:', error);
     res.status(500).json({ error: "Server error" });
   }
 });
