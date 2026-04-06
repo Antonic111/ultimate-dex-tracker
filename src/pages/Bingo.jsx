@@ -36,6 +36,7 @@ const Bingo = () => {
                 text: '',
                 completed: false,
                 pokemon: null,
+                pokemonList: [],
                 game: null
             }));
         }
@@ -48,7 +49,8 @@ const Bingo = () => {
                 return parsed.map((cell, i) => ({
                     ...cell,
                     text: (cell.text === 'FREE' || (cell.text && cell.text.startsWith('Goal '))) ? '' : cell.text,
-                    completed: (cell.id === 12 && cell.text === 'FREE') ? false : cell.completed
+                    completed: (cell.id === 12 && cell.text === 'FREE') ? false : cell.completed,
+                    pokemonList: (cell.pokemonList && cell.pokemonList.length > 0) ? cell.pokemonList : (cell.pokemon ? [cell.pokemon] : [])
                 }));
             } catch (e) {
                 console.error("Failed to parse saved bingo grid", e);
@@ -60,6 +62,7 @@ const Bingo = () => {
             text: '',
             completed: false,
             pokemon: null,
+            pokemonList: [],
             game: null
         }));
     });
@@ -70,6 +73,14 @@ const Bingo = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showClearConfirm, setShowClearConfirm] = useState(false);
     const [clearConfirmClosing, setClearConfirmClosing] = useState(false);
+    const [cycleIndex, setCycleIndex] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCycleIndex(prev => prev + 1);
+        }, 4000);
+        return () => clearInterval(interval);
+    }, []);
 
     const closeClearConfirmModal = () => {
         setClearConfirmClosing(true);
@@ -120,7 +131,10 @@ const Bingo = () => {
 
                 // Check if we received valid data
                 if (isMounted && data && Array.isArray(data.grid) && data.grid.length > 0) {
-                    setGrid(data.grid);
+                    setGrid(data.grid.map(cell => ({
+                        ...cell,
+                        pokemonList: (cell.pokemonList && cell.pokemonList.length > 0) ? cell.pokemonList : (cell.pokemon ? [cell.pokemon] : [])
+                    })));
                 }
             } catch (error) {
                 console.error("Failed to load bingo data:", error);
@@ -274,17 +288,26 @@ const Bingo = () => {
 
         setGrid(prev => prev.map(cell => {
             if (cell.id === editingCellId) {
+                const currentList = (cell.pokemonList && cell.pokemonList.length > 0) ? cell.pokemonList : (cell.pokemon ? [cell.pokemon] : []);
+                const existsIndex = currentList.findIndex(p => p.id === pokemon.id && p.name === pokemon.name);
+                
+                let newList;
+                if (existsIndex >= 0) {
+                    newList = currentList.filter((_, i) => i !== existsIndex);
+                } else {
+                    newList = [...currentList, pokemon];
+                }
+
                 return {
                     ...cell,
-                    pokemon: pokemon,
-                    game: selectedGame,
-                    text: formatPokemonName(pokemon.name) // Optional: update text fallback
+                    pokemon: newList.length > 0 ? newList[0] : null,
+                    pokemonList: newList,
+                    game: newList.length > 0 ? selectedGame : null,
+                    text: newList.length > 0 ? formatPokemonName(newList[0].name) : ''
                 };
             }
             return cell;
         }));
-
-        closeModal();
     };
 
     const handleClearSlot = () => {
@@ -294,6 +317,7 @@ const Bingo = () => {
                 return {
                     ...cell,
                     pokemon: null,
+                    pokemonList: [],
                     game: null,
                     text: '',
                     completed: false
@@ -407,43 +431,57 @@ const Bingo = () => {
                             {letter}
                         </div>
                     ))}
-                    {grid.map((cell) => (
+                    {grid.map((cell) => {
+                        const list = (cell.pokemonList && cell.pokemonList.length > 0) ? cell.pokemonList : (cell.pokemon ? [cell.pokemon] : []);
+
+                        return (
                         <div
                             key={cell.id}
                             className={`bingo-cell-wrapper`}
                             onClick={(e) => {
                                 if (readOnly) return;
-                                if (!cell.pokemon) openEditModal(cell.id);
+                                if (list.length === 0) openEditModal(cell.id);
                                 else if (cell.completed) toggleCompletion(cell.id, e);
                             }}
-                            style={{ cursor: readOnly ? 'default' : (!cell.pokemon || cell.completed) ? 'pointer' : 'default' }}
+                            style={{ cursor: readOnly ? 'default' : (list.length === 0 || cell.completed) ? 'pointer' : 'default' }}
                         >
-                            <div className={`bingo-cell ${cell.completed ? 'completed' : ''} ${!cell.pokemon ? 'empty' : ''}`}>
-                                {cell.pokemon ? (
+                            <div className={`bingo-cell ${cell.completed ? 'completed' : ''} ${list.length === 0 ? 'empty' : ''}`}>
+                                {list.length > 0 ? (
                                     <div className="bingo-content">
-                                        <img
-                                            src={getPokemonImage(cell.pokemon)}
-                                            alt={cell.pokemon.name}
-                                            className="bingo-pokemon-img"
-                                        />
-                                        {cell.game && getGameIcon(cell.game) && (
-                                            <div className="bingo-game-icon-container">
-                                                <img
-                                                    src={getGameIcon(cell.game)}
-                                                    alt={cell.game}
-                                                    className="bingo-game-overlay-icon"
-                                                />
-                                                <span className="game-tooltip">{cell.game}</span>
-                                            </div>
-                                        )}
-                                        {getFormIconInfo(cell.pokemon) && (
-                                            <div className="bingo-form-overlay-icon">
-                                                <img
-                                                    src={getFormIconInfo(cell.pokemon).src}
-                                                    alt="Form"
-                                                />
-                                            </div>
-                                        )}
+                                        {list.map((pokemon, idx) => {
+                                            const isActive = idx === (cycleIndex % list.length);
+                                            return (
+                                                <div 
+                                                    key={`${pokemon.id}-${pokemon.formType}-${idx}`}
+                                                    className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-in-out ${isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
+                                                >
+                                                    <img
+                                                        src={getPokemonImage(pokemon)}
+                                                        alt={pokemon.name}
+                                                        className="bingo-pokemon-img"
+                                                    />
+                                                    {cell.game && getGameIcon(cell.game) && (
+                                                        <div className="bingo-game-icon-container">
+                                                            <img
+                                                                src={getGameIcon(cell.game)}
+                                                                alt={cell.game}
+                                                                className="bingo-game-overlay-icon"
+                                                            />
+                                                            <span className="game-tooltip">{cell.game}</span>
+                                                        </div>
+                                                    )}
+                                                    {getFormIconInfo(pokemon) && (
+                                                        <div className="bingo-form-overlay-icon">
+                                                            <img
+                                                                src={getFormIconInfo(pokemon).src}
+                                                                alt="Form"
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+
                                     </div>
                                 ) : (
                                     <span className="bingo-placeholder">{cell.text}</span>
@@ -459,7 +497,7 @@ const Bingo = () => {
                                     </button>
                                 )}
 
-                                {cell.pokemon && !readOnly && (
+                                {list.length > 0 && !readOnly && (
                                     <button
                                         className={`bingo-check-btn ${cell.completed ? 'completed' : ''}`}
                                         onClick={(e) => toggleCompletion(cell.id, e)}
@@ -482,7 +520,7 @@ const Bingo = () => {
                                 )}
                             </div>
                         </div>
-                    ))}
+                    )})}
                 </div>
 
                 {!readOnly && (
@@ -585,12 +623,15 @@ const Bingo = () => {
                                         </div>
 
                                         <div className="pokemon-grid">
-                                            {filteredPokemon.map((pokemon, index) => (
+                                            {filteredPokemon.map((pokemon, index) => {
+                                                const isSelected = grid.find(c => c.id === editingCellId)?.pokemonList?.some(p => p.id === pokemon.id && p.name === pokemon.name);
+                                                return (
                                                 <button
                                                     key={`pokemon-${pokemon?.id || 'unknown'}-${index}`}
                                                     type="button"
-                                                    className="pokemon-item"
+                                                    className={`pokemon-item ${isSelected ? 'selected ring-2 ring-[var(--accent)]' : ''}`}
                                                     onClick={() => handlePokemonSelect(pokemon)}
+                                                    style={isSelected ? { backgroundColor: 'color-mix(in srgb, var(--accent) 20%, transparent)', borderColor: 'var(--accent)' } : {}}
                                                 >
                                                     <img
                                                         src={getPokemonImage(pokemon)}
@@ -608,7 +649,7 @@ const Bingo = () => {
                                                         )}
                                                     </div>
                                                 </button>
-                                            ))}
+                                            )})}
                                             {filteredPokemon.length === 0 && (
                                                 <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
                                                     No Pokemon found matching your search.
@@ -622,17 +663,38 @@ const Bingo = () => {
                                     </div>
                                 )}
 
-                                {/* Clear Slot Button - Bottom of modal */}
-                                {editingCellId !== null && grid.find(c => c.id === editingCellId)?.pokemon && (
-                                    <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', paddingBottom: '0.5rem' }}>
+                                {/* Bottom Buttons of modal */}
+                                {editingCellId !== null && (
+                                    <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', gap: '1rem', paddingBottom: '0.5rem' }}>
+                                        {grid.find(c => c.id === editingCellId)?.pokemonList?.length > 0 && (
+                                            <button
+                                                type="button"
+                                                style={{
+                                                    padding: '0.5rem 1.5rem',
+                                                    border: 'none',
+                                                    backgroundColor: '#ef4444',
+                                                    color: 'white',
+                                                    borderRadius: '6px',
+                                                    cursor: 'pointer',
+                                                    fontWeight: '600',
+                                                    fontSize: '0.9rem',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                                    transition: 'transform 0.1s'
+                                                }}
+                                                onClick={handleClearSlot}
+                                                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
+                                                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                                            >
+                                                Clear Slot
+                                            </button>
+                                        )}
                                         <button
                                             type="button"
                                             style={{
-                                                width: 'auto',
                                                 padding: '0.5rem 1.5rem',
                                                 border: 'none',
-                                                backgroundColor: '#ef4444',
-                                                color: 'white',
+                                                backgroundColor: 'var(--accent)',
+                                                color: 'black',
                                                 borderRadius: '6px',
                                                 cursor: 'pointer',
                                                 fontWeight: '600',
@@ -640,11 +702,11 @@ const Bingo = () => {
                                                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                                                 transition: 'transform 0.1s'
                                             }}
-                                            onClick={handleClearSlot}
+                                            onClick={closeModal}
                                             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
                                             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                                         >
-                                            Clear Slot
+                                            Done
                                         </button>
                                     </div>
                                 )}

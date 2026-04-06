@@ -22,7 +22,7 @@ const MaintenanceScreen = () => {
       </h1>
       <p style={{ fontSize: '1.2rem', color: '#a0a0a0', maxWidth: '500px', lineHeight: '1.6' }}>
         The Ultimate Dex Tracker is currently undergoing scheduled maintenance and updates.
-        Please check back in a few minutes!
+        Come back later!
       </p>
       
       <style>{`

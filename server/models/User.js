@@ -122,6 +122,7 @@ const userSchema = new mongoose.Schema({
       text: String,
       completed: Boolean,
       pokemon: Object,
+      pokemonList: [Object],
       game: String
     }],
     default: []

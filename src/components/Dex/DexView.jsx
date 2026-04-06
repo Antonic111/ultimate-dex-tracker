@@ -1,3 +1,4 @@
+import React from "react";
 import DexSection from "./DexSection";
 import Sidebar from "./PokemonSidebar";
 import SearchBar from "../Shared/SearchBar";

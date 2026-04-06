@@ -6,7 +6,8 @@
     "title": "",
     "description": "",
     "features": [
-      "Added a new Maintenance screen that will now warn people and remind them to save when the website is about to go down for future updates etc."
+      "Added a new Maintenance screen that will now warn people and remind them to save when the website is about to go down for future updates etc.",
+      "Added to ability to add multiple Pokemon to a BINGO slot and they will slideshow through the sprites."
     ],
     "fixes": [
       "Fixed broken sprites for Alpha Rotoms and Alpha Wormadams.",
@@ -14,7 +15,8 @@
       "Fixed a issue where Pokemon that should be locked were becoming unlocked while adding new data to the site.",
       "Fixed a issue where the recent entries on the profile page were not updating when a new entry was added.",
       "Multiple admin related fixes.",
-      "Many page shift fixes and interaction speed fixes for improved user experience."
+      "Many page shift fixes and interaction speed fixes for improved user experience.",
+      "Added styling to the Not Caught text in the sidebar when viewing your own not caught pokemon."
     ]
   },
   {
