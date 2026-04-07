@@ -48,6 +48,7 @@ const userSchema = new mongoose.Schema({
         date: String,
         notes: String,
         entryId: { type: String, default: () => Math.random().toString(36).substr(2, 9) },
+        isHuntTracker: Boolean,
         modifiers: {
           shinyCharm: Boolean,
           shinyParents: Boolean,
@@ -115,6 +116,8 @@ const userSchema = new mongoose.Schema({
   externalLinkPreference: { type: String, default: 'serebii', enum: ['serebii', 'bulbapedia', 'pokemondb', 'smogon'] },
   // SHINY CHARM GAMES ----------------------------------------- //
   shinyCharmGames: { type: [String], default: [] },
+  // HUNT SETTINGS ----------------------------------------- //
+  huntHotkey: { type: String, default: "a" },
   // BINGO GRID ----------------------------------------- //
   bingoGrid: {
     type: [{

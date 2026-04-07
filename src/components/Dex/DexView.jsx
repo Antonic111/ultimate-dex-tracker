@@ -411,6 +411,7 @@ export default function DexView({
                     pokemon={selectedPokemon}
                     onClose={handleSidebarClose}
                     caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon, null, showShiny)] : null}
+                    caughtInfoMap={caughtInfoMap}
                     updateCaughtInfo={updateCaughtInfo || (() => { })}
                     showShiny={showShiny}
                     viewingUsername={viewingUsername}

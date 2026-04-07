@@ -259,7 +259,8 @@ export const METHOD_OPTIONS = [
   "Gift Pokémon",
   "Fossil Revivals",
   "Mystery Gift",
-  "Permutations"
+  "Permutations",
+  "Evolved"
 ];
 
 

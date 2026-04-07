@@ -7,7 +7,10 @@
     "description": "",
     "features": [
       "Added a new Maintenance screen that will now warn people and remind them to save when the website is about to go down for future updates etc.",
-      "Added to ability to add multiple Pokemon to a BINGO slot and they will slideshow through the sprites."
+      "Added to ability to add multiple Pokemon to a BINGO slot and they will slideshow through the sprites.",
+      "Added a evolve feature to Pokemon in the sidebar that sends the Mons data to its evolutions if any.",
+      "Added the ability to assign a hotkey to up the checks in the Counters page.",
+      "Added a history section to the Counters page to view your recent hunts."
     ],
     "fixes": [
       "Fixed broken sprites for Alpha Rotoms and Alpha Wormadams.",

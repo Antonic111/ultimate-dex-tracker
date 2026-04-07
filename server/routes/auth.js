@@ -587,6 +587,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
     if (req.body.favoritePokemonShiny !== undefined) user.favoritePokemonShiny = req.body.favoritePokemonShiny;
     if (req.body.switchFriendCode !== undefined) user.switchFriendCode = sanitizedData.switchFriendCode;
     if (req.body.profileTrainer !== undefined) user.profileTrainer = sanitizedData.profileTrainer;
+    if (req.body.huntHotkey !== undefined) user.huntHotkey = sanitizedData.huntHotkey;
 
     // Handle profile visibility - saves both true and false
     if ("isProfilePublic" in req.body) {
@@ -666,6 +667,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
         dexPreferences: user.dexPreferences,
         externalLinkPreference: user.externalLinkPreference,
         shinyCharmGames: user.shinyCharmGames,
+        huntHotkey: user.huntHotkey,
         huntMethodMigrationCompleted: user.huntMethodMigrationCompleted,
         migrationVersion: user.migrationVersion,
       }
@@ -682,7 +684,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes dexPreferences externalLinkPreference shinyCharmGames isAdmin");
+    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes dexPreferences externalLinkPreference shinyCharmGames huntHotkey isAdmin");
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -700,6 +702,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
       dexPreferences: user.dexPreferences,
       externalLinkPreference: user.externalLinkPreference,
       shinyCharmGames: user.shinyCharmGames,
+      huntHotkey: user.huntHotkey,
       isAdmin: user.isAdmin,
     });
   } catch (err) {

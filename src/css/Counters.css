@@ -2404,3 +2404,203 @@
   height: 5px;
   pointer-events: none;
 }
+
+/* Header Actions Styles */
+.counters-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.counters-header-row .page-title {
+  margin: 0;
+}
+
+.counters-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.hotkey-setting {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--searchbar-bg);
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  min-width: 170px;
+}
+
+.hotkey-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.hotkey-input-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.hotkey-input {
+  width: auto;
+  min-width: 60px;
+  max-width: 100px;
+  height: 35px;
+  background: var(--sidebar-edit-inputs);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1rem;
+  text-transform: capitalize;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  padding: 0 8px;
+}
+
+.hotkey-input:focus {
+  outline: none;
+  background: var(--sidebar-edit-inputs);
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 15px var(--accent);
+}
+
+.hotkey-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.hunt-history-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--searchbar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hunt-history-btn:hover {
+  background: var(--sidebar-edit-inputs);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.hunt-history-btn svg {
+  color: var(--accent);
+}
+
+/* History Item Styles */
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: var(--searchbar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  transition: all 0.2s ease;
+}
+
+.history-item:hover {
+  border-color: var(--accent);
+  background: var(--sidebar-edit-inputs);
+}
+
+.history-pokemon {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.history-icon {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.history-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.history-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+}
+
+.history-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.history-stats {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.history-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+.history-stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.history-stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.date-stat {
+  min-width: 100px;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .history-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .history-stats {
+    width: 100%;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .history-stat {
+    align-items: flex-start;
+  }
+}

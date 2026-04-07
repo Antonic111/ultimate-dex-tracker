@@ -57,7 +57,7 @@ import ContentFilterInput from "../components/Shared/ContentFilterInput";
 import { validateContent } from "../../shared/contentFilter";
 import { UserContext } from "../components/Shared/UserContext";
 import { useMessage } from "../components/Shared/MessageContext";
-import { huntAPI, profileAPI } from "../utils/api";
+import { huntAPI, profileAPI, caughtAPI } from "../utils/api";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
 import gamePokemonData from "../data/gamePokemon.json";
@@ -147,6 +147,13 @@ export default function Counters() {
     mark: '',
     notes: ''
   });
+  const [hotkey, setHotkey] = useState('a');
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [historyModalClosing, setHistoryModalClosing] = useState(false);
+  const [deleteHistoryModal, setDeleteHistoryModal] = useState({ show: false, caughtKey: null, entryId: null });
+  const [deleteHistoryModalClosing, setDeleteHistoryModalClosing] = useState(false);
+  const [huntHistory, setHuntHistory] = useState([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   // Function to identify Hisuian balls
   const isHisuianBall = (ballValue) => {
@@ -204,20 +211,23 @@ export default function Counters() {
   }, [username, showMessage]);
 
 
-  // Load user's shiny charm games
-  const loadShinyCharmGames = useCallback(async () => {
+  // Load user's profile data
+  const loadProfileData = useCallback(async () => {
     if (!username) return;
 
     try {
       const profile = await profileAPI.getProfile();
       setShinyCharmGames(profile.shinyCharmGames || []);
+      if (profile.huntHotkey) {
+        setHotkey(profile.huntHotkey);
+      }
     } catch (error) {
-      console.error('Failed to load shiny charm games:', error);
+      console.error('Failed to load profile data:', error);
     }
   }, [username]);
 
   useEffect(() => {
-    loadShinyCharmGames();
+    loadProfileData();
 
     // Listen for updates from ShinyCharmModal
     const handleShinyCharmUpdate = (event) => {
@@ -225,7 +235,7 @@ export default function Counters() {
         setShinyCharmGames(event.detail.shinyCharmGames);
       } else {
         // Reload from server if detail not provided
-        loadShinyCharmGames();
+        loadProfileData();
       }
     };
 
@@ -233,7 +243,7 @@ export default function Counters() {
     return () => {
       window.removeEventListener('shinyCharmGamesUpdated', handleShinyCharmUpdate);
     };
-  }, [username, loadShinyCharmGames]);
+  }, [username, loadProfileData]);
 
   // Load hunt data on component mount
   useEffect(() => {
@@ -304,6 +314,169 @@ export default function Counters() {
     }
   }, [huntDetails.game, shinyCharmGames]);
 
+  // Get all Pokemon data (main + forms) using the same logic as the main app
+  const allPokemon = useMemo(() => {
+    // Use the same filtered forms data as the main app
+    const filteredFormsData = getFilteredFormsData(formsData);
+
+    // Combine main Pokemon with filtered forms data
+    return [...pokemonData, ...filteredFormsData];
+  }, []);
+
+  // Filter Pokemon based on search term
+  const filteredPokemon = useMemo(() => {
+    if (!searchTerm.trim()) return allPokemon;
+
+    return allPokemon.filter(pokemon => {
+      if (!pokemon || !pokemon.name || !pokemon.id) return false;
+
+      const searchLower = searchTerm.toLowerCase();
+      const nameMatch = pokemon.name.toLowerCase().includes(searchLower);
+      const idMatch = pokemon.id.toString().includes(searchLower);
+
+      return nameMatch || idMatch;
+    });
+  }, [allPokemon, searchTerm]);
+
+  // Load hunt history from caught data
+  const loadHuntHistory = useCallback(async () => {
+    if (!username) return;
+    setIsLoadingHistory(true);
+    try {
+      const response = await caughtAPI.getCaughtData();
+      const caughtData = response || {};
+
+      const history = [];
+      Object.keys(caughtData).forEach(key => {
+        const info = caughtData[key];
+        if (info && info.entries && Array.isArray(info.entries)) {
+          info.entries.forEach(entry => {
+            if (entry.isHuntTracker) {
+              const pkmn = allPokemon.find(p => getCaughtKey(p, null, true) === key);
+              if (pkmn) {
+                history.push({
+                  ...entry,
+                  pokemonName: pkmn.name,
+                  pokemonIcon: getPokemonImage(pkmn),
+                  sortDate: new Date(entry.date || 0).getTime(),
+                  caughtKey: key
+                });
+              }
+            }
+          });
+        }
+      });
+
+      history.sort((a, b) => (b.sortDate || 0) - (a.sortDate || 0));
+      setHuntHistory(history);
+    } catch (error) {
+      console.error('Failed to load hunt history:', error);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  }, [username, allPokemon]);
+
+  const handleRemoveFromHistoryClick = (caughtKey, entryId) => {
+    setDeleteHistoryModal({ show: true, caughtKey, entryId });
+  };
+
+  const handleRemoveFromHistoryConfirm = async () => {
+    const { caughtKey, entryId } = deleteHistoryModal;
+    if (!username || !caughtKey || !entryId) return;
+
+    setDeleteHistoryModalClosing(true);
+
+    try {
+      const { fetchCaughtData, updateCaughtData } = await import('../api/caught');
+      const existingCaughtData = await fetchCaughtData(username);
+      const existingCaughtInfo = existingCaughtData[caughtKey];
+      
+      if (existingCaughtInfo && existingCaughtInfo.entries) {
+        // Change isHuntTracker to false instead of deleting the whole entry
+        const updatedEntries = existingCaughtInfo.entries.map(e => 
+          e.entryId === entryId ? { ...e, isHuntTracker: false } : e
+        );
+        
+        const updatedCaughtInfo = {
+          ...existingCaughtInfo,
+          entries: updatedEntries
+        };
+        
+        await updateCaughtData(username, caughtKey, updatedCaughtInfo);
+        
+        // Remove from local state immediately for fast UI feedback
+        setHuntHistory(prev => prev.filter(h => h.entryId !== entryId));
+      }
+    } catch (error) {
+      console.error('Failed to remove from history:', error);
+      showMessage("Failed to remove from history", "error");
+    } finally {
+      setTimeout(() => {
+        setDeleteHistoryModal({ show: false, caughtKey: null, entryId: null });
+        setDeleteHistoryModalClosing(false);
+        showMessage("Removed from history", "info");
+      }, 300);
+    }
+  };
+
+  // Bulk add checks for all unpaused hunts (used by hotkey)
+  const handleBulkAddChecks = useCallback(() => {
+    const unpausedHunts = activeHunts.filter(h => !pausedHunts.has(h.id));
+    if (unpausedHunts.length === 0) return;
+
+    const now = Date.now();
+    const updatedHunts = [...activeHunts];
+    const updatedLastCheckTimes = { ...lastCheckTimes };
+    const updatedTotalCheckTimes = { ...totalCheckTimes };
+
+    unpausedHunts.forEach(hunt => {
+      const incrementValue = huntIncrements[hunt.id] || 1;
+      const bottomTimerValue = currentBottomTimers[hunt.id] || 0;
+
+      const huntIndex = updatedHunts.findIndex(h => h.id === hunt.id);
+      if (huntIndex !== -1) {
+        updatedHunts[huntIndex] = {
+          ...updatedHunts[huntIndex],
+          checks: updatedHunts[huntIndex].checks + incrementValue
+        };
+        updatedLastCheckTimes[hunt.id] = now;
+        updatedTotalCheckTimes[hunt.id] = (updatedTotalCheckTimes[hunt.id] || 0) + bottomTimerValue;
+      }
+    });
+
+    setActiveHunts(updatedHunts);
+    setLastCheckTimes(updatedLastCheckTimes);
+    setTotalCheckTimes(updatedTotalCheckTimes);
+
+    if (username) {
+      const huntData = {
+        activeHunts: updatedHunts,
+        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
+        lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
+        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
+        pausedHunts: Array.from(pausedHunts),
+        huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
+      };
+      saveHuntData(huntData);
+    }
+  }, [activeHunts, pausedHunts, huntIncrements, currentBottomTimers, username, huntTimers, saveHuntData, lastCheckTimes, totalCheckTimes]);
+
+  // Handle hotkey for counters
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) || document.activeElement.contentEditable === 'true') {
+        return;
+      }
+
+      if (e.key.toLowerCase() === hotkey.toLowerCase()) {
+        handleBulkAddChecks();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [hotkey, handleBulkAddChecks]);
+
   // Track the previous game in edit modal to detect manual game changes (not modal open)
   const prevEditGameRef = useRef(editForm.game);
   const editModalJustOpenedRef = useRef(false);
@@ -362,30 +535,6 @@ export default function Counters() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [username, activeHunts, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements]);
 
-
-  // Get all Pokemon data (main + forms) using the same logic as the main app
-  const allPokemon = useMemo(() => {
-    // Use the same filtered forms data as the main app
-    const filteredFormsData = getFilteredFormsData(formsData);
-
-    // Combine main Pokemon with filtered forms data
-    return [...pokemonData, ...filteredFormsData];
-  }, []);
-
-  // Filter Pokemon based on search term
-  const filteredPokemon = useMemo(() => {
-    if (!searchTerm.trim()) return allPokemon;
-
-    return allPokemon.filter(pokemon => {
-      if (!pokemon || !pokemon.name || !pokemon.id) return false;
-
-      const searchLower = searchTerm.toLowerCase();
-      const nameMatch = pokemon.name.toLowerCase().includes(searchLower);
-      const idMatch = pokemon.id.toString().includes(searchLower);
-
-      return nameMatch || idMatch;
-    });
-  }, [allPokemon, searchTerm]);
 
   const handlePokemonSelect = (pokemon) => {
     if (!pokemonModalClosing) {
@@ -755,22 +904,18 @@ export default function Counters() {
       time: totalCheckTimes[huntId] || 0, // Store time in milliseconds
       notes: completionForm.notes || "",
       entryId: Math.random().toString(36).substr(2, 9),
-      modifiers: hunt.modifiers || {} // Store modifiers with the entry
+      modifiers: hunt.modifiers || {}, // Store modifiers with the entry
+      isHuntTracker: true // Flag to identify this was completed from the tracker
     };
 
     // Get the caught key for this Pokemon - all hunts in the Counters page are shiny hunts
     const caughtKey = getCaughtKey(workingPokemon, null, true); // Always true since this is a shiny hunting tracker
-    console.log('Completion - Pokemon:', workingPokemon);
-    console.log('Completion - Caught Key:', caughtKey);
-    console.log('Completion - Username:', username);
 
     // First, fetch existing caught data from the database
     try {
       const { fetchCaughtData } = await import('../api/caught');
       const existingCaughtData = await fetchCaughtData(username);
-      console.log('Completion - Existing caught data:', existingCaughtData);
       const existingCaughtInfo = existingCaughtData[caughtKey] || null;
-      console.log('Completion - Existing caught info for this Pokemon:', existingCaughtInfo);
 
       // Create or update caught info
       let updatedCaughtInfo;
@@ -782,7 +927,6 @@ export default function Counters() {
           caughtAt: Date.now(),
           entries: [...existingCaughtInfo.entries, caughtEntry]
         };
-        console.log('Completion - Adding to existing entries:', updatedCaughtInfo);
       } else {
         // Pokemon is not caught yet, create new caught info
         updatedCaughtInfo = {
@@ -790,14 +934,11 @@ export default function Counters() {
           caughtAt: Date.now(),
           entries: [caughtEntry]
         };
-        console.log('Completion - Creating new caught info:', updatedCaughtInfo);
       }
 
       // Save to database using the same system as the main grid
       const { updateCaughtData } = await import('../api/caught');
-      console.log('Completion - About to save to database...');
       await updateCaughtData(username, caughtKey, updatedCaughtInfo);
-      console.log('Completion - Successfully saved to database');
 
       // Dispatch custom event to notify other components of caught data change
       window.dispatchEvent(new CustomEvent('caughtDataChanged', {
@@ -807,7 +948,6 @@ export default function Counters() {
           caughtKey: caughtKey
         }
       }));
-      console.log('Completion - Dispatched caughtDataChanged event');
     } catch (error) {
       console.error('Failed to save caught data to database:', error);
       showMessage('Failed to save to collection', 'error');
@@ -846,6 +986,9 @@ export default function Counters() {
       };
       saveHuntData(huntData);
     }
+
+    // Refresh history so the newly completed hunt immediately shows up
+    loadHuntHistory();
 
     // Close modal with animation
     setCompletionModalClosing(true);
@@ -1271,7 +1414,51 @@ export default function Counters() {
   return (
     <>
       <div className="container page-container counters-page">
-        <h1 className="page-title">Hunt Tracker</h1>
+        <div className="counters-header-row">
+          <h1 className="page-title">Hunt Tracker</h1>
+          <div className="counters-header-actions">
+            <div className="hotkey-setting">
+              <span className="hotkey-label">Hotkey:</span>
+              <div
+                className="hotkey-input-container"
+                title="Click and press any key to set the hotkey"
+              >
+                <input
+                  type="text"
+                  className="hotkey-input"
+                  value={hotkey === ' ' ? 'Space' : hotkey}
+                  readOnly
+                  onKeyDown={async (e) => {
+                    e.preventDefault();
+                    const key = e.key;
+                    // Ignore some keys that would be problematic
+                    if (['Escape', 'Tab', 'CapsLock'].includes(key)) return;
+                    setHotkey(key);
+
+                    if (username) {
+                      try {
+                        await profileAPI.updateProfile({ huntHotkey: key });
+                      } catch (error) {
+                        console.error('Failed to save hotkey to profile:', error);
+                      }
+                    }
+                  }}
+                  placeholder="Key"
+                />
+              </div>
+            </div>
+            <button
+              className="hunt-history-btn"
+              onClick={() => {
+                loadHuntHistory();
+                setShowHistoryModal(true);
+              }}
+            >
+              <RotateCcw size={16} />
+              Hunt History
+            </button>
+          </div>
+        </div>
         <div className="app-divider" />
 
         {/* Active Hunts Section */}
@@ -3282,6 +3469,151 @@ export default function Counters() {
                   className="sidebar-button"
                 >
                   Complete Hunt
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Hunt History Modal */}
+      {showHistoryModal && createPortal(
+        <div
+          className={`fixed inset-0 z-[20000] ${historyModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
+        >
+          <div className="bg-black/80 w-full h-full flex items-center justify-center p-4">
+            <div
+              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-4xl w-full max-h-[80vh] flex flex-col shadow-xl ${historyModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[var(--accent)]/20 rounded-full flex items-center justify-center">
+                    <RotateCcw className="w-5 h-5 text-[var(--accent)]" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-[var(--accent)]">Hunt History</h3>
+                    <p className="text-sm text-[var(--progressbar-info)]">View your completed hunts</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setHistoryModalClosing(true);
+                    setTimeout(() => {
+                      setShowHistoryModal(false);
+                      setHistoryModalClosing(false);
+                    }, 300);
+                  }}
+                  className="close-btn"
+                  aria-label="Close"
+                >
+                  <span className="sidebar-close-icon">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="20" cy="20" r="18" fill="#fff" stroke="#232323" strokeWidth="2" />
+                      <path d="M2 20a18 18 0 0 1 36 0" fill="#e62829" stroke="#232323" strokeWidth="2" />
+                      <rect x="2" y="19" width="36" height="2" fill="#232323" />
+                      <circle cx="20" cy="20" r="7" fill="#ffffffff" stroke="#232323" strokeWidth="2" />
+                    </svg>
+                  </span>
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto px-1 custom-scrollbar">
+                {isLoadingHistory ? (
+                  <div className="flex justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)]"></div>
+                  </div>
+                ) : huntHistory.length === 0 ? (
+                  <div className="text-center py-12 text-gray-400">
+                    <p>No completed hunts found in your history yet.</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {huntHistory.map((hunt, idx) => (
+                      <div key={hunt.entryId || idx} className="history-item">
+                        <div className="history-pokemon">
+                          <img src={hunt.pokemonIcon} alt={hunt.pokemonName} className="history-icon" />
+                          <div className="history-details">
+                            <span className="history-name">{formatPokemonName(hunt.pokemonName)}</span>
+                            <span className="history-meta">{hunt.game} • {hunt.method}</span>
+                          </div>
+                        </div>
+                        <div className="history-stats">
+                          <div className="history-stat">
+                            <span className="history-stat-label">Checks:</span>
+                            <span className="history-stat-value text-[var(--accent)]">{hunt.checks || '-'}</span>
+                          </div>
+                          <div className="history-stat">
+                            <span className="history-stat-label">Time:</span>
+                            <span className="history-stat-value text-blue-400">{formatTimeCompact(hunt.time || 0)}</span>
+                          </div>
+                          <div className="history-stat date-stat">
+                            <span className="history-stat-label">Date:</span>
+                            <span className="history-stat-value opacity-60">{hunt.date}</span>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveFromHistoryClick(hunt.caughtKey, hunt.entryId);
+                            }}
+                            className="hover:bg-black/30 rounded-md transition-colors text-gray-500 hover:text-[var(--accent)] ml-2 history-delete-btn flex items-center justify-center"
+                            title="Remove from history"
+                            style={{ padding: '2px' }}
+                          >
+                            <Trash2 size={20} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Delete History Item Modal */}
+      {deleteHistoryModal.show && createPortal(
+        <div
+          className={`fixed inset-0 z-[20000] ${deleteHistoryModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
+        >
+          <div className="bg-black/80 w-full h-full flex items-center justify-center">
+            <div
+              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${deleteHistoryModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-[var(--accent)]/20 rounded-full flex items-center justify-center">
+                  <Trash2 className="w-5 h-5 text-[var(--accent)]" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-[var(--accent)]">Remove from History</h3>
+                  <p className="text-sm text-[var(--progressbar-info)]">This removes the entry from the History List only</p>
+                </div>
+              </div>
+              <p className="text-gray-300 mb-6">
+                Are you sure you want to remove this hunt from your history? 
+                (The hunt check data and caught status inside your Living Dex collection will <strong>not</strong> be deleted.)
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => {
+                    setDeleteHistoryModalClosing(true);
+                    setTimeout(() => {
+                      setDeleteHistoryModal({ show: false, caughtKey: null, entryId: null });
+                      setDeleteHistoryModalClosing(false);
+                    }, 300);
+                  }}
+                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRemoveFromHistoryConfirm}
+                  className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
+                >
+                  Remove
                 </button>
               </div>
             </div>

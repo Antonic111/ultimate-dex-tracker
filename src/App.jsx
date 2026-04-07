@@ -983,7 +983,6 @@ export default function App() {
       if (event.detail?.source === 'app') return;
 
       const { pokemon, caughtInfo, caughtKey } = event.detail;
-      console.log('App.jsx - Received caughtDataChanged event:', { pokemon, caughtInfo, caughtKey });
 
       // Update the caughtInfoMap with the new data
       setCaughtInfoMap(prev => {
@@ -991,7 +990,6 @@ export default function App() {
           ...prev,
           [caughtKey]: caughtInfo
         };
-        console.log('App.jsx - Updated caughtInfoMap:', updated);
         return updated;
       });
 
@@ -1001,7 +999,6 @@ export default function App() {
           ...prev,
           [caughtKey]: true
         };
-        console.log('App.jsx - Updated caught map:', updated);
         return updated;
       });
     };
@@ -1892,6 +1889,7 @@ export default function App() {
                                   pokemon={selectedPokemon}
                                   onClose={() => setSelectedPokemon(null)}
                                   caughtInfo={caughtInfo}
+                                  caughtInfoMap={caughtInfoMap}
                                   updateCaughtInfo={updateCaughtInfo}
                                   showShiny={showShiny}
                                   onPokemonSelect={setSelectedPokemon}

@@ -3,7 +3,8 @@ import { createPortal } from "react-dom";
 import { Sparkles, Plus, Trash2, ChevronLeft, ChevronRight, Calendar, ChevronUp, ChevronDown, X, RotateCcw } from "lucide-react";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS, genderForms } from "../../Constants";
 import EvolutionChain from "../Dex/EvolutionChain";
-import { formatPokemonName, getFormDisplayName, renderTypeBadge, getRelatedForms } from "../../utils";
+import { getCaughtKey } from "../../caughtStorage";
+import { formatPokemonName, getFormDisplayName, renderTypeBadge, getRelatedForms, findPokemon } from "../../utils";
 
 import { SearchbarIconDropdown } from "../Shared/SearchBar";
 import ContentFilterInput from "../Shared/ContentFilterInput";
@@ -111,7 +112,7 @@ function GameTag({ gameGroup }) {
   );
 }
 
-export default function PokemonSidebar({ open = false, readOnly = false, pokemon, onClose, caughtInfo, updateCaughtInfo, showShiny, viewingUsername = null, onPokemonSelect = null, externalLinkPreference = 'serebii', dexPreferences = null }) {
+export default function PokemonSidebar({ open = false, readOnly = false, pokemon, onClose, caughtInfo, caughtInfoMap, updateCaughtInfo, showShiny, viewingUsername = null, onPokemonSelect = null, externalLinkPreference = 'serebii', dexPreferences = null }) {
   const [closing, setClosing] = useState(false);
   const [editing, setEditing] = useState(false);
   const [selectedEntryIndex, setSelectedEntryIndex] = useState(0);
@@ -749,6 +750,114 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     });
   }
 
+
+  const handleEvolve = () => {
+    if (!pokemon) return;
+
+    let evoSource = pokemon;
+    if (
+      !pokemon.evolution ||
+      (
+        (!pokemon.evolution.pre || pokemon.evolution.pre === null) &&
+        (!pokemon.evolution.next || pokemon.evolution.next.length === 0)
+      )
+    ) {
+      const base = findPokemon(pokemon.id, null);
+      if (base && base !== pokemon && base.evolution) evoSource = base;
+    }
+
+    if (!evoSource || !evoSource.evolution || !evoSource.evolution.next || evoSource.evolution.next.length === 0) {
+      showMessage("This Pokémon cannot evolve further.", "error");
+      return;
+    }
+
+    // Grab first evolution
+    const nextEvo = evoSource.evolution.next[0];
+    let nextPokemon = findPokemon(nextEvo.id, nextEvo.name);
+    
+    if (!nextPokemon) {
+      showMessage("Evolution target not found.", "error");
+      return;
+    }
+    
+    // Try to match form type (e.g. Alolan Vulpix -> Alolan Ninetales)
+    if (pokemon.formType && pokemon.formType !== "main" && pokemon.formType !== "default") {
+        const related = getRelatedForms(nextPokemon);
+        const match = related.find(r => r.formType === pokemon.formType);
+        if (match) {
+            nextPokemon = match;
+        }
+    }
+
+    let existingEntries = [];
+    if (caughtInfoMap) {
+      const nextKey = getCaughtKey(nextPokemon, null, showShiny);
+      const nextInfo = caughtInfoMap[nextKey];
+      if (nextInfo && nextInfo.entries && Array.isArray(nextInfo.entries)) {
+        existingEntries = nextInfo.entries;
+      } else if (nextInfo && nextInfo.caught) {
+        existingEntries = [{
+          ball: nextInfo.ball || "",
+          game: nextInfo.game || "",
+          mark: nextInfo.mark || "",
+          method: nextInfo.method || "",
+          checks: nextInfo.checks || "",
+          date: nextInfo.date || "",
+          notes: nextInfo.notes || "",
+          entryId: Math.random().toString(36).substr(2, 9)
+        }];
+      }
+    }
+
+    const duplicatedEntries = localEntries.map(entry => ({
+      ...entry,
+      notes: "",
+      method: "Evolved",
+      entryId: Math.random().toString(36).substr(2, 9)
+    }));
+
+    let combinedEntries = [...existingEntries, ...duplicatedEntries];
+    if (combinedEntries.length > 30) {
+      combinedEntries = combinedEntries.slice(0, 30);
+      showMessage(`Data evolved to ${formatPokemonName(nextPokemon.name)}! Max 30 entries kept.`, "success");
+    } else {
+      showMessage(`Data evolved to ${formatPokemonName(nextPokemon.name)}!`, "success");
+    }
+
+    const newInfo = {
+      caught: true,
+      entries: combinedEntries
+    };
+
+    updateCaughtInfo(nextPokemon, newInfo, showShiny);
+    
+    // Navigate to it
+    if (onPokemonSelect) {
+      onPokemonSelect(nextPokemon);
+    }
+  };
+
+  const hasEvolution = () => {
+    if (!pokemon) return false;
+    
+    // Only allow Evolve button for Main Living Dex and Alpha Forms
+    const isValidFormType = !pokemon.formType || 
+                            ["main", "default", "alpha", "alphaother"].includes(pokemon.formType);
+    if (!isValidFormType) return false;
+
+    let evoSource = pokemon;
+    if (
+      !pokemon.evolution ||
+      (
+        (!pokemon.evolution.pre || pokemon.evolution.pre === null) &&
+        (!pokemon.evolution.next || pokemon.evolution.next.length === 0)
+      )
+    ) {
+      const base = findPokemon(pokemon.id, null);
+      if (base && base !== pokemon && base.evolution) evoSource = base;
+    }
+    return !!(evoSource && evoSource.evolution && evoSource.evolution.next && evoSource.evolution.next.length > 0);
+  };
 
   async function handleReset() {
     setResetModal({ show: true, pokemonName: formatPokemonName(pokemon?.name) });
@@ -2069,8 +2178,17 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                 (localEntries.some(entry => entry.notes && entry.notes !== "")) ||
                 (localEntries.some(entry => entry.date && entry.date !== "")) ||
                 (localEntries.length > 1)) && (
-                <div className="sidebar-reset-section">
-                  <button className="sidebar-reset-button" onClick={handleReset}>Reset</button>
+                <div className="sidebar-reset-section" style={{ display: 'flex', gap: '12px', width: '100%' }}>
+                  <button className="sidebar-reset-button flex items-center justify-center" style={{ flex: '1 1 0', margin: 0, padding: '8px', minWidth: 0 }} onClick={handleReset}>Reset</button>
+                  {hasEvolution() && (
+                    <button 
+                      className="sidebar-button flex items-center justify-center" 
+                      style={{ flex: '1 1 0', margin: 0, padding: '8px', minWidth: 0 }} 
+                      onClick={handleEvolve}
+                    >
+                      Evolve
+                    </button>
+                  )}
                 </div>
               )
             )}

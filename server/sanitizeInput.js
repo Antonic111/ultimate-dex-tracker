@@ -59,6 +59,13 @@ export const SANITIZATION_RULES = {
     trim: true,
     normalize: true,
   },
+  huntHotkey: {
+    maxLength: 20,
+    minLength: 1,
+    allowedChars: /^[a-zA-Z0-9\s]+$/,
+    trim: false,
+    normalize: true,
+  },
   notes: {
     maxLength: 200,
     minLength: 0,
@@ -232,6 +239,7 @@ export function sanitizeProfileData(profileData) {
       else if (fieldName === 'gender') fieldType = 'gender';
       else if (fieldName === 'switchFriendCode') fieldType = 'switchFriendCode';
       else if (fieldName === 'profileTrainer') fieldType = 'profileTrainer';
+      else if (fieldName === 'huntHotkey') fieldType = 'huntHotkey';
       
       const result = sanitizeInput(value, fieldType);
       sanitized[fieldName] = result.sanitized;

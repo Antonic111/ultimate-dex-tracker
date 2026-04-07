@@ -510,6 +510,7 @@ export default function ViewDex() {
                     setSelectedPokemon(null);
                 }}
                 caughtInfo={selectedPokemon ? caughtInfoMap[getCaughtKey(selectedPokemon, null, showShiny)] : null}
+                caughtInfoMap={caughtInfoMap}
                 updateCaughtInfo={() => { }} // No-op for read-only mode
                 showShiny={showShiny}
                 viewingUsername={username}
