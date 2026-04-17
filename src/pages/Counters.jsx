@@ -46,7 +46,7 @@ function TimerDisplay({ huntId, lastCheckTime, isPaused, onTimeUpdate }) {
 
   return `${seconds}s`;
 }
-import { Search, X, Plus, Minus, Check, Trash2, Settings, Save, Info, RotateCcw, Pause, Play, CheckCircle, Edit } from "lucide-react";
+import { Search, X, Plus, Minus, Check, Trash2, Settings, Save, Info, RotateCcw, Pause, Play, CheckCircle, Edit, Maximize2 } from "lucide-react";
 import { BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import { getMethodsForGame, calculateOdds, getAllGames, getModifiersForGame, getCurrentHuntOdds } from "../utils/huntSystem";
 import { GAME_OPTIONS } from "../Constants";
@@ -176,6 +176,8 @@ export default function Counters() {
     return BALL_OPTIONS;
   };
   const lastPauseAction = useRef({});
+  // Track open popout windows so we can push state updates to them
+  const popoutWindowsRef = useRef({});
   const lastSaveTime = useRef(0);
   const { username } = useContext(UserContext);
   const { showMessage } = useMessage();
@@ -390,20 +392,20 @@ export default function Counters() {
       const { fetchCaughtData, updateCaughtData } = await import('../api/caught');
       const existingCaughtData = await fetchCaughtData(username);
       const existingCaughtInfo = existingCaughtData[caughtKey];
-      
+
       if (existingCaughtInfo && existingCaughtInfo.entries) {
         // Change isHuntTracker to false instead of deleting the whole entry
-        const updatedEntries = existingCaughtInfo.entries.map(e => 
+        const updatedEntries = existingCaughtInfo.entries.map(e =>
           e.entryId === entryId ? { ...e, isHuntTracker: false } : e
         );
-        
+
         const updatedCaughtInfo = {
           ...existingCaughtInfo,
           entries: updatedEntries
         };
-        
+
         await updateCaughtData(username, caughtKey, updatedCaughtInfo);
-        
+
         // Remove from local state immediately for fast UI feedback
         setHuntHistory(prev => prev.filter(h => h.entryId !== entryId));
       }
@@ -1287,6 +1289,49 @@ export default function Counters() {
     }
   };
 
+  // Listen for actions coming from popout windows via BroadcastChannel
+  // (placed here so handleAddCheck, handleDecreaseCheck, handlePauseHunt are all defined)
+  useEffect(() => {
+    const channels = {};
+
+    const subscribe = (huntId) => {
+      if (channels[huntId]) return;
+      const ch = new BroadcastChannel(`hunt-popout-${huntId}`);
+      channels[huntId] = ch;
+      ch.onmessage = (e) => {
+        const { type, action } = e.data;
+        if (type !== 'ACTION') return;
+        if (action === 'ADD')    handleAddCheck(huntId);
+        if (action === 'MINUS')  handleDecreaseCheck(huntId);
+        if (action === 'PAUSE')  handlePauseHunt(huntId);
+        if (action === 'RESUME') handlePauseHunt(huntId);
+      };
+    };
+
+    activeHunts.forEach(h => subscribe(h.id));
+
+    return () => {
+      Object.values(channels).forEach(ch => ch.close());
+    };
+  }, [activeHunts, handleAddCheck, handleDecreaseCheck, handlePauseHunt]);
+
+  // Push state updates to active popout windows whenever data changes
+  useEffect(() => {
+    activeHunts.forEach(hunt => {
+      const ch = new BroadcastChannel(`hunt-popout-${hunt.id}`);
+      ch.postMessage({
+        type: "STATE_UPDATE",
+        payload: {
+          checks: hunt.checks,
+          totalTime: totalCheckTimes[hunt.id] || 0,
+          isPaused: pausedHunts.has(hunt.id),
+          lastCheckTime: lastCheckTimes[hunt.id]
+        }
+      });
+      ch.close();
+    });
+  }, [activeHunts, totalCheckTimes, pausedHunts, lastCheckTimes]);
+
   const formatTime = (milliseconds) => {
     const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);
@@ -1455,7 +1500,7 @@ export default function Counters() {
               }}
             >
               <RotateCcw size={16} />
-              Hunt History
+              History
             </button>
           </div>
         </div>
@@ -1465,7 +1510,21 @@ export default function Counters() {
         <div className="active-hunts-section">
           <div className="hunts-grid">
             {activeHunts.map((hunt) => (
-              <div key={hunt.id} className="hunt-card">
+              <div key={hunt.id} className="hunt-card" style={{ position: 'relative' }}>
+                <button
+                  className="popout-overlay-btn"
+                  title="Popout hunt window"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(
+                      `/hunt-popout?huntId=${hunt.id}`,
+                      `hunt-popout-${hunt.id}`,
+                      'width=500,height=400,resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,status=no'
+                    );
+                  }}
+                >
+                  <Maximize2 size={20} />
+                </button>
                 <div className="hunt-header">
                   {!expandedHunts.has(hunt.id) ? (
                     // Normal view: Pokemon name and sprite
@@ -3593,7 +3652,7 @@ export default function Counters() {
                 </div>
               </div>
               <p className="text-gray-300 mb-6">
-                Are you sure you want to remove this hunt from your history? 
+                Are you sure you want to remove this hunt from your history?
                 (The hunt check data and caught status inside your Living Dex collection will <strong>not</strong> be deleted.)
               </p>
               <div className="flex gap-3 justify-end">

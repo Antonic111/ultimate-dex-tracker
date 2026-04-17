@@ -1,5 +1,20 @@
 [
   {
+    "date": "2026-04-17",
+    "version": "v1.1.3",
+    "type": "feature",
+    "title": "",
+    "description": "",
+    "features": [
+      "Added the ability to pop-out hunts on the counters page."
+    ],
+    "fixes": [
+      "Removed the hotkey display in the counters page on mobile phones.",
+      "Changed Hunt History to just History on the counters page to better fit on mobile.",
+      "Evolving Pokemon with multiple evolve paths will now give you an option to select the evolution."
+    ]
+  },
+  {
     "date": "2026-04-06",
     "version": "v1.1.2",
     "type": "feature",

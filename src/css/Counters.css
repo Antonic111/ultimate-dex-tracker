@@ -389,6 +389,23 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* Fix CSS out-of-bounds bug: Reset absolute positioning for the minus button in the button row */
+.checks-buttons .decrease-check-btn {
+  position: static;
+  width: auto;
+  height: auto;
+  bottom: auto;
+  left: auto;
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  box-shadow: none;
+}
+
+.checks-buttons .decrease-check-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 /* Hide the counter overlay button on mobile, show the button row version instead */
 @media (max-width: 768px) {
   .checks-display .decrease-check-btn {
@@ -2205,7 +2222,7 @@
     gap: 0.25rem;
   }
 
-  .decrease-check-btn {
+  .checks-buttons .decrease-check-btn {
     display: flex;
     background: #ef4444;
     color: white;
@@ -2586,12 +2603,16 @@
 
 /* Mobile Adjustments */
 @media (max-width: 768px) {
+  .hotkey-setting {
+    display: none;
+  }
+
   .history-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .history-stats {
     width: 100%;
     justify-content: space-between;
@@ -2599,8 +2620,192 @@
     padding-top: 0.75rem;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
-  
+
   .history-stat {
     align-items: flex-start;
   }
+}
+
+/* ==========================================================================
+   POPOUT MODE OVERRIDES
+   Force strictly desktop layout for the popout window regardless of size
+   ========================================================================== */
+
+/* 1. BUTTON VISIBILITY (Absolute minus vs inline minus) */
+body.popout-mode .checks-display .decrease-check-btn {
+  display: flex !important;
+  position: absolute !important;
+  bottom: -8px !important;
+  left: -8px !important;
+  width: 24px !important;
+  height: 24px !important;
+  padding: 0.25rem !important;
+  border-radius: 50% !important;
+}
+
+body.popout-mode .checks-buttons .decrease-check-btn {
+  display: none !important;
+}
+
+/* 2. HEADER AND CARDS */
+body.popout-mode .hunt-header {
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 1.5rem !important;
+  padding: 0 1rem !important;
+  flex-wrap: nowrap !important;
+}
+
+body.popout-mode .hunt-pokemon {
+  min-width: auto !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+}
+
+body.popout-mode .hunt-pokemon-image {
+  width: 90px !important;
+  height: 90px !important;
+}
+
+body.popout-mode .hunt-pokemon-name {
+  font-size: 1.5rem !important;
+  line-height: inherit !important;
+  word-break: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+}
+
+body.popout-mode .hunt-pokemon-info h3 {
+  font-size: 1.1rem !important;
+  line-height: normal !important;
+  word-break: normal !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  text-overflow: clip !important;
+}
+
+body.popout-mode .hunt-actions {
+  flex-direction: row !important;
+  gap: 0.5rem !important;
+  transform: none !important;
+  flex: 0 0 auto !important;
+}
+
+body.popout-mode .hunt-actions.expanded-view {
+  display: flex !important;
+  transform: none !important;
+}
+
+body.popout-mode .hunt-delete-btn,
+body.popout-mode .hunt-reset-btn,
+body.popout-mode .hunt-settings-btn,
+body.popout-mode .hunt-info-btn,
+body.popout-mode .hunt-edit-btn {
+  padding: 8px !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+body.popout-mode .hunt-delete-btn svg,
+body.popout-mode .hunt-reset-btn svg,
+body.popout-mode .hunt-settings-btn svg,
+body.popout-mode .hunt-info-btn svg,
+body.popout-mode .hunt-edit-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* 3. MIDDLE CHECKS ROW */
+body.popout-mode .hunt-checks {
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  flex-wrap: nowrap !important;
+  padding: 1.25rem !important;
+  gap: 0.25rem !important;
+}
+
+body.popout-mode .checks-display {
+  width: 6rem !important;
+  order: 0 !important;
+}
+
+body.popout-mode .checks-count {
+  font-size: 1.8rem !important;
+  width: 6rem !important;
+  padding: 0.25rem 1rem !important;
+  height: auto !important;
+}
+
+body.popout-mode .timer-display {
+  width: 6rem !important;
+  margin-left: auto !important;
+  order: 0 !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+  font-size: 0.8rem !important;
+}
+
+body.popout-mode .checks-buttons {
+  min-width: 6rem !important;
+  order: 0 !important;
+  margin-left: 0 !important;
+  gap: 0.5rem !important;
+}
+
+body.popout-mode .pause-btn,
+body.popout-mode .add-check-btn {
+  padding: 0.75rem 1.25rem !important;
+  font-size: 1rem !important;
+}
+
+/* 4. BOTTOM ACTION ROW */
+body.popout-mode .hunt-complete {
+  flex-direction: row !important;
+  gap: 1rem !important;
+}
+
+body.popout-mode .hunt-odds-display {
+  width: auto !important;
+  justify-content: flex-start !important;
+}
+
+body.popout-mode .complete-hunt-btn {
+  flex: 1 !important;
+  width: auto !important;
+}
+
+/* 5. POPOUT OVERLAY BUTTON (Counters Page) */
+.popout-overlay-btn {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  color: var(--sidebar-text);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.popout-overlay-btn:hover {
+  background: transparent;
+  color: white;
+  transform: scale(1.1);
+}
+
+.hunt-card:hover .popout-overlay-btn {
+  opacity: 0.6;
+}
+
+.hunt-card:hover .popout-overlay-btn:hover {
+  opacity: 1;
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Sparkles, Plus, Trash2, ChevronLeft, ChevronRight, Calendar, ChevronUp, ChevronDown, X, RotateCcw } from "lucide-react";
+import { Sparkles, Plus, Trash2, ChevronLeft, ChevronRight, Calendar, ChevronUp, ChevronDown, X, RotateCcw, ArrowUpCircle } from "lucide-react";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS, genderForms } from "../../Constants";
 import EvolutionChain from "../Dex/EvolutionChain";
 import { getCaughtKey } from "../../caughtStorage";
@@ -148,6 +148,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   const [deleteEntryModal, setDeleteEntryModal] = useState({ show: false, entryIndex: null, entryNumber: null });
   const [resetModalClosing, setResetModalClosing] = useState(false);
   const [deleteEntryModalClosing, setDeleteEntryModalClosing] = useState(false);
+  const [evolveModal, setEvolveModal] = useState({ show: false, options: [] });
+  const [evolveModalClosing, setEvolveModalClosing] = useState(false);
 
   // Always use .value, never the full object, in editData
   const defaultEditData = {
@@ -551,15 +553,23 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     };
   }, []);
 
-  // Prevent scrolling when reset modal is open
+  // Prevent scrolling when modals are open
   useEffect(() => {
     const preventScroll = (e) => {
+      // If we are in the evolve modal, allow scrolling inside the custom-scrollbar only
+      if (evolveModal.show) {
+        if (e.target.closest('.custom-scrollbar')) {
+          return; // Let the modal itself scroll normally
+        }
+      }
       e.preventDefault();
       e.stopPropagation();
       return false;
     };
 
-    if (resetModal.show) {
+    const isAnyModalOpen = resetModal.show || deleteEntryModal.show || evolveModal.show;
+
+    if (isAnyModalOpen) {
       document.body.style.overflow = 'hidden';
       document.addEventListener('wheel', preventScroll, { passive: false });
       document.addEventListener('touchmove', preventScroll, { passive: false });
@@ -574,7 +584,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       document.removeEventListener('wheel', preventScroll);
       document.removeEventListener('touchmove', preventScroll);
     };
-  }, [resetModal.show]);
+  }, [resetModal.show, deleteEntryModal.show, evolveModal.show]);
 
   // Function to format date from YYYY-MM-DD to MMM DD YYYY format
   function formatDate(dateString) {
@@ -751,34 +761,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   }
 
 
-  const handleEvolve = () => {
-    if (!pokemon) return;
-
-    let evoSource = pokemon;
-    if (
-      !pokemon.evolution ||
-      (
-        (!pokemon.evolution.pre || pokemon.evolution.pre === null) &&
-        (!pokemon.evolution.next || pokemon.evolution.next.length === 0)
-      )
-    ) {
-      const base = findPokemon(pokemon.id, null);
-      if (base && base !== pokemon && base.evolution) evoSource = base;
-    }
-
-    if (!evoSource || !evoSource.evolution || !evoSource.evolution.next || evoSource.evolution.next.length === 0) {
-      showMessage("This Pokémon cannot evolve further.", "error");
-      return;
-    }
-
-    // Grab first evolution
-    const nextEvo = evoSource.evolution.next[0];
-    let nextPokemon = findPokemon(nextEvo.id, nextEvo.name);
-    
-    if (!nextPokemon) {
-      showMessage("Evolution target not found.", "error");
-      return;
-    }
+  const executeEvolve = (targetPokemon) => {
+    let nextPokemon = targetPokemon;
     
     // Try to match form type (e.g. Alolan Vulpix -> Alolan Ninetales)
     if (pokemon.formType && pokemon.formType !== "main" && pokemon.formType !== "default") {
@@ -835,6 +819,46 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     if (onPokemonSelect) {
       onPokemonSelect(nextPokemon);
     }
+  };
+
+  const handleEvolve = () => {
+    if (!pokemon) return;
+
+    let evoSource = pokemon;
+    if (
+      !pokemon.evolution ||
+      (
+        (!pokemon.evolution.pre || pokemon.evolution.pre === null) &&
+        (!pokemon.evolution.next || pokemon.evolution.next.length === 0)
+      )
+    ) {
+      const base = findPokemon(pokemon.id, null);
+      if (base && base !== pokemon && base.evolution) evoSource = base;
+    }
+
+    if (!evoSource || !evoSource.evolution || !evoSource.evolution.next || evoSource.evolution.next.length === 0) {
+      showMessage("This Pokémon cannot evolve further.", "error");
+      return;
+    }
+
+    if (evoSource.evolution.next.length > 1) {
+      const options = evoSource.evolution.next.map(evo => findPokemon(evo.id, evo.name)).filter(Boolean);
+      if (options.length > 0) {
+        setEvolveModal({ show: true, options });
+        return;
+      }
+    }
+
+    // Grab first evolution
+    const nextEvo = evoSource.evolution.next[0];
+    const nextPokemon = findPokemon(nextEvo.id, nextEvo.name);
+    
+    if (!nextPokemon) {
+      showMessage("Evolution target not found.", "error");
+      return;
+    }
+    
+    executeEvolve(nextPokemon);
   };
 
   const hasEvolution = () => {
@@ -2463,6 +2487,71 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                   className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors"
                 >
                   Delete Entry
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Evolve Modal */}
+      {evolveModal.show && createPortal(
+        <div
+          className={`fixed inset-0 z-[20000] ${evolveModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+        >
+          <div className="bg-black/80 w-full h-full flex items-center justify-center">
+            <div
+              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl flex flex-col ${evolveModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
+              style={{ maxHeight: '80vh' }}
+            >
+              <div className="flex items-center gap-3 mb-4 shrink-0">
+                <div className="w-12 h-12 bg-[var(--accent)]/20 rounded-full flex items-center justify-center shrink-0">
+                  <ArrowUpCircle className="w-7 h-7 text-[var(--accent)]" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-[var(--accent)]">Multiple Evolutions Available</h3>
+                  <p className="text-sm text-[var(--progressbar-info)]">Choose which Pokémon to evolve into</p>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap justify-center gap-3 mb-6 mt-4 overflow-y-auto pr-1 custom-scrollbar" style={{ flex: '1 1 auto' }}>
+                {evolveModal.options.map((opt, i) => (
+                  <button
+                    key={`${opt.id}-${i}`}
+                    onClick={() => {
+                        setEvolveModalClosing(true);
+                        setTimeout(() => {
+                           setEvolveModal({ show: false, options: [] });
+                           setEvolveModalClosing(false);
+                           executeEvolve(opt);
+                        }, 300);
+                    }}
+                    className="w-[100px] flex flex-col items-center justify-start bg-[#2a2a2a] border border-[#444] rounded-[15px] p-2 hover:border-[var(--accent)] hover:bg-[#333] transition-all"
+                  >
+                    <img 
+                      src={showShiny && opt.sprites?.front_shiny ? opt.sprites.front_shiny : (opt.sprites?.front_default || "/fallback.png")} 
+                      alt={opt.name} 
+                      className="w-12 h-12 object-contain filter drop-shadow-md mb-1.5"
+                    />
+                    <span className="text-xs font-semibold text-center text-white break-words w-full" style={{ lineHeight: '1.2' }}>{formatPokemonName(opt.name)}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex gap-3 justify-end shrink-0">
+                <button
+                  onClick={() => {
+                    setEvolveModalClosing(true);
+                    setTimeout(() => {
+                      setEvolveModal({ show: false, options: [] });
+                      setEvolveModalClosing(false);
+                    }, 300);
+                  }}
+                  className="px-4 py-2 w-full rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
+                >
+                  Cancel
                 </button>
               </div>
             </div>

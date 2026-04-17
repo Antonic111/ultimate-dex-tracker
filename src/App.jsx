@@ -44,6 +44,7 @@ const ViewDex = lazy(() => import("./pages/ViewDex.jsx"));
 const Changelog = lazy(() => import("./pages/Changelog"));
 const Bingo = lazy(() => import("./pages/Bingo"));
 const Admin = lazy(() => import("./pages/Admin"));
+const HuntPopout = lazy(() => import("./pages/HuntPopout"));
 import { LoadingProvider, useLoading } from "./components/Shared/LoadingContext";
 import { LoadingSpinner } from "./components/Shared";
 import Footer from "./components/Shared/Footer";
@@ -174,6 +175,19 @@ const LocationListener = ({ onNavigateToHome }) => {
   }, [location.pathname, onNavigateToHome]);
 
   return null; // This component doesn't render anything
+};
+
+// Wrapper components to hide header/footer on popout window
+const HeaderWrapper = (props) => {
+  const location = useLocation();
+  if (location.pathname === '/hunt-popout') return null;
+  return <HeaderWithConditionalAuth {...props} />;
+};
+
+const FooterWrapper = () => {
+  const location = useLocation();
+  if (location.pathname === '/hunt-popout') return null;
+  return <Footer />;
 };
 
 
@@ -1731,7 +1745,7 @@ export default function App() {
                   </div>
                 )}
 
-                <HeaderWithConditionalAuth
+                <HeaderWrapper
                   user={user}
                   setUser={handleUserUpdate}
                   showMenu={showMenu}
@@ -2061,6 +2075,16 @@ export default function App() {
                       }
                     />
 
+                    {/* Hunt popout - standalone window, no auth wrapper */}
+                    <Route
+                      path="/hunt-popout"
+                      element={
+                        <Suspense fallback={<LoadingSpinner fullScreen />}>
+                          <HuntPopout />
+                        </Suspense>
+                      }
+                    />
+
                     {/* Temporary route to preview loading screen - REMOVE BEFORE PRODUCTION */}
                     <Route
                       path="/loading"
@@ -2070,7 +2094,7 @@ export default function App() {
                   </Routes>
                 </main>
 
-                <Footer />
+                <FooterWrapper />
 
                 {/* Custom Scrollbar for Desktop */}
                 <CustomScrollbar />
