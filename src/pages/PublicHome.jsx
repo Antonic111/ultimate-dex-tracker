@@ -1,10 +1,100 @@
 import { Link } from "react-router-dom";
-import { Sparkles, BarChart3, Filter, Users, SquarePen, Star, ArrowRight } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Sparkles, Users, SquarePen, Star, ArrowRight, Globe, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import pokemonData from "../data/pokemon.json";
 import "../css/PublicHome.css";
 
 export default function PublicHome() {
+  const [totalCaught, setTotalCaught] = useState(null);
+  const [displayCount, setDisplayCount] = useState(0);
+  const animFrameRef = useRef(null);
+
+  useEffect(() => {
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+    fetch(`${API_BASE}/api/profiles/stats/total-caught`)
+      .then(r => r.json())
+      .then(data => {
+        if (typeof data.total === 'number') {
+          setTotalCaught(data.total);
+        }
+      })
+      .catch(() => {/* silently fail */});
+  }, []);
+
+  // Animate count-up when totalCaught arrives
+  useEffect(() => {
+    if (totalCaught === null) return;
+    const duration = 1400;
+    const start = performance.now();
+    const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+    const step = (now) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      setDisplayCount(Math.floor(easeOut(progress) * totalCaught));
+      if (progress < 1) animFrameRef.current = requestAnimationFrame(step);
+    };
+    animFrameRef.current = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animFrameRef.current);
+  }, [totalCaught]);
+
+  const features = [
+    {
+      title: "Track Every Detail",
+      description: "Log specific details for each Pokémon including date caught, Poké Ball, origin game, hunt method, marks, and ribbons.",
+      image: "/data/public_home_images/track_progress.png",
+    },
+    {
+      title: "Smart Filters",
+      description: "Filter by type, generation, game, ball type, forms, and caught status with advanced search.",
+      image: "/data/public_home_images/smart_filters.png",
+    },
+    {
+      title: "Share & Compare",
+      description: "Share your profile link and view other trainers' collections to compare progress worldwide.",
+      image: "/data/public_home_images/share_and_compare.png",
+    },
+    {
+      title: "Personalize",
+      description: "Customize themes, set favorites, and backup your data with your unique trainer identity.",
+      image: "/data/public_home_images/personalize.png",
+    },
+  ];
+
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [featurePaused, setFeaturePaused] = useState(false);
+  const [featureTransitioning, setFeatureTransitioning] = useState(false);
+
+  const goToFeature = (index) => {
+    if (featureTransitioning) return;
+    setFeatureTransitioning(true);
+    setTimeout(() => {
+      setActiveFeature(typeof index === 'function' ? index(activeFeature) : index);
+      setFeatureTransitioning(false);
+    }, 250);
+  };
+
+  useEffect(() => {
+    if (featurePaused) return;
+    const id = setInterval(() => {
+      setFeatureTransitioning(true);
+      setTimeout(() => {
+        setActiveFeature(prev => (prev + 1) % features.length);
+        setFeatureTransitioning(false);
+      }, 250);
+    }, 7000);
+    return () => clearInterval(id);
+  }, [featurePaused]);
+
+  const [lightboxSrc, setLightboxSrc] = useState(null);
+
+  useEffect(() => {
+    if (!lightboxSrc) return;
+    const handler = (e) => { if (e.key === 'Escape') setLightboxSrc(null); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [lightboxSrc]);
+
   // Pre-define card positions to prevent CLS - these are fixed and known at render time
   const cardPositions = [
     { top: 10, left: 20, size: 'large', rotation: -8 },
@@ -100,16 +190,29 @@ export default function PublicHome() {
             <span>Ultimate Pokémon Collection Tracker</span>
           </div>
           <h1>Welcome to Ultimate Dex Tracker!</h1>
-          <p className="hero-subtitle">Track your Pokémon collection across all games with ease. Build your perfect living dex and never lose track of your progress again.</p>
+          <p className="hero-subtitle">The ultimate tracker for Living Dexes, shiny hunting, marks, forms, Poké Balls, and collection completion.</p>
 
           <p className="tracking-count">
-            Tracking 2064 Pokemon!
+            Track 2,064 Pokémon Forms &amp; Variants
           </p>
+
+          {totalCaught !== null && (
+            <div className="live-caught-stat">
+              <div className="live-caught-inner">
+                <div className="live-dot-wrapper">
+                  <span className="live-dot" />
+                </div>
+                <Globe className="live-globe-icon" />
+                <span className="live-caught-number">{displayCount.toLocaleString()}</span>
+                <span className="live-caught-label">Pokémon caught worldwide</span>
+              </div>
+            </div>
+          )}
 
           {/* Creator Credit */}
           <div className="creator-credit">
             <span>
-              Made by{" "}
+              Created by Pokémon collector &amp; content creator{" "}
               <a href="https://solo.to/antonic" target="_blank" rel="noopener noreferrer">
                 Antonic
               </a>
@@ -125,21 +228,9 @@ export default function PublicHome() {
               <Users className="btn-icon" />
               Login
             </Link>
-          </div>
-          <div className="hero-navigation">
-            <Link to="/trainers" className="trainers-nav-card group">
-              <div className="nav-card-content">
-                <div className="nav-card-icon">
-                  <Users />
-                </div>
-                <div className="nav-card-text">
-                  <span className="nav-card-title">Explore</span>
-                  <span className="nav-card-subtitle">Trainer Profiles</span>
-                </div>
-              </div>
-              <div className="nav-card-arrow">
-                <ArrowRight />
-              </div>
+            <Link to="/trainers" className="home-trainers-btn secondary-btn">
+              <ArrowRight className="btn-icon" />
+              Explore Trainers
             </Link>
           </div>
         </div>
@@ -178,42 +269,90 @@ export default function PublicHome() {
         </div>
       </div>
 
-      <div className="features-section">
+      <div className="features-section"
+        onMouseEnter={() => setFeaturePaused(true)}
+        onMouseLeave={() => setFeaturePaused(false)}
+      >
         <div className="features-header">
           <h2>Everything you need to master your collection</h2>
           <p>Powerful tools designed for serious Pokémon trainers</p>
         </div>
-        <div className="features-grid">
-          <div className="feature-card">
-            <div className="feature-icon">
-              <BarChart3 />
+
+        <div className="feature-carousel">
+          <button
+            className="feature-carousel-arrow left"
+            onClick={() => goToFeature((activeFeature - 1 + features.length) % features.length)}
+            aria-label="Previous feature"
+          >
+            <ChevronLeft size={22} />
+          </button>
+
+          <div className={`feature-slide ${featureTransitioning ? 'fading' : 'visible'}`}>
+            <div
+              className="feature-slide-image"
+              onClick={() => setLightboxSrc(features[activeFeature].image)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && setLightboxSrc(features[activeFeature].image)}
+              aria-label={`View ${features[activeFeature].title} full screen`}
+            >
+              <img
+                src={features[activeFeature].image}
+                alt={features[activeFeature].title}
+                draggable={false}
+              />
             </div>
-            <h3>Track Progress</h3>
-            <p>Track ball type, game caught, trainer info, and multiple forms for each Pokémon with visual progress bars.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <Filter />
+            <div className="feature-slide-text">
+              <h3>{features[activeFeature].title}</h3>
+              <p>{features[activeFeature].description}</p>
             </div>
-            <h3>Smart Filters</h3>
-            <p>Filter by type, generation, game, ball type, trainer, forms, and caught status with advanced search.</p>
           </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <Users />
-            </div>
-            <h3>Share & Compare</h3>
-            <p>Share your profile link and view other trainers' collections to compare progress worldwide.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <Star />
-            </div>
-            <h3>Personalize</h3>
-            <p>Customize themes, set favorites, and backup your data with your unique trainer identity.</p>
-          </div>
+
+          <button
+            className="feature-carousel-arrow right"
+            onClick={() => goToFeature((activeFeature + 1) % features.length)}
+            aria-label="Next feature"
+          >
+            <ChevronRight size={22} />
+          </button>
+        </div>
+
+        <div className="feature-dots">
+          {features.map((_, i) => (
+            <button
+              key={i}
+              className={`feature-dot ${i === activeFeature ? 'active' : ''}`}
+              onClick={() => goToFeature(i)}
+              aria-label={`Go to feature ${i + 1}`}
+            />
+          ))}
         </div>
       </div>
+
+      {/* Lightbox */}
+      {lightboxSrc && createPortal(
+        <div
+          className="lightbox-overlay"
+          onClick={() => setLightboxSrc(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Full screen image"
+        >
+          <button
+            className="lightbox-close"
+            onClick={() => setLightboxSrc(null)}
+            aria-label="Close"
+          >
+            ✕
+          </button>
+          <img
+            src={lightboxSrc}
+            alt="Feature screenshot"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>,
+        document.body
+      )}
 
       <div className="cta-section">
         <div className="cta-content">

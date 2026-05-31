@@ -56,7 +56,7 @@ import { buildApiUrl } from "./config/api.js";
 import { getFilteredFormsData, getDexPreferences } from "./utils/dexPreferences";
 import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "./data/blockedShinies";
 import { createPortal } from "react-dom";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, TriangleAlert } from "lucide-react";
 import { getAvailableGamesForPokemonSidebar, normalizeGameName } from "./utils/pokemonAvailability";
 
 // Mobile Keyboard Handler Hook
@@ -1752,7 +1752,7 @@ export default function App() {
                   selectedPokemon={selectedPokemon}
                 />
                 
-                {isMaintenancePending && (
+                {(isMaintenancePending || (maintenanceMode && isMaintenanceTime)) && (
                   <div style={{
                     backgroundColor: '#ef4444',
                     color: 'white',
@@ -1765,10 +1765,17 @@ export default function App() {
                     right: 0,
                     zIndex: 1500,
                     display: 'flex',
+                    alignItems: 'center',
                     justifyContent: 'center',
+                    gap: '8px',
                     boxShadow: '0 -2px 10px rgba(0,0,0,0.5)'
                   }}>
-                    ⚠️ SCHEDULED MAINTENANCE: The site will go into maintenance mode in {maintenanceMinutesLeft} minute{maintenanceMinutesLeft !== 1 && 's'}. Please save your work immediately.
+                    <TriangleAlert className="w-5 h-5 flex-shrink-0" />
+                    {isMaintenancePending ? (
+                      <span>SCHEDULED MAINTENANCE: The site will go into maintenance mode in {maintenanceMinutesLeft} minute{maintenanceMinutesLeft !== 1 ? 's' : ''}. Please save your work immediately.</span>
+                    ) : (
+                      <span>ACTIVE MAINTENANCE MODE: Only admins can access the site right now.</span>
+                    )}
                   </div>
                 )}
 

@@ -87,4 +87,32 @@ router.post('/:username/like', authenticateUser, async (req, res) => {
   }
 });
 
+// Get total caught Pokémon count across all accounts (public)
+router.get('/stats/total-caught', async (req, res) => {
+  try {
+    // Aggregate across all users: sum entries in caughtPokemon where caught === true
+    const result = await User.aggregate([
+      {
+        $project: {
+          caughtEntries: { $objectToArray: "$caughtPokemon" }
+        }
+      },
+      { $unwind: "$caughtEntries" },
+      {
+        $match: { "caughtEntries.v.caught": true }
+      },
+      {
+        $count: "total"
+      }
+    ]);
+
+    const total = result.length > 0 ? result[0].total : 0;
+    res.json({ total });
+  } catch (error) {
+    console.error('Error getting total caught count:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
+

@@ -552,45 +552,40 @@ export default function Trainers() {
                   <div className="trainer-meta">
                     <div className="trainer-name">
                       {u.username}
-                      {u.isAdmin && (
-                        <span className="crown-wrapper">
-                          <Crown
-                            size={16}
-                            strokeWidth={2.5}
-                            style={{
-                              color: "#fbbf24",
-                              flexShrink: 0,
-                              marginLeft: "6px"
-                            }}
-                          />
-                          <span className="crown-tooltip">Admin</span>
-                        </span>
-                      )}
-                      {u.isContentCreator && (
-                        <span className="crown-wrapper">
-                          <Video
-                            size={16}
-                            strokeWidth={2.5}
-                            style={{
-                              color: "#fbbf24",
-                              flexShrink: 0,
-                              marginLeft: u.isAdmin ? "4px" : "6px"
-                            }}
-                          />
-                          <span className="crown-tooltip">Content Creator</span>
-                        </span>
-                      )}
                     </div>
                     <div className="trainer-sub trainer-sub-icons">
                       {(() => {
                         const code = pickCountry(u.location);
                         const flag = code ? <span className={`fi fi-${code}`} /> : null;
                         const g = genderIcon(u.gender);
+                        const hasMeta = flag || g;
+                        const hasBadge = u.isAdmin || u.isContentCreator;
                         return (
                           <>
                             {flag}
                             {flag && g ? <span className="dot-sep" /> : null}
                             {g}
+                            {hasMeta && hasBadge ? <span className="dot-sep" /> : null}
+                            {u.isAdmin && (
+                              <span className="crown-wrapper">
+                                <Crown
+                                  size={14}
+                                  strokeWidth={2.5}
+                                  style={{ color: "#fbbf24", flexShrink: 0 }}
+                                />
+                                <span className="crown-tooltip">Admin</span>
+                              </span>
+                            )}
+                            {u.isContentCreator && (
+                              <span className="crown-wrapper">
+                                <Video
+                                  size={14}
+                                  strokeWidth={2.5}
+                                  style={{ color: "#fbbf24", flexShrink: 0 }}
+                                />
+                                <span className="crown-tooltip">Content Creator</span>
+                              </span>
+                            )}
                           </>
                         );
                       })()}
@@ -602,9 +597,7 @@ export default function Trainers() {
                   <div className="trainer-bio">
                     {u.bio.length > 90 ? `${u.bio.slice(0, 90)}…` : u.bio}
                   </div>
-                ) : (
-                  <div className="trainer-bio muted">No bio yet</div>
-                )}
+                ) : null}
               </Link>
             ))}
           </div>

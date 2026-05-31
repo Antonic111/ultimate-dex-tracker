@@ -12,7 +12,8 @@
       "Redisigned the site header for a better visual look and functionality.",
       "Moved the **Report a Bug** and **Request a Feature** sections out of the Changelog page and into their own dedicated tabs, making them easier to find and more visible to users.",
       "Added support for Google Autofill on all the login/register related pages, making it easier and faster to sign in using saved credentials.",
-      "Added tooltips on the profile page so that hovering over games, Poké Balls, and marks now displays their full item names."
+      "Added tooltips on the profile page so that hovering over games, Poké Balls, and marks now displays their full item names.",
+      "Added some improvments and stats to the sites landing page."
     ],
     "fixes": [
       "Fixed some security issues.",
@@ -24,7 +25,9 @@
       "Fixed the save button in the profile picture modal so it now correctly matches the site’s accent color.",
       "Profile picture changes now update the site header instantly without requiring a page refresh.",
       "Profile page pictures are now slightly zoomed in for a more natural appearance.",
-      "Made badges and icons in the profile page slightly bigger and better aligned."
+      "Made badges and icons in the profile page slightly bigger and better aligned.",
+      "If a trainer does not have a bio set it will now show nothing in the trainers page instead of **No bio yet**",
+      "Maintenance mode banner has some visual improvments."
     ]
   },
   {
