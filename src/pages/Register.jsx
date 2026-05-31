@@ -31,6 +31,8 @@ export default function Register() {
 
     if (clickedRef.current || loading) return; // 🚫 prevent rapid clicks
     clickedRef.current = true;
+    setShowPassword(false);
+    setShowConfirmPassword(false);
     setLoading(true);
 
     if (form.password !== form.confirmPassword) {
@@ -57,6 +59,18 @@ export default function Register() {
         password: form.password,
         profileTrainer: "ash.png",
       });
+
+      // Tell Chrome to offer saving the new credential
+      if (window.PasswordCredential) {
+        try {
+          const cred = new window.PasswordCredential({
+            id: form.email,
+            password: form.password,
+            name: form.username,
+          });
+          await navigator.credentials.store(cred);
+        } catch (_) { /* optional */ }
+      }
 
       if (result?.emailSent === false) {
               showMessage("Account created, but email failed to send. Please use Resend Email on the verify page.", "warning");
@@ -95,11 +109,14 @@ export default function Register() {
         <div className="input-icon-wrapper">
           <User className="auth-icon" size={20} />
           <input
+            id="username"
             name="username"
+            type="text"
             value={form.username}
             onChange={handleChange}
             placeholder="Username"
             className="register-input"
+            autoComplete="username"
             required
           />
         </div>
@@ -107,11 +124,14 @@ export default function Register() {
         <div className="input-icon-wrapper">
           <Mail className="auth-icon" size={20} />
           <input
+            id="email"
             name="email"
             type="email"
             placeholder="Email"
+            value={form.email}
             onChange={handleChange}
             className="register-input"
+            autoComplete="email"
             required
           />
         </div>
@@ -119,9 +139,11 @@ export default function Register() {
         <div className="input-icon-wrapper password-wrapper">
           <Lock className="auth-icon" size={20} />
           <input
+            id="new-password"
             name="password"
             type={showPassword ? "text" : "password"}
             placeholder="Password"
+            value={form.password}
             onChange={handleChange}
             className="register-input"
             autoComplete="new-password"
@@ -141,9 +163,11 @@ export default function Register() {
         <div className="input-icon-wrapper password-wrapper">
           <Lock className="auth-icon" size={20} />
           <input
+            id="confirm-password"
             name="confirmPassword"
             type={showConfirmPassword ? "text" : "password"}
             placeholder="Confirm Password"
+            value={form.confirmPassword}
             onChange={handleChange}
             className="register-input"
             autoComplete="new-password"

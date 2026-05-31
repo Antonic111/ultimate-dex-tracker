@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { profileAPI } from "../../utils/api";
 
 const ThemeContext = createContext();
 export const useTheme = () => useContext(ThemeContext);
@@ -8,8 +9,11 @@ const THEME_KEY = "theme";
 const ACCENT_KEY = "accent";
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => localStorage.getItem(THEME_KEY) || "dark");
-  const [accent, setAccent] = useState(() => localStorage.getItem(ACCENT_KEY) || "yellow");
+  const [theme, setThemeState] = useState(() => localStorage.getItem(THEME_KEY) || "dark");
+  const [accent, setAccentState] = useState(() => localStorage.getItem(ACCENT_KEY) || "yellow");
+
+  // Track whether we've loaded server prefs yet (prevents overwriting server values with stale localStorage)
+  const serverLoaded = useRef(false);
 
   // OS preference watcher for "system"
   const media = useMemo(
@@ -47,7 +51,7 @@ export function ThemeProvider({ children }) {
     brown: "#6a3c06",
   };
 
-  // Apply resolved theme to <html> and persist user's choice ("system" is stored as-is)
+  // Apply resolved theme to <html> and persist to localStorage
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", resolvedTheme);
     localStorage.setItem(THEME_KEY, theme);
@@ -61,20 +65,52 @@ export function ThemeProvider({ children }) {
     return () => media.removeEventListener?.("change", onChange);
   }, [media]);
 
-  // Accent handling (unchanged)
+  // Apply accent CSS vars and persist to localStorage
   useEffect(() => {
     localStorage.setItem(ACCENT_KEY, accent);
     document.documentElement.style.setProperty("--accent", accentMap[accent]);
     document.documentElement.style.setProperty("--accent-hover", accentHoverMap[accent]);
   }, [accent]);
 
-  // Keep your toggle cycling just light <-> dark (leaves "system" to the cards UI)
-  const toggleTheme = () => setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  // Called once after login/auth with values from the server profile
+  const initFromProfile = (serverAccent, serverTheme) => {
+    if (serverAccent && serverAccent !== accent) {
+      setAccentState(serverAccent);
+      localStorage.setItem(ACCENT_KEY, serverAccent);
+    }
+    if (serverTheme && serverTheme !== theme) {
+      setThemeState(serverTheme);
+      localStorage.setItem(THEME_KEY, serverTheme);
+    }
+    serverLoaded.current = true;
+  };
+
+  // Wrapper: sets locally + saves to server
+  const setAccent = async (newAccent) => {
+    setAccentState(newAccent);
+    try {
+      await profileAPI.updateProfile({ accentColor: newAccent });
+    } catch (e) {
+      console.error("Failed to save accent to server:", e);
+    }
+  };
+
+  const setTheme = async (newTheme) => {
+    setThemeState(newTheme);
+    try {
+      await profileAPI.updateProfile({ siteTheme: newTheme });
+    } catch (e) {
+      console.error("Failed to save theme to server:", e);
+    }
+  };
+
+  // Keep your toggle cycling just light <-> dark
+  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
   // Expose resolvedTheme for assets (logos, etc.)
   return (
     <ThemeContext.Provider
-      value={{ theme, setTheme, toggleTheme, accent, setAccent, resolvedTheme }}
+      value={{ theme, setTheme, toggleTheme, accent, setAccent, resolvedTheme, initFromProfile }}
     >
       {children}
     </ThemeContext.Provider>

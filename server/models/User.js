@@ -114,6 +114,9 @@ const userSchema = new mongoose.Schema({
   },
   // EXTERNAL LINK PREFERENCE ----------------------------------------- //
   externalLinkPreference: { type: String, default: 'serebii', enum: ['serebii', 'bulbapedia', 'pokemondb', 'smogon'] },
+  // APPEARANCE PREFERENCES ----------------------------------------- //
+  accentColor: { type: String, default: 'yellow', enum: ['yellow', 'red', 'orange', 'green', 'blue', 'cyan', 'purple', 'pink', 'brown'] },
+  siteTheme: { type: String, default: 'dark', enum: ['light', 'dark', 'system'] },
   // SHINY CHARM GAMES ----------------------------------------- //
   shinyCharmGames: { type: [String], default: [] },
   // HUNT SETTINGS ----------------------------------------- //
@@ -132,6 +135,10 @@ const userSchema = new mongoose.Schema({
   },
   // ADMIN STATUS ----------------------------------------- //
   isAdmin: { type: Boolean, default: false },
+  // CONTENT CREATOR STATUS ----------------------------------------- //
+  isContentCreator: { type: Boolean, default: false },
+  youtubeUrl: { type: String, default: null },
+  twitchUrl: { type: String, default: null },
   // DELETE ACCOUNT CODE ----------------------------------------- //
   deleteCodeHash: { type: String, default: null },
   deleteCodeExpires: { type: Date, default: null },

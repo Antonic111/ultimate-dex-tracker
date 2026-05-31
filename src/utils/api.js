@@ -213,6 +213,67 @@ export const api = {
     return fetchRequest();
   },
 
+  // PATCH request
+  async patch(endpoint, data = null, options = {}) {
+    const url = buildApiUrl(endpoint);
+
+    const fetchRequest = async () => {
+      // Get token from localStorage for all users
+      const token = localStorage.getItem('authToken');
+      const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+
+      // Add Authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(url, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers,
+        body: data ? JSON.stringify(data) : undefined,
+        ...options,
+      });
+
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
+          error.status = response.status;
+          error.data = errorData;
+          error.userMessage = errorData?.error || 'An error occurred';
+          throw error;
+        } else {
+          const errorText = await response.text();
+          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+          error.status = response.status;
+          error.data = { error: errorText };
+          error.userMessage = errorText || 'An error occurred';
+          throw error;
+        }
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const result = await response.json();
+        return result;
+      }
+
+      return { message: 'Success' };
+    };
+
+    // Use mobile retry for mobile devices
+    if (isMobile()) {
+      return mobileRetry(fetchRequest);
+    }
+
+    return fetchRequest();
+  },
+
   // DELETE request
   async delete(endpoint, options = {}) {
     const url = buildApiUrl(endpoint);
@@ -550,5 +611,25 @@ export const debugAPI = {
   // Test health
   async testHealth() {
     return api.get('/health');
+  },
+};
+
+// ─── Content Creator API ───────────────────────────────────────────────────────
+export const creatorAPI = {
+  // Submit a new creator request
+  async submitRequest(data) {
+    return api.post('/creator-request', data);
+  },
+  // Get the current user's request status
+  async getStatus() {
+    return api.get('/creator-request/status');
+  },
+  // Admin: get all creator requests
+  async getAll(status = 'pending') {
+    return api.get(`/admin/creator-requests?status=${status}`);
+  },
+  // Admin: approve or reject a request
+  async updateRequest(id, data) {
+    return api.patch(`/admin/creator-requests/${id}`, data);
   },
 };

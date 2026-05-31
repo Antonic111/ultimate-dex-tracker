@@ -22,7 +22,7 @@ import { Suspense, lazy } from "react";
 import { MessageProvider } from "./components/Shared/MessageContext";
 import { UserContext } from "./components/Shared/UserContext";
 import HeaderWithConditionalAuth from "./Header";
-import { ThemeProvider } from "./components/Shared/ThemeContext";
+import { ThemeProvider, useTheme } from "./components/Shared/ThemeContext";
 import './css/theme.css';
 // import './css/pageAnimations.css'; // Moved to backup folder
 
@@ -42,6 +42,8 @@ const Counters = lazy(() => import("./pages/Counters"));
 const PublicProfile = lazy(() => import("./pages/PublicProfile"));
 const ViewDex = lazy(() => import("./pages/ViewDex.jsx"));
 const Changelog = lazy(() => import("./pages/Changelog"));
+const Feedback = lazy(() => import("./pages/Feedback"));
+
 const Bingo = lazy(() => import("./pages/Bingo"));
 const Admin = lazy(() => import("./pages/Admin"));
 const HuntPopout = lazy(() => import("./pages/HuntPopout"));
@@ -323,6 +325,31 @@ function CloseSidebarOnRouteChange({ setSidebarOpen, setSelectedPokemon, sidebar
       if (selectedPokemon) setSelectedPokemon(null);
     }
   }, [location.pathname, setSidebarOpen, setSelectedPokemon, sidebarOpen, selectedPokemon]);
+  return null;
+}
+
+// Syncs server-side accent/theme into ThemeContext once per login
+function AppThemeSync({ username }) {
+  const { initFromProfile } = useTheme();
+  const hasInit = useRef(false);
+
+  useEffect(() => {
+    if (!username || hasInit.current) return;
+    hasInit.current = true;
+    profileAPI.getProfile()
+      .then(data => {
+        if (data?.accentColor || data?.siteTheme) {
+          initFromProfile(data.accentColor, data.siteTheme);
+        }
+      })
+      .catch(() => { /* silently ignore — localStorage fallback still applies */ });
+  }, [username]);
+
+  // Reset so it syncs again on next login
+  useEffect(() => {
+    if (!username) hasInit.current = false;
+  }, [username]);
+
   return null;
 }
 
@@ -2019,6 +2046,16 @@ export default function App() {
                       }
                     />
                     <Route
+                      path="/feedback"
+                      element={
+                        <RequireAuth loading={loading} authReady={authReady} user={user}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading feedback..." />}>
+                            <Feedback />
+                          </Suspense>
+                        </RequireAuth>
+                      }
+                    />
+                    <Route
                       path="/admin"
                       element={
                         <RequireAuth loading={loading} authReady={authReady} user={user}>
@@ -2175,6 +2212,7 @@ export default function App() {
               </div>,
               document.body
             )}
+          <AppThemeSync username={user?.username} />
           </MessageProvider>
         </UserContext.Provider>
       </LoadingProvider>

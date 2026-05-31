@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Users, Bug, Shield, Settings, Search, ChevronDown, CheckCircle, XCircle, AlertCircle, Calendar, Mail, UserCheck, Filter, Trash2, Check, ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from 'lucide-react';
+import { Users, Bug, Shield, Settings, Search, ChevronDown, CheckCircle, XCircle, AlertCircle, Calendar, Mail, UserCheck, Filter, Trash2, Check, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, Video, Youtube, Twitch, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMessage } from '../components/Shared/MessageContext';
 import { buildApiUrl } from '../config/api.js';
+import { creatorAPI } from '../utils/api.js';
 import './Admin.css';
 
 const Admin = () => {
@@ -12,6 +13,7 @@ const Admin = () => {
   const [users, setUsers] = useState([]);
   const [bugReports, setBugReports] = useState([]);
   const [featureRequests, setFeatureRequests] = useState([]);
+  const [creatorRequests, setCreatorRequests] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(null); // null = checking, true = admin, false = not admin
   const [maintenanceMode, setMaintenanceMode] = useState(false);
@@ -25,20 +27,27 @@ const Admin = () => {
   const [showUserActions, setShowUserActions] = useState(false);
   const [editingBio, setEditingBio] = useState('');
   const [editingUsername, setEditingUsername] = useState('');
+  const [editingCreator, setEditingCreator] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   
   // Bug report management
   const [bugReportSearch, setBugReportSearch] = useState('');
-  const [bugReportFilter, setBugReportFilter] = useState('all');
+  const [bugReportFilter, setBugReportFilter] = useState('open');
   const [showBugReportFilter, setShowBugReportFilter] = useState(false);
   const bugReportFilterRef = useRef();
   
   // Feature request management
   const [featureRequestSearch, setFeatureRequestSearch] = useState('');
-  const [featureRequestFilter, setFeatureRequestFilter] = useState('all');
+  const [featureRequestFilter, setFeatureRequestFilter] = useState('open');
   const [showFeatureRequestFilter, setShowFeatureRequestFilter] = useState(false);
   const featureRequestFilterRef = useRef();
   
+  // Creator request management
+  const [creatorRequestSearch, setCreatorRequestSearch] = useState('');
+  const [creatorRequestFilter, setCreatorRequestFilter] = useState('pending');
+  const [showCreatorRequestFilter, setShowCreatorRequestFilter] = useState(false);
+  const creatorRequestFilterRef = useRef();
+
   // Modal states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showResolveModal, setShowResolveModal] = useState(false);
@@ -58,6 +67,9 @@ const Admin = () => {
       }
       if (featureRequestFilterRef.current && !featureRequestFilterRef.current.contains(event.target)) {
         setShowFeatureRequestFilter(false);
+      }
+      if (creatorRequestFilterRef.current && !creatorRequestFilterRef.current.contains(event.target)) {
+        setShowCreatorRequestFilter(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -120,7 +132,7 @@ const Admin = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [usersRes, bugReportsRes, featureRequestsRes, settingsRes] = await Promise.all([
+      const [usersRes, bugReportsRes, featureRequestsRes, settingsRes, creatorReqsData] = await Promise.all([
         fetch(buildApiUrl('/admin/users'), {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
           credentials: 'include'
@@ -133,7 +145,8 @@ const Admin = () => {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
           credentials: 'include'
         }),
-        fetch(buildApiUrl('/site-settings'))
+        fetch(buildApiUrl('/site-settings')),
+        creatorAPI.getAll('all').catch(() => ({ requests: [] }))
       ]);
 
       if (usersRes.ok) {
@@ -164,10 +177,24 @@ const Admin = () => {
         const settingsData = await settingsRes.json();
         setMaintenanceMode(settingsData.maintenanceMode || false);
       }
+
+      if (creatorReqsData && creatorReqsData.requests) {
+        setCreatorRequests(creatorReqsData.requests);
+      }
     } catch (err) {
       showMessage('Failed to load admin data', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateCreatorRequest = async (id, status, adminNotes = '') => {
+    try {
+      await creatorAPI.updateRequest(id, { status, adminNotes });
+      showMessage(`Creator request ${status} successfully`, 'success');
+      loadData();
+    } catch (err) {
+      showMessage(err.userMessage || `Failed to ${status} request`, 'error');
     }
   };
 
@@ -285,6 +312,7 @@ const Admin = () => {
     if (selectedUser) {
       setEditingBio(selectedUser.bio || '');
       setEditingUsername(selectedUser.username || '');
+      setEditingCreator(selectedUser.isContentCreator || false);
     }
   }, [selectedUser]);
 
@@ -300,7 +328,8 @@ const Admin = () => {
         },
         body: JSON.stringify({ 
           bio: editingBio,
-          username: editingUsername 
+          username: editingUsername,
+          isContentCreator: editingCreator
         }),
         credentials: 'include'
       });
@@ -309,9 +338,9 @@ const Admin = () => {
         const result = await response.json();
         showMessage(result.message, 'success');
         setUsers(users.map(u => 
-          u._id === selectedUser._id ? { ...u, bio: result.bio, username: result.username } : u
+          u._id === selectedUser._id ? { ...u, bio: result.bio, username: result.username, isContentCreator: result.isContentCreator } : u
         ));
-        setSelectedUser({ ...selectedUser, bio: result.bio, username: result.username });
+        setSelectedUser({ ...selectedUser, bio: result.bio, username: result.username, isContentCreator: result.isContentCreator });
       } else {
         const error = await response.json();
         showMessage(error.error || 'Failed to update profile', 'error');
@@ -334,6 +363,12 @@ const Admin = () => {
     const matchesSearch = request.title.toLowerCase().includes(featureRequestSearch.toLowerCase()) ||
                          request.description.toLowerCase().includes(featureRequestSearch.toLowerCase());
     const matchesFilter = featureRequestFilter === 'all' || request.status === featureRequestFilter;
+    return matchesSearch && matchesFilter;
+  });
+
+  const filteredCreatorRequests = creatorRequests.filter(request => {
+    const matchesSearch = request.username.toLowerCase().includes(creatorRequestSearch.toLowerCase());
+    const matchesFilter = creatorRequestFilter === 'all' || request.status === creatorRequestFilter;
     return matchesSearch && matchesFilter;
   });
 
@@ -417,6 +452,9 @@ const Admin = () => {
     switch (status) {
       case 'open': return <AlertCircle className="status-icon open" />;
       case 'resolved': return <CheckCircle className="status-icon resolved" />;
+      case 'pending': return <Clock className="status-icon" style={{ color: '#f59e0b' }} />;
+      case 'approved': return <CheckCircle className="status-icon" style={{ color: '#10b981' }} />;
+      case 'rejected': return <XCircle className="status-icon" style={{ color: '#ef4444' }} />;
       default: return <AlertCircle className="status-icon" />;
     }
   };
@@ -425,6 +463,9 @@ const Admin = () => {
     switch (status) {
       case 'open': return 'Open';
       case 'resolved': return 'Resolved';
+      case 'pending': return 'Pending';
+      case 'approved': return 'Approved';
+      case 'rejected': return 'Rejected';
       default: return 'Unknown';
     }
   };
@@ -443,6 +484,16 @@ const Admin = () => {
       case 'all': return 'All Status';
       case 'open': return 'Open';
       case 'resolved': return 'Resolved';
+      default: return 'All Status';
+    }
+  };
+
+  const getCreatorRequestFilterLabel = () => {
+    switch (creatorRequestFilter) {
+      case 'all': return 'All Status';
+      case 'pending': return 'Pending';
+      case 'approved': return 'Approved';
+      case 'rejected': return 'Rejected';
       default: return 'All Status';
     }
   };
@@ -492,14 +543,21 @@ const Admin = () => {
             onClick={() => setActiveTab('bug-reports')}
           >
             <Bug size={18} />
-            Bug Reports ({bugReports.length})
+            Bug Reports ({bugReports.filter(r => r.status === 'open').length})
           </button>
           <button 
             className={`admin-tab ${activeTab === 'feature-requests' ? 'active' : ''}`}
             onClick={() => setActiveTab('feature-requests')}
           >
             <Shield size={18} />
-            Feature Requests ({featureRequests.length})
+            Feature Requests ({featureRequests.filter(r => r.status === 'open').length})
+          </button>
+          <button 
+            className={`admin-tab ${activeTab === 'creator-requests' ? 'active' : ''}`}
+            onClick={() => setActiveTab('creator-requests')}
+          >
+            <Video size={18} />
+            Creator Requests ({creatorRequests.filter(r => r.status === 'pending').length})
           </button>
           <button 
             className={`admin-tab ${activeTab === 'settings' ? 'active' : ''}`}
@@ -685,6 +743,16 @@ const Admin = () => {
                       </span>
                     </div>
 
+                    <div className="action-item" style={{ alignItems: 'center' }}>
+                      <label style={{ margin: 0 }}>Content Creator</label>
+                      <input 
+                        type="checkbox" 
+                        checked={editingCreator} 
+                        onChange={(e) => setEditingCreator(e.target.checked)} 
+                        style={{ cursor: 'pointer', width: '18px', height: '18px', accentColor: 'var(--accent)' }}
+                      />
+                    </div>
+
                     <div style={{ padding: '12px', background: 'var(--bg-primary)', borderRadius: '8px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 'bold' }}>Username</label>
@@ -726,16 +794,16 @@ const Admin = () => {
                       </div>
                       <button 
                         onClick={handleSaveProfile}
-                        disabled={isSavingProfile || (editingBio === (selectedUser.bio || '') && editingUsername === selectedUser.username)}
+                        disabled={isSavingProfile || (editingBio === (selectedUser.bio || '') && editingUsername === selectedUser.username && editingCreator === !!selectedUser.isContentCreator)}
                         style={{
                           alignSelf: 'flex-end',
                           padding: '6px 12px',
-                          background: (isSavingProfile || (editingBio === (selectedUser.bio || '') && editingUsername === selectedUser.username)) ? 'var(--bg-secondary)' : 'var(--accent)',
-                          color: (isSavingProfile || (editingBio === (selectedUser.bio || '') && editingUsername === selectedUser.username)) ? 'var(--text-secondary)' : '#1a1a1a',
+                          background: (isSavingProfile || (editingBio === (selectedUser.bio || '') && editingUsername === selectedUser.username && editingCreator === !!selectedUser.isContentCreator)) ? 'var(--bg-secondary)' : 'var(--accent)',
+                          color: (isSavingProfile || (editingBio === (selectedUser.bio || '') && editingUsername === selectedUser.username && editingCreator === !!selectedUser.isContentCreator)) ? 'var(--text-secondary)' : '#1a1a1a',
                           border: '1px solid var(--border-color)',
                           borderRadius: '6px',
                           fontWeight: 'bold',
-                          cursor: (isSavingProfile || (editingBio === (selectedUser.bio || '') && editingUsername === selectedUser.username)) ? 'not-allowed' : 'pointer',
+                          cursor: (isSavingProfile || (editingBio === (selectedUser.bio || '') && editingUsername === selectedUser.username && editingCreator === !!selectedUser.isContentCreator)) ? 'not-allowed' : 'pointer',
                           fontSize: '0.85rem',
                           transition: 'all 0.2s'
                         }}
@@ -1006,6 +1074,152 @@ const Admin = () => {
                       </button>
                     </div>
                     <p className="bug-report-description">{request.description}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Creator Requests Tab */}
+        {activeTab === 'creator-requests' && (
+          <div className="admin-section">
+            <div className="section-header">
+              <h2>Content Creator Requests</h2>
+              <div className="search-controls">
+                <div className="search-input-wrap">
+                  <Search className="search-icon" size={16} />
+                  <input
+                    type="text"
+                    placeholder="Search by username..."
+                    value={creatorRequestSearch}
+                    onChange={(e) => setCreatorRequestSearch(e.target.value)}
+                    className="search-input"
+                  />
+                </div>
+                <div className={`filter-button-wrap ${showCreatorRequestFilter ? 'open' : ''}`} ref={creatorRequestFilterRef}>
+                  <button
+                    className="filter-button"
+                    onClick={() => setShowCreatorRequestFilter(!showCreatorRequestFilter)}
+                    aria-label="Filter creator requests"
+                  >
+                    <div className="filter-content">
+                      <Filter size={18} />
+                      <span>{getCreatorRequestFilterLabel()}</span>
+                    </div>
+                    <ChevronDown 
+                      className={`ml-2 flex-shrink-0 transition-transform duration-200 cursor-pointer ${showCreatorRequestFilter ? '' : 'rotate-180'}`}
+                      style={{ color: 'var(--accent)' }}
+                      size={16}
+                    />
+                  </button>
+                  
+                  {showCreatorRequestFilter && (
+                    <div className="filter-dropdown">
+                      <button
+                        className={`filter-option ${creatorRequestFilter === "all" ? "active" : ""}`}
+                        onClick={() => {
+                          setCreatorRequestFilter("all");
+                          setShowCreatorRequestFilter(false);
+                        }}
+                      >
+                        All Status
+                      </button>
+                      <button
+                        className={`filter-option ${creatorRequestFilter === "pending" ? "active" : ""}`}
+                        onClick={() => {
+                          setCreatorRequestFilter("pending");
+                          setShowCreatorRequestFilter(false);
+                        }}
+                      >
+                        Pending
+                      </button>
+                      <button
+                        className={`filter-option ${creatorRequestFilter === "approved" ? "active" : ""}`}
+                        onClick={() => {
+                          setCreatorRequestFilter("approved");
+                          setShowCreatorRequestFilter(false);
+                        }}
+                      >
+                        Approved
+                      </button>
+                      <button
+                        className={`filter-option ${creatorRequestFilter === "rejected" ? "active" : ""}`}
+                        onClick={() => {
+                          setCreatorRequestFilter("rejected");
+                          setShowCreatorRequestFilter(false);
+                        }}
+                      >
+                        Rejected
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <div className="bug-reports-list">
+              {filteredCreatorRequests.length === 0 ? (
+                <div className="empty-state">
+                  <Video size={48} className="empty-state-icon" />
+                  <h3>No Creator Requests</h3>
+                </div>
+              ) : (
+                filteredCreatorRequests.map(request => (
+                  <div key={request._id} className="bug-report-card">
+                    <div className="bug-report-header">
+                      <div className="bug-report-meta">
+                        <span className="report-id">#{request._id.substring(request._id.length - 6).toUpperCase()}</span>
+                        {getStatusIcon(request.status)}
+                        <span className="status-label">{getStatusLabel(request.status)}</span>
+                        <span className="date">
+                          <Calendar size={14} />
+                          {new Date(request.submittedAt).toLocaleDateString()}
+                        </span>
+                        <span className="submitter">
+                          by {request.username}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="bug-report-actions">
+                      {request.youtubeUrl && (
+                        <a href={request.youtubeUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', borderRadius: '8px', color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', textDecoration: 'none', transition: 'all 0.2s' }} title="YouTube Channel">
+                          <Youtube size={26} />
+                        </a>
+                      )}
+                      {request.twitchUrl && (
+                        <a href={request.twitchUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', borderRadius: '8px', color: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.1)', textDecoration: 'none', transition: 'all 0.2s' }} title="Twitch Channel">
+                          <Twitch size={26} />
+                        </a>
+                      )}
+                      {request.status === 'pending' && (
+                        <>
+                          {(request.youtubeUrl || request.twitchUrl) && (
+                            <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--border-color)', margin: '0 8px' }}></div>
+                          )}
+                          <button
+                            className="resolve-report-btn"
+                            onClick={() => handleUpdateCreatorRequest(request._id, 'approved')}
+                            title="Approve Request"
+                          >
+                            <Check size={20} />
+                          </button>
+                          <button
+                            className="delete-report-btn"
+                            onClick={() => handleUpdateCreatorRequest(request._id, 'rejected')}
+                            title="Reject Request"
+                          >
+                            <XCircle size={20} />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                    <div className="bug-report-description">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <p style={{ margin: 0 }}><strong>Content Type:</strong> {request.contentType}</p>
+                        <p style={{ margin: 0 }}><strong>Subscribers:</strong> {request.subscriberCount}</p>
+                      </div>
+                    </div>
                   </div>
                 ))
               )}

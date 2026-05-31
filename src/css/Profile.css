@@ -101,14 +101,43 @@ button:focus {
   @apply flex items-center gap-2 px-3.5 py-2 bg-[var(--accent)] text-black font-bold border-none rounded-lg cursor-pointer transition-colors duration-200;
 }
 
-.profile-edit-btn:hover,
-.profile-cancel-btn:hover {
+.profile-edit-btn:hover:not(:disabled),
+.profile-cancel-btn:hover:not(:disabled) {
   @apply bg-[var(--accent-hover)] text-[var(--text)];
+}
+
+.profile-edit-btn:disabled,
+.profile-cancel-btn:disabled {
+  @apply bg-[var(--bg-secondary)] text-[var(--text-secondary)] border border-[var(--border-color)] cursor-not-allowed opacity-70;
 }
 
 /* Buttons row */
 .profile-actions {
   @apply flex items-center gap-2.5;
+}
+
+.profile-social-btn {
+  @apply flex items-center gap-1.5 px-3.5 py-2 rounded-lg no-underline font-bold transition-all duration-200 text-[0.95rem];
+}
+
+.youtube-btn {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.youtube-btn:hover {
+  background-color: #ef4444;
+  color: white;
+}
+
+.twitch-btn {
+  background-color: rgba(168, 85, 247, 0.15);
+  color: #a855f7;
+}
+
+.twitch-btn:hover {
+  background-color: #a855f7;
+  color: white;
 }
 
 /* ================================
@@ -134,6 +163,8 @@ button:focus {
 .profile-avatar-img {
   @apply w-full h-auto object-contain;
   image-rendering: pixelated;
+  transform: scale(1.20) translateY(15%);
+  transform-origin: center bottom;
 }
 
 .profile-bio-block {
@@ -149,7 +180,12 @@ button:focus {
 }
 
 .profile-field.full-span {
-  @apply col-span-full mt-3;
+  @apply w-full mt-3;
+  flex: 0 0 100%;
+}
+
+.profile-field label {
+  @apply flex items-center gap-1.5;
 }
 
 /* ================================
@@ -368,7 +404,7 @@ button:focus {
   justify-content: flex-start;
   gap: 12px;
   flex-wrap: nowrap;
-  overflow: hidden;
+  overflow: visible;
   padding: 10px 16px;
 }
 
@@ -387,7 +423,18 @@ button:focus {
 
 .stat-icon-item:hover {
   transform: scale(1.12);
-  z-index: 5;
+  z-index: 50;
+}
+
+/* Stat icon tooltip — matches evo-tooltip style */
+.stat-icon-tooltip {
+  @apply hidden absolute left-1/2 bottom-16 transform -translate-x-1/2 text-white text-sm font-medium px-3 py-2 rounded-lg shadow-xl z-[999] whitespace-nowrap text-center;
+  background: #000;
+  pointer-events: none;
+}
+
+.stat-icon-item:hover .stat-icon-tooltip {
+  @apply block;
 }
 
 .stat-icon-img {
@@ -580,11 +627,14 @@ button:focus {
 }
 
 .save-btn {
-  @apply bg-yellow-400 text-gray-800 border-none px-2.5 py-2 rounded-md cursor-pointer font-bold transition-colors duration-200;
+  @apply border-none px-2.5 py-2 rounded-md cursor-pointer font-bold transition-colors duration-200;
+  background: var(--accent);
+  color: #000;
 }
 
 .save-btn:hover {
-  @apply bg-yellow-500;
+  background: var(--accent-hover);
+  color: var(--text);
 }
 
 /* COPY LINK BUTTON ------------------------------------------------------------- */

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "flag-icons/css/flag-icons.min.css";
 import "../css/Trainers.css";
 import { COUNTRY_OPTIONS } from "../data/countries";
-import { Mars, Venus, VenusAndMars, Search, Heart, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, RefreshCcw, MoveUp, MoveDown, Check, X, Crown, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { Mars, Venus, VenusAndMars, Search, Heart, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, RefreshCcw, MoveUp, MoveDown, Check, X, Crown, ChevronLeft, ChevronRight, Calendar, Video } from "lucide-react";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { profileAPI } from "../utils/api";
 import { UserContext } from "../components/Shared/UserContext";
@@ -564,6 +564,20 @@ export default function Trainers() {
                             }}
                           />
                           <span className="crown-tooltip">Admin</span>
+                        </span>
+                      )}
+                      {u.isContentCreator && (
+                        <span className="crown-wrapper">
+                          <Video
+                            size={16}
+                            strokeWidth={2.5}
+                            style={{
+                              color: "#fbbf24",
+                              flexShrink: 0,
+                              marginLeft: u.isAdmin ? "4px" : "6px"
+                            }}
+                          />
+                          <span className="crown-tooltip">Content Creator</span>
                         </span>
                       )}
                     </div>

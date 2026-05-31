@@ -5,9 +5,9 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/SiteLogo.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ultimate Dex Tracker - Pokémon Tracker for Living Dex, Shinies, and Forms</title>
+  <title>Ultimate Dex Tracker</title>
 
-  <!-- SEO Meta Tags - Important for Google AdSense verification -->
+  <!-- SEO Meta Tags -->
   <meta name="description"
     content="Ultimate Dex Tracker is a free Pokémon tracker to build your living dex, track shinies, forms, and progress across every game. Track 2064+ Pokémon in one place." />
   <meta name="keywords"
@@ -17,7 +17,7 @@
   <link rel="canonical" href="https://www.ultimatedextracker.com/" />
 
   <!-- Open Graph Meta Tags for Social Sharing -->
-  <meta property="og:title" content="Ultimate Dex Tracker - Pokémon Tracker for Living Dex, Shinies, and Forms" />
+  <meta property="og:title" content="Ultimate Dex Tracker" />
   <meta property="og:description"
     content="A free Pokémon tracker to build your living dex, track shinies, forms, and progress across every game. Track 2064+ Pokémon in one place." />
   <meta property="og:type" content="website" />
@@ -27,7 +27,7 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Ultimate Dex Tracker - Pokémon Tracker for Living Dex, Shinies, and Forms" />
+  <meta name="twitter:title" content="Ultimate Dex Tracker" />
   <meta name="twitter:description"
     content="A free Pokémon tracker to build your living dex, track shinies, forms, and progress across every game. Track 2064+ Pokémon in one place." />
   <meta name="twitter:image" content="/SiteLogo.png" />
@@ -36,25 +36,86 @@
   <meta name="application-name" content="Ultimate Dex Tracker" />
   <meta name="theme-color" content="#0f0f0f" />
 
-  <!-- Structured Data -->
+  <!-- Structured Data: WebSite + SiteLinksSearchBox -->
   <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "Ultimate Dex Tracker",
-        "url": "https://www.ultimatedextracker.com/",
-        "description": "A free Pokémon tracker to build your living dex, track shinies, forms, and progress across every game. Track 2064+ Pokémon in one place.",
-        "publisher": {
-          "@type": "Person",
-          "name": "Antonic",
-          "url": "https://solo.to/antonic"
-        }
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Ultimate Dex Tracker",
+      "url": "https://www.ultimatedextracker.com/",
+      "description": "A free Pokémon tracker to build your living dex, track shinies, forms, and progress across every game. Track 2064+ Pokémon in one place.",
+      "publisher": {
+        "@type": "Person",
+        "name": "Antonic",
+        "url": "https://solo.to/antonic"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://www.ultimatedextracker.com/trainers?query={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
       }
-    </script>
+    }
+  </script>
 
-  <!-- Google AdSense Verification Script -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6475589957282046"
-    crossorigin="anonymous"></script>
+  <!-- Structured Data: Named Sitelinks (hints Google toward these pages) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Ultimate Dex Tracker Navigation",
+      "url": "https://www.ultimatedextracker.com/",
+      "itemListElement": [
+        {
+          "@type": "SiteLinksSearchBox",
+          "url": "https://www.ultimatedextracker.com/",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://www.ultimatedextracker.com/trainers?query={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Login",
+          "url": "https://www.ultimatedextracker.com/login",
+          "description": "Sign in to your Ultimate Dex Tracker account"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Register",
+          "url": "https://www.ultimatedextracker.com/register",
+          "description": "Create a free account to track your Pokémon collection"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Counters",
+          "url": "https://www.ultimatedextracker.com/counters",
+          "description": "Track your shiny hunting encounters with live counters"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Bingo",
+          "url": "https://www.ultimatedextracker.com/bingo",
+          "description": "Play Pokémon shiny hunt bingo with your collection"
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "Trainers",
+          "url": "https://www.ultimatedextracker.com/trainers",
+          "description": "Browse and compare Pokémon collections from other trainers"
+        }
+      ]
+    }
+  </script>
+
 </head>
 
 <body>

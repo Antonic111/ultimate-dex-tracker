@@ -34,6 +34,8 @@ export default function Login({ onLogin }) {
     if (clickedRef.current || loading) return; // 🛑 block spam clicks
     clickedRef.current = true;
 
+    // Ensure password field type is "password" on submit so Chrome detects it
+    setShowPassword(false);
     setLoading(true);
 
     try {
@@ -82,8 +84,24 @@ export default function Login({ onLogin }) {
         createdAt: loginData.user.createdAt,
         profileTrainer: loginData.user.profileTrainer,
         verified: loginData.user.verified,
+        isAdmin: loginData.user.isAdmin || false,
         progressBars: progressBars,
       });
+
+      // Tell Chrome/browser password manager to offer saving the credential
+      if (window.PasswordCredential) {
+        try {
+          const cred = new window.PasswordCredential({
+            id: form.usernameOrEmail,
+            password: form.password,
+            name: loginData.user.username,
+          });
+          await navigator.credentials.store(cred);
+        } catch (_) {
+          // Silently ignore — credential storage is optional
+        }
+      }
+
       navigate("/");
     } catch (err) {
       // Handle specific verification error
@@ -126,8 +144,11 @@ export default function Login({ onLogin }) {
         <div className="input-icon-wrapper">
           <User className="auth-icon" size={20} />
           <input
+            id="username"
             name="usernameOrEmail"
+            type="text"
             placeholder="Username or Email"
+            value={form.usernameOrEmail}
             onChange={handleChange}
             className="login-input"
             required
@@ -138,9 +159,11 @@ export default function Login({ onLogin }) {
         <div className="input-icon-wrapper password-wrapper">
           <Lock className="auth-icon" size={20} />
           <input
+            id="password"
             name="password"
             type={showPassword ? "text" : "password"}
             placeholder="Password"
+            value={form.password}
             onChange={handleChange}
             className="login-input"
             required

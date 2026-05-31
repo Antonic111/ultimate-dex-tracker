@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useUser } from "../components/Shared/UserContext";
 import "../css/Profile.css";
-import { NotebookPen, Trophy, Mars, Venus, VenusAndMars, PencilLine, SquareX, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight } from "lucide-react";
+import { NotebookPen, Trophy, Mars, Venus, VenusAndMars, PencilLine, SquareX, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight, Video, Clock, Youtube, Twitch } from "lucide-react";
 import { IconDropdown } from "../components/Shared/IconDropdown";
 import FavoriteSelectionModal from "../components/Shared/FavoriteSelectionModal";
+import CreatorRequestModal from "../components/Shared/CreatorRequestModal";
 import "flag-icons/css/flag-icons.min.css";
 import { COUNTRY_OPTIONS } from "../data/countries";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
@@ -18,7 +19,7 @@ import { useLoading } from "../components/Shared/LoadingContext";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
 import { validateContent } from "../../shared/contentFilter";
-import { profileAPI, caughtAPI } from "../utils/api";
+import { profileAPI, caughtAPI, creatorAPI } from "../utils/api";
 import { getFilteredFormsData } from "../utils/dexPreferences";
 import { SearchbarIconDropdown } from "../components/Shared/SearchBar";
 
@@ -105,7 +106,7 @@ function formatSwitchFCInput(value) {
 
 export default function Profile() {
     const navigate = useNavigate();
-    const { username, email, createdAt, loading } = useUser();
+    const { username, email, createdAt, loading, setUser } = useUser();
     const { setLoading, isLoading } = useLoading();
     const { showMessage } = useMessage();
 
@@ -189,9 +190,14 @@ export default function Profile() {
         favoriteGames: ["", "", "", "", ""],
         favoritePokemon: ["", "", "", "", ""],
         favoritePokemonShiny: [false, false, false, false, false],
-        switchFriendCode: ""
+        switchFriendCode: "",
+        youtubeUrl: "",
+        twitchUrl: "",
     });
     const [isAdmin, setIsAdmin] = useState(false);
+    const [isContentCreator, setIsContentCreator] = useState(false);
+    const [showCreatorModal, setShowCreatorModal] = useState(false);
+    const [creatorStatus, setCreatorStatus] = useState("none");
 
     useEffect(() => {
         if (!loading && (!username || !email)) {
@@ -231,9 +237,18 @@ export default function Profile() {
                     favoriteGames: Array.isArray(data.favoriteGames) ? [...data.favoriteGames] : prev.favoriteGames,
                     favoritePokemon: Array.isArray(data.favoritePokemon) ? [...data.favoritePokemon] : prev.favoritePokemon,
                     favoritePokemonShiny: Array.isArray(data.favoritePokemonShiny) ? [...data.favoritePokemonShiny] : prev.favoritePokemonShiny,
-                    switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode
+                    switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode,
+                    youtubeUrl: data.youtubeUrl ?? prev.youtubeUrl,
+                    twitchUrl: data.twitchUrl ?? prev.twitchUrl
                 }));
                 setIsAdmin(data.isAdmin ?? false);
+                setIsContentCreator(data.isContentCreator ?? false);
+
+                if (!data.isContentCreator) {
+                    creatorAPI.getStatus().then(res => setCreatorStatus(res.status)).catch(console.error);
+                } else {
+                    setCreatorStatus("approved");
+                }
 
                 // Don't call setUser here - it causes infinite loops with App.jsx checkAuth
                 // The profileTrainer will be updated when the user actually edits their profile
@@ -761,7 +776,7 @@ export default function Profile() {
                                 {isAdmin && (
                                     <span className="crown-wrapper">
                                         <Crown
-                                            size={22}
+                                            size={26}
                                             strokeWidth={2.5}
                                             style={{
                                                 color: "#fbbf24",
@@ -771,6 +786,19 @@ export default function Profile() {
                                         <span className="crown-tooltip">Admin</span>
                                     </span>
                                 )}
+                                {isContentCreator && (
+                                    <span className="crown-wrapper" style={{ marginLeft: '-2px' }}>
+                                        <Video
+                                            size={26}
+                                            strokeWidth={2.5}
+                                            style={{
+                                                color: "#fbbf24",
+                                                flexShrink: 0
+                                            }}
+                                        />
+                                        <span className="crown-tooltip">Content Creator</span>
+                                    </span>
+                                )}
                             </span>
                         </h1>
                         <button
@@ -778,7 +806,7 @@ export default function Profile() {
                             onClick={handleCopyLink}
                             aria-label="Copy shareable link"
                         >
-                            <LinkIcon size={16} />
+                            <LinkIcon size={22} />
                             <span className="copy-tooltip">Copy shareable link</span>
                         </button>
                         <button
@@ -789,7 +817,7 @@ export default function Profile() {
                             aria-label={hasLiked ? "Remove like" : "Like profile"}
                         >
                             <span className="like-heart-anchor">
-                                <Heart size={20} fill={hasLiked ? "currentColor" : "none"} />
+                                <Heart size={22} fill={hasLiked ? "currentColor" : "none"} />
                                 {likeBurst > 0 && (
                                     <span key={likeBurst} aria-hidden="true">
                                         <span className="like-heart">❤</span>
@@ -815,6 +843,31 @@ export default function Profile() {
                 <div className="profile-header-right">
                     <div className="profile-actions">
 
+                        {isContentCreator && form.youtubeUrl && (
+                            <a href={form.youtubeUrl} target="_blank" rel="noopener noreferrer" className="profile-social-btn youtube-btn" aria-label="YouTube Channel">
+                                <Youtube size={18} />
+                                <span className="hidden sm:inline">YouTube</span>
+                            </a>
+                        )}
+                        {isContentCreator && form.twitchUrl && (
+                            <a href={form.twitchUrl} target="_blank" rel="noopener noreferrer" className="profile-social-btn twitch-btn" aria-label="Twitch Channel">
+                                <Twitch size={18} />
+                                <span className="hidden sm:inline">Twitch</span>
+                            </a>
+                        )}
+
+                        {!isContentCreator && (
+                            <button
+                                className="profile-edit-btn"
+                                onClick={() => setShowCreatorModal(true)}
+                                disabled={creatorStatus === 'pending'}
+                                title={creatorStatus === 'pending' ? "Request Pending" : "Request Content Creator Status"}
+                            >
+                                {creatorStatus === 'pending' ? <Clock size={16} /> : <Video size={16} />}
+                                <span className="hidden md:inline">{creatorStatus === 'pending' ? "CC Request Pending" : "Request Creator Status"}</span>
+                            </button>
+                        )}
+
                         <button
                             className={`profile-edit-btn ${isEditing ? "active" : ""}`}
                             disabled={isLoading('save-profile')}
@@ -825,6 +878,24 @@ export default function Profile() {
                                     if (fc && !SWITCH_FC_RE.test(fc)) {
                                         showMessage("Friend code must be like: SW-1234-5678-9012", "error");
                                         return;
+                                    }
+
+                                    let finalYoutube = (form.youtubeUrl || "").trim();
+                                    if (finalYoutube) {
+                                        if (!/^https?:\/\//i.test(finalYoutube)) finalYoutube = 'https://' + finalYoutube;
+                                        if (!/^(https?:\/\/)?(www\.)?(youtube\.com\/(channel\/|@|c\/)|youtu\.be\/)/i.test(finalYoutube)) {
+                                            showMessage("Invalid YouTube URL. Example: youtube.com/@YourChannel", "error");
+                                            return;
+                                        }
+                                    }
+
+                                    let finalTwitch = (form.twitchUrl || "").trim();
+                                    if (finalTwitch) {
+                                        if (!/^https?:\/\//i.test(finalTwitch)) finalTwitch = 'https://' + finalTwitch;
+                                        if (!/^(https?:\/\/)?(www\.)?twitch\.tv\/[a-zA-Z0-9_]+/i.test(finalTwitch)) {
+                                            showMessage("Invalid Twitch URL. Example: twitch.tv/yourchannel", "error");
+                                            return;
+                                        }
                                     }
 
                                     const reorderedGames = reorderGames(form.favoriteGames);
@@ -848,6 +919,8 @@ export default function Profile() {
                                             favoritePokemon: reorderedPokemon,
                                             favoritePokemonShiny: reorderedShiny,
                                             switchFriendCode: fc,
+                                            youtubeUrl: finalYoutube,
+                                            twitchUrl: finalTwitch,
                                         });
 
                                         showMessage("Profile changes saved", "success");
@@ -859,11 +932,14 @@ export default function Profile() {
                                             favoritePokemonShiny: reorderedShiny,
                                             profileTrainer: form.profileTrainer,
                                             switchFriendCode: fc,
+                                            youtubeUrl: finalYoutube,
+                                            twitchUrl: finalTwitch,
                                         }));
-                                        // setUser((prev) => ({ // This line was removed
-                                        //     ...prev,
-                                        //     profileTrainer: form.profileTrainer || prev.profileTrainer,
-                                        // }));
+                                        // Update the header avatar immediately
+                                        setUser((prev) => ({
+                                            ...prev,
+                                            profileTrainer: form.profileTrainer || prev.profileTrainer,
+                                        }));
 
                                         setIsEditing(false);
                                     } catch (err) {
@@ -1037,6 +1113,29 @@ export default function Profile() {
                                 <div className="field-display">{form.switchFriendCode || "N/A"}</div>
                             )}
                         </div>
+
+                        {isContentCreator && isEditing && (
+                            <>
+                                <div className="profile-field">
+                                    <label><Youtube size={16} color="#ef4444" /> YouTube URL</label>
+                                    <input
+                                        type="url"
+                                        placeholder="https://youtube.com/@YourChannel"
+                                        value={form.youtubeUrl}
+                                        onChange={(e) => setForm({ ...form, youtubeUrl: e.target.value })}
+                                    />
+                                </div>
+                                <div className="profile-field">
+                                    <label><Twitch size={16} color="#a855f7" /> Twitch URL</label>
+                                    <input
+                                        type="url"
+                                        placeholder="https://twitch.tv/yourchannel"
+                                        value={form.twitchUrl}
+                                        onChange={(e) => setForm({ ...form, twitchUrl: e.target.value })}
+                                    />
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     <div className="profile-ranking-group">
@@ -1177,7 +1276,8 @@ export default function Profile() {
                             <div className={`field-display stat-icon-row${(() => { const s = stats.allGames.slice(statPage.games * STAT_PAGE_SIZE, (statPage.games + 1) * STAT_PAGE_SIZE); return s.length === STAT_PAGE_SIZE ? ' stat-icon-row--full' : ''; })()}`}>
                                 {stats.allGames && stats.allGames.length > 0 ? (
                                     stats.allGames.slice(statPage.games * STAT_PAGE_SIZE, (statPage.games + 1) * STAT_PAGE_SIZE).map((g, i) => (
-                                        <div key={i} className="stat-icon-item" title={`${g.name}: ${g.count}`}>
+                                        <div key={i} className="stat-icon-item">
+                                            <span className="stat-icon-tooltip">{g.name}</span>
                                             {g.image ? (
                                                 <img src={g.image} alt={g.name} className="stat-icon-img" />
                                             ) : (
@@ -1208,7 +1308,8 @@ export default function Profile() {
                             <div className={`field-display stat-icon-row${(() => { const s = stats.allBalls.slice(statPage.balls * STAT_PAGE_SIZE, (statPage.balls + 1) * STAT_PAGE_SIZE); return s.length === STAT_PAGE_SIZE ? ' stat-icon-row--full' : ''; })()}`}>
                                 {stats.allBalls && stats.allBalls.length > 0 ? (
                                     stats.allBalls.slice(statPage.balls * STAT_PAGE_SIZE, (statPage.balls + 1) * STAT_PAGE_SIZE).map((b, i) => (
-                                        <div key={i} className="stat-icon-item" title={`${b.name}: ${b.count}`}>
+                                        <div key={i} className="stat-icon-item">
+                                            <span className="stat-icon-tooltip">{b.name}</span>
                                             {b.image ? (
                                                 <img src={b.image} alt={b.name} className="stat-icon-img" />
                                             ) : (
@@ -1239,7 +1340,8 @@ export default function Profile() {
                             <div className={`field-display stat-icon-row${(() => { const s = stats.allMarks.slice(statPage.marks * STAT_PAGE_SIZE, (statPage.marks + 1) * STAT_PAGE_SIZE); return s.length === STAT_PAGE_SIZE ? ' stat-icon-row--full' : ''; })()}`}>
                                 {stats.allMarks && stats.allMarks.length > 0 ? (
                                     stats.allMarks.slice(statPage.marks * STAT_PAGE_SIZE, (statPage.marks + 1) * STAT_PAGE_SIZE).map((m, i) => (
-                                        <div key={i} className="stat-icon-item" title={`${m.name}: ${m.count}`}>
+                                        <div key={i} className="stat-icon-item">
+                                            <span className="stat-icon-tooltip">{m.name}</span>
                                             {m.image ? (
                                                 <img src={m.image} alt={m.name} className="stat-icon-img" />
                                             ) : (
@@ -1318,6 +1420,11 @@ export default function Profile() {
                 selected={form.favoritePokemon[pokemonSlotIndex] ? [form.favoritePokemon[pokemonSlotIndex]] : []}
                 onChange={(val) => updatePokemonAtIndex(val.value, val.isShiny)}
                 max={1}
+            />
+            <CreatorRequestModal
+                isOpen={showCreatorModal}
+                onClose={() => setShowCreatorModal(false)}
+                onSubmitted={() => setCreatorStatus('pending')}
             />
             <FavoriteSelectionModal
                 isOpen={showTrainerModal}

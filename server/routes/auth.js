@@ -10,6 +10,7 @@ import { authLimiter } from "../middleware/rateLimit.js";
 import { validateContent } from "../contentFilter.js";
 import { sanitizeProfileData, sanitizeInput, sanitizeEntryData } from "../sanitizeInput.js";
 import { authenticateUser } from "../middleware/authenticateUser.js";
+import CreatorRequest from "../models/CreatorRequest.js";
 
 // CORS middleware for auth routes
 const corsMiddleware = (req, res, next) => {
@@ -206,7 +207,7 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
     if (!isMatch) return res.status(400).json({ error: "Invalid password" });
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
+      expiresIn: rememberMe ? "30d" : "2h",
     });
 
     // iOS Safari specific cookie configuration
@@ -264,6 +265,9 @@ router.get("/me", authenticateUser, async (req, res) => {
       verified: user.verified,
       progressBars: user.progressBars || [],
       isAdmin: user.isAdmin,
+      isContentCreator: user.isContentCreator || false,
+      youtubeUrl: user.youtubeUrl || null,
+      twitchUrl: user.twitchUrl || null,
     });
 
   } catch (err) {
@@ -643,12 +647,42 @@ router.put("/profile", authenticateUser, async (req, res) => {
       }
     }
 
+    // Handle accent color
+    if (req.body.accentColor !== undefined) {
+      const validAccents = ['yellow', 'red', 'orange', 'green', 'blue', 'cyan', 'purple', 'pink', 'brown'];
+      if (validAccents.includes(req.body.accentColor)) {
+        user.accentColor = req.body.accentColor;
+      }
+    }
+
+    // Handle site theme
+    if (req.body.siteTheme !== undefined) {
+      const validThemes = ['light', 'dark', 'system'];
+      if (validThemes.includes(req.body.siteTheme)) {
+        user.siteTheme = req.body.siteTheme;
+      }
+    }
+
     // Handle migration fields
     if (req.body.huntMethodMigrationCompleted !== undefined) {
       user.huntMethodMigrationCompleted = !!req.body.huntMethodMigrationCompleted;
     }
     if (req.body.migrationVersion !== undefined) {
       user.migrationVersion = String(req.body.migrationVersion);
+    }
+
+    // Handle creator channel URLs (only if user is an approved content creator)
+    if (user.isContentCreator) {
+      const YOUTUBE_RE = /^https?:\/\/(www\.)?(youtube\.com\/(channel\/|@|c\/)|youtu\.be\/)/;
+      const TWITCH_RE  = /^https?:\/\/(www\.)?twitch\.tv\/[a-zA-Z0-9_]+/;
+      if (req.body.youtubeUrl !== undefined) {
+        const yt = String(req.body.youtubeUrl || '').trim();
+        if (yt === '' || YOUTUBE_RE.test(yt)) user.youtubeUrl = yt || null;
+      }
+      if (req.body.twitchUrl !== undefined) {
+        const tw = String(req.body.twitchUrl || '').trim();
+        if (tw === '' || TWITCH_RE.test(tw)) user.twitchUrl = tw || null;
+      }
     }
 
     await user.save();
@@ -670,6 +704,11 @@ router.put("/profile", authenticateUser, async (req, res) => {
         huntHotkey: user.huntHotkey,
         huntMethodMigrationCompleted: user.huntMethodMigrationCompleted,
         migrationVersion: user.migrationVersion,
+        accentColor: user.accentColor || 'yellow',
+        siteTheme: user.siteTheme || 'dark',
+        isContentCreator: user.isContentCreator || false,
+        youtubeUrl: user.youtubeUrl || null,
+        twitchUrl: user.twitchUrl || null,
       }
     });
   } catch (err) {
@@ -684,7 +723,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes dexPreferences externalLinkPreference shinyCharmGames huntHotkey isAdmin");
+    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes dexPreferences externalLinkPreference shinyCharmGames huntHotkey isAdmin accentColor siteTheme isContentCreator youtubeUrl twitchUrl");
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -704,6 +743,11 @@ router.get("/profile", authenticateUser, async (req, res) => {
       shinyCharmGames: user.shinyCharmGames,
       huntHotkey: user.huntHotkey,
       isAdmin: user.isAdmin,
+      accentColor: user.accentColor || 'yellow',
+      siteTheme: user.siteTheme || 'dark',
+      isContentCreator: user.isContentCreator || false,
+      youtubeUrl: user.youtubeUrl || null,
+      twitchUrl: user.twitchUrl || null,
     });
   } catch (err) {
     res.status(401).json({ error: "Invalid or expired token" });
@@ -1228,35 +1272,7 @@ router.put("/change-password", authenticateUser, async (req, res) => {
   }
 });
 
-// Emergency password reset (for development/testing - remove in production)
-router.post("/emergency-reset-password", async (req, res) => {
-  const { email, newPassword } = req.body;
-
-  if (!email || !newPassword) {
-    return res.status(400).json({ error: "Email and new password are required" });
-  }
-
-  if (newPassword.length < 8) {
-    return res.status(400).json({ error: "Password must be at least 8 characters" });
-  }
-
-  try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    // Hash the new password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    // Update password directly to avoid double-hashing
-    await User.findByIdAndUpdate(user._id, { password: hashedPassword });
-
-    res.json({ message: "Password reset successfully" });
-  } catch (err) {
-    console.error('Emergency password reset error:', err);
-    res.status(500).json({ error: "Password reset failed" });
-  }
-});
+// Emergency password reset endpoint removed — was unauthenticated and unsafe for production.
 
 // Send password verification code
 router.post("/send-password-verification-code", authenticateUser, async (req, res) => {
@@ -1388,6 +1404,7 @@ router.get("/users/public", async (req, res) => {
           createdAt: 1,
           verified: 1,
           isAdmin: 1,
+          isContentCreator: 1,
           // count non-null entries in caughtPokemon
           shinies: {
             $size: {
@@ -1425,7 +1442,7 @@ router.get("/users/:username/public", async (req, res) => {
       username: req.params.username,
       isProfilePublic: { $ne: false }
     })
-      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin bingoGrid")
+      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin bingoGrid isContentCreator youtubeUrl twitchUrl")
       .lean();
 
     if (!u) return res.status(404).json({ error: "User not found or private" });
@@ -1603,8 +1620,22 @@ router.put("/hunts", authenticateUser, async (req, res) => {
   }
 });
 
-// POST /api/migrate-hunt-methods (Bulk migration endpoint)
-router.post("/migrate-hunt-methods", authenticateUser, async (req, res) => {
+// Middleware to check if user is admin
+const requireAdmin = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user || !user.isAdmin) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+    next();
+  } catch (error) {
+    console.error('Admin check error:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// POST /api/migrate-hunt-methods (Bulk migration endpoint - admin only)
+router.post("/migrate-hunt-methods", authenticateUser, requireAdmin, async (req, res) => {
   try {
     // Get the requesting user
     const user = await User.findById(req.userId);
@@ -1660,21 +1691,6 @@ router.post("/migrate-hunt-methods", authenticateUser, async (req, res) => {
 
 // ADMIN ROUTES ----------------------------------------- //
 
-
-// Middleware to check if user is admin
-const requireAdmin = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.userId);
-    if (!user || !user.isAdmin) {
-      return res.status(403).json({ error: "Admin access required" });
-    }
-    next();
-  } catch (error) {
-    console.error('Admin check error:', error);
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
 // POST /api/assign-admin - Assign admin status to a user
 router.post("/assign-admin", authenticateUser, requireAdmin, async (req, res) => {
   try {
@@ -1713,7 +1729,7 @@ router.post("/assign-admin", authenticateUser, requireAdmin, async (req, res) =>
 // GET /api/admin/users - Get all users (admin only)
 router.get("/admin/users", authenticateUser, requireAdmin, async (req, res) => {
   try {
-    const users = await User.find({}, 'username email isAdmin verified createdAt bio')
+    const users = await User.find({}, 'username email isAdmin verified createdAt bio isContentCreator')
       .sort({ createdAt: -1 })
       .limit(100); // Limit to prevent large responses
 
@@ -1728,11 +1744,15 @@ router.get("/admin/users", authenticateUser, requireAdmin, async (req, res) => {
 router.patch("/admin/users/:id/profile", authenticateUser, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { bio, username } = req.body;
+    const { bio, username, isContentCreator } = req.body;
     const updates = {};
 
     if (typeof bio === 'string') {
       updates.bio = bio;
+    }
+
+    if (typeof isContentCreator === 'boolean') {
+      updates.isContentCreator = isContentCreator;
     }
 
     if (typeof username === 'string' && username.trim() !== '') {
@@ -1764,7 +1784,7 @@ router.patch("/admin/users/:id/profile", authenticateUser, requireAdmin, async (
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.json({ message: "Profile updated successfully", bio: updatedUser.bio, username: updatedUser.username });
+    res.json({ message: "Profile updated successfully", bio: updatedUser.bio, username: updatedUser.username, isContentCreator: updatedUser.isContentCreator });
   } catch (error) {
     console.error("Error updating user profile:", error);
     res.status(500).json({ error: "Server error" });
@@ -1920,6 +1940,144 @@ router.put("/admin/site-settings", authenticateUser, requireAdmin, async (req, r
     res.json({ message: "Site settings updated", settings });
   } catch (error) {
     console.error('Error updating site settings:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONTENT CREATOR REQUESTS
+// ─────────────────────────────────────────────────────────────────────────────
+
+const YOUTUBE_RE = /^https?:\/\/(www\.)?(youtube\.com\/(channel\/|@|c\/)|youtu\.be\/)/;
+const TWITCH_RE  = /^https?:\/\/(www\.)?twitch\.tv\/[a-zA-Z0-9_]+/;
+
+// POST /api/creator-request — submit a new creator application
+router.post("/creator-request", authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Already a creator
+    if (user.isContentCreator) {
+      return res.status(400).json({ error: "You are already a Content Creator." });
+    }
+
+    // Check for existing pending request
+    const existing = await CreatorRequest.findOne({ userId: req.userId, status: 'pending' });
+    if (existing) {
+      return res.status(400).json({ error: "You already have a pending request." });
+    }
+
+    // Check for a rejected request within the last 30 days
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const recentRejected = await CreatorRequest.findOne({
+      userId: req.userId,
+      status: 'rejected',
+      resolvedAt: { $gte: thirtyDaysAgo }
+    }).sort({ resolvedAt: -1 });
+
+    if (recentRejected) {
+      const daysLeft = Math.ceil((recentRejected.resolvedAt.getTime() + 30 * 24 * 60 * 60 * 1000 - Date.now()) / (1000 * 60 * 60 * 24));
+      return res.status(400).json({ error: `Your previous request was rejected. You must wait ${daysLeft} more day(s) before applying again.` });
+    }
+
+    const { youtubeUrl, twitchUrl, contentType, subscriberCount } = req.body;
+
+    if (!contentType || !subscriberCount) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
+    if (!youtubeUrl && !twitchUrl) {
+      return res.status(400).json({ error: "At least one channel URL (YouTube or Twitch) is required." });
+    }
+    if (youtubeUrl && !YOUTUBE_RE.test(youtubeUrl)) {
+      return res.status(400).json({ error: "Invalid YouTube URL. Example: https://youtube.com/@YourChannel" });
+    }
+    if (twitchUrl && !TWITCH_RE.test(twitchUrl)) {
+      return res.status(400).json({ error: "Invalid Twitch URL. Example: https://twitch.tv/yourchannel" });
+    }
+
+    const lastReq = await CreatorRequest.findOne({}, {}, { sort: { requestId: -1 } });
+    const nextId = lastReq ? lastReq.requestId + 1 : 1;
+
+    const creatorReq = new CreatorRequest({
+      requestId: nextId,
+      username: user.username,
+      userId: req.userId,
+      youtubeUrl: youtubeUrl || null,
+      twitchUrl: twitchUrl || null,
+      contentType: String(contentType).trim().slice(0, 200),
+      subscriberCount: String(subscriberCount).trim().slice(0, 100),
+    });
+    await creatorReq.save();
+
+    res.status(201).json({ message: "Request submitted successfully." });
+  } catch (err) {
+    console.error("POST /creator-request error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// GET /api/creator-request/status — get the current user's request status
+router.get("/creator-request/status", authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("isContentCreator youtubeUrl twitchUrl");
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    if (user.isContentCreator) {
+      return res.json({ status: 'approved', isContentCreator: true, youtubeUrl: user.youtubeUrl, twitchUrl: user.twitchUrl });
+    }
+
+    const req_ = await CreatorRequest.findOne({ userId: req.userId }).sort({ submittedAt: -1 });
+    if (!req_) return res.json({ status: 'none' });
+
+    res.json({ status: req_.status, submittedAt: req_.submittedAt, adminNotes: req_.adminNotes });
+  } catch (err) {
+    console.error("GET /creator-request/status error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// GET /api/admin/creator-requests — admin: list all creator requests
+router.get("/admin/creator-requests", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const { status = 'pending' } = req.query;
+    const query = status === 'all' ? {} : { status };
+    const requests = await CreatorRequest.find(query).sort({ submittedAt: -1 });
+    res.json({ requests });
+  } catch (err) {
+    console.error("GET /admin/creator-requests error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// PATCH /api/admin/creator-requests/:id — admin: approve or reject
+router.patch("/admin/creator-requests/:id", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const { status, adminNotes } = req.body;
+    if (!['approved', 'rejected'].includes(status)) {
+      return res.status(400).json({ error: "Status must be 'approved' or 'rejected'." });
+    }
+
+    const creatorReq = await CreatorRequest.findById(req.params.id);
+    if (!creatorReq) return res.status(404).json({ error: "Request not found." });
+
+    creatorReq.status = status;
+    creatorReq.adminNotes = adminNotes || null;
+    creatorReq.resolvedAt = new Date();
+    await creatorReq.save();
+
+    // If approved, grant the user creator status and copy the URLs
+    if (status === 'approved') {
+      await User.findByIdAndUpdate(creatorReq.userId, {
+        isContentCreator: true,
+        youtubeUrl: creatorReq.youtubeUrl,
+        twitchUrl: creatorReq.twitchUrl,
+      });
+    }
+
+    res.json({ message: `Request ${status}.` });
+  } catch (err) {
+    console.error("PATCH /admin/creator-requests/:id error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });

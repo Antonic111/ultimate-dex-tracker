@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, User, Settings, Users, Database, Tally5, FileText, Shield, ShieldUser, Crown, Menu, X, Grid3x3 } from "lucide-react";
+import { LogOut, User, Settings, Users, Database, Tally5, FileText, Shield, ShieldUser, Crown, Menu, X, Grid3x3, MessageCircleWarning } from "lucide-react";
 import { authAPI } from './utils/api';
 import { useTheme } from "./components/Shared/ThemeContext";
 
@@ -137,8 +137,10 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
   return (
 
     <header className="bg-[var(--header)] transition-[background-color] duration-[var(--transition-speed)] border-b-8" style={{ borderColor: 'var(--accent)' }}>
-      <div className="w-full md:w-[1300px] h-[80px] md:h-[130px] max-h-[80px] md:max-h-[130px] mx-auto flex items-center justify-between px-3 md:px-3 md:pr-2">
-        <div className="flex items-center gap-3">
+      <div className="w-full h-[80px] md:h-[130px] max-h-[80px] md:max-h-[130px] mx-auto flex items-center justify-between px-3 md:px-8 md:pr-6 relative">
+
+        {/* Logo — far left */}
+        <div className="flex items-center gap-3 flex-shrink-0">
           <Link
             to="/"
             className="flex items-center text-decoration-none hover:text-[var(--accent)] focus:text-[var(--accent)] active:text-[var(--accent)] hover:outline-none focus:outline-none"
@@ -158,7 +160,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                 console.log('Hamburger clicked, current state:', showMobileNav);
                 setShowMobileNav(!showMobileNav);
               }}
-              className="md:hidden flex items-center justify-center w-10 h-10 text-[var(--accent)] rounded-lg transition-colors duration-200 z-50 relative"
+              className="xl:hidden flex items-center justify-center w-10 h-10 text-[var(--accent)] rounded-lg transition-colors duration-200 z-50 relative"
               aria-label="Toggle navigation menu"
               style={{ zIndex: 1000 }}
             >
@@ -167,57 +169,93 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
           )}
         </div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-end gap-1 md:gap-3 w-full max-w-full md:max-w-none self-end ml-4 md:ml-8 mr-4 md:mr-8">
-          {/* Only show Trainers button when not on auth flow pages, but allow on public home page */}
-          {!['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
-            <Link
-              to="/trainers"
-              className={`flex items-center gap-1 md:gap-1.5 px-1 md:px-4 py-0.5 md:py-2 pb-1.5 md:pb-4 border-2 border-[var(--accent)] border-b-0 rounded-t-lg text-decoration-none cursor-pointer text-[10px] md:text-base font-medium transition-all duration-200 md:hover:bg-[var(--accent)] md:hover:text-white md:hover:pb-2.5 md:hover:pb-5 ${location.pathname === '/trainers' ? 'bg-[var(--accent)] text-white pb-1.5 md:pb-5' : 'bg-[var(--header)] text-[var(--accent)]'}`}
-            >
-              <Users size={10} className="md:w-4 md:h-4 bg-transparent" />
-              <span>Trainers</span>
-            </Link>
-          )}
+        {/* Desktop Navigation — absolutely centered */}
+        {!['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
+          <nav className="hidden xl:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 pointer-events-none">
+            <div className="flex items-center gap-1 pointer-events-auto">
 
-          {/* Only show Counters button when user is logged in and not on auth flow pages */}
-          {user?.username && !['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
-            <Link
-              to="/counters"
-              className={`flex items-center gap-1 md:gap-1.5 px-1 md:px-4 py-0.5 md:py-2 pb-1.5 md:pb-4 border-2 border-[var(--accent)] border-b-0 rounded-t-lg text-decoration-none cursor-pointer text-[10px] md:text-base font-medium transition-all duration-200 md:hover:bg-[var(--accent)] md:hover:text-white md:hover:pb-2.5 md:hover:pb-5 ${location.pathname === '/counters' ? 'bg-[var(--accent)] text-white pb-1.5 md:pb-5' : 'bg-[var(--header)] text-[var(--accent)]'}`}
-            >
-              <Tally5 size={10} className="md:w-4 md:h-4 bg-transparent" style={{ transform: 'rotate(-1deg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
-              <span>Counters</span>
-            </Link>
-          )}
+              <Link
+                to="/trainers"
+                className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/trainers'
+                  ? 'text-[var(--accent)]'
+                  : 'text-[var(--text-muted,var(--text-color))] opacity-70 hover:opacity-100 hover:text-[var(--accent)]'
+                  }`}
+              >
+                <Users size={19} className="flex-shrink-0" />
+                <span>Trainers</span>
+                <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${location.pathname === '/trainers' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
+                  }`} style={{ transformOrigin: 'center' }} />
+              </Link>
 
+              {user?.username && (
+                <Link
+                  to="/counters"
+                  className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/counters'
+                    ? 'text-[var(--accent)]'
+                    : 'text-[var(--text-muted,var(--text-color))] opacity-70 hover:opacity-100 hover:text-[var(--accent)]'
+                    }`}
+                >
+                  <Tally5 size={19} className="flex-shrink-0" style={{ transform: 'rotate(-1deg)' }} />
+                  <span>Counters</span>
+                  <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${location.pathname === '/counters' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
+                    }`} style={{ transformOrigin: 'center' }} />
+                </Link>
+              )}
 
-          {/* Only show Bingo button when user is logged in and not on auth flow pages */}
-          {user?.username && !['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
-            <Link
-              to="/bingo"
-              className={`flex items-center gap-1 md:gap-1.5 px-1 md:px-4 py-0.5 md:py-2 pb-1.5 md:pb-4 border-2 border-[var(--accent)] border-b-0 rounded-t-lg text-decoration-none cursor-pointer text-[10px] md:text-base font-medium transition-all duration-200 md:hover:bg-[var(--accent)] md:hover:text-white md:hover:pb-2.5 md:hover:pb-5 ${location.pathname === '/bingo' ? 'bg-[var(--accent)] text-white pb-1.5 md:pb-5' : 'bg-[var(--header)] text-[var(--accent)]'}`}
-            >
-              <Grid3x3 size={10} className="md:w-4 md:h-4 bg-transparent" />
-              <span>Bingo</span>
-            </Link>
-          )}
+              {user?.username && (
+                <Link
+                  to="/bingo"
+                  className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/bingo'
+                    ? 'text-[var(--accent)]'
+                    : 'text-[var(--text-muted,var(--text-color))] opacity-70 hover:opacity-100 hover:text-[var(--accent)]'
+                    }`}
+                >
+                  <Grid3x3 size={19} className="flex-shrink-0" />
+                  <span>Bingo</span>
+                  <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${location.pathname === '/bingo' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
+                    }`} style={{ transformOrigin: 'center' }} />
+                </Link>
+              )}
 
-          {/* Only show Changelog button when user is logged in and not on auth flow pages */}
-          {user?.username && !['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
-            <Link
-              to="/changelog"
-              className={`flex items-center gap-1 md:gap-1.5 px-1 md:px-4 py-0.5 md:py-2 pb-1.5 md:pb-4 border-2 border-[var(--accent)] border-b-0 rounded-t-lg text-decoration-none cursor-pointer text-[10px] md:text-base font-medium transition-all duration-200 md:hover:bg-[var(--accent)] md:hover:text-white md:hover:pb-2.5 md:hover:pb-5 ${location.pathname === '/changelog' ? 'bg-[var(--accent)] text-white pb-1.5 md:pb-5' : 'bg-[var(--header)] text-[var(--accent)]'}`}
-            >
-              <FileText size={10} className="md:w-4 md:h-4 bg-transparent" />
-              <span>Changelog</span>
-            </Link>
-          )}
-        </nav>
+              {user?.username && (
+                <Link
+                  to="/changelog"
+                  className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/changelog'
+                    ? 'text-[var(--accent)]'
+                    : 'text-[var(--text-muted,var(--text-color))] opacity-70 hover:opacity-100 hover:text-[var(--accent)]'
+                    }`}
+                >
+                  <FileText size={19} className="flex-shrink-0" />
+                  <span>Changelog</span>
+                  <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${location.pathname === '/changelog' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
+                    }`} style={{ transformOrigin: 'center' }} />
+                </Link>
+              )}
+
+              {user?.username && (
+                <Link
+                  to="/feedback"
+                  className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${
+                    location.pathname === '/feedback'
+                      ? 'text-[var(--accent)]'
+                      : 'text-[var(--text-muted,var(--text-color))] opacity-70 hover:opacity-100 hover:text-[var(--accent)]'
+                  }`}
+                >
+                  <MessageCircleWarning size={19} className="flex-shrink-0" />
+                  <span>Feedback</span>
+                  <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${
+                    location.pathname === '/feedback' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
+                  }`} style={{ transformOrigin: 'center' }} />
+                </Link>
+              )}
+
+            </div>
+          </nav>
+        )}
 
         {/* Mobile Navigation Dropdown */}
         {showMobileNav && !['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
-          <div className="mobile-nav-dropdown md:hidden fixed top-[90px] left-4 right-4 bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-xl py-2 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow)] z-50 backdrop-blur-[10px] animate-[dropdownOpen_0.2s_ease-out]">
+          <div className="mobile-nav-dropdown xl:hidden fixed top-[90px] left-4 right-4 bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-xl py-2 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow)] z-50 backdrop-blur-[10px] animate-[dropdownOpen_0.2s_ease-out]">
             <Link
               to="/trainers"
               className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/trainers' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
@@ -263,6 +301,17 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                     Changelog
                   </div>
                 </Link>
+
+                <Link
+                  to="/feedback"
+                  className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/feedback' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
+                  onClick={() => setShowMobileNav(false)}
+                >
+                  <div className="flex items-center gap-3">
+                    <MessageCircleWarning size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
+                    Feedback
+                  </div>
+                </Link>
               </>
             )}
           </div>
@@ -270,7 +319,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
 
 
         {user?.username && (
-          <nav className="ml-auto">
+          <nav className="ml-auto pr-2 md:pr-4">
             <div className="relative flex items-center" ref={userMenuRef}>
               <div className="flex items-center gap-3 cursor-pointer" onClick={() => {
                 if (showMenu) {

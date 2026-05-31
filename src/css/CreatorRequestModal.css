@@ -1,0 +1,259 @@
+.cr-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+.cr-modal-backdrop.closing {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+.cr-modal {
+    background-color: var(--profile-modal-bg);
+    transition: background-color var(--transition-speed);
+    border: none;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    transform: scale(0.95);
+    opacity: 0;
+    animation: slideUpFade 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.cr-modal.closing {
+    animation: slideDownFade 0.3s ease-in forwards;
+}
+
+.cr-modal-header {
+    padding: 20px 20px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cr-modal-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cr-badge-icon {
+    font-size: 1.5rem;
+}
+
+.cr-modal-title-row h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.close-btn .sidebar-close-icon svg {
+    display: block;
+    transition: transform 0.18s, filter 0.18s;
+}
+
+.close-btn:hover .sidebar-close-icon svg,
+.close-btn:focus .sidebar-close-icon svg {
+    transform: scale(1.13) rotate(-17deg);
+    filter: drop-shadow(0 0 6px #ffffff77);
+}
+
+.close-btn:focus,
+.close-btn:active {
+    outline: none;
+    box-shadow: none;
+}
+
+.cr-modal-subtitle {
+    padding: 0 20px;
+    margin: 0;
+    color: var(--profile-text);
+    opacity: 0.8;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.cr-modal-form {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+}
+
+.cr-section-label {
+    font-weight: 600;
+    color: var(--profile-text);
+    margin-bottom: -10px;
+}
+
+.cr-required {
+    color: #ef4444;
+}
+
+.cr-channel-row {
+    display: flex;
+    gap: 16px;
+}
+
+.cr-channel-row .cr-input-group {
+    flex: 1;
+}
+
+.cr-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cr-input-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--profile-text);
+}
+
+.cr-yt-icon { color: #ef4444; }
+.cr-tw-icon { color: #a855f7; }
+
+.cr-input-group input,
+.cr-input-group textarea {
+    background: var(--profile-modal-boxes);
+    border: 1px solid var(--border-color, transparent);
+    color: var(--profile-text);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Remove default webkit autofill styling */
+.cr-input-group input:-webkit-autofill,
+.cr-input-group input:-webkit-autofill:hover,
+.cr-input-group input:-webkit-autofill:focus,
+.cr-input-group input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px var(--profile-modal-boxes) inset !important;
+    -webkit-text-fill-color: var(--profile-text) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.cr-input-group input:focus,
+.cr-input-group textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(var(--accent-rgb, 255, 255, 255), 0.1);
+}
+
+.cr-input-group input.error,
+.cr-input-group textarea.error {
+    border-color: #ef4444;
+}
+
+.cr-input-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.cr-char-count {
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--profile-text);
+    opacity: 0.6;
+    margin-top: -4px;
+}
+
+.cr-field-error {
+    color: #ef4444;
+    font-size: 0.85rem;
+    margin-top: 2px;
+}
+
+.cr-modal-footer {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.cr-submit-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cr-submit-btn:hover:not(:disabled) {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+.cr-submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .cr-channel-row {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+    }
+}

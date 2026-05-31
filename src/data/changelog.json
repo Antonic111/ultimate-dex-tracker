@@ -1,5 +1,33 @@
 [
   {
+    "date": "2026-05-31",
+    "version": "v1.1.4",
+    "type": "feature",
+    "title": "",
+    "description": "",
+    "features": [
+      "Added an option on the profile page to request a Content Creator role for Twitch or YouTube accounts.",
+      "Verified Content Creators will get a badge on their profile and in the trainers page.",
+      "Verified Content Creators can add and edit YouTube/Twitch links on their profile.",
+      "Redisigned the site header for a better visual look and functionality.",
+      "Moved the **Report a Bug** and **Request a Feature** sections out of the Changelog page and into their own dedicated tabs, making them easier to find and more visible to users.",
+      "Added support for Google Autofill on all the login/register related pages, making it easier and faster to sign in using saved credentials.",
+      "Added tooltips on the profile page so that hovering over games, Poké Balls, and marks now displays their full item names."
+    ],
+    "fixes": [
+      "Fixed some security issues.",
+      "Added the divider bar to the **Changelog** and **Feedback** pages for consistency with the rest of the site.",
+      "Website accent colors are now saved to your account, allowing your color preferences to sync across devices and persist between sessions.",
+      "Fixed some admin related issues.",
+      "Fixed the **Remember Me** checkbox on the login page. It should now correctly keep you signed in when enabled.",
+      "Implemented various SEO improvements to enhance search engine visibility and improve how the website appears in Google search results.",
+      "Fixed the save button in the profile picture modal so it now correctly matches the site’s accent color.",
+      "Profile picture changes now update the site header instantly without requiring a page refresh.",
+      "Profile page pictures are now slightly zoomed in for a more natural appearance.",
+      "Made badges and icons in the profile page slightly bigger and better aligned."
+    ]
+  },
+  {
     "date": "2026-04-17",
     "version": "v1.1.3",
     "type": "feature",

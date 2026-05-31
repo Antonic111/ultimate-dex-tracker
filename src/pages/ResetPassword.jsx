@@ -33,6 +33,8 @@ const ResetPassword = () => {
 
     if (clickedRef.current || loading) return;
     clickedRef.current = true;
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
     setLoading(true);
 
     try {
@@ -48,6 +50,16 @@ const ResetPassword = () => {
         return;
       }
       if (data.success) {
+        // Tell Chrome to update the saved credential
+        if (window.PasswordCredential) {
+          try {
+            const cred = new window.PasswordCredential({
+              id: email,
+              password: newPassword,
+            });
+            await navigator.credentials.store(cred);
+          } catch (_) { /* optional */ }
+        }
         showMessage("Password reset successful!", "success");
         navigate("/login");
       } else {
@@ -70,11 +82,14 @@ const ResetPassword = () => {
         <div className="input-icon-wrapper password-wrapper">
           <Lock className="auth-icon" size={20} />
           <input
+            id="new-password"
+            name="new-password"
             type={showNewPassword ? "text" : "password"}
             placeholder="New password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             className="reset-password-input"
+            autoComplete="new-password"
             required
           />
           <button
@@ -91,11 +106,14 @@ const ResetPassword = () => {
         <div className="input-icon-wrapper password-wrapper">
           <Lock className="auth-icon" size={20} />
           <input
+            id="confirm-password"
+            name="confirm-password"
             type={showConfirmPassword ? "text" : "password"}
             placeholder="Confirm password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="reset-password-input"
+            autoComplete="new-password"
             required
           />
           <button

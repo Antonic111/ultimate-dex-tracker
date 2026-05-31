@@ -1,6 +1,5 @@
 /* Changelog Page - Matching Site Theme */
 .changelog-page {
-  min-height: 100vh;
   padding: 2rem 0;
   animation: pageFadeIn 0.8s ease-out forwards;
 }
@@ -24,7 +23,12 @@
 }
 
 .changelog-page h1 {
-  @apply mt-12 mb-6 text-5xl font-extrabold tracking-wide relative text-[var(--text-color)];
+  @apply mt-12 mb-4 text-5xl font-extrabold tracking-wide relative text-[var(--text-color)];
+}
+
+.changelog-page .app-divider {
+  @apply h-1 w-full mb-6 rounded-sm;
+  background: linear-gradient(90deg, var(--dividers) 30%, var(--accent) 100%);
 }
 
 .changelog-section,

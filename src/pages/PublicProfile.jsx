@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import "../css/Profile.css";
-import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight } from "lucide-react";
+import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight, Video, Youtube, Twitch } from "lucide-react";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
@@ -689,7 +689,7 @@ export default function PublicProfile() {
                                 {data.isAdmin && (
                                     <span className="crown-wrapper">
                                         <Crown
-                                            size={22}
+                                            size={26}
                                             strokeWidth={2.5}
                                             style={{
                                                 color: "#fbbf24",
@@ -699,6 +699,19 @@ export default function PublicProfile() {
                                         <span className="crown-tooltip">Admin</span>
                                     </span>
                                 )}
+                                {data.isContentCreator && (
+                                    <span className="crown-wrapper" style={{ marginLeft: '-2px' }}>
+                                        <Video
+                                            size={26}
+                                            strokeWidth={2.5}
+                                            style={{
+                                                color: "#fbbf24",
+                                                flexShrink: 0
+                                            }}
+                                        />
+                                        <span className="crown-tooltip">Content Creator</span>
+                                    </span>
+                                )}
                             </span>
                         </h1>
                         <button
@@ -706,7 +719,7 @@ export default function PublicProfile() {
                             onClick={handleCopyLink}
                             aria-label="Copy shareable link"
                         >
-                            <LinkIcon size={16} />
+                            <LinkIcon size={22} />
                             <span className="copy-tooltip">Copy shareable link</span>
                         </button>
                         {currentUsername ? (
@@ -718,7 +731,7 @@ export default function PublicProfile() {
                                 aria-label={hasLiked ? "Remove like" : "Like profile"}
                             >
                                 <span className="like-heart-anchor">
-                                    <Heart size={20} fill={hasLiked ? "currentColor" : "none"} />
+                                    <Heart size={22} fill={hasLiked ? "currentColor" : "none"} />
                                     {likeBurst > 0 && (
                                         <span key={likeBurst} aria-hidden="true">
                                             <span className="like-heart">❤</span>
@@ -731,7 +744,7 @@ export default function PublicProfile() {
                             </button>
                         ) : (
                             <div className="profile-like-display liked">
-                                <Heart size={20} fill="currentColor" />
+                                <Heart size={22} fill="currentColor" />
                                 <span className="like-count">{likeCount}</span>
                             </div>
                         )}
@@ -745,10 +758,24 @@ export default function PublicProfile() {
                 </div>
 
                 <div className="profile-header-right">
-                    <Link to="/trainers" className="profile-edit-btn">
-                        <ArrowBigLeft size={18} />
-                        Back
-                    </Link>
+                    <div className="profile-actions">
+                        {data.isContentCreator && data.youtubeUrl && (
+                            <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" className="profile-social-btn youtube-btn" aria-label="YouTube Channel">
+                                <Youtube size={18} />
+                                <span className="hidden sm:inline">YouTube</span>
+                            </a>
+                        )}
+                        {data.isContentCreator && data.twitchUrl && (
+                            <a href={data.twitchUrl} target="_blank" rel="noopener noreferrer" className="profile-social-btn twitch-btn" aria-label="Twitch Channel">
+                                <Twitch size={18} />
+                                <span className="hidden sm:inline">Twitch</span>
+                            </a>
+                        )}
+                        <Link to="/trainers" className="profile-edit-btn">
+                            <ArrowBigLeft size={18} />
+                            Back
+                        </Link>
+                    </div>
                 </div>
             </div>
 
@@ -928,7 +955,8 @@ export default function PublicProfile() {
                             <div className={`field-display stat-icon-row${(() => { const s = stats.allGames.slice(statPage.games * STAT_PAGE_SIZE, (statPage.games + 1) * STAT_PAGE_SIZE); return s.length === STAT_PAGE_SIZE ? ' stat-icon-row--full' : ''; })()}`}>
                                 {stats.allGames && stats.allGames.length > 0 ? (
                                     stats.allGames.slice(statPage.games * STAT_PAGE_SIZE, (statPage.games + 1) * STAT_PAGE_SIZE).map((g, i) => (
-                                        <div key={i} className="stat-icon-item" title={`${g.name}: ${g.count}`}>
+                                        <div key={i} className="stat-icon-item">
+                                            <span className="stat-icon-tooltip">{g.name}</span>
                                             {g.image ? (
                                                 <img src={g.image} alt={g.name} className="stat-icon-img" />
                                             ) : (
@@ -959,7 +987,8 @@ export default function PublicProfile() {
                             <div className={`field-display stat-icon-row${(() => { const s = stats.allBalls.slice(statPage.balls * STAT_PAGE_SIZE, (statPage.balls + 1) * STAT_PAGE_SIZE); return s.length === STAT_PAGE_SIZE ? ' stat-icon-row--full' : ''; })()}`}>
                                 {stats.allBalls && stats.allBalls.length > 0 ? (
                                     stats.allBalls.slice(statPage.balls * STAT_PAGE_SIZE, (statPage.balls + 1) * STAT_PAGE_SIZE).map((b, i) => (
-                                        <div key={i} className="stat-icon-item" title={`${b.name}: ${b.count}`}>
+                                        <div key={i} className="stat-icon-item">
+                                            <span className="stat-icon-tooltip">{b.name}</span>
                                             {b.image ? (
                                                 <img src={b.image} alt={b.name} className="stat-icon-img" />
                                             ) : (
@@ -990,7 +1019,8 @@ export default function PublicProfile() {
                             <div className={`field-display stat-icon-row${(() => { const s = stats.allMarks.slice(statPage.marks * STAT_PAGE_SIZE, (statPage.marks + 1) * STAT_PAGE_SIZE); return s.length === STAT_PAGE_SIZE ? ' stat-icon-row--full' : ''; })()}`}>
                                 {stats.allMarks && stats.allMarks.length > 0 ? (
                                     stats.allMarks.slice(statPage.marks * STAT_PAGE_SIZE, (statPage.marks + 1) * STAT_PAGE_SIZE).map((m, i) => (
-                                        <div key={i} className="stat-icon-item" title={`${m.name}: ${m.count}`}>
+                                        <div key={i} className="stat-icon-item">
+                                            <span className="stat-icon-tooltip">{m.name}</span>
                                             {m.image ? (
                                                 <img src={m.image} alt={m.name} className="stat-icon-img" />
                                             ) : (
