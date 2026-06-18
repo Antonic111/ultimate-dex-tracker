@@ -1,0 +1,487 @@
+/* ============================================================
+   PermutationTable — MMO Tool KO/Catch grid
+   ============================================================ */
+
+.perm-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Config bar ─────────────────────────────────────────────── */
+.perm-config-bar {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.perm-config-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* ── Switch ───────────────────────────────────────────────────────── */
+.perm-switch-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.perm-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  background: var(--searchbar-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+
+.perm-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.perm-switch-wrap:hover .perm-switch {
+  border-color: var(--accent);
+}
+
+.perm-switch.active {
+  background: var(--searchbar-bg);
+  border-color: var(--accent);
+}
+
+.perm-switch.active::after {
+  left: 22px;
+  background: var(--accent);
+}
+
+.perm-config-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.perm-config-sub {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.perm-spawn-btns {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.perm-spawn-btn {
+  width: 42px;
+  height: 34px;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  background: var(--searchbar-bg);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.perm-spawn-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.perm-spawn-btn.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── Section header ─────────────────────────────────────────── */
+.perm-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.perm-section-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.perm-section-count {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background: var(--searchbar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 0.15rem 0.65rem;
+}
+
+/* ── Scroll wrapper ─────────────────────────────────────────── */
+.perm-scroll-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--searchbar-dropdown);
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.perm-scroll-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+
+.perm-scroll-wrap::-webkit-scrollbar-track {
+  background: var(--searchbar-dropdown);
+}
+
+.perm-scroll-wrap::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+/* ── Table ──────────────────────────────────────────────────── */
+.perm-table {
+  width: max-content;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  table-layout: auto;
+}
+
+/* Header */
+.perm-th {
+  padding: 0.55rem 0.5rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--accent);
+  color: #fff;
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.perm-th:last-child {
+  border-right: none;
+}
+
+.perm-th-order {
+  min-width: 60px;
+  left: 0;
+  z-index: 3;
+  vertical-align: middle;
+}
+
+.perm-th-spawn {
+  font-size: 0.85rem;
+  padding: 0.6rem 1rem;
+}
+
+.perm-th-num {
+  min-width: 44px;
+}
+
+.perm-th-complete {
+  min-width: 56px;
+  vertical-align: middle;
+}
+
+/* Rows */
+.perm-row {
+  transition: background 0.1s ease;
+}
+
+.perm-wrapper:not(.perm-readonly) .perm-row:hover td {
+  background: rgba(29, 200, 232, 0.06) !important;
+}
+
+.perm-row-alt .perm-td-order,
+.perm-row-alt .perm-td-complete,
+.perm-row-alt .perm-cell-c {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.perm-row-done td {
+  opacity: 0.4;
+}
+
+.perm-row-done .perm-cell {
+  position: relative;
+}
+
+.perm-row-done .perm-cell::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 2px;
+  background-color: var(--text-color);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.perm-td-order {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  padding: 0.45rem 0.5rem;
+  background: var(--sidebar-bg, #1a1a2e);
+  border-right: 1px solid var(--border-color);
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.perm-td-complete {
+  text-align: center;
+  padding: 0.45rem 0.5rem;
+  border-left: 2px solid var(--border-color);
+  width: 56px;
+  min-width: 56px;
+  max-width: 56px;
+  box-sizing: border-box;
+  cursor: default;
+}
+
+.perm-wrapper:not(.perm-readonly) .perm-td-complete {
+  cursor: pointer;
+}
+
+.perm-wrapper:not(.perm-readonly) .perm-td-complete:hover .perm-check-btn {
+  border-color: var(--accent);
+}
+
+/* ── Cells ──────────────────────────────────────────────────── */
+.perm-cell {
+  padding: 0.35rem 0.3rem;
+  text-align: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.perm-cell-c {
+  background: transparent;
+}
+
+.perm-cell-locked {
+  position: relative;
+}
+
+.perm-cell-locked::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 2px;
+  background-color: var(--text-color);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.perm-cell-locked .perm-c {
+  opacity: 0.06;
+}
+
+.perm-cell-ko {
+  background: color-mix(in srgb, var(--ko-color) 10%, transparent);
+}
+
+.perm-c {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 24px;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.perm-ko {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 24px;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* ── Checkbox / Done button ─────────────────────────────────── */
+.perm-check-btn {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-radius: 5px;
+  border: 2px solid var(--border-color);
+  background: var(--searchbar-bg);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.perm-wrapper:not(.perm-readonly) .perm-check-btn:hover {
+  border-color: var(--accent);
+}
+
+.perm-check-btn.perm-check-btn-done {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ── Legend ─────────────────────────────────────────────────── */
+.perm-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  padding: 0.65rem 1rem;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.perm-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+
+.perm-color-picker-wrap {
+  width: 24px;
+  height: 16px;
+  border-radius: 4px;
+  display: inline-block;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.perm-color-input {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+  opacity: 0;
+}
+
+.perm-legend-swatch {
+  width: 24px;
+  height: 16px;
+  border-radius: 4px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.perm-legend-c {
+  background: var(--searchbar-bg);
+  border: 1px solid var(--border-color);
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 600px) {
+
+  .perm-c,
+  .perm-ko {
+    width: 26px;
+    height: 20px;
+    font-size: 0.65rem;
+  }
+
+  .perm-th-order {
+    min-width: 46px;
+  }
+}
+
+/* ── Reset Button ───────────────────────────────────────────── */
+.perm-reset-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.perm-reset-btn {
+  background: var(--searchbar-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.perm-reset-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

@@ -1,0 +1,571 @@
+(self.webpackChunk_N_E = self.webpackChunk_N_E || []).push([[7254], {
+    6996: (C, O, K) => {
+        "use strict";
+        K.d(O, {
+            M: () => a
+        });
+        var e = K(71041);
+        let a = (C, O) => {
+            let[K,a] = (0,
+            e.useState)(O);
+            return (0,
+            e.useEffect)( () => {
+                a((C => {
+                    try {
+                        let K = localStorage.getItem(C);
+                        if (K && "undefined" !== K)
+                            return JSON.parse(K);
+                        return O
+                    } catch {
+                        return O
+                    }
+                }
+                )(C))
+            }
+            , [C]),
+            [K, (0,
+            e.useCallback)(O => {
+                try {
+                    a(K => {
+                        let e = O instanceof Function ? O(K) : O;
+                        return localStorage.setItem(C, JSON.stringify(e)),
+                        e
+                    }
+                    )
+                } catch (C) {}
+            }
+            , [C]), (0,
+            e.useCallback)( () => {
+                try {
+                    localStorage.removeItem(C)
+                } catch (C) {}
+            }
+            , [C])]
+        }
+    }
+    ,
+    25538: C => {
+        C.exports = {
+            toolContainer: "style_toolContainer__bNVoa",
+            numberSelector: "style_numberSelector__bUgBq",
+            content: "style_content__tFzyu"
+        }
+    }
+    ,
+    32111: (C, O, K) => {
+        "use strict";
+        K.d(O, {
+            A: () => t
+        });
+        var e = K(74429);
+        K(71041);
+        var a = K(71623)
+          , v = K(38306)
+          , L = K.n(v);
+        function t({label: C, checked: O, onChange: K, className: v, disabled: s=!1}) {
+            return (0,
+            e.jsxs)("div", {
+                className: (0,
+                a.A)(L().switchContainer, s && L().disabled, v),
+                onClick: () => {
+                    s || K(!O)
+                }
+                ,
+                children: [(0,
+                e.jsx)("div", {
+                    className: (0,
+                    a.A)(L().switch, O && L().checked),
+                    children: (0,
+                    e.jsx)("div", {
+                        className: L().handle
+                    })
+                }), C && (0,
+                e.jsx)("span", {
+                    className: L().label,
+                    children: C
+                })]
+            })
+        }
+    }
+    ,
+    38306: C => {
+        C.exports = {
+            switchContainer: "Switch_switchContainer__a2UI2",
+            disabled: "Switch_disabled__kWP_D",
+            switch: "Switch_switch__9aGR2",
+            checked: "Switch_checked__O1gCJ",
+            handle: "Switch_handle__GccET",
+            label: "Switch_label__HxKap"
+        }
+    }
+    ,
+    46950: (C, O, K) => {
+        "use strict";
+        K.r(O),
+        K.d(O, {
+            __N_SSG: () => m,
+            default: () => u
+        });
+        var e = K(74429);
+        K(71041);
+        var a = K(90115);
+        K(52835);
+        var v = K(32991)
+          , L = K(6996)
+          , t = K(56129)
+          , s = K(88865)
+          , n = K(32111)
+          , r = K(58761)
+          , l = K(97619);
+        let o = {
+            4: [["C", "C", "C", "C"], ["C", "C", "C", "Leave", "C"], ["C", "C", "Leave", "C", "C"], ["C", "Leave", "C", "C", "C"], ["C", "C", "Leave", "C", "Leave", "C"], ["C", "Leave", "C", "Leave", "C", "C"], ["C", "Leave", "C", "C", "Leave", "C"], ["C", "Leave", "C", "Leave", "C", "Leave", "C"]],
+            3: [["C", "C", "C"], ["C", "Leave", "C", "C"], ["Leave", "C", "C", "C"], ["C", "C", "Leave", "C"], ["C", "Leave", "C", "Leave", "C"], ["Leave", "C", "Leave", "C", "C"], ["Leave", "C", "C", "Leave", "C"], ["Leave", "C", "Leave", "C", "Leave", "C"]],
+            2: [["C", "C"], ["C", "Leave", "C"], ["Leave", "C", "C"], ["Leave", "C", "Leave", "C"]],
+            1: [["C"], ["Leave", "C"]]
+        }
+          , i = {
+            6: [["C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C"], ["C", "KO1", "KO1", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C"]],
+            7: [["C", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C"]],
+            8: [["C", "C", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C"]],
+            9: [["C", "C", "C", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C"]],
+            10: [["C", "C", "C", "C", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "C", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "C", "C", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "KO3", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "KO3", "KO3", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C"]]
+        }
+          , c = {
+            6: [["C", "C", "C", "C", "C", "C"], ["C", "C", "C", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "Leave", "C", "C"], ["C", "C", "C", "Leave", "C", "C", "C"], ["C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "C"], ["C", "KO1", "KO1", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "Leave", "C"]],
+            7: [["C", "C", "C", "C", "C", "C", "C"], ["C", "C", "C", "C", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "Leave", "C", "C", "C"], ["C", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C"], ["C", "KO1", "KO1", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C"], ["C", "C", "KO1", "KO1", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C"]],
+            8: [["C", "C", "C", "C", "C", "C", "C", "C"], ["C", "C", "C", "C", "C", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "C", "Leave", "C", "C", "C"], ["C", "C", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "C", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "Leave", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C"]],
+            9: [["C", "C", "C", "C", "C", "C", "C", "C", "C"], ["C", "C", "C", "C", "C", "C", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "C", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "C", "C", "Leave", "C", "C", "C"], ["C", "C", "C", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "Leave", "C", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C"]],
+            10: [["C", "C", "C", "C", "C", "C", "C", "C", "C", "C"], ["C", "C", "C", "C", "C", "C", "C", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "C", "C", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "C", "C", "C", "Leave", "C", "C", "C"], ["C", "C", "C", "C", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "C"], ["KO1", "KO1", "KO2", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "C"], ["KO1", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "C"], ["C", "KO1", "KO1", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "KO1", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "C", "KO1", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "C", "C", "KO1", "KO1", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "C", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "C", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C", "Leave", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "C"], ["C", "C", "C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "C", "C", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "Leave", "C", "C", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "Leave", "C", "Leave", "C", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "Leave", "C", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "KO1", "C", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "KO1", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "KO1", "Leave", "C", "Leave", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "KO1", "KO1", "C"], ["C", "C", "C", "C", "C", "KO1", "KO1", "KO1", "KO1", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "KO3", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "KO3", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "KO3", "Leave", "C", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "KO3", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "KO3", "KO3", "C"], ["KO1", "KO1", "KO2", "KO2", "C", "KO3", "KO3", "KO3", "KO3", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "KO3", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "KO3", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "C"], ["KO1", "KO1", "C", "KO2", "KO2", "KO3", "KO3", "KO3", "KO3", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["KO1", "KO1", "C", "C", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["KO1", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "Leave", "C", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["KO1", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "KO1", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "KO1", "KO1", "C", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "C", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "Leave", "C", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "Leave", "C", "Leave", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "C"], ["C", "C", "KO1", "KO1", "C", "KO2", "KO2", "KO2", "KO2", "Leave", "C"]]
+        };
+        var h = K(25538)
+          , d = K.n(h)
+          , m = !0;
+        let u = ({pageData: C, gamesData: O}) => {
+            let[K,h,m] = (0,
+            L.M)("selectedOutbreakSize", 8)
+              , [u,p,_] = (0,
+            L.M)("useAdvancedMode", !1)
+              , [w,x,b] = (0,
+            L.M)("useWords", !1)
+              , [j,y,k] = (0,
+            L.M)("viewSecondWave", !1)
+              , [g,f,S] = (0,
+            L.M)("selectedSecondTableSize", 6)
+              , [N,T,A] = (0,
+            L.M)("viewGhostSpawns", !1);
+            return (0,
+            e.jsxs)(e.Fragment, {
+                children: [(0,
+                e.jsx)(a.bV, {
+                    title: C.meta.title ? C.meta.title : C.attributes.title + " - RotomLabs",
+                    description: C.meta.description,
+                    openGraph: {
+                        title: C.meta.title,
+                        description: C.meta.title
+                    }
+                }), (0,
+                e.jsx)(v.A, {
+                    title: C.title,
+                    explanation: (0,
+                    e.jsx)(l.A, {
+                        content: C.content.root.children,
+                        makeTOC: !1,
+                        isFullWidth: !0
+                    }),
+                    children: (0,
+                    e.jsxs)("div", {
+                        className: d().toolContainer,
+                        children: [(0,
+                        e.jsxs)(r.A, {
+                            variant: "inset",
+                            title: "First Wave Configuration",
+                            controls: (0,
+                            e.jsx)(n.A, {
+                                label: "Advanced Mode",
+                                checked: u,
+                                onChange: C => {
+                                    p(C)
+                                }
+                            }),
+                            children: [(0,
+                            e.jsx)("p", {
+                                style: {
+                                    textAlign: "center",
+                                    marginBottom: "1rem"
+                                },
+                                children: "Select the Number of Spawns in the First Wave"
+                            }), (0,
+                            e.jsxs)("div", {
+                                className: d().numberSelector,
+                                children: [(0,
+                                e.jsx)(s.$n, {
+                                    size: "sm",
+                                    variant: 8 !== K ? "outline" : "default",
+                                    onClick: () => h(8),
+                                    children: "8"
+                                }), (0,
+                                e.jsx)(s.$n, {
+                                    size: "sm",
+                                    variant: 9 !== K ? "outline" : "default",
+                                    onClick: () => h(9),
+                                    children: "9"
+                                }), (0,
+                                e.jsx)(s.$n, {
+                                    size: "sm",
+                                    variant: 10 !== K ? "outline" : "default",
+                                    onClick: () => h(10),
+                                    children: "10"
+                                })]
+                            })]
+                        }), (0,
+                        e.jsx)(r.A, {
+                            variant: "inset",
+                            title: "All Permutations",
+                            controls: (0,
+                            e.jsx)(n.A, {
+                                label: "Word View",
+                                checked: w,
+                                onChange: C => {
+                                    x(C)
+                                }
+                            }),
+                            children: (0,
+                            e.jsx)(t.A, {
+                                permutationList: u ? c[K] : i[K],
+                                numSpawns: u ? K + 3 : K,
+                                numPermutations: K,
+                                useWords: w,
+                                maxTableSize: 570,
+                                tableHeader: u ? "Instruction Number" : "Spawn Number"
+                            })
+                        }), (0,
+                        e.jsx)(r.A, {
+                            variant: "inset",
+                            title: "Second Wave Analysis",
+                            controls: (0,
+                            e.jsx)(n.A, {
+                                label: "View Second Wave",
+                                checked: j,
+                                onChange: C => {
+                                    y(C)
+                                }
+                            }),
+                            children: j ? (0,
+                            e.jsxs)(e.Fragment, {
+                                children: [(0,
+                                e.jsx)("p", {
+                                    style: {
+                                        textAlign: "center",
+                                        marginBottom: "1rem"
+                                    },
+                                    children: "Select the Number of Spawns in the Second Wave"
+                                }), (0,
+                                e.jsxs)("div", {
+                                    className: d().numberSelector,
+                                    children: [(0,
+                                    e.jsx)(s.$n, {
+                                        size: "sm",
+                                        variant: 6 !== g ? "outline" : "default",
+                                        onClick: () => f(6),
+                                        children: "6"
+                                    }), (0,
+                                    e.jsx)(s.$n, {
+                                        size: "sm",
+                                        variant: 7 !== g ? "outline" : "default",
+                                        onClick: () => f(7),
+                                        children: "7"
+                                    })]
+                                }), (0,
+                                e.jsx)(t.A, {
+                                    permutationList: i[g],
+                                    numSpawns: g,
+                                    numPermutations: g,
+                                    useWords: w,
+                                    maxTableSize: 13
+                                }), (0,
+                                e.jsxs)("div", {
+                                    style: {
+                                        marginTop: "1rem"
+                                    },
+                                    children: [(0,
+                                    e.jsx)("p", {
+                                        children: "This second table can help you keep track of permuting the second wave. If you wish to get even more spawns, perform a set of actions on a row in the table above and then do the actions in the table below. So, if there are eight spawns in the first wave, you would repeat this second table more than twenty times."
+                                    }), (0,
+                                    e.jsxs)("p", {
+                                        children: [(0,
+                                        e.jsx)("strong", {
+                                            children: "Disclaimer:"
+                                        }), " There are diminishing returns on permuting the second wave as the first four spawns are always the same. Not as much research has been done on the second wave, but following these permutations could also give separate spawns beyond the first four. As more research is done, the information presented here will be updated as well. As such, it is", " ", (0,
+                                        e.jsx)("strong", {
+                                            children: "not recommended to permute the second wave of spawns."
+                                        })]
+                                    })]
+                                })]
+                            }) : (0,
+                            e.jsx)("p", {
+                                style: {
+                                    textAlign: "center",
+                                    opacity: .7
+                                },
+                                children: "Enable the toggle above to view second wave permutations."
+                            })
+                        }), (0,
+                        e.jsx)(r.A, {
+                            variant: "inset",
+                            title: "Ghost Spawn Extensions (ADVANCED)",
+                            controls: (0,
+                            e.jsx)(n.A, {
+                                label: "View Ghost Spawns",
+                                checked: N,
+                                onChange: C => {
+                                    T(C)
+                                }
+                            }),
+                            children: N ? (0,
+                            e.jsxs)(e.Fragment, {
+                                children: [(0,
+                                e.jsx)(t.A, {
+                                    permutationList: o[4],
+                                    numSpawns: 7,
+                                    numPermutations: 8,
+                                    useWords: w,
+                                    maxTableSize: 8
+                                }), (0,
+                                e.jsxs)("div", {
+                                    style: {
+                                        marginTop: "1rem"
+                                    },
+                                    children: [(0,
+                                    e.jsx)("p", {
+                                        children: "It turns out another method to extend unique spawns has been discovered when there are still Pok\xe9mon remaining in an outbreak but no more can spawn in. For example, there are only three remaining of the original eight spawns. If you travel so that the Pok\xe9mon are completely out of sight (you can place down a marker on your map and travel away until the marker is about 120 away or fast travel to camp or another close landmark) and return to the outbreak, you can get different results. The table below shows all combinations that you can do."
+                                    }), (0,
+                                    e.jsxs)("p", {
+                                        children: ["To interpret the table, after every color grouping, simply leave the area (fly or run far enough away or fast travel) then return to the location of the outbreak.", " ", (0,
+                                        e.jsx)("strong", {
+                                            children: "This method is not recommended unless you have exhausted all of the options of the table above and do not want to spend the time resetting for another outbreak with the same target spawns."
+                                        })]
+                                    }), (0,
+                                    e.jsxs)("p", {
+                                        children: [(0,
+                                        e.jsx)("strong", {
+                                            children: 'To use this table, choose a row in the first table above that has four regular despawns "C" in the last four columns.'
+                                        }), " ", "Simply repeat that row until the last four every time to try a different row in this table."]
+                                    })]
+                                })]
+                            }) : (0,
+                            e.jsx)("p", {
+                                style: {
+                                    textAlign: "center",
+                                    opacity: .7
+                                },
+                                children: "Enable the toggle above to view ghost spawn extensions."
+                            })
+                        })]
+                    })
+                })]
+            })
+        }
+    }
+    ,
+    56129: (C, O, K) => {
+        "use strict";
+        K.d(O, {
+            A: () => r
+        });
+        var e = K(74429);
+        K(71041);
+        var a = K(63996)
+          , v = K.n(a)
+          , L = K(6996);
+        function t({singleTask: C}) {
+            let O = v().singleTask;
+            return C.startsWith("K") ? (O += " " + v().cellKO,
+            "1" == C.slice(-1) ? O += " " + v().ko1 : "2" == C.slice(-1) ? O += " " + v().ko2 : "3" == C.slice(-1) ? O += " " + v().ko3 : "4" == C.slice(-1) ? O += " " + v().ko1 : "5" == C.slice(-1) && (O += " " + v().ko2),
+            (0,
+            e.jsx)("td", {
+                className: O,
+                children: "KO"
+            })) : "C" == C ? (O += " " + v().cellCatch,
+            (0,
+            e.jsx)("td", {
+                className: O,
+                children: "C"
+            })) : "Leave" == C ? (O += " " + v().cellLeave,
+            (0,
+            e.jsx)("td", {
+                className: O,
+                children: "L"
+            })) : (O += " " + v().cellKO,
+            "1" == C.slice(-1) ? O += " " + v().ko1 : "2" == C.slice(-1) ? O += " " + v().ko2 : "3" == C.slice(-1) && (O += " " + v().ko3),
+            (0,
+            e.jsx)("td", {
+                className: O,
+                children: "C"
+            }))
+        }
+        function s({singleRow: C, rowLength: O}) {
+            let K = ""
+              , a = 0
+              , L = 0
+              , t = "C";
+            for (var n = 0; n < O && n != C.length; n++) {
+                let O = C[n];
+                O == t ? a += 1 : (a > 0 && (t.startsWith("KO") ? (K += '<span class="color' + L + '">KO ' + a + "</span>, ",
+                L += 1) : 2 == t.length ? (K += '<span class="color' + L + '">Catch ' + a + "</span>, Travel, ",
+                L += 1) : "Leave" == t ? K += '<span class="colorLeave">Leave</span>, ' : K += "Catch " + a + ", "),
+                a = 1,
+                t = O)
+            }
+            return t.startsWith("KO") ? K += "KO " + a : K += "Catch " + a,
+            (0,
+            e.jsx)("td", {
+                className: v().singleTask,
+                colSpan: O,
+                children: (0,
+                e.jsx)("div", {
+                    dangerouslySetInnerHTML: {
+                        __html: K
+                    }
+                })
+            })
+        }
+        function n({singleRow: C, rowNum: O, rowStatus: K, updateRow: a, numInstructions: L, useWords: r=!0}) {
+            let l = [];
+            if (!r && C.length < L)
+                for (var o = 0; o < L - C.length; o++)
+                    l.push("");
+            return (0,
+            e.jsxs)("tr", {
+                className: K ? v().rowComplete : "",
+                children: [(0,
+                e.jsx)("td", {
+                    children: O + 1
+                }), r ? (0,
+                e.jsx)(s, {
+                    singleRow: C,
+                    rowLength: L
+                }) : C.map( (C, O) => (0,
+                e.jsx)(t, {
+                    singleTask: C
+                }, O)), l.map( (C, O) => (0,
+                e.jsx)("td", {
+                    children: C
+                }, O)), (0,
+                e.jsx)("td", {
+                    className: v().markCompleteBox,
+                    onClick: () => {
+                        a(O)
+                    }
+                    ,
+                    children: (0,
+                    e.jsx)("input", {
+                        type: "checkbox",
+                        checked: K,
+                        name: "rowcheck" + O,
+                        onChange: C => {}
+                    })
+                })]
+            })
+        }
+        function r({permutationList: C, numPermutations: O, numSpawns: K, useWords: a, maxTableSize: t=543, tableHeader: s="Spawn Number", localStoragePrefix: l=""}) {
+            let o = Array(t);
+            for (let C = 0; C < t; ++C)
+                o[C] = !1;
+            let[i,c,h] = (0,
+            L.M)(l + "permutationTable" + t, o)
+              , d = C => {
+                c(i.map( (O, K) => K === C ? !O : O))
+            }
+            ;
+            for (var m = [], u = 0; u < K; u++)
+                m.push((0,
+                e.jsx)("th", {
+                    children: u + 1
+                }, "header" + u + "1"));
+            return (0,
+            e.jsxs)("div", {
+                className: v().permutationWrapper,
+                children: [(0,
+                e.jsx)("table", {
+                    className: v().permutationTable,
+                    children: (0,
+                    e.jsxs)("tbody", {
+                        children: [(0,
+                        e.jsxs)("tr", {
+                            children: [(0,
+                            e.jsx)("th", {
+                                className: v().emptyHeader,
+                                rowSpan: "2",
+                                children: "Order #"
+                            }), (0,
+                            e.jsx)("th", {
+                                className: v().spawnNumberHeader,
+                                colSpan: K,
+                                children: s
+                            }), (0,
+                            e.jsx)("th", {
+                                className: v().emptyHeader,
+                                rowSpan: "2",
+                                children: "Complete"
+                            })]
+                        }), (0,
+                        e.jsx)("tr", {
+                            children: m
+                        }), C.map( (C, O) => (0,
+                        e.jsx)(n, {
+                            singleRow: C,
+                            rowNum: O,
+                            rowStatus: i[O],
+                            updateRow: d,
+                            numInstructions: K,
+                            useWords: a
+                        }, O))]
+                    })
+                }), (0,
+                e.jsx)("div", {
+                    className: v().resetButton,
+                    onClick: () => {
+                        c(o)
+                    }
+                    ,
+                    children: "Reset Table"
+                })]
+            })
+        }
+    }
+    ,
+    63996: C => {
+        C.exports = {
+            permutationWrapper: "styles_permutationWrapper__WP7_R",
+            permutationTable: "styles_permutationTable__tnQ4y",
+            pokemonTable: "styles_pokemonTable__Hf3FY",
+            emptyHeader: "styles_emptyHeader__F8EhM",
+            spawnNumberHeader: "styles_spawnNumberHeader__ShmJp",
+            cellKO: "styles_cellKO__VVd6W",
+            ko1: "styles_ko1__jZOib",
+            ko2: "styles_ko2__Pp5bI",
+            ko3: "styles_ko3__6VprO",
+            cellCatch: "styles_cellCatch__YqBYE",
+            cellLeave: "styles_cellLeave__mlYse",
+            markCompleteBox: "styles_markCompleteBox__o_5s9",
+            rowComplete: "styles_rowComplete__ktjRy",
+            singleTask: "styles_singleTask__3ViU8",
+            resetButton: "styles_resetButton__fyD8R",
+            pokemonIconContainer: "styles_pokemonIconContainer__VIsww",
+            pokemonIcon: "styles_pokemonIcon__bffkC",
+            canMultiBattle: "styles_canMultiBattle__T4WRj",
+            cannotMultiBattle: "styles_cannotMultiBattle__HDyHK"
+        }
+    }
+    ,
+    91939: (C, O, K) => {
+        (window.__NEXT_P = window.__NEXT_P || []).push(["/legends-arceus/massive-mass-outbreak", function() {
+            return K(46950)
+        }
+        ])
+    }
+}, C => {
+    C.O(0, [7725, 490, 8865, 6327, 2991, 6224, 636, 6593, 8792], () => C(C.s = 91939)),
+    _N_E = C.O()
+}
+]);

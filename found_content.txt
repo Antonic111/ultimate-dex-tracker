@@ -1,0 +1,34 @@
+Created At: 2026-06-02T06:29:42Z
+Completed At: 2026-06-02T06:29:42Z
+File Path: `file:///c:/Users/anton/Desktop/ultimate-dex-tracker/src/pages/MMOTool.jsx`
+Total Lines: 1942
+Total Bytes: 96459
+Showing lines 800 to 825
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+800:           <div className="mmo-title-block">
+801:             <h1 className="mmo-page-title">
+802:               MMO Tool
+803:             </h1>
+804:           </div>
+805:         </div>
+806: 
+807:         <div className="app-divider" />
+808: 
+809:         {/* ── Active Permutation Hunts ──────────────────────────── */}
+810:         <div className="mmo-section-header">
+811:           <div className="mmo-section-title">
+812:             Active Permutation Hunts
+813:             <span className="mmo-section-count">{permutationHunts.length}</span>
+814:           </div>
+815:         </div>
+816: 
+817:         <div className="hunts-grid">
+818:           {permutationHunts.map(hunt => (
+819:             <div key={hunt.id} className="hunt-card" style={{ position: 'relative' }}>
+820:               <div className="hunt-header">
+821:                 {!expandedHunts.has(hunt.id) ? (
+822:                   // Normal view: Pokemon name and sprite
+823:                   <>
+824:                     <div className="hunt-pokemon">
+825:                       <img
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

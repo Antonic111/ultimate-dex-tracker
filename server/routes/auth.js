@@ -1582,7 +1582,8 @@ router.get("/hunts", authenticateUser, async (req, res) => {
       lastCheckTimes,
       totalCheckTimes,
       pausedHunts: user.pausedHunts || [],
-      huntIncrements
+      huntIncrements,
+      mmoSettings: user.mmoSettings || {}
     });
   } catch (err) {
     console.error('Error getting hunt data:', err);
@@ -1593,7 +1594,7 @@ router.get("/hunts", authenticateUser, async (req, res) => {
 // PUT /api/hunts
 router.put("/hunts", authenticateUser, async (req, res) => {
   try {
-    const { activeHunts, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements } = req.body;
+    const { activeHunts, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements, mmoSettings } = req.body;
 
     // Build update object
     const updateData = {};
@@ -1603,6 +1604,7 @@ router.put("/hunts", authenticateUser, async (req, res) => {
     if (totalCheckTimes !== undefined) updateData.totalCheckTimes = new Map(Object.entries(totalCheckTimes));
     if (pausedHunts !== undefined) updateData.pausedHunts = pausedHunts;
     if (huntIncrements !== undefined) updateData.huntIncrements = new Map(Object.entries(huntIncrements));
+    if (mmoSettings !== undefined) updateData.mmoSettings = mmoSettings;
 
     // Use findByIdAndUpdate for atomic operation to prevent race conditions
     const user = await User.findByIdAndUpdate(
@@ -1730,8 +1732,7 @@ router.post("/assign-admin", authenticateUser, requireAdmin, async (req, res) =>
 router.get("/admin/users", authenticateUser, requireAdmin, async (req, res) => {
   try {
     const users = await User.find({}, 'username email isAdmin verified createdAt bio isContentCreator')
-      .sort({ createdAt: -1 })
-      .limit(100); // Limit to prevent large responses
+      .sort({ createdAt: -1 });
 
     res.json({ users });
   } catch (error) {

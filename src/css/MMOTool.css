@@ -1,0 +1,1188 @@
+/* ============================================================
+   MMO Tool Page — Legends Arceus Permutation Hunt Tracker
+   ============================================================ */
+
+.mmo-page {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ── Header Row ─────────────────────────────────────── */
+.mmo-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.mmo-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mmo-page-title {
+  margin-top: 3rem;
+  margin-bottom: 0;
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mmo-title-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(79,70,229,0.25) 100%);
+  border: 1px solid rgba(139,92,246,0.5);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #a78bfa;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 3.25rem;
+  align-self: flex-start;
+}
+
+.mmo-subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.mmo-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 3rem;
+}
+
+/* ── Graph Placeholder ──────────────────────────────── */
+.mmo-graph-section {
+  margin: 2rem 0;
+}
+
+.mmo-graph-placeholder {
+  background: var(--card-background);
+  border: 2px dashed rgba(139,92,246,0.4);
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.mmo-graph-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    rgba(139,92,246,0.04) 0%,
+    rgba(79,70,229,0.04) 50%,
+    rgba(139,92,246,0.04) 100%
+  );
+  pointer-events: none;
+}
+
+.mmo-graph-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mmo-graph-icon {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, rgba(139,92,246,0.2) 0%, rgba(79,70,229,0.2) 100%);
+  border: 2px solid rgba(139,92,246,0.4);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a78bfa;
+  animation: mmo-pulse 3s ease-in-out infinite;
+}
+
+@keyframes mmo-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(139,92,246,0.3); }
+  50%       { box-shadow: 0 0 0 12px rgba(139,92,246,0); }
+}
+
+.mmo-graph-coming-soon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.9rem;
+  background: rgba(139,92,246,0.15);
+  border: 1px solid rgba(139,92,246,0.35);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #a78bfa;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mmo-graph-placeholder h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.mmo-graph-placeholder p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+  max-width: 520px;
+  line-height: 1.6;
+}
+
+/* Fake chart bars */
+.mmo-fake-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 60px;
+  margin-top: 0.5rem;
+  opacity: 0.25;
+}
+
+.mmo-fake-bar {
+  width: 12px;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(to top, #7c3aed, #a78bfa);
+  animation: mmo-bar-wave 2.4s ease-in-out infinite;
+}
+
+.mmo-fake-bar:nth-child(1)  { height: 30%; animation-delay: 0s; }
+.mmo-fake-bar:nth-child(2)  { height: 55%; animation-delay: 0.1s; }
+.mmo-fake-bar:nth-child(3)  { height: 75%; animation-delay: 0.2s; }
+.mmo-fake-bar:nth-child(4)  { height: 90%; animation-delay: 0.3s; }
+.mmo-fake-bar:nth-child(5)  { height: 70%; animation-delay: 0.4s; }
+.mmo-fake-bar:nth-child(6)  { height: 100%; animation-delay: 0.5s; }
+.mmo-fake-bar:nth-child(7)  { height: 80%; animation-delay: 0.6s; }
+.mmo-fake-bar:nth-child(8)  { height: 60%; animation-delay: 0.7s; }
+.mmo-fake-bar:nth-child(9)  { height: 45%; animation-delay: 0.8s; }
+.mmo-fake-bar:nth-child(10) { height: 35%; animation-delay: 0.9s; }
+.mmo-fake-bar:nth-child(11) { height: 50%; animation-delay: 1.0s; }
+.mmo-fake-bar:nth-child(12) { height: 65%; animation-delay: 1.1s; }
+
+@keyframes mmo-bar-wave {
+  0%, 100% { transform: scaleY(1); }
+  50%       { transform: scaleY(0.7); }
+}
+
+/* ── Section Divider ────────────────────────────────── */
+.mmo-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.mmo-section-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.mmo-section-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* ── Hunt Grid — reuses Counters patterns ───────────── */
+.mmo-hunts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ── Hunt Card ──────────────────────────────────────── */
+.mmo-hunt-card {
+  background: var(--card-background);
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: border-color 0.25s ease, transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mmo-hunt-card:hover {
+  border-color: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+/* Purple accent stripe for permutation hunts */
+.mmo-hunt-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #7c3aed, #a78bfa, #7c3aed);
+  background-size: 200% 100%;
+  animation: mmo-stripe-scroll 4s linear infinite;
+}
+
+@keyframes mmo-stripe-scroll {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
+/* ── Add Hunt Card ──────────────────────────────────── */
+.mmo-add-hunt-card {
+  background: var(--card-background);
+  border: 2px dashed var(--accent);
+  border-radius: 16px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  opacity: 0.7;
+}
+
+.mmo-add-hunt-card:hover {
+  border-color: var(--accent-hover);
+  opacity: 1;
+  transform: translateY(-2px);
+  background: var(--searchbar-bg);
+}
+
+.mmo-add-hunt-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--accent);
+}
+
+.mmo-add-hunt-icon {
+  width: 56px;
+  height: 56px;
+  background: rgba(var(--accent-rgb, 0,0,0), 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.mmo-add-hunt-card:hover .mmo-add-hunt-icon {
+  transform: scale(1.15) rotate(90deg);
+}
+
+.mmo-add-hunt-content h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* ── Empty State ────────────────────────────────────── */
+.mmo-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+}
+
+.mmo-empty-state p {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* ── History Button ─────────────────────────────────── */
+.mmo-history-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.1rem;
+  background: var(--searchbar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mmo-history-btn:hover {
+  background: var(--dropdown-item-hover-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Pokemon Picker Modal (shared with Counters) ────── */
+.mmo-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.mmo-modal-backdrop.closing {
+  animation: fadeOut 0.3s ease-in forwards;
+  pointer-events: none;
+}
+
+.mmo-pokemon-modal {
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 85vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+  animation: slideIn 0.3s ease-out;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--searchbar-dropdown);
+}
+
+.mmo-pokemon-modal.closing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+.mmo-pokemon-modal::-webkit-scrollbar { width: 8px; }
+.mmo-pokemon-modal::-webkit-scrollbar-track { background: var(--searchbar-dropdown); }
+.mmo-pokemon-modal::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+.mmo-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  background: var(--sidebar-bg);
+  z-index: 1;
+}
+
+.mmo-modal-header h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.mmo-modal-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.2s;
+}
+
+.mmo-modal-close:hover { color: var(--accent); }
+
+.mmo-modal-search {
+  padding: 1rem 1.5rem 0.5rem;
+  position: relative;
+}
+
+.mmo-modal-search-input {
+  width: 100%;
+  padding: 10px 36px 10px 14px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--sidebar-edit-inputs);
+  color: var(--text-color);
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.mmo-modal-search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.mmo-modal-search-clear {
+  position: absolute;
+  right: 1.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.mmo-pokemon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.5rem;
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.mmo-pokemon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.6rem 0.4rem;
+  background: var(--searchbar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.mmo-pokemon-item:hover {
+  border-color: var(--accent);
+  background: var(--dropdown-item-hover-bg);
+  transform: translateY(-2px);
+}
+
+.mmo-pokemon-item img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.mmo-pokemon-item-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-color);
+  line-height: 1.2;
+}
+
+.mmo-pokemon-item-form {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+/* ── Hunt Details Modal ─────────────────────────────── */
+.mmo-hunt-modal {
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 440px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+  animation: slideIn 0.3s ease-out;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--searchbar-dropdown);
+}
+
+.mmo-hunt-modal.closing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+.mmo-hunt-modal::-webkit-scrollbar { width: 8px; }
+.mmo-hunt-modal::-webkit-scrollbar-track { background: var(--searchbar-dropdown); }
+.mmo-hunt-modal::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+.mmo-hunt-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mmo-hunt-modal-pkmn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mmo-hunt-modal-sprite-wrap {
+  background: var(--sidebar-pokemon-bg);
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mmo-hunt-modal-sprite-wrap img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.mmo-hunt-modal-pkmn-name {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--accent);
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.mmo-hunt-modal-pkmn-num {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0.1rem 0 0;
+}
+
+.mmo-hunt-modal-pkmn-form {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.mmo-hunt-modal-content {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mmo-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.mmo-form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+/* Modifiers */
+.mmo-modifiers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.mmo-modifier-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--text-color);
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  background: var(--searchbar-bg);
+  border: 1px solid var(--border-color);
+  transition: border-color 0.15s;
+  user-select: none;
+}
+
+.mmo-modifier-check:hover {
+  border-color: var(--accent);
+}
+
+.mmo-modifier-check input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+/* Odds preview */
+.mmo-odds-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--sidebar-edit-inputs);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.mmo-odds-preview-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.mmo-odds-preview-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+/* Start button */
+.mmo-start-btn {
+  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  margin-top: 0.25rem;
+}
+
+.mmo-start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(124,58,237,0.4);
+}
+
+.mmo-start-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── Confirm / generic action modals ────────────────── */
+.mmo-confirm-modal {
+  background: var(--progress-bg, var(--card-background));
+  border: 1px solid #444;
+  border-radius: 20px;
+  padding: 1.5rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+  animation: slideIn 0.3s ease-out;
+}
+
+.mmo-confirm-modal.closing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+.mmo-confirm-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+
+.mmo-confirm-body {
+  color: var(--text-color);
+  margin: 0 0 1.5rem;
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+.mmo-confirm-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.mmo-btn-cancel {
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  background: transparent;
+  border: 2px solid var(--dividers, #444);
+  color: var(--text-color);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.mmo-btn-cancel:hover { background: var(--dividers, #444); }
+
+.mmo-btn-danger {
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  background: #ef4444;
+  border: none;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.mmo-btn-danger:hover { background: #dc2626; }
+
+.mmo-btn-confirm {
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.mmo-btn-confirm:hover { opacity: 0.9; }
+
+/* ── Settings Modal specific ────────────────────────── */
+.mmo-settings-input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--sidebar-edit-inputs);
+  color: var(--text-color);
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.mmo-settings-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ── Completion Modal ───────────────────────────────── */
+.mmo-completion-modal {
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 420px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+  animation: slideIn 0.3s ease-out;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--searchbar-dropdown);
+}
+
+.mmo-completion-modal.closing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+.mmo-completion-modal::-webkit-scrollbar { width: 8px; }
+.mmo-completion-modal::-webkit-scrollbar-track { background: var(--searchbar-dropdown); }
+.mmo-completion-modal::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+.mmo-completion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mmo-completion-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0;
+}
+
+.mmo-completion-content {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mmo-completion-footer {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding: 0 1.5rem 1.5rem;
+}
+
+/* ── Ball / Mark select ─────────────────────────────── */
+.mmo-select {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--sidebar-edit-inputs);
+  color: var(--text-color);
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.mmo-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.mmo-textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--sidebar-edit-inputs);
+  color: var(--text-color);
+  font-size: 0.9rem;
+  resize: vertical;
+  min-height: 72px;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.mmo-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ── Hunt card internals (mirrors Counters) ─────────── */
+.mmo-hunt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+  background: var(--searchbar-bg);
+  border-radius: 12px;
+  min-height: 100px;
+}
+
+.mmo-hunt-pokemon {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 0 0 auto;
+}
+
+.mmo-hunt-pokemon img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.mmo-hunt-pokemon-name {
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.mmo-hunt-pokemon-form {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.mmo-hunt-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.mmo-hunt-actions button {
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.mmo-btn-delete  { background: #ef4444; }
+.mmo-btn-delete:hover  { background: #dc2626; transform: scale(1.05); }
+
+.mmo-btn-reset   { background: #f59e0b; }
+.mmo-btn-reset:hover   { background: #d97706; transform: scale(1.05); }
+
+.mmo-btn-settings { background: #8b5cf6; }
+.mmo-btn-settings:hover { background: #7c3aed; transform: scale(1.05); }
+
+.mmo-btn-info  { background: #3b82f6; }
+.mmo-btn-info:hover  { background: #2563eb; transform: scale(1.05); }
+
+.mmo-btn-edit  { background: #10b981; }
+.mmo-btn-edit:hover  { background: #059669; transform: scale(1.05); }
+
+/* Hunt details expanded */
+.mmo-hunt-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  margin: 0 0.5rem;
+}
+
+.mmo-hunt-detail-item {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 0.25rem 0.5rem;
+  background: var(--sidebar-edit-inputs);
+  border-radius: 6px;
+  border-left: 3px solid #7c3aed;
+}
+
+/* Checks row */
+.mmo-hunt-checks {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+  background: var(--searchbar-bg);
+  border-radius: 12px;
+  gap: 0.25rem;
+}
+
+.mmo-checks-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  width: 6rem;
+  position: relative;
+}
+
+.mmo-checks-count {
+  background: #7c3aed;
+  color: white;
+  border-radius: 10px;
+  padding: 0.25rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.8rem;
+  width: 6rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.mmo-timer-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  align-items: flex-start;
+  width: 6rem;
+  padding: 0.5rem;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.mmo-total-time {
+  font-weight: 600;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mmo-checks-btns {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  min-width: 6rem;
+}
+
+.mmo-btn-add {
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.mmo-btn-add:hover { transform: translateY(-2px) scale(1.05); background: #6d28d9; }
+
+.mmo-btn-minus-lg {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mmo-btn-minus-lg:hover { background: #dc2626; }
+.mmo-btn-minus-lg:disabled { background: #6b7280; cursor: not-allowed; }
+
+.mmo-btn-minus-overlay {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: -8px;
+  left: -8px;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.mmo-btn-minus-overlay:disabled { background: #6b7280; cursor: not-allowed; }
+.mmo-btn-minus-overlay:hover:not(:disabled) { transform: scale(1.1); }
+
+.mmo-btn-pause {
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mmo-btn-pause:hover { transform: translateY(-2px) scale(1.05); background: #6d28d9; }
+
+/* Bottom row */
+.mmo-hunt-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.mmo-hunt-odds-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--searchbar-bg);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.mmo-odds-label {
+  font-weight: 500;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.mmo-odds-value {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #a78bfa;
+}
+
+.mmo-btn-complete {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.mmo-btn-complete:hover { transform: translateY(-2px) scale(1.02); }
+
+/* Hide the minus overlay on mobile */
+@media (max-width: 768px) {
+  .mmo-checks-display .mmo-btn-minus-overlay { display: none; }
+}
+@media (min-width: 769px) {
+  .mmo-checks-btns .mmo-btn-minus-lg { display: none; }
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 600px) {
+  .mmo-page-title { font-size: 2rem; }
+  .mmo-hunts-grid { grid-template-columns: 1fr; }
+  .mmo-hunt-modal, .mmo-pokemon-modal { max-width: 100%; }
+  .mmo-modifiers-grid { grid-template-columns: 1fr; }
+}
+
+
+/* Centered active hunt in MMO Tool */
+.hunts-grid.single-hunt-active {
+  display: grid !important;
+  grid-template-columns: minmax(350px, 400px) !important;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+@keyframes slideToCenter {
+  0% { transform: translateY(20px) scale(0.95); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.hunts-grid.single-hunt-active .hunt-card {
+  width: 100%;
+  max-width: none;
+  animation: slideToCenter 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}

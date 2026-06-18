@@ -47,6 +47,7 @@ const Feedback = lazy(() => import("./pages/Feedback"));
 const Bingo = lazy(() => import("./pages/Bingo"));
 const Admin = lazy(() => import("./pages/Admin"));
 const HuntPopout = lazy(() => import("./pages/HuntPopout"));
+const MMOTool = lazy(() => import("./pages/MMOTool"));
 import { LoadingProvider, useLoading } from "./components/Shared/LoadingContext";
 import { LoadingSpinner } from "./components/Shared";
 import Footer from "./components/Shared/Footer";
@@ -2058,6 +2059,16 @@ export default function App() {
                         <RequireAuth loading={loading} authReady={authReady} user={user}>
                           <Suspense fallback={<LoadingSpinner fullScreen text="Loading feedback..." />}>
                             <Feedback />
+                          </Suspense>
+                        </RequireAuth>
+                      }
+                    />
+                    <Route
+                      path="/mmo-tool"
+                      element={
+                        <RequireAuth loading={loading} authReady={authReady} user={user}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading MMO Tool..." />}>
+                            <MMOTool />
                           </Suspense>
                         </RequireAuth>
                       }

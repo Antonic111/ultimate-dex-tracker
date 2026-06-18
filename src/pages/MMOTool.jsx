@@ -1,127 +1,154 @@
 import { useState, useEffect, useContext, useMemo, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import {
+  Plus, Minus, Check, Trash2, Settings, RotateCcw, Pause, Play,
+  Info, Edit, X, BarChart3, Sparkles, Zap, CheckCircle
+} from "lucide-react";
+import { calculateOdds, getMethodsForGame, getModifiersForGame } from "../utils/huntSystem";
+import { formatPokemonName, getFormDisplayName } from "../utils";
+import { getCaughtKey } from "../caughtStorage";
+import { UserContext } from "../components/Shared/UserContext";
+import { useMessage } from "../components/Shared/MessageContext";
+import { huntAPI, profileAPI, caughtAPI } from "../utils/api";
+import { BALL_OPTIONS, MARK_OPTIONS, GAME_OPTIONS } from "../Constants";
+import pokemonData from "../data/pokemon.json";
+import gamePokemonData from "../data/gamePokemon.json";
+import formsData from "../utils/loadFormsData";
+import { getFilteredFormsData } from "../utils/dexPreferences";
+import ContentFilterInput from "../components/Shared/ContentFilterInput";
+import { SearchbarIconDropdown } from "../components/Shared/SearchBar";
+import { validateContent } from "../../shared/contentFilter";
+import PermutationTable from "../components/MMO/PermutationTable";
+import "../css/Counters.css";
+import "../css/MMOTool.css";
 
-// Simple timer component that updates every second
+// ─── Inline timer (same pattern as Counters) ─────────────────────────────────
 function TimerDisplay({ huntId, lastCheckTime, isPaused, onTimeUpdate }) {
   const [seconds, setSeconds] = useState(0);
   const intervalRef = useRef(null);
 
   useEffect(() => {
     if (isPaused) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
       return;
     }
-
-    // Start timer
-    intervalRef.current = setInterval(() => {
-      setSeconds(prev => prev + 1);
-    }, 1000);
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
+    intervalRef.current = setInterval(() => setSeconds(p => p + 1), 1000);
+    return () => clearInterval(intervalRef.current);
   }, [isPaused]);
 
-  // Update parent with current seconds value
   useEffect(() => {
-    if (onTimeUpdate && !isPaused) {
-      onTimeUpdate(huntId, seconds * 1000);
-    }
+    if (onTimeUpdate && !isPaused) onTimeUpdate(huntId, seconds * 1000);
   }, [seconds, huntId, onTimeUpdate, isPaused]);
 
-  // Reset timer when lastCheckTime changes (new hunt or add check)
-  useEffect(() => {
-    setSeconds(0);
-  }, [lastCheckTime]);
+  useEffect(() => { setSeconds(0); }, [lastCheckTime]);
 
-  if (isPaused) {
-    return "Paused";
-  }
-
+  if (isPaused) return "Paused";
   return `${seconds}s`;
 }
-import { Search, X, Plus, Minus, Check, Trash2, Settings, Save, Info, RotateCcw, Pause, Play, CheckCircle, Edit, Maximize2 } from "lucide-react";
-import { BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
-import { getMethodsForGame, calculateOdds, getAllGames, getModifiersForGame, getCurrentHuntOdds } from "../utils/huntSystem";
-import { GAME_OPTIONS } from "../Constants";
-import { formatPokemonName, getFormDisplayName, renderTypeBadge } from "../utils";
-import { getCaughtKey } from "../caughtStorage";
-import { SearchbarIconDropdown } from "../components/Shared/SearchBar";
-import ContentFilterInput from "../components/Shared/ContentFilterInput";
-import { validateContent } from "../../shared/contentFilter";
-import { UserContext } from "../components/Shared/UserContext";
-import { useMessage } from "../components/Shared/MessageContext";
-import { huntAPI, profileAPI, caughtAPI } from "../utils/api";
-import pokemonData from "../data/pokemon.json";
-import formsData from "../utils/loadFormsData";
-import gamePokemonData from "../data/gamePokemon.json";
-import { getAvailableGamesForPokemon } from "../utils/gameMapping";
-import { getFilteredFormsData } from "../utils/dexPreferences";
-import "../css/Counters.css";
 
-export default function Counters() {
-  const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedPokemon, setSelectedPokemon] = useState(null);
-  const [huntDetails, setHuntDetails] = useState({
-    game: "",
-    ball: "",
-    mark: "",
-    method: "",
-    notes: ""
-  });
+// ─── Legends Arceus permutation ball filter ──────────────────────────────────
+const HISUIAN_BALLS = [
+  "Feather Ball","Wing Ball","Jet Ball","Heavy Ball (Hisui)",
+  "Leaden Ball","Gigaton Ball","Poké Ball (Hisui)",
+  "Great Ball (Hisui)","Ultra Ball (Hisui)","Origin Ball","Strange Ball"
+];
+
+function formatTime(ms) {
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  const h = Math.floor(m / 60);
+  if (h > 0) return `${h}h ${m % 60}m ${s % 60}s`;
+  if (m > 0) return `${m}m ${s % 60}s`;
+  return `${s}s`;
+}
+
+const formatTimeCompact = (milliseconds) => {
+  const seconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+
+  if (hours > 0) {
+    const mins = minutes % 60;
+    return mins > 0 ? `${hours}h${mins}m` : `${hours}h`;
+  } else if (minutes > 0) {
+    return `${minutes}m`;
+  } else {
+    return `${seconds}s`;
+  }
+};
+
+function getPokemonImage(pokemon) {
+  if (!pokemon) return "";
+  return pokemon.sprites?.front_shiny || pokemon.sprites?.front_default || "";
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+export default function MMOTool() {
+  const { username } = useContext(UserContext);
+  const { showMessage } = useMessage();
+
+  // ── Hunt state (shared with Counters via huntAPI) ─────────────────────────
+  const [activeHunts, setActiveHunts]         = useState([]);
+  const [huntTimers, setHuntTimers]           = useState({});
+  const [lastCheckTimes, setLastCheckTimes]   = useState({});
+  const [totalCheckTimes, setTotalCheckTimes] = useState({});
+  const [pausedHunts, setPausedHunts]         = useState(new Set());
+  const [huntIncrements, setHuntIncrements]   = useState({});
+  const [currentBottomTimers, setCurrentBottomTimers] = useState({});
+  const [expandedHunts, setExpandedHunts]     = useState(new Set());
+  const [shinyCharmGames, setShinyCharmGames] = useState([]);
+
+  const lastSaveTime = useRef(0);
+
+  // ── Modal state ───────────────────────────────────────────────────────────
+  const [showPokemonModal, setShowPokemonModal] = useState(false);
+  const [showHuntModal, setShowHuntModal]       = useState(false);
+  const [searchTerm, setSearchTerm]             = useState("");
+  const [selectedPokemon, setSelectedPokemon]   = useState(null);
+  const [huntDetails, setHuntDetails] = useState({ game: "Legends Arceus", method: "Permutations", modifiers: {} });
+
+  const [resetModal, setResetModal]     = useState({ show: false, hunt: null });
+  const [deleteModal, setDeleteModal]   = useState({ show: false, hunt: null });
+  const [completionModal, setCompletionModal] = useState({ show: false, hunt: null });
+
+  const [pokemonModalClosing, setPokemonModalClosing]     = useState(false);
+  const [huntModalClosing, setHuntModalClosing]           = useState(false);
+  const [backdropClosing, setBackdropClosing]             = useState(false);
+  const [resetModalClosing, setResetModalClosing]         = useState(false);
+  const [deleteModalClosing, setDeleteModalClosing]       = useState(false);
+  const [completionModalClosing, setCompletionModalClosing]= useState(false);
+
+  const isHisuianBall = (ballValue) => {
+    return HISUIAN_BALLS.includes(ballValue);
+  };
+
+  const getCompletionBallOptions = () => {
+    if (completionModal.hunt && completionModal.hunt.game === "Legends Arceus") {
+      return BALL_OPTIONS.filter(ball =>
+        ball.value === "" || isHisuianBall(ball.value)
+      );
+    }
+    return BALL_OPTIONS;
+  };
+
   const [modifiers, setModifiers] = useState({
     shinyCharm: false,
-    shinyParents: false,
-    lureActive: false,
     researchLv10: false,
     perfectResearch: false,
-    sparklingLv1: false,
-    sparklingLv2: false,
-    sparklingLv3: false,
-    eventBoosted: false,
-    communityDay: false,
-    raidDay: false,
-    researchDay: false,
-    galarBirds: false,
-    hatchDay: false
   });
-  const [currentChecks, setCurrentChecks] = useState(0);
-  const [showPokemonModal, setShowPokemonModal] = useState(false);
-  const [showHuntModal, setShowHuntModal] = useState(false);
-  const [activeHunts, setActiveHunts] = useState([]);
-  const [huntTimers, setHuntTimers] = useState({});
-  const [lastCheckTimes, setLastCheckTimes] = useState({});
-  const [totalCheckTimes, setTotalCheckTimes] = useState({});
-  const [pausedHunts, setPausedHunts] = useState(new Set());
-  const [expandedHunts, setExpandedHunts] = useState(new Set());
-  const [currentBottomTimers, setCurrentBottomTimers] = useState({});
-  const [huntIncrements, setHuntIncrements] = useState({});
-  const [resetModal, setResetModal] = useState({ show: false, hunt: null });
-  const [deleteModal, setDeleteModal] = useState({ show: false, hunt: null });
-  const [settingsModal, setSettingsModal] = useState({ show: false, hunt: null });
-  const [editModal, setEditModal] = useState({ show: false, hunt: null });
-  const [completionModal, setCompletionModal] = useState({ show: false, hunt: null });
-  const [resetModalClosing, setResetModalClosing] = useState(false);
-  const [deleteModalClosing, setDeleteModalClosing] = useState(false);
-  const [settingsModalClosing, setSettingsModalClosing] = useState(false);
-  const [editModalClosing, setEditModalClosing] = useState(false);
-  const [pokemonModalClosing, setPokemonModalClosing] = useState(false);
-  const [huntModalClosing, setHuntModalClosing] = useState(false);
-  const [backdropClosing, setBackdropClosing] = useState(false);
-  const [completionModalClosing, setCompletionModalClosing] = useState(false);
+
   const [settingsForm, setSettingsForm] = useState({
     manualChecks: '',
     manualTotalTime: '',
-    manualIncrements: ''
+    manualIncrements: '',
   });
+
+  const [settingsModal, setSettingsModal] = useState({ show: false, hunt: null });
+  const [settingsModalClosing, setSettingsModalClosing] = useState(false);
+  const [completionForm, setCompletionForm] = useState({ ball: '', mark: '', notes: '' });
+  const [editModal, setEditModal] = useState({ show: false, hunt: null });
+  const [editModalClosing, setEditModalClosing] = useState(false);
   const [editForm, setEditForm] = useState({
     game: '',
     method: '',
@@ -143,1255 +170,6 @@ export default function Counters() {
       hatchDay: false
     }
   });
-  const [isEditingPokemon, setIsEditingPokemon] = useState(false);
-  const [completionForm, setCompletionForm] = useState({
-    ball: '',
-    mark: '',
-    notes: ''
-  });
-  const [hotkey, setHotkey] = useState('a');
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [historyModalClosing, setHistoryModalClosing] = useState(false);
-  const [deleteHistoryModal, setDeleteHistoryModal] = useState({ show: false, caughtKey: null, entryId: null });
-  const [deleteHistoryModalClosing, setDeleteHistoryModalClosing] = useState(false);
-  const [huntHistory, setHuntHistory] = useState([]);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-
-  // Function to identify Hisuian balls
-  const isHisuianBall = (ballValue) => {
-    const hisuianBalls = [
-      "Feather Ball", "Wing Ball", "Jet Ball", "Heavy Ball (Hisui)",
-      "Leaden Ball", "Gigaton Ball", "Poké Ball (Hisui)",
-      "Great Ball (Hisui)", "Ultra Ball (Hisui)", "Origin Ball", "Strange Ball"
-    ];
-    return hisuianBalls.includes(ballValue);
-  };
-
-  // Filter ball options based on selected game for completion modal
-  const getCompletionBallOptions = () => {
-    if (completionModal.hunt && completionModal.hunt.game === "Legends Arceus") {
-      // Show only Hisuian balls for Legends Arceus
-      return BALL_OPTIONS.filter(ball =>
-        ball.value === "" || isHisuianBall(ball.value)
-      );
-    }
-    return BALL_OPTIONS;
-  };
-  const lastPauseAction = useRef({});
-  // Track open popout windows so we can push state updates to them
-  const popoutWindowsRef = useRef({});
-  const lastSaveTime = useRef(0);
-  const { username } = useContext(UserContext);
-  const { showMessage } = useMessage();
-  const [shinyCharmGames, setShinyCharmGames] = useState([]);
-
-  // Save hunt data to server - immediate save with current state and throttling
-  const saveHuntData = useCallback(async (huntDataOverride = null) => {
-    if (!username) return; // Don't save if user is not logged in
-
-    // Only throttle automatic saves (when no explicit data provided)
-    // Allow immediate saves when explicit data is provided (like from handleAddCheck)
-    const now = Date.now();
-    if (!huntDataOverride && now - lastSaveTime.current < 500) {
-      return; // Skip this save if it's too soon (only for automatic saves)
-    }
-    lastSaveTime.current = now;
-
-    try {
-      const huntData = huntDataOverride || {
-        activeHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-      };
-
-      await huntAPI.updateHuntData(huntData);
-    } catch (error) {
-      console.error('Failed to save hunt data:', error);
-      showMessage('Failed to save hunt data', 'error');
-    }
-  }, [username, showMessage]);
-
-
-  // Load user's profile data
-  const loadProfileData = useCallback(async () => {
-    if (!username) return;
-
-    try {
-      const profile = await profileAPI.getProfile();
-      setShinyCharmGames(profile.shinyCharmGames || []);
-      if (profile.huntHotkey) {
-        setHotkey(profile.huntHotkey);
-      }
-    } catch (error) {
-      console.error('Failed to load profile data:', error);
-    }
-  }, [username]);
-
-  useEffect(() => {
-    loadProfileData();
-
-    // Listen for updates from ShinyCharmModal
-    const handleShinyCharmUpdate = (event) => {
-      if (event.detail?.shinyCharmGames) {
-        setShinyCharmGames(event.detail.shinyCharmGames);
-      } else {
-        // Reload from server if detail not provided
-        loadProfileData();
-      }
-    };
-
-    window.addEventListener('shinyCharmGamesUpdated', handleShinyCharmUpdate);
-    return () => {
-      window.removeEventListener('shinyCharmGamesUpdated', handleShinyCharmUpdate);
-    };
-  }, [username, loadProfileData]);
-
-  // Load hunt data on component mount
-  useEffect(() => {
-    const loadHuntData = async () => {
-      if (!username) return;
-
-      try {
-        const data = await huntAPI.getHuntData();
-
-        if (data.activeHunts) {
-          // Ensure each hunt has modifiers field for backward compatibility
-          const huntsWithModifiers = data.activeHunts.map(hunt => ({
-            ...hunt,
-            modifiers: hunt.modifiers || {
-              shinyCharm: false,
-              shinyParents: false,
-              lureActive: false,
-              researchLv10: false,
-              perfectResearch: false,
-              sparklingLv1: false,
-              sparklingLv2: false,
-              sparklingLv3: false,
-              eventBoosted: false
-            }
-          }));
-          setActiveHunts(huntsWithModifiers);
-        }
-        if (data.huntTimers) {
-          setHuntTimers(data.huntTimers);
-        }
-        if (data.lastCheckTimes) {
-          setLastCheckTimes(data.lastCheckTimes);
-        }
-        if (data.totalCheckTimes) {
-          setTotalCheckTimes(data.totalCheckTimes);
-        }
-        if (data.huntIncrements) {
-          setHuntIncrements(data.huntIncrements);
-        }
-
-        // Always set all hunts to paused on page load/refresh
-        if (data.activeHunts && data.activeHunts.length > 0) {
-          const allHuntIds = data.activeHunts.map(hunt => hunt.id);
-          setPausedHunts(new Set(allHuntIds));
-        } else {
-          setPausedHunts(new Set());
-        }
-      } catch (error) {
-        console.error('Failed to load hunt data:', error);
-        // Don't show error message for initial load failure
-      }
-    };
-
-    loadHuntData();
-  }, [username]);
-
-  // Auto-check/uncheck shiny charm modifier when game is selected or shinyCharmGames changes (new hunt)
-  useEffect(() => {
-    if (huntDetails.game) {
-      const shouldHaveCharm = shinyCharmGames.includes(huntDetails.game);
-      setModifiers(prev => {
-        let changed = false;
-        const newModifiers = { ...prev };
-        
-        if (prev.shinyCharm !== shouldHaveCharm) {
-          newModifiers.shinyCharm = shouldHaveCharm;
-          changed = true;
-        }
-        
-        if (huntDetails.game === "Legends Arceus" && shouldHaveCharm && !prev.researchLv10) {
-          newModifiers.researchLv10 = true;
-          changed = true;
-        }
-        
-        return changed ? newModifiers : prev;
-      });
-    }
-  }, [huntDetails.game, shinyCharmGames]);
-
-  // Get all Pokemon data (main + forms) using the same logic as the main app
-  const allPokemon = useMemo(() => {
-    // Use the same filtered forms data as the main app
-    const filteredFormsData = getFilteredFormsData(formsData);
-
-    // Combine main Pokemon with filtered forms data
-    return [...pokemonData, ...filteredFormsData];
-  }, []);
-
-  // Filter Pokemon based on search term
-  const filteredPokemon = useMemo(() => {
-    if (!searchTerm.trim()) return allPokemon;
-
-    return allPokemon.filter(pokemon => {
-      if (!pokemon || !pokemon.name || !pokemon.id) return false;
-
-      const searchLower = searchTerm.toLowerCase();
-      const nameMatch = pokemon.name.toLowerCase().includes(searchLower);
-      const idMatch = pokemon.id.toString().includes(searchLower);
-
-      return nameMatch || idMatch;
-    });
-  }, [allPokemon, searchTerm]);
-
-  // Load hunt history from caught data
-  const loadHuntHistory = useCallback(async () => {
-    if (!username) return;
-    setIsLoadingHistory(true);
-    try {
-      const response = await caughtAPI.getCaughtData();
-      const caughtData = response || {};
-
-      const history = [];
-      Object.keys(caughtData).forEach(key => {
-        const info = caughtData[key];
-        if (info && info.entries && Array.isArray(info.entries)) {
-          info.entries.forEach(entry => {
-            if (entry.isHuntTracker) {
-              const pkmn = allPokemon.find(p => getCaughtKey(p, null, true) === key);
-              if (pkmn) {
-                history.push({
-                  ...entry,
-                  pokemonName: pkmn.name,
-                  pokemonIcon: getPokemonImage(pkmn),
-                  sortDate: new Date(entry.date || 0).getTime(),
-                  caughtKey: key
-                });
-              }
-            }
-          });
-        }
-      });
-
-      history.sort((a, b) => (b.sortDate || 0) - (a.sortDate || 0));
-      setHuntHistory(history);
-    } catch (error) {
-      console.error('Failed to load hunt history:', error);
-    } finally {
-      setIsLoadingHistory(false);
-    }
-  }, [username, allPokemon]);
-
-  const handleRemoveFromHistoryClick = (caughtKey, entryId) => {
-    setDeleteHistoryModal({ show: true, caughtKey, entryId });
-  };
-
-  const handleRemoveFromHistoryConfirm = async () => {
-    const { caughtKey, entryId } = deleteHistoryModal;
-    if (!username || !caughtKey || !entryId) return;
-
-    setDeleteHistoryModalClosing(true);
-
-    try {
-      const { fetchCaughtData, updateCaughtData } = await import('../api/caught');
-      const existingCaughtData = await fetchCaughtData(username);
-      const existingCaughtInfo = existingCaughtData[caughtKey];
-
-      if (existingCaughtInfo && existingCaughtInfo.entries) {
-        // Change isHuntTracker to false instead of deleting the whole entry
-        const updatedEntries = existingCaughtInfo.entries.map(e =>
-          e.entryId === entryId ? { ...e, isHuntTracker: false } : e
-        );
-
-        const updatedCaughtInfo = {
-          ...existingCaughtInfo,
-          entries: updatedEntries
-        };
-
-        await updateCaughtData(username, caughtKey, updatedCaughtInfo);
-
-        // Remove from local state immediately for fast UI feedback
-        setHuntHistory(prev => prev.filter(h => h.entryId !== entryId));
-      }
-    } catch (error) {
-      console.error('Failed to remove from history:', error);
-      showMessage("Failed to remove from history", "error");
-    } finally {
-      setTimeout(() => {
-        setDeleteHistoryModal({ show: false, caughtKey: null, entryId: null });
-        setDeleteHistoryModalClosing(false);
-        showMessage("Removed from history", "info");
-      }, 300);
-    }
-  };
-
-  // Bulk add checks for all unpaused hunts (used by hotkey)
-  const handleBulkAddChecks = useCallback(() => {
-    const unpausedHunts = activeHunts.filter(h => !pausedHunts.has(h.id));
-    if (unpausedHunts.length === 0) return;
-
-    const now = Date.now();
-    const updatedHunts = [...activeHunts];
-    const updatedLastCheckTimes = { ...lastCheckTimes };
-    const updatedTotalCheckTimes = { ...totalCheckTimes };
-
-    unpausedHunts.forEach(hunt => {
-      const incrementValue = huntIncrements[hunt.id] || 1;
-      const bottomTimerValue = currentBottomTimers[hunt.id] || 0;
-
-      const huntIndex = updatedHunts.findIndex(h => h.id === hunt.id);
-      if (huntIndex !== -1) {
-        updatedHunts[huntIndex] = {
-          ...updatedHunts[huntIndex],
-          checks: updatedHunts[huntIndex].checks + incrementValue
-        };
-        updatedLastCheckTimes[hunt.id] = now;
-        updatedTotalCheckTimes[hunt.id] = (updatedTotalCheckTimes[hunt.id] || 0) + bottomTimerValue;
-      }
-    });
-
-    setActiveHunts(updatedHunts);
-    setLastCheckTimes(updatedLastCheckTimes);
-    setTotalCheckTimes(updatedTotalCheckTimes);
-
-    if (username) {
-      const huntData = {
-        activeHunts: updatedHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-  }, [activeHunts, pausedHunts, huntIncrements, currentBottomTimers, username, huntTimers, saveHuntData, lastCheckTimes, totalCheckTimes]);
-
-  // Handle hotkey for counters
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) || document.activeElement.contentEditable === 'true') {
-        return;
-      }
-
-      if (e.key.toLowerCase() === hotkey.toLowerCase()) {
-        handleBulkAddChecks();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [hotkey, handleBulkAddChecks]);
-
-  // Track the previous game in edit modal to detect manual game changes (not modal open)
-  const prevEditGameRef = useRef(editForm.game);
-  const editModalJustOpenedRef = useRef(false);
-
-  // Auto-check shiny charm modifier ONLY when user manually changes the game in edit modal
-  useEffect(() => {
-    // Skip if this is from the modal opening (not a manual game change)
-    if (editModalJustOpenedRef.current) {
-      editModalJustOpenedRef.current = false;
-      prevEditGameRef.current = editForm.game;
-      return;
-    }
-
-    // Only auto-check if the game actually changed (user action, not data load)
-    if (prevEditGameRef.current !== editForm.game && editForm.game) {
-      prevEditGameRef.current = editForm.game;
-
-      // Only auto-check shiny charm if user has this game in their shiny charm list
-      if (shinyCharmGames.includes(editForm.game)) {
-        setEditForm(prev => {
-          const newModifiers = { ...prev.modifiers, shinyCharm: true };
-          if (editForm.game === "Legends Arceus") {
-            newModifiers.researchLv10 = true;
-          }
-          return {
-            ...prev,
-            modifiers: newModifiers
-          };
-        });
-      }
-    }
-  }, [editForm.game, shinyCharmGames]);
-
-  // Save immediately on page unload
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (username && activeHunts.length > 0) {
-        // Use sendBeacon for reliable saving on page unload
-        const huntData = {
-          activeHunts,
-          huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-          lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes).map(([k, v]) => [k, v])),
-          totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes).map(([k, v]) => [k, v])),
-          pausedHunts: Array.from(pausedHunts),
-          huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-        };
-
-        // Try to save synchronously on page unload
-        try {
-          const xhr = new XMLHttpRequest();
-          xhr.open('PUT', '/api/hunts', false); // Synchronous request
-          xhr.setRequestHeader('Content-Type', 'application/json');
-          xhr.setRequestHeader('Authorization', `Bearer ${localStorage.getItem('authToken')}`);
-          xhr.send(JSON.stringify(huntData));
-        } catch (error) {
-          console.error('Failed to save on page unload:', error);
-        }
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [username, activeHunts, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements]);
-
-
-  const handlePokemonSelect = (pokemon) => {
-    if (!pokemonModalClosing) {
-      setSelectedPokemon(pokemon);
-      setPokemonModalClosing(true);
-      setTimeout(() => {
-        setShowPokemonModal(false);
-        setPokemonModalClosing(false);
-
-        if (isEditingPokemon) {
-          // If we're editing, update the edit form and return to edit modal
-          setEditForm(prev => ({ ...prev, pokemon: pokemon }));
-          setIsEditingPokemon(false);
-          // Restore the edit modal with the original hunt data
-          setEditModal(prev => ({ ...prev, show: true }));
-        } else {
-          // Normal flow - go to hunt modal
-          setShowHuntModal(true);
-        }
-      }, 300);
-    }
-  };
-
-  // OLD COMPLEX SCROLL PREVENTION - DISABLED
-  // Disable body scrolling when modals are open
-  useEffect(() => {
-    const hasOpenModal = showPokemonModal || showHuntModal || resetModal.show || deleteModal.show || settingsModal.show || completionModal.show;
-
-    if (hasOpenModal) {
-      const preventScroll = (e) => {
-        // Check if the scroll event is happening inside modal content or dropdown
-        const target = e.target;
-        const isInsideModalContent = target.closest('.hunt-modal-content, .pokemon-modal-content');
-        const isInsideDropdown = target.closest('.dropdown, .dropdown-content, .select-dropdown, [role="listbox"], [role="option"]');
-
-        // Only allow scrolling inside modal content or dropdowns
-        if (isInsideModalContent || isInsideDropdown) {
-          return;
-        }
-
-        // Prevent all other scrolling when modal is open
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      };
-
-      const preventKeyboardScroll = (e) => {
-        // Check if the keydown event is happening inside modal content or dropdown
-        const target = e.target;
-        const isInsideModalContent = target.closest('.hunt-modal-content, .pokemon-modal-content');
-        const isInsideDropdown = target.closest('.dropdown, .dropdown-content, .select-dropdown, [role="listbox"], [role="option"]');
-        const isInputField = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.contentEditable === 'true';
-
-        // Only allow keyboard scrolling inside modal content, dropdowns, or input fields
-        if (isInsideModalContent || isInsideDropdown || isInputField) {
-          return;
-        }
-
-        // Prevent keyboard scrolling everywhere else
-        if ([32, 33, 34, 35, 36, 37, 38, 39, 40].includes(e.keyCode)) {
-          e.preventDefault();
-        }
-      };
-
-      // Add event listeners to prevent scrolling - use capture phase to catch all events
-      document.addEventListener('wheel', preventScroll, { passive: false, capture: true });
-      document.addEventListener('touchmove', preventScroll, { passive: false, capture: true });
-      document.addEventListener('keydown', preventKeyboardScroll, { capture: true });
-
-      // Also add event listeners to modal backdrops to ensure they catch scroll events
-      const modalBackdrops = document.querySelectorAll('.pokemon-modal-backdrop, .hunt-modal-backdrop');
-      modalBackdrops.forEach(backdrop => {
-        backdrop.addEventListener('wheel', preventScroll, { passive: false });
-        backdrop.addEventListener('touchmove', preventScroll, { passive: false });
-      });
-
-      return () => {
-        document.removeEventListener('wheel', preventScroll, { capture: true });
-        document.removeEventListener('touchmove', preventScroll, { capture: true });
-        document.removeEventListener('keydown', preventKeyboardScroll, { capture: true });
-
-        // Remove backdrop event listeners
-        modalBackdrops.forEach(backdrop => {
-          backdrop.removeEventListener('wheel', preventScroll);
-          backdrop.removeEventListener('touchmove', preventScroll);
-        });
-      };
-    }
-  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, settingsModal.show, editModal.show, completionModal.show]);
-
-  // Simple body scroll disable when modals are open
-  useEffect(() => {
-    const hasOpenModal = showPokemonModal || showHuntModal || resetModal.show || deleteModal.show || settingsModal.show || editModal.show || completionModal.show;
-
-    if (hasOpenModal) {
-      const html = document.documentElement;
-      const body = document.body;
-      // Store the current scroll position
-      const scrollY = window.scrollY;
-      body.dataset.scrollY = scrollY;
-
-      // Prevent scrolling without using position:fixed on body
-      // This avoids breaking fixed-position modals during page transitions
-      html.style.overflow = 'hidden';
-      body.style.overflow = 'hidden';
-      html.style.height = '100vh';
-      body.style.height = '100vh';
-      body.style.marginTop = `-${scrollY}px`;
-      body.style.paddingTop = `${scrollY}px`;
-
-      return () => {
-        // Re-enable body scrolling
-        html.style.overflow = '';
-        body.style.overflow = '';
-        html.style.height = '';
-        body.style.height = '';
-        body.style.marginTop = '';
-        body.style.paddingTop = '';
-
-        // Restore scroll position
-        const savedScrollY = parseInt(body.dataset.scrollY || '0', 10);
-        window.scrollTo(0, savedScrollY);
-      };
-    }
-  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, settingsModal.show, editModal.show, completionModal.show]);
-
-  // Add CSS to prevent scroll chaining on modal content
-  useEffect(() => {
-    const hasOpenModal = showPokemonModal || showHuntModal || resetModal.show || deleteModal.show || settingsModal.show || editModal.show || completionModal.show;
-
-    if (hasOpenModal) {
-      // Add CSS to prevent scroll chaining
-      const style = document.createElement('style');
-      style.textContent = `
-        .hunt-modal-content, .pokemon-modal-content {
-          overscroll-behavior: contain;
-        }
-      `;
-      document.head.appendChild(style);
-
-      return () => {
-        document.head.removeChild(style);
-      };
-    }
-  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, settingsModal.show, editModal.show, completionModal.show]);
-
-
-  const handleAddHunt = () => {
-    setSearchTerm("");
-    setPokemonModalClosing(false);
-    setIsEditingPokemon(false); // Reset editing state to ensure we start a new hunt
-    setShowPokemonModal(true);
-  };
-
-  const handleStartHunt = () => {
-    if (!selectedPokemon || huntModalClosing) return;
-
-    // Calculate the odds for this hunt
-    const huntOdds = huntDetails.game && huntDetails.method
-      ? calculateOdds(huntDetails.game, huntDetails.method, modifiers)
-      : null; // Use null to indicate no odds available
-
-    const startTime = Date.now();
-    const huntId = startTime;
-
-    const newHunt = {
-      id: huntId,
-      pokemon: selectedPokemon,
-      game: huntDetails.game,
-      ball: huntDetails.ball,
-      mark: huntDetails.mark,
-      method: huntDetails.method,
-      notes: huntDetails.notes,
-      checks: 0,
-      odds: huntOdds,
-      startDate: new Date().toISOString(),
-      startTime: startTime,
-      increment: 1,
-      modifiers: { ...modifiers } // Store modifiers with each hunt
-    };
-
-    const updatedActiveHunts = [...activeHunts, newHunt];
-    const updatedHuntTimers = { ...huntTimers, [huntId]: startTime };
-    const updatedLastCheckTimes = { ...lastCheckTimes, [huntId]: startTime };
-    const updatedTotalCheckTimes = { ...totalCheckTimes, [huntId]: 0 };
-    const updatedHuntIncrements = { ...huntIncrements, [huntId]: 1 };
-    const updatedPausedHunts = new Set([...pausedHunts, huntId]);
-
-    setActiveHunts(updatedActiveHunts);
-    setHuntTimers(updatedHuntTimers);
-    setLastCheckTimes(updatedLastCheckTimes);
-    setTotalCheckTimes(updatedTotalCheckTimes);
-    setHuntIncrements(updatedHuntIncrements);
-    setPausedHunts(updatedPausedHunts);
-
-    // Save immediately with updated state
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(updatedHuntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(updatedPausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(updatedHuntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-
-    // Close hunt modal with animation
-    setHuntModalClosing(true);
-    setBackdropClosing(true);
-    setTimeout(() => {
-      setShowHuntModal(false);
-      setHuntModalClosing(false);
-      setBackdropClosing(false);
-
-      // Reset form states after animation completes
-      setHuntDetails({
-        game: "",
-        ball: "",
-        mark: "",
-        method: "",
-        notes: ""
-      });
-      setModifiers({
-        shinyCharm: false,
-        shinyParents: false,
-        lureActive: false,
-        researchLv10: false,
-        perfectResearch: false,
-        sparklingLv1: false,
-        sparklingLv2: false,
-        sparklingLv3: false,
-        eventBoosted: false,
-        communityDay: false,
-        raidDay: false,
-        researchDay: false,
-        galarBirds: false,
-        hatchDay: false
-      });
-      setSelectedPokemon(null);
-      showMessage("Hunt started!", "success");
-    }, 300);
-  };
-
-  const handleAddCheck = (huntId) => {
-    const now = Date.now();
-    const isPaused = pausedHunts.has(huntId);
-
-    // Get the current bottom timer value (what's actually displayed)
-    const bottomTimerValue = currentBottomTimers[huntId] || 0;
-
-    // Only add the bottom timer value if hunt is not currently paused
-    const timeToAdd = isPaused ? 0 : bottomTimerValue;
-
-    // Get the increment value for this hunt (default to 1 if not set)
-    const incrementValue = huntIncrements[huntId] || 1;
-
-    const updatedActiveHunts = activeHunts.map(hunt =>
-      hunt.id === huntId
-        ? { ...hunt, checks: hunt.checks + incrementValue }
-        : hunt
-    );
-    const updatedLastCheckTimes = { ...lastCheckTimes, [huntId]: now };
-    const updatedTotalCheckTimes = {
-      ...totalCheckTimes,
-      [huntId]: (totalCheckTimes[huntId] || 0) + timeToAdd
-    };
-
-    setActiveHunts(updatedActiveHunts);
-    setLastCheckTimes(updatedLastCheckTimes);
-    setTotalCheckTimes(updatedTotalCheckTimes);
-
-    // Save immediately for critical actions like adding checks
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-  };
-
-  const handleDecreaseCheck = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    if (!hunt || hunt.checks <= 0) return; // Don't go below 0
-
-    // Get the increment value for this hunt (default to 1 if not set)
-    const incrementValue = huntIncrements[huntId] || 1;
-
-    const updatedActiveHunts = activeHunts.map(h =>
-      h.id === huntId
-        ? { ...h, checks: Math.max(0, h.checks - incrementValue) } // Ensure it doesn't go below 0
-        : h
-    );
-
-    setActiveHunts(updatedActiveHunts);
-
-    // Save immediately for critical actions like decreasing checks
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-  };
-
-  const handleCompleteHunt = (hunt) => {
-    // Open completion modal to get final details
-    setCompletionModal({ show: true, hunt });
-    setCompletionForm({
-      ball: hunt.ball || '',
-      mark: hunt.mark || '',
-      notes: hunt.notes || ''
-    });
-  };
-
-  const handleCompletionConfirm = async () => {
-    if (!completionModal.hunt) return;
-
-    // Validate notes content before proceeding (silent validation - no toast)
-    const validation = validateContent(String(completionForm.notes || ''), 'notes');
-    if (!validation.isValid) {
-      // Don't show toast here since ContentFilterInput already showed it
-      return;
-    }
-
-    // Get the current hunt data from activeHunts (in case it was edited)
-    const currentHunt = activeHunts.find(h => h.id === completionModal.hunt.id);
-    if (!currentHunt) {
-      showMessage('Hunt not found', 'error');
-      return;
-    }
-
-    const hunt = currentHunt;
-    const huntId = hunt.id;
-
-    // Ensure pokemon object has stableId for users with older activeHunts that lack it
-    let workingPokemon = hunt.pokemon;
-    if (!workingPokemon.stableId) {
-      const fullPokemon = allPokemon.find(p => p.id === workingPokemon.id && p.name === workingPokemon.name);
-      if (fullPokemon && fullPokemon.stableId) {
-        workingPokemon = { ...workingPokemon, stableId: fullPokemon.stableId };
-      } else {
-        showMessage('Error: Could not determine stable ID for this Pokemon', 'error');
-        return;
-      }
-    }
-
-    // Create the caught entry with completion details
-    const caughtEntry = {
-      date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
-      ball: completionForm.ball || "",
-      mark: completionForm.mark || "",
-      game: hunt.game,
-      method: hunt.method,
-      checks: hunt.checks || "",
-      time: totalCheckTimes[huntId] || 0, // Store time in milliseconds
-      notes: completionForm.notes || "",
-      entryId: Math.random().toString(36).substr(2, 9),
-      modifiers: hunt.modifiers || {}, // Store modifiers with the entry
-      isHuntTracker: true // Flag to identify this was completed from the tracker
-    };
-
-    // Get the caught key for this Pokemon - all hunts in the Counters page are shiny hunts
-    const caughtKey = getCaughtKey(workingPokemon, null, true); // Always true since this is a shiny hunting tracker
-
-    // First, fetch existing caught data from the database
-    try {
-      const { fetchCaughtData } = await import('../api/caught');
-      const existingCaughtData = await fetchCaughtData(username);
-      const existingCaughtInfo = existingCaughtData[caughtKey] || null;
-
-      // Create or update caught info
-      let updatedCaughtInfo;
-      if (existingCaughtInfo && existingCaughtInfo.entries) {
-        // Pokemon is already caught, add new entry
-        updatedCaughtInfo = {
-          ...existingCaughtInfo,
-          caught: true,
-          caughtAt: Date.now(),
-          entries: [...existingCaughtInfo.entries, caughtEntry]
-        };
-      } else {
-        // Pokemon is not caught yet, create new caught info
-        updatedCaughtInfo = {
-          caught: true,
-          caughtAt: Date.now(),
-          entries: [caughtEntry]
-        };
-      }
-
-      // Save to database using the same system as the main grid
-      const { updateCaughtData } = await import('../api/caught');
-      await updateCaughtData(username, caughtKey, updatedCaughtInfo);
-
-      // Dispatch custom event to notify other components of caught data change
-      window.dispatchEvent(new CustomEvent('caughtDataChanged', {
-        detail: {
-          pokemon: workingPokemon,
-          caughtInfo: updatedCaughtInfo,
-          caughtKey: caughtKey
-        }
-      }));
-    } catch (error) {
-      console.error('Failed to save caught data to database:', error);
-      showMessage('Failed to save to collection', 'error');
-      return; // Don't proceed with hunt cleanup if save failed
-    }
-
-    // Remove from active hunts
-    const updatedActiveHunts = activeHunts.filter(h => h.id !== huntId);
-    const updatedTotalCheckTimes = { ...totalCheckTimes };
-    delete updatedTotalCheckTimes[huntId];
-    const updatedLastCheckTimes = { ...lastCheckTimes };
-    delete updatedLastCheckTimes[huntId];
-    const updatedHuntTimers = { ...huntTimers };
-    delete updatedHuntTimers[huntId];
-    const updatedHuntIncrements = { ...huntIncrements };
-    delete updatedHuntIncrements[huntId];
-    const updatedPausedHunts = new Set(pausedHunts);
-    updatedPausedHunts.delete(huntId);
-
-    setActiveHunts(updatedActiveHunts);
-    setTotalCheckTimes(updatedTotalCheckTimes);
-    setLastCheckTimes(updatedLastCheckTimes);
-    setHuntTimers(updatedHuntTimers);
-    setHuntIncrements(updatedHuntIncrements);
-    setPausedHunts(updatedPausedHunts);
-
-    // Save the updated hunt data to the database immediately
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(updatedHuntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(updatedPausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(updatedHuntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-
-    // Refresh history so the newly completed hunt immediately shows up
-    loadHuntHistory();
-
-    // Close modal with animation
-    setCompletionModalClosing(true);
-    setTimeout(() => {
-      setCompletionModal({ show: false, hunt: null });
-      setCompletionModalClosing(false);
-      setCompletionForm({ ball: '', mark: '', notes: '' });
-      showMessage(`${formatPokemonName(hunt.pokemon.name)} hunt completed and added to collection!`, "success");
-    }, 300);
-  };
-
-  const handleDeleteHunt = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    setDeleteModal({ show: true, hunt });
-  };
-
-  const handleDeleteConfirm = () => {
-    if (!deleteModal.hunt) return;
-
-    const huntId = deleteModal.hunt.id;
-
-    // Apply deletion immediately
-    const updatedActiveHunts = activeHunts.filter(h => h.id !== huntId);
-    const updatedTotalCheckTimes = { ...totalCheckTimes };
-    delete updatedTotalCheckTimes[huntId];
-    const updatedLastCheckTimes = { ...lastCheckTimes };
-    delete updatedLastCheckTimes[huntId];
-    const updatedHuntTimers = { ...huntTimers };
-    delete updatedHuntTimers[huntId];
-    const updatedHuntIncrements = { ...huntIncrements };
-    delete updatedHuntIncrements[huntId];
-    const updatedPausedHunts = new Set(pausedHunts);
-    updatedPausedHunts.delete(huntId);
-
-    setActiveHunts(updatedActiveHunts);
-    setTotalCheckTimes(updatedTotalCheckTimes);
-    setCurrentBottomTimers(prev => {
-      const newTimers = { ...prev };
-      delete newTimers[huntId];
-      return newTimers;
-    });
-    setLastCheckTimes(updatedLastCheckTimes);
-    setHuntTimers(updatedHuntTimers);
-    setHuntIncrements(updatedHuntIncrements);
-    setPausedHunts(updatedPausedHunts);
-
-    // Save the updated hunt data to the database immediately
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(updatedHuntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(updatedPausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(updatedHuntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-
-    // Close modal with animation
-    setDeleteModalClosing(true);
-    setTimeout(() => {
-      setDeleteModal({ show: false, hunt: null });
-      setDeleteModalClosing(false);
-      showMessage("Hunt deleted", "info");
-    }, 300);
-  };
-
-  const handleInfoHunt = (huntId) => {
-    setExpandedHunts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(huntId)) {
-        newSet.delete(huntId);
-      } else {
-        newSet.add(huntId);
-      }
-      return newSet;
-    });
-  };
-
-  const handleResetHunt = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    setResetModal({ show: true, hunt });
-  };
-
-  const handleResetConfirm = () => {
-    if (!resetModal.hunt) return;
-
-    setResetModalClosing(true);
-    setTimeout(() => {
-      const now = Date.now();
-      const huntId = resetModal.hunt.id;
-
-      // Compute updated values before setting state
-      const updatedActiveHunts = activeHunts.map(hunt =>
-        hunt.id === huntId ? { ...hunt, checks: 0 } : hunt
-      );
-      const updatedTotalCheckTimes = { ...totalCheckTimes, [huntId]: 0 };
-      const updatedLastCheckTimes = { ...lastCheckTimes, [huntId]: now };
-
-      setActiveHunts(updatedActiveHunts);
-      setTotalCheckTimes(updatedTotalCheckTimes);
-      setCurrentBottomTimers(prev => ({ ...prev, [huntId]: 0 }));
-      setLastCheckTimes(updatedLastCheckTimes);
-
-      // Save immediately with the updated data
-      if (username) {
-        const huntData = {
-          activeHunts: updatedActiveHunts,
-          huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-          lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
-          totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-          pausedHunts: Array.from(pausedHunts),
-          huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-        };
-        saveHuntData(huntData);
-      }
-
-      setResetModal({ show: false, hunt: null });
-      setResetModalClosing(false);
-      showMessage("Hunt reset", "info");
-    }, 300);
-  };
-
-  const handleBottomTimerUpdate = useCallback((huntId, timeInMs) => {
-    setCurrentBottomTimers(prev => ({ ...prev, [huntId]: timeInMs }));
-  }, []);
-
-  const handleSettingsHunt = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    setSettingsModal({ show: true, hunt });
-    setSettingsForm({
-      manualChecks: hunt.checks.toString(),
-      manualTotalTime: formatTime(totalCheckTimes[huntId] || 0),
-      manualIncrements: (huntIncrements[huntId] || 1).toString()
-    });
-  };
-
-  const handleEditHunt = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    setEditModal({ show: true, hunt });
-    // Mark that we're opening the modal (not a manual game change)
-    editModalJustOpenedRef.current = true;
-    setEditForm({
-      game: hunt.game || '',
-      method: hunt.method || '',
-      pokemon: hunt.pokemon || null,
-      modifiers: hunt.modifiers || {
-        shinyCharm: false,
-        shinyParents: false,
-        lureActive: false,
-        researchLv10: false,
-        perfectResearch: false,
-        sparklingLv1: false,
-        sparklingLv2: false,
-        sparklingLv3: false,
-        eventBoosted: false,
-        communityDay: false,
-        raidDay: false,
-        researchDay: false,
-        galarBirds: false,
-        hatchDay: false
-      }
-    });
-  };
-
-  const handleSettingsConfirm = () => {
-    if (!settingsModal.hunt) return;
-
-    const huntId = settingsModal.hunt.id;
-
-    // Parse and apply manual checks
-    const newChecks = parseInt(settingsForm.manualChecks) || 0;
-
-    // Parse and apply manual total time (convert from "1h 2m 3s" format to milliseconds)
-    const timeStr = settingsForm.manualTotalTime;
-    let totalMs = 0;
-    if (timeStr) {
-      const hours = (timeStr.match(/(\d+)h/) || [0, 0])[1];
-      const minutes = (timeStr.match(/(\d+)m/) || [0, 0])[1];
-      const seconds = (timeStr.match(/(\d+)s/) || [0, 0])[1];
-      totalMs = (parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds)) * 1000;
-    }
-
-    // Parse and apply manual increments (default to 1 if invalid)
-    const newIncrements = parseInt(settingsForm.manualIncrements) || 1;
-
-    // Compute updated values before setting state
-    const updatedActiveHunts = activeHunts.map(hunt =>
-      hunt.id === huntId ? { ...hunt, checks: newChecks } : hunt
-    );
-    const updatedTotalCheckTimes = { ...totalCheckTimes, [huntId]: totalMs };
-    const updatedHuntIncrements = { ...huntIncrements, [huntId]: newIncrements };
-
-    // Apply changes to state
-    setActiveHunts(updatedActiveHunts);
-    setTotalCheckTimes(updatedTotalCheckTimes);
-    setHuntIncrements(updatedHuntIncrements);
-
-    // Save immediately with the updated data (must pass explicitly to avoid stale closure values)
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(updatedHuntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-
-    // Close modal with animation
-    setSettingsModalClosing(true);
-    setTimeout(() => {
-      setSettingsModal({ show: false, hunt: null });
-      setSettingsModalClosing(false);
-      showMessage("Hunt settings updated", "success");
-    }, 300);
-  };
-
-  const handleEditConfirm = () => {
-    if (!editModal.hunt) return;
-
-    const huntId = editModal.hunt.id;
-
-    // Calculate new odds based on the updated game, method, and modifiers
-    const newOdds = editForm.game && editForm.method
-      ? calculateOdds(editForm.game, editForm.method, editForm.modifiers)
-      : null;
-
-    // Update the hunt with new game, method, pokemon, modifiers, and recalculated odds
-    const updatedActiveHunts = activeHunts.map(hunt =>
-      hunt.id === huntId ? {
-        ...hunt,
-        game: editForm.game,
-        method: editForm.method,
-        pokemon: editForm.pokemon,
-        modifiers: editForm.modifiers,
-        odds: newOdds
-      } : hunt
-    );
-
-    setActiveHunts(updatedActiveHunts);
-
-    // Save immediately with the updated hunt data
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-
-    // Close modal with animation
-    setEditModalClosing(true);
-    setTimeout(() => {
-      setEditModal({ show: false, hunt: null });
-      setEditModalClosing(false);
-      showMessage("Hunt updated", "success");
-    }, 300);
-  };
-
-  const handlePauseHunt = (huntId) => {
-    const now = Date.now();
-    const lastAction = lastPauseAction.current[huntId];
-
-    // Prevent duplicate calls within 500ms
-    if (lastAction && now - lastAction < 500) {
-      return;
-    }
-
-    lastPauseAction.current[huntId] = now;
-
-    const wasPaused = pausedHunts.has(huntId);
-
-    setPausedHunts(prev => {
-      const newSet = new Set(prev);
-      if (wasPaused) {
-        newSet.delete(huntId);
-      } else {
-        newSet.add(huntId);
-      }
-      return newSet;
-    });
-
-    // Show message after state update
-    if (wasPaused) {
-      showMessage("Hunt resumed", "info");
-    } else {
-      showMessage("Hunt paused", "info");
-    }
-  };
-
-  // Listen for actions coming from popout windows via BroadcastChannel
-  // (placed here so handleAddCheck, handleDecreaseCheck, handlePauseHunt are all defined)
-  useEffect(() => {
-    const channels = {};
-
-    const subscribe = (huntId) => {
-      if (channels[huntId]) return;
-      const ch = new BroadcastChannel(`hunt-popout-${huntId}`);
-      channels[huntId] = ch;
-      ch.onmessage = (e) => {
-        const { type, action } = e.data;
-        if (type !== 'ACTION') return;
-        if (action === 'ADD') handleAddCheck(huntId);
-        if (action === 'MINUS') handleDecreaseCheck(huntId);
-        if (action === 'PAUSE') handlePauseHunt(huntId);
-        if (action === 'RESUME') handlePauseHunt(huntId);
-      };
-    };
-
-    activeHunts.forEach(h => subscribe(h.id));
-
-    return () => {
-      Object.values(channels).forEach(ch => ch.close());
-    };
-  }, [activeHunts, handleAddCheck, handleDecreaseCheck, handlePauseHunt]);
-
-  // Push state updates to active popout windows whenever data changes
-  useEffect(() => {
-    activeHunts.forEach(hunt => {
-      const ch = new BroadcastChannel(`hunt-popout-${hunt.id}`);
-      ch.postMessage({
-        type: "STATE_UPDATE",
-        payload: {
-          checks: hunt.checks,
-          totalTime: totalCheckTimes[hunt.id] || 0,
-          isPaused: pausedHunts.has(hunt.id),
-          lastCheckTime: lastCheckTimes[hunt.id]
-        }
-      });
-      ch.close();
-    });
-  }, [activeHunts, totalCheckTimes, pausedHunts, lastCheckTimes]);
-
-  const formatTime = (milliseconds) => {
-    const seconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-
-    if (hours > 0) {
-      return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
-    } else if (minutes > 0) {
-      return `${minutes}m ${seconds % 60}s`;
-    } else {
-      return `${seconds}s`;
-    }
-  };
-
-  const formatTimeCompact = (milliseconds) => {
-    const seconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-
-    if (hours > 0) {
-      const mins = minutes % 60;
-      return mins > 0 ? `${hours}h${mins}m` : `${hours}h`;
-    } else if (minutes > 0) {
-      return `${minutes}m`;
-    } else {
-      return `${seconds}s`;
-    }
-  };
-
-  const getPokemonImage = (pokemon) => {
-    if (!pokemon) return "";
-
-    // Always show shiny sprites for hunt tracking
-    return pokemon.sprites?.front_shiny || pokemon.sprites?.front_default || "";
-  };
-
-  // Get available methods for selected game
-  const availableMethods = useMemo(() => {
-    if (!huntDetails.game) return [];
-    return getMethodsForGame(huntDetails.game);
-  }, [huntDetails.game]);
-
-  // Get current odds based on selected method and modifiers
   const currentOdds = useMemo(() => {
     if (!huntDetails.game || !huntDetails.method) return "NA";
 
@@ -1463,6 +241,810 @@ export default function Counters() {
     return calculateOdds(huntDetails.game, huntDetails.method, modifiers);
   }, [huntDetails.game, huntDetails.method, modifiers]);
 
+  const [isEditingPokemon, setIsEditingPokemon] = useState(false);
+  const [selectedHuntId, setSelectedHuntId] = useState(null);
+  const [multiCheckEnabled, setMultiCheckEnabled] = useState(false);
+  const [legendColors, setLegendColors] = useState({});
+  const [isSaveOrder, setIsSaveOrder] = useState(false);
+  const [showSecondWave, setShowSecondWave] = useState(true);
+  const [showGhostChecks, setShowGhostChecks] = useState(true);
+  const [isAdvanced, setIsAdvanced] = useState(false);
+  const [secondSpawn, setSecondSpawn] = useState(6);
+
+  const isInitialMount = useRef(true);
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (!username) return;
+    const timer = setTimeout(() => {
+      huntAPI.updateHuntData({
+        mmoSettings: {
+          multiCheckEnabled,
+          legendColors,
+          isSaveOrder,
+          showSecondWave,
+          showGhostChecks,
+          isAdvanced,
+          secondSpawn
+        }
+      });
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [multiCheckEnabled, legendColors, isSaveOrder, showSecondWave, showGhostChecks, isAdvanced, secondSpawn, username]);
+
+
+  const lastPauseAction = useRef({});
+  const prevEditGameRef = useRef(editForm.game);
+  const editModalJustOpenedRef = useRef(false);
+
+  // ── All pokemon list ──────────────────────────────────────────────────────
+  const allPokemon = useMemo(() => {
+    const baseList = pokemonData.map(p => ({
+      ...p,
+      formType: "main",
+      stableId: `${p.name}-main-${String(p.id).padStart(4, '0')}`
+    }));
+
+    const formsList = formsData.map(f => ({
+      ...f,
+      stableId: f.stableId || `${f.name}-${f.formType}-${String(f.id).padStart(4, '0')}`
+    }));
+
+    return [...baseList, ...formsList];
+  }, []);
+
+  const filteredPokemon = useMemo(() => {
+    const legendsArceusIds = gamePokemonData["Legends Arceus"] || [];
+    const alphas = allPokemon.filter(p => {
+      const isAlpha = p.formType && p.formType.toLowerCase().includes("alpha");
+      if (!isAlpha) return false;
+      const formattedId = String(p.id).padStart(4, "0");
+      return legendsArceusIds.includes(formattedId);
+    });
+    if (!searchTerm.trim()) return alphas;
+    const q = searchTerm.toLowerCase();
+    return alphas.filter(p =>
+      p && p.name && (p.name.toLowerCase().includes(q) || String(p.id).includes(q))
+    );
+  }, [allPokemon, searchTerm]);
+
+  // ── Only permutation hunts from Legends Arceus ────────────────────────────
+  const permutationHunts = useMemo(() =>
+    activeHunts.filter(h => h.game === "Legends Arceus" && h.method === "Permutations"),
+    [activeHunts]
+  );
+
+  useEffect(() => {
+    if (selectedHuntId && !permutationHunts.find(h => h.id === selectedHuntId)) {
+      setSelectedHuntId(null);
+    }
+  }, [permutationHunts, selectedHuntId]);
+
+
+  // ── Save hunt data ────────────────────────────────────────────────────────
+  const saveHuntData = useCallback(async (override = null) => {
+    if (!username) return;
+    const now = Date.now();
+    if (!override && now - lastSaveTime.current < 500) return;
+    lastSaveTime.current = now;
+    try {
+      const data = override || {
+        activeHunts,
+        huntTimers: Object.fromEntries(Object.entries(huntTimers)),
+        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes)),
+        totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes)),
+        pausedHunts: Array.from(pausedHunts),
+        huntIncrements: Object.fromEntries(Object.entries(huntIncrements)),
+      };
+      await huntAPI.updateHuntData(data);
+    } catch {
+      showMessage('Failed to save hunt data', 'error');
+    }
+  }, [username, activeHunts, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements, showMessage]);
+
+  // ── Load on mount ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!username) return;
+    (async () => {
+      try {
+        const data = await huntAPI.getHuntData();
+        if (data.activeHunts) {
+          setActiveHunts(data.activeHunts.map(h => ({
+            ...h,
+            modifiers: h.modifiers || { shinyCharm: false, researchLv10: false, perfectResearch: false }
+          })));
+        }
+        if (data.huntTimers)      setHuntTimers(data.huntTimers);
+        if (data.lastCheckTimes)  setLastCheckTimes(data.lastCheckTimes);
+        if (data.totalCheckTimes) setTotalCheckTimes(data.totalCheckTimes);
+        if (data.huntIncrements)  setHuntIncrements(data.huntIncrements);
+        if (data.mmoSettings) {
+          if (data.mmoSettings.multiCheckEnabled !== undefined) setMultiCheckEnabled(data.mmoSettings.multiCheckEnabled);
+          if (data.mmoSettings.legendColors) setLegendColors(data.mmoSettings.legendColors);
+          if (data.mmoSettings.isSaveOrder !== undefined) setIsSaveOrder(data.mmoSettings.isSaveOrder);
+          if (data.mmoSettings.showSecondWave !== undefined) setShowSecondWave(data.mmoSettings.showSecondWave);
+          if (data.mmoSettings.showGhostChecks !== undefined) setShowGhostChecks(data.mmoSettings.showGhostChecks);
+          if (data.mmoSettings.isAdvanced !== undefined) setIsAdvanced(data.mmoSettings.isAdvanced);
+          if (data.mmoSettings.secondSpawn !== undefined) setSecondSpawn(data.mmoSettings.secondSpawn);
+        }
+        // Start all paused
+        if (data.activeHunts?.length) {
+          setPausedHunts(new Set(data.activeHunts.map(h => h.id)));
+        }
+      } catch { /* silently ignore */ }
+    })();
+  }, [username]);
+
+  // ── Load profile (shiny charm) ────────────────────────────────────────────
+  useEffect(() => {
+    if (!username) return;
+    profileAPI.getProfile()
+      .then(p => setShinyCharmGames(p.shinyCharmGames || []))
+      .catch(() => {});
+  }, [username]);
+
+  // Auto-set shiny charm when modifiers opened
+  const hasCharmForLA = shinyCharmGames.includes("Legends Arceus");
+
+  // Auto-check/uncheck shiny charm modifier when game is selected or shinyCharmGames changes (new hunt)
+  useEffect(() => {
+    if (huntDetails.game) {
+      const shouldHaveCharm = shinyCharmGames.includes(huntDetails.game);
+      setModifiers(prev => {
+        let changed = false;
+        const newModifiers = { ...prev };
+        
+        if (prev.shinyCharm !== shouldHaveCharm) {
+          newModifiers.shinyCharm = shouldHaveCharm;
+          changed = true;
+        }
+        
+        if (huntDetails.game === "Legends Arceus" && shouldHaveCharm && !prev.researchLv10) {
+          newModifiers.researchLv10 = true;
+          changed = true;
+        }
+        
+        return changed ? newModifiers : prev;
+      });
+    }
+  }, [huntDetails.game, shinyCharmGames]);
+
+  // Auto-check shiny charm modifier ONLY when user manually changes the game in edit modal
+  useEffect(() => {
+    // Skip if this is from the modal opening (not a manual game change)
+    if (editModalJustOpenedRef.current) {
+      editModalJustOpenedRef.current = false;
+      prevEditGameRef.current = editForm.game;
+      return;
+    }
+
+    // Only auto-check if the game actually changed (user action, not data load)
+    if (prevEditGameRef.current !== editForm.game && editForm.game) {
+      prevEditGameRef.current = editForm.game;
+
+      // Only auto-check shiny charm if user has this game in their shiny charm list
+      if (shinyCharmGames.includes(editForm.game)) {
+        setEditForm(prev => {
+          const newModifiers = { ...prev.modifiers, shinyCharm: true };
+          if (editForm.game === "Legends Arceus") {
+            newModifiers.researchLv10 = true;
+          }
+          return {
+            ...prev,
+            modifiers: newModifiers
+          };
+        });
+      }
+    }
+  }, [editForm.game, shinyCharmGames]);
+
+  // ── Body scroll lock while modal open ────────────────────────────────────
+  useEffect(() => {
+    const open = showPokemonModal || showHuntModal || resetModal.show ||
+      deleteModal.show || completionModal.show || editModal.show || settingsModal.show;
+    if (open) {
+      const scrollY = window.scrollY;
+      document.body.dataset.scrollY = scrollY;
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      const saved = parseInt(document.body.dataset.scrollY || '0', 10);
+      window.scrollTo(0, saved);
+    }
+  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, completionModal.show, editModal.show, settingsModal.show]);
+
+  // ── Handlers ──────────────────────────────────────────────────────────────
+  const handleEditHunt = (huntId) => {
+    const hunt = activeHunts.find(h => h.id === huntId);
+    setEditModal({ show: true, hunt });
+    // Mark that we're opening the modal (not a manual game change)
+    editModalJustOpenedRef.current = true;
+    setEditForm({
+      game: hunt.game || '',
+      method: hunt.method || '',
+      pokemon: hunt.pokemon || null,
+      modifiers: hunt.modifiers || {
+        shinyCharm: false,
+        shinyParents: false,
+        lureActive: false,
+        researchLv10: false,
+        perfectResearch: false,
+        sparklingLv1: false,
+        sparklingLv2: false,
+        sparklingLv3: false,
+        eventBoosted: false,
+        communityDay: false,
+        raidDay: false,
+        researchDay: false,
+        galarBirds: false,
+        hatchDay: false
+      }
+    });
+  };
+
+  const handleEditConfirm = () => {
+    if (!editModal.hunt) return;
+
+    const huntId = editModal.hunt.id;
+
+    // Calculate new odds based on the updated game, method, and modifiers
+    const newOdds = editForm.game && editForm.method
+      ? calculateOdds(editForm.game, editForm.method, editForm.modifiers)
+      : null;
+
+    // Update the hunt with new game, method, pokemon, modifiers, and recalculated odds
+    const updatedActiveHunts = activeHunts.map(hunt =>
+      hunt.id === huntId ? {
+        ...hunt,
+        game: editForm.game,
+        method: editForm.method,
+        pokemon: editForm.pokemon,
+        modifiers: editForm.modifiers,
+        odds: newOdds
+      } : hunt
+    );
+
+    setActiveHunts(updatedActiveHunts);
+
+    // Save immediately with the updated hunt data
+    if (username) {
+      const huntData = {
+        activeHunts: updatedActiveHunts,
+        huntTimers: Object.fromEntries(Object.entries(huntTimers)),
+        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes)),
+        totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes)),
+        pausedHunts: Array.from(pausedHunts),
+        huntIncrements: Object.fromEntries(Object.entries(huntIncrements))
+      };
+      saveHuntData(huntData);
+    }
+
+    // Close modal with animation
+    setEditModalClosing(true);
+    setTimeout(() => {
+      setEditModal({ show: false, hunt: null });
+      setEditModalClosing(false);
+      showMessage("Hunt updated", "success");
+    }, 300);
+  };
+
+  const handleAddHunt = () => {
+    setIsEditingPokemon(false);
+    setSelectedPokemon(null);
+    setEditForm({
+      game: "Legends Arceus",
+      method: "Permutations",
+      odds: 4096,
+      charms: 0,
+      shinyCharm: false,
+      lure: false,
+      modifiers: {}
+    });
+    setHuntDetails({
+      game: "Legends Arceus",
+      method: "Permutations",
+      modifiers: {}
+    });
+    setHuntModalClosing(false);
+    setPokemonModalClosing(false);
+    setBackdropClosing(false);
+    setShowPokemonModal(true);
+  };
+
+  const handlePokemonSelect = (pokemon) => {
+    if (pokemonModalClosing) return;
+    setSelectedPokemon(pokemon);
+    setPokemonModalClosing(true);
+    setTimeout(() => {
+      setShowPokemonModal(false);
+      setPokemonModalClosing(false);
+      setShowHuntModal(true);
+    }, 280);
+  };
+
+  const handleStartHunt = () => {
+    if (!selectedPokemon || huntModalClosing) return;
+
+    // Calculate the odds for this hunt
+    const huntOdds = huntDetails.game && huntDetails.method
+      ? calculateOdds(huntDetails.game, huntDetails.method, modifiers)
+      : null; // Use null to indicate no odds available
+
+    const startTime = Date.now();
+    const huntId = startTime;
+
+    const newHunt = {
+      id: huntId,
+      pokemon: selectedPokemon,
+      game: huntDetails.game,
+      ball: huntDetails.ball,
+      mark: huntDetails.mark,
+      method: huntDetails.method,
+      notes: huntDetails.notes,
+      checks: 0,
+      odds: huntOdds,
+      startDate: new Date().toISOString(),
+      startTime: startTime,
+      increment: 1,
+      modifiers: { ...modifiers } // Store modifiers with each hunt
+    };
+
+    const updatedActiveHunts = [...activeHunts, newHunt];
+    const updatedHuntTimers = { ...huntTimers, [huntId]: startTime };
+    const updatedLastCheckTimes = { ...lastCheckTimes, [huntId]: startTime };
+    const updatedTotalCheckTimes = { ...totalCheckTimes, [huntId]: 0 };
+    const updatedHuntIncrements = { ...huntIncrements, [huntId]: 1 };
+    const updatedPausedHunts = new Set([...pausedHunts, huntId]);
+
+    setActiveHunts(updatedActiveHunts);
+    setHuntTimers(updatedHuntTimers);
+    setLastCheckTimes(updatedLastCheckTimes);
+    setTotalCheckTimes(updatedTotalCheckTimes);
+    setHuntIncrements(updatedHuntIncrements);
+    setPausedHunts(updatedPausedHunts);
+
+    // Save immediately with updated state
+    if (username) {
+      const huntData = {
+        activeHunts: updatedActiveHunts,
+        huntTimers: Object.fromEntries(Object.entries(updatedHuntTimers).map(([k, v]) => [k, v])),
+        lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
+        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
+        pausedHunts: Array.from(updatedPausedHunts),
+        huntIncrements: Object.fromEntries(Object.entries(updatedHuntIncrements).map(([k, v]) => [k, v]))
+      };
+      saveHuntData(huntData);
+    }
+
+    // Close hunt modal with animation
+    setHuntModalClosing(true);
+    setBackdropClosing(true);
+    setTimeout(() => {
+      setShowHuntModal(false);
+      setHuntModalClosing(false);
+      setBackdropClosing(false);
+
+      // Reset form states after animation completes
+      setHuntDetails({
+        game: "Legends Arceus",
+        ball: "",
+        mark: "",
+        method: "Permutations",
+        notes: ""
+      });
+      setModifiers({
+        shinyCharm: false,
+        shinyParents: false,
+        lureActive: false,
+        researchLv10: false,
+        perfectResearch: false,
+        sparklingLv1: false,
+        sparklingLv2: false,
+        sparklingLv3: false,
+        eventBoosted: false,
+        communityDay: false,
+        raidDay: false,
+        researchDay: false,
+        galarBirds: false,
+        hatchDay: false
+      });
+      setSelectedPokemon(null);
+      showMessage("Hunt started!", "success");
+    }, 300);
+  };
+
+  const handleAddCheck = useCallback((huntId) => {
+    const now = Date.now();
+    const isPaused = pausedHunts.has(huntId);
+    const bottomTimerValue = currentBottomTimers[huntId] || 0;
+    const timeToAdd = isPaused ? 0 : bottomTimerValue;
+    const increment = huntIncrements[huntId] || 1;
+
+    const updatedHunts = activeHunts.map(h =>
+      h.id === huntId ? { ...h, checks: h.checks + increment } : h
+    );
+    const updatedLastCheck  = { ...lastCheckTimes,  [huntId]: now };
+    const updatedTotalTimes = { ...totalCheckTimes, [huntId]: (totalCheckTimes[huntId] || 0) + timeToAdd };
+
+    setActiveHunts(updatedHunts);
+    setLastCheckTimes(updatedLastCheck);
+    setTotalCheckTimes(updatedTotalTimes);
+
+    if (username) {
+      saveHuntData({
+        activeHunts: updatedHunts,
+        huntTimers: { ...huntTimers },
+        lastCheckTimes: { ...updatedLastCheck },
+        totalCheckTimes: { ...updatedTotalTimes },
+        pausedHunts: Array.from(pausedHunts),
+        huntIncrements: { ...huntIncrements },
+      });
+    }
+  }, [activeHunts, pausedHunts, currentBottomTimers, huntIncrements, lastCheckTimes, totalCheckTimes, huntTimers, username, saveHuntData]);
+
+  const handleChartConfigUpdate = useCallback((newConfig) => {
+    if (!selectedHuntId) return;
+
+    if (newConfig.isSaveOrder !== undefined) setIsSaveOrder(newConfig.isSaveOrder);
+    if (newConfig.showSecondWave !== undefined) setShowSecondWave(newConfig.showSecondWave);
+    if (newConfig.showGhostChecks !== undefined) setShowGhostChecks(newConfig.showGhostChecks);
+    if (newConfig.isAdvanced !== undefined) setIsAdvanced(newConfig.isAdvanced);
+    if (newConfig.secondSpawn !== undefined) setSecondSpawn(newConfig.secondSpawn);
+
+    const updatedHunts = activeHunts.map(h => 
+      h.id === selectedHuntId ? { ...h, chartConfig: newConfig } : h
+    );
+    setActiveHunts(updatedHunts);
+    if (username) {
+      saveHuntData({ activeHunts: updatedHunts, huntTimers: { ...huntTimers }, lastCheckTimes: { ...lastCheckTimes }, totalCheckTimes: { ...totalCheckTimes }, pausedHunts: Array.from(pausedHunts), huntIncrements: { ...huntIncrements } });
+    }
+  }, [selectedHuntId, activeHunts, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements, username, saveHuntData]);
+
+  const handleChartUpdate = useCallback((newChartData) => {
+    if (!selectedHuntId) return;
+    const updatedHunts = activeHunts.map(h => 
+      h.id === selectedHuntId ? { ...h, chartData: newChartData } : h
+    );
+    setActiveHunts(updatedHunts);
+    // Explicit save
+    if (username) {
+      saveHuntData({
+        activeHunts: updatedHunts,
+        huntTimers: { ...huntTimers },
+        lastCheckTimes: { ...lastCheckTimes },
+        totalCheckTimes: { ...totalCheckTimes },
+        pausedHunts: Array.from(pausedHunts),
+        huntIncrements: { ...huntIncrements },
+      });
+    }
+  }, [selectedHuntId, activeHunts, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements, username, saveHuntData]);
+
+  const handleChartCheck = useCallback((isAdding) => {
+    if (!selectedHuntId) return;
+    const now = Date.now();
+    const isPaused = pausedHunts.has(selectedHuntId);
+    const bottomTimerValue = currentBottomTimers[selectedHuntId] || 0;
+    const timeToAdd = isPaused ? 0 : bottomTimerValue;
+
+    const activeHuntConfig = activeHunts.find(h => h.id === selectedHuntId)?.chartConfig || {};
+    const currentSecondSpawn = activeHuntConfig.secondSpawn ?? 6;
+    const incrementValue = multiCheckEnabled ? currentSecondSpawn : 1;
+
+    const updatedHunts = activeHunts.map(h => {
+      if (h.id !== selectedHuntId) return h;
+      const newChecks = isAdding ? h.checks + incrementValue : Math.max(0, h.checks - incrementValue);
+      return { ...h, checks: newChecks };
+    });
+
+    const updatedLastCheck = { ...lastCheckTimes, [selectedHuntId]: now };
+    const updatedTotalTimes = { ...totalCheckTimes, [selectedHuntId]: (totalCheckTimes[selectedHuntId] || 0) + timeToAdd };
+
+    setActiveHunts(updatedHunts);
+    if (isAdding) {
+      setLastCheckTimes(updatedLastCheck);
+      setTotalCheckTimes(updatedTotalTimes);
+    }
+
+    if (username) {
+      saveHuntData({
+        activeHunts: updatedHunts,
+        huntTimers: { ...huntTimers },
+        lastCheckTimes: isAdding ? { ...updatedLastCheck } : { ...lastCheckTimes },
+        totalCheckTimes: isAdding ? { ...updatedTotalTimes } : { ...totalCheckTimes },
+        pausedHunts: Array.from(pausedHunts),
+        huntIncrements: { ...huntIncrements },
+      });
+    }
+  }, [selectedHuntId, activeHunts, pausedHunts, currentBottomTimers, lastCheckTimes, totalCheckTimes, huntTimers, username, saveHuntData, huntIncrements, multiCheckEnabled]);
+
+  const handleDecreaseCheck = useCallback((huntId) => {
+    const hunt = activeHunts.find(h => h.id === huntId);
+    if (!hunt || hunt.checks <= 0) return;
+    const increment = huntIncrements[huntId] || 1;
+    const updatedHunts = activeHunts.map(h =>
+      h.id === huntId ? { ...h, checks: Math.max(0, h.checks - increment) } : h
+    );
+    setActiveHunts(updatedHunts);
+    if (username) {
+      saveHuntData({
+        activeHunts: updatedHunts,
+        huntTimers: { ...huntTimers },
+        lastCheckTimes: { ...lastCheckTimes },
+        totalCheckTimes: { ...totalCheckTimes },
+        pausedHunts: Array.from(pausedHunts),
+        huntIncrements: { ...huntIncrements },
+      });
+    }
+  }, [activeHunts, huntIncrements, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, username, saveHuntData]);
+
+  const handlePauseHunt = useCallback((huntId) => {
+    const now = Date.now();
+    const last = lastPauseAction.current[huntId];
+    if (last && now - last < 500) return;
+    lastPauseAction.current[huntId] = now;
+    const wasPaused = pausedHunts.has(huntId);
+    setPausedHunts(prev => {
+      const s = new Set(prev);
+      wasPaused ? s.delete(huntId) : s.add(huntId);
+      return s;
+    });
+    showMessage(wasPaused ? "Hunt resumed" : "Hunt paused", "info");
+  }, [pausedHunts, showMessage]);
+
+  const handleResetHunt = (huntId) => {
+    const hunt = activeHunts.find(h => h.id === huntId);
+    setResetModal({ show: true, hunt });
+  };
+
+  const handleResetConfirm = () => {
+    if (!resetModal.hunt) return;
+    setResetModalClosing(true);
+    setTimeout(() => {
+      const now = Date.now();
+      const huntId = resetModal.hunt.id;
+      const updatedHunts      = activeHunts.map(h => h.id === huntId ? { ...h, checks: 0 } : h);
+      const updatedLastCheck  = { ...lastCheckTimes,  [huntId]: now };
+      const updatedTotalTimes = { ...totalCheckTimes, [huntId]: 0 };
+      setActiveHunts(updatedHunts);
+      setLastCheckTimes(updatedLastCheck);
+      setTotalCheckTimes(updatedTotalTimes);
+      setCurrentBottomTimers(p => ({ ...p, [huntId]: 0 }));
+      if (username) {
+        saveHuntData({
+          activeHunts: updatedHunts,
+          huntTimers: { ...huntTimers },
+          lastCheckTimes: { ...updatedLastCheck },
+          totalCheckTimes: { ...updatedTotalTimes },
+          pausedHunts: Array.from(pausedHunts),
+          huntIncrements: { ...huntIncrements },
+        });
+      }
+      setResetModal({ show: false, hunt: null });
+      setResetModalClosing(false);
+      showMessage("Hunt reset", "info");
+    }, 280);
+  };
+
+  const handleDeleteHunt = (huntId) => {
+    const hunt = activeHunts.find(h => h.id === huntId);
+    setDeleteModal({ show: true, hunt });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deleteModal.hunt) return;
+    const huntId = deleteModal.hunt.id;
+
+    const updatedHunts      = activeHunts.filter(h => h.id !== huntId);
+    const updatedLastCheck  = { ...lastCheckTimes };  delete updatedLastCheck[huntId];
+    const updatedTotalTimes = { ...totalCheckTimes }; delete updatedTotalTimes[huntId];
+    const updatedTimers     = { ...huntTimers };       delete updatedTimers[huntId];
+    const updatedIncrements = { ...huntIncrements };   delete updatedIncrements[huntId];
+    const updatedPaused     = new Set(pausedHunts);    updatedPaused.delete(huntId);
+
+    setActiveHunts(updatedHunts);
+    setLastCheckTimes(updatedLastCheck);
+    setTotalCheckTimes(updatedTotalTimes);
+    setHuntTimers(updatedTimers);
+    setHuntIncrements(updatedIncrements);
+    setPausedHunts(updatedPaused);
+    setCurrentBottomTimers(p => { const n = { ...p }; delete n[huntId]; return n; });
+
+    if (username) {
+      saveHuntData({
+        activeHunts: updatedHunts,
+        huntTimers: updatedTimers,
+        lastCheckTimes: updatedLastCheck,
+        totalCheckTimes: updatedTotalTimes,
+        pausedHunts: Array.from(updatedPaused),
+        huntIncrements: updatedIncrements,
+      });
+    }
+
+    setDeleteModalClosing(true);
+    setTimeout(() => {
+      setDeleteModal({ show: false, hunt: null });
+      setDeleteModalClosing(false);
+      showMessage("Hunt deleted", "info");
+    }, 280);
+  };
+
+  const handleSettingsHunt = (huntId) => {
+    const hunt = activeHunts.find(h => h.id === huntId);
+    setSettingsModal({ show: true, hunt });
+    setSettingsForm({
+      manualChecks: hunt.checks.toString(),
+      manualTotalTime: formatTime(totalCheckTimes[huntId] || 0),
+      manualIncrements: (huntIncrements[huntId] || 1).toString(),
+    });
+  };
+
+  const handleSettingsConfirm = () => {
+    if (!settingsModal.hunt) return;
+    const huntId = settingsModal.hunt.id;
+    const newChecks = parseInt(settingsForm.manualChecks) || 0;
+    const timeStr = settingsForm.manualTotalTime;
+    let totalMs = 0;
+    if (timeStr) {
+      const h = (timeStr.match(/(\d+)h/) || [0,0])[1];
+      const m = (timeStr.match(/(\d+)m/) || [0,0])[1];
+      const s = (timeStr.match(/(\d+)s/) || [0,0])[1];
+      totalMs = (parseInt(h)*3600 + parseInt(m)*60 + parseInt(s)) * 1000;
+    }
+    const newIncrements = parseInt(settingsForm.manualIncrements) || 1;
+
+    const updatedHunts      = activeHunts.map(h => h.id === huntId ? { ...h, checks: newChecks } : h);
+    const updatedTotalTimes = { ...totalCheckTimes, [huntId]: totalMs };
+    const updatedIncrements = { ...huntIncrements,  [huntId]: newIncrements };
+
+    setActiveHunts(updatedHunts);
+    setTotalCheckTimes(updatedTotalTimes);
+    setHuntIncrements(updatedIncrements);
+
+    if (username) {
+      saveHuntData({
+        activeHunts: updatedHunts,
+        huntTimers: { ...huntTimers },
+        lastCheckTimes: { ...lastCheckTimes },
+        totalCheckTimes: updatedTotalTimes,
+        pausedHunts: Array.from(pausedHunts),
+        huntIncrements: updatedIncrements,
+      });
+    }
+
+    setSettingsModalClosing(true);
+    setTimeout(() => {
+      setSettingsModal({ show: false, hunt: null });
+      setSettingsModalClosing(false);
+      showMessage("Hunt settings updated", "success");
+    }, 280);
+  };
+
+  const handleCompleteHunt = (hunt) => {
+    setCompletionModal({ show: true, hunt });
+    setCompletionForm({ ball: hunt.ball || '', mark: hunt.mark || '', notes: hunt.notes || '' });
+  };
+
+  const handleCompletionConfirm = async () => {
+    if (!completionModal.hunt) return;
+    const validation = validateContent(String(completionForm.notes || ''), 'notes');
+    if (!validation.isValid) return;
+
+    const hunt = activeHunts.find(h => h.id === completionModal.hunt.id);
+    if (!hunt) { showMessage('Hunt not found', 'error'); return; }
+
+    let workingPokemon = hunt.pokemon;
+    if (!workingPokemon.stableId) {
+      const full = allPokemon.find(p => p.id === workingPokemon.id && p.name === workingPokemon.name);
+      if (full?.stableId) workingPokemon = { ...workingPokemon, stableId: full.stableId };
+      else { showMessage('Error: Could not determine stable ID', 'error'); return; }
+    }
+
+    const caughtEntry = {
+      date: new Date().toISOString().split('T')[0],
+      ball: completionForm.ball || "",
+      mark: completionForm.mark || "",
+      game: hunt.game,
+      method: hunt.method,
+      checks: hunt.checks || "",
+      time: totalCheckTimes[hunt.id] || 0,
+      notes: completionForm.notes || "",
+      entryId: Math.random().toString(36).substr(2, 9),
+      modifiers: hunt.modifiers || {},
+      isHuntTracker: true,
+      ...(hunt.method === "Permutations" && {
+        chartData: hunt.chartData || {},
+        chartConfig: {
+          firstSpawn: hunt.chartConfig?.firstSpawn ?? 8,
+          secondSpawn: hunt.chartConfig?.secondSpawn ?? secondSpawn,
+          isAdvanced,
+          isSaveOrder,
+          showSecondWave,
+          showGhostChecks,
+          legendColors: legendColors
+        }
+      })
+    };
+
+    const caughtKey = getCaughtKey(workingPokemon, null, true);
+
+    try {
+      const { fetchCaughtData, updateCaughtData } = await import('../api/caught');
+      const existing = await fetchCaughtData(username);
+      const existingInfo = existing[caughtKey] || null;
+
+      const updatedInfo = existingInfo?.entries
+        ? { ...existingInfo, caught: true, caughtAt: Date.now(), entries: [...existingInfo.entries, caughtEntry] }
+        : { caught: true, caughtAt: Date.now(), entries: [caughtEntry] };
+
+      await updateCaughtData(username, caughtKey, updatedInfo);
+      window.dispatchEvent(new CustomEvent('caughtDataChanged', {
+        detail: { pokemon: workingPokemon, caughtInfo: updatedInfo, caughtKey }
+      }));
+    } catch {
+      showMessage('Failed to save to collection', 'error');
+      return;
+    }
+
+    const huntId = hunt.id;
+    const updatedHunts      = activeHunts.filter(h => h.id !== huntId);
+    const updatedLastCheck  = { ...lastCheckTimes };  delete updatedLastCheck[huntId];
+    const updatedTotalTimes = { ...totalCheckTimes }; delete updatedTotalTimes[huntId];
+    const updatedTimers     = { ...huntTimers };       delete updatedTimers[huntId];
+    const updatedIncrements = { ...huntIncrements };   delete updatedIncrements[huntId];
+    const updatedPaused     = new Set(pausedHunts);    updatedPaused.delete(huntId);
+
+    setActiveHunts(updatedHunts);
+    setLastCheckTimes(updatedLastCheck);
+    setTotalCheckTimes(updatedTotalTimes);
+    setHuntTimers(updatedTimers);
+    setHuntIncrements(updatedIncrements);
+    setPausedHunts(updatedPaused);
+
+    if (username) {
+      saveHuntData({
+        activeHunts: updatedHunts,
+        huntTimers: updatedTimers,
+        lastCheckTimes: updatedLastCheck,
+        totalCheckTimes: updatedTotalTimes,
+        pausedHunts: Array.from(updatedPaused),
+        huntIncrements: updatedIncrements,
+      });
+    }
+
+    setCompletionModalClosing(true);
+    setTimeout(() => {
+      setCompletionForm({ ball: '', mark: '', notes: '' });
+      showMessage(`${formatPokemonName(hunt.pokemon.name)} caught and added to collection!`, "success");
+      setCompletionModal({ show: false, hunt: null });
+      setCompletionModalClosing(false);
+    }, 280);
+  };
+
+  const handleInfoHunt = (huntId) => {
+    setExpandedHunts(prev => {
+      const s = new Set(prev);
+      s.has(huntId) ? s.delete(huntId) : s.add(huntId);
+      return s;
+    });
+  };
+
+  const handleBottomTimerUpdate = useCallback((huntId, ms) => {
+    setCurrentBottomTimers(p => ({ ...p, [huntId]: ms }));
+  }, []);
+
+  // ── Computed odds for new hunt modal ──────────────────────────────────────
+  const newHuntOdds = useMemo(() =>
+    calculateOdds("Legends Arceus", "Permutations", modifiers),
+    [modifiers]
+  );
+
+  // ── Ball options for completion (Hisui only) ──────────────────────────────
+  const hisuiBalls = BALL_OPTIONS.filter(b => b.value === "" || HISUIAN_BALLS.includes(b.value));
+
   // Get all available games (use GAME_OPTIONS with images)
   const allGames = useMemo(() => {
     return GAME_OPTIONS;
@@ -1470,388 +1052,301 @@ export default function Counters() {
 
   // Get modifiers for the selected game
   const gameModifiers = useMemo(() => {
+    if (!huntDetails.game) return [];
     return getModifiersForGame(huntDetails.game);
   }, [huntDetails.game]);
 
+  // Get methods for the selected game
+  const availableMethods = useMemo(() => {
+    if (!huntDetails.game) return [];
+    return getMethodsForGame(huntDetails.game);
+  }, [huntDetails.game]);
+
+
+  // ─────────────────────────────────────────────────────────────────────────
   return (
     <>
-      <div className="container page-container counters-page">
-        <div className="counters-header-row">
-          <h1 className="page-title">Hunt Tracker</h1>
-          <div className="counters-header-actions">
-            <div className="hotkey-setting">
-              <span className="hotkey-label">Hotkey:</span>
-              <div
-                className="hotkey-input-container"
-                title="Click and press any key to set the hotkey"
-              >
-                <input
-                  type="text"
-                  className="hotkey-input"
-                  value={hotkey === ' ' ? 'Space' : hotkey}
-                  readOnly
-                  onKeyDown={async (e) => {
-                    e.preventDefault();
-                    const key = e.key;
-                    // Ignore some keys that would be problematic
-                    if (['Escape', 'Tab', 'CapsLock'].includes(key)) return;
-                    setHotkey(key);
-
-                    if (username) {
-                      try {
-                        await profileAPI.updateProfile({ huntHotkey: key });
-                      } catch (error) {
-                        console.error('Failed to save hotkey to profile:', error);
-                      }
-                    }
-                  }}
-                  placeholder="Key"
-                />
-              </div>
-            </div>
-            <button
-              className="hunt-history-btn"
-              onClick={() => {
-                loadHuntHistory();
-                setShowHistoryModal(true);
-              }}
-            >
-              <RotateCcw size={16} />
-              History
-            </button>
+      <div className="container page-container mmo-page">
+        {/* MMO Tool Header */}
+        <div className="mmo-header">
+          <div className="mmo-title-block">
+            <h1 className="mmo-page-title">
+              MMO Tool
+            </h1>
           </div>
         </div>
+
         <div className="app-divider" />
 
-        {/* Active Hunts Section */}
-        <div className="active-hunts-section">
-          <div className="hunts-grid">
-            {activeHunts.map((hunt) => (
-              <div key={hunt.id} className="hunt-card" style={{ position: 'relative' }}>
-                {hunt.method !== "Permutations" && (
-                  <button
-                    className="popout-overlay-btn"
-                    title="Popout hunt window"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(
-                        `/hunt-popout?huntId=${hunt.id}`,
-                        `hunt-popout-${hunt.id}`,
-                        'width=500,height=400,resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,status=no'
-                      );
-                    }}
-                  >
-                    <Maximize2 size={20} />
-                  </button>
-                )}
-                <div className="hunt-header">
-                  {!expandedHunts.has(hunt.id) ? (
-                    // Normal view: Pokemon name and sprite
-                    <>
-                      <div className="hunt-pokemon">
-                        <img
-                          src={getPokemonImage(hunt.pokemon)}
-                          alt={formatPokemonName(hunt.pokemon.name)}
-                          className="hunt-pokemon-image"
-                        />
-                        <div className="hunt-pokemon-info">
-                          <h3>{formatPokemonName(hunt.pokemon.name)}</h3>
-                          {hunt.pokemon.formType && hunt.pokemon.formType !== "main" && (
-                            <div className="hunt-pokemon-form">
-                              {hunt.pokemon.formType === "alpha" || hunt.pokemon.formType === "alphaother"
-                                ? "Alpha"
-                                : hunt.pokemon.formType === "alphaother"
-                                  ? "Alpha Forms"
-                                  : hunt.pokemon.formType === "gmax"
-                                    ? "Gigantamax"
-                                    : hunt.pokemon.formType === "alolan"
-                                      ? "Alolan"
-                                      : hunt.pokemon.formType === "galarian"
-                                        ? "Galarian"
-                                        : hunt.pokemon.formType === "hisuian"
-                                          ? "Hisuian"
-                                          : hunt.pokemon.formType === "paldean"
-                                            ? "Paldean"
-                                            : hunt.pokemon.formType === "therian"
-                                              ? "Therian"
-                                              : hunt.pokemon.formType === "ash-cap" || hunt.pokemon.formType === "partner-cap"
-                                                ? "Partner Cap"
-                                                : hunt.pokemon.formType}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="hunt-actions">
-                        {!expandedHunts.has(hunt.id) ? (
-                          <>
-                            {hunt.method !== "Permutations" && (
-                              <button
-                                onClick={() => handleResetHunt(hunt.id)}
-                                className="hunt-reset-btn"
-                                title="Reset hunt"
-                              >
-                                <RotateCcw size={16} />
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleDeleteHunt(hunt.id)}
-                              className="hunt-delete-btn"
-                              title="Delete hunt"
-                              style={hunt.method === "Permutations" ? { gridColumn: '2', gridRow: '1' } : {}}
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                            {hunt.method !== "Permutations" && (
-                              <button
-                                onClick={() => handleSettingsHunt(hunt.id)}
-                                className="hunt-settings-btn"
-                                title="Hunt settings"
-                              >
-                                <Settings size={16} />
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleInfoHunt(hunt.id)}
-                              className="hunt-info-btn"
-                              title="Show hunt details"
-                              style={hunt.method === "Permutations" ? { gridColumn: '2', gridRow: '2' } : {}}
-                            >
-                              <Info size={16} />
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              onClick={() => handleEditHunt(hunt.id)}
-                              className="hunt-edit-btn"
-                              title="Edit hunt"
-                            >
-                              <Edit size={16} />
-                            </button>
-                            <button
-                              onClick={() => handleInfoHunt(hunt.id)}
-                              className="hunt-info-btn"
-                              title="Hide hunt details"
-                            >
-                              <X size={16} />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </>
-                  ) : (
-                    // Expanded view: Game and method details
-                    <>
-                      <div className="hunt-details">
-                        <div className="hunt-detail-item">Game: {hunt.game || "NA"}</div>
-                        <div className="hunt-detail-item">Method: {hunt.method || "NA"}</div>
-                      </div>
-                      <div className="hunt-actions expanded-view">
-                        <button
-                          onClick={() => handleEditHunt(hunt.id)}
-                          className="hunt-edit-btn"
-                          title="Edit hunt"
-                          style={{ gridColumn: '2', gridRow: '1' }}
-                        >
-                          <Edit size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleInfoHunt(hunt.id)}
-                          className="hunt-info-btn"
-                          title="Hide hunt details"
-                          style={{ gridColumn: '2', gridRow: '2' }}
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {hunt.method === "Permutations" ? (
-                  <div className="hunt-checks mmo-redirect" style={{ padding: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <button
-                      className="mmo-redirect-btn"
-                      onClick={() => navigate('/mmo-tool')}
-                      style={{
-                        width: '100%',
-                        padding: '13px',
-                        fontSize: '1.1rem',
-                        backgroundColor: 'var(--accent)',
-                        color: 'var(--bg-color)',
-                        borderRadius: '8px',
-                        border: 'none',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        transition: 'transform 0.2s, opacity 0.2s',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.opacity = '0.9';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.opacity = '1';
-                      }}
-                    >
-                      <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>Permutation chart</span>
-                    </button>
-                  </div>
-                ) : (
-                  <div className="hunt-checks">
-                    <div className="checks-display">
-                      <span className="checks-count">{hunt.checks}</span>
-                      <button
-                        onClick={() => handleDecreaseCheck(hunt.id)}
-                        className="decrease-check-btn"
-                        title="Decrease check"
-                        disabled={hunt.checks <= 0}
-                      >
-                        <Minus size={12} />
-                      </button>
-                    </div>
-                    <div className="timer-display">
-                      <div className="total-time">
-                        {formatTime(totalCheckTimes[hunt.id] || 0)}
-                      </div>
-                      <div className="last-check-time">
-                        <TimerDisplay
-                          huntId={hunt.id}
-                          lastCheckTime={lastCheckTimes[hunt.id] || huntTimers[hunt.id]}
-                          isPaused={pausedHunts.has(hunt.id)}
-                          onTimeUpdate={handleBottomTimerUpdate}
-                        />
-                      </div>
-                    </div>
-                    <div className="checks-buttons">
-                      <button
-                        onClick={() => handlePauseHunt(hunt.id)}
-                        className="pause-btn"
-                        title={pausedHunts.has(hunt.id) ? "Resume hunt" : "Pause hunt"}
-                      >
-                        {pausedHunts.has(hunt.id) ? <Play size={16} /> : <Pause size={16} />}
-                      </button>
-                      <button
-                        onClick={() => handleDecreaseCheck(hunt.id)}
-                        className="decrease-check-btn"
-                        title="Decrease check"
-                        disabled={hunt.checks <= 0}
-                      >
-                        <Minus size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleAddCheck(hunt.id)}
-                        className="add-check-btn"
-                        title="Add check"
-                      >
-                        <Plus size={16} />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                <div className="hunt-complete">
-                  <div className="hunt-odds-display">
-                    <span className="odds-label">Odds:</span>
-                    <span className="odds-value">
-                      {(() => {
-                        // Special case for Ultra Wormholes in Ultra Sun/Ultra Moon
-                        if (hunt.method === "Ultra Wormholes" && (hunt.game === "Ultra Sun" || hunt.game === "Ultra Moon")) {
-                          return "1% - 36%";
-                        }
-
-                        // Use the hunt's own modifiers instead of global modifiers
-                        // Provide default modifiers if not present (for backward compatibility)
-                        const huntModifiers = hunt.modifiers || {
-                          shinyCharm: false,
-                          shinyParents: false,
-                          lureActive: false,
-                          researchLv10: false,
-                          perfectResearch: false,
-                          sparklingLv1: false,
-                          sparklingLv2: false,
-                          sparklingLv3: false,
-                          eventBoosted: false,
-                          communityDay: false,
-                          raidDay: false,
-                          researchDay: false,
-                          galarBirds: false,
-                          hatchDay: false
-                        };
-
-                        // For Poke Radar in Diamond/Pearl/Platinum, calculate current odds based on chain length
-                        if (hunt.method === "Poke Radar" && (hunt.game === "Diamond" || hunt.game === "Pearl" || hunt.game === "Platinum")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For Poke Radar in X/Y, calculate current odds based on chain length
-                        if (hunt.method === "Poke Radar" && (hunt.game === "X" || hunt.game === "Y")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For Poke Radar in Brilliant Diamond/Shining Pearl, calculate current odds based on chain length
-                        if (hunt.method === "Poke Radar" && (hunt.game === "Brilliant Diamond" || hunt.game === "Shining Pearl")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For Chain Fishing in X/Y, calculate current odds based on streak length
-                        if (hunt.method === "Chain Fishing" && (hunt.game === "X" || hunt.game === "Y")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For Chain Fishing in Omega Ruby/Alpha Sapphire, calculate current odds based on streak length
-                        if (hunt.method === "Chain Fishing" && (hunt.game === "Omega Ruby" || hunt.game === "Alpha Sapphire")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For DexNav in Omega Ruby/Alpha Sapphire, calculate current odds based on search level
-                        if (hunt.method === "DexNav" && (hunt.game === "Omega Ruby" || hunt.game === "Alpha Sapphire")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For SOS method in Sun/Moon and Ultra Sun/Ultra Moon, calculate current odds based on chain length
-                        if (hunt.method === "SOS" && (hunt.game === "Sun" || hunt.game === "Moon" || hunt.game === "Ultra Sun" || hunt.game === "Ultra Moon")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For KO Method in Sword/Shield, calculate current odds based on KO count
-                        if (hunt.method === "KO Method" && (hunt.game === "Sword" || hunt.game === "Shield")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For Catch Combo in Let's Go games, calculate current odds based on combo count
-                        if (hunt.method === "Catch Combo" && (hunt.game === "Let's Go Pikachu" || hunt.game === "Let's Go Eevee")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For Mass Outbreaks in Scarlet/Violet, calculate current odds based on checks cleared
-                        if (hunt.method === "Mass Outbreaks" && (hunt.game === "Scarlet" || hunt.game === "Violet")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For all other methods, use the stored odds
-                        if (hunt.odds === null) {
-                          return "NA";
-                        }
-                        return `1/${hunt.odds || 4096}`;
-                      })()}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => handleCompleteHunt(hunt)}
-                    className="complete-hunt-btn"
-                  >
-                    <Check size={16} />
-                    Complete Hunt
-                  </button>
-                </div>
-              </div>
-            ))}
-
-            {/* Add Hunt Card - always at the end */}
-            <div className="add-hunt-card" onClick={handleAddHunt}>
-              <div className="add-hunt-content">
-                <div className="add-hunt-icon">
-                  <Plus size={32} />
-                </div>
-                <h3>Start New Hunt</h3>
-              </div>
+        <div className="mmo-section-header">
+          <div className="mmo-section-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <div>
+              Active Permutation Hunts
+              <span className="mmo-section-count">{permutationHunts.length}</span>
             </div>
+            <label className="modifier-checkbox" style={{ fontSize: '0.9rem', margin: 0, padding: '4px 10px', backgroundColor: 'var(--bg-color)', borderRadius: '6px' }}>
+              <input
+                type="checkbox"
+                checked={multiCheckEnabled}
+                onChange={(e) => setMultiCheckEnabled(e.target.checked)}
+              />
+              +{activeHunts.find(h => h.id === selectedHuntId)?.chartConfig?.secondSpawn ?? 6} Checks per Chart Click
+            </label>
           </div>
         </div>
+
+        <div className={`hunts-grid ${selectedHuntId ? 'single-hunt-active' : ''}`}>
+          {permutationHunts
+            .filter(hunt => !selectedHuntId || hunt.id === selectedHuntId)
+            .map(hunt => (
+            <div key={hunt.id} className="hunt-card" style={{ position: 'relative' }}>
+              <div className="hunt-header">
+                {!expandedHunts.has(hunt.id) ? (
+                  <>
+                    <div className="hunt-pokemon">
+                      <img
+                        src={getPokemonImage(hunt.pokemon) || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${hunt.pokemon.id}.png`}
+                        alt={formatPokemonName(hunt.pokemon.name)}
+                        className="hunt-pokemon-image"
+                      />
+                      <div className="hunt-pokemon-info">
+                        <h3>{formatPokemonName(hunt.pokemon.name)}</h3>
+                        {hunt.pokemon.formType && hunt.pokemon.formType !== "main" && (
+                          <div className="hunt-pokemon-form">
+                            {hunt.pokemon.formType === "alpha" || hunt.pokemon.formType === "alphaother"
+                              ? "Alpha"
+                              : hunt.pokemon.formType === "gmax"
+                                ? "Gigantamax"
+                                : hunt.pokemon.formType === "alolan"
+                                  ? "Alolan"
+                                  : hunt.pokemon.formType === "galarian"
+                                    ? "Galarian"
+                                    : hunt.pokemon.formType === "hisuian"
+                                      ? "Hisuian"
+                                      : hunt.pokemon.formType === "paldean"
+                                        ? "Paldean"
+                                        : hunt.pokemon.formType === "mega"
+                                          ? "Mega"
+                                          : hunt.pokemon.formType === "primal"
+                                            ? "Primal"
+                                            : hunt.pokemon.formType === "gender"
+                                              ? "Gender"
+                                              : hunt.pokemon.formType === "therian"
+                                                ? "Therian"
+                                                : hunt.pokemon.formType === "ash-cap" || hunt.pokemon.formType === "partner-cap"
+                                                  ? "Partner Cap"
+                                                  : hunt.pokemon.formType}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="hunt-actions">
+                      <button
+                        onClick={() => handleResetHunt(hunt.id)}
+                        className="hunt-reset-btn"
+                        title="Reset hunt"
+                      >
+                        <RotateCcw size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteHunt(hunt.id)}
+                        className="hunt-delete-btn"
+                        title="Delete hunt"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleSettingsHunt(hunt.id)}
+                        className="hunt-settings-btn"
+                        title="Hunt settings"
+                      >
+                        <Settings size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleInfoHunt(hunt.id)}
+                        className="hunt-info-btn"
+                        title="Show hunt details"
+                      >
+                        <Info size={16} />
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="hunt-details">
+                      <div className="hunt-detail-item">Game: {hunt.game || "NA"}</div>
+                      <div className="hunt-detail-item">Method: {hunt.method || "NA"}</div>
+                    </div>
+                    <div className="hunt-actions expanded-view">
+                      <button
+                        onClick={() => handleEditHunt(hunt.id)}
+                        className="hunt-edit-btn"
+                        title="Edit hunt"
+                        style={{ gridColumn: '2', gridRow: '1' }}
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleInfoHunt(hunt.id)}
+                        className="hunt-info-btn"
+                        title="Hide hunt details"
+                        style={{ gridColumn: '2', gridRow: '2' }}
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <div className="hunt-checks">
+                <div className="checks-display">
+                  <span className="checks-count">{hunt.checks}</span>
+                </div>
+                <div className="timer-display">
+                  <div className="total-time">
+                    {formatTime(totalCheckTimes[hunt.id] || 0)}
+                  </div>
+                  <div className="last-check-time">
+                    <TimerDisplay
+                      huntId={hunt.id}
+                      lastCheckTime={lastCheckTimes[hunt.id] || huntTimers[hunt.id]}
+                      isPaused={pausedHunts.has(hunt.id)}
+                      onTimeUpdate={handleBottomTimerUpdate}
+                    />
+                  </div>
+                </div>
+                <div className="checks-buttons">
+                  <button
+                    onClick={() => handlePauseHunt(hunt.id)}
+                    className="pause-btn"
+                    title={pausedHunts.has(hunt.id) ? "Resume hunt" : "Pause hunt"}
+                  >
+                    {pausedHunts.has(hunt.id) ? <Play size={16} /> : <Pause size={16} />}
+                  </button>
+                  <button
+                    onClick={() => handleDecreaseCheck(hunt.id)}
+                    className="decrease-check-btn"
+                    title="Decrease check"
+                    disabled={hunt.checks <= 0}
+                  >
+                    <Minus size={16} />
+                  </button>
+                  <button
+                    onClick={() => setSelectedHuntId(selectedHuntId === hunt.id ? null : hunt.id)}
+                    className="pause-btn"
+                    title={selectedHuntId === hunt.id ? "Unlink from Chart" : "Link to Chart"}
+                    style={{
+                      backgroundColor: selectedHuntId === hunt.id ? '#ff4444' : undefined,
+                      borderColor: selectedHuntId === hunt.id ? '#ff4444' : undefined
+                    }}
+                  >
+                    {selectedHuntId === hunt.id ? <X size={16} strokeWidth={3} color="#ffffff" /> : <Check size={16} strokeWidth={3} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="hunt-complete">
+                <div className="hunt-odds-display">
+                  <span className="odds-label">Odds:</span>
+                  <span className="odds-value">
+                    1/{hunt.odds || 4096}
+                  </span>
+                </div>
+                <button
+                  className="complete-hunt-btn"
+                  onClick={() => handleCompleteHunt(hunt)}
+                  title="Mark as caught"
+                >
+                  <Check size={20} />
+                  Complete Hunt
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {/* ─ Add Hunt Card ─ */}
+          {!selectedHuntId && (
+          <div className="add-hunt-card" onClick={handleAddHunt}>
+            <div className="add-hunt-content">
+              <div className="add-hunt-icon">
+                <Plus size={32} />
+              </div>
+              <h3>Start New Hunt</h3>
+            </div>
+          </div>
+          )}
+        </div>
+
+        {permutationHunts.length === 0 && (
+          <div style={{
+            marginTop: '3rem',
+            marginBottom: '2rem',
+            padding: '3rem 2rem',
+            textAlign: 'center',
+            backgroundColor: 'var(--card-background)',
+            border: '2px dashed var(--border-color)',
+            borderRadius: '16px',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+          }}>
+            <p style={{
+              fontSize: '1.4rem',
+              fontWeight: '600',
+              color: 'var(--text)',
+              margin: 0,
+              letterSpacing: '0.5px'
+            }}>
+              No active permutation hunts - click the card above to start one!
+            </p>
+          </div>
+        )}
+
+        {permutationHunts.length > 0 && !selectedHuntId && (
+          <div style={{
+            marginTop: '3rem',
+            marginBottom: '2rem',
+            padding: '3rem 2rem',
+            textAlign: 'center',
+            backgroundColor: 'var(--card-background)',
+            border: '2px dashed var(--border-color)',
+            borderRadius: '16px',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+          }}>
+            <p style={{
+              fontSize: '1.4rem',
+              fontWeight: '600',
+              color: 'var(--text)',
+              margin: 0,
+              letterSpacing: '0.5px'
+            }}>
+              Select a hunt to show the permutation chart
+            </p>
+          </div>
+        )}
+
+        {/* ── Permutation Table ─────────────────────────────────── */}
+        {selectedHuntId && (() => {
+          const selectedHunt = activeHunts.find(h => h.id === selectedHuntId);
+          return (
+            <div className="mmo-graph-section">
+              <PermutationTable 
+                chartData={selectedHunt?.chartData || {}} 
+                chartConfig={{
+                  firstSpawn: selectedHunt?.chartConfig?.firstSpawn ?? 8,
+                  secondSpawn: selectedHunt?.chartConfig?.secondSpawn ?? secondSpawn,
+                  isAdvanced: isAdvanced,
+                  isSaveOrder: isSaveOrder,
+                  showSecondWave: showSecondWave,
+                  showGhostChecks: showGhostChecks
+                }}
+                legendColors={legendColors}
+                setLegendColors={setLegendColors}
+                onChartUpdate={handleChartUpdate} 
+                onChartConfigUpdate={handleChartConfigUpdate}
+                onChartCheck={handleChartCheck} />
+            </div>
+          );
+        })()}
 
       </div>
 
@@ -2053,7 +1548,9 @@ export default function Counters() {
                       placeholder="Select a game..."
                       customBackground="var(--sidebar-edit-inputs)"
                       customBorder="var(--border-color)"
-                    />
+                    disabled={true}
+                    hideClearButton={true}
+                  />
                   </div>
 
                   <div className="hunt-form-group">
@@ -2090,7 +1587,8 @@ export default function Counters() {
                       placeholder={huntDetails.game ? "Select a method..." : "Select a game first"}
                       customBackground="var(--sidebar-edit-inputs)"
                       customBorder="var(--border-color)"
-                      disabled={!huntDetails.game}
+                      disabled={true}
+                      hideClearButton={true}
                     />
                   </div>
 
@@ -2982,45 +2480,6 @@ export default function Counters() {
                     placeholder="e.g., 1h 30m 45s"
                   />
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Adjust Increments
-                  </label>
-                  <div className="settings-number-input-wrapper">
-                    <input
-                      type="number"
-                      value={settingsForm.manualIncrements}
-                      onChange={(e) => setSettingsForm(prev => ({ ...prev, manualIncrements: e.target.value }))}
-                      className="settings-number-input"
-                      placeholder="Enter increment value (default: 1)"
-                      min="1"
-                    />
-                    <div className="settings-number-buttons">
-                      <button
-                        type="button"
-                        className="settings-number-btn settings-number-btn-up"
-                        onClick={() => setSettingsForm(prev => ({ ...prev, manualIncrements: String(Math.max(1, (parseInt(prev.manualIncrements) || 1) + 1)) }))}
-                      >
-                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
-                          <path d="M5 0L10 6H0L5 0Z" />
-                        </svg>
-                      </button>
-                      <button
-                        type="button"
-                        className="settings-number-btn settings-number-btn-down"
-                        onClick={() => setSettingsForm(prev => ({ ...prev, manualIncrements: String(Math.max(1, (parseInt(prev.manualIncrements) || 1) - 1)) }))}
-                      >
-                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
-                          <path d="M5 6L0 0H10L5 6Z" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-400 mt-1">
-                    How many encounters to add each time you click the + button
-                  </p>
-                </div>
               </div>
 
               <div className="flex gap-3 justify-end">
@@ -3105,6 +2564,8 @@ export default function Counters() {
                     placeholder="Select a game..."
                     customBackground="var(--sidebar-edit-inputs)"
                     customBorder="var(--border-color)"
+                    disabled={true}
+                    hideClearButton={true}
                   />
                 </div>
 
@@ -3125,7 +2586,8 @@ export default function Counters() {
                     placeholder={editForm.game ? "Select a method..." : "Select a game first"}
                     customBackground="var(--sidebar-edit-inputs)"
                     customBorder="var(--border-color)"
-                    disabled={!editForm.game}
+                    disabled={true}
+                    hideClearButton={true}
                   />
                 </div>
 
@@ -3546,7 +3008,7 @@ export default function Counters() {
                       placeholder="Select a mark..."
                       customBackground="var(--sidebar-edit-inputs)"
                       customBorder="var(--border-color)"
-                    />
+                  />
                   </div>
                 )}
 
@@ -3595,150 +3057,6 @@ export default function Counters() {
         document.body
       )}
 
-      {/* Hunt History Modal */}
-      {showHistoryModal && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${historyModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center p-4">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-4xl w-full max-h-[80vh] flex flex-col shadow-xl ${historyModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-[var(--accent)]/20 rounded-full flex items-center justify-center">
-                    <RotateCcw className="w-5 h-5 text-[var(--accent)]" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-[var(--accent)]">Hunt History</h3>
-                    <p className="text-sm text-[var(--progressbar-info)]">View your completed hunts</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setHistoryModalClosing(true);
-                    setTimeout(() => {
-                      setShowHistoryModal(false);
-                      setHistoryModalClosing(false);
-                    }, 300);
-                  }}
-                  className="close-btn"
-                  aria-label="Close"
-                >
-                  <span className="sidebar-close-icon">
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="20" cy="20" r="18" fill="#fff" stroke="#232323" strokeWidth="2" />
-                      <path d="M2 20a18 18 0 0 1 36 0" fill="#e62829" stroke="#232323" strokeWidth="2" />
-                      <rect x="2" y="19" width="36" height="2" fill="#232323" />
-                      <circle cx="20" cy="20" r="7" fill="#ffffffff" stroke="#232323" strokeWidth="2" />
-                    </svg>
-                  </span>
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto px-1 custom-scrollbar">
-                {isLoadingHistory ? (
-                  <div className="flex justify-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)]"></div>
-                  </div>
-                ) : huntHistory.length === 0 ? (
-                  <div className="text-center py-12 text-gray-400">
-                    <p>No completed hunts found in your history yet.</p>
-                  </div>
-                ) : (
-                  <div className="grid gap-4">
-                    {huntHistory.map((hunt, idx) => (
-                      <div key={hunt.entryId || idx} className="history-item">
-                        <div className="history-pokemon">
-                          <img src={hunt.pokemonIcon} alt={hunt.pokemonName} className="history-icon" />
-                          <div className="history-details">
-                            <span className="history-name">{formatPokemonName(hunt.pokemonName)}</span>
-                            <span className="history-meta">{hunt.game} • {hunt.method}</span>
-                          </div>
-                        </div>
-                        <div className="history-stats">
-                          <div className="history-stat">
-                            <span className="history-stat-label">Checks:</span>
-                            <span className="history-stat-value text-[var(--accent)]">{hunt.checks || '-'}</span>
-                          </div>
-                          <div className="history-stat">
-                            <span className="history-stat-label">Time:</span>
-                            <span className="history-stat-value text-blue-400">{formatTimeCompact(hunt.time || 0)}</span>
-                          </div>
-                          <div className="history-stat date-stat">
-                            <span className="history-stat-label">Date:</span>
-                            <span className="history-stat-value opacity-60">{hunt.date}</span>
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemoveFromHistoryClick(hunt.caughtKey, hunt.entryId);
-                            }}
-                            className="hover:bg-black/30 rounded-md transition-colors text-gray-500 hover:text-[var(--accent)] ml-2 history-delete-btn flex items-center justify-center"
-                            title="Remove from history"
-                            style={{ padding: '2px' }}
-                          >
-                            <Trash2 size={20} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* Delete History Item Modal */}
-      {deleteHistoryModal.show && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${deleteHistoryModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${deleteHistoryModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-[var(--accent)]/20 rounded-full flex items-center justify-center">
-                  <Trash2 className="w-5 h-5 text-[var(--accent)]" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--accent)]">Remove from History</h3>
-                  <p className="text-sm text-[var(--progressbar-info)]">This removes the entry from the History List only</p>
-                </div>
-              </div>
-              <p className="text-gray-300 mb-6">
-                Are you sure you want to remove this hunt from your history?
-                (The hunt check data and caught status inside your Living Dex collection will <strong>not</strong> be deleted.)
-              </p>
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setDeleteHistoryModalClosing(true);
-                    setTimeout(() => {
-                      setDeleteHistoryModal({ show: false, caughtKey: null, entryId: null });
-                      setDeleteHistoryModalClosing(false);
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleRemoveFromHistoryConfirm}
-                  className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-    </>
+          </>
   );
 }

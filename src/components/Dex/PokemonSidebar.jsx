@@ -1,8 +1,10 @@
 import { useEffect, useState, useContext, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Sparkles, Plus, Trash2, ChevronLeft, ChevronRight, Calendar, ChevronUp, ChevronDown, X, RotateCcw, ArrowUpCircle } from "lucide-react";
+import { Sparkles, Plus, Trash2, ChevronLeft, ChevronRight, Calendar, ChevronUp, ChevronDown, X, RotateCcw, ArrowUpCircle, ListTodo } from "lucide-react";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS, genderForms } from "../../Constants";
 import EvolutionChain from "../Dex/EvolutionChain";
+import PermutationTable from "../MMO/PermutationTable";
+
 import { getCaughtKey } from "../../caughtStorage";
 import { formatPokemonName, getFormDisplayName, renderTypeBadge, getRelatedForms, findPokemon } from "../../utils";
 
@@ -148,6 +150,9 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   const [deleteEntryModal, setDeleteEntryModal] = useState({ show: false, entryIndex: null, entryNumber: null });
   const [resetModalClosing, setResetModalClosing] = useState(false);
   const [deleteEntryModalClosing, setDeleteEntryModalClosing] = useState(false);
+  const [showChartModal, setShowChartModal] = useState(false);
+  const [chartModalClosing, setChartModalClosing] = useState(false);
+
   const [evolveModal, setEvolveModal] = useState({ show: false, options: [] });
   const [evolveModalClosing, setEvolveModalClosing] = useState(false);
 
@@ -492,6 +497,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
           checks: firstEntry.checks || "",
           time: firstEntry.time || "",
           notes: firstEntry.notes || "",
+          chartData: firstEntry.chartData || null,
+          chartConfig: firstEntry.chartConfig || null,
           entryId: firstEntry.entryId || Math.random().toString(36).substr(2, 9),
           modifiers: firstEntry.modifiers || defaultEditData.modifiers
         });
@@ -507,6 +514,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
           checks: currentEntry.checks || "",
           time: currentEntry.time || "",
           notes: currentEntry.notes || "",
+          chartData: currentEntry.chartData || null,
+          chartConfig: currentEntry.chartConfig || null,
           entryId: currentEntry.entryId || Math.random().toString(36).substr(2, 9),
           modifiers: currentEntry.modifiers || defaultEditData.modifiers
         });
@@ -556,8 +565,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   // Prevent scrolling when modals are open
   useEffect(() => {
     const preventScroll = (e) => {
-      // If we are in the evolve modal, allow scrolling inside the custom-scrollbar only
-      if (evolveModal.show) {
+      // If we are in the evolve modal or chart modal, allow scrolling inside the custom-scrollbar only
+      if (evolveModal.show || showChartModal) {
         if (e.target.closest('.custom-scrollbar')) {
           return; // Let the modal itself scroll normally
         }
@@ -567,7 +576,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       return false;
     };
 
-    const isAnyModalOpen = resetModal.show || deleteEntryModal.show || evolveModal.show;
+    const isAnyModalOpen = resetModal.show || deleteEntryModal.show || evolveModal.show || showChartModal;
 
     if (isAnyModalOpen) {
       document.body.style.overflow = 'hidden';
@@ -584,7 +593,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       document.removeEventListener('wheel', preventScroll);
       document.removeEventListener('touchmove', preventScroll);
     };
-  }, [resetModal.show, deleteEntryModal.show, evolveModal.show]);
+  }, [resetModal.show, deleteEntryModal.show, evolveModal.show, showChartModal]);
 
   // Function to format date from YYYY-MM-DD to MMM DD YYYY format
   function formatDate(dateString) {
@@ -619,6 +628,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
         checks: selectedEntry.checks || "",
         time: selectedEntry.time || "",
         notes: selectedEntry.notes || "",
+        chartData: selectedEntry.chartData || null,
+        chartConfig: selectedEntry.chartConfig || null,
         entryId: selectedEntry.entryId || Math.random().toString(36).substr(2, 9),
         modifiers: selectedEntry.modifiers || defaultEditData.modifiers
       });
@@ -635,6 +646,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       checks: "",
       time: "",
       notes: "",
+      chartData: null,
+      chartConfig: null,
       entryId: Math.random().toString(36).substr(2, 9),
       modifiers: { ...defaultEditData.modifiers }
     };
@@ -2073,8 +2086,20 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                     <div className="sidebar-display-label">Method</div>
                     <div className="sidebar-display-value">{editData.method}</div>
                   </div>
-                  <div className="sidebar-display-icon">
-                    <img src="/data/SidebarIcons/Method.svg" alt="Method" className="w-full h-full object-contain" />
+                  <div className="flex items-center gap-4">
+                    {editData.method === "Permutations" && editData.chartData && (
+                      <button
+                        type="button"
+                        onClick={() => setShowChartModal(true)}
+                        className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#2a2a2a] hover:bg-[#383838] border border-[#444] hover:border-[var(--accent)] text-[var(--accent)] transition-all duration-200 cursor-pointer"
+                        title="View Permutation Chart"
+                      >
+                        <ListTodo size={20} />
+                      </button>
+                    )}
+                    <div className="sidebar-display-icon">
+                      <img src="/data/SidebarIcons/Method.svg" alt="Method" className="w-full h-full object-contain" />
+                    </div>
                   </div>
                 </div>
               )}
@@ -2104,6 +2129,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                     </div>
                   </div>
                 )}
+
+
 
               {showShiny && editData.game && editData.method && (() => {
                 try {
@@ -2149,6 +2176,9 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                   </div>
                 </div>
               )}
+
+
+
 
 
 
@@ -2553,6 +2583,90 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                 >
                   Cancel
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Chart Modal */}
+      {showChartModal && createPortal(
+        <div
+          className={`fixed inset-0 z-[20000] ${chartModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+          onClick={() => {
+            setChartModalClosing(true);
+            setTimeout(() => {
+              setShowChartModal(false);
+              setChartModalClosing(false);
+            }, 300);
+          }}
+        >
+          <div className="bg-black/80 w-full h-full flex items-center justify-center p-4">
+            <div
+              className={`relative bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-4xl w-full max-h-[90vh] flex flex-col shadow-xl ${chartModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6 shrink-0 border-b border-[#444] pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center bg-[var(--sidebar-pokemon-bg)] border border-[var(--accent)]">
+                    <img 
+                      src={pokeImg} 
+                      alt={pokeName} 
+                      className="w-full h-full object-contain image-render-pixelated" 
+                      style={{ imageRendering: 'pixelated' }}
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-[var(--accent)]">Permutation Chart</h3>
+                    <p className="text-sm text-[var(--progressbar-info)]">
+                      {pokemon.formType === 'alpha' || pokemon.formType === 'alphaother' || (pokemon.name && pokemon.name.includes('-alpha')) ? `Alpha ${pokeName}` : pokeName} - Completed Hunt
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setChartModalClosing(true);
+                    setTimeout(() => {
+                      setShowChartModal(false);
+                      setChartModalClosing(false);
+                    }, 300);
+                  }}
+                  className="absolute top-4 right-4 p-1 rounded-full transition-all duration-200 z-10"
+                  style={{ background: 'none', border: 'none' }}
+                  title="Close Chart"
+                >
+                  <span className="flex items-center justify-center">
+                    <svg
+                      width="40"
+                      height="40"
+                      viewBox="0 0 40 40"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                      className="sidebar-close-icon"
+                    >
+                      <circle cx="20" cy="20" r="18" fill="#fff" stroke="#232323" strokeWidth="2" />
+                      <path d="M2 20a18 18 0 0 1 36 0" fill="#e62829" stroke="#232323" strokeWidth="2" />
+                      <rect x="2" y="19" width="36" height="2" fill="#232323" />
+                      <circle cx="20" cy="20" r="7" fill="#ffffffff" stroke="#232323" strokeWidth="2" />
+                      <circle cx="20" cy="20" r="3.5" fill="#fff" stroke="#232323" strokeWidth="1.5" />
+                    </svg>
+                  </span>
+                </button>
+              </div>
+
+              <div 
+                className="flex-1 overflow-y-auto pr-1 custom-scrollbar text-gray-300"
+                style={{ overscrollBehavior: 'contain' }}
+              >
+                <PermutationTable
+                  readOnly={true}
+                  chartData={editData.chartData || {}}
+                  chartConfig={editData.chartConfig || {}}
+                  legendColors={editData.chartConfig?.legendColors || {}}
+                />
               </div>
             </div>
           </div>

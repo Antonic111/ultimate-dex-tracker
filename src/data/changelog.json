@@ -1,5 +1,19 @@
 [
   {
+    "date": "2026-06-02",
+    "version": "v1.1.5",
+    "type": "feature",
+    "title": "",
+    "description": "",
+    "features": [
+      "Added the MMO Tools page, featuring a comprehensive Pokémon Legends: Arceus Permutation Hunt Tracker fully integrated with the main Dex and Counters pages for seamless hunt tracking and progress management."
+    ],
+    "fixes": [
+      "Fixed an issue where the Favorite Games and Favorite Pokémon sections were not visible on public profile pages.",
+      "Updated the public homepage to display shiny Pokémon sprites instead of standard sprites."
+    ]
+  },
+  {
     "date": "2026-05-31",
     "version": "v1.1.4",
     "type": "feature",

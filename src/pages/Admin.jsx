@@ -101,7 +101,7 @@ const Admin = () => {
   const checkAdminStatus = async () => {
     try {
       const response = await fetch(buildApiUrl('/profile'), {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
+        headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
         credentials: 'include'
       });
       
@@ -134,15 +134,15 @@ const Admin = () => {
     try {
       const [usersRes, bugReportsRes, featureRequestsRes, settingsRes, creatorReqsData] = await Promise.all([
         fetch(buildApiUrl('/admin/users'), {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
+          headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
           credentials: 'include'
         }),
         fetch(buildApiUrl('/admin/bug-reports'), {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
+          headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
           credentials: 'include'
         }),
         fetch(buildApiUrl('/admin/feature-requests'), {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
+          headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
           credentials: 'include'
         }),
         fetch(buildApiUrl('/site-settings')),
@@ -204,7 +204,7 @@ const Admin = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {})
         },
         body: JSON.stringify({ username, isAdmin }),
         credentials: 'include'
@@ -250,7 +250,7 @@ const Admin = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {})
         },
         body: JSON.stringify(payload),
         credentials: 'include'
@@ -324,7 +324,7 @@ const Admin = () => {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {})
         },
         body: JSON.stringify({ 
           bio: editingBio,
@@ -384,9 +384,7 @@ const Admin = () => {
     try {
       const response = await fetch(buildApiUrl(`/admin/delete-report/${selectedReport._id}`), {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
+        headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
         credentials: 'include'
       });
 
@@ -423,7 +421,7 @@ const Admin = () => {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {})
         },
         body: JSON.stringify({ status: 'resolved' }),
         credentials: 'include'

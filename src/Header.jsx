@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, User, Settings, Users, Database, Tally5, FileText, Shield, ShieldUser, Crown, Menu, X, Grid3x3, MessageCircleWarning } from "lucide-react";
+import { LogOut, User, Settings, Users, Database, Tally5, FileText, Shield, ShieldUser, Crown, Menu, X, Grid3x3, MessageCircleWarning, Layers } from "lucide-react";
 import { authAPI } from './utils/api';
 import { useTheme } from "./components/Shared/ThemeContext";
 
@@ -204,6 +204,21 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
 
               {user?.username && (
                 <Link
+                  to="/mmo-tool"
+                  className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/mmo-tool'
+                    ? 'text-[var(--accent)]'
+                    : 'text-[var(--text-muted,var(--text-color))] opacity-70 hover:opacity-100 hover:text-[var(--accent)]'
+                    }`}
+                >
+                  <Layers size={19} className="flex-shrink-0" />
+                  <span>MMO Tool</span>
+                  <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${location.pathname === '/mmo-tool' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
+                    }`} style={{ transformOrigin: 'center' }} />
+                </Link>
+              )}
+
+              {user?.username && (
+                <Link
                   to="/bingo"
                   className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/bingo'
                     ? 'text-[var(--accent)]'
@@ -277,6 +292,17 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                   <div className="flex items-center gap-3">
                     <Tally5 size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
                     Counters
+                  </div>
+                </Link>
+
+                <Link
+                  to="/mmo-tool"
+                  className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/mmo-tool' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
+                  onClick={() => setShowMobileNav(false)}
+                >
+                  <div className="flex items-center gap-3">
+                    <Layers size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
+                    MMO Tool
                   </div>
                 </Link>
 

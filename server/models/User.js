@@ -49,6 +49,8 @@ const userSchema = new mongoose.Schema({
         notes: String,
         entryId: { type: String, default: () => Math.random().toString(36).substr(2, 9) },
         isHuntTracker: Boolean,
+        chartData: { type: mongoose.Schema.Types.Mixed, default: {} },
+        chartConfig: { type: mongoose.Schema.Types.Mixed, default: {} },
         modifiers: {
           shinyCharm: Boolean,
           shinyParents: Boolean,
@@ -176,6 +178,8 @@ const userSchema = new mongoose.Schema({
       checks: { type: Number, default: 0 },
       odds: { type: Number, default: null },
       startDate: { type: String, required: true },
+      chartData: { type: mongoose.Schema.Types.Mixed, default: {} },
+      chartConfig: { type: mongoose.Schema.Types.Mixed, default: {} },
       startTime: { type: Number, required: true },
       increment: { type: Number, default: 1 },
       modifiers: {
@@ -226,6 +230,15 @@ const userSchema = new mongoose.Schema({
     type: Map,
     of: Number,
     default: new Map()
+  },
+  mmoSettings: {
+    multiCheckEnabled: { type: Boolean, default: false },
+    secondSpawn: { type: Number, default: 6 },
+    isSaveOrder: { type: Boolean, default: false },
+    showSecondWave: { type: Boolean, default: true },
+    showGhostChecks: { type: Boolean, default: true },
+    isAdvanced: { type: Boolean, default: false },
+    legendColors: { type: mongoose.Schema.Types.Mixed, default: {} }
   },
   // Migration tracking
   huntMethodMigrationCompleted: {

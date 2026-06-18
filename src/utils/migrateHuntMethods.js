@@ -55,7 +55,6 @@ export function migrateHuntMethods(caughtData) {
         
         // Handle old format (simple boolean) - convert to new format
         if (pokemonData === true || pokemonData === false) {
-            console.log(`Converting old format Pokemon ${key} to new format`);
             migratedData[key] = {
                 caught: pokemonData,
                 entries: []
@@ -69,7 +68,6 @@ export function migrateHuntMethods(caughtData) {
             pokemonData.entries = pokemonData.entries.map(entry => {
                 // Handle entries with method but no game
                 if (entry.method && !entry.game) {
-                    console.log(`Entry has method "${entry.method}" but no game, removing method`);
                     removalCount++;
                     return { ...entry, method: "" };
                 }
@@ -85,7 +83,6 @@ export function migrateHuntMethods(caughtData) {
                 
                 // Check if the game exists in the hunt system
                 if (!HUNT_SYSTEM[game]) {
-                    console.log(`Game "${game}" not found in hunt system, removing method from entry`);
                     removalCount++;
                     return { ...entry, method: "" };
                 }
@@ -96,26 +93,22 @@ export function migrateHuntMethods(caughtData) {
                 // Check if the current method is valid for this game
                 if (availableMethods.includes(oldMethod)) {
                     // Method is already valid, no change needed
-                    console.log(`Method "${oldMethod}" is already valid for game "${game}"`);
                     return entry;
                 }
 
                 // Try to map the old method to a new method
                 const mappedMethod = methodMappings[oldMethod];
                 if (mappedMethod && availableMethods.includes(mappedMethod)) {
-                    console.log(`Migrating method "${oldMethod}" to "${mappedMethod}" for game "${game}"`);
                     migrationCount++;
                     return { ...entry, method: mappedMethod };
                 }
 
                 // Method doesn't exist for this game, remove it
-                console.log(`Method "${oldMethod}" not available for game "${game}", removing method`);
                 removalCount++;
                 return { ...entry, method: "" };
             });
         } else if (pokemonData && typeof pokemonData === 'object' && !pokemonData.entries) {
             // Handle Pokemon that are caught but don't have entries yet - ensure they have the new format
-            console.log(`Ensuring Pokemon ${key} has proper new format`);
             migratedData[key] = {
                 caught: pokemonData.caught || true,
                 entries: []
@@ -123,7 +116,6 @@ export function migrateHuntMethods(caughtData) {
         }
     });
 
-    console.log(`Migration complete: ${pokemonProcessed} Pokemon processed, ${methodsProcessed} methods processed, ${migrationCount} methods migrated, ${removalCount} methods removed`);
     return migratedData;
 }
 
