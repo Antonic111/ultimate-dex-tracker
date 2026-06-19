@@ -706,25 +706,31 @@ export default function MMOTool() {
 
   const handleChartUpdate = useCallback((newChartData) => {
     if (!selectedHuntId) return;
-    const updatedHunts = activeHunts.map(h => 
-      h.id === selectedHuntId ? { ...h, chartData: newChartData } : h
-    );
-    setActiveHunts(updatedHunts);
-    // Explicit save
-    if (username) {
-      saveHuntData({
-        activeHunts: updatedHunts,
-        huntTimers: { ...huntTimers },
-        lastCheckTimes: { ...lastCheckTimes },
-        totalCheckTimes: { ...totalCheckTimes },
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: { ...huntIncrements },
-      });
-    }
-  }, [selectedHuntId, activeHunts, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements, username, saveHuntData]);
+    
+    const oldChartData = activeHunts.find(h => h.id === selectedHuntId)?.chartData || {};
+    const oldKeysCount = Object.keys(oldChartData).filter(k => oldChartData[k]).length;
+    const newKeysCount = Object.keys(newChartData).filter(k => newChartData[k]).length;
+    const diff = newKeysCount - oldKeysCount;
 
-  const handleChartCheck = useCallback((isAdding) => {
-    if (!selectedHuntId) return;
+    if (diff === 0) {
+      const updatedHunts = activeHunts.map(h => 
+        h.id === selectedHuntId ? { ...h, chartData: newChartData } : h
+      );
+      setActiveHunts(updatedHunts);
+      if (username) {
+        saveHuntData({
+          activeHunts: updatedHunts,
+          huntTimers: { ...huntTimers },
+          lastCheckTimes: { ...lastCheckTimes },
+          totalCheckTimes: { ...totalCheckTimes },
+          pausedHunts: Array.from(pausedHunts),
+          huntIncrements: { ...huntIncrements },
+        });
+      }
+      return;
+    }
+
+    const isAdding = diff > 0;
     const now = Date.now();
     const isPaused = pausedHunts.has(selectedHuntId);
     const bottomTimerValue = currentBottomTimers[selectedHuntId] || 0;
@@ -733,11 +739,12 @@ export default function MMOTool() {
     const activeHuntConfig = activeHunts.find(h => h.id === selectedHuntId)?.chartConfig || {};
     const currentSecondSpawn = activeHuntConfig.secondSpawn ?? 6;
     const incrementValue = multiCheckEnabled ? currentSecondSpawn : 1;
+    const totalIncrement = Math.abs(diff) * incrementValue;
 
     const updatedHunts = activeHunts.map(h => {
       if (h.id !== selectedHuntId) return h;
-      const newChecks = isAdding ? h.checks + incrementValue : Math.max(0, h.checks - incrementValue);
-      return { ...h, checks: newChecks };
+      const newChecks = isAdding ? h.checks + totalIncrement : Math.max(0, h.checks - totalIncrement);
+      return { ...h, checks: newChecks, chartData: newChartData };
     });
 
     const updatedLastCheck = { ...lastCheckTimes, [selectedHuntId]: now };
@@ -760,6 +767,8 @@ export default function MMOTool() {
       });
     }
   }, [selectedHuntId, activeHunts, pausedHunts, currentBottomTimers, lastCheckTimes, totalCheckTimes, huntTimers, username, saveHuntData, huntIncrements, multiCheckEnabled]);
+
+
 
   const handleDecreaseCheck = useCallback((huntId) => {
     const hunt = activeHunts.find(h => h.id === huntId);
@@ -1342,8 +1351,7 @@ export default function MMOTool() {
                 legendColors={legendColors}
                 setLegendColors={setLegendColors}
                 onChartUpdate={handleChartUpdate} 
-                onChartConfigUpdate={handleChartConfigUpdate}
-                onChartCheck={handleChartCheck} />
+                onChartConfigUpdate={handleChartConfigUpdate} />
             </div>
           );
         })()}

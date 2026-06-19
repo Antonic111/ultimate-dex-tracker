@@ -1,6 +1,6 @@
 [
   {
-    "date": "2026-06-02",
+    "date": "2026-06-18",
     "version": "v1.1.5",
     "type": "feature",
     "title": "",
@@ -10,7 +10,8 @@
     ],
     "fixes": [
       "Fixed an issue where the Favorite Games and Favorite Pokémon sections were not visible on public profile pages.",
-      "Updated the public homepage to display shiny Pokémon sprites instead of standard sprites."
+      "Updated the public homepage to display shiny Pokémon sprites instead of standard sprites.",
+      "Fixed a issue where viewing someones public profile page was not showing the Favorite Games and Favorite Pokemon sections."
     ]
   },
   {

@@ -677,10 +677,6 @@ export default function PublicProfile() {
         );
     }
 
-    if (data) {
-        console.log("FAVORITE GAMES:", data.favoriteGames);
-        console.log("FAVORITE POKEMON:", data.favoritePokemon);
-    }
     return (
         <div className="profile-wrapper page-container profile-page">
             {/* ===== header bar (same layout, no edit buttons) ===== */}
@@ -833,11 +829,11 @@ export default function PublicProfile() {
                                 {data.gender === "Other" ? "Female" : (data.gender || "N/A")}
                             </div>
                         </div>
-                    </div>
 
-                    <div className="profile-field full-span">
-                        <label>Nintendo Switch Friend Code</label>
-                        <div className="field-display">{data.switchFriendCode || "N/A"}</div>
+                        <div className="profile-field full-span">
+                            <label>Nintendo Switch Friend Code</label>
+                            <div className="field-display">{data.switchFriendCode || "N/A"}</div>
+                        </div>
                     </div>
 
                     {/* Favorite Games */}
@@ -854,7 +850,6 @@ export default function PublicProfile() {
                                                 String(g.value).toLowerCase() === gameKey ||
                                                 String(g.name || g.label || "").toLowerCase() === gameKey
                                         );
-                                        console.log("GAME INDEX:", index, "GAME:", game, "GAMEDATA:", gameData);
                                         const isEmpty = !gameData;
                                         return (
                                             <div key={index} className="profile-rank-item">
@@ -892,7 +887,6 @@ export default function PublicProfile() {
                                         const p = poke && poke.trim() !== '' ? POKEMON_LOOKUP.get(poke) ||
                                             // Fallback: try to find base form for special forms like gmax, alolan, etc.
                                             POKEMON_LOOKUP.get(poke.split('-')[0]) : null;
-                                        console.log("POKE INDEX:", index, "POKE:", poke, "POKEDATA:", p);
                                         const isEmpty = !p || !poke || poke.trim() === '';
 
                                         return (
