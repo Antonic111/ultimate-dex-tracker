@@ -59,19 +59,21 @@ export default function DexSection({
   const boxes = useMemo(() => {
     if (!pokemonList || pokemonList.length === 0) return [];
 
-    // Special handling for Unown boxes: split normal vs alpha forms
+    // Special handling for Unown and Vivillon boxes: split normal vs alpha forms
     const sectionTitle = String(title || '').toLowerCase();
     const isUnownSection = sectionTitle.includes('unown');
-    if (isUnownSection) {
+    const isVivillonSection = sectionTitle.includes('vivillon');
+
+    if (isUnownSection || isVivillonSection) {
       const isAlphaForm = (p) => {
         const form = String(p.form || '').toLowerCase();
         const name = String(p.name || '').toLowerCase();
-        return p.formType === 'alpha' || form.includes('alpha') || name.includes('alpha');
+        return p.formType === 'alpha' || p.formType === 'alphaother' || form.includes('alpha') || name.includes('alpha');
       };
       const normals = (pokemonList || []).filter(p => !isAlphaForm(p));
       const alphas = (pokemonList || []).filter(p => isAlphaForm(p));
       if (normals.length > 0 && alphas.length > 0) {
-        // Regular Unown's Box first, Alpha Unown's Box second
+        // Regular Box first, Alpha Box second
         return [
           { pokemon: normals },
           { pokemon: alphas, isAlphaBox: true }
@@ -317,7 +319,11 @@ export default function DexSection({
                             if (match === "alcremie") {
                               label = "Alcremie's Box";
                             } else if (match === "vivillon") {
-                              label = "Vivillon's Box";
+                              if (isAlphaBox) {
+                                label = "Alpha Vivillon's Box";
+                              } else {
+                                label = "Vivillon's Box";
+                              }
                             } else if (match === "unown") {
                               // Special naming for Unown boxes
                               if (isAlphaBox) {
@@ -331,8 +337,8 @@ export default function DexSection({
                               label = `${capitalized} Forms Box`;
                             }
 
-                            // For Unown boxes, always display Box 1 visually
-                            if (match === "unown") {
+                            // For Unown and Vivillon boxes, always display Box 1 visually
+                            if (match === "unown" || match === "vivillon") {
                               return `${label} 1`;
                             }
                             return `${label} ${boxIndex + 1}`;

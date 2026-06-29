@@ -24,24 +24,7 @@ export default function EvolutionChain({ pokemon, showShiny = false, onPokemonSe
       (!evoSource.evolution.next || evoSource.evolution.next.length === 0)
     )
   ) {
-    return (
-      <div className="evolution-chain-section">
-        <div className="evo-chain-title">Evolution Chain</div>
-        <div className="evo-chain-divider"></div>
-        <div className="evo-chain-none-wrapper">
-          <EvoSprite
-            mon={pokemon}
-            highlight={true}
-            leaving={false}
-            showShiny={showShiny}
-            size={64}
-            onPokemonSelect={onPokemonSelect}
-            currentPokemon={pokemon}
-          />
-          <div className="evo-chain-none">No Evolutions</div>
-        </div>
-      </div>
-    );
+    return null;
   }
 
 
@@ -149,36 +132,59 @@ function getMatchingForm(baseMon, targetMon) {
   if (baseMon.id === targetMon.id) return targetMon;
 
   const related = getRelatedForms(baseMon);
-  // related includes baseMon usually, and all variants
   if (!related || related.length === 0) return baseMon;
 
-  // 1. Try to match Form Type
-  let candidates = related.filter(r => r.formType === targetMon.formType);
+  const targetBase = findPokemon(targetMon.id);
+  const baseMonClean = findPokemon(baseMon.id);
 
-  // Fallback: if alphaother (e.g. Female Alpha Venusaur) and no match found (e.g. Bulbasaur has no alpha-female), try 'alpha'
-  if (candidates.length === 0 && targetMon.formType === 'alphaother') {
-    candidates = related.filter(r => r.formType === 'alpha');
+  if (!targetBase || !baseMonClean) return baseMon;
+
+  // Determine desired traits
+  const isTargetAlpha = targetMon.formType === 'alpha' || targetMon.formType === 'alphaother' || targetMon.name.includes('-alpha');
+  
+  // Extract core regional suffix (remove alpha parts)
+  const getCoreSuffix = (monName, baseName) => {
+    let suffix = monName.replace(baseName, '');
+    return suffix.replace(/-alphaother|-alpha/g, '');
+  };
+
+  const targetSuffix = getCoreSuffix(targetMon.name, targetBase.name);
+  const baseSuffix = getCoreSuffix(baseMon.name, baseMonClean.name);
+
+  // If target has no regional suffix (e.g., Sirfetch'd), preserve baseMon's explicitly defined regional suffix.
+  // Otherwise, use the target's regional suffix (e.g., Alolan Ninetales dictates Alolan Vulpix).
+  const desiredSuffix = targetSuffix || baseSuffix;
+
+  // Score function for candidates
+  const getScore = (candidate) => {
+    let score = 0;
+    const isCAlpha = candidate.formType === 'alpha' || candidate.formType === 'alphaother' || candidate.name.includes('-alpha');
+    const cSuffix = getCoreSuffix(candidate.name, baseMonClean.name);
+
+    // +100 for matching Alpha status
+    if (isTargetAlpha === isCAlpha) score += 100;
+    
+    // +50 for matching Regional suffix
+    if (cSuffix === desiredSuffix) score += 50;
+
+    // Tie-breaker: EXACT match on target's formType string (if applicable)
+    if (candidate.formType === targetMon.formType) score += 10;
+
+    return score;
+  };
+
+  let bestMatch = baseMon;
+  let highestScore = getScore(baseMon);
+
+  for (const candidate of related) {
+    const score = getScore(candidate);
+    if (score > highestScore) {
+      highestScore = score;
+      bestMatch = candidate;
+    }
   }
 
-  if (candidates.length === 0) return baseMon;
-  if (candidates.length === 1) return candidates[0];
-
-  // 2. If multiple candidates (e.g. multiple 'other' forms), try to match Name Suffix
-  // Get suffix of target (e.g. "-east" from "shellos-east")
-  const targetBase = findPokemon(targetMon.id);
-  const targetSuffix = targetBase ? targetMon.name.replace(targetBase.name, '') : '';
-
-  // Find candidate with same suffix relative to ITS base (which is baseMon)
-  // Note: baseMon might NOT be the clean base name if baseMon itself is a variant, but findPokemon(baseMon.id) gives clean base.
-  const baseMonClean = findPokemon(baseMon.id);
-  const baseName = baseMonClean ? baseMonClean.name : baseMon.name;
-
-  const bestMatch = candidates.find(c => {
-    const suffix = c.name.replace(baseName, '');
-    return suffix === targetSuffix;
-  });
-
-  return bestMatch || candidates[0];
+  return bestMatch;
 }
 
 function EvoChainNode({ mon, showShiny, onPokemonSelect = null, currentPokemon = null, preventFormSwitch = false }) {

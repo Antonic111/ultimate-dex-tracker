@@ -1266,19 +1266,13 @@ export default function App() {
     const key = getCaughtKey(poke, null, isShiny);
     if (!key) return;
 
-    setCaughtInfoMap(prev => {
-      // If we're resetting/clearing data
-      if (info == null) {
-        const updated = { ...prev, [key]: null };
-        if (user?.username) {
-          updateCaughtData(user.username, key, null); // persist delete
-        }
-        return updated;
-      }
-
-      // Normalize data for backend schema (checks is Number or omitted)
+    const wasAlreadyCaught = !!caught[key];
+    
+    // Normalize data for backend schema (checks is Number or omitted)
+    let cleanedInfo = null;
+    if (info != null) {
       const checksStr = info.checks == null ? "" : String(info.checks).trim();
-      const cleanedInfo = { ...info };
+      cleanedInfo = { ...info };
       if (checksStr === "" || checksStr === "0") {
         delete cleanedInfo.checks;
       } else if (!Number.isNaN(Number(checksStr))) {
@@ -1286,16 +1280,56 @@ export default function App() {
       } else {
         delete cleanedInfo.checks;
       }
+    }
 
-      const updated = { ...prev, [key]: cleanedInfo };
-      if (user?.username) {
-        updateCaughtData(user.username, key, cleanedInfo); // persist update
+    setCaughtInfoMap(prev => {
+      const updated = { ...prev };
+      if (cleanedInfo == null) {
+        updated[key] = null;
+      } else {
+        updated[key] = cleanedInfo;
       }
       return updated;
     });
 
+    if (user?.username) {
+      updateCaughtData(user.username, key, cleanedInfo);
+    }
+
     // caught = true if we have info, false if we cleared it
     setCaught(prev => ({ ...prev, [key]: !!info }));
+
+    // Persist the most-recent-catch order to sessionStorage
+    try {
+      const existing = JSON.parse(sessionStorage.getItem('recentCatchOrder') || '[]');
+      let updated;
+      if (!wasAlreadyCaught && info != null) {
+        // Prepend the new catch, remove duplicates, keep top 5
+        updated = [
+          { stableId: poke.stableId, isShiny },
+          ...existing.filter(c => !(c.stableId === poke.stableId && !!c.isShiny === !!isShiny))
+        ].slice(0, 5);
+      } else if (info == null) {
+        // Remove the uncaught Pokémon from the order
+        updated = existing.filter(c => !(c.stableId === poke.stableId && !!c.isShiny === !!isShiny));
+      } else {
+        // Was already caught and still caught (update). Do not change the order.
+        updated = existing;
+      }
+      sessionStorage.setItem('recentCatchOrder', JSON.stringify(updated));
+    } catch { /* sessionStorage unavailable — silently ignore */ }
+
+    // Notify other pages
+    window.dispatchEvent(new CustomEvent('caughtDataChanged', {
+      detail: {
+        pokemon: poke,
+        caughtKey: key,
+        caughtInfo: cleanedInfo,
+        wasCaught: wasAlreadyCaught,
+        isShiny,
+        source: 'app'
+      }
+    }));
 
     // keep sidebar in sync - only switch when caught status actually changes
     if (sidebarOpen && selectedPokemon) {

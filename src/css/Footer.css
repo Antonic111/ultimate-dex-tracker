@@ -28,6 +28,10 @@
   }
 }
 
+.footer-section {
+  text-align: center;
+}
+
 .footer-section h3 {
   color: var(--accent);
   font-size: 1.2rem;
@@ -61,8 +65,9 @@
 /* Quick Links Grid Layout */
 .quick-links-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(3, max-content);
+  justify-content: center;
+  gap: 8px 16px;
 }
 
 .quick-link {
@@ -72,7 +77,8 @@
   padding: 4px 0;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  white-space: nowrap;
 }
 
 .quick-link:hover {
@@ -87,9 +93,9 @@
 @media (max-width: 768px) {
   .quick-links-grid {
     display: grid !important;
-    grid-template-columns: repeat(2, auto) !important;
+    grid-template-columns: repeat(3, auto) !important;
     grid-auto-rows: auto !important;
-    gap: 8px 32px !important;
+    gap: 8px 20px !important;
     width: fit-content !important;
     margin: 0 auto !important;
   }

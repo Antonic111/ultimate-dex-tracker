@@ -553,6 +553,14 @@ export const HUNT_SYSTEM = {
       "Galar Birds": 1, // Special calculation for Galar Birds in Daily Adventure Incense
       "Hatch Day": 1 // Special calculation for Hatch Day events
     }
+  },
+  "Home": {
+    methods: [
+      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as a gift in Home" }
+    ],
+    modifiers: {
+      "Shiny Charm": 0
+    }
   }
 };
 

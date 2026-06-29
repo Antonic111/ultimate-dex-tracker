@@ -1,13 +1,28 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, User, Settings, Users, Database, Tally5, FileText, Shield, ShieldUser, Crown, Menu, X, Grid3x3, MessageCircleWarning, Layers } from "lucide-react";
+import { LogOut, User, Settings, Users, Database, Tally5, FileText, Shield, ShieldUser, Crown, Menu, X, Grid3x3, MessageCircleWarning, ListChecks, Heart } from "lucide-react";
 import { authAPI } from './utils/api';
 import { useTheme } from "./components/Shared/ThemeContext";
+import changelogData from "./data/changelog.json";
 
 export default function HeaderWithConditionalAuth({ user, setUser, showMenu, setShowMenu, userMenuRef }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [showMobileNav, setShowMobileNav] = useState(false);
+  const [hasNewUpdate, setHasNewUpdate] = useState(false);
+
+  useEffect(() => {
+    if (!changelogData || changelogData.length === 0) return;
+    const latestVersion = changelogData[0].version;
+    const viewedVersion = localStorage.getItem("lastViewedChangelogVersion");
+
+    if (location.pathname === '/changelog') {
+      localStorage.setItem("lastViewedChangelogVersion", latestVersion);
+      setHasNewUpdate(false);
+    } else if (viewedVersion !== latestVersion) {
+      setHasNewUpdate(true);
+    }
+  }, [location.pathname]);
 
   // Close the menu after login/logout or on any navigation
   useEffect(() => { setShowMenu(false); }, [user?.username, location.pathname]);
@@ -210,8 +225,8 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                     : 'text-[var(--text-muted,var(--text-color))] opacity-70 hover:opacity-100 hover:text-[var(--accent)]'
                     }`}
                 >
-                  <Layers size={19} className="flex-shrink-0" />
-                  <span>MMO Tool</span>
+                  <ListChecks size={19} className="flex-shrink-0" />
+                  <span className="whitespace-nowrap">MMO Tool</span>
                   <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${location.pathname === '/mmo-tool' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
                     }`} style={{ transformOrigin: 'center' }} />
                 </Link>
@@ -226,7 +241,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                     }`}
                 >
                   <Grid3x3 size={19} className="flex-shrink-0" />
-                  <span>Bingo</span>
+                  <span className="whitespace-nowrap">Bingo</span>
                   <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${location.pathname === '/bingo' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
                     }`} style={{ transformOrigin: 'center' }} />
                 </Link>
@@ -241,7 +256,12 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                     }`}
                 >
                   <FileText size={19} className="flex-shrink-0" />
-                  <span>Changelog</span>
+                  <span className="relative whitespace-nowrap">
+                    Changelog
+                    {hasNewUpdate && (
+                      <span className="absolute -top-2 -right-7 px-[5px] py-[3px] text-[0.7rem] font-bold uppercase tracking-wider text-white bg-red-500 rounded-full leading-none shadow-sm pointer-events-none">New</span>
+                    )}
+                  </span>
                   <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${location.pathname === '/changelog' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
                     }`} style={{ transformOrigin: 'center' }} />
                 </Link>
@@ -257,11 +277,24 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                   }`}
                 >
                   <MessageCircleWarning size={19} className="flex-shrink-0" />
-                  <span>Feedback</span>
+                  <span className="whitespace-nowrap">Feedback</span>
                   <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${
                     location.pathname === '/feedback' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
                   }`} style={{ transformOrigin: 'center' }} />
                 </Link>
+              )}
+
+              {user?.username && (
+                <a
+                  href="https://streamelements.com/antonic111-1c2e0/tip"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline text-[var(--text-muted,var(--text-color))] opacity-70 hover:opacity-100 hover:text-[var(--accent)]"
+                >
+                  <Heart size={19} className="flex-shrink-0 text-red-500" fill="currentColor" />
+                  <span className="whitespace-nowrap">Leave a Tip</span>
+                  <span className="absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100" style={{ transformOrigin: 'center' }} />
+                </a>
               )}
 
             </div>
@@ -301,8 +334,8 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                   onClick={() => setShowMobileNav(false)}
                 >
                   <div className="flex items-center gap-3">
-                    <Layers size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
-                    MMO Tool
+                    <ListChecks size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
+                    <span className="whitespace-nowrap">MMO Tool</span>
                   </div>
                 </Link>
 
@@ -313,7 +346,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                 >
                   <div className="flex items-center gap-3">
                     <Grid3x3 size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
-                    Bingo
+                    <span className="whitespace-nowrap">Bingo</span>
                   </div>
                 </Link>
 
@@ -322,9 +355,14 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                   className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/changelog' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
                   onClick={() => setShowMobileNav(false)}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 w-full">
                     <FileText size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
-                    Changelog
+                    <span className="flex items-center gap-2 whitespace-nowrap">
+                      Changelog
+                      {hasNewUpdate && (
+                        <span className="px-1.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider text-white bg-red-500 rounded-full leading-none">New</span>
+                      )}
+                    </span>
                   </div>
                 </Link>
 
@@ -335,9 +373,22 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                 >
                   <div className="flex items-center gap-3">
                     <MessageCircleWarning size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
-                    Feedback
+                    <span className="whitespace-nowrap">Feedback</span>
                   </div>
                 </Link>
+
+                <a
+                  href="https://streamelements.com/antonic111-1c2e0/tip"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]"
+                  onClick={() => setShowMobileNav(false)}
+                >
+                  <div className="flex items-center gap-3">
+                    <Heart size={16} className="flex-shrink-0 text-red-500" fill="currentColor" />
+                    <span className="whitespace-nowrap">Leave a Tip</span>
+                  </div>
+                </a>
               </>
             )}
           </div>

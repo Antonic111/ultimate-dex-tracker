@@ -104,7 +104,8 @@ export const GAME_OPTIONS = [
   { name: "Legends Z-A", value: "Legends Z-A", image: "/data/games/legends-za.png" },
 
   // Other
-  { name: "GO", value: "GO", image: "/data/games/go.png" }
+  { name: "GO", value: "GO", image: "/data/games/go.png" },
+  { name: "Home", value: "Home", image: "/data/games/home.png" }
 ];
 
 export const GAME_OPTIONS_TWO = [
@@ -169,7 +170,8 @@ export const GAME_OPTIONS_TWO = [
   { name: "Legends Z-A", value: "Legends Z-A", image: "/data/games/legends-za.png" },
 
   // Other
-  { name: "GO", value: "GO", image: "/data/games/go.png" }
+  { name: "GO", value: "GO", image: "/data/games/go.png" },
+  { name: "Home", value: "Home", image: "/data/games/home.png" }
 ];
 
 // MARKS
@@ -412,6 +414,7 @@ export const specialFormLabels = {
   "floette-orange": "Orange Flower",
   "floette-blue": "Blue Flower",
   "floette-white": "White Flower",
+  "floette-eternal": "Eternal Flower",
   "florges": "Red Flower",
   "florges-yellow": "Yellow Flower",
   "florges-orange": "Orange Flower",
@@ -516,6 +519,26 @@ export const specialFormLabels = {
   "vivillon-tundra": "Tundra Forme",
   "vivillon-fancy": "Fancy Forme",
   "vivillon-pokeball": "Pokeball Forme",
+  "vivillon-meadow-alpha": "Alpha Meadow Forme",
+  "vivillon-archipelago-alpha": "Alpha Archipelago Forme",
+  "vivillon-continental-alpha": "Alpha Continental Forme",
+  "vivillon-elegant-alpha": "Alpha Elegant Forme",
+  "vivillon-garden-alpha": "Alpha Garden Forme",
+  "vivillon-high-plains-alpha": "Alpha High Plains Forme",
+  "vivillon-icy-snow-alpha": "Alpha Icy Snow Forme",
+  "vivillon-jungle-alpha": "Alpha Jungle Forme",
+  "vivillon-marine-alpha": "Alpha Marine Forme",
+  "vivillon-modern-alpha": "Alpha Modern Forme",
+  "vivillon-monsoon-alpha": "Alpha Monsoon Forme",
+  "vivillon-ocean-alpha": "Alpha Ocean Forme",
+  "vivillon-polar-alpha": "Alpha Polar Forme",
+  "vivillon-river-alpha": "Alpha River Forme",
+  "vivillon-sandstorm-alpha": "Alpha Sandstorm Forme",
+  "vivillon-savanna-alpha": "Alpha Savanna Forme",
+  "vivillon-sun-alpha": "Alpha Sun Forme",
+  "vivillon-tundra-alpha": "Alpha Tundra Forme",
+  "vivillon-fancy-alpha": "Alpha Fancy Forme",
+  "vivillon-pokeball-alpha": "Alpha Pokeball Forme",
   "magikarp-level-100-female": "Lvl 100 Female",
   "magikarp-level-100-male": "Lvl 100 Male",
   "sneasel-gender-alphaother": "Alpha Male",
@@ -595,6 +618,7 @@ export const specialFormLabels = {
   "raichu-alolan-alphaother": "Alpha Alolan Form",
   "stunfisk-galarian-alphaother": "Alpha Galarian Form",
   "qwilfish-alphaother": "Alpha Pokémon",
+  "keldeo-resolute": "Resolute Forme"
 };
 
 
@@ -614,6 +638,7 @@ export const specialCases = {
   "thundurus-incarnate": "Thundurus",
   "landorus-incarnate": "Landorus",
   "keldeo-ordinary": "Keldeo",
+  "keldeo-resolute": "Keldeo",
   "meloetta-aria": "Meloetta",
   "meowstic-male": "Meowstic",
   "zygarde-50": "Zygarde",
@@ -712,6 +737,7 @@ export const specialCases = {
   "floette-orange": "Floette",
   "floette-blue": "Floette",
   "floette-white": "Floette",
+  "floette-eternal": "Floette",
   "florges-yellow": "Florges",
   "florges-orange": "Florges",
   "florges-blue": "Florges",
@@ -848,4 +874,24 @@ export const specialCases = {
   "raichu-alolan-alphaother": "Raichu",
   "stunfisk-galarian-alphaother": "Stunfisk",
   "qwilfish-alphaother": "Qwilfish",
+  "vivillon-meadow-alpha": "Vivillon",
+  "vivillon-archipelago-alpha": "Vivillon",
+  "vivillon-continental-alpha": "Vivillon",
+  "vivillon-elegant-alpha": "Vivillon",
+  "vivillon-garden-alpha": "Vivillon",
+  "vivillon-high-plains-alpha": "Vivillon",
+  "vivillon-icy-snow-alpha": "Vivillon",
+  "vivillon-jungle-alpha": "Vivillon",
+  "vivillon-marine-alpha": "Vivillon",
+  "vivillon-modern-alpha": "Vivillon",
+  "vivillon-monsoon-alpha": "Vivillon",
+  "vivillon-ocean-alpha": "Vivillon",
+  "vivillon-polar-alpha": "Vivillon",
+  "vivillon-river-alpha": "Vivillon",
+  "vivillon-sandstorm-alpha": "Vivillon",
+  "vivillon-savanna-alpha": "Vivillon",
+  "vivillon-sun-alpha": "Vivillon",
+  "vivillon-tundra-alpha": "Vivillon",
+  "vivillon-fancy-alpha": "Vivillon",
+  "vivillon-pokeball-alpha": "Vivillon"
 };

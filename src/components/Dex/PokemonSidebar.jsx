@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, useCallback, useRef } from "react";
+import { useEffect, useState, useContext, useCallback, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { Sparkles, Plus, Trash2, ChevronLeft, ChevronRight, Calendar, ChevronUp, ChevronDown, X, RotateCcw, ArrowUpCircle, ListTodo } from "lucide-react";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS, genderForms } from "../../Constants";
@@ -242,6 +242,41 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     prevGameRef.current = null;
     isLoadingDataRef.current = true;
   }, [pokemon, caughtInfo]);
+
+  // Check if the current pokemon is a blocked shiny
+  const isBlockedShiny = useMemo(() => {
+    if (!pokemon || !showShiny) return false;
+    
+    // Use provided dexPreferences or default to true for blocking rules to be safe
+    const prefs = dexPreferences || { 
+      blockUnobtainableShinies: true, 
+      blockGOExclusiveShinies: true, 
+      blockNOOTExclusiveShinies: true 
+    };
+
+    const pokeId = String(pokemon.id).padStart(4, "0");
+    const pokeName = pokemon.name?.toLowerCase() || '';
+    
+    const isBlockedUnobtainableById = prefs.blockUnobtainableShinies && UNOBTAINABLE_SHINY_DEX_NUMBERS.includes(pokeId);
+    const isBlockedUnobtainableByForm = prefs.blockUnobtainableShinies && UNOBTAINABLE_SHINY_FORM_NAMES.some(formName => pokeName === formName.toLowerCase());
+    
+    const isBlockedGOById = prefs.blockGOExclusiveShinies && GO_EXCLUSIVE_SHINY_DEX_NUMBERS.includes(pokeId);
+    const isBlockedGOByForm = prefs.blockGOExclusiveShinies && GO_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokeName === formName.toLowerCase());
+    
+    const isBlockedNOOTById = prefs.blockNOOTExclusiveShinies && NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.includes(pokeId);
+    const isBlockedNOOTByForm = prefs.blockNOOTExclusiveShinies && NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokeName === formName.toLowerCase());
+    
+    return isBlockedUnobtainableById || isBlockedUnobtainableByForm || 
+           isBlockedGOById || isBlockedGOByForm || 
+           isBlockedNOOTById || isBlockedNOOTByForm;
+  }, [pokemon, showShiny, dexPreferences]);
+
+  // Force close sidebar if trying to view a blocked shiny
+  useEffect(() => {
+    if (open && isBlockedShiny && typeof onClose === 'function') {
+      onClose();
+    }
+  }, [open, isBlockedShiny, onClose]);
 
   // Auto-check shiny charm when user manually changes the game (not when loading data)
   useEffect(() => {
@@ -654,6 +689,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
 
     const newInfo = {
       caught: true,
+      caughtAt: Date.now(),
       entries: [newEntry]
     };
 
@@ -734,6 +770,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
 
     const updatedInfo = {
       caught: true,
+      caughtAt: caughtInfo?.caughtAt || Date.now(),
       entries: updatedEntries
     };
 
@@ -1489,7 +1526,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                   setEditData(edit => ({
                     ...edit,
                     game: val,
-                    method: "",
+                    method: val === "Home" ? "Gift Pokemon" : "",
                     mark: "",
                     ball: shouldClearBall ? "" : edit.ball
                   }));
@@ -1505,6 +1542,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
               <label className="sidebar-label">Method:</label>
               <SearchbarIconDropdown
                 id="method-dropdown"
+                disabled={editData.game === "Home"}
                 options={[
                   { name: "None", value: "" },
                   ...availableMethods.map(method => ({ name: method.name, value: method.name })),

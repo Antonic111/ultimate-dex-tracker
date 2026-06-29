@@ -16,8 +16,9 @@ import gamePokemonData from "../data/gamePokemon.json";
 import formsData from "../utils/loadFormsData";
 import { getFilteredFormsData } from "../utils/dexPreferences";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
-import { SearchbarIconDropdown } from "../components/Shared/SearchBar";
 import { validateContent } from "../../shared/contentFilter";
+import { SearchbarIconDropdown } from "../components/Shared/SearchBar";
+import { getAvailableGamesForPokemonSidebar } from "../utils/pokemonAvailability";
 import PermutationTable from "../components/MMO/PermutationTable";
 import "../css/Counters.css";
 import "../css/MMOTool.css";
@@ -296,16 +297,13 @@ export default function MMOTool() {
   }, []);
 
   const filteredPokemon = useMemo(() => {
-    const legendsArceusIds = gamePokemonData["Legends Arceus"] || [];
-    const alphas = allPokemon.filter(p => {
-      const isAlpha = p.formType && p.formType.toLowerCase().includes("alpha");
-      if (!isAlpha) return false;
-      const formattedId = String(p.id).padStart(4, "0");
-      return legendsArceusIds.includes(formattedId);
+    const laPokemon = allPokemon.filter(p => {
+      const availableGames = getAvailableGamesForPokemonSidebar(p);
+      return availableGames.includes("Legends Arceus");
     });
-    if (!searchTerm.trim()) return alphas;
+    if (!searchTerm.trim()) return laPokemon;
     const q = searchTerm.toLowerCase();
-    return alphas.filter(p =>
+    return laPokemon.filter(p =>
       p && p.name && (p.name.toLowerCase().includes(q) || String(p.id).includes(q))
     );
   }, [allPokemon, searchTerm]);
@@ -991,7 +989,7 @@ export default function MMOTool() {
 
       await updateCaughtData(username, caughtKey, updatedInfo);
       window.dispatchEvent(new CustomEvent('caughtDataChanged', {
-        detail: { pokemon: workingPokemon, caughtInfo: updatedInfo, caughtKey }
+        detail: { pokemon: workingPokemon, caughtInfo: updatedInfo, caughtKey, wasCaught: !!existingInfo, isShiny: true }
       }));
     } catch {
       showMessage('Failed to save to collection', 'error');
@@ -1056,7 +1054,7 @@ export default function MMOTool() {
 
   // Get all available games (use GAME_OPTIONS with images)
   const allGames = useMemo(() => {
-    return GAME_OPTIONS;
+    return GAME_OPTIONS.filter(g => g.value !== "Home");
   }, []);
 
   // Get modifiers for the selected game
@@ -2566,7 +2564,7 @@ export default function MMOTool() {
                   <label className="hunt-label">Game:</label>
                   <SearchbarIconDropdown
                     id="edit-game-dropdown"
-                    options={GAME_OPTIONS}
+                    options={GAME_OPTIONS.filter(g => g.value !== "Home")}
                     value={editForm.game}
                     onChange={val => setEditForm(prev => ({ ...prev, game: val }))}
                     placeholder="Select a game..."

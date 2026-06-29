@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Youtube, Twitch, Home, User, Users, Settings, Tally5, FileText } from 'lucide-react';
+import { Youtube, Twitch, Home, User, Users, Settings, Tally5, FileText, ListChecks, Grid3x3, Heart } from 'lucide-react';
 import '../../css/Footer.css';
 
 export default function Footer() {
@@ -28,10 +28,22 @@ export default function Footer() {
               <Tally5 size={16} style={{ transform: 'rotate(-1deg)' }} />
               <span>Counters</span>
             </Link>
+            <Link to="/mmo-tool" className="quick-link">
+              <ListChecks size={16} />
+              <span>MMO Tool</span>
+            </Link>
+            <Link to="/bingo" className="quick-link">
+              <Grid3x3 size={16} />
+              <span>Bingo</span>
+            </Link>
             <Link to="/changelog" className="quick-link">
               <FileText size={16} />
               <span>Changelog</span>
             </Link>
+            <a href="https://streamelements.com/antonic111-1c2e0/tip" target="_blank" rel="noopener noreferrer" className="quick-link">
+              <Heart size={16} className="text-red-500" fill="currentColor" />
+              <span>Leave a Tip</span>
+            </a>
             <Link to="/settings" className="quick-link">
               <Settings size={16} />
               <span>Settings</span>

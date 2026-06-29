@@ -732,7 +732,18 @@ export default function Profile() {
                     optimisticOrderRef.current = next.map(p => ({ stableId: p.mon?.stableId, isShiny: !!p.info?.isShiny }));
                     return next;
                 });
-            } else if (pokemon && wasCaught) {
+            } else if (pokemon && caughtInfo && wasCaught) {
+                // Update existing caught info in place
+                setRecentAdded(prev => {
+                    const next = prev.map(p => {
+                        if (p.mon?.stableId === pokemon.stableId && !!p.info?.isShiny === !!isShiny) {
+                            return { ...p, info: { ...caughtInfo, isShiny: !!isShiny } };
+                        }
+                        return p;
+                    });
+                    return next;
+                });
+            } else if (pokemon && !caughtInfo) {
                 // Uncaught: remove from recentAdded
                 setRecentAdded(prev => {
                     const next = prev.filter(p => !(p.mon?.stableId === pokemon.stableId && !!p.info?.isShiny === !!isShiny));

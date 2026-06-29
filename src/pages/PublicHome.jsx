@@ -3,6 +3,7 @@ import { Sparkles, Users, SquarePen, Star, ArrowRight, Globe, ChevronLeft, Chevr
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import pokemonData from "../data/pokemon.json";
+import formsData from "../utils/loadFormsData";
 import "../css/PublicHome.css";
 
 export default function PublicHome() {
@@ -149,11 +150,12 @@ export default function PublicHome() {
     for (let i = 0; i < cardPositions.length; i++) {
       // 90% chance for database Pokémon, 10% chance for local special forms
       const useLocalSprite = Math.random() < 0.1;
+      const isShiny = Math.random() < 0.5;
 
       if (useLocalSprite) {
         // Use local special form sprite
         const localSprite = localSprites[Math.floor(Math.random() * localSprites.length)];
-        const spriteName = localSprite;
+        const spriteName = isShiny ? `${localSprite}-shiny` : localSprite;
 
         cards.push({
           id: i,
@@ -166,7 +168,9 @@ export default function PublicHome() {
       } else {
         // Use database Pokémon
         const randomPokemon = allPokemon[Math.floor(Math.random() * allPokemon.length)];
-        const spriteUrl = randomPokemon.sprites.front_default;
+        const spriteUrl = isShiny && randomPokemon.sprites.front_shiny
+          ? randomPokemon.sprites.front_shiny
+          : randomPokemon.sprites.front_default;
 
         cards.push({
           id: i,
@@ -193,7 +197,7 @@ export default function PublicHome() {
           <p className="hero-subtitle">The ultimate tracker for Living Dexes, shiny hunting, marks, forms, Poké Balls, and collection completion.</p>
 
           <p className="tracking-count">
-            Track 2,064 Pokémon Forms &amp; Variants
+            Track {(pokemonData.length + formsData.length).toLocaleString()} Pokémon Forms &amp; Variants
           </p>
 
           {totalCaught !== null && (
@@ -204,7 +208,7 @@ export default function PublicHome() {
                 </div>
                 <Globe className="live-globe-icon" />
                 <span className="live-caught-number">{displayCount.toLocaleString()}</span>
-                <span className="live-caught-label">Pokémon caught worldwide</span>
+                <span className="live-caught-label">Pokémon tracked worldwide</span>
               </div>
             </div>
           )}

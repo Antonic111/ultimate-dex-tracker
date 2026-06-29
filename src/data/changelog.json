@@ -1,5 +1,32 @@
 [
   {
+    "date": "2026-06-29",
+    "version": "v1.1.6",
+    "type": "fix",
+    "title": "",
+    "description": "",
+    "features": [],
+    "fixes": [
+      "Added support for hunting non-Alpha Pokémon in the Legends: Arceus MMO Tool page.",
+      "In the Counters page, permutation hunts can no longer be completed from this view, as this was causing issues.",
+      "Added Eternal Floette forme and marked it as unobtainable in the shiny list, displaying a lock icon over it.",
+      "Added Keldeo Resolute forme and marked it as unobtainable in the shiny list, displaying a lock icon over it.",
+      "Added Alpha Garden Forme Vivillon and marked it as unobtainable in the shiny list, displaying a lock icon over it.",
+      "Fixed an issue where locked Pokémon could still be viewed in the sidebar and marked as caught or have data added.",
+      "Fixed multiple issues where Pokémon were not appearing in the recent catches bar on the profile page after being marked as caught.",
+      "Added Pokémon HOME as a game to allow HOME gift rewards to be tracked and recorded accurately.",
+      "Updated the **Track 2,067 Pokémon Forms & Variants** counter on the homepage to automatically update whenever new Pokémon are added.",
+      "Fixed an issue on the homepage where only regular Pokémon sprites were displayed instead of a mix of regular and shiny sprites.",
+      "Reworded **Pokémon Caught Worldwide** to **Pokémon Tracked Worldwide** on the public home page.",
+      "Added a new badge to the changelog tab in the header that highlights updates you haven't viewed yet, just like this one!",
+      "Fixed an autofill issue on the Settings page affecting Google Chrome users.",
+      "Added a **Leave a Tip** button to the header so users can optionally support the site and help with upkeep. All tips are completely optional and greatly appreciated.",
+      "Replaced the MMO Tool SVG to something more fitting.",
+      "Fixed an issue where evolutions with regional pre-evolutions were displaying the incorrect regional form.",
+      "Hidden the evolution chain section in the sidebar for Pokémon that do not have any evolutions."
+    ]
+  },
+  {
     "date": "2026-06-18",
     "version": "v1.1.5",
     "type": "feature",

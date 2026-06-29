@@ -275,16 +275,20 @@ export default function Settings() {
                     <div className="setting-block">
                         <h3>Change Email</h3>
                         <form onSubmit={(e) => { e.preventDefault(); handleEmailChange(); }}>
+                            {/* Dummy fields to trick Chrome's aggressive password manager autofill */}
+                            <input type="text" name="fakeusernameremembered" style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} aria-hidden="true" tabIndex="-1" autoComplete="username" />
+                            <input type="password" name="fakepasswordremembered" style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} aria-hidden="true" tabIndex="-1" autoComplete="current-password" />
+                            
                             <div className="input-icon-wrapper">
                                 <Mail className="auth-icon" size={24} />
                                 <input
                                     id="settings-new-email"
-                                    name="email"
+                                    name="new_email_address"
                                     type="email"
                                     placeholder={email || "new email"}
                                     value={newEmail}
                                     onChange={(e) => setNewEmail(e.target.value)}
-                                    autoComplete="email"
+                                    autoComplete="off"
                                 />
                             </div>
                             <div className="input-icon-wrapper">

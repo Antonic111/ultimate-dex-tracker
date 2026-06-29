@@ -1465,7 +1465,7 @@ export default function Counters() {
 
   // Get all available games (use GAME_OPTIONS with images)
   const allGames = useMemo(() => {
-    return GAME_OPTIONS;
+    return GAME_OPTIONS.filter(g => g.value !== "Home");
   }, []);
 
   // Get modifiers for the selected game
@@ -1754,7 +1754,10 @@ export default function Counters() {
                 )}
 
                 <div className="hunt-complete">
-                  <div className="hunt-odds-display">
+                  <div 
+                    className="hunt-odds-display" 
+                    style={hunt.method === "Permutations" ? { flex: 1, justifyContent: "center" } : {}}
+                  >
                     <span className="odds-label">Odds:</span>
                     <span className="odds-value">
                       {(() => {
@@ -1830,13 +1833,15 @@ export default function Counters() {
                       })()}
                     </span>
                   </div>
-                  <button
-                    onClick={() => handleCompleteHunt(hunt)}
-                    className="complete-hunt-btn"
-                  >
-                    <Check size={16} />
-                    Complete Hunt
-                  </button>
+                  {hunt.method !== "Permutations" && (
+                    <button
+                      onClick={() => handleCompleteHunt(hunt)}
+                      className="complete-hunt-btn"
+                    >
+                      <Check size={16} />
+                      Complete Hunt
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -3099,7 +3104,7 @@ export default function Counters() {
                   <label className="hunt-label">Game:</label>
                   <SearchbarIconDropdown
                     id="edit-game-dropdown"
-                    options={GAME_OPTIONS}
+                    options={GAME_OPTIONS.filter(g => g.value !== "Home")}
                     value={editForm.game}
                     onChange={val => setEditForm(prev => ({ ...prev, game: val }))}
                     placeholder="Select a game..."

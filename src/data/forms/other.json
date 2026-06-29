@@ -592,6 +592,25 @@
     }
   },
   {
+    "id": 647,
+    "name": "keldeo-resolute",
+    "formType": "other",
+    "stableId": "keldeo-resolute-0647",
+    "types": [
+      "water",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/keldeo-resolute.png",
+      "front_shiny": "/Sprites/keldeo-resolute-shiny.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
     "id": 669,
     "name": "flabebe-yellow",
     "formType": "other",
@@ -728,6 +747,24 @@
     "sprites": {
       "front_default": "/Sprites/floette-white.png",
       "front_shiny": "/Sprites/floette-white-shiny.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": null,
+      "next": []
+    }
+  },
+  {
+    "id": 670,
+    "name": "floette-eternal",
+    "formType": "other",
+    "stableId": "floette-eternal-0670",
+    "types": [
+      "fairy"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/floette-eternal.png",
+      "front_shiny": "/Sprites/floette-eternal-shiny.png"
     },
     "gen": 6,
     "evolution": {
