@@ -144,6 +144,15 @@ export const FILTER_CONFIGS = {
     similarityThreshold: 0.2, // Tighter threshold for bio
     fieldName: "Bio"
   },
+  nickname: {
+    minLength: 0,
+    maxLength: 12,
+    allowedChars: null,
+    charDescription: null,
+    checkBadWords: true,
+    similarityThreshold: 0.2,
+    fieldName: "Nickname"
+  },
   notes: {
     minLength: 0,
     maxLength: 200,

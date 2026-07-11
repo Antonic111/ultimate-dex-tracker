@@ -719,10 +719,10 @@ export default function Profile() {
         // full data in the event detail. We can immediately update recentAdded without waiting
         // for a server fetch (which would be stale due to async save timing).
         const handleCaughtDataChanged = (e) => {
-            const { pokemon, caughtInfo, wasCaught, isShiny } = e?.detail || {};
+            const { pokemon, caughtInfo, wasCaught, isShiny, isNewEntry } = e?.detail || {};
 
-            if (pokemon && caughtInfo && !wasCaught) {
-                // Newly caught: prepend to recentAdded immediately
+            if (pokemon && caughtInfo && (!wasCaught || isNewEntry)) {
+                // Newly caught or new entry added: prepend to recentAdded immediately
                 setRecentAdded(prev => {
                     const newEntry = { mon: pokemon, info: { ...caughtInfo, isShiny: !!isShiny } };
                     // Remove any existing entry for the same Pokémon (same stableId), then prepend

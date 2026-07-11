@@ -162,7 +162,7 @@ export default function Counters() {
     const hisuianBalls = [
       "Feather Ball", "Wing Ball", "Jet Ball", "Heavy Ball (Hisui)",
       "Leaden Ball", "Gigaton Ball", "Poké Ball (Hisui)",
-      "Great Ball (Hisui)", "Ultra Ball (Hisui)", "Origin Ball", "Strange Ball"
+      "Great Ball (Hisui)", "Ultra Ball (Hisui)", "Origin Ball"
     ];
     return hisuianBalls.includes(ballValue);
   };
@@ -172,7 +172,7 @@ export default function Counters() {
     if (completionModal.hunt && completionModal.hunt.game === "Legends Arceus") {
       // Show only Hisuian balls for Legends Arceus
       return BALL_OPTIONS.filter(ball =>
-        ball.value === "" || isHisuianBall(ball.value)
+        ball.value === "" || ball.value === "Strange Ball" || isHisuianBall(ball.value)
       );
     }
     return BALL_OPTIONS;
@@ -1394,6 +1394,7 @@ export default function Counters() {
   // Get current odds based on selected method and modifiers
   const currentOdds = useMemo(() => {
     if (!huntDetails.game || !huntDetails.method) return "NA";
+    if (huntDetails.game === "Home" && huntDetails.method === "Gift Pokemon") return "hide";
 
     // Special case for Poke Radar in Diamond/Pearl/Platinum - show table
     if (huntDetails.method === "Poke Radar" && (huntDetails.game === "Diamond" || huntDetails.game === "Pearl" || huntDetails.game === "Platinum")) {
@@ -2390,7 +2391,7 @@ export default function Counters() {
                     )}
 
                   {/* Odds Display */}
-                  {((huntDetails.game && huntDetails.method && availableMethods.length > 0) || (!huntDetails.game || !huntDetails.method)) && (
+                  {currentOdds !== "hide" && ((huntDetails.game && huntDetails.method && availableMethods.length > 0) || (!huntDetails.game || !huntDetails.method)) && (
                     <div className="hunt-form-group">
                       <label className="hunt-label">Current Odds:</label>
                       <div className="odds-display">

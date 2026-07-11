@@ -52,7 +52,7 @@ function TimerDisplay({ huntId, lastCheckTime, isPaused, onTimeUpdate }) {
 const HISUIAN_BALLS = [
   "Feather Ball","Wing Ball","Jet Ball","Heavy Ball (Hisui)",
   "Leaden Ball","Gigaton Ball","Poké Ball (Hisui)",
-  "Great Ball (Hisui)","Ultra Ball (Hisui)","Origin Ball","Strange Ball"
+  "Great Ball (Hisui)","Ultra Ball (Hisui)","Origin Ball"
 ];
 
 function formatTime(ms) {
@@ -127,7 +127,7 @@ export default function MMOTool() {
   const getCompletionBallOptions = () => {
     if (completionModal.hunt && completionModal.hunt.game === "Legends Arceus") {
       return BALL_OPTIONS.filter(ball =>
-        ball.value === "" || isHisuianBall(ball.value)
+        ball.value === "" || ball.value === "Strange Ball" || isHisuianBall(ball.value)
       );
     }
     return BALL_OPTIONS;
@@ -1050,7 +1050,7 @@ export default function MMOTool() {
   );
 
   // ── Ball options for completion (Hisui only) ──────────────────────────────
-  const hisuiBalls = BALL_OPTIONS.filter(b => b.value === "" || HISUIAN_BALLS.includes(b.value));
+  const hisuiBalls = BALL_OPTIONS.filter(b => b.value === "" || b.value === "Strange Ball" || HISUIAN_BALLS.includes(b.value));
 
   // Get all available games (use GAME_OPTIONS with images)
   const allGames = useMemo(() => {

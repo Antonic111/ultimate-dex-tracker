@@ -568,7 +568,6 @@ export const specialFormLabels = {
   "squawkabilly-white-alphaother": "Alpha White Plumage",
   "tatsugiri-droopy-alphaother": "Alpha Droopy Form",
   "tatsugiri-stretchy-alphaother": "Alpha Stretchy Form",
-  "furfrou": "Alpha Natural Form",
   "furfrou-heart-alphaother": "Alpha Heart Trim",
   "furfrou-star-alphaother": "Alpha Star Trim",
   "furfrou-diamond-alphaother": "Alpha Diamond Trim",

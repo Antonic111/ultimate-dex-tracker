@@ -191,6 +191,27 @@
   </noscript>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
+  <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+  <script>
+    kofiWidgetOverlay.draw('antonic111', {
+      'type': 'floating-chat',
+      'floating-chat.donateButton.text': 'Tip Me',
+      'floating-chat.donateButton.background-color': '#323842',
+      'floating-chat.donateButton.text-color': '#fff'
+    });
+  </script>
+  <style>
+    /* Force Ko-Fi widget to bottom left */
+    .floatingchat-container-wrap {
+      left: 16px !important;
+      right: auto !important;
+    }
+
+    .floating-chat-kofi-popup-iframe {
+      left: 16px !important;
+      right: auto !important;
+    }
+  </style>
 </body>
 
 </html>

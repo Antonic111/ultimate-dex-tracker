@@ -10,11 +10,11 @@ export async function fetchCaughtData(username) {
   }
 }
 
-export async function updateCaughtData(username, key, infoMap) {
+export async function updateCaughtData(username, key, infoMap, newCatchTrigger = null) {
   try {
     if (key) {
       // Atomic per-entry update to avoid race conditions
-      const result = await caughtAPI.updateCaughtEntry(key, infoMap);
+      const result = await caughtAPI.updateCaughtEntry(key, infoMap, newCatchTrigger);
       return result;
     } else {
       // Full map update (from mark all operations)

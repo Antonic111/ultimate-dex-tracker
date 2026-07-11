@@ -10275,8 +10275,8 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/676.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/676.png"
+      "front_default": "/Sprites/furfrou.png",
+      "front_shiny": "/Sprites/furfrou-shiny.png"
     },
     "gen": 6,
     "evolution": {

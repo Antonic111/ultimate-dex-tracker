@@ -1,5 +1,27 @@
 [
   {
+    "date": "2026-07-10",
+    "version": "v1.1.7",
+    "type": "feature",
+    "title": "",
+    "description": "",
+    "features": [
+      "Added a desktop-only Live Activity Feed to the main grid, displaying recent Pokémon catches from users across the site.",
+      "Added sidebar tabs to separate Data and Info, reducing vertical scrolling and making navigation easier.",
+      "Added the ability to track nicknames for each Pokémon you catch.",
+      "Replaced the \"Leave a Tip\" buttons in the header and footer with a floating Ko-fi tip button in the bottom left corner."
+    ],
+    "fixes": [
+      "Ultra Wormhole encounter odds in the sidebar have been updated to display as 1%–36% instead of 1/4096.",
+      "Scarlet & Violet Outbreak + Level 3 Sandwich shiny odds have been corrected to 1/512 without any check data.",
+      "Strange Ball can now be assigned to all Pokémon.",
+      "Editing a Pokémon that was previously marked as Caught will no longer create a duplicate entry in the Recent Entries section. Only newly added entries will appear there.",
+      "Pokémon HOME entries no longer display shiny odds, and the Checks field in the sidebar is now disabled since gift Pokémon from HOME cannot be checked.",
+      "Fixed a form name mismatch affecting Shiny Furfrou.",
+      "Upscaled the Natural Form Furfrou regular, shiny, and alpha sprites to match the sizing of the other Furfrou forms."
+    ]
+  },
+  {
     "date": "2026-06-29",
     "version": "v1.1.6",
     "type": "fix",

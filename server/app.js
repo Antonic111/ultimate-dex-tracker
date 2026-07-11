@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.js";
 import profileRoutes from "./routes/profiles.js";
 import bugReportRoutes from "./routes/bugReports.js";
+import recentCatchesRoutes from "./routes/recentCatches.js";
 
 // Load environment variables from both .env and .env.local (and parent dir)
 dotenv.config();
@@ -92,6 +93,7 @@ app.get("/api/iphone-test", (req, res) => {
 app.use("/api", authRoutes);
 app.use("/api/profiles", profileRoutes);
 app.use("/api/bug-reports", bugReportRoutes);
+app.use("/api/recent-catches", recentCatchesRoutes);
 
 // Global error handler for oversized payloads and other errors
 app.use((err, req, res, next) => {

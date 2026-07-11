@@ -4,7 +4,6 @@
 
 /* Evolution Chain Spacer */
 .evolution-chain-spacer {
-  @apply mt-auto;
   height: 1rem;
   border: none;
 }

@@ -28,6 +28,15 @@ const LoadingSpinner = ({
   const variantClass = `loading-${variant}`;
   const colorClass = `loading-${color}`;
 
+  const hideKofiStyle = (fullScreen || overlay) ? (
+    <style>{`
+      html body .floatingchat-container-wrap, 
+      html body .floating-chat-kofi-popup-iframe {
+        display: none !important;
+      }
+    `}</style>
+  ) : null;
+
   // Use the module-level selected ball for consistency across all instances
   const randomBall = SELECTED_BALL;
 
@@ -55,8 +64,10 @@ const LoadingSpinner = ({
 
   if (fullScreen) {
     return (
-      <div className="loading-fullscreen">
-        {variant === 'logo' ? (
+      <>
+        {hideKofiStyle}
+        <div className="loading-fullscreen">
+          {variant === 'logo' ? (
           <BallLoader />
         ) : (
           <>
@@ -124,13 +135,16 @@ const LoadingSpinner = ({
           </footer>
         </div>
       </div>
+      </>
     );
   }
 
   if (overlay) {
     return (
-      <div className="loading-overlay">
-        {variant === 'logo' ? (
+      <>
+        {hideKofiStyle}
+        <div className="loading-overlay">
+          {variant === 'logo' ? (
           <BallLoader showText={false} />
         ) : (
           <>
@@ -157,6 +171,7 @@ const LoadingSpinner = ({
           </>
         )}
       </div>
+      </>
     );
   }
 

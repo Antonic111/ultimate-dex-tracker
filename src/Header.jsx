@@ -65,8 +65,6 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
   // Prevent body scroll when profile menu is open
   useEffect(() => {
     if (showMenu) {
-      document.body.style.overflow = 'hidden';
-
       // Close dropdown on scroll events
       const handleScroll = (event) => {
         // Only close if it's a wheel event or touch scroll, not programmatic
@@ -80,12 +78,9 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
       document.addEventListener('touchmove', handleScroll, { passive: true, capture: true });
 
       return () => {
-        document.body.style.overflow = 'unset';
         document.removeEventListener('wheel', handleScroll, { capture: true });
         document.removeEventListener('touchmove', handleScroll, { capture: true });
       };
-    } else {
-      document.body.style.overflow = 'unset';
     }
 
     // Cleanup on unmount
@@ -150,8 +145,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
   }
 
   return (
-
-    <header className="bg-[var(--header)] transition-[background-color] duration-[var(--transition-speed)] border-b-8" style={{ borderColor: 'var(--accent)' }}>
+    <header className={`relative z-40 bg-[var(--header)] transition-[background-color] duration-[var(--transition-speed)] border-b-8 ${location.pathname === '/' ? 'sticky top-0' : ''}`} style={{ borderColor: 'var(--accent)' }}>
       <div className="w-full h-[80px] md:h-[130px] max-h-[80px] md:max-h-[130px] mx-auto flex items-center justify-between px-3 md:px-8 md:pr-6 relative">
 
         {/* Logo — far left */}
@@ -284,19 +278,6 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                 </Link>
               )}
 
-              {user?.username && (
-                <a
-                  href="https://streamelements.com/antonic111-1c2e0/tip"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline text-[var(--text-muted,var(--text-color))] opacity-70 hover:opacity-100 hover:text-[var(--accent)]"
-                >
-                  <Heart size={19} className="flex-shrink-0 text-red-500" fill="currentColor" />
-                  <span className="whitespace-nowrap">Leave a Tip</span>
-                  <span className="absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100" style={{ transformOrigin: 'center' }} />
-                </a>
-              )}
-
             </div>
           </nav>
         )}
@@ -376,19 +357,6 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                     <span className="whitespace-nowrap">Feedback</span>
                   </div>
                 </Link>
-
-                <a
-                  href="https://streamelements.com/antonic111-1c2e0/tip"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]"
-                  onClick={() => setShowMobileNav(false)}
-                >
-                  <div className="flex items-center gap-3">
-                    <Heart size={16} className="flex-shrink-0 text-red-500" fill="currentColor" />
-                    <span className="whitespace-nowrap">Leave a Tip</span>
-                  </div>
-                </a>
               </>
             )}
           </div>

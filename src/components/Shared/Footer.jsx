@@ -40,10 +40,6 @@ export default function Footer() {
               <FileText size={16} />
               <span>Changelog</span>
             </Link>
-            <a href="https://streamelements.com/antonic111-1c2e0/tip" target="_blank" rel="noopener noreferrer" className="quick-link">
-              <Heart size={16} className="text-red-500" fill="currentColor" />
-              <span>Leave a Tip</span>
-            </a>
             <Link to="/settings" className="quick-link">
               <Settings size={16} />
               <span>Settings</span>

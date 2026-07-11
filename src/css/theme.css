@@ -427,3 +427,17 @@ textarea:focus {
   outline: none;
   border-color: var(--accent) !important;
 }
+@keyframes slideDownCatch {
+  0% { opacity: 0; transform: translateY(-30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popInHover {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideDownCatchWrapper {
+  0% { transform: translateY(-190px); }
+  100% { transform: translateY(0); }
+}

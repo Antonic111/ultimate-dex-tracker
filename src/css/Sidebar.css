@@ -150,6 +150,12 @@
   align-items: center;
 }
 
+.sidebar-input:disabled {
+  background-color: transparent;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .sidebar-input::placeholder {
   color: var(--input-placeholder);
 }

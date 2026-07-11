@@ -15,7 +15,7 @@ import Sidebar from "./components/Dex/PokemonSidebar";
 import ProgressManager from "./components/Progress/ProgressManager";
 import SearchBar from "./components/Shared/SearchBar";
 import NoResults from "./components/Shared/NoResults";
-import { formatPokemonName, getLevenshteinDistance, getEvolutionChainIds, findPokemon } from "./utils";
+import { formatPokemonName, getFormDisplayName, getLevenshteinDistance, getEvolutionChainIds, findPokemon } from "./utils";
 import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isPseudoLegendaryEvo, isSubLegendary, isStarter, isStarterEvo, isFossil, isFossilEvo, isBaby, isBabyEvo, isParadox, getPokemonCategory } from "./utils/pokemonCategories";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
@@ -53,6 +53,7 @@ import { LoadingSpinner } from "./components/Shared";
 import Footer from "./components/Shared/Footer";
 import CustomScrollbar from "./components/Shared/CustomScrollbar";
 import MaintenanceScreen from "./components/Shared/MaintenanceScreen";
+import RecentCatchesSidebar from "./components/Shared/RecentCatchesSidebar";
 import { buildApiUrl } from "./config/api.js";
 import { getFilteredFormsData, getDexPreferences } from "./utils/dexPreferences";
 import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "./data/blockedShinies";
@@ -285,7 +286,10 @@ function hasMeaningfulInfo(info) {
   }
 
   // Handle old format (direct fields)
-  const { date, ball, mark, method, game, checks, notes } = info;
+  const { nickname, date, ball, mark, method, game, checks, notes } = info;
+
+  // nickname filled?
+  if (nickname && String(nickname).trim() !== "") return true;
 
   // date filled?
   if (date && String(date).trim() !== "") return true;
@@ -408,7 +412,7 @@ export default function App() {
               authAPI.getCurrentUser(),
               fetch(buildApiUrl('/site-settings')).then(res => res.json())
             ]);
-            
+
             if (settingsRes.status === 'fulfilled' && settingsRes.value) {
               setMaintenanceMode(settingsRes.value.maintenanceMode || false);
               setMaintenanceStartTime(settingsRes.value.maintenanceStartTime || null);
@@ -435,10 +439,10 @@ export default function App() {
             authAPI.getCurrentUser(),
             fetch(buildApiUrl('/site-settings')).then(res => res.json())
           ]);
-          
+
           if (userRes.status === 'fulfilled') userData = userRes.value;
           else authError = userRes.reason;
-          
+
           if (settingsRes.status === 'fulfilled' && settingsRes.value) {
             setMaintenanceMode(settingsRes.value.maintenanceMode || false);
             setMaintenanceStartTime(settingsRes.value.maintenanceStartTime || null);
@@ -1262,12 +1266,12 @@ export default function App() {
 
 
 
-  const updateCaughtInfo = useCallback((poke, info, isShiny = false) => {
+  const updateCaughtInfo = useCallback((poke, info, isShiny = false, isNewEntryArg = false) => {
     const key = getCaughtKey(poke, null, isShiny);
     if (!key) return;
 
     const wasAlreadyCaught = !!caught[key];
-    
+
     // Normalize data for backend schema (checks is Number or omitted)
     let cleanedInfo = null;
     if (info != null) {
@@ -1293,7 +1297,14 @@ export default function App() {
     });
 
     if (user?.username) {
-      updateCaughtData(user.username, key, cleanedInfo);
+      let newCatchTrigger = null;
+      if (isNewEntryArg) {
+        const pokeName = formatPokemonName(poke.name);
+        const formName = getFormDisplayName(poke) || null;
+        const sprite = isShiny && poke.sprites?.front_shiny ? poke.sprites.front_shiny : (poke.sprites?.front_default || "/fallback.png");
+        newCatchTrigger = { pokemonName: pokeName, formName: formName, sprite: sprite, username: user.username, profileTrainer: user.profileTrainer };
+      }
+      updateCaughtData(user.username, key, cleanedInfo, newCatchTrigger);
     }
 
     // caught = true if we have info, false if we cleared it
@@ -1303,7 +1314,7 @@ export default function App() {
     try {
       const existing = JSON.parse(sessionStorage.getItem('recentCatchOrder') || '[]');
       let updated;
-      if (!wasAlreadyCaught && info != null) {
+      if ((!wasAlreadyCaught || isNewEntryArg) && info != null) {
         // Prepend the new catch, remove duplicates, keep top 5
         updated = [
           { stableId: poke.stableId, isShiny },
@@ -1326,6 +1337,7 @@ export default function App() {
         caughtKey: key,
         caughtInfo: cleanedInfo,
         wasCaught: wasAlreadyCaught,
+        isNewEntry: isNewEntryArg,
         isShiny,
         source: 'app'
       }
@@ -1459,7 +1471,14 @@ export default function App() {
         const { caughtAPI } = await import('./utils/api.js');
         await caughtAPI.patchCaughtData({ changes: delta });
       } else if (user?.username) {
-        await updateCaughtData(user.username, null, newInfoMap);
+        let newCatchTrigger = null;
+        if (isNewEntryArg) {
+          const pokeName = formatPokemonName(poke.name);
+          const formName = getFormDisplayName(poke) || null;
+          const sprite = isShiny && poke.sprites?.front_shiny ? poke.sprites.front_shiny : (poke.sprites?.front_default || "/fallback.png");
+          newCatchTrigger = { pokemonName: pokeName, formName: formName, sprite: sprite, username: user.username, profileTrainer: user.profileTrainer };
+        }
+        await updateCaughtData(user.username, null, newInfoMap, newCatchTrigger);
       }
     } catch (e) {
       // swallow; UI already updated optimistically
@@ -1499,6 +1518,7 @@ export default function App() {
 
     if (!wasAlreadyCaught) {
       const newEntry = {
+        nickname: "",
         date: "",
         ball: BALL_OPTIONS[0].value,
         mark: MARK_OPTIONS[0].value,
@@ -1518,7 +1538,11 @@ export default function App() {
         [key]: freshInfo
       }));
       if (user?.username) {
-        updateCaughtData(user.username, key, freshInfo);
+        const pokeName = formatPokemonName(poke.name);
+        const formName = getFormDisplayName(poke) || null;
+        const sprite = isShiny && poke.sprites?.front_shiny ? poke.sprites.front_shiny : (poke.sprites?.front_default || "/fallback.png");
+        const newCatchTrigger = { pokemonName: pokeName, formName: formName, sprite: sprite, username: user.username, profileTrainer: user.profileTrainer };
+        updateCaughtData(user.username, key, freshInfo, newCatchTrigger);
       }
     } else {
       setCaughtInfoMap(prevInfoMap => {
@@ -1780,13 +1804,15 @@ export default function App() {
           <MessageProvider>
             <Router>
               <div className="flex flex-col min-h-screen">
+                <RecentCatchesSidebar />
+
                 <CloseSidebarOnRouteChange
                   setSidebarOpen={setSidebarOpen}
                   setSelectedPokemon={setSelectedPokemon}
                   sidebarOpen={sidebarOpen}
                   selectedPokemon={selectedPokemon}
                 />
-                
+
                 {(isMaintenancePending || (maintenanceMode && isMaintenanceTime)) && (
                   <div style={{
                     backgroundColor: '#ef4444',
@@ -2264,7 +2290,7 @@ export default function App() {
               </div>,
               document.body
             )}
-          <AppThemeSync username={user?.username} />
+            <AppThemeSync username={user?.username} />
           </MessageProvider>
         </UserContext.Provider>
       </LoadingProvider>

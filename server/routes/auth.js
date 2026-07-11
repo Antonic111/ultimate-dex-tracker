@@ -11,6 +11,8 @@ import { validateContent } from "../contentFilter.js";
 import { sanitizeProfileData, sanitizeInput, sanitizeEntryData } from "../sanitizeInput.js";
 import { authenticateUser } from "../middleware/authenticateUser.js";
 import CreatorRequest from "../models/CreatorRequest.js";
+import RecentCatch from "../models/RecentCatch.js";
+import { broadcastNewCatch } from "./recentCatches.js";
 
 // CORS middleware for auth routes
 const corsMiddleware = (req, res, next) => {
@@ -822,10 +824,18 @@ router.patch("/caught", authenticateUser, async (req, res) => {
       if (value === null) {
         unsetOps["caughtPokemon." + key] = "";
       } else {
-        // Validate notes if present per entry
-        if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, 'notes')) {
-          const notesValidation = validateContent(String(value.notes || ''), 'notes');
-          if (!notesValidation.isValid) return res.status(400).json({ error: notesValidation.error });
+        // Validate notes and nickname if present in entries
+        if (value && typeof value === 'object' && value.entries && Array.isArray(value.entries)) {
+          for (const entry of value.entries) {
+            if (entry.notes) {
+              const notesValidation = validateContent(String(entry.notes || ''), 'notes');
+              if (!notesValidation.isValid) return res.status(400).json({ error: notesValidation.error });
+            }
+            if (entry.nickname) {
+              const nicknameValidation = validateContent(String(entry.nickname || ''), 'nickname');
+              if (!nicknameValidation.isValid) return res.status(400).json({ error: nicknameValidation.error });
+            }
+          }
         }
         setOps["caughtPokemon." + key] = value;
       }
@@ -899,17 +909,60 @@ router.put("/caught/:key", authenticateUser, async (req, res) => {
     const info = Object.prototype.hasOwnProperty.call(req.body, 'info') ? req.body.info : undefined;
     if (typeof info === 'undefined') return res.status(400).json({ error: "Missing info" });
 
-    if (info && typeof info === 'object' && Object.prototype.hasOwnProperty.call(info, 'notes')) {
-      const notesValidation = validateContent(String(info.notes || ''), 'notes');
-      if (!notesValidation.isValid) return res.status(400).json({ error: notesValidation.error });
+    if (info && typeof info === 'object' && info.entries && Array.isArray(info.entries)) {
+      for (const entry of info.entries) {
+        if (entry.notes) {
+          const notesValidation = validateContent(String(entry.notes || ''), 'notes');
+          if (!notesValidation.isValid) return res.status(400).json({ error: notesValidation.error });
+        }
+        if (entry.nickname) {
+          const nicknameValidation = validateContent(String(entry.nickname || ''), 'nickname');
+          if (!nicknameValidation.isValid) return res.status(400).json({ error: nicknameValidation.error });
+        }
+      }
     }
 
-    const update = info === null
+    console.log("RECEIVED INFO:", JSON.stringify(info?.entries)); const update = info === null
       ? { $unset: { ["caughtPokemon." + key]: "" } }
       : { $set: { ["caughtPokemon." + key]: info } };
 
     const result = await User.updateOne({ _id: req.userId }, update);
     if (result.matchedCount === 0) return res.status(404).json({ error: "User not found" });
+
+    // Handle Recent Catches broadcast
+    const newCatchTrigger = Object.prototype.hasOwnProperty.call(req.body, 'newCatchTrigger') ? req.body.newCatchTrigger : null;
+    
+    if (newCatchTrigger && newCatchTrigger.pokemonName && newCatchTrigger.sprite && newCatchTrigger.username) {
+      try {
+        const now = Date.now();
+        
+        // Duplicate Toggle Prevention: No exact matches within the last 30 seconds
+        const duplicateCheck = await RecentCatch.findOne({
+          username: newCatchTrigger.username,
+          pokemonName: newCatchTrigger.pokemonName,
+          formName: newCatchTrigger.formName || null,
+          caughtAt: { $gt: new Date(now - 30 * 1000) }
+        }).lean();
+
+        if (!duplicateCheck) {
+          const recentCatch = new RecentCatch({
+            pokemonName: newCatchTrigger.pokemonName,
+            formName: newCatchTrigger.formName || null,
+            sprite: newCatchTrigger.sprite,
+            username: newCatchTrigger.username,
+            profileTrainer: newCatchTrigger.profileTrainer || null
+          });
+          await recentCatch.save();
+          
+          // Broadcast to all connected clients
+          broadcastNewCatch(recentCatch);
+        } else {
+          console.log(`[Anti-Spam] Skipped feed broadcast for ${newCatchTrigger.username} (${newCatchTrigger.pokemonName})`);
+        }
+      } catch (catchErr) {
+        console.error("Error saving/broadcasting recent catch:", catchErr);
+      }
+    }
 
     return res.json({ success: true });
   } catch (err) {

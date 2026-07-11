@@ -39,6 +39,7 @@ const userSchema = new mongoose.Schema({
       caught: Boolean,
       caughtAt: Number,
       entries: [{
+        nickname: String,
         ball: String,
         mark: String,
         method: String,

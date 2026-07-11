@@ -418,8 +418,12 @@ export const caughtAPI = {
   },
 
   // Atomically update a single entry
-  async updateCaughtEntry(key, info) {
-    return api.put(`/caught/${encodeURIComponent(key)}`, { info });
+  async updateCaughtEntry(key, info, newCatchTrigger = null) {
+    const payload = { info };
+    if (newCatchTrigger) {
+      payload.newCatchTrigger = newCatchTrigger;
+    }
+    return api.put(`/caught/${encodeURIComponent(key)}`, payload);
   },
 
   // Apply partial/delta updates: { key: info|null }
