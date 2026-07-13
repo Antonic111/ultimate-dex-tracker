@@ -60,6 +60,20 @@ export function transformSpriteUrlForViewer(url, useHomeSprites = false) {
             }
         }
     }
-    
+    // Handle Local Sprites
+    if (url.startsWith('/Sprites/')) {
+        if (useHomeSprites) {
+            // Transform to HOME
+            if (!url.startsWith('/Sprites/Home/')) {
+                return url.replace('/Sprites/', '/Sprites/Home/');
+            }
+        } else {
+            // Transform back to default
+            if (url.startsWith('/Sprites/Home/')) {
+                return url.replace('/Sprites/Home/', '/Sprites/');
+            }
+        }
+    }
+
     return url;
 }
