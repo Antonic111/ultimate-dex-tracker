@@ -16,6 +16,7 @@ import ProgressManager from "./components/Progress/ProgressManager";
 import SearchBar from "./components/Shared/SearchBar";
 import NoResults from "./components/Shared/NoResults";
 import { formatPokemonName, getFormDisplayName, getLevenshteinDistance, getEvolutionChainIds, findPokemon } from "./utils";
+import { getSpriteUrl } from "./utils/spriteUtils";
 import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isPseudoLegendaryEvo, isSubLegendary, isStarter, isStarterEvo, isFossil, isFossilEvo, isBaby, isBabyEvo, isParadox, getPokemonCategory } from "./utils/pokemonCategories";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
@@ -1301,7 +1302,7 @@ export default function App() {
       if (isNewEntryArg) {
         const pokeName = formatPokemonName(poke.name);
         const formName = getFormDisplayName(poke) || null;
-        const sprite = isShiny && poke.sprites?.front_shiny ? poke.sprites.front_shiny : (poke.sprites?.front_default || "/fallback.png");
+        const sprite = getSpriteUrl(poke, isShiny, currentDexPreferences?.useHomeSprites);
         newCatchTrigger = { pokemonName: pokeName, formName: formName, sprite: sprite, username: user.username, profileTrainer: user.profileTrainer };
       }
       updateCaughtData(user.username, key, cleanedInfo, newCatchTrigger);
@@ -1475,7 +1476,7 @@ export default function App() {
         if (isNewEntryArg) {
           const pokeName = formatPokemonName(poke.name);
           const formName = getFormDisplayName(poke) || null;
-          const sprite = isShiny && poke.sprites?.front_shiny ? poke.sprites.front_shiny : (poke.sprites?.front_default || "/fallback.png");
+          const sprite = getSpriteUrl(poke, isShiny, currentDexPreferences?.useHomeSprites);
           newCatchTrigger = { pokemonName: pokeName, formName: formName, sprite: sprite, username: user.username, profileTrainer: user.profileTrainer };
         }
         await updateCaughtData(user.username, null, newInfoMap, newCatchTrigger);
@@ -1540,7 +1541,7 @@ export default function App() {
       if (user?.username) {
         const pokeName = formatPokemonName(poke.name);
         const formName = getFormDisplayName(poke) || null;
-        const sprite = isShiny && poke.sprites?.front_shiny ? poke.sprites.front_shiny : (poke.sprites?.front_default || "/fallback.png");
+        const sprite = getSpriteUrl(poke, isShiny, currentDexPreferences?.useHomeSprites);
         const newCatchTrigger = { pokemonName: pokeName, formName: formName, sprite: sprite, username: user.username, profileTrainer: user.profileTrainer };
         updateCaughtData(user.username, key, freshInfo, newCatchTrigger);
       }
@@ -1786,7 +1787,9 @@ export default function App() {
 
 
   const isMaintenanceTime = !maintenanceStartTime || new Date(maintenanceStartTime).getTime() <= currentTime;
-  if (maintenanceMode && (!user || !user.isAdmin) && isMaintenanceTime) {
+  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  
+  if (maintenanceMode && (!user || !user.isAdmin) && !isLocalhost && isMaintenanceTime) {
     return <MaintenanceScreen />;
   }
 

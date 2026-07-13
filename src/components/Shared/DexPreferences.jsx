@@ -21,6 +21,7 @@ export default function DexPreferences() {
         blockGOExclusiveShinies: false,
         blockNOOTExclusiveShinies: false,
         hideLockedShinies: false,
+        useHomeSprites: false,
         dexViewMode: 'categorized', // 'categorized' = separate sections, 'unified' = all Pokemon in one list sorted by dex number
     };
 
@@ -245,6 +246,10 @@ export default function DexPreferences() {
         { key: 'hideLockedShinies', label: 'Hide Locked Shinies from Grid' },
     ];
 
+    const visualOptions = [
+        { key: 'useHomeSprites', label: 'Use Pokémon HOME Sprites' },
+    ];
+
     return (
         <div className="setting-block">
             {/* Dex View Mode Section */}
@@ -324,6 +329,31 @@ export default function DexPreferences() {
 
                 <div className="dex-preferences-grid">
                     {shinyBlockingOptions.map(({ key, label }) => (
+                        <div key={key} className="preference-item">
+                            <label className="preference-checkbox">
+                                <input
+                                    type="checkbox"
+                                    checked={!!preferences[key]}
+                                    onChange={() => handleToggle(key)}
+                                />
+                                <span className="preference-label">{label}</span>
+                            </label>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Visual Preferences Section */}
+            <div className="setting-divider" />
+
+            <div className="visual-preferences-section">
+                <h4 className="preference-section-header">Visuals</h4>
+                <p className="setting-description">
+                    Customize the visual appearance of Pokémon in the app.
+                </p>
+
+                <div className="dex-preferences-grid">
+                    {visualOptions.map(({ key, label }) => (
                         <div key={key} className="preference-item">
                             <label className="preference-checkbox">
                                 <input

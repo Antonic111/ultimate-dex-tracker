@@ -1,7 +1,8 @@
 import "../../css/EvolutionChain.css";
 import { findPokemon, getRelatedForms } from "../../utils";
+import { getSpriteUrl } from "../../utils/spriteUtils";
 
-export default function EvolutionChain({ pokemon, showShiny = false, onPokemonSelect = null }) {
+export default function EvolutionChain({ pokemon, showShiny = false, onPokemonSelect = null, dexPreferences = null }) {
 
   // --- MAIN LOGIC TO INHERIT CHAIN FROM BASE FORM ---
   // If the current Pokémon has no evolution chain, try to use the "main" one with same id
@@ -47,6 +48,7 @@ export default function EvolutionChain({ pokemon, showShiny = false, onPokemonSe
           showShiny={showShiny}
           onPokemonSelect={onPokemonSelect}
           currentPokemon={pokemon}
+          dexPreferences={dexPreferences}
         />
       </div>
     </div>
@@ -64,14 +66,11 @@ function buildTree(mon) {
   };
 }
 
-function EvoSprite({ mon, size = 44, showShiny = false, onPokemonSelect = null, currentPokemon = null }) {
+function EvoSprite({ mon, size = 44, showShiny = false, onPokemonSelect = null, currentPokemon = null, dexPreferences = null }) {
   if (!mon)
     return <div className="evo-sprite blank" style={{ width: size, height: size }} />;
 
-  const imgSrc =
-    showShiny && mon.sprites?.front_shiny
-      ? mon.sprites.front_shiny
-      : mon.sprites?.front_default;
+  const imgSrc = getSpriteUrl(mon, showShiny, dexPreferences?.useHomeSprites);
 
   const isSelected = currentPokemon && mon.id === currentPokemon.id && mon.name === currentPokemon.name;
   const isClickable = onPokemonSelect !== null;
@@ -187,7 +186,7 @@ function getMatchingForm(baseMon, targetMon) {
   return bestMatch;
 }
 
-function EvoChainNode({ mon, showShiny, onPokemonSelect = null, currentPokemon = null, preventFormSwitch = false }) {
+function EvoChainNode({ mon, showShiny, onPokemonSelect = null, currentPokemon = null, preventFormSwitch = false, dexPreferences = null }) {
   // Determine which form of 'mon' to display based on currentPokemon context
   const displayMon = preventFormSwitch ? mon : getMatchingForm(mon, currentPokemon);
 
@@ -199,6 +198,7 @@ function EvoChainNode({ mon, showShiny, onPokemonSelect = null, currentPokemon =
           showShiny={showShiny}
           onPokemonSelect={onPokemonSelect}
           currentPokemon={currentPokemon}
+          dexPreferences={dexPreferences}
         />
       </div>
     );
@@ -218,6 +218,7 @@ function EvoChainNode({ mon, showShiny, onPokemonSelect = null, currentPokemon =
             showShiny={showShiny}
             onPokemonSelect={onPokemonSelect}
             currentPokemon={currentPokemon}
+            dexPreferences={dexPreferences}
           />
         </div>
         <div className="evo-chain-children">
@@ -235,6 +236,7 @@ function EvoChainNode({ mon, showShiny, onPokemonSelect = null, currentPokemon =
                     onPokemonSelect={onPokemonSelect}
                     currentPokemon={currentPokemon}
                     preventFormSwitch={isFormBranch}
+                    dexPreferences={dexPreferences}
                   />
                 ) : null}
               </div>
@@ -255,6 +257,7 @@ function EvoChainNode({ mon, showShiny, onPokemonSelect = null, currentPokemon =
           showShiny={showShiny}
           onPokemonSelect={onPokemonSelect}
           currentPokemon={currentPokemon}
+          dexPreferences={dexPreferences}
         />
       </div>
       <EvoArrow how={next.how} />
@@ -264,6 +267,7 @@ function EvoChainNode({ mon, showShiny, onPokemonSelect = null, currentPokemon =
           showShiny={showShiny}
           onPokemonSelect={onPokemonSelect}
           currentPokemon={currentPokemon}
+          dexPreferences={dexPreferences}
         />
       ) : null}
     </div>

@@ -112,8 +112,6 @@ function PokemonGridItem({
           width={64}
           height={64}
           loading={priorityLoad ? "eager" : "lazy"}
-          decoding="async"
-          fetchPriority={priorityLoad ? "high" : "low"}
           draggable={false}
           onError={(e) => (e.currentTarget.style.display = "none")}
           style={{ filter: isBlocked ? "grayscale(100%)" : "none" }}

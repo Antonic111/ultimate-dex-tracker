@@ -254,8 +254,10 @@
 }
 
 .random-cards-container {
-  @apply relative w-96 h-96;
-  min-height: 384px;
+  @apply relative;
+  width: 500px;
+  height: 500px;
+  min-height: 500px;
 }
 
 .random-card {
@@ -270,15 +272,15 @@
 }
 
 .random-card.large {
-  @apply w-24 h-24;
+  @apply w-32 h-32;
 }
 
 .random-card.medium {
-  @apply w-20 h-20;
+  @apply w-28 h-28;
 }
 
 .random-card.small {
-  @apply w-16 h-16;
+  @apply w-24 h-24;
 }
 
 .random-card:hover {

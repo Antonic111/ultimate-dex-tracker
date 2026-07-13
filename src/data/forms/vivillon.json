@@ -10,7 +10,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-archipelago.png",
-      "front_shiny": "/Sprites/vivillon-archipelago-shiny.png"
+      "front_shiny": "/Sprites/vivillon-archipelago-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-archipelago.png",
+      "home_shiny": "/Sprites/Home/vivillon-archipelago-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -29,7 +31,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-continental.png",
-      "front_shiny": "/Sprites/vivillon-continental-shiny.png"
+      "front_shiny": "/Sprites/vivillon-continental-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-continental.png",
+      "home_shiny": "/Sprites/Home/vivillon-continental-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -48,7 +52,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-elegant.png",
-      "front_shiny": "/Sprites/vivillon-elegant-shiny.png"
+      "front_shiny": "/Sprites/vivillon-elegant-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-elegant.png",
+      "home_shiny": "/Sprites/Home/vivillon-elegant-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -67,7 +73,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-garden.png",
-      "front_shiny": "/Sprites/vivillon-garden-shiny.png"
+      "front_shiny": "/Sprites/vivillon-garden-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-garden.png",
+      "home_shiny": "/Sprites/Home/vivillon-garden-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -86,7 +94,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-high-plains.png",
-      "front_shiny": "/Sprites/vivillon-high-plains-shiny.png"
+      "front_shiny": "/Sprites/vivillon-high-plains-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-high-plains.png",
+      "home_shiny": "/Sprites/Home/vivillon-high-plains-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -105,7 +115,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-icy-snow.png",
-      "front_shiny": "/Sprites/vivillon-icy-snow-shiny.png"
+      "front_shiny": "/Sprites/vivillon-icy-snow-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-icy-snow.png",
+      "home_shiny": "/Sprites/Home/vivillon-icy-snow-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -124,7 +136,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-jungle.png",
-      "front_shiny": "/Sprites/vivillon-jungle-shiny.png"
+      "front_shiny": "/Sprites/vivillon-jungle-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-jungle.png",
+      "home_shiny": "/Sprites/Home/vivillon-jungle-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -143,7 +157,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-marine.png",
-      "front_shiny": "/Sprites/vivillon-marine-shiny.png"
+      "front_shiny": "/Sprites/vivillon-marine-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-marine.png",
+      "home_shiny": "/Sprites/Home/vivillon-marine-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -162,7 +178,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-modern.png",
-      "front_shiny": "/Sprites/vivillon-modern-shiny.png"
+      "front_shiny": "/Sprites/vivillon-modern-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-modern.png",
+      "home_shiny": "/Sprites/Home/vivillon-modern-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -181,7 +199,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-monsoon.png",
-      "front_shiny": "/Sprites/vivillon-monsoon-shiny.png"
+      "front_shiny": "/Sprites/vivillon-monsoon-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-monsoon.png",
+      "home_shiny": "/Sprites/Home/vivillon-monsoon-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -200,7 +220,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-ocean.png",
-      "front_shiny": "/Sprites/vivillon-ocean-shiny.png"
+      "front_shiny": "/Sprites/vivillon-ocean-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-ocean.png",
+      "home_shiny": "/Sprites/Home/vivillon-ocean-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -219,7 +241,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-polar.png",
-      "front_shiny": "/Sprites/vivillon-polar-shiny.png"
+      "front_shiny": "/Sprites/vivillon-polar-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-polar.png",
+      "home_shiny": "/Sprites/Home/vivillon-polar-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -238,7 +262,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-river.png",
-      "front_shiny": "/Sprites/vivillon-river-shiny.png"
+      "front_shiny": "/Sprites/vivillon-river-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-river.png",
+      "home_shiny": "/Sprites/Home/vivillon-river-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -257,7 +283,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-sandstorm.png",
-      "front_shiny": "/Sprites/vivillon-sandstorm-shiny.png"
+      "front_shiny": "/Sprites/vivillon-sandstorm-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-sandstorm.png",
+      "home_shiny": "/Sprites/Home/vivillon-sandstorm-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -276,7 +304,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-savanna.png",
-      "front_shiny": "/Sprites/vivillon-savanna-shiny.png"
+      "front_shiny": "/Sprites/vivillon-savanna-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-savanna.png",
+      "home_shiny": "/Sprites/Home/vivillon-savanna-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -295,7 +325,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-sun.png",
-      "front_shiny": "/Sprites/vivillon-sun-shiny.png"
+      "front_shiny": "/Sprites/vivillon-sun-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-sun.png",
+      "home_shiny": "/Sprites/Home/vivillon-sun-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -314,7 +346,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-tundra.png",
-      "front_shiny": "/Sprites/vivillon-tundra-shiny.png"
+      "front_shiny": "/Sprites/vivillon-tundra-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-tundra.png",
+      "home_shiny": "/Sprites/Home/vivillon-tundra-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -333,7 +367,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-fancy.png",
-      "front_shiny": "/Sprites/vivillon-fancy-shiny.png"
+      "front_shiny": "/Sprites/vivillon-fancy-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-fancy.png",
+      "home_shiny": "/Sprites/Home/vivillon-fancy-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -352,7 +388,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-pokeball.png",
-      "front_shiny": "/Sprites/vivillon-pokeball-shiny.png"
+      "front_shiny": "/Sprites/vivillon-pokeball-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-pokeball.png",
+      "home_shiny": "/Sprites/Home/vivillon-pokeball-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -371,7 +409,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/vivillon-garden.png",
-      "front_shiny": "/Sprites/vivillon-garden-shiny.png"
+      "front_shiny": "/Sprites/vivillon-garden-shiny.png",
+      "home_default": "/Sprites/Home/vivillon-garden.png",
+      "home_shiny": "/Sprites/Home/vivillon-garden-shiny.png"
     },
     "gen": 6,
     "evolution": {

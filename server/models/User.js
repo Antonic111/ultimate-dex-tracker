@@ -113,6 +113,7 @@ const userSchema = new mongoose.Schema({
     blockGOExclusiveShinies: { type: Boolean, default: false },
     blockNOOTExclusiveShinies: { type: Boolean, default: false },
     hideLockedShinies: { type: Boolean, default: false },
+    useHomeSprites: { type: Boolean, default: false },
     dexViewMode: { type: String, default: 'categorized', enum: ['categorized', 'unified'] },
   },
   // EXTERNAL LINK PREFERENCE ----------------------------------------- //

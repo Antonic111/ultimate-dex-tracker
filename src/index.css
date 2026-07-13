@@ -79,3 +79,9 @@ body {
   width: 100% !important;
   max-width: 100% !important;
 }
+
+/* Remove pixelation from Home sprites globally */
+img[src*="/Home/"],
+img[src*="/other/home/"] {
+  image-rendering: auto !important;
+}

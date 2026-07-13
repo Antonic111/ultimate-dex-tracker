@@ -10,6 +10,7 @@ import { COUNTRY_OPTIONS } from "../data/countries";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import pokemonData from "../data/pokemon.json";
 import { formatPokemonName, getFormDisplayName } from "../utils";
+import { getSpriteUrl } from "../utils/spriteUtils";
 import trainerOptions from "../trainers.json";
 import { useNavigate } from "react-router-dom";
 import { useMessage } from "../components/Shared/MessageContext";
@@ -34,13 +35,6 @@ const FORM_TYPES_FOR_FAVORITES = [
     "alcremie",
     "vivillon",
 ];
-
-const BASE_POKEMON_OPTIONS = pokemonData.map((p) => ({
-    name: formatPokemonName(p.name),
-    value: p.name,
-    image: p.sprites.front_default,
-    shinyImage: p.sprites.front_shiny,
-}));
 
 // We'll calculate these inside the component to be reactive to user preferences
 
@@ -107,6 +101,25 @@ function formatSwitchFCInput(value) {
 export default function Profile() {
     const navigate = useNavigate();
     const { username, email, createdAt, loading, setUser } = useUser();
+
+    const [useHomeSprites, setUseHomeSprites] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false;
+        } catch {
+            return false;
+        }
+    });
+
+    useEffect(() => {
+        const handlePrefsChange = () => {
+            try {
+                setUseHomeSprites(JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false);
+            } catch { }
+        };
+        window.addEventListener('dexPreferencesChanged', handlePrefsChange);
+        return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
+    }, []);
+
     const { setLoading, isLoading } = useLoading();
     const { showMessage } = useMessage();
 
@@ -126,6 +139,15 @@ export default function Profile() {
         return getFilteredFormsData(formsData, dexPreferences);
     }, [dexPreferences]);
 
+    const BASE_POKEMON_OPTIONS = useMemo(() => {
+        return pokemonData.map((p) => ({
+            name: formatPokemonName(p.name),
+            value: p.name,
+            image: getSpriteUrl(p, false, useHomeSprites),
+            shinyImage: getSpriteUrl(p, true, useHomeSprites),
+        }));
+    }, [useHomeSprites]);
+
     // Calculate form options for favorites
     const FORM_POKEMON_OPTIONS = useMemo(() => {
         return filteredFormsData
@@ -137,15 +159,15 @@ export default function Profile() {
                 return {
                     name,
                     value: p.name,
-                    image: p.sprites.front_default,
-                    shinyImage: p.sprites.front_shiny,
+                    image: getSpriteUrl(p, false, useHomeSprites),
+                    shinyImage: getSpriteUrl(p, true, useHomeSprites),
                 };
             });
-    }, [filteredFormsData]);
+    }, [filteredFormsData, useHomeSprites]);
 
     const POKEMON_OPTIONS = useMemo(() => {
         return [...BASE_POKEMON_OPTIONS, ...FORM_POKEMON_OPTIONS];
-    }, [FORM_POKEMON_OPTIONS]);
+    }, [BASE_POKEMON_OPTIONS, FORM_POKEMON_OPTIONS]);
 
     const [isEditing, setIsEditing] = useState(false);
     const [showGameModal, setShowGameModal] = useState(false);
@@ -1385,7 +1407,7 @@ export default function Profile() {
                                                     )}
                                                     <div className="profile-pokemon-box recent-pokemon-box">
                                                         <img
-                                                            src={isShiny ? mon?.sprites?.front_shiny : mon?.sprites?.front_default}
+                                                            src={getSpriteUrl(mon, isShiny, useHomeSprites)}
                                                             alt={formatPokemonName(mon?.name)}
                                                             className="pokemon-img"
                                                         />

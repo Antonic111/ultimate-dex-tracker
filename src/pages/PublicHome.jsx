@@ -4,12 +4,15 @@ import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
+import { getSpriteUrl } from "../utils/spriteUtils";
 import "../css/PublicHome.css";
 
 export default function PublicHome() {
   const [totalCaught, setTotalCaught] = useState(null);
   const [displayCount, setDisplayCount] = useState(0);
   const animFrameRef = useRef(null);
+
+
 
   useEffect(() => {
     const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
@@ -168,9 +171,7 @@ export default function PublicHome() {
       } else {
         // Use database Pokémon
         const randomPokemon = allPokemon[Math.floor(Math.random() * allPokemon.length)];
-        const spriteUrl = isShiny && randomPokemon.sprites.front_shiny
-          ? randomPokemon.sprites.front_shiny
-          : randomPokemon.sprites.front_default;
+        const spriteUrl = getSpriteUrl(randomPokemon, isShiny, false);
 
         cards.push({
           id: i,
@@ -242,8 +243,8 @@ export default function PublicHome() {
           <div className="random-cards-container">
             {randomCards.map((card) => {
               // Get image dimensions based on card size
-              const sizeMap = { large: 96, medium: 80, small: 64 };
-              const imgSize = sizeMap[card.position.size] || 80;
+              const sizeMap = { large: 128, medium: 112, small: 96 };
+              const imgSize = sizeMap[card.position.size] || 96;
 
               return (
                 <div

@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import "../css/Profile.css";
 import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight, Video, Youtube, Twitch } from "lucide-react";
@@ -12,45 +12,10 @@ import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
 import { useMessage } from "../components/Shared";
 import { profileAPI } from "../utils/api";
 import { UserContext } from "../components/Shared/UserContext";
+import { getSpriteUrl } from "../utils/spriteUtils";
 
 
-const POKEMON_OPTIONS = pokemonData.map((p) => ({
-    name: formatPokemonName(p.name),
-    value: p.name,
-    image: p.sprites.front_default,
-    shinyImage: p.sprites.front_shiny,
-}));
-
-// Create a comprehensive Pokémon lookup that includes forms
-const createPokemonLookup = () => {
-    const lookup = new Map();
-
-    // Add base forms
-    pokemonData.forEach(p => {
-        lookup.set(p.name, {
-            name: formatPokemonName(p.name),
-            value: p.name,
-            image: p.sprites.front_default,
-            shinyImage: p.sprites.front_shiny,
-        });
-    });
-
-    // Add form-specific entries
-    formsData.forEach(form => {
-        if (form.sprites && form.sprites.front_default) {
-            lookup.set(form.name, {
-                name: formatPokemonName(form.name),
-                value: form.name,
-                image: form.sprites.front_default,
-                shinyImage: form.sprites.front_shiny || form.sprites.front_default,
-            });
-        }
-    });
-
-    return lookup;
-};
-
-const POKEMON_LOOKUP = createPokemonLookup();
+// Move createPokemonLookup and POKEMON_OPTIONS inside the component
 
 // Turn "US" -> 🇺🇸  (works for any 2-letter ISO code)
 const flagFromISO = (cc) =>
@@ -169,6 +134,50 @@ export default function PublicProfile() {
     const [hasLiked, setHasLiked] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
     const [likeBurst, setLikeBurst] = useState(0);
+    
+    const [useHomeSprites, setUseHomeSprites] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false;
+        } catch {
+            return false;
+        }
+    });
+
+    useEffect(() => {
+        const handlePrefsChange = () => {
+            try {
+                setUseHomeSprites(JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false);
+            } catch { }
+        };
+        window.addEventListener('dexPreferencesChanged', handlePrefsChange);
+        return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
+    }, []);
+
+    const POKEMON_LOOKUP = useMemo(() => {
+        const lookup = new Map();
+
+        pokemonData.forEach(p => {
+            lookup.set(p.name, {
+                name: formatPokemonName(p.name),
+                value: p.name,
+                image: getSpriteUrl(p, false, useHomeSprites),
+                shinyImage: getSpriteUrl(p, true, useHomeSprites),
+            });
+        });
+
+        formsData.forEach(form => {
+            if (form.sprites && form.sprites.front_default) {
+                lookup.set(form.name, {
+                    name: formatPokemonName(form.name),
+                    value: form.name,
+                    image: getSpriteUrl(form, false, useHomeSprites),
+                    shinyImage: getSpriteUrl(form, true, useHomeSprites),
+                });
+            }
+        });
+
+        return lookup;
+    }, [useHomeSprites]);
     const [profileOwnerPreferences, setProfileOwnerPreferences] = useState(null);
     const [statPage, setStatPage] = useState({ games: 0, balls: 0, marks: 0 });
     const STAT_PAGE_SIZE = 8;
@@ -1053,7 +1062,7 @@ export default function PublicProfile() {
                                                     )}
                                                     <div className="profile-pokemon-box recent-pokemon-box">
                                                         <img
-                                                            src={isShiny ? mon?.sprites?.front_shiny : mon?.sprites?.front_default}
+                                                            src={getSpriteUrl(mon, isShiny, useHomeSprites)}
                                                             alt={formatPokemonName(mon?.name)}
                                                             className="pokemon-img"
                                                         />

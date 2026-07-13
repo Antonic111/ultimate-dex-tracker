@@ -605,7 +605,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
       const { dexPreferences } = req.body;
       if (typeof dexPreferences === 'object') {
         const allowedKeys = [
-          'showGenderForms', 'showAlolanForms', 'showGalarianForms', 'showHisuianForms', 'showPaldeanForms', 'showGmaxForms', 'showUnownForms', 'showOtherForms', 'showAlcremieForms', 'showVivillonForms', 'showAlphaForms', 'showAlphaOtherForms', 'blockUnobtainableShinies', 'blockGOExclusiveShinies', 'blockNOOTExclusiveShinies', 'hideLockedShinies', 'dexViewMode'
+          'showGenderForms', 'showAlolanForms', 'showGalarianForms', 'showHisuianForms', 'showPaldeanForms', 'showGmaxForms', 'showUnownForms', 'showOtherForms', 'showAlcremieForms', 'showVivillonForms', 'showAlphaForms', 'showAlphaOtherForms', 'blockUnobtainableShinies', 'blockGOExclusiveShinies', 'blockNOOTExclusiveShinies', 'hideLockedShinies', 'useHomeSprites', 'dexViewMode'
         ];
         Object.keys(dexPreferences).forEach(key => {
           if (allowedKeys.includes(key)) {

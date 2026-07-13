@@ -11,6 +11,7 @@ import { UserContext } from "../components/Shared/UserContext";
 import { useMessage } from "../components/Shared/MessageContext";
 import { huntAPI, profileAPI, caughtAPI } from "../utils/api";
 import { BALL_OPTIONS, MARK_OPTIONS, GAME_OPTIONS } from "../Constants";
+import { getSpriteUrl } from "../utils/spriteUtils";
 import pokemonData from "../data/pokemon.json";
 import gamePokemonData from "../data/gamePokemon.json";
 import formsData from "../utils/loadFormsData";
@@ -79,9 +80,9 @@ const formatTimeCompact = (milliseconds) => {
   }
 };
 
-function getPokemonImage(pokemon) {
+function getPokemonImage(pokemon, useHomeSprites = false) {
   if (!pokemon) return "";
-  return pokemon.sprites?.front_shiny || pokemon.sprites?.front_default || "";
+  return getSpriteUrl(pokemon, true, useHomeSprites);
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
@@ -138,6 +139,24 @@ export default function MMOTool() {
     researchLv10: false,
     perfectResearch: false,
   });
+
+  const [useHomeSprites, setUseHomeSprites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false;
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    const handlePrefsChange = () => {
+      try {
+        setUseHomeSprites(JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false);
+      } catch { }
+    };
+    window.addEventListener('dexPreferencesChanged', handlePrefsChange);
+    return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
+  }, []);
 
   const [settingsForm, setSettingsForm] = useState({
     manualChecks: '',
@@ -1112,7 +1131,7 @@ export default function MMOTool() {
                   <>
                     <div className="hunt-pokemon">
                       <img
-                        src={getPokemonImage(hunt.pokemon) || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${hunt.pokemon.id}.png`}
+                        src={getPokemonImage(hunt.pokemon, useHomeSprites)}
                         alt={formatPokemonName(hunt.pokemon.name)}
                         className="hunt-pokemon-image"
                       />
@@ -1433,7 +1452,7 @@ export default function MMOTool() {
                       onClick={() => handlePokemonSelect(pokemon)}
                     >
                       <img
-                        src={getPokemonImage(pokemon)}
+                        src={getPokemonImage(pokemon, useHomeSprites)}
                         alt={formatPokemonName(String(pokemon?.name || ''))}
                         className="pokemon-img"
                       />
@@ -1488,7 +1507,7 @@ export default function MMOTool() {
                 <div className="hunt-pokemon-info">
                   <div className="hunt-pokemon-image-container">
                     <img
-                      src={getPokemonImage(selectedPokemon)}
+                      src={getPokemonImage(selectedPokemon, useHomeSprites)}
                       alt={formatPokemonName(selectedPokemon.name)}
                       className="hunt-pokemon-image"
                     />

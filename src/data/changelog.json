@@ -1,5 +1,16 @@
 [
   {
+    "date": "2026-07-12",
+    "version": "v1.1.8",
+    "type": "feature",
+    "title": "",
+    "description": "",
+    "features": [
+      "Added a new settings toggle to switch all site-wide Pokémon sprites between the default Gen 5 pixel sprites and Pokémon HOME-style sprites."
+    ],
+    "fixes": []
+  },
+  {
     "date": "2026-07-10",
     "version": "v1.1.7",
     "type": "feature",

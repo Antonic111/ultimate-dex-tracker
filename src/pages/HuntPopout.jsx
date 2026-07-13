@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { formatPokemonName } from "../utils";
+import { getSpriteUrl } from "../utils/spriteUtils";
 import { huntAPI, profileAPI } from "../utils/api";
 import { RotateCcw, Trash2, Settings, Info, Edit, X, Minus, Plus, Play, Pause, Check } from "lucide-react";
 import { getCurrentHuntOdds } from "../utils/huntSystem";
@@ -37,6 +38,24 @@ const formatTime = (milliseconds) => {
 export default function HuntPopout() {
   const [hunt, setHunt] = useState(null);
   const [checks, setChecks] = useState(0);
+
+  const [useHomeSprites, setUseHomeSprites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false;
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    const handlePrefsChange = () => {
+      try {
+        setUseHomeSprites(JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false);
+      } catch { }
+    };
+    window.addEventListener('dexPreferencesChanged', handlePrefsChange);
+    return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
+  }, []);
   const [totalTime, setTotalTime] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [lastCheckTime, setLastCheckTime] = useState(Date.now());
@@ -244,7 +263,7 @@ export default function HuntPopout() {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'gray' }}>Loading hunt…</div>;
   }
 
-  const getPokemonImage = (pokemon) => pokemon?.sprites?.front_shiny || pokemon?.sprites?.front_default || "";
+  const getPokemonImage = (pokemon) => getSpriteUrl(pokemon, true, useHomeSprites);
 
   const renderFormType = () => {
     if (!hunt.pokemon.formType || hunt.pokemon.formType === "main") return null;

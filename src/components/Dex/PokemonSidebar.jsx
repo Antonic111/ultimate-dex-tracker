@@ -7,6 +7,7 @@ import PermutationTable from "../MMO/PermutationTable";
 
 import { getCaughtKey } from "../../caughtStorage";
 import { formatPokemonName, getFormDisplayName, renderTypeBadge, getRelatedForms, findPokemon } from "../../utils";
+import { getSpriteUrl } from "../../utils/spriteUtils";
 
 import { SearchbarIconDropdown } from "../Shared/SearchBar";
 import ContentFilterInput from "../Shared/ContentFilterInput";
@@ -1016,9 +1017,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   const gameObj = GAME_OPTIONS.find(opt => opt.value === (editData?.game ?? ""));
   const markObj = MARK_OPTIONS.find(opt => opt.value === (editData?.mark ?? ""));
 
-  const pokeImg = showShiny && pokemon?.sprites?.front_shiny
-    ? pokemon.sprites.front_shiny
-    : pokemon?.sprites?.front_default || "/fallback.png";
+  const pokeImg = getSpriteUrl(pokemon, showShiny, dexPreferences?.useHomeSprites);
   const pokeName = formatPokemonName(pokemon?.name);
   const pokeTypes = pokemon?.types || [];
 
@@ -2411,7 +2410,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
           </div>
         )}
 
-        {pokemon && <EvolutionChain pokemon={pokemon} showShiny={showShiny} onPokemonSelect={onPokemonSelect} />}
+        {pokemon && <EvolutionChain pokemon={pokemon} showShiny={showShiny} onPokemonSelect={onPokemonSelect} dexPreferences={dexPreferences} />}
 
         {/* Related Forms Section */}
         {pokemon && (() => {
@@ -2507,9 +2506,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                   <div className="related-forms-divider"></div>
                   <div className="related-forms-grid">
                     {group.forms.map((form, index) => {
-                      const imgSrc = showShiny && form.sprites?.front_shiny
-                        ? form.sprites.front_shiny
-                        : form.sprites?.front_default;
+                      const imgSrc = getSpriteUrl(form, showShiny, dexPreferences?.useHomeSprites);
 
                       const formLabel = getFormDisplayName(form) || formatPokemonName(form.name);
                       const isClickable = onPokemonSelect !== null;
@@ -2749,7 +2746,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                     className="w-[100px] flex flex-col items-center justify-start bg-[#2a2a2a] border border-[#444] rounded-[15px] p-2 hover:border-[var(--accent)] hover:bg-[#333] transition-all"
                   >
                     <img 
-                      src={showShiny && opt.sprites?.front_shiny ? opt.sprites.front_shiny : (opt.sprites?.front_default || "/fallback.png")} 
+                      src={getSpriteUrl(opt, showShiny, dexPreferences?.useHomeSprites)} 
                       alt={opt.name} 
                       className="w-12 h-12 object-contain filter drop-shadow-md mb-1.5"
                     />

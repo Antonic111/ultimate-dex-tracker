@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from './UserContext';
 import { buildApiUrl } from '../../config/api';
 import { findPokemon, formatPokemonName } from '../../utils';
+import { transformSpriteUrlForViewer } from '../../utils/spriteUtils';
 import pokemonData from '../../data/pokemon.json';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 
@@ -31,6 +32,23 @@ const RecentCatchesSidebar = () => {
   const [hoveredCatch, setHoveredCatch] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isMinimized, setIsMinimized] = useState(() => localStorage.getItem('hideRecentCatches') === 'true');
+  const [useHomeSprites, setUseHomeSprites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false;
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    const handlePrefsChange = () => {
+      try {
+        setUseHomeSprites(JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false);
+      } catch { }
+    };
+    window.addEventListener('dexPreferencesChanged', handlePrefsChange);
+    return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('hideRecentCatches', isMinimized);
@@ -139,7 +157,7 @@ const RecentCatchesSidebar = () => {
                         <Sparkles size={20} color="#facc15" fill="#facc15" />
                       </div>
                     )}
-                    <img src={c.sprite} alt={c.pokemonName} className="w-full h-full object-contain drop-shadow-lg transition-all duration-200 ease-in group-hover:translate-y-8 group-hover:opacity-0 group-hover:scale-95" style={{ imageRendering: 'pixelated' }} onError={e => e.target.style.display = 'none'} />
+                    <img src={transformSpriteUrlForViewer(c.sprite, useHomeSprites)} alt={c.pokemonName} className="w-full h-full object-contain drop-shadow-lg transition-all duration-200 ease-in group-hover:translate-y-8 group-hover:opacity-0 group-hover:scale-95" style={{ imageRendering: 'pixelated' }} onError={e => e.target.style.display = 'none'} />
                     <div className="absolute bottom-2 left-2 right-2 flex flex-col items-start gap-0 transition-all duration-200 ease-in group-hover:-translate-x-[150%] group-hover:opacity-0 pointer-events-none">
                     {formName && (
                       <div 

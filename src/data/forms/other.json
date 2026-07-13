@@ -9,7 +9,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/partner-cap-pikachu.png",
-      "front_shiny": "/Sprites/partner-cap-pikachu-shiny.png"
+      "front_shiny": "/Sprites/partner-cap-pikachu-shiny.png",
+      "home_default": "/Sprites/Home/partner-cap-pikachu.png",
+      "home_shiny": "/Sprites/Home/partner-cap-pikachu-shiny.png"
     },
     "gen": 1,
     "evolution": {
@@ -27,7 +29,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/129.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/129.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/129.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/129.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/129.png"
     },
     "gen": 1,
     "evolution": {
@@ -51,7 +55,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/129.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/129.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/129.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/129.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/129.png"
     },
     "gen": 1,
     "evolution": {
@@ -75,7 +81,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/deoxys-attack.png",
-      "front_shiny": "/Sprites/deoxys-attack-shiny.png"
+      "front_shiny": "/Sprites/deoxys-attack-shiny.png",
+      "home_default": "/Sprites/Home/deoxys-attack.png",
+      "home_shiny": "/Sprites/Home/deoxys-attack-shiny.png"
     },
     "gen": 3,
     "evolution": {
@@ -93,7 +101,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/deoxys-defense.png",
-      "front_shiny": "/Sprites/deoxys-defense-shiny.png"
+      "front_shiny": "/Sprites/deoxys-defense-shiny.png",
+      "home_default": "/Sprites/Home/deoxys-defense.png",
+      "home_shiny": "/Sprites/Home/deoxys-defense-shiny.png"
     },
     "gen": 3,
     "evolution": {
@@ -111,7 +121,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/deoxys-speed.png",
-      "front_shiny": "/Sprites/deoxys-speed-shiny.png"
+      "front_shiny": "/Sprites/deoxys-speed-shiny.png",
+      "home_default": "/Sprites/Home/deoxys-speed.png",
+      "home_shiny": "/Sprites/Home/deoxys-speed-shiny.png"
     },
     "gen": 3,
     "evolution": {
@@ -129,7 +141,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/412-sandy.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-sandy.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-sandy.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/412-sandy.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/412-sandy.png"
     },
     "gen": 4,
     "evolution": {
@@ -158,7 +172,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/412-trash.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-trash.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-trash.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/412-trash.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/412-trash.png"
     },
     "gen": 4,
     "evolution": {
@@ -188,7 +204,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/wormadam-sandy.png",
-      "front_shiny": "/Sprites/wormadam-sandy-shiny.png"
+      "front_shiny": "/Sprites/wormadam-sandy-shiny.png",
+      "home_default": "/Sprites/Home/wormadam-sandy.png",
+      "home_shiny": "/Sprites/Home/wormadam-sandy-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -211,7 +229,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/wormadam-trash.png",
-      "front_shiny": "/Sprites/wormadam-trash-shiny.png"
+      "front_shiny": "/Sprites/wormadam-trash-shiny.png",
+      "home_default": "/Sprites/Home/wormadam-trash.png",
+      "home_shiny": "/Sprites/Home/wormadam-trash-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -233,7 +253,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/422.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/422.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/422.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/422.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/422.png"
     },
     "gen": 4,
     "evolution": {
@@ -252,7 +274,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/423.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/423.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/423.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/423.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/423.png"
     },
     "gen": 4,
     "evolution": {
@@ -271,7 +295,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/rotom-heat.png",
-      "front_shiny": "/Sprites/rotom-heat-shiny.png"
+      "front_shiny": "/Sprites/rotom-heat-shiny.png",
+      "home_default": "/Sprites/Home/rotom-heat.png",
+      "home_shiny": "/Sprites/Home/rotom-heat-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -290,7 +316,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/rotom-wash.png",
-      "front_shiny": "/Sprites/rotom-wash-shiny.png"
+      "front_shiny": "/Sprites/rotom-wash-shiny.png",
+      "home_default": "/Sprites/Home/rotom-wash.png",
+      "home_shiny": "/Sprites/Home/rotom-wash-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -309,7 +337,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/rotom-frost.png",
-      "front_shiny": "/Sprites/rotom-frost-shiny.png"
+      "front_shiny": "/Sprites/rotom-frost-shiny.png",
+      "home_default": "/Sprites/Home/rotom-frost.png",
+      "home_shiny": "/Sprites/Home/rotom-frost-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -328,7 +358,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/rotom-fan.png",
-      "front_shiny": "/Sprites/rotom-fan-shiny.png"
+      "front_shiny": "/Sprites/rotom-fan-shiny.png",
+      "home_default": "/Sprites/Home/rotom-fan.png",
+      "home_shiny": "/Sprites/Home/rotom-fan-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -347,7 +379,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/rotom-mow.png",
-      "front_shiny": "/Sprites/rotom-mow-shiny.png"
+      "front_shiny": "/Sprites/rotom-mow-shiny.png",
+      "home_default": "/Sprites/Home/rotom-mow.png",
+      "home_shiny": "/Sprites/Home/rotom-mow-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -366,7 +400,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/shaymin-sky.png",
-      "front_shiny": "/Sprites/shaymin-sky-shiny.png"
+      "front_shiny": "/Sprites/shaymin-sky-shiny.png",
+      "home_default": "/Sprites/Home/shaymin-sky.png",
+      "home_shiny": "/Sprites/Home/shaymin-sky-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -384,7 +420,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/basculin-bluestriped.png",
-      "front_shiny": "/Sprites/basculin-bluestriped-shiny.png"
+      "front_shiny": "/Sprites/basculin-bluestriped-shiny.png",
+      "home_default": "/Sprites/Home/basculin-bluestriped.png",
+      "home_shiny": "/Sprites/Home/basculin-bluestriped-shiny.png"
     },
     "gen": 5,
     "evolution": {
@@ -402,7 +440,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10247.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10247.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10247.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10247.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10247.png"
     },
     "gen": 5,
     "evolution": {
@@ -432,7 +472,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/585-summer.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/585-summer.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/585-summer.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/585-summer.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/585-summer.png"
     },
     "gen": 5,
     "evolution": {
@@ -451,7 +493,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/585-autumn.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/585-autumn.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/585-autumn.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/585-autumn.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/585-autumn.png"
     },
     "gen": 5,
     "evolution": {
@@ -470,7 +514,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/585-winter.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/585-winter.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/585-winter.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/585-winter.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/585-winter.png"
     },
     "gen": 5,
     "evolution": {
@@ -489,7 +535,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/586-summer.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/586-summer.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/586-summer.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/586-summer.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/586-summer.png"
     },
     "gen": 5,
     "evolution": {
@@ -508,7 +556,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/586-autumn.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/586-autumn.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/586-autumn.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/586-autumn.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/586-autumn.png"
     },
     "gen": 5,
     "evolution": {
@@ -527,7 +577,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/586-winter.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/586-winter.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/586-winter.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/586-winter.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/586-winter.png"
     },
     "gen": 5,
     "evolution": {
@@ -545,7 +597,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/tornadus-therian.png",
-      "front_shiny": "/Sprites/tornadus-therian-shiny.png"
+      "front_shiny": "/Sprites/tornadus-therian-shiny.png",
+      "home_default": "/Sprites/Home/tornadus-therian.png",
+      "home_shiny": "/Sprites/Home/tornadus-therian-shiny.png"
     },
     "gen": 5,
     "evolution": {
@@ -564,7 +618,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/thundurus-therian.png",
-      "front_shiny": "/Sprites/thundurus-therian-shiny.png"
+      "front_shiny": "/Sprites/thundurus-therian-shiny.png",
+      "home_default": "/Sprites/Home/thundurus-therian.png",
+      "home_shiny": "/Sprites/Home/thundurus-therian-shiny.png"
     },
     "gen": 5,
     "evolution": {
@@ -583,7 +639,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/landorus-therian.png",
-      "front_shiny": "/Sprites/landorus-therian-shiny.png"
+      "front_shiny": "/Sprites/landorus-therian-shiny.png",
+      "home_default": "/Sprites/Home/landorus-therian.png",
+      "home_shiny": "/Sprites/Home/landorus-therian-shiny.png"
     },
     "gen": 5,
     "evolution": {
@@ -602,7 +660,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/keldeo-resolute.png",
-      "front_shiny": "/Sprites/keldeo-resolute-shiny.png"
+      "front_shiny": "/Sprites/keldeo-resolute-shiny.png",
+      "home_default": "/Sprites/Home/keldeo-resolute.png",
+      "home_shiny": "/Sprites/Home/keldeo-resolute-shiny.png"
     },
     "gen": 5,
     "evolution": {
@@ -620,7 +680,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/flabebe-yellow.png",
-      "front_shiny": "/Sprites/flabebe-yellow-shiny.png"
+      "front_shiny": "/Sprites/flabebe-yellow-shiny.png",
+      "home_default": "/Sprites/Home/flabebe-yellow.png",
+      "home_shiny": "/Sprites/Home/flabebe-yellow-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -638,7 +700,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/flabebe-orange.png",
-      "front_shiny": "/Sprites/flabebe-orange-shiny.png"
+      "front_shiny": "/Sprites/flabebe-orange-shiny.png",
+      "home_default": "/Sprites/Home/flabebe-orange.png",
+      "home_shiny": "/Sprites/Home/flabebe-orange-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -656,7 +720,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/flabebe-blue.png",
-      "front_shiny": "/Sprites/flabebe-blue-shiny.png"
+      "front_shiny": "/Sprites/flabebe-blue-shiny.png",
+      "home_default": "/Sprites/Home/flabebe-blue.png",
+      "home_shiny": "/Sprites/Home/flabebe-blue-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -674,7 +740,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/flabebe-white.png",
-      "front_shiny": "/Sprites/flabebe-white-shiny.png"
+      "front_shiny": "/Sprites/flabebe-white-shiny.png",
+      "home_default": "/Sprites/Home/flabebe-white.png",
+      "home_shiny": "/Sprites/Home/flabebe-white-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -692,7 +760,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/floette-yellow.png",
-      "front_shiny": "/Sprites/floette-yellow-shiny.png"
+      "front_shiny": "/Sprites/floette-yellow-shiny.png",
+      "home_default": "/Sprites/Home/floette-yellow.png",
+      "home_shiny": "/Sprites/Home/floette-yellow-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -710,7 +780,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/floette-orange.png",
-      "front_shiny": "/Sprites/floette-orange-shiny.png"
+      "front_shiny": "/Sprites/floette-orange-shiny.png",
+      "home_default": "/Sprites/Home/floette-orange.png",
+      "home_shiny": "/Sprites/Home/floette-orange-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -728,7 +800,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/floette-blue.png",
-      "front_shiny": "/Sprites/floette-blue-shiny.png"
+      "front_shiny": "/Sprites/floette-blue-shiny.png",
+      "home_default": "/Sprites/Home/floette-blue.png",
+      "home_shiny": "/Sprites/Home/floette-blue-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -746,7 +820,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/floette-white.png",
-      "front_shiny": "/Sprites/floette-white-shiny.png"
+      "front_shiny": "/Sprites/floette-white-shiny.png",
+      "home_default": "/Sprites/Home/floette-white.png",
+      "home_shiny": "/Sprites/Home/floette-white-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -764,7 +840,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/floette-eternal.png",
-      "front_shiny": "/Sprites/floette-eternal-shiny.png"
+      "front_shiny": "/Sprites/floette-eternal-shiny.png",
+      "home_default": "/Sprites/Home/floette-eternal.png",
+      "home_shiny": "/Sprites/Home/floette-eternal-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -782,7 +860,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/florges-yellow.png",
-      "front_shiny": "/Sprites/florges-yellow-shiny.png"
+      "front_shiny": "/Sprites/florges-yellow-shiny.png",
+      "home_default": "/Sprites/Home/florges-yellow.png",
+      "home_shiny": "/Sprites/Home/florges-yellow-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -800,7 +880,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/florges-orange.png",
-      "front_shiny": "/Sprites/florges-orange-shiny.png"
+      "front_shiny": "/Sprites/florges-orange-shiny.png",
+      "home_default": "/Sprites/Home/florges-orange.png",
+      "home_shiny": "/Sprites/Home/florges-orange-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -818,7 +900,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/florges-blue.png",
-      "front_shiny": "/Sprites/florges-blue-shiny.png"
+      "front_shiny": "/Sprites/florges-blue-shiny.png",
+      "home_default": "/Sprites/Home/florges-blue.png",
+      "home_shiny": "/Sprites/Home/florges-blue-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -836,7 +920,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/florges-white.png",
-      "front_shiny": "/Sprites/florges-white-shiny.png"
+      "front_shiny": "/Sprites/florges-white-shiny.png",
+      "home_default": "/Sprites/Home/florges-white.png",
+      "home_shiny": "/Sprites/Home/florges-white-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -854,7 +940,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-heart.png",
-      "front_shiny": "/Sprites/furfrou-heart-shiny.png"
+      "front_shiny": "/Sprites/furfrou-heart-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-heart.png",
+      "home_shiny": "/Sprites/Home/furfrou-heart-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -872,7 +960,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-star.png",
-      "front_shiny": "/Sprites/furfrou-star-shiny.png"
+      "front_shiny": "/Sprites/furfrou-star-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-star.png",
+      "home_shiny": "/Sprites/Home/furfrou-star-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -890,7 +980,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-diamond.png",
-      "front_shiny": "/Sprites/furfrou-diamond-shiny.png"
+      "front_shiny": "/Sprites/furfrou-diamond-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-diamond.png",
+      "home_shiny": "/Sprites/Home/furfrou-diamond-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -908,7 +1000,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-debutante.png",
-      "front_shiny": "/Sprites/furfrou-debutante-shiny.png"
+      "front_shiny": "/Sprites/furfrou-debutante-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-debutante.png",
+      "home_shiny": "/Sprites/Home/furfrou-debutante-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -926,7 +1020,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-matron.png",
-      "front_shiny": "/Sprites/furfrou-matron-shiny.png"
+      "front_shiny": "/Sprites/furfrou-matron-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-matron.png",
+      "home_shiny": "/Sprites/Home/furfrou-matron-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -944,7 +1040,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-dandy.png",
-      "front_shiny": "/Sprites/furfrou-dandy-shiny.png"
+      "front_shiny": "/Sprites/furfrou-dandy-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-dandy.png",
+      "home_shiny": "/Sprites/Home/furfrou-dandy-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -962,7 +1060,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-lareine.png",
-      "front_shiny": "/Sprites/furfrou-lareine-shiny.png"
+      "front_shiny": "/Sprites/furfrou-lareine-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-lareine.png",
+      "home_shiny": "/Sprites/Home/furfrou-lareine-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -980,7 +1080,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-kabuki.png",
-      "front_shiny": "/Sprites/furfrou-kabuki-shiny.png"
+      "front_shiny": "/Sprites/furfrou-kabuki-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-kabuki.png",
+      "home_shiny": "/Sprites/Home/furfrou-kabuki-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -998,7 +1100,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-pharaoh.png",
-      "front_shiny": "/Sprites/furfrou-pharaoh-shiny.png"
+      "front_shiny": "/Sprites/furfrou-pharaoh-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-pharaoh.png",
+      "home_shiny": "/Sprites/Home/furfrou-pharaoh-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -1017,7 +1121,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/pumpkaboo-small.png",
-      "front_shiny": "/Sprites/pumpkaboo-small-shiny.png"
+      "front_shiny": "/Sprites/pumpkaboo-small-shiny.png",
+      "home_default": "/Sprites/Home/pumpkaboo-small.png",
+      "home_shiny": "/Sprites/Home/pumpkaboo-small-shiny.png"
     },
     "sizeScale": 0.85,
     "gen": 6,
@@ -1037,7 +1143,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/pumpkaboo-large.png",
-      "front_shiny": "/Sprites/pumpkaboo-large-shiny.png"
+      "front_shiny": "/Sprites/pumpkaboo-large-shiny.png",
+      "home_default": "/Sprites/Home/pumpkaboo-large.png",
+      "home_shiny": "/Sprites/Home/pumpkaboo-large-shiny.png"
     },
     "sizeScale": 1.15,
     "gen": 6,
@@ -1057,7 +1165,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/pumpkaboo-super.png",
-      "front_shiny": "/Sprites/pumpkaboo-super-shiny.png"
+      "front_shiny": "/Sprites/pumpkaboo-super-shiny.png",
+      "home_default": "/Sprites/Home/pumpkaboo-super.png",
+      "home_shiny": "/Sprites/Home/pumpkaboo-super-shiny.png"
     },
     "sizeScale": 1.5,
     "gen": 6,
@@ -1077,7 +1187,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/gourgeist-small.png",
-      "front_shiny": "/Sprites/gourgeist-small-shiny.png"
+      "front_shiny": "/Sprites/gourgeist-small-shiny.png",
+      "home_default": "/Sprites/Home/gourgeist-small.png",
+      "home_shiny": "/Sprites/Home/gourgeist-small-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -1096,7 +1208,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/gourgeist-large.png",
-      "front_shiny": "/Sprites/gourgeist-large-shiny.png"
+      "front_shiny": "/Sprites/gourgeist-large-shiny.png",
+      "home_default": "/Sprites/Home/gourgeist-large.png",
+      "home_shiny": "/Sprites/Home/gourgeist-large-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -1115,7 +1229,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/gourgeist-super.png",
-      "front_shiny": "/Sprites/gourgeist-super-shiny.png"
+      "front_shiny": "/Sprites/gourgeist-super-shiny.png",
+      "home_default": "/Sprites/Home/gourgeist-super.png",
+      "home_shiny": "/Sprites/Home/gourgeist-super-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -1134,7 +1250,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/zygarde-10.png",
-      "front_shiny": "/Sprites/zygarde-10-shiny.png"
+      "front_shiny": "/Sprites/zygarde-10-shiny.png",
+      "home_default": "/Sprites/Home/zygarde-10.png",
+      "home_shiny": "/Sprites/Home/zygarde-10-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -1153,7 +1271,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/oricorio-pom-pom.png",
-      "front_shiny": "/Sprites/oricorio-pom-pom-shiny.png"
+      "front_shiny": "/Sprites/oricorio-pom-pom-shiny.png",
+      "home_default": "/Sprites/Home/oricorio-pom-pom.png",
+      "home_shiny": "/Sprites/Home/oricorio-pom-pom-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -1172,7 +1292,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/oricorio-pau.png",
-      "front_shiny": "/Sprites/oricorio-pau-shiny.png"
+      "front_shiny": "/Sprites/oricorio-pau-shiny.png",
+      "home_default": "/Sprites/Home/oricorio-pau.png",
+      "home_shiny": "/Sprites/Home/oricorio-pau-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -1191,7 +1313,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/oricorio-sensu.png",
-      "front_shiny": "/Sprites/oricorio-sensu-shiny.png"
+      "front_shiny": "/Sprites/oricorio-sensu-shiny.png",
+      "home_default": "/Sprites/Home/oricorio-sensu.png",
+      "home_shiny": "/Sprites/Home/oricorio-sensu-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -1209,7 +1333,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/lycanroc-midnight.png",
-      "front_shiny": "/Sprites/lycanroc-midnight-shiny.png"
+      "front_shiny": "/Sprites/lycanroc-midnight-shiny.png",
+      "home_default": "/Sprites/Home/lycanroc-midnight.png",
+      "home_shiny": "/Sprites/Home/lycanroc-midnight-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -1227,7 +1353,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/lycanroc-dusk.png",
-      "front_shiny": "/Sprites/lycanroc-dusk-shiny.png"
+      "front_shiny": "/Sprites/lycanroc-dusk-shiny.png",
+      "home_default": "/Sprites/Home/lycanroc-dusk.png",
+      "home_shiny": "/Sprites/Home/lycanroc-dusk-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -1246,7 +1374,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/minior-orange.png",
-      "front_shiny": "/Sprites/minior-orange-shiny.png"
+      "front_shiny": "/Sprites/minior-orange-shiny.png",
+      "home_default": "/Sprites/Home/minior-orange.png",
+      "home_shiny": "/Sprites/Home/minior-orange-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -1265,7 +1395,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/minior-yellow.png",
-      "front_shiny": "/Sprites/minior-yellow-shiny.png"
+      "front_shiny": "/Sprites/minior-yellow-shiny.png",
+      "home_default": "/Sprites/Home/minior-yellow.png",
+      "home_shiny": "/Sprites/Home/minior-yellow-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -1284,7 +1416,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/minior-green.png",
-      "front_shiny": "/Sprites/minior-green-shiny.png"
+      "front_shiny": "/Sprites/minior-green-shiny.png",
+      "home_default": "/Sprites/Home/minior-green.png",
+      "home_shiny": "/Sprites/Home/minior-green-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -1303,7 +1437,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/minior-blue.png",
-      "front_shiny": "/Sprites/minior-blue-shiny.png"
+      "front_shiny": "/Sprites/minior-blue-shiny.png",
+      "home_default": "/Sprites/Home/minior-blue.png",
+      "home_shiny": "/Sprites/Home/minior-blue-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -1322,7 +1458,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/minior-indigo.png",
-      "front_shiny": "/Sprites/minior-indigo-shiny.png"
+      "front_shiny": "/Sprites/minior-indigo-shiny.png",
+      "home_default": "/Sprites/Home/minior-indigo.png",
+      "home_shiny": "/Sprites/Home/minior-indigo-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -1341,7 +1479,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/minior-violet.png",
-      "front_shiny": "/Sprites/minior-violet-shiny.png"
+      "front_shiny": "/Sprites/minior-violet-shiny.png",
+      "home_default": "/Sprites/Home/minior-violet.png",
+      "home_shiny": "/Sprites/Home/minior-violet-shiny.png"
     },
     "gen": 7,
     "evolution": {
@@ -1360,7 +1500,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/toxtricity-lowkey.png",
-      "front_shiny": "/Sprites/toxtricity-lowkey-shiny.png"
+      "front_shiny": "/Sprites/toxtricity-lowkey-shiny.png",
+      "home_default": "/Sprites/Home/toxtricity-lowkey.png",
+      "home_shiny": "/Sprites/Home/toxtricity-lowkey-shiny.png"
     },
     "gen": 8,
     "evolution": {
@@ -1378,7 +1520,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/854.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/854.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/854.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/854.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/854.png"
     },
     "gen": 8,
     "evolution": {
@@ -1396,7 +1540,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/855.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/855.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/855.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/855.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/855.png"
     },
     "gen": 8,
     "evolution": {
@@ -1415,7 +1561,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10191.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10191.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10191.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10191.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10191.png"
     },
     "gen": 8,
     "evolution": {
@@ -1434,7 +1582,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10249.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10249.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10249.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10249.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10249.png"
     },
     "gen": 8,
     "evolution": {
@@ -1452,7 +1602,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/maushold-family-of-three.png",
-      "front_shiny": "/Sprites/maushold-family-of-three-shiny.png"
+      "front_shiny": "/Sprites/maushold-family-of-three-shiny.png",
+      "home_default": "/Sprites/Home/maushold-family-of-three.png",
+      "home_shiny": "/Sprites/Home/maushold-family-of-three-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -1470,8 +1622,10 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "/Sprites/sqwuawkabilly-blue.png",
-      "front_shiny": "/Sprites/sqwuawkabilly-blue-shiny.png"
+      "front_default": "/Sprites/squawkabilly-blue.png",
+      "front_shiny": "/Sprites/squawkabilly-blue-shiny.png",
+      "home_default": "/Sprites/Home/squawkabilly-blue.png",
+      "home_shiny": "/Sprites/Home/squawkabilly-blue-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -1489,8 +1643,10 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "/Sprites/sqwuawkabilly-yellow.png",
-      "front_shiny": "/Sprites/sqwuawkabilly-yellow-shiny.png"
+      "front_default": "/Sprites/squawkabilly-yellow.png",
+      "front_shiny": "/Sprites/squawkabilly-yellow-shiny.png",
+      "home_default": "/Sprites/Home/squawkabilly-yellow.png",
+      "home_shiny": "/Sprites/Home/squawkabilly-yellow-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -1508,8 +1664,10 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "/Sprites/sqwuawkabilly-white.png",
-      "front_shiny": "/Sprites/sqwuawkabilly-white-shiny.png"
+      "front_default": "/Sprites/squawkabilly-white.png",
+      "front_shiny": "/Sprites/squawkabilly-white-shiny.png",
+      "home_default": "/Sprites/Home/squawkabilly-white.png",
+      "home_shiny": "/Sprites/Home/squawkabilly-white-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -1528,7 +1686,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/tatsugiri-droopy.png",
-      "front_shiny": "/Sprites/tatsugiri-droopy-shiny.png"
+      "front_shiny": "/Sprites/tatsugiri-droopy-shiny.png",
+      "home_default": "/Sprites/Home/tatsugiri-droopy.png",
+      "home_shiny": "/Sprites/Home/tatsugiri-droopy-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -1547,7 +1707,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/tatsugiri-stretchy.png",
-      "front_shiny": "/Sprites/tatsugiri-stretchy-shiny.png"
+      "front_shiny": "/Sprites/tatsugiri-stretchy-shiny.png",
+      "home_default": "/Sprites/Home/tatsugiri-stretchy.png",
+      "home_shiny": "/Sprites/Home/tatsugiri-stretchy-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -1565,7 +1727,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10255.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10255.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10255.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10255.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10255.png"
     },
     "gen": 9,
     "evolution": {
@@ -1584,7 +1748,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1012.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1012.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1012.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1012.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1012.png"
     },
     "gen": 9,
     "evolution": {
@@ -1609,7 +1775,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1013.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1013.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1013.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1013.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1013.png"
     },
     "gen": 9,
     "evolution": {

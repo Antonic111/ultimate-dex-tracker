@@ -56,6 +56,8 @@ import { getCaughtKey } from "../caughtStorage";
 import { SearchbarIconDropdown } from "../components/Shared/SearchBar";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
 import { validateContent } from "../../shared/contentFilter";
+import { useTheme } from "../components/Shared/ThemeContext";
+import { getSpriteUrl } from "../utils/spriteUtils";
 import { UserContext } from "../components/Shared/UserContext";
 import { useMessage } from "../components/Shared/MessageContext";
 import { huntAPI, profileAPI, caughtAPI } from "../utils/api";
@@ -122,6 +124,28 @@ export default function Counters() {
     manualTotalTime: '',
     manualIncrements: ''
   });
+
+  const [showOptionsIndex, setShowOptionsIndex] = useState(null);
+  const optionsMenuRef = useRef(null);
+  
+  const [useHomeSprites, setUseHomeSprites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false;
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    const handlePrefsChange = () => {
+      try {
+        setUseHomeSprites(JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false);
+      } catch { }
+    };
+    window.addEventListener('dexPreferencesChanged', handlePrefsChange);
+    return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
+  }, []);
+
   const [editForm, setEditForm] = useState({
     game: '',
     method: '',
@@ -1382,7 +1406,7 @@ export default function Counters() {
     if (!pokemon) return "";
 
     // Always show shiny sprites for hunt tracking
-    return pokemon.sprites?.front_shiny || pokemon.sprites?.front_default || "";
+    return getSpriteUrl(pokemon, true, useHomeSprites);
   };
 
   // Get available methods for selected game

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { formatPokemonName } from "../../utils";
+import { getSpriteUrl } from "../../utils/spriteUtils";
 import { Plus, Minus } from "lucide-react";
 import PokemonGridItem from "./PokemonGridItem";
 
@@ -22,6 +23,24 @@ export default function DexSection({
   const [contentHeight, setContentHeight] = useState(0);
   const [transitionReady, setTransitionReady] = useState(false);
   const contentRef = useRef(null);
+  
+  const [useHomeSprites, setUseHomeSprites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false;
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    const handlePrefsChange = () => {
+      try {
+        setUseHomeSprites(JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false);
+      } catch { }
+    };
+    window.addEventListener('dexPreferencesChanged', handlePrefsChange);
+    return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
+  }, []);
   const nameCacheRef = useRef(new Map());
   const dexNumberCacheRef = useRef(new Map());
   const touchTimerRef = useRef(null);
@@ -283,8 +302,7 @@ export default function DexSection({
                 <div className={containerClassName} key={`box-${box[0]?.id ?? i}-${i}`}>
                   <div className="rounded-lg p-2 md:p-3 shadow-lg overflow-visible" style={{ 
                     backgroundColor: 'var(--searchbar-bg)', 
-                    border: '1px solid var(--border-color)', 
-                    ...(boxIndex > 0 ? { contentVisibility: 'auto', containIntrinsicSize: 'auto 400px' } : {}) 
+                    border: '1px solid var(--border-color)'
                   }}>
                     {/* Box Header */}
                     <div className="flex items-center justify-between py-0">
@@ -378,8 +396,7 @@ export default function DexSection({
                     <div className="grid grid-cols-6 gap-1 overflow-visible">
                       {box.map((poke, idx) => {
                         const key = getCaughtKey(poke) + "_" + idx;
-                        const sprites = poke?.sprites ?? {};
-                        const sprite = (showShiny && sprites.front_shiny) ? sprites.front_shiny : (sprites.front_default || "");
+                        const sprite = getSpriteUrl(poke, showShiny, useHomeSprites);
                         const isBlocked = poke._isBlocked === true;
                         const isCaught = safeIsCaught(poke);
                         const displayName = getDisplayName(poke.name);
@@ -395,7 +412,7 @@ export default function DexSection({
                             readOnly={readOnly}
                             displayName={displayName}
                             dexNumber={getDexNumber(poke?.id)}
-                            priorityLoad={absoluteIndex < 30}
+                            priorityLoad={!useHomeSprites && absoluteIndex < 30}
                             onSelect={onSelect}
                             onToggleCaught={onToggleCaught}
                             handleTouchStart={handleTouchStart}

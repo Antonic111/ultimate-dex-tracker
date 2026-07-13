@@ -9,6 +9,7 @@ import { getFilteredFormsData } from "../utils/dexPreferences";
 import { getAvailableGamesForPokemonSidebar, normalizeGameName, GAME_COUNTERPARTS } from "../utils/pokemonAvailability";
 import versionExclusives from "../data/versionExclusives.json";
 import { formatPokemonName, getFormDisplayName } from "../utils";
+import { getSpriteUrl } from "../utils/spriteUtils";
 import './Bingo.css';
 import '../css/Counters.css'; // Import Counters styles for the modal
 import { SearchbarIconDropdown } from "../components/Shared/SearchBar";
@@ -19,9 +20,27 @@ import { UserContext } from "../components/Shared/UserContext";
 
 const Bingo = () => {
     const { showMessage } = useMessage();
-    const { username: currentUsername } = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
-    // Local storage key
+    const [useHomeSprites, setUseHomeSprites] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false;
+        } catch {
+            return false;
+        }
+    });
+
+    useEffect(() => {
+        const handlePrefsChange = () => {
+            try {
+                setUseHomeSprites(JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false);
+            } catch { }
+        };
+        window.addEventListener('dexPreferencesChanged', handlePrefsChange);
+        return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
+    }, []);
+
+    // Configuration / Filter State key
     const STORAGE_KEY = 'bingo-grid-state-v1';
 
     // State initialization
@@ -343,7 +362,10 @@ const Bingo = () => {
     };
 
     const getPokemonImage = (pokemon) => {
-        return pokemon?.sprites?.front_shiny || pokemon?.sprites?.front_default || "";
+        // In Bingo, we often use shiny sprites by default, so we'll pass true for isShiny
+        // Look up fresh data to avoid missing new sprites in stale localStorage entries
+        const freshPokemon = allPokemon.find(p => p.id === pokemon.id && p.name === pokemon.name) || pokemon;
+        return getSpriteUrl(freshPokemon, true, useHomeSprites);
     };
 
     // Helper to get game icon if available (optional)
@@ -401,7 +423,7 @@ const Bingo = () => {
                             <span>Back to Profile</span>
                         </Link>
                     ) : (
-                        currentUsername && (
+                        user?.username && (
                             <button
                                 onClick={handleShare}
                                 className="bingo-copy-btn p-2 rounded-full hover:bg-[var(--bg-secondary)] transition-colors text-[var(--accent)]"
@@ -456,7 +478,7 @@ const Bingo = () => {
                                                     className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-in-out ${isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'}`}
                                                 >
                                                     <img
-                                                        src={getPokemonImage(pokemon)}
+                                                        src={getPokemonImage(pokemon) || "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="}
                                                         alt={pokemon.name}
                                                         className="bingo-pokemon-img"
                                                     />
@@ -634,7 +656,7 @@ const Bingo = () => {
                                                     style={isSelected ? { backgroundColor: 'color-mix(in srgb, var(--accent) 20%, transparent)', borderColor: 'var(--accent)' } : {}}
                                                 >
                                                     <img
-                                                        src={getPokemonImage(pokemon)}
+                                                        src={getPokemonImage(pokemon) || "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="}
                                                         alt={formatPokemonName(String(pokemon?.name || ''))}
                                                         className="pokemon-img"
                                                     />

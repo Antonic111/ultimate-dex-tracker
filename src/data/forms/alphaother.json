@@ -8,7 +8,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/25.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/25.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/25.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/25.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/25.png"
     },
     "gen": 1,
     "formType": "alphaother",
@@ -36,7 +38,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/26.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/26.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/26.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/26.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/26.png"
     },
     "gen": 1,
     "formType": "alphaother",
@@ -59,7 +63,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/41.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/41.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/41.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/41.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/41.png"
     },
     "gen": 1,
     "formType": "alphaother",
@@ -84,7 +90,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/42.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/42.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/42.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/42.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/42.png"
     },
     "gen": 1,
     "formType": "alphaother",
@@ -112,7 +120,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/64.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/64.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/64.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/64.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/64.png"
     },
     "gen": 1,
     "formType": "alphaother",
@@ -140,7 +150,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/65.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/65.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/65.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/65.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/65.png"
     },
     "gen": 1,
     "formType": "alphaother",
@@ -163,7 +175,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/111.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/111.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/111.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/111.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/111.png"
     },
     "gen": 1,
     "formType": "alphaother",
@@ -188,7 +202,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/112.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/112.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/112.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/112.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/112.png"
     },
     "gen": 1,
     "formType": "alphaother",
@@ -217,7 +233,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/123.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/123.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/123.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/123.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/123.png"
     },
     "gen": 1,
     "formType": "alphaother",
@@ -241,7 +259,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/129.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/129.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/129.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/129.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/129.png"
     },
     "gen": 1,
     "formType": "alphaother",
@@ -266,7 +286,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/130.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/130.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/130.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/130.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/130.png"
     },
     "gen": 1,
     "formType": "alphaother",
@@ -288,7 +310,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/133.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/133.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/133.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/133.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/133.png"
     },
     "gen": 1,
     "formType": "alphaother",
@@ -306,7 +330,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/157.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/157.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/157.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/157.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/157.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -328,7 +354,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/185.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/185.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/185.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/185.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/185.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -350,7 +378,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/190.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/190.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/190.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/190.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/190.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -375,7 +405,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/198.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/198.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/198.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/198.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/198.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -400,7 +432,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/207.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/207.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/207.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/207.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/207.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -425,7 +459,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/208.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/208.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/208.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/208.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/208.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -448,7 +484,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/212.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/212.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/212.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/212.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/212.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -471,7 +509,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/214.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/214.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/214.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/214.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/214.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -490,7 +530,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/215.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/215.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/215.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/215.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/215.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -515,7 +557,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/215.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/215.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/215.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/215.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/215.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -540,7 +584,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10235.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10235.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10235.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10235.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10235.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -558,7 +604,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/217.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/217.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/217.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/217.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/217.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -581,7 +629,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/221.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/221.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/221.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/221.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/221.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -609,7 +659,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/224.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/224.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/224.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/224.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/224.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -632,7 +684,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/267.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/267.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/267.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/267.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/267.png"
     },
     "gen": 3,
     "formType": "alphaother",
@@ -655,7 +709,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/269.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/269.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/269.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/269.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/269.png"
     },
     "gen": 3,
     "formType": "alphaother",
@@ -678,7 +734,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/315.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/315.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/315.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/315.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/315.png"
     },
     "gen": 3,
     "formType": "alphaother",
@@ -707,7 +765,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/396.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/396.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/396.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/396.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/396.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -732,7 +792,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/397.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/397.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/397.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/397.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/397.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -761,7 +823,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/398.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/398.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/398.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/398.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/398.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -783,7 +847,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/399.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/399.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/399.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/399.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/399.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -808,7 +874,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/400.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/400.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/400.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/400.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/400.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -830,7 +898,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/401.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/401.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/401.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/401.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/401.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -854,7 +924,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/402.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/402.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/402.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/402.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/402.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -876,7 +948,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/403.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/403.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/403.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/403.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/403.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -900,7 +974,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/404.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/404.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/404.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/404.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/404.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -928,7 +1004,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/405.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/405.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/405.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/405.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/405.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -951,7 +1029,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/407.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/407.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/407.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/407.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/407.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -974,7 +1054,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/412-sandy.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-sandy.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-sandy.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/412-sandy.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/412-sandy.png"
     },
     "gen": 4,
     "evolution": {
@@ -1003,7 +1085,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/412-trash.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-trash.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/412-trash.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/412-trash.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/412-trash.png"
     },
     "gen": 4,
     "evolution": {
@@ -1033,7 +1117,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/wormadam-sandy.png",
-      "front_shiny": "/Sprites/wormadam-sandy-shiny.png"
+      "front_shiny": "/Sprites/wormadam-sandy-shiny.png",
+      "home_default": "/Sprites/Home/wormadam-sandy.png",
+      "home_shiny": "/Sprites/Home/wormadam-sandy-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -1056,7 +1142,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/wormadam-trash.png",
-      "front_shiny": "/Sprites/wormadam-trash-shiny.png"
+      "front_shiny": "/Sprites/wormadam-trash-shiny.png",
+      "home_default": "/Sprites/Home/wormadam-trash.png",
+      "home_shiny": "/Sprites/Home/wormadam-trash-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -1078,7 +1166,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/415.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/415.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/415.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/415.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/415.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1102,7 +1192,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/417.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/417.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/417.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/417.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/417.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1120,7 +1212,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/418.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/418.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/418.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/418.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/418.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1144,7 +1238,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/419.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/419.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/419.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/419.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/419.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1167,7 +1263,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/422.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/422.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/422.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/422.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/422.png"
     },
     "gen": 4,
     "evolution": {
@@ -1186,7 +1284,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/423.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/423.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/423.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/423.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/423.png"
     },
     "gen": 4,
     "evolution": {
@@ -1203,7 +1303,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/424.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/424.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/424.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/424.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/424.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1226,7 +1328,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/443.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/443.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/443.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/443.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/443.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1251,7 +1355,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/444.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/444.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/444.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/444.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/444.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1280,7 +1386,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/445.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/445.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/445.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/445.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/445.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1302,7 +1410,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/449.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/449.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/449.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/449.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/449.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1326,7 +1436,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/450.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/450.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/450.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/450.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/450.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1349,7 +1461,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/453.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/453.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/453.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/453.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/453.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1374,7 +1488,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/454.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/454.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/454.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/454.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/454.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1396,7 +1512,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/456.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/456.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/456.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/456.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/456.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1420,7 +1538,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/457.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/457.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/457.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/457.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/457.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1443,7 +1563,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/459.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/459.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/459.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/459.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/459.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1468,7 +1590,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/460.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/460.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/460.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/460.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/460.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1491,7 +1615,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/461.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/461.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/461.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/461.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/461.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1514,7 +1640,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/464.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/464.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/464.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/464.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/464.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1536,7 +1664,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/465.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/465.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/465.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/465.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/465.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1559,7 +1689,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/473.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/473.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/473.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/473.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/473.png"
     },
     "gen": 4,
     "formType": "alphaother",
@@ -1583,7 +1715,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/rotom-heat.png",
-      "front_shiny": "/Sprites/rotom-heat-shiny.png"
+      "front_shiny": "/Sprites/rotom-heat-shiny.png",
+      "home_default": "/Sprites/Home/rotom-heat.png",
+      "home_shiny": "/Sprites/Home/rotom-heat-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -1602,7 +1736,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/rotom-wash.png",
-      "front_shiny": "/Sprites/rotom-wash-shiny.png"
+      "front_shiny": "/Sprites/rotom-wash-shiny.png",
+      "home_default": "/Sprites/Home/rotom-wash.png",
+      "home_shiny": "/Sprites/Home/rotom-wash-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -1621,7 +1757,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/rotom-frost.png",
-      "front_shiny": "/Sprites/rotom-frost-shiny.png"
+      "front_shiny": "/Sprites/rotom-frost-shiny.png",
+      "home_default": "/Sprites/Home/rotom-frost.png",
+      "home_shiny": "/Sprites/Home/rotom-frost-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -1640,7 +1778,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/rotom-fan.png",
-      "front_shiny": "/Sprites/rotom-fan-shiny.png"
+      "front_shiny": "/Sprites/rotom-fan-shiny.png",
+      "home_default": "/Sprites/Home/rotom-fan.png",
+      "home_shiny": "/Sprites/Home/rotom-fan-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -1659,7 +1799,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/rotom-mow.png",
-      "front_shiny": "/Sprites/rotom-mow-shiny.png"
+      "front_shiny": "/Sprites/rotom-mow-shiny.png",
+      "home_default": "/Sprites/Home/rotom-mow.png",
+      "home_shiny": "/Sprites/Home/rotom-mow-shiny.png"
     },
     "gen": 4,
     "evolution": {
@@ -1676,7 +1818,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/503.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/503.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/503.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/503.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/503.png"
     },
     "gen": 5,
     "formType": "alphaother",
@@ -1698,7 +1842,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/549.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/549.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/549.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/549.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/549.png"
     },
     "gen": 5,
     "formType": "alphaother",
@@ -1721,7 +1867,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/628.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/628.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/628.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/628.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/628.png"
     },
     "gen": 5,
     "formType": "alphaother",
@@ -1743,7 +1891,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/705.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/705.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/705.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/705.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/705.png"
     },
     "gen": 6,
     "formType": "alphaother",
@@ -1771,7 +1921,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/706.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/706.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/706.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/706.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/706.png"
     },
     "gen": 6,
     "formType": "alphaother",
@@ -1793,7 +1945,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/713.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/713.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/713.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/713.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/713.png"
     },
     "gen": 6,
     "formType": "alphaother",
@@ -1816,7 +1970,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/724.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/724.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/724.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/724.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/724.png"
     },
     "gen": 7,
     "formType": "alphaother",
@@ -1839,7 +1995,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10248.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10248.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10248.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10248.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10248.png"
     },
     "gen": 8,
     "formType": "alphaother",
@@ -1862,7 +2020,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10107.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10107.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10107.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10107.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10107.png"
     },
     "gen": 7,
     "evolution": {
@@ -1886,7 +2046,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10108.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10108.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10108.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10108.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10108.png"
     },
     "gen": 7,
     "evolution": {
@@ -1908,7 +2070,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10161.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10161.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10161.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10161.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10161.png"
     },
     "gen": 8,
     "evolution": {
@@ -1932,7 +2096,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10166.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10166.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10166.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10166.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10166.png"
     },
     "gen": 8,
     "evolution": {
@@ -1956,7 +2122,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10115.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10115.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10115.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10115.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10115.png"
     },
     "gen": 7,
     "formType": "alphaother",
@@ -1979,7 +2147,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10168.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10168.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10168.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10168.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10168.png"
     },
     "gen": 8,
     "formType": "alphaother",
@@ -2008,7 +2178,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10179.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10179.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10179.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10179.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10179.png"
     },
     "gen": 8,
     "formType": "alphaother",
@@ -2034,7 +2206,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/toxtricity-lowkey.png",
-      "front_shiny": "/Sprites/toxtricity-lowkey-shiny.png"
+      "front_shiny": "/Sprites/toxtricity-lowkey-shiny.png",
+      "home_default": "/Sprites/Home/toxtricity-lowkey.png",
+      "home_shiny": "/Sprites/Home/toxtricity-lowkey-shiny.png"
     },
     "gen": 8,
     "evolution": {
@@ -2053,7 +2227,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/876.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/876.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/876.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/876.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/876.png"
     },
     "gen": 8,
     "evolution": {
@@ -2071,8 +2247,10 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "/Sprites/sqwuawkabilly-blue.png",
-      "front_shiny": "/Sprites/sqwuawkabilly-blue-shiny.png"
+      "front_default": "/Sprites/squawkabilly-blue.png",
+      "front_shiny": "/Sprites/squawkabilly-blue-shiny.png",
+      "home_default": "/Sprites/Home/squawkabilly-blue.png",
+      "home_shiny": "/Sprites/Home/squawkabilly-blue-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -2090,8 +2268,10 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "/Sprites/sqwuawkabilly-yellow.png",
-      "front_shiny": "/Sprites/sqwuawkabilly-yellow-shiny.png"
+      "front_default": "/Sprites/squawkabilly-yellow.png",
+      "front_shiny": "/Sprites/squawkabilly-yellow-shiny.png",
+      "home_default": "/Sprites/Home/squawkabilly-yellow.png",
+      "home_shiny": "/Sprites/Home/squawkabilly-yellow-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -2109,8 +2289,10 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "/Sprites/sqwuawkabilly-white.png",
-      "front_shiny": "/Sprites/sqwuawkabilly-white-shiny.png"
+      "front_default": "/Sprites/squawkabilly-white.png",
+      "front_shiny": "/Sprites/squawkabilly-white-shiny.png",
+      "home_default": "/Sprites/Home/squawkabilly-white.png",
+      "home_shiny": "/Sprites/Home/squawkabilly-white-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -2129,7 +2311,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/tatsugiri-droopy.png",
-      "front_shiny": "/Sprites/tatsugiri-droopy-shiny.png"
+      "front_shiny": "/Sprites/tatsugiri-droopy-shiny.png",
+      "home_default": "/Sprites/Home/tatsugiri-droopy.png",
+      "home_shiny": "/Sprites/Home/tatsugiri-droopy-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -2148,7 +2332,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/tatsugiri-stretchy.png",
-      "front_shiny": "/Sprites/tatsugiri-stretchy-shiny.png"
+      "front_shiny": "/Sprites/tatsugiri-stretchy-shiny.png",
+      "home_default": "/Sprites/Home/tatsugiri-stretchy.png",
+      "home_shiny": "/Sprites/Home/tatsugiri-stretchy-shiny.png"
     },
     "gen": 9,
     "evolution": {
@@ -2166,7 +2352,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/255.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/255.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/255.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/255.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/255.png"
     },
     "gen": 3,
     "evolution": {
@@ -2191,7 +2379,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/256.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/256.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/256.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/256.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/256.png"
     },
     "gen": 3,
     "evolution": {
@@ -2220,7 +2410,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/257.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/257.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/257.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/257.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/257.png"
     },
     "gen": 3,
     "evolution": {
@@ -2242,7 +2434,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/307.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/307.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/307.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/307.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/307.png"
     },
     "gen": 3,
     "formType": "alphaother",
@@ -2267,7 +2461,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/308.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/308.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/308.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/308.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/308.png"
     },
     "gen": 3,
     "formType": "alphaother",
@@ -2290,7 +2486,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/154.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/154.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/154.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/154.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/154.png"
     },
     "gen": 2,
     "evolution": {
@@ -2311,7 +2509,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10025.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10025.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10025.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10025.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10025.png"
     },
     "gen": 6,
     "formType": "alphaother",
@@ -2334,7 +2534,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/668.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/668.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/668.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/668.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/668.png"
     },
     "gen": 6,
     "formType": "alphaother",
@@ -2353,7 +2555,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/322.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/322.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/322.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/322.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/322.png"
     },
     "gen": 3,
     "formType": "alphaother",
@@ -2378,7 +2582,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/323.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/323.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/323.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/323.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/323.png"
     },
     "gen": 3,
     "formType": "alphaother",
@@ -2401,7 +2607,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/3.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/3.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/3.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/3.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/3.png"
     },
     "gen": 1,
     "formType": "alphaother",
@@ -2420,7 +2628,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-heart.png",
-      "front_shiny": "/Sprites/furfrou-heart-shiny.png"
+      "front_shiny": "/Sprites/furfrou-heart-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-heart.png",
+      "home_shiny": "/Sprites/Home/furfrou-heart-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2438,7 +2648,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-star.png",
-      "front_shiny": "/Sprites/furfrou-star-shiny.png"
+      "front_shiny": "/Sprites/furfrou-star-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-star.png",
+      "home_shiny": "/Sprites/Home/furfrou-star-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2456,7 +2668,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-diamond.png",
-      "front_shiny": "/Sprites/furfrou-diamond-shiny.png"
+      "front_shiny": "/Sprites/furfrou-diamond-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-diamond.png",
+      "home_shiny": "/Sprites/Home/furfrou-diamond-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2474,7 +2688,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-debutante.png",
-      "front_shiny": "/Sprites/furfrou-debutante-shiny.png"
+      "front_shiny": "/Sprites/furfrou-debutante-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-debutante.png",
+      "home_shiny": "/Sprites/Home/furfrou-debutante-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2492,7 +2708,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-matron.png",
-      "front_shiny": "/Sprites/furfrou-matron-shiny.png"
+      "front_shiny": "/Sprites/furfrou-matron-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-matron.png",
+      "home_shiny": "/Sprites/Home/furfrou-matron-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2510,7 +2728,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-dandy.png",
-      "front_shiny": "/Sprites/furfrou-dandy-shiny.png"
+      "front_shiny": "/Sprites/furfrou-dandy-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-dandy.png",
+      "home_shiny": "/Sprites/Home/furfrou-dandy-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2528,7 +2748,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-lareine.png",
-      "front_shiny": "/Sprites/furfrou-lareine-shiny.png"
+      "front_shiny": "/Sprites/furfrou-lareine-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-lareine.png",
+      "home_shiny": "/Sprites/Home/furfrou-lareine-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2546,7 +2768,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-kabuki.png",
-      "front_shiny": "/Sprites/furfrou-kabuki-shiny.png"
+      "front_shiny": "/Sprites/furfrou-kabuki-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-kabuki.png",
+      "home_shiny": "/Sprites/Home/furfrou-kabuki-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2564,7 +2788,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/furfrou-pharaoh.png",
-      "front_shiny": "/Sprites/furfrou-pharaoh-shiny.png"
+      "front_shiny": "/Sprites/furfrou-pharaoh-shiny.png",
+      "home_default": "/Sprites/Home/furfrou-pharaoh.png",
+      "home_shiny": "/Sprites/Home/furfrou-pharaoh-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2583,7 +2809,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/pumpkaboo-small.png",
-      "front_shiny": "/Sprites/pumpkaboo-small-shiny.png"
+      "front_shiny": "/Sprites/pumpkaboo-small-shiny.png",
+      "home_default": "/Sprites/Home/pumpkaboo-small.png",
+      "home_shiny": "/Sprites/Home/pumpkaboo-small-shiny.png"
     },
     "sizeScale": 0.85,
     "gen": 6,
@@ -2603,7 +2831,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/pumpkaboo-large.png",
-      "front_shiny": "/Sprites/pumpkaboo-large-shiny.png"
+      "front_shiny": "/Sprites/pumpkaboo-large-shiny.png",
+      "home_default": "/Sprites/Home/pumpkaboo-large.png",
+      "home_shiny": "/Sprites/Home/pumpkaboo-large-shiny.png"
     },
     "sizeScale": 1.15,
     "gen": 6,
@@ -2623,7 +2853,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/pumpkaboo-super.png",
-      "front_shiny": "/Sprites/pumpkaboo-super-shiny.png"
+      "front_shiny": "/Sprites/pumpkaboo-super-shiny.png",
+      "home_default": "/Sprites/Home/pumpkaboo-super.png",
+      "home_shiny": "/Sprites/Home/pumpkaboo-super-shiny.png"
     },
     "sizeScale": 1.5,
     "gen": 6,
@@ -2643,7 +2875,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/gourgeist-small.png",
-      "front_shiny": "/Sprites/gourgeist-small-shiny.png"
+      "front_shiny": "/Sprites/gourgeist-small-shiny.png",
+      "home_default": "/Sprites/Home/gourgeist-small.png",
+      "home_shiny": "/Sprites/Home/gourgeist-small-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2662,7 +2896,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/gourgeist-large.png",
-      "front_shiny": "/Sprites/gourgeist-large-shiny.png"
+      "front_shiny": "/Sprites/gourgeist-large-shiny.png",
+      "home_default": "/Sprites/Home/gourgeist-large.png",
+      "home_shiny": "/Sprites/Home/gourgeist-large-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2681,7 +2917,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/gourgeist-super.png",
-      "front_shiny": "/Sprites/gourgeist-super-shiny.png"
+      "front_shiny": "/Sprites/gourgeist-super-shiny.png",
+      "home_default": "/Sprites/Home/gourgeist-super.png",
+      "home_shiny": "/Sprites/Home/gourgeist-super-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2699,7 +2937,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/229.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/229.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/229.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/229.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/229.png"
     },
     "gen": 2,
     "formType": "alphaother",
@@ -2717,7 +2957,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/316.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/316.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/316.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/316.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/316.png"
     },
     "gen": 3,
     "formType": "alphaother",
@@ -2741,7 +2983,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/317.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/317.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/317.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/317.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/317.png"
     },
     "gen": 3,
     "formType": "alphaother",
@@ -2763,7 +3007,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/female/350.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/350.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/female/350.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/350.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/350.png"
     },
     "gen": 3,
     "formType": "alphaother",
@@ -2782,7 +3028,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/flabebe-yellow.png",
-      "front_shiny": "/Sprites/flabebe-yellow-shiny.png"
+      "front_shiny": "/Sprites/flabebe-yellow-shiny.png",
+      "home_default": "/Sprites/Home/flabebe-yellow.png",
+      "home_shiny": "/Sprites/Home/flabebe-yellow-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2800,7 +3048,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/flabebe-orange.png",
-      "front_shiny": "/Sprites/flabebe-orange-shiny.png"
+      "front_shiny": "/Sprites/flabebe-orange-shiny.png",
+      "home_default": "/Sprites/Home/flabebe-orange.png",
+      "home_shiny": "/Sprites/Home/flabebe-orange-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2818,7 +3068,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/flabebe-blue.png",
-      "front_shiny": "/Sprites/flabebe-blue-shiny.png"
+      "front_shiny": "/Sprites/flabebe-blue-shiny.png",
+      "home_default": "/Sprites/Home/flabebe-blue.png",
+      "home_shiny": "/Sprites/Home/flabebe-blue-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2836,7 +3088,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/flabebe-white.png",
-      "front_shiny": "/Sprites/flabebe-white-shiny.png"
+      "front_shiny": "/Sprites/flabebe-white-shiny.png",
+      "home_default": "/Sprites/Home/flabebe-white.png",
+      "home_shiny": "/Sprites/Home/flabebe-white-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2854,7 +3108,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/floette-yellow.png",
-      "front_shiny": "/Sprites/floette-yellow-shiny.png"
+      "front_shiny": "/Sprites/floette-yellow-shiny.png",
+      "home_default": "/Sprites/Home/floette-yellow.png",
+      "home_shiny": "/Sprites/Home/floette-yellow-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2872,7 +3128,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/floette-orange.png",
-      "front_shiny": "/Sprites/floette-orange-shiny.png"
+      "front_shiny": "/Sprites/floette-orange-shiny.png",
+      "home_default": "/Sprites/Home/floette-orange.png",
+      "home_shiny": "/Sprites/Home/floette-orange-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2890,7 +3148,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/floette-blue.png",
-      "front_shiny": "/Sprites/floette-blue-shiny.png"
+      "front_shiny": "/Sprites/floette-blue-shiny.png",
+      "home_default": "/Sprites/Home/floette-blue.png",
+      "home_shiny": "/Sprites/Home/floette-blue-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2908,7 +3168,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/floette-white.png",
-      "front_shiny": "/Sprites/floette-white-shiny.png"
+      "front_shiny": "/Sprites/floette-white-shiny.png",
+      "home_default": "/Sprites/Home/floette-white.png",
+      "home_shiny": "/Sprites/Home/floette-white-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2926,7 +3188,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/florges-yellow.png",
-      "front_shiny": "/Sprites/florges-yellow-shiny.png"
+      "front_shiny": "/Sprites/florges-yellow-shiny.png",
+      "home_default": "/Sprites/Home/florges-yellow.png",
+      "home_shiny": "/Sprites/Home/florges-yellow-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2944,7 +3208,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/florges-orange.png",
-      "front_shiny": "/Sprites/florges-orange-shiny.png"
+      "front_shiny": "/Sprites/florges-orange-shiny.png",
+      "home_default": "/Sprites/Home/florges-orange.png",
+      "home_shiny": "/Sprites/Home/florges-orange-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2962,7 +3228,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/florges-blue.png",
-      "front_shiny": "/Sprites/florges-blue-shiny.png"
+      "front_shiny": "/Sprites/florges-blue-shiny.png",
+      "home_default": "/Sprites/Home/florges-blue.png",
+      "home_shiny": "/Sprites/Home/florges-blue-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2980,7 +3248,9 @@
     ],
     "sprites": {
       "front_default": "/Sprites/florges-white.png",
-      "front_shiny": "/Sprites/florges-white-shiny.png"
+      "front_shiny": "/Sprites/florges-white-shiny.png",
+      "home_default": "/Sprites/Home/florges-white.png",
+      "home_shiny": "/Sprites/Home/florges-white-shiny.png"
     },
     "gen": 6,
     "evolution": {
@@ -2997,7 +3267,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10164.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10164.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10164.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10164.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10164.png"
     },
     "gen": 8,
     "formType": "alphaother",
@@ -3027,7 +3299,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10165.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10165.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10165.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10165.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10165.png"
     },
     "gen": 8,
     "formType": "alphaother",
@@ -3051,7 +3325,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10172.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10172.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10172.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10172.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10172.png"
     },
     "gen": 8,
     "formType": "alphaother",
@@ -3075,7 +3351,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10100.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10100.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10100.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10100.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10100.png"
     },
     "gen": 7,
     "formType": "alphaother",
@@ -3098,7 +3376,9 @@
     ],
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10180.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10180.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10180.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10180.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10180.png"
     },
     "gen": 8,
     "formType": "alphaother",
@@ -3118,7 +3398,9 @@
     "formType": "alphaother",
     "sprites": {
       "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/211.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/211.png"
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/211.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/211.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/211.png"
     },
     "gen": 2,
     "evolution": {
