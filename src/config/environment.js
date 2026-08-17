@@ -1,8 +1,8 @@
 // Environment configuration for different deployment environments
 export const ENV_CONFIG = {
-  // Development environment
+  // Development environment (uses relative path /api with Vite proxy for both localhost & LAN IPs)
   development: {
-    API_BASE_URL: 'http://localhost:5000',
+    API_BASE_URL: '',
     NODE_ENV: 'development'
   },
   
@@ -15,6 +15,7 @@ export const ENV_CONFIG = {
 
 // Get current environment
 const currentEnv = import.meta.env.MODE || 'development';
-export const currentConfig = ENV_CONFIG[currentEnv];
+export const currentConfig = ENV_CONFIG[currentEnv] || ENV_CONFIG.development;
 
 export default currentConfig;
+

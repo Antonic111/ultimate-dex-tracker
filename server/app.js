@@ -29,13 +29,17 @@ app.use((req, res, next) => {
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:5175",
-    "http://192.168.2.15:5173",
   ];
 
-  // Allow origin if it's in the allowed list
-  if (origin && allowedOrigins.includes(origin)) {
+  // Allow production domains, localhost, and any LAN IP in development
+  const isLocalOrNetworkDev =
+    origin &&
+    /^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/.test(origin);
+
+  if (origin && (allowedOrigins.includes(origin) || isLocalOrNetworkDev)) {
     res.header("Access-Control-Allow-Origin", origin);
   }
+
 
   // Enhanced CORS headers for mobile compatibility
   res.header("Access-Control-Allow-Credentials", "true");

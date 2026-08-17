@@ -1,20 +1,17 @@
 // API configuration for different environments
 import { currentConfig } from './environment.js';
 
-const API_CONFIG = {
-  development: {
-    baseURL: 'http://localhost:5000'
-  },
-  production: {
-    baseURL: currentConfig.API_BASE_URL
-  }
-};
+const envApiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
 
-const environment = import.meta.env.MODE || 'development';
-export const API_BASE_URL = API_CONFIG[environment].baseURL;
+export const API_BASE_URL = envApiUrl !== undefined ? envApiUrl : (currentConfig?.API_BASE_URL ?? '');
 
 // Helper function to build full API URLs
 export const buildApiUrl = (endpoint) => {
-  if (!API_BASE_URL) return `/api${endpoint}`;
-  return `${API_BASE_URL}/api${endpoint}`;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  if (!API_BASE_URL) {
+    return cleanEndpoint.startsWith('/api') ? cleanEndpoint : `/api${cleanEndpoint}`;
+  }
+  const cleanBase = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+  return cleanEndpoint.startsWith('/api') ? `${cleanBase}${cleanEndpoint}` : `${cleanBase}/api${cleanEndpoint}`;
 };
+

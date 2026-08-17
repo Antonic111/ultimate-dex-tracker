@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { profileAPI } from "../../utils/api";
-import "../../css/CreatorRequestModal.css";
+import { Award } from "lucide-react";
+import "../../css/Onboarding.css";
 
 export default function TutorialCompleteModal({ onComplete, onReplay }) {
   const [saving, setSaving] = useState(false);
@@ -8,10 +9,13 @@ export default function TutorialCompleteModal({ onComplete, onReplay }) {
   useEffect(() => {
     document.documentElement.classList.add("tutorial-active");
     document.body.classList.add("tutorial-active");
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
 
     return () => {
       document.documentElement.classList.remove("tutorial-active");
       document.body.classList.remove("tutorial-active");
+      document.body.style.overflow = originalOverflow;
     };
   }, []);
 
@@ -47,39 +51,44 @@ export default function TutorialCompleteModal({ onComplete, onReplay }) {
   };
 
   return (
-    <div className="cr-modal-backdrop">
-      <div className="cr-modal" style={{ maxWidth: '500px' }}>
-        <div className="cr-modal-header" style={{ justifyContent: 'center', paddingTop: '30px' }}>
-          <div className="cr-modal-title-row">
-            <h2>Welcome to Dex Tracker!</h2>
+    <div className="onboarding-setup-backdrop">
+      <div className="onboarding-setup-modal" style={{ maxWidth: '460px' }}>
+        <div className="onboarding-setup-header" style={{ justifyContent: 'center', paddingTop: '20px' }}>
+          <div className="onboarding-title" style={{ fontSize: '1.3rem' }}>
+            <Award size={24} color="var(--accent)" />
+            <span>Welcome to Dex Tracker!</span>
           </div>
         </div>
         
-        <div className="cr-modal-form" style={{ textAlign: 'center', paddingBottom: '30px' }}>
-          <p className="cr-modal-subtitle" style={{ fontSize: '1.05rem', marginTop: '10px' }}>
+        <div className="onboarding-setup-body" style={{ textAlign: 'center', padding: '20px' }}>
+          <p className="onboarding-subtitle" style={{ fontSize: '1rem', lineHeight: '1.6', margin: '0 auto', color: 'var(--text)' }}>
             You're all set!
             <br /><br />
-            Enjoy tracking your collection, completing your Pokédex, and connecting with other trainers.
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+              Enjoy tracking your collection, completing your Pokédex, and connecting with other trainers.
+            </span>
           </p>
+        </div>
 
-          <div style={{ display: 'flex', gap: '10px', marginTop: '20px', padding: '0 20px' }}>
-            <button 
-              className="cr-submit-btn"
-              onClick={handleReplay} 
-              disabled={saving} 
-              style={{ flex: 1, background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text)' }}
-            >
-              Replay Tutorial
-            </button>
-            <button 
-              className="cr-submit-btn"
-              onClick={handleComplete} 
-              disabled={saving} 
-              style={{ flex: 1 }}
-            >
-              {saving ? "Saving..." : "Start Tracking"}
-            </button>
-          </div>
+        <div className="onboarding-setup-footer" style={{ display: 'flex', gap: '10px', padding: '16px 20px' }}>
+          <button 
+            type="button"
+            className="onboarding-btn-back"
+            onClick={handleReplay} 
+            disabled={saving} 
+            style={{ flex: 1, textAlign: 'center' }}
+          >
+            Replay Tutorial
+          </button>
+          <button 
+            type="button"
+            className="onboarding-btn-next"
+            onClick={handleComplete} 
+            disabled={saving} 
+            style={{ flex: 1, textAlign: 'center' }}
+          >
+            {saving ? "Saving..." : "Start Tracking"}
+          </button>
         </div>
       </div>
     </div>

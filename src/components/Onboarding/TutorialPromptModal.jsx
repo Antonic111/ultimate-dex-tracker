@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { profileAPI } from "../../utils/api";
 import { PlayCircle } from "lucide-react";
-import "../../css/CreatorRequestModal.css";
+import "../../css/Onboarding.css";
 
 export default function TutorialPromptModal({ onSkip, onAccept }) {
   const [closing, setClosing] = useState(false);
@@ -16,12 +16,12 @@ export default function TutorialPromptModal({ onSkip, onAccept }) {
         onboarding: { isComplete: true, tutorialStep: 0 }
       });
       setClosing(true);
-      setTimeout(() => onSkip(), 280);
+      setTimeout(() => onSkip(), 250);
     } catch (err) {
       console.error("Failed to update onboarding state:", err);
       // Fallback: still skip
       setClosing(true);
-      setTimeout(() => onSkip(), 280);
+      setTimeout(() => onSkip(), 250);
     } finally {
       setSaving(false);
     }
@@ -29,58 +29,59 @@ export default function TutorialPromptModal({ onSkip, onAccept }) {
 
   const handleAccept = async () => {
     setClosing(true);
-    setTimeout(() => onAccept(), 280);
+    setTimeout(() => onAccept(), 250);
   };
 
-  // Prevent scroll without breaking sticky header
+  // Lock background body scroll cleanly
   useEffect(() => {
-    const preventScroll = (e) => e.preventDefault();
-    document.addEventListener('wheel', preventScroll, { passive: false });
-    document.addEventListener('touchmove', preventScroll, { passive: false });
-    
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     return () => {
-      document.removeEventListener('wheel', preventScroll);
-      document.removeEventListener('touchmove', preventScroll);
+      document.body.style.overflow = originalOverflow;
     };
   }, []);
 
   return createPortal(
-    <div className={`cr-modal-backdrop ${closing ? "closing" : ""}`} style={{ zIndex: 9999 }}>
-      <div className={`cr-modal ${closing ? "closing" : ""}`} style={{ maxWidth: '450px' }}>
+    <div className={`onboarding-setup-backdrop ${closing ? "closing" : ""}`}>
+      <div className={`onboarding-setup-modal ${closing ? "closing" : ""}`} style={{ maxWidth: '440px' }}>
         
         {/* Header */}
-        <div className="cr-modal-header" style={{ paddingBottom: '10px' }}>
-          <div className="cr-modal-title-row">
-            <PlayCircle className="cr-badge-icon" color="var(--accent)" />
-            <h2>You're Ready!</h2>
+        <div className="onboarding-setup-header" style={{ justifyContent: 'center' }}>
+          <div className="onboarding-title" style={{ fontSize: '1.25rem' }}>
+            <PlayCircle size={22} color="var(--accent)" />
+            <span>You're All Set!</span>
           </div>
         </div>
 
-        {/* Dynamic Content */}
-        <div className="cr-modal-body" style={{ padding: '10px 20px 20px', textAlign: 'center' }}>
-          <p className="cr-modal-subtitle" style={{ fontSize: '1.05rem', lineHeight: '1.6', margin: '0 auto', maxWidth: '380px' }}>
-            Would you like a quick interactive walkthrough?
+        {/* Modal Body */}
+        <div className="onboarding-setup-body" style={{ textAlign: 'center', padding: '24px 20px' }}>
+          <p className="onboarding-subtitle" style={{ fontSize: '0.98rem', lineHeight: '1.6', margin: '0 auto', maxWidth: '360px', color: 'var(--text)' }}>
+            Would you like a quick interactive walkthrough of the tracker?
             <br /><br />
-            It takes around two minutes and can always be replayed later from Settings.
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              It takes under two minutes and can always be replayed anytime from Settings.
+            </span>
           </p>
         </div>
 
         {/* Footer Actions */}
-        <div className="cr-modal-footer" style={{ borderTop: '1px solid var(--border-color)', padding: '20px', display: 'flex', gap: '15px', justifyContent: 'center' }}>
+        <div className="onboarding-setup-footer" style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
           <button 
-            className="cr-cancel-btn" 
+            type="button"
+            className="onboarding-btn-back" 
             onClick={handleSkip} 
             disabled={saving}
-            style={{ flex: 1, padding: '10px', background: 'var(--searchbar-dropdown)', color: 'white', border: '1px solid var(--border-color)', borderRadius: '8px', cursor: 'pointer', fontWeight: 500 }}
+            style={{ flex: 1, textAlign: 'center', padding: '10px 14px' }}
           >
             {saving ? "Skipping..." : "Skip Tutorial"}
           </button>
           
           <button 
-            className="cr-submit-btn" 
+            type="button"
+            className="onboarding-btn-next" 
             onClick={handleAccept} 
             disabled={saving}
-            style={{ flex: 1, padding: '10px', background: 'var(--accent)', color: 'black', fontWeight: 'bold', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
+            style={{ flex: 1, textAlign: 'center', padding: '10px 14px' }}
           >
             Start Tutorial
           </button>

@@ -14,36 +14,8 @@ import CreatorRequest from "../models/CreatorRequest.js";
 import RecentCatch from "../models/RecentCatch.js";
 import { broadcastNewCatch } from "./recentCatches.js";
 
-// CORS middleware for auth routes
-const corsMiddleware = (req, res, next) => {
-  const origin = req.headers.origin;
-
-  // Allow specific origins
-  const allowedOrigins = [
-    'https://ultimatedextracker.com',
-    'https://www.ultimatedextracker.com',
-    'https://ultimate-dex-tracker-pr5vf4mcr-antonics-projects.vercel.app',
-    'https://ultimate-dex-tracker.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:5173'
-  ];
-
-  if (origin && allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-  next();
-};
-
 const router = express.Router();
+
 dotenv.config();
 const PUBLIC_FIELDS = "username profileTrainer bio location gender createdAt";
 const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -113,7 +85,7 @@ router.post("/account/delete/send", authenticateUser, async (req, res) => {
 
 
 // Register
-router.post("/register", corsMiddleware, authLimiter, async (req, res) => {
+router.post("/register", authLimiter, async (req, res) => {
   const { username, email, password, profileTrainer = "ash.png" } = req.body;
 
   // Sanitize input data
@@ -188,7 +160,7 @@ router.post("/register", corsMiddleware, authLimiter, async (req, res) => {
 });
 
 // Login
-router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
+router.post("/login", authLimiter, async (req, res) => {
   const { usernameOrEmail, password, rememberMe } = req.body;
 
   try {
@@ -392,7 +364,7 @@ router.get("/username-cooldown", authenticateUser, async (req, res) => {
 });
 
 // Verify signup code
-router.post("/verify-code", corsMiddleware, async (req, res) => {
+router.post("/verify-code", async (req, res) => {
   const { email, code } = req.body;
   const trimmedCode = String(code || "").trim();
   const normalizedEmail = String(email || "").trim().toLowerCase();
@@ -460,7 +432,7 @@ router.post("/verify-code", corsMiddleware, async (req, res) => {
 });
 
 // Resend verification code
-router.post("/resend-code", corsMiddleware, async (req, res) => {
+router.post("/resend-code", async (req, res) => {
   const { email } = req.body;
 
   const normalizedEmail = String(email || "").trim().toLowerCase();
