@@ -38,7 +38,8 @@ export default function ViewDex() {
         method: [],
         categories: [],
         caught: "",
-        showEvolutions: false
+        showEvolutions: false,
+        showFullBox: false
     });
     const [toggles, setToggles] = useState(() => loadDexToggles());
     const togglesRef = useRef(toggles);
@@ -47,16 +48,21 @@ export default function ViewDex() {
     const showShiny = toggles.showShiny;
     const showForms = toggles.showForms;
 
-    // Debug logging for toggle state
+    const [selectedPokemon, setSelectedPokemon] = useState(null);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const setShowShiny = useCallback(val => {
+        if (val && selectedPokemon?.formType === "mighty") {
+            setSelectedPokemon(null);
+            setSidebarOpen(false);
+        }
         const updated = { ...togglesRef.current, showShiny: val };
         setToggles(updated);
         localStorage.setItem("dexToggles", JSON.stringify(updated));
 
         // Dispatch custom event to notify App component
         window.dispatchEvent(new CustomEvent('dexTogglesChanged', { detail: updated }));
-    }, []);
+    }, [selectedPokemon]);
 
     const setShowForms = useCallback(val => {
         const updated = { ...togglesRef.current, showForms: val };
@@ -92,8 +98,14 @@ export default function ViewDex() {
             window.removeEventListener('dexTogglesChanged', handleToggleChange);
         };
     }, []);
-    const [selectedPokemon, setSelectedPokemon] = useState(null);
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    // Auto-close sidebar on mighty pokemon if switched to shiny
+    useEffect(() => {
+        if (showShiny && selectedPokemon?.formType === "mighty") {
+            setSelectedPokemon(null);
+            setSidebarOpen(false);
+        }
+    }, [showShiny, selectedPokemon]);
     const [profileOwnerPreferences, setProfileOwnerPreferences] = useState(null);
     const [viewedUserShinyCharmGames, setViewedUserShinyCharmGames] = useState([]);
     const [externalLinkPreference, setExternalLinkPreference] = useState('serebii');
@@ -155,6 +167,7 @@ export default function ViewDex() {
                         showVivillonForms: true,
                         showAlphaForms: true,
                         showAlphaOtherForms: true,
+                        showMightyForms: true,
                     });
                 }
 
@@ -177,6 +190,7 @@ export default function ViewDex() {
                     showVivillonForms: true,
                     showAlphaForms: true,
                     showAlphaOtherForms: true,
+                    showMightyForms: true,
                 });
                 // Reset shiny charm games on error
                 setViewedUserShinyCharmGames([]);
@@ -196,6 +210,7 @@ export default function ViewDex() {
         "paldean",
         "unown",
         "other",
+        "mighty",
         "alcremie",
         "vivillon",
         "alpha",
@@ -218,6 +233,9 @@ export default function ViewDex() {
             getList: () => pokemonData
         },
         ...FORM_TYPES.map(type => {
+            // Mighty forms cannot be shiny
+            if (showShiny && type === 'mighty') return null;
+
             // Check if this form type should be shown based on profile owner's preferences
             if (profileOwnerPreferences) {
                 let shouldShow = false;
@@ -231,8 +249,10 @@ export default function ViewDex() {
                     case 'unown': shouldShow = profileOwnerPreferences.showUnownForms; break;
                     case 'other': shouldShow = profileOwnerPreferences.showOtherForms; break;
                     case 'alcremie': shouldShow = profileOwnerPreferences.showAlcremieForms; break;
+                    case 'vivillon': shouldShow = profileOwnerPreferences.showVivillonForms; break;
                     case 'alpha': shouldShow = profileOwnerPreferences.showAlphaForms; break;
                     case 'alphaother': shouldShow = profileOwnerPreferences.showAlphaOtherForms; break;
+                    case 'mighty': shouldShow = profileOwnerPreferences.showMightyForms; break;
                     default: shouldShow = true;
                 }
 
@@ -302,8 +322,8 @@ export default function ViewDex() {
             return poke;
         }).filter(poke => poke !== null);
 
-        // Then apply the filtering logic
-        return markedList.filter(pokemon => {
+        // Helper to test single Pokemon against filters
+        const testPokemon = (pokemon) => {
             // When viewing someone else's dex, always show forms (respect their preferences)
             // The current user's showForms toggle doesn't apply to viewing other people's dexes
             if (pokemon.formType && pokemon.formType !== "main" && pokemon.formType !== "default") {
@@ -312,40 +332,43 @@ export default function ViewDex() {
                 if (profileOwnerPreferences) {
                     switch (formType) {
                         case 'gender':
-                            if (!profileOwnerPreferences.showGenderForms) return false;
+                            if (!profileOwnerPreferences.showGenderForms) return { match: false, isSearchMatch: false };
                             break;
                         case 'alolan':
-                            if (!profileOwnerPreferences.showAlolanForms) return false;
+                            if (!profileOwnerPreferences.showAlolanForms) return { match: false, isSearchMatch: false };
                             break;
                         case 'galarian':
-                            if (!profileOwnerPreferences.showGalarianForms) return false;
+                            if (!profileOwnerPreferences.showGalarianForms) return { match: false, isSearchMatch: false };
                             break;
                         case 'hisuian':
-                            if (!profileOwnerPreferences.showHisuianForms) return false;
+                            if (!profileOwnerPreferences.showHisuianForms) return { match: false, isSearchMatch: false };
                             break;
                         case 'paldean':
-                            if (!profileOwnerPreferences.showPaldeanForms) return false;
+                            if (!profileOwnerPreferences.showPaldeanForms) return { match: false, isSearchMatch: false };
                             break;
                         case 'gmax':
-                            if (!profileOwnerPreferences.showGmaxForms) return false;
+                            if (!profileOwnerPreferences.showGmaxForms) return { match: false, isSearchMatch: false };
                             break;
                         case 'unown':
-                            if (!profileOwnerPreferences.showUnownForms) return false;
+                            if (!profileOwnerPreferences.showUnownForms) return { match: false, isSearchMatch: false };
                             break;
                         case 'other':
-                            if (!profileOwnerPreferences.showOtherForms) return false;
+                            if (!profileOwnerPreferences.showOtherForms) return { match: false, isSearchMatch: false };
                             break;
                         case 'alcremie':
-                            if (!profileOwnerPreferences.showAlcremieForms) return false;
+                            if (!profileOwnerPreferences.showAlcremieForms) return { match: false, isSearchMatch: false };
                             break;
                         case 'vivillon':
-                            if (!profileOwnerPreferences.showVivillonForms) return false;
+                            if (!profileOwnerPreferences.showVivillonForms) return { match: false, isSearchMatch: false };
                             break;
                         case 'alpha':
-                            if (!profileOwnerPreferences.showAlphaForms) return false;
+                            if (!profileOwnerPreferences.showAlphaForms) return { match: false, isSearchMatch: false };
                             break;
                         case 'alphaother':
-                            if (!profileOwnerPreferences.showAlphaOtherForms) return false;
+                            if (!profileOwnerPreferences.showAlphaOtherForms) return { match: false, isSearchMatch: false };
+                            break;
+                        case 'mighty':
+                            if (!profileOwnerPreferences.showMightyForms) return { match: false, isSearchMatch: false };
                             break;
                         default:
                             break;
@@ -353,12 +376,16 @@ export default function ViewDex() {
                 }
             }
 
+            // Mighty forms cannot be shiny
+            if (showShiny && pokemon.formType === "mighty") {
+                return { match: false, isSearchMatch: false };
+            }
+
             // Get caught info based on the current shiny toggle state
             const caughtInfo = caughtInfoMap[getCaughtKey(pokemon, null, showShiny)];
-
-            // Get the first entry for filtering (or use old structure for backward compatibility)
             const firstEntry = caughtInfo?.entries?.[0] || caughtInfo;
 
+            let isSearchMatch = false;
             // Search by name/dex
             if (filters.searchTerm) {
                 const term = filters.searchTerm.toLowerCase();
@@ -366,30 +393,34 @@ export default function ViewDex() {
                 const idStr = String(pokemon.id).padStart(4, "0");
                 const dexMatch = idStr.includes(term.replace(/^#/, ""));
 
-                // If showEvolutions is enabled, check if any pokemon in the evolution chain matches
-                if (!nameMatch && !dexMatch) {
-                    if (filters.showEvolutions) {
-                        const chainIds = getEvolutionChainIds(pokemon);
-                        // Check if any pokemon in the chain matches the search
-                        const chainMatches = chainIds.some(chainId => {
-                            const chainPoke = findPokemon(chainId);
-                            if (!chainPoke) return false;
-                            const chainNameMatch = chainPoke.name.toLowerCase().includes(term);
-                            const chainIdStr = String(chainPoke.id).padStart(4, "0");
-                            const chainDexMatch = chainIdStr.includes(term.replace(/^#/, ""));
-                            return chainNameMatch || chainDexMatch;
-                        });
-                        if (!chainMatches) return false;
-                    } else {
-                        return false;
+                if (nameMatch || dexMatch) {
+                    isSearchMatch = true;
+                } else if (filters.showEvolutions) {
+                    const chainIds = getEvolutionChainIds(pokemon);
+                    const chainMatches = chainIds.some(chainId => {
+                        const chainPoke = findPokemon(chainId);
+                        if (!chainPoke) return false;
+                        const chainNameMatch = chainPoke.name.toLowerCase().includes(term);
+                        const chainIdStr = String(chainPoke.id).padStart(4, "0");
+                        const chainDexMatch = chainIdStr.includes(term.replace(/^#/, ""));
+                        return chainNameMatch || chainDexMatch;
+                    });
+                    if (chainMatches) {
+                        isSearchMatch = true;
                     }
                 }
+
+                if (!isSearchMatch) {
+                    return { match: false, isSearchMatch: false };
+                }
+            } else {
+                isSearchMatch = true;
             }
 
             // Game filter (multi-select)
             if (filters.game && filters.game.length > 0) {
                 const matchesGame = filters.game.some(game => firstEntry?.game === game);
-                if (!matchesGame) return false;
+                if (!matchesGame) return { match: false, isSearchMatch: false };
             }
             // Game obtainable in (multi-select)
             if (filters.gameObtainable && filters.gameObtainable.length > 0) {
@@ -398,47 +429,46 @@ export default function ViewDex() {
                 const matchesGame = filters.gameObtainable.some(game =>
                     normalizedAvailable.has(normalizeGameName(game))
                 );
-                if (!matchesGame) return false;
+                if (!matchesGame) return { match: false, isSearchMatch: false };
             }
 
             // Ball filter (multi-select)
             if (filters.ball && filters.ball.length > 0) {
                 const matchesBall = filters.ball.some(ball => firstEntry?.ball === ball);
-                if (!matchesBall) return false;
+                if (!matchesBall) return { match: false, isSearchMatch: false };
             }
 
             // Mark filter (multi-select)
             if (filters.mark && filters.mark.length > 0) {
                 const matchesMark = filters.mark.some(mark => firstEntry?.mark === mark);
-                if (!matchesMark) return false;
+                if (!matchesMark) return { match: false, isSearchMatch: false };
             }
 
             // Method filter (multi-select)
             if (filters.method && filters.method.length > 0) {
                 const matchesMethod = filters.method.some(method => firstEntry?.method === method);
-                if (!matchesMethod) return false;
+                if (!matchesMethod) return { match: false, isSearchMatch: false };
             }
 
             // Type filter (multi-select)
             if (filters.type && filters.type.length > 0) {
                 const matchesType = filters.type.some(type => pokemon.types?.includes(type));
-                if (!matchesType) return false;
+                if (!matchesType) return { match: false, isSearchMatch: false };
             }
 
             // Generation filter (multi-select)
             if (filters.gen && filters.gen.length > 0) {
                 const matchesGen = filters.gen.some(gen => String(pokemon.gen) === String(gen));
-                if (!matchesGen) return false;
+                if (!matchesGen) return { match: false, isSearchMatch: false };
             }
 
             // Caught/uncaught filter
             const isCaught = !!caughtInfo;
-            if (filters.caught === "caught" && !isCaught) return false;
-            if (filters.caught === "uncaught" && isCaught) return false;
+            if (filters.caught === "caught" && !isCaught) return { match: false, isSearchMatch: false };
+            if (filters.caught === "uncaught" && isCaught) return { match: false, isSearchMatch: false };
 
             // Category filtering
             if (filters.categories && filters.categories.length > 0) {
-                const pokemonCategory = getPokemonCategory(pokemon);
                 const matchesAnyCategory = filters.categories.some(category => {
                     switch (category) {
                         case "legendary":
@@ -464,10 +494,40 @@ export default function ViewDex() {
                     }
                 });
 
-                if (!matchesAnyCategory) return false;
+                if (!matchesAnyCategory) return { match: false, isSearchMatch: false };
             }
 
-            return true;
+            return { match: true, isSearchMatch };
+        };
+
+        // When Show Full Box and a search term are active, chunk into boxes of 30 and keep full boxes that contain matches
+        if (filters.searchTerm && filters.showFullBox) {
+            const boxSize = 30;
+            const result = [];
+            for (let i = 0; i < markedList.length; i += boxSize) {
+                const boxIndex = Math.floor(i / boxSize);
+                const boxSlice = markedList.slice(i, i + boxSize);
+                const testedBox = boxSlice.map(p => {
+                    const res = testPokemon(p);
+                    return {
+                        ...p,
+                        _isSearchMatch: res.match && res.isSearchMatch,
+                        _boxIndex: boxIndex
+                    };
+                });
+
+                const hasMatch = testedBox.some(p => p._isSearchMatch);
+                if (hasMatch) {
+                    result.push(...testedBox);
+                }
+            }
+            return result;
+        }
+
+        // Then apply standard filtering logic
+        return markedList.filter(pokemon => {
+            const res = testPokemon(pokemon);
+            return res.match;
         });
     }, [filters, profileOwnerPreferences, showShiny]);
 

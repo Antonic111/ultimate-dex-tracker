@@ -24,6 +24,17 @@
           "how": "Use Fire Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Ultra Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -49,6 +60,18 @@
         "how": "Use Fire Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Repeat Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Ultra Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -76,6 +99,17 @@
           "how": "Use Leaf Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "pokeball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -101,6 +135,17 @@
         "how": "Use Leaf Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Poké Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -126,6 +171,18 @@
         "how": "Level Up to 14"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Great Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Great Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -152,6 +209,18 @@
           "name": "overqwil",
           "how": "strong style move"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Master Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Heavy Ball",
+        "Dive Ball"
       ]
     }
   },
@@ -180,6 +249,18 @@
           "how": "Use the Razer Claw item on Sneasel"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Heavy Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Gigaton Ball",
+        "Luxury Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -205,6 +286,18 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Timer Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Dive Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -230,6 +323,17 @@
         "how": "sun stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Heal Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -257,6 +361,17 @@
           "how": "Level 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Poké Ball (Hisui)"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Moon Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -282,6 +397,17 @@
         "how": "Level 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Poké Ball (Hisui)"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Premier Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -307,6 +433,18 @@
         "how": "Level Up to 54"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Gigaton Ball",
+        "Premier Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Gigaton Ball",
+        "Heavy Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -338,6 +476,18 @@
           "how": "Level Up to 40"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Heavy Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Safari Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -363,6 +513,18 @@
         "how": "Level Up to 40"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Heavy Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Safari Ball",
+        "Luxury Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -388,6 +550,17 @@
         "how": "Level Up to 37"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Timer Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -413,6 +586,18 @@
         "how": "Level Up to 17"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Luxury Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Dusk Ball",
+        "Friend Ball"
+      ]
     }
   }
 ]

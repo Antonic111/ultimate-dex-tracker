@@ -218,7 +218,7 @@ export default function PublicHome() {
           <div className="creator-credit">
             <span>
               Created by Pokémon collector &amp; content creator{" "}
-              <a href="https://solo.to/antonic" target="_blank" rel="noopener noreferrer">
+              <a href="https://antonic.ca" target="_blank" rel="noopener noreferrer">
                 Antonic
               </a>
             </span>

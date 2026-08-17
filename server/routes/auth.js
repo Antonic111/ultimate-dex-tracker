@@ -160,7 +160,11 @@ router.post("/register", corsMiddleware, authLimiter, async (req, res) => {
       verified: false,
       profileTrainer: trainerResult.sanitized,
       verificationCode: code,
-      verificationCodeExpires: Date.now() + 1000 * 60 * 10 // 10 minutes
+      verificationCodeExpires: Date.now() + 1000 * 60 * 10, // 10 minutes
+      onboarding: {
+        isComplete: false,
+        tutorialStep: 0
+      }
     });
 
     let emailSent = true;
@@ -238,6 +242,7 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
         profileTrainer: user.profileTrainer,
         verified: true,
         isAdmin: user.isAdmin,
+        onboarding: user.onboarding,
       },
       token: token, // Return token for all users (needed for Authorization header)
     };
@@ -252,12 +257,31 @@ router.post("/login", corsMiddleware, authLimiter, async (req, res) => {
 });
 
 // Me
-router.get("/me", authenticateUser, async (req, res) => {
+router.get("/me", async (req, res) => {
   res.set("Cache-Control", "no-store");
 
   try {
-    const user = await User.findById(req.userId).select("-password -__v")
-    if (!user) return res.status(404).json({ error: "User not found" });
+    let token = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    }
+    if (!token) {
+      token = req.cookies.token;
+    }
+    
+    if (!token) return res.status(200).json({ authenticated: false });
+
+    let userId;
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      userId = decoded.userId;
+    } catch (err) {
+      return res.status(200).json({ authenticated: false });
+    }
+
+    const user = await User.findById(userId).select("-password -__v");
+    if (!user) return res.status(200).json({ authenticated: false });
 
     res.json({
       username: user.username,
@@ -270,6 +294,7 @@ router.get("/me", authenticateUser, async (req, res) => {
       isContentCreator: user.isContentCreator || false,
       youtubeUrl: user.youtubeUrl || null,
       twitchUrl: user.twitchUrl || null,
+      onboarding: user.onboarding,
     });
 
   } catch (err) {
@@ -423,6 +448,8 @@ router.post("/verify-code", corsMiddleware, async (req, res) => {
           email: user.email,
           profileTrainer: user.profileTrainer,
           createdAt: user.createdAt,
+          isAdmin: user.isAdmin,
+          onboarding: user.onboarding,
         },
         token,
       });
@@ -592,6 +619,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
     if (req.body.favoritePokemon !== undefined) user.favoritePokemon = sanitizedData.favoritePokemon;
     if (req.body.favoritePokemonShiny !== undefined) user.favoritePokemonShiny = req.body.favoritePokemonShiny;
     if (req.body.switchFriendCode !== undefined) user.switchFriendCode = sanitizedData.switchFriendCode;
+    if (req.body.goFriendCode !== undefined) user.goFriendCode = sanitizedData.goFriendCode;
     if (req.body.profileTrainer !== undefined) user.profileTrainer = sanitizedData.profileTrainer;
     if (req.body.huntHotkey !== undefined) user.huntHotkey = sanitizedData.huntHotkey;
 
@@ -605,7 +633,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
       const { dexPreferences } = req.body;
       if (typeof dexPreferences === 'object') {
         const allowedKeys = [
-          'showGenderForms', 'showAlolanForms', 'showGalarianForms', 'showHisuianForms', 'showPaldeanForms', 'showGmaxForms', 'showUnownForms', 'showOtherForms', 'showAlcremieForms', 'showVivillonForms', 'showAlphaForms', 'showAlphaOtherForms', 'blockUnobtainableShinies', 'blockGOExclusiveShinies', 'blockNOOTExclusiveShinies', 'hideLockedShinies', 'useHomeSprites', 'dexViewMode'
+          'showGenderForms', 'showAlolanForms', 'showGalarianForms', 'showHisuianForms', 'showPaldeanForms', 'showGmaxForms', 'showUnownForms', 'showOtherForms', 'showAlcremieForms', 'showVivillonForms', 'showAlphaForms', 'showAlphaOtherForms', 'showMightyForms', 'blockUnobtainableShinies', 'blockGOExclusiveShinies', 'blockNOOTExclusiveShinies', 'hideLockedShinies', 'useHomeSprites', 'dexViewMode'
         ];
         Object.keys(dexPreferences).forEach(key => {
           if (allowedKeys.includes(key)) {
@@ -651,7 +679,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
 
     // Handle accent color
     if (req.body.accentColor !== undefined) {
-      const validAccents = ['yellow', 'red', 'orange', 'green', 'blue', 'cyan', 'purple', 'pink', 'brown'];
+      const validAccents = ['yellow', 'red', 'orange', 'green', 'lime', 'blue', 'cyan', 'purple', 'lavender', 'pink', 'brown', 'platinum'];
       if (validAccents.includes(req.body.accentColor)) {
         user.accentColor = req.body.accentColor;
       }
@@ -687,6 +715,19 @@ router.put("/profile", authenticateUser, async (req, res) => {
       }
     }
 
+    // Handle onboarding state
+    if (req.body.onboarding) {
+      const { onboarding } = req.body;
+      if (typeof onboarding === 'object') {
+        if (typeof onboarding.isComplete === 'boolean') {
+          user.onboarding.isComplete = onboarding.isComplete;
+        }
+        if (typeof onboarding.tutorialStep === 'number') {
+          user.onboarding.tutorialStep = onboarding.tutorialStep;
+        }
+      }
+    }
+
     await user.save();
 
     res.json({
@@ -699,6 +740,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
         favoritePokemonShiny: user.favoritePokemonShiny,
         profileTrainer: user.profileTrainer,
         switchFriendCode: user.switchFriendCode,
+        goFriendCode: user.goFriendCode,
         isProfilePublic: user.isProfilePublic,
         dexPreferences: user.dexPreferences,
         externalLinkPreference: user.externalLinkPreference,
@@ -708,6 +750,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
         migrationVersion: user.migrationVersion,
         accentColor: user.accentColor || 'yellow',
         siteTheme: user.siteTheme || 'dark',
+        onboarding: user.onboarding,
         isContentCreator: user.isContentCreator || false,
         youtubeUrl: user.youtubeUrl || null,
         twitchUrl: user.twitchUrl || null,
@@ -725,7 +768,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode isProfilePublic likes dexPreferences externalLinkPreference shinyCharmGames huntHotkey isAdmin accentColor siteTheme isContentCreator youtubeUrl twitchUrl");
+    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer switchFriendCode goFriendCode isProfilePublic likes dexPreferences externalLinkPreference shinyCharmGames huntHotkey isAdmin accentColor siteTheme isContentCreator youtubeUrl twitchUrl lastActiveAt");
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -738,6 +781,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
       favoritePokemonShiny: user.favoritePokemonShiny,
       profileTrainer: user.profileTrainer,
       switchFriendCode: user.switchFriendCode,
+      goFriendCode: user.goFriendCode,
       isProfilePublic: user.isProfilePublic,
       likeCount: user.likes ? user.likes.length : 0,
       dexPreferences: user.dexPreferences,
@@ -750,6 +794,8 @@ router.get("/profile", authenticateUser, async (req, res) => {
       isContentCreator: user.isContentCreator || false,
       youtubeUrl: user.youtubeUrl || null,
       twitchUrl: user.twitchUrl || null,
+      lastActiveAt: user.lastActiveAt,
+      isOnline: true,
     });
   } catch (err) {
     res.status(401).json({ error: "Invalid or expired token" });
@@ -1495,20 +1541,34 @@ router.get("/users/:username/public", async (req, res) => {
       username: req.params.username,
       isProfilePublic: { $ne: false }
     })
-      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin bingoGrid isContentCreator youtubeUrl twitchUrl")
+      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer createdAt switchFriendCode goFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin bingoGrid isContentCreator youtubeUrl twitchUrl lastActiveAt")
       .lean();
 
     if (!u) return res.status(404).json({ error: "User not found or private" });
 
     // Safely check if bingo grid has any data
-    const hasBingoData = u.bingoGrid && Array.isArray(u.bingoGrid) && u.bingoGrid.length > 0 && u.bingoGrid.some(cell => cell.pokemon);
+    const hasBingoData = Boolean(
+      u.bingoGrid &&
+      Array.isArray(u.bingoGrid) &&
+      u.bingoGrid.length > 0 &&
+      u.bingoGrid.some(cell => 
+        (cell.pokemonList && cell.pokemonList.length > 0) ||
+        cell.pokemon ||
+        cell.completed ||
+        (cell.text && cell.text.trim() !== '')
+      )
+    );
 
     // Remove bingoGrid from response to avoid sending the whole grid here
     delete u.bingoGrid;
 
     // Add like count - safely handle undefined likes
     const likeCount = Array.isArray(u.likes) ? u.likes.length : 0;
-    res.json({ ...u, likeCount, hasBingoData });
+
+    // Determine online status (within 5 minutes)
+    const isOnline = Boolean(u.lastActiveAt && (Date.now() - new Date(u.lastActiveAt).getTime() < 5 * 60 * 1000));
+
+    res.json({ ...u, likeCount, hasBingoData, isOnline });
   } catch (error) {
     console.error('Error getting public profile:', error);
     res.status(500).json({ error: "Server error" });

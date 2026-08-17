@@ -196,25 +196,7 @@ button:focus {
   @apply flex flex-col gap-4 pt-6 w-full;
 }
 
-.profile-stats-grid {
-  @apply grid grid-cols-2;
-  gap: 8px 16px;
-}
 
-.profile-stats-grid .full-span {
-  @apply col-span-2;
-  margin-bottom: 0;
-}
-
-.profile-stats-grid .recent-field {
-  @apply col-span-2;
-}
-
-/* Tighten stat section fields so they stack more compactly */
-.profile-stats-grid .full-span.profile-field {
-  gap: 4px;
-  margin-bottom: 2px;
-}
 
 /* Simple section heading to match favorites layout */
 .profile-simple-section {
@@ -313,12 +295,42 @@ button:focus {
 
 /* Tighter spacing for form tags in recent entries */
 .recent-field .form-type-tag {
-  @apply mt-0.5 px-1 py-0.5 text-[0.65rem];
+  @apply mt-0.5 px-1.5 py-0.5 text-[10px] font-medium rounded-md;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 /* Form type tag styling - Updated */
 .form-type-tag {
-  @apply text-[0.7rem] text-[var(--accent)] rounded-lg px-1 py-0.5 mt-0.5 text-center font-medium capitalize flex-shrink-0 leading-tight;
+  @apply text-[0.7rem] rounded-md px-1.5 py-0.5 mt-0.5 text-center font-medium capitalize flex-shrink-0 leading-tight;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Full Stats Button on Profile Header */
+.full-stats-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.full-stats-btn:hover {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
 /* No recent Pokemon message styling */

@@ -27,6 +27,8 @@ app.use((req, res, next) => {
     "https://ultimate-dex-tracker.vercel.app",
     "http://localhost:3000",
     "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
     "http://192.168.2.15:5173",
   ];
 

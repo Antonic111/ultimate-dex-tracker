@@ -353,8 +353,8 @@ export default function Counters() {
 
   // Get all Pokemon data (main + forms) using the same logic as the main app
   const allPokemon = useMemo(() => {
-    // Use the same filtered forms data as the main app
-    const filteredFormsData = getFilteredFormsData(formsData);
+    // Use the same filtered forms data as the main app, excluding mighty forms (since hunts are shiny hunts)
+    const filteredFormsData = getFilteredFormsData(formsData).filter(p => p.formType !== "mighty");
 
     // Combine main Pokemon with filtered forms data
     return [...pokemonData, ...filteredFormsData];
@@ -3570,7 +3570,7 @@ export default function Counters() {
                     <label className="sidebar-label">Mark:</label>
                     <SearchbarIconDropdown
                       id="completion-mark-dropdown"
-                      options={MARK_OPTIONS}
+                      options={MARK_OPTIONS.filter(m => m.value !== "mightiest")}
                       value={completionForm.mark}
                       onChange={val => setCompletionForm(prev => ({ ...prev, mark: val }))}
                       placeholder="Select a mark..."

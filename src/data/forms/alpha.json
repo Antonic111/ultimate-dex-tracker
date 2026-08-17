@@ -24,6 +24,17 @@
           "how": "Level Up to 17"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Friend Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Lure Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -49,6 +60,17 @@
         "how": "Level Up to 17"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Friend Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Lure Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -70,6 +92,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Luxury Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Dusk Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -96,6 +130,18 @@
           "how": "Level Up to 14"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Repeat Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Luxury Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -120,6 +166,18 @@
         "how": "Level Up to 14"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Repeat Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Luxury Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -141,6 +199,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Dream Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Dream Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -167,6 +237,16 @@
           "how": "Level Up to 17"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -191,6 +271,16 @@
         "how": "Level Up to 17"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Net Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Net Ball"
+      ]
     }
   },
   {
@@ -212,6 +302,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Timer Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Dive Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -238,6 +340,18 @@
           "how": "Level Up to 15"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Safari Ball",
+        "Nest Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Safari Ball",
+        "Luxury Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -263,6 +377,18 @@
         "how": "Level Up to 15"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Safari Ball",
+        "Nest Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Safari Ball",
+        "Luxury Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -289,6 +415,17 @@
           "name": "staravia",
           "how": "Level Up to 14"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Safari Ball",
+        "Luxury Ball",
+        "Nest Ball"
       ]
     }
   },
@@ -321,6 +458,17 @@
           "how": "Level Up to 34"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Safari Ball",
+        "Luxury Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -346,6 +494,17 @@
         "how": "Level Up to 34"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Safari Ball",
+        "Luxury Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -371,6 +530,18 @@
           "name": "luxio",
           "how": "Level Up to 15"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball (Hisui)",
+        "Quick Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Ultra Ball",
+        "Level Ball"
       ]
     }
   },
@@ -402,6 +573,18 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Gigaton Ball",
+        "Quick Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Ultra Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -426,6 +609,18 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Gigaton Ball",
+        "Quick Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Ultra Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -451,6 +646,18 @@
           "name": "silcoon",
           "how": "Level Up to 7"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Sport Ball",
+        "Poké Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Dream Ball",
+        "Master Ball"
       ]
     }
   },
@@ -481,6 +688,18 @@
           "name": "beautifly",
           "how": "Level Up to 10"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Premier Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Quick Ball",
+        "Moon Ball"
       ]
     }
   },
@@ -513,6 +732,18 @@
           "how": "Level Up to 7"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball (Hisui)",
+        "Level Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Level Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -543,6 +774,18 @@
           "how": "Level Up to 10"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Dream Ball",
+        "Love Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Friend Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -568,6 +811,17 @@
         "how": "Level Up to 10"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Dream Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -594,6 +848,18 @@
           "how": "Level Up to 40"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Fast Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Quick Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -618,6 +884,18 @@
         "how": "Level Up to 40"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Fast Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Heal Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -638,6 +916,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -667,6 +955,17 @@
           "name": "jolteon",
           "how": "Use thunder stone"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Net Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
       ]
     }
   },
@@ -698,6 +997,16 @@
           "how": "Use fire stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -727,6 +1036,18 @@
           "name": "espeon",
           "how": "level up"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Repeat Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Repeat Ball",
+        "Fast Ball"
       ]
     }
   },
@@ -758,6 +1079,16 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -787,6 +1118,17 @@
           "name": "leafeon",
           "how": "level up"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Ultra Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Net Ball"
       ]
     }
   },
@@ -818,6 +1160,14 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -848,6 +1198,16 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Strange Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Strange Ball"
+      ]
     }
   },
   {
@@ -872,6 +1232,18 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Love Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Dive Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -898,6 +1270,17 @@
           "name": "golbat",
           "how": "Level Up to 22"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Dusk Ball",
+        "Nest Ball",
+        "Friend Ball"
       ]
     }
   },
@@ -930,6 +1313,17 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Dusk Ball",
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -955,6 +1349,16 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Dream Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -982,6 +1386,16 @@
           "how": "Level Up to 28"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Quick Ball",
+        "Strange Ball"
+      ]
     }
   },
   {
@@ -1007,6 +1421,16 @@
         "how": "Level Up to 28"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Quick Ball",
+        "Strange Ball"
+      ]
     }
   },
   {
@@ -1033,6 +1457,17 @@
           "how": "Level Up to 10"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Repeat Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -1057,6 +1492,17 @@
         "how": "Level Up to 10"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Repeat Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -1083,6 +1529,17 @@
           "how": "Level Up to 26"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Quick Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -1107,6 +1564,17 @@
         "how": "Level Up to 26"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Quick Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -1127,6 +1595,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Friend Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -1148,6 +1628,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Friend Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -1169,6 +1661,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Quick Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -1195,6 +1697,17 @@
           "name": "graveler",
           "how": "Level Up to 25"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Safari Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Ultra Ball"
       ]
     }
   },
@@ -1227,6 +1740,17 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Safari Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Repeat Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -1252,6 +1776,17 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Repeat Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -1278,6 +1813,16 @@
           "how": "agile style move"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -1303,6 +1848,17 @@
         "how": "agile style move"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Luxury Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -1329,6 +1885,18 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Moon Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Moon Ball",
+        "Heavy Ball"
+      ]
     }
   },
   {
@@ -1353,6 +1921,18 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Net Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Heavy Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -1380,6 +1960,18 @@
           "how": "Level Up to 24"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Repeat Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Repeat Ball",
+        "Sport Ball"
+      ]
     }
   },
   {
@@ -1405,6 +1997,18 @@
         "how": "Level Up to 24"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Repeat Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Level Ball",
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -1430,6 +2034,18 @@
           "name": "pikachu-alpha",
           "how": "level up"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball (Hisui)",
+        "Ultra Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Ultra Ball",
+        "Level Ball"
       ]
     }
   },
@@ -1461,6 +2077,18 @@
           "how": "Use thunder stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball (Hisui)",
+        "Level Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Level Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -1485,6 +2113,18 @@
         "how": "Use thunder stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball (Hisui)",
+        "Level Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Level Ball",
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -1510,6 +2150,16 @@
           "name": "kadabra",
           "how": "Level Up to 16"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Level Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Ultra Ball"
       ]
     }
   },
@@ -1541,6 +2191,16 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Level Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -1565,6 +2225,17 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Level Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -1590,6 +2261,18 @@
           "name": "monferno",
           "how": "Level Up to 14"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Fast Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Heal Ball",
+        "Love Ball"
       ]
     }
   },
@@ -1622,6 +2305,18 @@
           "how": "Level Up to 36"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Fast Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Heal Ball",
+        "Love Ball"
+      ]
     }
   },
   {
@@ -1647,6 +2342,18 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Fast Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Heal Ball",
+        "Love Ball"
+      ]
     }
   },
   {
@@ -1673,6 +2380,16 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -1697,6 +2414,16 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -1723,6 +2450,17 @@
           "how": "Level Up to 25"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Friend Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -1747,6 +2485,18 @@
         "how": "Level Up to 25"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Dream Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Friend Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -1773,6 +2523,17 @@
           "how": "Level Up to 33"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball (Hisui)",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Dive Ball",
+        "Strange Ball"
+      ]
     }
   },
   {
@@ -1797,6 +2558,18 @@
         "how": "Level Up to 33"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Lure Ball",
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Lure Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -1818,6 +2591,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball (Hisui)",
+        "Level Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Luxury Ball",
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -1843,6 +2628,18 @@
         "how": "Level Up to 21"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball (Hisui)",
+        "Level Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Luxury Ball",
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -1870,6 +2667,16 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Friend Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -1895,6 +2702,17 @@
         "how": "Use black augurite"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Dusk Ball",
+        "Nest Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -1926,6 +2744,17 @@
           "how": "Use black augurite"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Sport Ball",
+        "Poké Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -1947,6 +2776,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Net Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball",
+        "Love Ball"
+      ]
     }
   },
   {
@@ -1974,6 +2814,17 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Dream Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -1999,6 +2850,17 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dream Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -2025,6 +2887,16 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -2049,6 +2921,16 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -2075,6 +2957,18 @@
           "how": "Level Up to 20"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Poké Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Ultra Ball",
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -2100,6 +2994,18 @@
         "how": "Level Up to 20"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Dive Ball",
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Poké Ball",
+        "Timer Ball"
+      ]
     }
   },
   {
@@ -2126,6 +3032,18 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Quick Ball",
+        "Strange Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Quick Ball",
+        "Strange Ball"
+      ]
     }
   },
   {
@@ -2151,6 +3069,14 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -2172,6 +3098,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Master Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Heavy Ball",
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -2193,6 +3131,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Master Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Heavy Ball",
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -2218,6 +3168,18 @@
           "name": "chansey",
           "how": "level up"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Heal Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball",
+        "Dream Ball"
       ]
     }
   },
@@ -2249,6 +3211,16 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -2273,6 +3245,16 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -2299,6 +3281,15 @@
           "name": "roselia",
           "how": "level up"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Dream Ball"
       ]
     }
   },
@@ -2331,6 +3322,17 @@
           "how": "Use shiny stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Great Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -2356,6 +3358,17 @@
         "how": "Use shiny stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Great Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -2376,6 +3389,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball",
+        "Friend Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -2396,6 +3421,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -2417,6 +3452,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Heal Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -2443,6 +3489,18 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Net Ball",
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Dusk Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -2467,6 +3525,16 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Net Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -2494,6 +3562,18 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Net Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Ultra Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -2519,6 +3599,18 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Net Ball",
+        "Moon Ball",
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Net Ball",
+        "Lure Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -2546,6 +3638,17 @@
           "how": "Level Up to 37"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Net Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Net Ball",
+        "Strange Ball"
+      ]
     }
   },
   {
@@ -2571,6 +3674,17 @@
         "how": "Level Up to 37"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Net Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Net Ball",
+        "Strange Ball"
+      ]
     }
   },
   {
@@ -2597,6 +3711,17 @@
           "name": "kirlia",
           "how": "Level Up to 20"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Great Ball",
+        "Lure Ball"
       ]
     }
   },
@@ -2629,6 +3754,17 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Great Ball",
+        "Lure Ball"
+      ]
     }
   },
   {
@@ -2660,6 +3796,17 @@
           "how": "Use dawn stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Great Ball",
+        "Lure Ball"
+      ]
     }
   },
   {
@@ -2685,6 +3832,17 @@
         "how": "Use dawn stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Great Ball",
+        "Lure Ball"
+      ]
     }
   },
   {
@@ -2712,6 +3870,17 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Net Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -2737,6 +3906,18 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dusk Ball",
+        "Friend Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Great Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -2763,6 +3944,18 @@
           "how": "Level Up to 34"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Safari Ball",
+        "Nest Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Safari Ball",
+        "Nest Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -2787,6 +3980,17 @@
         "how": "Level Up to 34"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Safari Ball",
+        "Luxury Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -2807,6 +4011,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Love Ball"
+      ]
     }
   },
   {
@@ -2834,6 +4048,18 @@
           "how": "Level Up to 34"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Dusk Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Poké Ball",
+        "Sport Ball"
+      ]
     }
   },
   {
@@ -2859,6 +4085,18 @@
         "how": "Level Up to 34"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Dusk Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Poké Ball",
+        "Sport Ball"
+      ]
     }
   },
   {
@@ -2884,6 +4122,18 @@
           "name": "ursaring",
           "how": "Level Up to 30"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Moon Ball",
+        "Strange Ball"
       ]
     }
   },
@@ -2915,6 +4165,18 @@
           "how": "Use peat block"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -2940,6 +4202,18 @@
         "how": "Use peat block"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Luxury Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Luxury Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -2965,6 +4239,16 @@
           "name": "sliggoo",
           "how": "Level Up to 40"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Dusk Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Heal Ball"
       ]
     }
   },
@@ -2996,6 +4280,18 @@
           "how": "Level Up to 50"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Heavy Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Safari Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -3020,6 +4316,18 @@
         "how": "Level Up to 50"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Heavy Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Safari Ball",
+        "Luxury Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -3047,6 +4355,17 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -3072,6 +4391,16 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Level Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -3098,6 +4427,18 @@
           "name": "rhydon",
           "how": "Level Up to 42"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Gigaton Ball",
+        "Heavy Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Level Ball",
+        "Luxury Ball"
       ]
     }
   },
@@ -3130,6 +4471,16 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -3155,6 +4506,15 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -3181,6 +4541,17 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Luxury Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -3205,6 +4576,17 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -3231,6 +4613,16 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Love Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -3255,6 +4647,15 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -3280,6 +4681,18 @@
           "name": "togetic",
           "how": "level up"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Premier Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Premier Ball",
+        "Great Ball"
       ]
     }
   },
@@ -3312,6 +4725,16 @@
           "how": "Use shiny stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -3337,6 +4760,16 @@
         "how": "Use shiny stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -3362,6 +4795,17 @@
           "name": "grotle",
           "how": "Level Up to 18"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Quick Ball",
+        "Strange Ball"
       ]
     }
   },
@@ -3393,6 +4837,17 @@
           "how": "Level Up to 32"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Quick Ball",
+        "Strange Ball"
+      ]
     }
   },
   {
@@ -3418,6 +4873,16 @@
         "how": "Level Up to 32"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -3443,6 +4908,18 @@
           "name": "porygon2",
           "how": "Trade"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Lure Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Heal Ball",
+        "Great Ball"
       ]
     }
   },
@@ -3474,6 +4951,18 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Lure Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Heal Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -3498,6 +4987,16 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball",
+        "Great Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Great Ball"
+      ]
     }
   },
   {
@@ -3524,6 +5023,18 @@
           "name": "haunter",
           "how": "Level Up to 25"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Dream Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Dream Ball",
+        "Dusk Ball"
       ]
     }
   },
@@ -3556,6 +5067,18 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Dream Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Dream Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -3581,6 +5104,18 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Dream Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Dream Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -3602,6 +5137,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Lure Ball",
+        "Strange Ball"
+      ]
     }
   },
   {
@@ -3629,6 +5174,17 @@
           "how": "Use dusk stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Dream Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -3654,6 +5210,17 @@
         "how": "Use dusk stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -3674,6 +5241,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Gigaton Ball",
+        "Luxury Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Great Ball (Hisui)",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -3700,6 +5279,18 @@
           "name": "sealeo",
           "how": "Level Up to 32"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Moon Ball",
+        "Strange Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Love Ball",
+        "Heal Ball"
       ]
     }
   },
@@ -3732,6 +5323,18 @@
           "how": "Level Up to 44"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Moon Ball",
+        "Strange Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Love Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -3757,6 +5360,18 @@
         "how": "Level Up to 44"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Moon Ball",
+        "Strange Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Love Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -3783,6 +5398,16 @@
           "how": "Level Up to 25"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -3807,6 +5432,17 @@
         "how": "Level Up to 25"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Timer Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -3834,6 +5470,16 @@
           "how": "Level Up to 40"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Net Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Lure Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -3859,6 +5505,16 @@
         "how": "Level Up to 40"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Lure Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -3880,6 +5536,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Ultra Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -3901,6 +5568,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Repeat Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Ultra Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -3927,6 +5606,18 @@
           "how": "Level Up to 38"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Luxury Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Love Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -3951,6 +5642,18 @@
         "how": "Level Up to 38"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Luxury Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Love Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -3976,6 +5679,17 @@
           "name": "machoke",
           "how": "Level Up to 28"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Dive Ball",
+        "Strange Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Nest Ball"
       ]
     }
   },
@@ -4007,6 +5721,17 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Heavy Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -4031,6 +5756,17 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Heavy Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -4052,6 +5788,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Luxury Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Luxury Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -4077,6 +5825,18 @@
           "name": "dusclops",
           "how": "Level Up to 37"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Heavy Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Sport Ball",
+        "Timer Ball",
+        "Dusk Ball"
       ]
     }
   },
@@ -4108,6 +5868,18 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Heavy Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Sport Ball",
+        "Timer Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -4132,6 +5904,16 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -4157,6 +5939,18 @@
           "name": "prinplup",
           "how": "Level Up to 16"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Dive Ball",
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Dive Ball",
+        "Quick Ball"
       ]
     }
   },
@@ -4188,6 +5982,18 @@
           "how": "Level Up to 36"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Dive Ball",
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Dive Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -4213,6 +6019,18 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Dive Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Dive Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -4240,6 +6058,18 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Dive Ball",
+        "Strange Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Dive Ball",
+        "Strange Ball"
+      ]
     }
   },
   {
@@ -4265,6 +6095,15 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Net Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -4296,6 +6135,18 @@
           "how": "Use 294 HP in recoil damage without fainting (Female)"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Nest Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Nest Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -4321,6 +6172,15 @@
         "how": "Use 294 HP in recoil damage without fainting (Male)"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -4347,6 +6207,15 @@
           "how": "Use fire stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -4371,6 +6240,16 @@
         "how": "Use fire stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Heavy Ball"
+      ]
     }
   },
   {
@@ -4398,6 +6277,16 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Net Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -4423,6 +6312,17 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Net Ball",
+        "Quick Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -4449,6 +6349,17 @@
           "how": "Level Up to 31"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Net Ball",
+        "Strange Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -4473,6 +6384,17 @@
         "how": "Level Up to 31"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Net Ball",
+        "Strange Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -4498,6 +6420,18 @@
           "name": "magmar",
           "how": "Level Up to 30"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Repeat Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Level Ball",
+        "Repeat Ball"
       ]
     }
   },
@@ -4529,6 +6463,17 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -4553,6 +6498,17 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Dream Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -4579,6 +6535,17 @@
           "name": "magneton",
           "how": "Level Up to 30"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Gigaton Ball",
+        "Great Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Gigaton Ball",
+        "Luxury Ball"
       ]
     }
   },
@@ -4611,6 +6578,17 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Gigaton Ball",
+        "Great Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Gigaton Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -4636,6 +6614,18 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball (Hisui)",
+        "Heavy Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Gigaton Ball",
+        "Heavy Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -4663,6 +6653,18 @@
           "how": "Level Up to 33"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Quick Ball",
+        "Net Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -4688,6 +6690,17 @@
         "how": "Level Up to 33"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Net Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -4713,6 +6726,16 @@
           "name": "electabuzz",
           "how": "Level Up to 30"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Fast Ball"
       ]
     }
   },
@@ -4744,6 +6767,17 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Repeat Ball",
+        "Level Ball",
+        "Fast Ball"
+      ]
     }
   },
   {
@@ -4768,6 +6802,15 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -4795,6 +6838,16 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -4820,6 +6873,17 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Dusk Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -4846,6 +6910,18 @@
           "name": "gabite",
           "how": "Level Up to 24"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Great Ball",
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Quick Ball",
+        "Beast Ball"
       ]
     }
   },
@@ -4878,6 +6954,18 @@
           "how": "Level Up to 48"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Great Ball",
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Great Ball",
+        "Lure Ball"
+      ]
     }
   },
   {
@@ -4903,6 +6991,18 @@
         "how": "Level Up to 48"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Great Ball",
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Great Ball (Hisui)",
+        "Great Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -4929,6 +7029,18 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Lure Ball",
+        "Net Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball",
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -4954,6 +7066,16 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -4975,6 +7097,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Poké Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Gigaton Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -4996,6 +7129,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball (Hisui)",
+        "Poké Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Gigaton Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -5017,6 +7161,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Fast Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -5043,6 +7197,18 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Premier Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Premier Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -5067,6 +7233,18 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Level Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Quick Ball",
+        "Strange Ball"
+      ]
     }
   },
   {
@@ -5093,6 +7271,17 @@
           "how": "Use dusk stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Moon Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -5117,6 +7306,17 @@
         "how": "Use dusk stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Master Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -5142,6 +7342,18 @@
           "name": "clefairy",
           "how": "level up"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Heal Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball",
+        "Moon Ball"
       ]
     }
   },
@@ -5173,6 +7385,18 @@
           "how": "Use moon stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Heal Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -5197,6 +7421,18 @@
         "how": "Use moon stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Heal Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -5218,6 +7454,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Dream Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -5243,6 +7490,18 @@
         "how": "Use the Razer Claw item on Sneasel"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball (Hisui)",
+        "Luxury Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Ultra Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -5268,6 +7527,15 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -5293,6 +7561,18 @@
           "name": "glalie",
           "how": "Level Up to 42"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Ultra Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Moon Ball",
+        "Quick Ball"
       ]
     }
   },
@@ -5324,6 +7604,18 @@
           "how": "Use dawn stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Moon Ball",
+        "Net Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Sport Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -5349,6 +7641,16 @@
         "how": "Use dawn stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -5375,6 +7677,18 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Net Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Luxury Ball",
+        "Sport Ball"
+      ]
     }
   },
   {
@@ -5399,6 +7713,18 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Net Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Luxury Ball",
+        "Sport Ball"
+      ]
     }
   },
   {
@@ -5426,6 +7752,17 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Moon Ball",
+        "Heavy Ball"
+      ]
     }
   },
   {
@@ -5451,6 +7788,17 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Moon Ball",
+        "Heavy Ball"
+      ]
     }
   },
   {
@@ -5477,6 +7825,15 @@
           "name": "piloswine",
           "how": "Level Up to 33"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Safari Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Nest Ball"
       ]
     }
   },
@@ -5509,6 +7866,16 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Safari Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -5534,6 +7901,18 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Safari Ball",
+        "Nest Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -5554,6 +7933,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Quick Ball",
+        "Dive Ball",
+        "Beast Ball"
+      ]
     }
   },
   {
@@ -5575,6 +7964,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Poké Ball (Hisui)",
+        "Timer Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -5602,6 +8002,18 @@
           "how": "Level Up to 40"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Nest Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Dive Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -5627,6 +8039,18 @@
         "how": "Level Up to 40"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Premier Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Dive Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -5648,6 +8072,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Poké Ball (Hisui)"
+      ],
+      "shiny": [
+        "Jet Ball",
+        "Moon Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -5669,6 +8104,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Poké Ball (Hisui)"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Premier Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -5690,6 +8136,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Timer Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Timer Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -5711,6 +8169,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Gigaton Ball",
+        "Premier Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Gigaton Ball",
+        "Heavy Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -5737,6 +8207,18 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Moon Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Level Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -5762,6 +8244,18 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Jet Ball",
+        "Moon Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Ultra Ball (Hisui)",
+        "Level Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -5793,6 +8287,18 @@
           "how": "Use Moon Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -5818,6 +8324,18 @@
         "how": "Use Moon Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -5844,6 +8362,17 @@
           "how": "Level Up to 28"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Ultra Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -5868,6 +8397,17 @@
         "how": "Level Up to 28"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Premier Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -5893,6 +8433,16 @@
           "name": "primeape",
           "how": "Level Up to 28"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball"
       ]
     }
   },
@@ -5924,6 +8474,16 @@
           "how": "other"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -5945,6 +8505,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -5976,6 +8546,16 @@
           "how": "Level Up to 28 at night in Alola"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -6000,6 +8580,16 @@
         "how": "Level Up to 28"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -6025,6 +8615,17 @@
           "name": "grovyle",
           "how": "Level Up to 16"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Lure Ball",
+        "Moon Ball",
+        "Great Ball"
       ]
     }
   },
@@ -6056,6 +8657,17 @@
           "how": "Level Up to 36"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Lure Ball",
+        "Moon Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -6080,6 +8692,17 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Lure Ball",
+        "Moon Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -6105,6 +8728,17 @@
           "name": "combusken",
           "how": "Level Up to 16"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Fast Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Fast Ball",
+        "Repeat Ball",
+        "Level Ball"
       ]
     }
   },
@@ -6137,6 +8771,17 @@
           "how": "Level Up to 36"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Fast Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Repeat Ball",
+        "Fast Ball"
+      ]
     }
   },
   {
@@ -6162,6 +8807,18 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Fast Ball",
+        "Repeat Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Repeat Ball",
+        "Sport Ball"
+      ]
     }
   },
   {
@@ -6187,6 +8844,18 @@
           "name": "marshtomp",
           "how": "Level Up to 16"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball",
+        "Net Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Master Ball",
+        "Heal Ball"
       ]
     }
   },
@@ -6219,6 +8888,18 @@
           "how": "Level Up to 36"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball",
+        "Net Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Master Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -6244,6 +8925,18 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball",
+        "Net Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Master Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -6270,6 +8963,18 @@
           "how": "Level Up to 26"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Friend Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Quick Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -6294,6 +8999,18 @@
         "how": "Level Up to 26"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Master Ball",
+        "Dream Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Quick Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -6320,6 +9037,18 @@
           "how": "Level Up to 32"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Dream Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Heal Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -6344,6 +9073,18 @@
         "how": "Level Up to 32"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Dream Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Heal Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -6364,6 +9105,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Timer Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Dive Ball",
+        "Lure Ball"
+      ]
     }
   },
   {
@@ -6384,6 +9137,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Moon Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Dusk Ball",
+        "Moon Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -6410,6 +9175,18 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Net Ball",
+        "Heal Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -6434,6 +9211,18 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball",
+        "Great Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Heal Ball",
+        "Lure Ball"
+      ]
     }
   },
   {
@@ -6454,6 +9243,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Safari Ball",
+        "Friend Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Safari Ball",
+        "Moon Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -6480,6 +9281,17 @@
           "how": "Level Up to 20"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dream Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -6504,6 +9316,18 @@
         "how": "Level Up to 20"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dream Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Level Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -6530,6 +9354,16 @@
           "how": "Use Moon Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -6554,6 +9388,16 @@
         "how": "Use Moon Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -6574,6 +9418,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Timer Ball"
+      ]
     }
   },
   {
@@ -6594,6 +9446,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Net Ball"
+      ],
+      "shiny": [
+        "Net Ball"
+      ]
     }
   },
   {
@@ -6620,6 +9480,18 @@
           "how": "Level 34 (Unova)"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Ultra Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Luxury Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -6644,6 +9516,18 @@
         "how": "Level 34 (Unova)"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Ultra Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Dream Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -6671,6 +9555,15 @@
           "how": "Level Up to 39"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -6696,6 +9589,15 @@
         "how": "Level Up to 39"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -6716,6 +9618,15 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -6743,6 +9654,17 @@
           "how": "Level Up to 43"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Heavy Ball",
+        "Moon Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -6768,6 +9690,17 @@
         "how": "Level Up to 43"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Heavy Ball",
+        "Moon Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -6794,6 +9727,17 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Fast Ball",
+        "Poké Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -6819,6 +9763,17 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Quick Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Poké Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -6846,6 +9801,18 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Heal Ball",
+        "Net Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Poké Ball",
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -6871,6 +9838,18 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Heal Ball",
+        "Net Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Great Ball",
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -6898,6 +9877,17 @@
           "how": "Level Up to 42"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Luxury Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -6923,6 +9913,17 @@
         "how": "Level Up to 42"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball",
+        "Luxury Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -6944,6 +9945,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Love Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Love Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -6969,6 +9981,17 @@
           "name": "corvisquire",
           "how": "Level Up to 18"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Moon Ball",
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Level Ball"
       ]
     }
   },
@@ -7000,6 +10023,17 @@
           "how": "Level Up to 38"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Level Ball",
+        "Heavy Ball"
+      ]
     }
   },
   {
@@ -7025,6 +10059,18 @@
         "how": "Level Up to 38"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Moon Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Heavy Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -7051,6 +10097,18 @@
           "how": "Level Up to 18"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Repeat Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Heavy Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -7075,6 +10133,18 @@
         "how": "Level Up to 18"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Repeat Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Heavy Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -7102,6 +10172,18 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball",
+        "Love Ball"
+      ]
     }
   },
   {
@@ -7127,6 +10209,18 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Dream Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Quick Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -7153,6 +10247,18 @@
           "how": "level up"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Poké Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Repeat Ball",
+        "Lure Ball",
+        "Heavy Ball"
+      ]
     }
   },
   {
@@ -7177,6 +10283,18 @@
         "how": "level up"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Moon Ball",
+        "Net Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Fast Ball",
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -7201,6 +10319,18 @@
         "how": "Level Up to 28"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Heavy Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Level Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -7225,6 +10355,16 @@
         "how": "three critical hits"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -7250,6 +10390,18 @@
         "how": "Level Up to 42"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball",
+        "Dive Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Timer Ball",
+        "Heavy Ball"
+      ]
     }
   },
   {
@@ -7275,6 +10427,17 @@
         "how": "Take 49+ HP damage & pass under Stone Sculpture in Dusty Bowl"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Timer Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -7296,6 +10459,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Premier Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Dream Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -7317,6 +10492,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -7343,6 +10528,16 @@
           "how": "Level Up to 26"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -7367,6 +10562,18 @@
         "how": "Level Up to 26"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Ultra Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Safari Ball",
+        "Timer Ball"
+      ]
     }
   },
   {
@@ -7388,6 +10595,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -7413,6 +10630,16 @@
           "name": "naclstack",
           "how": "Level Up to 24"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Level Ball"
       ]
     }
   },
@@ -7444,6 +10671,16 @@
           "how": "Level Up to 38"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -7468,6 +10705,16 @@
         "how": "Level Up to 38"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -7499,6 +10746,18 @@
           "how": "Malicious Armor"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Dusk Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Repeat Ball",
+        "Dusk Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -7524,6 +10783,18 @@
         "how": "Auspicious Armor"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Repeat Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Repeat Ball",
+        "Fast Ball"
+      ]
     }
   },
   {
@@ -7549,6 +10820,18 @@
         "how": "Malicious Armor"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Master Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Master Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -7575,6 +10858,17 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Ultra Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -7599,6 +10893,17 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Ultra Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -7626,6 +10931,16 @@
           "how": "Level Up to 28"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -7651,6 +10966,18 @@
         "how": "Level Up to 28"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Great Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Level Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -7677,6 +11004,18 @@
           "how": "Use Fire Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Dusk Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Level Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -7702,6 +11041,17 @@
         "how": "Use Fire Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Dusk Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -7728,6 +11078,18 @@
           "name": "tinkatuff",
           "how": "Level Up to 24"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Dream Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball",
+        "Luxury Ball"
       ]
     }
   },
@@ -7760,6 +11122,18 @@
           "how": "Level Up to 38"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Dream Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -7785,6 +11159,18 @@
         "how": "Level Up to 38"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Dream Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -7806,6 +11192,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dusk Ball",
+        "Friend Ball"
+      ],
+      "shiny": [
+        "Quick Ball",
+        "Moon Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -7833,6 +11230,18 @@
           "how": "Level Up to 35"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Quick Ball",
+        "Beast Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Net Ball",
+        "Beast Ball"
+      ]
     }
   },
   {
@@ -7858,6 +11267,18 @@
         "how": "Level Up to 35"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Quick Ball",
+        "Beast Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Net Ball",
+        "Beast Ball"
+      ]
     }
   },
   {
@@ -7884,6 +11305,18 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Dive Ball",
+        "Friend Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -7908,6 +11341,18 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Moon Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Moon Ball",
+        "Timer Ball"
+      ]
     }
   },
   {
@@ -7929,6 +11374,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -7949,6 +11404,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Heavy Ball",
+        "Beast Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -7970,6 +11436,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Repeat Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -7995,6 +11471,17 @@
         "how": "other"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Heavy Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Heavy Ball",
+        "Timer Ball"
+      ]
     }
   },
   {
@@ -8021,6 +11508,18 @@
           "name": "arctibax",
           "how": "Level Up to 35"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Dive Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Net Ball",
+        "Beast Ball"
       ]
     }
   },
@@ -8053,6 +11552,18 @@
           "how": "Level Up to 54"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Dive Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Net Ball",
+        "Beast Ball"
+      ]
     }
   },
   {
@@ -8078,6 +11589,18 @@
         "how": "Level Up to 54"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Dive Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Net Ball",
+        "Beast Ball"
+      ]
     }
   },
   {
@@ -8104,6 +11627,16 @@
           "how": "other"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -8129,6 +11662,16 @@
         "how": "other"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -8154,6 +11697,16 @@
           "name": "bayleef",
           "how": "Level Up to 16"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Ultra Ball"
       ]
     }
   },
@@ -8185,6 +11738,16 @@
           "how": "Level Up to 32"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -8209,6 +11772,17 @@
         "how": "Level Up to 32"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball",
+        "Love Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -8234,6 +11808,17 @@
           "name": "pignite",
           "how": "Level Up to 17"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Repeat Ball",
+        "Level Ball",
+        "Luxury Ball"
       ]
     }
   },
@@ -8266,6 +11851,15 @@
           "how": "Level Up to 36"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -8291,6 +11885,16 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Heavy Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -8316,6 +11920,17 @@
           "name": "croconaw",
           "how": "Level Up to 18"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball",
+        "Quick Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Quick Ball"
       ]
     }
   },
@@ -8347,6 +11962,17 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball",
+        "Quick Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -8371,6 +11997,17 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball",
+        "Quick Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -8397,6 +12034,17 @@
           "name": "fletchinder",
           "how": "Level Up to 17"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball",
+        "Fast Ball"
       ]
     }
   },
@@ -8429,6 +12077,18 @@
           "how": "Level Up to 35"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Repeat Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball",
+        "Fast Ball"
+      ]
     }
   },
   {
@@ -8454,6 +12114,18 @@
         "how": "Level Up to 35"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Repeat Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball",
+        "Fast Ball"
+      ]
     }
   },
   {
@@ -8480,6 +12152,16 @@
           "how": "Level Up to 20"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Heavy Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -8505,6 +12187,16 @@
         "how": "Level Up to 20"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Heavy Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -8530,6 +12222,16 @@
           "name": "spewpa",
           "how": "Level Up to 9"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Ultra Ball"
       ]
     }
   },
@@ -8561,6 +12263,18 @@
           "how": "Level Up to 12"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Timer Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Timer Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -8586,6 +12300,14 @@
         "how": "Level Up to 12"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball"
+      ],
+      "shiny": [
+        "Love Ball"
+      ]
     }
   },
   {
@@ -8612,6 +12334,17 @@
           "name": "kakuna",
           "how": "Level Up to 7"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Ultra Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Luxury Ball"
       ]
     }
   },
@@ -8644,6 +12377,17 @@
           "how": "Level Up to 10"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Dusk Ball",
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -8669,6 +12413,17 @@
         "how": "Level Up to 10"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Dusk Ball",
+        "Moon Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -8695,6 +12450,18 @@
           "name": "pidgeotto",
           "how": "Level Up to 18"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Luxury Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Luxury Ball",
+        "Safari Ball"
       ]
     }
   },
@@ -8727,6 +12494,17 @@
           "how": "Level Up to 36"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Fast Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -8752,6 +12530,17 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Fast Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -8777,6 +12566,15 @@
           "name": "flaaffy",
           "how": "Level Up to 15"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Heal Ball"
       ]
     }
   },
@@ -8808,6 +12606,16 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -8832,6 +12640,18 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Level Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -8858,6 +12678,18 @@
           "how": "Level Up to 20"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Repeat Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Quick Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -8882,6 +12714,18 @@
         "how": "Level Up to 20"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Repeat Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Dusk Ball",
+        "Friend Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -8909,6 +12753,18 @@
           "how": "Level Up to 39"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Sport Ball",
+        "Dive Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Love Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -8934,6 +12790,18 @@
         "how": "Level Up to 39"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Sport Ball",
+        "Dive Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Love Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -8960,6 +12828,16 @@
           "how": "Use Water Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Quick Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -8985,6 +12863,17 @@
         "how": "Use Water Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Luxury Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Lure Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -9010,6 +12899,16 @@
           "name": "floette",
           "how": "Level Up to 19"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Poké Ball",
+        "Premier Ball"
       ]
     }
   },
@@ -9041,6 +12940,16 @@
           "how": "Use Shiny Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Poké Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -9065,6 +12974,16 @@
         "how": "Use Shiny Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball"
+      ],
+      "shiny": [
+        "Poké Ball",
+        "Dream Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -9091,6 +13010,16 @@
           "how": "Level Up to 32"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball",
+        "Friend Ball"
+      ],
+      "shiny": [
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -9115,6 +13044,17 @@
         "how": "Level Up to 32"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball",
+        "Friend Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -9146,6 +13086,17 @@
           "how": "Level Up to 25 (Female)"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Dream Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -9170,6 +13121,16 @@
         "how": "Level 25 (Male)"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -9197,6 +13158,17 @@
           "how": "Level Up to 35"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Luxury Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Fast Ball"
+      ]
     }
   },
   {
@@ -9222,6 +13194,18 @@
         "how": "Level Up to 35"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Fast Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Fast Ball",
+        "Repeat Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -9248,6 +13232,16 @@
           "how": "Level Up to 32"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Ultra Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -9273,6 +13267,18 @@
         "how": "Level Up to 32"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Ultra Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Safari Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -9299,6 +13305,16 @@
           "how": "Level Up to 36"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Heavy Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -9323,6 +13339,16 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Heavy Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -9344,6 +13370,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Level Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -9371,6 +13408,17 @@
           "how": "Level Up to 22"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Heal Ball",
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -9396,6 +13444,17 @@
         "how": "Level Up to 22"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Quick Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -9422,6 +13481,17 @@
           "how": "Level Up to 22"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Master Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -9446,6 +13516,18 @@
         "how": "Level Up to 22"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Master Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Level Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -9472,6 +13554,17 @@
           "name": "whirlipede",
           "how": "Level Up to 22"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dusk Ball",
+        "Sport Ball",
+        "Poké Ball"
+      ],
+      "shiny": [
+        "Dusk Ball",
+        "Safari Ball"
       ]
     }
   },
@@ -9504,6 +13597,15 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dusk Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -9529,6 +13631,18 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dusk Ball",
+        "Sport Ball",
+        "Poké Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Lure Ball",
+        "Timer Ball"
+      ]
     }
   },
   {
@@ -9555,6 +13669,16 @@
           "name": "doublade",
           "how": "Level Up to 35"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Lure Ball"
       ]
     }
   },
@@ -9587,6 +13711,17 @@
           "how": "Use Dusk Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Luxury Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -9612,6 +13747,17 @@
         "how": "Level Up to 35"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Dusk Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -9638,6 +13784,17 @@
           "name": "weepinbell",
           "how": "Level Up to 21"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Safari Ball",
+        "Luxury Ball"
       ]
     }
   },
@@ -9670,6 +13827,17 @@
           "how": "Use Leaf Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -9695,6 +13863,17 @@
         "how": "Use Leaf Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -9721,6 +13900,16 @@
           "how": "Use Leaf Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -9745,6 +13934,16 @@
         "how": "Use Leaf Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -9771,6 +13970,18 @@
           "how": "Use Fire Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Fast Ball",
+        "Repeat Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Fast Ball",
+        "Repeat Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -9795,6 +14006,18 @@
         "how": "Use Fire Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Fast Ball",
+        "Repeat Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Fast Ball",
+        "Repeat Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -9821,6 +14044,18 @@
           "how": "Use Water Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball",
+        "Moon Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Lure Ball",
+        "Moon Ball",
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -9845,6 +14080,18 @@
         "how": "Use Water Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball",
+        "Moon Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Lure Ball",
+        "Moon Ball",
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -9872,6 +14119,18 @@
           "how": "Level Up to 37"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Great Ball",
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Heal Ball",
+        "Sport Ball"
+      ]
     }
   },
   {
@@ -9897,6 +14156,18 @@
         "how": "Level Up to 37"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Premier Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Dive Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -9923,6 +14194,17 @@
           "how": "Level Up to 26"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Moon Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Quick Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -9947,6 +14229,16 @@
         "how": "Level Up to 26"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -9974,6 +14266,17 @@
           "how": "Level Up to 24"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Quick Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -9999,6 +14302,17 @@
         "how": "Level Up to 24"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Quick Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -10026,6 +14340,18 @@
           "how": "Level Up to 35"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Dive Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Level Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -10051,6 +14377,18 @@
         "how": "Level Up to 35"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Dive Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Level Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -10071,6 +14409,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Love Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Love Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -10097,6 +14446,18 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Dream Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -10121,6 +14482,18 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Dream Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -10147,6 +14520,16 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -10171,6 +14554,16 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Love Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -10197,6 +14590,18 @@
           "how": "Level Up to 37"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Dusk Ball",
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Dusk Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -10221,6 +14626,18 @@
         "how": "Level Up to 37"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Level Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Level Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -10246,6 +14663,15 @@
           "name": "vanillish",
           "how": "Level Up to 35"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Dive Ball"
       ]
     }
   },
@@ -10277,6 +14703,14 @@
           "how": "Level Up to 47"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -10301,6 +14735,14 @@
         "how": "Level Up to 47"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -10328,6 +14770,17 @@
           "how": "Level Up to 33"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -10353,6 +14806,17 @@
         "how": "Level Up to 33"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Moon Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -10379,6 +14843,18 @@
           "how": "Level Up to 31"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Great Ball",
+        "Net Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Love Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -10404,6 +14880,16 @@
         "how": "Level Up to 31"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -10430,6 +14916,17 @@
           "name": "krokorok",
           "how": "Level Up to 29"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Ultra Ball",
+        "Quick Ball"
       ]
     }
   },
@@ -10462,6 +14959,17 @@
           "how": "Level Up to 40"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Quick Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -10487,6 +14995,18 @@
         "how": "Level Up to 40"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Sport Ball",
+        "Poké Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Nest Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -10508,6 +15028,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Heavy Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -10529,6 +15059,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dusk Ball",
+        "Master Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -10550,6 +15092,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Level Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Heal Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -10570,6 +15124,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Moon Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Timer Ball",
+        "Poké Ball"
+      ]
     }
   },
   {
@@ -10602,6 +15168,17 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dream Ball",
+        "Love Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -10627,6 +15204,17 @@
         "how": "Level up to 37"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dream Ball",
+        "Love Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -10652,6 +15240,18 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Love Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Dream Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -10679,6 +15279,17 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball",
+        "Great Ball",
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -10704,6 +15315,18 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Lure Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Master Ball",
+        "Dream Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -10729,6 +15352,14 @@
           "name": "eelektrik",
           "how": "Level Up to 39"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Premier Ball"
       ]
     }
   },
@@ -10760,6 +15391,18 @@
           "how": "Use Thunder Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Moon Ball",
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Quick Ball",
+        "Moon Ball",
+        "Lure Ball"
+      ]
     }
   },
   {
@@ -10784,6 +15427,18 @@
         "how": "Use Thunder Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Moon Ball",
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball",
+        "Lure Ball"
+      ]
     }
   },
   {
@@ -10809,6 +15464,16 @@
           "name": "dragonair",
           "how": "Level Up to 30"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball",
+        "Dream Ball"
       ]
     }
   },
@@ -10840,6 +15505,16 @@
           "how": "Level Up to 55"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Heal Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -10865,6 +15540,17 @@
         "how": "Level Up to 55"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Fast Ball",
+        "Repeat Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -10891,6 +15577,17 @@
           "name": "ivysaur",
           "how": "Level Up to 16"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Lure Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball"
       ]
     }
   },
@@ -10923,6 +15620,17 @@
           "how": "Level Up to 32"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Lure Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -10948,6 +15656,17 @@
         "how": "Level Up to 32"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Lure Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -10973,6 +15692,15 @@
           "name": "charmeleon",
           "how": "Level Up to 16"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Repeat Ball"
       ]
     }
   },
@@ -11004,6 +15732,16 @@
           "how": "Level Up to 36"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Poké Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -11029,6 +15767,15 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Timer Ball"
+      ]
     }
   },
   {
@@ -11054,6 +15801,16 @@
           "name": "wartortle",
           "how": "Level Up to 16"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Safari Ball"
       ]
     }
   },
@@ -11085,6 +15842,17 @@
           "how": "Level Up to 36"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -11109,6 +15877,18 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Moon Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -11130,6 +15910,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Quick Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Quick Ball",
+        "Moon Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -11150,6 +15942,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -11177,6 +15977,16 @@
           "how": "Level Up to 30"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -11202,6 +16012,17 @@
         "how": "Level Up to 30"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -11229,6 +16050,18 @@
           "how": "Level Up to 48"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Dive Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -11254,6 +16087,18 @@
         "how": "Level Up to 48"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Dive Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -11280,6 +16125,17 @@
           "how": "Level Up to 37"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Sport Ball",
+        "Lure Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -11304,6 +16160,17 @@
         "how": "Level Up to 37"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Sport Ball",
+        "Lure Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -11325,6 +16192,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball",
+        "Premier Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Dream Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -11345,6 +16224,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -11366,6 +16255,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Ultra Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -11387,6 +16287,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Sport Ball",
+        "Luxury Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -11414,6 +16324,17 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dusk Ball",
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -11439,6 +16360,17 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dusk Ball",
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -11466,6 +16398,16 @@
           "how": "Level Up to 39"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Repeat Ball",
+        "Fast Ball"
+      ]
     }
   },
   {
@@ -11491,6 +16433,17 @@
         "how": "Level Up to 39"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Dusk Ball",
+        "Friend Ball",
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -11518,6 +16471,17 @@
           "how": "Level Up to 48"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -11543,6 +16507,17 @@
         "how": "Level Up to 48"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Dream Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -11564,6 +16539,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Timer Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Quick Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -11590,6 +16576,18 @@
           "name": "lampent",
           "how": "Level Up to 41"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Moon Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Moon Ball",
+        "Net Ball"
       ]
     }
   },
@@ -11622,6 +16620,18 @@
           "how": "Use Dusk Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Ultra Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Net Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -11647,6 +16657,18 @@
         "how": "Use Dusk Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Ultra Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Repeat Ball",
+        "Dusk Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -11668,6 +16690,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Dream Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -11695,6 +16729,17 @@
           "how": "Level Up to 39"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Timer Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -11720,6 +16765,17 @@
         "how": "Level Up to 39"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Timer Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -11747,6 +16803,18 @@
           "how": "Level Up to 39"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Dive Ball",
+        "Beast Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Quick Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -11772,6 +16840,18 @@
         "how": "Level Up to 39"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Dive Ball",
+        "Beast Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Quick Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -11798,6 +16878,17 @@
           "name": "lairon",
           "how": "Level Up to 32"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Premier Ball",
+        "Heavy Ball"
       ]
     }
   },
@@ -11830,6 +16921,17 @@
           "how": "Level Up to 42"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Premier Ball",
+        "Heavy Ball"
+      ]
     }
   },
   {
@@ -11855,6 +16957,17 @@
         "how": "Level Up to 42"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Premier Ball",
+        "Heavy Ball"
+      ]
     }
   },
   {
@@ -11882,6 +16995,15 @@
           "how": "Use Sun Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -11907,6 +17029,15 @@
         "how": "Use Sun Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -11934,6 +17065,17 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Dusk Ball",
+        "Ultra Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -11959,6 +17101,17 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Dusk Ball",
+        "Ultra Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -11985,6 +17138,18 @@
           "name": "pupitar",
           "how": "Level Up to 30"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball",
+        "Dusk Ball"
       ]
     }
   },
@@ -12017,6 +17182,17 @@
           "how": "Level Up to 55"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Net Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Dusk Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -12042,6 +17218,18 @@
         "how": "Level Up to 55"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Dusk Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -12067,6 +17255,15 @@
           "name": "frogadier",
           "how": "Level Up to 16"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Beast Ball"
       ]
     }
   },
@@ -12098,6 +17295,14 @@
           "how": "Level Up to 36"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -12123,6 +17328,17 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Moon Ball",
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -12143,6 +17359,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Fast Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -12168,6 +17394,15 @@
           "name": "quilladin",
           "how": "Level Up to 16"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Luxury Ball"
       ]
     }
   },
@@ -12199,6 +17434,15 @@
           "how": "Level Up to 36"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -12224,6 +17468,17 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -12245,6 +17500,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -12270,6 +17536,16 @@
           "name": "braixen",
           "how": "Level Up to 16"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Dusk Ball"
       ]
     }
   },
@@ -12301,6 +17577,17 @@
           "how": "Level Up to 36"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Dusk Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -12326,6 +17613,17 @@
         "how": "Level Up to 36"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Dusk Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -12351,6 +17649,18 @@
           "name": "shelgon",
           "how": "Level Up to 30"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Moon Ball",
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Dusk Ball",
+        "Nest Ball"
       ]
     }
   },
@@ -12382,6 +17692,17 @@
           "how": "Level Up to 50"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Dusk Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -12407,6 +17728,16 @@
         "how": "Level Up to 50"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Dusk Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -12427,6 +17758,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Safari Ball",
+        "Nest Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Safari Ball",
+        "Nest Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -12448,6 +17791,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Premier Ball",
+        "Friend Ball"
+      ],
+      "shiny": [
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -12474,6 +17827,16 @@
           "name": "metang",
           "how": "Level Up to 20"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Net Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Luxury Ball"
       ]
     }
   },
@@ -12506,6 +17869,16 @@
           "how": "Level Up to 45"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Net Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -12531,6 +17904,16 @@
         "how": "Level Up to 45"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Net Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Luxury Ball"
+      ]
     }
   }
 ]

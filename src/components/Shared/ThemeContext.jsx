@@ -32,11 +32,14 @@ export function ThemeProvider({ children }) {
     red: "#ef4444",
     orange: "#f97316",
     green: "#22c55e",
+    lime: "#84cc16",
     blue: "#3b82f6",
     cyan: "#06b6d4",
     purple: "#a855f7",
+    lavender: "#c084fc",
     pink: "#ec4899",
-    brown: "#8f4d00",
+    brown: "#5c3810",
+    platinum: "#cbd5e1",
   };
 
   const accentHoverMap = {
@@ -44,11 +47,14 @@ export function ThemeProvider({ children }) {
     red: "#dc2626",
     orange: "#ea580c",
     green: "#16a34a",
+    lime: "#65a30d",
     blue: "#2563eb",
     cyan: "#0891b2",
     purple: "#9333ea",
+    lavender: "#a855f7",
     pink: "#db2777",
-    brown: "#6a3c06",
+    brown: "#42280a",
+    platinum: "#94a3b8",
   };
 
   // Apply resolved theme to <html> and persist to localStorage
@@ -68,8 +74,9 @@ export function ThemeProvider({ children }) {
   // Apply accent CSS vars and persist to localStorage
   useEffect(() => {
     localStorage.setItem(ACCENT_KEY, accent);
-    document.documentElement.style.setProperty("--accent", accentMap[accent]);
-    document.documentElement.style.setProperty("--accent-hover", accentHoverMap[accent]);
+    document.documentElement.setAttribute("data-accent", accent);
+    document.documentElement.style.setProperty("--accent", accentMap[accent] || accentMap.yellow);
+    document.documentElement.style.setProperty("--accent-hover", accentHoverMap[accent] || accentHoverMap.yellow);
   }, [accent]);
 
   // Called once after login/auth with values from the server profile

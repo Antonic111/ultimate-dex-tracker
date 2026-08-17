@@ -141,6 +141,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                 case 'vivillon': return dexPreferences.showVivillonForms;
                 case 'alpha': return dexPreferences.showAlphaForms;
                 case 'alphaother': return dexPreferences.showAlphaOtherForms;
+                case 'mighty': return dexPreferences.showMightyForms;
                 default: return true;
             }
         });
@@ -261,47 +262,32 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
 
     useEffect(() => {
-        const html = document.documentElement;
-        const body = document.body;
-
         if (showSettings) {
-            // Store current scroll position
-            const scrollY = window.scrollY;
-            body.dataset.scrollY = scrollY;
+            const preventScroll = (e) => {
+                if (e.target.closest('.progress-manager-modal') || e.target.closest('[role="dialog"]') || e.target.closest('.custom-scrollbar')) return;
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            };
 
-            // Prevent scrolling without using position:fixed on body
-            // This avoids breaking fixed-position modals during page transitions
-            html.style.overflow = 'hidden';
-            body.style.overflow = 'hidden';
-            html.style.height = '100vh';
-            body.style.height = '100vh';
-            // Use margin-top instead of position:fixed to maintain scroll position appearance
-            body.style.marginTop = `-${scrollY}px`;
-            body.style.paddingTop = `${scrollY}px`;
-        } else {
-            // Restore scrolling
-            const scrollY = parseInt(body.dataset.scrollY || '0', 10);
-            html.style.overflow = '';
-            body.style.overflow = '';
-            html.style.height = '';
-            body.style.height = '';
-            body.style.marginTop = '';
-            body.style.paddingTop = '';
+            const preventKeyScroll = (e) => {
+                if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) {
+                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && !e.target.closest('[role="dialog"]')) {
+                        e.preventDefault();
+                    }
+                }
+            };
 
-            // Restore scroll position
-            if (scrollY) {
-                window.scrollTo(0, scrollY);
-            }
+            document.addEventListener('wheel', preventScroll, { passive: false });
+            document.addEventListener('touchmove', preventScroll, { passive: false });
+            document.addEventListener('keydown', preventKeyScroll, { passive: false });
+
+            return () => {
+                document.removeEventListener('wheel', preventScroll);
+                document.removeEventListener('touchmove', preventScroll);
+                document.removeEventListener('keydown', preventKeyScroll);
+            };
         }
-        return () => {
-            // Cleanup
-            html.style.overflow = '';
-            body.style.overflow = '';
-            html.style.height = '';
-            body.style.height = '';
-            body.style.marginTop = '';
-            body.style.paddingTop = '';
-        };
     }, [showSettings]);
 
     // New functions for save/cancel system
@@ -377,7 +363,12 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
         if (!bar.filters) bar.filters = {};
 
         if (bar.filters?.tally === "mark") {
-            const allMarkValues = new Set(MARK_OPTIONS.map((m) => m.value).filter(Boolean));
+            const isShinyBar = bar.filters?.shiny === true;
+            const isShinyMode = isShinyBar || (showShiny && bar.filters?.shiny !== false);
+            const availableMarks = isShinyMode
+                ? MARK_OPTIONS.filter((m) => m.value && m.value !== "mightiest")
+                : MARK_OPTIONS.filter((m) => m.value);
+            const allMarkValues = new Set(availableMarks.map((m) => m.value));
             const foundMarks = new Set();
 
             Object.entries(caughtMap).forEach(([key, data]) => {
@@ -388,13 +379,24 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                 if (data && data.entries && Array.isArray(data.entries)) {
                     // New format: extract from entries array
                     data.entries.forEach(entry => {
-                        if (entry && entry.mark && allMarkValues.has(entry.mark)) {
-                            foundMarks.add(entry.mark);
+                        const mList = Array.isArray(entry?.marks)
+                            ? entry.marks
+                            : (entry?.mark ? [entry.mark] : []);
+                        mList.forEach(m => {
+                            if (m && allMarkValues.has(m)) {
+                                foundMarks.add(m);
+                            }
+                        });
+                    });
+                } else if (data) {
+                    const mList = Array.isArray(data.marks)
+                        ? data.marks
+                        : (data.mark ? [data.mark] : []);
+                    mList.forEach(m => {
+                        if (m && allMarkValues.has(m)) {
+                            foundMarks.add(m);
                         }
                     });
-                } else if (data && data.mark && allMarkValues.has(data.mark)) {
-                    // Old format: use data directly
-                    foundMarks.add(data.mark);
                 }
             });
 
@@ -451,8 +453,16 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             return { total: allGameValues.size, caught: foundGames.size };
         }
 
+        const isShinyBar = bar.filters?.shiny === true;
+        const isShinyMode = isShinyBar || (showShiny && !isShinyBar);
+
         const filtered = visibleMons.filter((mon) => {
             const formType = mon.formType || "main";
+
+            // Mighty Pokemon cannot be shiny
+            if (isShinyMode && formType === "mighty") {
+                return false;
+            }
 
             if (bar.filters?.formType?.length > 0) {
                 if (!bar.filters.formType.includes(formType)) {
@@ -494,10 +504,6 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
         const total = filtered.length;
 
-        // Count both regular and shiny Pokémon for the total
-        // For caught count, check if the progress bar is specifically for shiny tracking
-        const isShinyBar = bar.filters?.shiny === true;
-
         // If showShiny is true and this is a general progress bar (not specifically shiny), 
         // prioritize showing shiny progress. If showShiny is false, prioritize regular progress.
         const shouldShowShinyProgress = showShiny && !isShinyBar;
@@ -527,7 +533,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
 
     return (
-        <div className="w-full max-w-[1300px] mx-auto px-4 pt-2 pb-1 rounded-lg shadow-sm mb-6 mt-6" style={{ width: '100%', maxWidth: '1300px', backgroundColor: 'var(--searchbar-bg)', border: '1px solid var(--border-color)' }}>
+        <div data-tutorial-id="progress-bars" className="w-full max-w-[1300px] mx-auto px-4 pt-2 pb-1 rounded-lg shadow-sm mb-6 mt-6" style={{ width: '100%', maxWidth: '1300px', backgroundColor: 'var(--searchbar-bg)', border: '1px solid var(--border-color)' }}>
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Progress Bars</h2>
                 <div className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef, useContext } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { createPortal } from "react-dom";
 import { X, Search, Edit2, Check, RotateCcw, Link as LinkIcon, ArrowBigLeft } from "lucide-react";
@@ -16,11 +16,25 @@ import { SearchbarIconDropdown } from "../components/Shared/SearchBar";
 import { useTheme } from '../components/Shared/ThemeContext';
 import { bingoAPI } from "../utils/api";
 import { useMessage } from "../components/Shared/MessageContext";
-import { UserContext } from "../components/Shared/UserContext";
+import { useUser } from "../components/Shared/UserContext";
+
+const createEmptyGrid = () => Array.from({ length: 25 }, (_, i) => ({
+    id: i,
+    text: '',
+    completed: false,
+    pokemon: null,
+    pokemonList: [],
+    game: null
+}));
 
 const Bingo = () => {
     const { showMessage } = useMessage();
-    const { user } = useContext(UserContext);
+    const { username: authUsername } = useUser();
+    const { username: routeUsername } = useParams();
+    const readOnly = !!routeUsername;
+    const currentUsername = routeUsername || authUsername;
+
+    const STORAGE_KEY = authUsername ? `bingo-grid-state-v1:${authUsername}` : null;
 
     const [useHomeSprites, setUseHomeSprites] = useState(() => {
         try {
@@ -40,50 +54,32 @@ const Bingo = () => {
         return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
     }, []);
 
-    // Configuration / Filter State key
-    const STORAGE_KEY = 'bingo-grid-state-v1';
-
-    // State initialization
-    const { username } = useParams();
-    const readOnly = !!username;
-
     // State initialization
     const [grid, setGrid] = useState(() => {
         if (readOnly) {
-            return Array.from({ length: 25 }, (_, i) => ({
-                id: i,
-                text: '',
-                completed: false,
-                pokemon: null,
-                pokemonList: [],
-                game: null
-            }));
+            return createEmptyGrid();
         }
 
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                // Migration: Clear "Goal X" and "FREE" texts and unmark auto-completed center
-                return parsed.map((cell, i) => ({
-                    ...cell,
-                    text: (cell.text === 'FREE' || (cell.text && cell.text.startsWith('Goal '))) ? '' : cell.text,
-                    completed: (cell.id === 12 && cell.text === 'FREE') ? false : cell.completed,
-                    pokemonList: (cell.pokemonList && cell.pokemonList.length > 0) ? cell.pokemonList : (cell.pokemon ? [cell.pokemon] : [])
-                }));
-            } catch (e) {
-                console.error("Failed to parse saved bingo grid", e);
+        // Clean up legacy unscoped key if present
+        localStorage.removeItem('bingo-grid-state-v1');
+
+        if (STORAGE_KEY) {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    return parsed.map((cell, i) => ({
+                        ...cell,
+                        text: (cell.text === 'FREE' || (cell.text && cell.text.startsWith('Goal '))) ? '' : cell.text,
+                        completed: (cell.id === 12 && cell.text === 'FREE') ? false : cell.completed,
+                        pokemonList: (cell.pokemonList && cell.pokemonList.length > 0) ? cell.pokemonList : (cell.pokemon ? [cell.pokemon] : [])
+                    }));
+                } catch (e) {
+                    console.error("Failed to parse saved bingo grid", e);
+                }
             }
         }
-        // distinct initial state
-        return Array.from({ length: 25 }, (_, i) => ({
-            id: i,
-            text: '',
-            completed: false,
-            pokemon: null,
-            pokemonList: [],
-            game: null
-        }));
+        return createEmptyGrid();
     });
 
     const [showModal, setShowModal] = useState(false);
@@ -93,6 +89,8 @@ const Bingo = () => {
     const [showClearConfirm, setShowClearConfirm] = useState(false);
     const [clearConfirmClosing, setClearConfirmClosing] = useState(false);
     const [cycleIndex, setCycleIndex] = useState(0);
+
+    const isDataLoadedRef = useRef(false);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -110,13 +108,7 @@ const Bingo = () => {
     };
 
     const handleClearBoard = () => {
-        setGrid(Array.from({ length: 25 }, (_, i) => ({
-            id: i,
-            text: '',
-            completed: false,
-            pokemon: null,
-            game: null
-        })));
+        setGrid(createEmptyGrid());
         closeClearConfirmModal();
         showMessage("Board cleared!", "success");
     };
@@ -129,9 +121,6 @@ const Bingo = () => {
             .catch(() => showMessage("Failed to copy link", "error"));
     };
 
-
-
-    // Load grid from server on mount
     const gridRef = useRef(grid);
 
     // Keep ref updated
@@ -139,36 +128,57 @@ const Bingo = () => {
         gridRef.current = grid;
     }, [grid]);
 
-    // Load grid from server on mount
+    // Load grid from server on mount or user change
     useEffect(() => {
         let isMounted = true;
+        isDataLoadedRef.current = false;
+
         const loadBingoData = async () => {
             try {
                 const data = readOnly
-                    ? await bingoAPI.getPublicBingo(username)
+                    ? await bingoAPI.getPublicBingo(routeUsername)
                     : await bingoAPI.getBingo();
 
-                // Check if we received valid data
-                if (isMounted && data && Array.isArray(data.grid) && data.grid.length > 0) {
-                    setGrid(data.grid.map(cell => ({
+                if (!isMounted) return;
+
+                if (data && Array.isArray(data.grid) && data.grid.length > 0) {
+                    const loadedGrid = data.grid.map(cell => ({
                         ...cell,
                         pokemonList: (cell.pokemonList && cell.pokemonList.length > 0) ? cell.pokemonList : (cell.pokemon ? [cell.pokemon] : [])
-                    })));
+                    }));
+                    setGrid(loadedGrid);
+                    if (STORAGE_KEY) {
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(loadedGrid));
+                    }
+                } else if (!readOnly) {
+                    // Empty or fresh user
+                    const emptyGrid = createEmptyGrid();
+                    setGrid(emptyGrid);
+                    if (STORAGE_KEY) {
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(emptyGrid));
+                    }
                 }
             } catch (error) {
                 console.error("Failed to load bingo data:", error);
+            } finally {
+                if (isMounted) {
+                    isDataLoadedRef.current = true;
+                }
             }
         };
+
         loadBingoData();
         return () => { isMounted = false; };
-    }, [username, readOnly]);
+    }, [routeUsername, readOnly, authUsername]);
 
-    // Persist grid changes to Local Storage AND Server
+    // Persist grid changes to Local Storage AND Server (only after initial load has finished)
     useEffect(() => {
-        if (readOnly) return;
+        if (readOnly || !isDataLoadedRef.current) return;
 
-        // Save to local storage immediately
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(grid));
+        // Save to user-scoped local storage
+        if (STORAGE_KEY) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(grid));
+        }
 
         // Debounce save to server
         const timeoutId = setTimeout(async () => {
@@ -177,14 +187,14 @@ const Bingo = () => {
             } catch (error) {
                 console.error("Failed to save bingo data to server:", error);
             }
-        }, 500); // 500ms debounce
+        }, 500);
 
         return () => clearTimeout(timeoutId);
-    }, [grid, readOnly]);
+    }, [grid, readOnly, STORAGE_KEY]);
 
     // Save on unload
     useEffect(() => {
-        if (readOnly) return;
+        if (readOnly || !isDataLoadedRef.current) return;
 
         const handleBeforeUnload = () => {
             const token = localStorage.getItem('authToken');
@@ -239,7 +249,7 @@ const Bingo = () => {
 
     // Memoize all pokemon data (base + forms)
     const allPokemon = useMemo(() => {
-        const filteredFormsData = getFilteredFormsData(formsData);
+        const filteredFormsData = getFilteredFormsData(formsData).filter(p => p.formType !== "mighty");
         return [...pokemonData, ...filteredFormsData];
     }, []);
 
@@ -409,12 +419,12 @@ const Bingo = () => {
             <div className="bingo-container">
                 <div className="mt-12 mb-6" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
                     <h1 className="bingo-page-title !m-0">
-                        {readOnly ? `${username}'s ` : ''}2026 Shiny BINGO
+                        {readOnly ? `${routeUsername}'s ` : ''}2026 Shiny BINGO
                     </h1>
 
                     {readOnly ? (
                         <Link
-                            to={`/u/${username}`}
+                            to={`/u/${routeUsername}`}
                             className="flex items-center gap-2 px-3.5 py-2 bg-[var(--accent)] text-black font-bold border-none rounded-lg cursor-pointer transition-colors duration-200 hover:bg-[var(--accent-hover)] hover:text-[var(--text)]"
                             title="Back to Profile"
                             style={{ textDecoration: 'none' }}
@@ -423,7 +433,7 @@ const Bingo = () => {
                             <span>Back to Profile</span>
                         </Link>
                     ) : (
-                        user?.username && (
+                        authUsername && (
                             <button
                                 onClick={handleShare}
                                 className="bingo-copy-btn p-2 rounded-full hover:bg-[var(--bg-secondary)] transition-colors text-[var(--accent)]"

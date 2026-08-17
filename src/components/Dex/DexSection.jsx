@@ -18,8 +18,30 @@ export default function DexSection({
   showShiny = false,
   showForms = false,
   isAlphaBox = false,
+  isTutorialActive = false,
 }) {
   const [collapsed, setCollapsed] = useState(false);
+  const titleSlug = title.replace(/\s+/g, '-').toLowerCase();
+
+  // Listen for tutorial events to auto-collapse forms
+  useEffect(() => {
+    const handleStepChange = (e) => {
+      const { targetId } = e.detail || {};
+      if (targetId === "dex-header-gender-forms" || targetId === "all-categories") {
+        setCollapsed(true);
+      }
+    };
+    window.addEventListener("tutorialStepChange", handleStepChange);
+    return () => window.removeEventListener("tutorialStepChange", handleStepChange);
+  }, [title]);
+
+  // Reset collapsed state when tutorial restarts
+  useEffect(() => {
+    if (isTutorialActive) {
+      setCollapsed(false);
+    }
+  }, [isTutorialActive]);
+
   const [contentHeight, setContentHeight] = useState(0);
   const [transitionReady, setTransitionReady] = useState(false);
   const contentRef = useRef(null);
@@ -94,22 +116,59 @@ export default function DexSection({
       if (normals.length > 0 && alphas.length > 0) {
         // Regular Box first, Alpha Box second
         return [
-          { pokemon: normals },
-          { pokemon: alphas, isAlphaBox: true }
+          { pokemon: normals, boxIndex: normals[0]?._boxIndex ?? 0 },
+          { pokemon: alphas, isAlphaBox: true, boxIndex: alphas[0]?._boxIndex ?? 1 }
         ];
       }
+      if (alphas.length > 0 && normals.length === 0) {
+        return [{ pokemon: alphas, isAlphaBox: true, boxIndex: alphas[0]?._boxIndex ?? 1 }];
+      }
+      if (normals.length > 0 && alphas.length === 0) {
+        return [{ pokemon: normals, isAlphaBox: false, boxIndex: normals[0]?._boxIndex ?? 0 }];
+      }
       // Fallback to default chunking if detection failed
+    }
+
+    // If pokemonList items have _boxIndex property (from showFullBox mode),
+    // group by _boxIndex so distinct non-contiguous boxes stay as separate boxes!
+    const hasExplicitBoxes = pokemonList.some(p => p._boxIndex !== undefined);
+    if (hasExplicitBoxes) {
+      const boxMap = new Map();
+      pokemonList.forEach(p => {
+        const bIdx = p._boxIndex ?? 0;
+        if (!boxMap.has(bIdx)) {
+          boxMap.set(bIdx, []);
+        }
+        boxMap.get(bIdx).push(p);
+      });
+      const out = [];
+      boxMap.forEach((pList, bIdx) => {
+        out.push({
+          pokemon: pList,
+          boxIndex: bIdx,
+          isAlphaBox: pList.some(p => p.formType === 'alpha' || p.formType === 'alphaother')
+        });
+      });
+      return out;
     }
 
     const boxSize = 30; // 6x5 grid
     const out = [];
     for (let i = 0; i < pokemonList.length; i += boxSize) {
-      out.push(pokemonList.slice(i, i + boxSize));
+      out.push({ pokemon: pokemonList.slice(i, i + boxSize), boxIndex: Math.floor(i / boxSize) });
     }
     return out;
   }, [pokemonList, title]);
 
   const filteredList = pokemonList || [];
+
+  const displayCount = useMemo(() => {
+    const hasExplicitMatch = filteredList.some(p => p._isSearchMatch !== undefined);
+    if (hasExplicitMatch) {
+      return filteredList.filter(p => p._isSearchMatch).length;
+    }
+    return filteredList.length;
+  }, [filteredList]);
 
 
   // Calculate content height for smooth animation
@@ -242,11 +301,12 @@ export default function DexSection({
       <div className="w-full">
         <div
           className={`flex items-center justify-between pl-0 pr-4 rounded-lg mb-2 ${collapsed ? " opacity-75 py-0" : "py-2"}`}
+          data-tutorial-id={`dex-header-${titleSlug}`}
         >
           <div>
             <div className={`font-bold leading-none ${collapsed ? "text-lg" : "text-2xl"}`} style={{ color: 'var(--text)' }}>{title}</div>
             {!collapsed && (
-              <div className="text-sm text-gray-600 dark:text-gray-400 leading-none mt-1">{`Showing ${filteredList.length} Pokémon`}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 leading-none mt-1">{`Showing ${displayCount} Pokémon`}</div>
             )}
           </div>
 
@@ -256,6 +316,7 @@ export default function DexSection({
               onClick={() => setCollapsed(v => !v)}
               aria-label={collapsed ? "Expand section" : "Collapse section"}
               tabIndex={0}
+              data-tutorial-id={`collapse-${titleSlug}`}
             >
               {collapsed ? (
                 <Plus size={22} strokeWidth={4} style={{ color: 'var(--accent)' }} />
@@ -276,20 +337,16 @@ export default function DexSection({
           ref={contentRef}
           className={transitionReady ? "transition-all duration-300 ease-in-out" : ""}
           style={{
-            // iOS Safari doesn't handle max-height: none well, use a very large value instead
-            maxHeight: collapsed ? '0px' : (transitionReady ? `${contentHeight || 99999}px` : '99999px'),
+            maxHeight: collapsed ? '0px' : (transitionReady && contentHeight ? `${contentHeight}px` : 'none'),
             opacity: collapsed ? 0 : 1,
             overflow: collapsed ? 'hidden' : 'visible',
-            // WebKit-specific properties for smoother animations
-            WebkitTransform: 'translateZ(0)',
-            transform: 'translateZ(0)'
           }}
         >
           <div className={`${boxes.length === 1 ? 'grid grid-cols-1 justify-items-center' : 'grid grid-cols-1 lg:grid-cols-2'} gap-0 md:gap-6`}>
             {boxes.map((boxData, i) => {
               const box = boxData.pokemon || boxData; // Handle both new and old structure
               const isAlphaBox = !!boxData.isAlphaBox;
-              const boxIndex = i;
+              const boxIndex = boxData.boxIndex !== undefined ? boxData.boxIndex : (box[0]?._boxIndex ?? i);
 
               const single = boxes.length === 1;
               const isLastSingleOnLg = boxes.length > 1 && (boxes.length % 2 === 1) && i === boxes.length - 1;
@@ -299,7 +356,7 @@ export default function DexSection({
                   ? 'w-auto mb-8 lg:col-span-2 place-self-center'
                   : 'w-full mb-8';
               return (
-                <div className={containerClassName} key={`box-${box[0]?.id ?? i}-${i}`}>
+                <div className={containerClassName} key={`box-${box[0]?.id ?? i}-${boxIndex}-${i}`}>
                   <div className="rounded-lg p-2 md:p-3 shadow-lg overflow-visible" style={{ 
                     backgroundColor: 'var(--searchbar-bg)', 
                     border: '1px solid var(--border-color)'
@@ -317,6 +374,7 @@ export default function DexSection({
                             "paldean",
                             "unown",
                             "other",
+                            "mighty",
                             "alcremie",
                             "vivillon",
                             "alpha",

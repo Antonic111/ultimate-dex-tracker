@@ -90,8 +90,10 @@ const userSchema = new mongoose.Schema({
   favoritePokemon: [String],
   favoritePokemonShiny: [Boolean],
   switchFriendCode: String,
+  goFriendCode: String,
   profileTrainer: String,
   isProfilePublic: { type: Boolean, default: true },
+  lastActiveAt: { type: Date, default: Date.now },
   // LIKES ----------------------------------------- //
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   // DEX PREFERENCES ----------------------------------------- //
@@ -109,6 +111,7 @@ const userSchema = new mongoose.Schema({
     showVivillonForms: { type: Boolean, default: true },
     showAlphaForms: { type: Boolean, default: true },
     showAlphaOtherForms: { type: Boolean, default: true },
+    showMightyForms: { type: Boolean, default: true },
     blockUnobtainableShinies: { type: Boolean, default: false },
     blockGOExclusiveShinies: { type: Boolean, default: false },
     blockNOOTExclusiveShinies: { type: Boolean, default: false },
@@ -119,7 +122,7 @@ const userSchema = new mongoose.Schema({
   // EXTERNAL LINK PREFERENCE ----------------------------------------- //
   externalLinkPreference: { type: String, default: 'serebii', enum: ['serebii', 'bulbapedia', 'pokemondb', 'smogon'] },
   // APPEARANCE PREFERENCES ----------------------------------------- //
-  accentColor: { type: String, default: 'yellow', enum: ['yellow', 'red', 'orange', 'green', 'blue', 'cyan', 'purple', 'pink', 'brown'] },
+  accentColor: { type: String, default: 'yellow', enum: ['yellow', 'red', 'orange', 'green', 'lime', 'blue', 'cyan', 'purple', 'lavender', 'pink', 'brown', 'platinum'] },
   siteTheme: { type: String, default: 'dark', enum: ['light', 'dark', 'system'] },
   // SHINY CHARM GAMES ----------------------------------------- //
   shinyCharmGames: { type: [String], default: [] },
@@ -241,6 +244,14 @@ const userSchema = new mongoose.Schema({
     showGhostChecks: { type: Boolean, default: true },
     isAdvanced: { type: Boolean, default: false },
     legendColors: { type: mongoose.Schema.Types.Mixed, default: {} }
+  },
+  // ONBOARDING STATUS ----------------------------------------- //
+  onboarding: {
+    type: {
+      isComplete: { type: Boolean, default: true },
+      tutorialStep: { type: Number, default: 0 }
+    },
+    default: () => ({ isComplete: true, tutorialStep: 0 })
   },
   // Migration tracking
   huntMethodMigrationCompleted: {

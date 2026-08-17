@@ -309,6 +309,7 @@ export default function PublicProfile() {
                             showVivillonForms: true,
                             showAlphaForms: true,
                             showAlphaOtherForms: true,
+                            showMightyForms: true,
                         });
                     }
                 }
@@ -329,6 +330,7 @@ export default function PublicProfile() {
                         showVivillonForms: true,
                         showAlphaForms: true,
                         showAlphaOtherForms: true,
+                        showMightyForms: true,
                     });
                 }
             } finally { if (!ignore) setLoading(false); }
@@ -366,6 +368,7 @@ export default function PublicProfile() {
                 case 'vivillon': return preferences.showVivillonForms;
                 case 'alpha': return preferences.showAlphaForms;
                 case 'alphaother': return preferences.showAlphaOtherForms;
+                case 'mighty': return preferences.showMightyForms;
                 default: return true;
             }
         });
@@ -587,40 +590,32 @@ export default function PublicProfile() {
         loadInitialLikes();
     }, [username, currentUsername]);
 
-    // Poll for like updates every 5 seconds to keep like count real-time (reduced from 2 seconds)
+    // Refresh like status when tab gains focus or becomes visible
     useEffect(() => {
         if (!username) return;
 
-        const interval = setInterval(async () => {
+        const refreshLikes = async () => {
+            if (document.hidden) return;
             try {
                 if (currentUsername) {
-                    // User is logged in - get their like status and count
                     const { hasLiked: userHasLiked, likeCount: count } = await profileAPI.getProfileLikes(username);
-                    setLikeCount(prevCount => {
-                        // Only update if the count actually changed
-                        if (prevCount !== count) {
-                            return count;
-                        }
-                        return prevCount;
-                    });
+                    setLikeCount(count);
                     setHasLiked(userHasLiked);
                 } else {
-                    // User is not logged in - just get the count
                     const { count } = await profileAPI.getPublicProfileLikes(username);
-                    setLikeCount(prevCount => {
-                        // Only update if the count actually changed
-                        if (prevCount !== count) {
-                            return count;
-                        }
-                        return prevCount;
-                    });
+                    setLikeCount(count);
                 }
-            } catch (error) {
-                // Silently handle errors to avoid spam
-            }
-        }, 5000); // Check every 5 seconds instead of 2
+            } catch (error) {}
+        };
 
-        return () => clearInterval(interval);
+        const handleFocus = () => refreshLikes();
+        window.addEventListener('focus', handleFocus);
+        window.addEventListener('visibilitychange', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+            window.removeEventListener('visibilitychange', handleFocus);
+        };
     }, [username, currentUsername]);
 
 
@@ -838,11 +833,27 @@ export default function PublicProfile() {
                                 {data.gender === "Other" ? "Female" : (data.gender || "N/A")}
                             </div>
                         </div>
+                    </div>
 
-                        <div className="profile-field full-span">
-                            <label>Nintendo Switch Friend Code</label>
-                            <div className="field-display">{data.switchFriendCode || "N/A"}</div>
-                        </div>
+                    <div className="profile-row-split">
+                        {data.switchFriendCode && (
+                            <div className="profile-field">
+                                <label>Switch Friend Code</label>
+                                <div className="field-display">
+                                    <img src="/data/friend_code_icons/switch.png" alt="Switch" className="w-5 h-5 object-contain" style={{ marginRight: "6px" }} />
+                                    <span>{data.switchFriendCode}</span>
+                                </div>
+                            </div>
+                        )}
+                        {data.goFriendCode && (
+                            <div className="profile-field">
+                                <label>GO Friend Code</label>
+                                <div className="field-display">
+                                    <img src="/data/friend_code_icons/go.png" alt="Pokémon GO" className="w-5 h-5 object-contain" style={{ marginRight: "6px" }} />
+                                    <span>{data.goFriendCode}</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Favorite Games */}

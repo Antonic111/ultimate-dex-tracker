@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, useCallback, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { Sparkles, Plus, Trash2, ChevronLeft, ChevronRight, Calendar, ChevronUp, ChevronDown, X, RotateCcw, ArrowUpCircle, ListTodo } from "lucide-react";
+import { Sparkles, Plus, Trash2, ChevronLeft, ChevronRight, Calendar, ChevronUp, ChevronDown, X, RotateCcw, ArrowUpCircle, ListTodo, Search, MoreHorizontal, ChevronsUp, Copy, FileText, Check, Crown, Layers, Gamepad2 } from "lucide-react";
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS, genderForms } from "../../Constants";
 import EvolutionChain from "../Dex/EvolutionChain";
 import PermutationTable from "../MMO/PermutationTable";
@@ -61,9 +61,9 @@ function GameTag({ gameGroup }) {
         className={`game-tag ${gameGroup.type === 'pair' ? 'game-tag-pair' : gameGroup.type === 'quad' ? 'game-tag-quad' : 'game-tag-single'} ${showTooltip ? 'show-tooltip' : ''}`}
         style={{
           background: gameGroup.type === 'pair'
-            ? `linear-gradient(90deg, ${gameGroup.colors[0]} 50%, ${gameGroup.colors[1]} 50%)`
+            ? `linear-gradient(135deg, ${gameGroup.colors[0]} 0%, ${gameGroup.colors[1]} 100%)`
             : gameGroup.type === 'quad'
-              ? `linear-gradient(90deg, ${gameGroup.colors[0]} 25%, ${gameGroup.colors[1]} 25%, ${gameGroup.colors[1]} 50%, ${gameGroup.colors[2]} 50%, ${gameGroup.colors[2]} 75%, ${gameGroup.colors[3]} 75%)`
+              ? `linear-gradient(135deg, ${gameGroup.colors[0]} 0%, ${gameGroup.colors[1]} 33%, ${gameGroup.colors[2]} 66%, ${gameGroup.colors[3]} 100%)`
               : gameGroup.colors[0]
         }}
         onClick={(e) => {
@@ -93,20 +93,19 @@ function GameTag({ gameGroup }) {
             fontWeight: 500,
             whiteSpace: 'nowrap',
             boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
-            textShadow: 'none',
-            fontFamily: 'sans-serif'
+            textShadow: 'none'
           }}
         >
           {gameGroup.games.join(", ")}
-          {/* Manual Arrow */}
           <div style={{
             position: 'absolute',
             top: '100%',
             left: '50%',
             transform: 'translateX(-50%)',
-            borderLeft: '6px solid transparent',
-            borderRight: '6px solid transparent',
-            borderTop: '6px solid rgba(0, 0, 0, 0.95)'
+            border: '6px solid transparent',
+            borderTopColor: 'rgba(0, 0, 0, 0.95)',
+            width: 0,
+            height: 0
           }} />
         </div>,
         document.body
@@ -115,7 +114,161 @@ function GameTag({ gameGroup }) {
   );
 }
 
-export default function PokemonSidebar({ open = false, readOnly = false, pokemon, onClose, caughtInfo, caughtInfoMap, updateCaughtInfo, showShiny, viewingUsername = null, onPokemonSelect = null, externalLinkPreference = 'serebii', dexPreferences = null }) {
+function RecommendedBallComponent({ ballObj }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const tagRef = useRef(null);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+
+  const updatePosition = () => {
+    if (tagRef.current) {
+      const rect = tagRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.top,
+        left: rect.left + rect.width / 2
+      });
+    }
+  };
+
+  const handleMouseEnter = () => {
+    updatePosition();
+    setShowTooltip(true);
+  };
+
+  return (
+    <>
+      <div 
+        ref={tagRef}
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', transition: 'transform 0.2s ease-in-out' }} 
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.1)';
+          handleMouseEnter();
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          setShowTooltip(false);
+        }}
+      >
+        <img 
+          src={ballObj.image} 
+          alt={ballObj.name} 
+          style={{ width: '40px', height: '40px', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))' }} 
+        />
+      </div>
+      {showTooltip && createPortal(
+        <div
+          style={{
+            position: 'fixed',
+            top: Math.round(coords.top - 10),
+            left: Math.round(coords.left),
+            transform: 'translate(-50%, -100%)',
+            zIndex: 99999,
+            pointerEvents: 'none',
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            color: 'white',
+            padding: '6px 10px',
+            borderRadius: '6px',
+            fontSize: '12px',
+            fontWeight: 500,
+            whiteSpace: 'nowrap',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+            textShadow: 'none'
+          }}
+        >
+          {ballObj.name}
+          <div style={{
+            position: 'absolute',
+            top: '100%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            border: '6px solid transparent',
+            borderTopColor: 'rgba(0, 0, 0, 0.95)',
+            width: 0,
+            height: 0
+          }} />
+        </div>,
+        document.body
+      )}
+    </>
+  );
+}
+
+function MarksTabButton({ active, disabled, onClick }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const btnRef = useRef(null);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+
+  const updatePosition = () => {
+    if (btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.top,
+        left: rect.left + rect.width / 2
+      });
+    }
+  };
+
+  const handleMouseEnter = () => {
+    if (disabled) {
+      updatePosition();
+      setShowTooltip(true);
+    }
+  };
+
+  return (
+    <>
+      <button
+        ref={btnRef}
+        type="button"
+        className={`sidebar-tab-btn ${active ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
+        onClick={() => {
+          if (!disabled) onClick();
+        }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={() => setShowTooltip(false)}
+      >
+        Marks
+      </button>
+      {showTooltip && disabled && createPortal(
+        <div
+          style={{
+            position: 'fixed',
+            top: Math.round(coords.top - 8),
+            left: Math.round(coords.left),
+            transform: 'translate(-50%, -100%)',
+            zIndex: 99999,
+            pointerEvents: 'none',
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            color: 'white',
+            padding: '6px 10px',
+            borderRadius: '6px',
+            fontSize: '12px',
+            fontWeight: 500,
+            whiteSpace: 'nowrap',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+            textShadow: 'none'
+          }}
+        >
+          Select a game that has marks or ribbons in it
+          <div
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              border: '6px solid transparent',
+              borderTopColor: 'rgba(0, 0, 0, 0.95)',
+              width: 0,
+              height: 0
+            }}
+          />
+        </div>,
+        document.body
+      )}
+    </>
+  );
+}
+
+export default function PokemonSidebar({ open = false, readOnly = false, pokemon, onClose, caughtInfo, caughtInfoMap, updateCaughtInfo, showShiny, viewingUsername = null, onPokemonSelect = null, externalLinkPreference = 'serebii', dexPreferences = null, isTutorialActive = false }) {
   const [closing, setClosing] = useState(false);
   const [editing, setEditing] = useState(false);
   const [selectedEntryIndex, setSelectedEntryIndex] = useState(0);
@@ -123,6 +276,13 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   const { showMessage } = useMessage();
   const { username } = useContext(UserContext);
   const [shinyCharmGames, setShinyCharmGames] = useState([]);
+
+  // Mighty Pokemon cannot be shiny under any circumstances - auto close if switching to shiny mode
+  useEffect(() => {
+    if (showShiny && pokemon?.formType === "mighty") {
+      onClose?.();
+    }
+  }, [showShiny, pokemon, onClose]);
 
   // Format time in full format (e.g., "1 Hour 5 Minutes 15 Seconds")
   const formatTimeFull = (milliseconds) => {
@@ -152,20 +312,26 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   const [resetModalClosing, setResetModalClosing] = useState(false);
   const [deleteEntryModalClosing, setDeleteEntryModalClosing] = useState(false);
   const [showChartModal, setShowChartModal] = useState(false);
-  const [chartModalClosing, setChartModalClosing] = useState(false);
-  const [activeTab, setActiveTab] = useState('caught');
+  const [activeTab, setActiveTab] = useState('data'); // 'data' | 'marks' | 'notes'
+  const [openAccordion, setOpenAccordion] = useState(null); // null | 'catch' | 'hunt' | 'additional'
+  const [markSearchQuery, setMarkSearchQuery] = useState("");
 
   const [evolveModal, setEvolveModal] = useState({ show: false, options: [] });
   const [evolveModalClosing, setEvolveModalClosing] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const moreMenuRef = useRef(null);
+
+  const isMighty = pokemon?.formType === "mighty";
 
   // Always use .value, never the full object, in editData
-  const defaultEditData = {
+  const defaultEditData = useMemo(() => ({
     nickname: "",
     date: "",
     ball: "",
-    mark: "",
-    method: "",
-    game: "",
+    marks: isMighty ? ["mightiest"] : [],
+    mark: isMighty ? "mightiest" : "",
+    method: isMighty ? "Tera Raids" : "",
+    game: isMighty ? "Scarlet" : "",
     checks: "",
     time: "",
     notes: "",
@@ -186,7 +352,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       galarBirds: false,
       hatchDay: false
     }
-  };
+  }), [isMighty]);
 
 
 
@@ -201,8 +367,45 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   // Get available modifiers for the selected game
   const gameModifiers = editData.game ? getModifiersForGame(editData.game) : {};
 
-  // Check if marks are available for the selected game
-  const marksAvailable = ["Scarlet", "Violet", "Sword", "Shield"].includes(editData.game);
+
+  // Selected marks list helper (supports both multiple marks array and legacy mark string)
+  const selectedMarks = useMemo(() => {
+    if (isMighty) return ["mightiest"];
+    if (Array.isArray(editData?.marks)) {
+      return editData.marks.filter(m => m && m !== "none" && m !== "");
+    }
+    if (editData?.mark && editData.mark !== "none" && editData.mark !== "") {
+      return [editData.mark];
+    }
+    return [];
+  }, [editData?.marks, editData?.mark, isMighty]);
+
+  const filteredMarks = useMemo(() => {
+    return MARK_OPTIONS.filter(m => {
+      if (!m.value) return false;
+      if (isMighty && m.value !== "mightiest") return false;
+      if (!isMighty && m.value === "mightiest") return false;
+      if (!markSearchQuery) return true;
+      return m.name.toLowerCase().includes(markSearchQuery.toLowerCase());
+    });
+  }, [markSearchQuery, isMighty]);
+
+  // Helper to determine if catch/hunt data exists for current entry in view mode
+  const hasCatchData = Boolean(editData.nickname || editData.date || editData.ball || editData.game || editData.method);
+  const hasHuntData = Boolean(
+    (showShiny && editData.game && editData.method) ||
+    (showShiny && editData.checks !== undefined && editData.checks !== null && String(editData.checks).trim() !== "" && String(editData.checks).trim() !== "0") ||
+    (editData.time !== undefined && editData.time !== null && editData.time !== "" && editData.time !== 0) ||
+    editData.chartData
+  );
+
+  const MARKS_GAMES = ["Scarlet", "Violet", "Sword", "Shield"];
+  const marksAvailable = isMighty || MARKS_GAMES.includes(editData?.game);
+  const isMarksDisabled = editing ? !marksAvailable : false;
+
+  // Tab visibility rules: Marks and Notes tabs only visible when data exists or when editing
+  const showMarksTab = editing || selectedMarks.length > 0;
+  const showNotesTab = editing || Boolean(caughtInfo && editData.notes && editData.notes.trim() !== "");
 
   // Load user's shiny charm games
   const loadShinyCharmGames = useCallback(async () => {
@@ -239,12 +442,114 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   // Track the previous game to detect when user manually changes the game selection
   const prevGameRef = useRef(null);
   const isLoadingDataRef = useRef(true);
+  const prevOpenRef = useRef(open);
+  const prevWasCaughtRef = useRef(Boolean(caughtInfo));
 
-  // Reset refs when pokemon or caughtInfo changes (new sidebar opened or new entry created)
+  useEffect(() => {
+    // When sidebar transitions from closed to open:
+    // If not caught, auto-open 'additional'. If caught, start with accordions closed (null)
+    if (!prevOpenRef.current && open) {
+      if (!caughtInfo && !editing) {
+        setOpenAccordion('additional');
+      } else {
+        setOpenAccordion(null);
+      }
+      prevWasCaughtRef.current = Boolean(caughtInfo);
+    }
+    setShowMoreMenu(false);
+    prevOpenRef.current = open;
+  }, [open, caughtInfo, editing]);
+
+  // Close more menu when clicking outside
+  useEffect(() => {
+    if (!showMoreMenu) return;
+    const handleClickOutside = (e) => {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target)) {
+        setShowMoreMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showMoreMenu]);
+
+  // Reset refs and update accordion state when switching pokemon or caught status changes
   useEffect(() => {
     prevGameRef.current = null;
     isLoadingDataRef.current = true;
-  }, [pokemon, caughtInfo]);
+    setShowMoreMenu(false);
+
+    const isCaught = Boolean(caughtInfo);
+    const wasCaught = prevWasCaughtRef.current;
+    prevWasCaughtRef.current = isCaught;
+
+    if (!isCaught && !editing) {
+      // Switching to an uncaught pokemon: auto-open additional info
+      setOpenAccordion('additional');
+    } else if (!wasCaught && isCaught && !editing) {
+      // Switching from uncaught to caught pokemon: start with catch info open if in tutorial
+      if (isTutorialActive) {
+        setOpenAccordion('catch');
+      } else {
+        setOpenAccordion(null);
+      }
+    } else if (wasCaught && isCaught && !editing) {
+      // Switching between two caught pokemon: preserve the currently open accordion if valid for this pokemon
+      if (isTutorialActive) {
+        setOpenAccordion('catch');
+      } else {
+        const firstEntry = caughtInfo?.entries?.[0] || caughtInfo;
+        const targetHasCatchData = Boolean(firstEntry?.nickname || firstEntry?.date || firstEntry?.ball || firstEntry?.game || firstEntry?.method);
+        const targetHasHuntData = Boolean(
+          (showShiny && firstEntry?.game && firstEntry?.method) ||
+          (showShiny && firstEntry?.checks !== undefined && firstEntry?.checks !== null && String(firstEntry.checks).trim() !== "" && String(firstEntry.checks).trim() !== "0") ||
+          (firstEntry?.time !== undefined && firstEntry?.time !== null && firstEntry?.time !== "" && firstEntry?.time !== 0) ||
+          firstEntry?.chartData
+        );
+
+        setOpenAccordion(prev => {
+          if (prev === 'catch' && !targetHasCatchData) return null;
+          if (prev === 'hunt' && !targetHasHuntData) return null;
+          return prev;
+        });
+      }
+    }
+  }, [pokemon, caughtInfo, editing, showShiny, isTutorialActive]);
+
+  // Listen for tutorial step changes to open accordions automatically
+  useEffect(() => {
+    const handleTutorialStep = (e) => {
+      if (e.detail?.targetId === "sidebar-entries-overview") {
+        setActiveTab('data');
+        setOpenAccordion('catch');
+      }
+    };
+    window.addEventListener('tutorialStepChange', handleTutorialStep);
+    return () => window.removeEventListener('tutorialStepChange', handleTutorialStep);
+  }, []);
+
+  // Ensure activeTab is valid if current tab becomes hidden or disabled
+  useEffect(() => {
+    if (activeTab === 'marks' && (!showMarksTab || (editing && !marksAvailable))) {
+      setActiveTab('data');
+    } else if (activeTab === 'notes' && !showNotesTab) {
+      setActiveTab('data');
+    }
+  }, [activeTab, showMarksTab, showNotesTab, editing, marksAvailable]);
+
+  // Pre-fill fake data during the tutorial
+  useEffect(() => {
+    if (editing && isTutorialActive) {
+      setEditData(prev => ({
+        ...prev,
+        nickname: "Bulby",
+        date: new Date().toISOString().split('T')[0],
+        ball: "Poké Ball",
+        game: "Red",
+        method: "Random Encounters",
+        notes: "My very first Pokémon! Found in Pallet Town.",
+      }));
+    }
+  }, [editing, isTutorialActive]);
 
   // Check if the current pokemon is a blocked shiny
   const isBlockedShiny = useMemo(() => {
@@ -298,7 +603,11 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       if (!readOnly && shinyCharmGames.includes(editData.game)) {
         setEditData(prev => ({
           ...prev,
-          modifiers: { ...prev.modifiers, shinyCharm: true }
+          modifiers: {
+            ...prev.modifiers,
+            shinyCharm: true,
+            researchLv10: editData.game === "Legends Arceus" ? true : prev.modifiers?.researchLv10 || false
+          }
         }));
       }
     }
@@ -518,6 +827,32 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     return gameGroups;
   };
 
+  // Format raw entry to consistent editData structure with full backwards compatibility
+  const formatEntryToEditData = useCallback((entry) => {
+    if (!entry) return defaultEditData;
+    const marks = isMighty
+      ? ["mightiest"]
+      : (Array.isArray(entry.marks)
+          ? entry.marks.filter(Boolean)
+          : (entry.mark && entry.mark !== "none" ? [entry.mark] : []));
+    return {
+      nickname: entry.nickname || "",
+      date: entry.date || "",
+      ball: entry.ball || BALL_OPTIONS[0].value,
+      marks: marks,
+      mark: marks[0] || "",
+      method: isMighty ? "Tera Raids" : (entry.method || METHOD_OPTIONS[0]),
+      game: isMighty ? (entry.game === "Violet" ? "Violet" : "Scarlet") : (entry.game || GAME_OPTIONS[0].value),
+      checks: entry.checks || "",
+      time: entry.time || "",
+      notes: entry.notes || "",
+      chartData: entry.chartData || null,
+      chartConfig: entry.chartConfig || null,
+      entryId: entry.entryId || Math.random().toString(36).substr(2, 9),
+      modifiers: entry.modifiers || defaultEditData.modifiers
+    };
+  }, [isMighty, defaultEditData]);
+
   // Initialize state when component first mounts or when caughtInfo changes
   useEffect(() => {
     if (caughtInfo?.entries && caughtInfo.entries.length > 0) {
@@ -525,40 +860,10 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       // Only reset to first entry if we don't have a valid selectedEntryIndex
       if (selectedEntryIndex >= caughtInfo.entries.length) {
         setSelectedEntryIndex(0);
-        const firstEntry = caughtInfo.entries[0];
-        setEditData({
-          nickname: firstEntry.nickname || "",
-          date: firstEntry.date || "",
-          ball: firstEntry.ball || BALL_OPTIONS[0].value,
-          mark: firstEntry.mark || MARK_OPTIONS[0].value,
-          method: firstEntry.method || METHOD_OPTIONS[0],
-          game: firstEntry.game || GAME_OPTIONS[0].value,
-          checks: firstEntry.checks || "",
-          time: firstEntry.time || "",
-          notes: firstEntry.notes || "",
-          chartData: firstEntry.chartData || null,
-          chartConfig: firstEntry.chartConfig || null,
-          entryId: firstEntry.entryId || Math.random().toString(36).substr(2, 9),
-          modifiers: firstEntry.modifiers || defaultEditData.modifiers
-        });
+        setEditData(formatEntryToEditData(caughtInfo.entries[0]));
       } else {
         // Keep current selection but update editData to show current entry
-        const currentEntry = caughtInfo.entries[selectedEntryIndex];
-        setEditData({
-          nickname: currentEntry.nickname || "",
-          date: currentEntry.date || "",
-          ball: currentEntry.ball || BALL_OPTIONS[0].value,
-          mark: currentEntry.mark || MARK_OPTIONS[0].value,
-          method: currentEntry.method || METHOD_OPTIONS[0],
-          game: currentEntry.game || GAME_OPTIONS[0].value,
-          checks: currentEntry.checks || "",
-          time: currentEntry.time || "",
-          notes: currentEntry.notes || "",
-          chartData: currentEntry.chartData || null,
-          chartConfig: currentEntry.chartConfig || null,
-          entryId: currentEntry.entryId || Math.random().toString(36).substr(2, 9),
-          modifiers: currentEntry.modifiers || defaultEditData.modifiers
-        });
+        setEditData(formatEntryToEditData(caughtInfo.entries[selectedEntryIndex]));
       }
     } else {
       setLocalEntries([]);
@@ -566,7 +871,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       setSelectedEntryIndex(0);
     }
     setEditing(false);
-  }, [caughtInfo, pokemon]);
+  }, [caughtInfo, pokemon, isMighty, formatEntryToEditData, defaultEditData]);
 
 
 
@@ -616,22 +921,30 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       return false;
     };
 
+    const preventKeyScroll = (e) => {
+      if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && !e.target.closest('[role="dialog"]') && !e.target.closest('.custom-scrollbar')) {
+          e.preventDefault();
+        }
+      }
+    };
+
     const isAnyModalOpen = resetModal.show || deleteEntryModal.show || evolveModal.show || showChartModal;
 
     if (isAnyModalOpen) {
-      document.body.style.overflow = 'hidden';
       document.addEventListener('wheel', preventScroll, { passive: false });
       document.addEventListener('touchmove', preventScroll, { passive: false });
+      document.addEventListener('keydown', preventKeyScroll, { passive: false });
     } else {
-      document.body.style.overflow = '';
       document.removeEventListener('wheel', preventScroll);
       document.removeEventListener('touchmove', preventScroll);
+      document.removeEventListener('keydown', preventKeyScroll);
     }
 
     return () => {
-      document.body.style.overflow = '';
       document.removeEventListener('wheel', preventScroll);
       document.removeEventListener('touchmove', preventScroll);
+      document.removeEventListener('keydown', preventKeyScroll);
     };
   }, [resetModal.show, deleteEntryModal.show, evolveModal.show, showChartModal]);
 
@@ -658,40 +971,27 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   // Function to manually update editData when switching entries
   function switchToEntry(index) {
     if (localEntries && localEntries[index]) {
-      const selectedEntry = localEntries[index];
-      setEditData({
-        nickname: selectedEntry.nickname || "",
-        date: selectedEntry.date || "",
-        ball: selectedEntry.ball || BALL_OPTIONS[0].value,
-        mark: selectedEntry.mark || MARK_OPTIONS[0].value,
-        method: selectedEntry.method || METHOD_OPTIONS[0],
-        game: selectedEntry.game || GAME_OPTIONS[0].value,
-        checks: selectedEntry.checks || "",
-        time: selectedEntry.time || "",
-        notes: selectedEntry.notes || "",
-        chartData: selectedEntry.chartData || null,
-        chartConfig: selectedEntry.chartConfig || null,
-        entryId: selectedEntry.entryId || Math.random().toString(36).substr(2, 9),
-        modifiers: selectedEntry.modifiers || defaultEditData.modifiers
-      });
+      setEditData(formatEntryToEditData(localEntries[index]));
     }
   }
 
   function handleSetCaught() {
+    if (showShiny && pokemon?.formType === "mighty") return;
+
+    // Create a fresh default entry
     const newEntry = {
       nickname: "",
       date: "",
-      ball: BALL_OPTIONS[0].value,
-      mark: MARK_OPTIONS[0].value,
-      method: METHOD_OPTIONS[0],
-      game: GAME_OPTIONS[0].value,
+      ball: "",
+      marks: isMighty ? ["mightiest"] : [],
+      mark: isMighty ? "mightiest" : "",
+      game: isMighty ? "Scarlet" : "",
+      method: isMighty ? "Tera Raids" : "",
       checks: "",
       time: "",
       notes: "",
-      chartData: null,
-      chartConfig: null,
       entryId: Math.random().toString(36).substr(2, 9),
-      modifiers: { ...defaultEditData.modifiers }
+      modifiers: defaultEditData.modifiers
     };
 
     const newInfo = {
@@ -701,6 +1001,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     };
 
     setEditing(true);
+    setOpenAccordion('catch');
     setLocalEntries([newEntry]);
     setEditData(newEntry);
     setSelectedEntryIndex(0);
@@ -715,6 +1016,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   }
 
   function handleSaveEdit() {
+    if (showShiny && pokemon?.formType === "mighty") return;
+
     // Save-time validation for notes and nickname
     const notesValidation = validateContent(String(editData.notes || ''), 'notes');
     if (!notesValidation.isValid) {
@@ -734,21 +1037,29 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     let newSelectedIndex = selectedEntryIndex;
 
     // Check if we're updating an existing entry based on selectedEntryIndex
+    const marks = isMighty
+      ? ["mightiest"]
+      : (Array.isArray(editData.marks)
+          ? editData.marks.filter(m => m && m !== "mightiest")
+          : (editData.mark && editData.mark !== "mightiest" ? [editData.mark] : []));
+
     if (selectedEntryIndex < currentEntries.length) {
       // Update existing entry at the current index
       const cleaned = {
         nickname: editData.nickname || "",
         date: editData.date || "",
         ball: editData.ball || "",
-        mark: editData.mark || "",
-        game: editData.game || "",
-        method: editData.method || "",
-        checks:
+        marks: marks,
+        mark: marks[0] || "",
+        game: isMighty ? (editData.game === "Violet" ? "Violet" : "Scarlet") : (editData.game || ""),
+        method: isMighty ? "Tera Raids" : (editData.method || ""),
+        checks: !showShiny ? "" : (
           editData.checks === null ||
             String(editData.checks).trim() === "" ||
             String(editData.checks).trim() === "0"
             ? ""
-            : String(editData.checks).trim(),
+            : String(editData.checks).trim()
+        ),
         time: editData.time || "",
         notes: editData.notes || "",
         entryId: currentEntries[selectedEntryIndex].entryId, // Keep the existing entryId
@@ -764,15 +1075,17 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
         nickname: editData.nickname || "",
         date: editData.date || "",
         ball: editData.ball || "",
-        mark: editData.mark || "",
-        game: editData.game || "",
-        method: editData.method || "",
-        checks:
+        marks: marks,
+        mark: marks[0] || "",
+        game: isMighty ? (editData.game === "Violet" ? "Violet" : "Scarlet") : (editData.game || ""),
+        method: isMighty ? "Tera Raids" : (editData.method || ""),
+        checks: !showShiny ? "" : (
           editData.checks === null ||
             String(editData.checks).trim() === "" ||
             String(editData.checks).trim() === "0"
             ? ""
-            : String(editData.checks).trim(),
+            : String(editData.checks).trim()
+        ),
         time: editData.time || "",
         notes: editData.notes || "",
         entryId: Math.random().toString(36).substr(2, 9), // Generate new entryId for new entries
@@ -791,7 +1104,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       entries: updatedEntries
     };
 
-    // Update global state first
+    // Update global state (App.jsx handles sandbox state during tutorial)
     updateCaughtInfo(pokemon, updatedInfo, showShiny, isNewEntry);
 
     // Update local state and editData in the correct order
@@ -805,8 +1118,9 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     }
     setSelectedEntryIndex(newSelectedIndex);
 
-    // Exit edit mode
+    // Exit edit mode and open catch info accordion to show the saved data
     setEditing(false);
+    setOpenAccordion('catch');
   }
 
 
@@ -955,6 +1269,87 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     setResetModal({ show: true, pokemonName: formatPokemonName(pokemon?.name) });
   }
 
+  const handleDuplicateEntry = () => {
+    if (!caughtInfo || !localEntries || localEntries.length === 0) return;
+    if (localEntries.length >= 30) {
+      showMessage("Maximum limit of 30 entries reached.", "error");
+      return;
+    }
+
+    const currentEntry = localEntries[selectedEntryIndex] || editData;
+    const duplicated = {
+      ...currentEntry,
+      nickname: currentEntry.nickname ? `${currentEntry.nickname} (Copy)` : "",
+      entryId: Math.random().toString(36).substr(2, 9),
+      modifiers: currentEntry.modifiers ? { ...currentEntry.modifiers } : { ...defaultEditData.modifiers }
+    };
+
+    const updatedEntries = [...localEntries, duplicated];
+    const updatedInfo = {
+      caught: true,
+      caughtAt: caughtInfo?.caughtAt || Date.now(),
+      entries: updatedEntries
+    };
+
+    updateCaughtInfo(pokemon, updatedInfo, showShiny);
+    setLocalEntries(updatedEntries);
+    setSelectedEntryIndex(updatedEntries.length - 1);
+    showMessage(`Entry duplicated (#${updatedEntries.length})!`, "success");
+  };
+
+  const handleCopySummary = () => {
+    if (!pokemon) return;
+    const currentEntry = localEntries[selectedEntryIndex] || editData;
+    const pokemonName = formatPokemonName(pokemon.name);
+    const shinyPrefix = showShiny ? "✨ " : "";
+    
+    const parts = [`${shinyPrefix}${pokemonName}${currentEntry?.nickname ? ` ("${currentEntry.nickname}")` : ""}`];
+    
+    if (currentEntry?.ball) parts.push(currentEntry.ball);
+    if (currentEntry?.game) parts.push(currentEntry.game);
+    const marksList = Array.isArray(currentEntry?.marks) && currentEntry.marks.length > 0
+      ? currentEntry.marks
+      : (currentEntry?.mark ? [currentEntry.mark] : []);
+    if (marksList.length > 0) {
+      const markNames = marksList.map(mVal => {
+        const markObj = MARK_OPTIONS.find(m => m.value === mVal);
+        return markObj ? markObj.name : mVal;
+      });
+      parts.push(markNames.join(", "));
+    }
+    if (currentEntry?.method && currentEntry.method !== "None" && currentEntry.method !== "Standard") {
+      parts.push(currentEntry.method);
+    }
+    if (currentEntry?.checks) {
+      parts.push(`${currentEntry.checks} ${currentEntry.method === 'Masuda' || currentEntry.method === 'Egg / Breeding' ? 'Eggs' : 'Encounters'}`);
+    }
+    if (currentEntry?.date) {
+      parts.push(currentEntry.date);
+    }
+    if (currentEntry?.notes) {
+      parts.push(`Notes: ${currentEntry.notes}`);
+    }
+
+    const summaryText = parts.join(" • ");
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(summaryText).then(() => {
+        showMessage("Summary copied to clipboard!", "success");
+      }).catch(() => {
+        showMessage("Failed to copy summary to clipboard.", "error");
+      });
+    } else {
+      showMessage("Clipboard not accessible.", "error");
+    }
+  };
+
+  const handleDeleteEntry = () => {
+    setDeleteEntryModal({
+      show: true,
+      entryIndex: selectedEntryIndex,
+      entryNumber: selectedEntryIndex + 1
+    });
+  };
+
   // Handle reset confirmation
   const handleResetConfirm = () => {
     setResetModalClosing(true);
@@ -999,18 +1394,23 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     }, 300);
   };
 
+  useEffect(() => {
+    window.dispatchEvent(new Event('sidebarOpened'));
+  }, []);
+
   const handleClose = () => {
     setClosing(true);
     setTimeout(() => {
       setClosing(false);
+      setOpenAccordion(null);
       onClose();
     }, 370); // Match the original backup animation duration
   };
 
   if (!open && !closing) return null;
 
-  // Safety check for pokemon
-  if (!pokemon) return null;
+  // Safety check for pokemon (Mighty Pokemon can never exist in shiny mode)
+  if (!pokemon || (showShiny && pokemon.formType === "mighty")) return null;
 
   // Look up objects for display by value
   const ballObj = BALL_OPTIONS.find(opt => opt.value === (editData?.ball ?? ""));
@@ -1370,12 +1770,277 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     }
   };
 
+  const toRomanGen = (gen) => {
+    const map = { 1: "I", 2: "II", 3: "III", 4: "IV", 5: "V", 6: "VI", 7: "VII", 8: "VIII", 9: "IX" };
+    return map[gen] || gen || "I";
+  };
+
+  const handleSelectMark = (markVal) => {
+    if (readOnly) return;
+    if (isMighty) return;
+
+    const currentMarks = selectedMarks;
+    const isSelected = currentMarks.includes(markVal);
+    const nextMarks = isSelected
+      ? currentMarks.filter(m => m !== markVal)
+      : [...currentMarks, markVal];
+
+    setEditData(prev => ({
+      ...prev,
+      marks: nextMarks,
+      mark: nextMarks[0] || ""
+    }));
+
+    if (!editing && caughtInfo && localEntries.length > 0) {
+      const currentEntries = [...localEntries];
+      const updated = currentEntries.map((entry, idx) =>
+        idx === selectedEntryIndex
+          ? {
+              ...entry,
+              marks: nextMarks,
+              mark: nextMarks[0] || ""
+            }
+          : entry
+      );
+      updateCaughtInfo(pokemon, {
+        caught: true,
+        caughtAt: caughtInfo.caughtAt || Date.now(),
+        entries: updated
+      }, showShiny);
+      setLocalEntries(updated);
+      const chosenMarkObj = MARK_OPTIONS.find(m => m.value === markVal);
+      showMessage(
+        isSelected
+          ? `Removed ${chosenMarkObj?.name || markVal}`
+          : `Added ${chosenMarkObj?.name || markVal}`,
+        "success"
+      );
+    }
+  };
+
+  const handleClearAllMarks = () => {
+    if (readOnly || isMighty) return;
+    setEditData(prev => ({ ...prev, marks: [], mark: "" }));
+
+    if (!editing && caughtInfo && localEntries.length > 0) {
+      const currentEntries = [...localEntries];
+      const updated = currentEntries.map((entry, idx) =>
+        idx === selectedEntryIndex ? { ...entry, marks: [], mark: "" } : entry
+      );
+      updateCaughtInfo(pokemon, {
+        caught: true,
+        caughtAt: caughtInfo.caughtAt || Date.now(),
+        entries: updated
+      }, showShiny);
+      setLocalEntries(updated);
+      showMessage("All marks removed", "success");
+    }
+  };
+
+  const handleAddEntry = () => {
+    if (localEntries.length >= 30 || readOnly) return;
+
+    const newEntry = {
+      nickname: "",
+      date: "",
+      ball: BALL_OPTIONS[0].value,
+      marks: isMighty ? ["mightiest"] : [],
+      mark: isMighty ? "mightiest" : "",
+      method: isMighty ? "Tera Raids" : METHOD_OPTIONS[0],
+      game: isMighty ? "Scarlet" : GAME_OPTIONS[0].value,
+      checks: "",
+      time: "",
+      notes: "",
+      entryId: Math.random().toString(36).substr(2, 9),
+      modifiers: defaultEditData.modifiers
+    };
+
+    const currentEntries = localEntries;
+    const updatedInfo = {
+      caught: true,
+      caughtAt: Date.now(),
+      entries: [...currentEntries, newEntry]
+    };
+
+    updateCaughtInfo(pokemon, updatedInfo, showShiny, true);
+    setLocalEntries([...currentEntries, newEntry]);
+    setSelectedEntryIndex(currentEntries.length);
+    setEditData(newEntry);
+    setEditing(true);
+  };
+
+  const handleDeleteEntryClick = (e) => {
+    e?.stopPropagation?.();
+    if (readOnly) return;
+    const currentEntry = localEntries[selectedEntryIndex];
+    const hasData = currentEntry && (
+      currentEntry.nickname || currentEntry.date || currentEntry.ball || currentEntry.game ||
+      currentEntry.mark || currentEntry.method || currentEntry.checks || currentEntry.notes
+    );
+
+    if (hasData) {
+      setDeleteEntryModal({ show: true, entryIndex: selectedEntryIndex, entryNumber: selectedEntryIndex + 1 });
+    } else {
+      const updatedEntries = localEntries.filter((_, i) => i !== selectedEntryIndex);
+      if (updatedEntries.length === 0) {
+        updateCaughtInfo(pokemon, null, showShiny);
+        setLocalEntries([]);
+        setEditData(defaultEditData);
+      } else {
+        updateCaughtInfo(pokemon, {
+          caught: true,
+          entries: updatedEntries
+        }, showShiny);
+        setLocalEntries(updatedEntries);
+        const nextIdx = Math.max(0, Math.min(selectedEntryIndex, updatedEntries.length - 1));
+        setSelectedEntryIndex(nextIdx);
+        setEditData(updatedEntries[nextIdx]);
+      }
+    }
+  };
+
+    const renderRelatedFormsSection = () => {
+    if (!pokemon) return null;
+    let relatedForms = getRelatedForms(pokemon);
+
+    if (dexPreferences) {
+      relatedForms = filterFormsByPreferences(relatedForms, dexPreferences);
+
+      if (showShiny) {
+        relatedForms = relatedForms.filter(form => form.formType !== "mighty");
+
+        const {
+          blockUnobtainableShinies,
+          blockGOExclusiveShinies,
+          blockNOOTExclusiveShinies
+        } = dexPreferences;
+
+        relatedForms = relatedForms.filter(form => {
+          const paddedId = String(form.id).padStart(4, '0');
+          const formName = form.name;
+
+          if (blockUnobtainableShinies) {
+            if (UNOBTAINABLE_SHINY_DEX_NUMBERS.includes(paddedId)) return false;
+            if (UNOBTAINABLE_SHINY_FORM_NAMES.includes(formName)) return false;
+          }
+
+          if (blockGOExclusiveShinies) {
+            if (GO_EXCLUSIVE_SHINY_DEX_NUMBERS.includes(paddedId)) return false;
+            if (GO_EXCLUSIVE_SHINY_FORM_NAMES.includes(formName)) return false;
+          }
+
+          if (blockNOOTExclusiveShinies) {
+            if (NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.includes(paddedId)) return false;
+            if (NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.includes(formName)) return false;
+          }
+
+          return true;
+        });
+      }
+    }
+
+    if (relatedForms.length === 0) return null;
+
+    return (
+      <div className="sidebar-info-section">
+        <div className="sidebar-info-section-header">
+          <Layers size={18} className="text-[var(--accent)]" />
+          <span className="sidebar-info-section-title">FORMS</span>
+        </div>
+        <div className="sidebar-info-section-divider"></div>
+        <div className="related-forms-list">
+          {relatedForms.map((form) => {
+            const imgSrc = getSpriteUrl(form, showShiny, dexPreferences?.useHomeSprites);
+            const formLabel = getFormDisplayName(form) || formatPokemonName(form.name);
+            const isClickable = onPokemonSelect !== null;
+
+            let iconSrc = null;
+            let iconColor = "#6b7280";
+            let iconPadding = "2px";
+
+            const isFormMighty = form.formType === 'mighty' || (form.name && form.name.includes('-mighty')) || (form.stableId && form.stableId.includes('mighty'));
+            const isAlpha = form.formType === 'alpha' || form.formType === 'alphaother' || (form.name && form.name.includes('-alpha'));
+            const isGmax = form.formType === 'gmax' || (form.name && form.name.includes('-gmax'));
+
+            let nameToCheck = form.name || "";
+            if (nameToCheck.includes("-alpha")) nameToCheck = nameToCheck.replace("-alpha", "");
+
+            const isFemale = form.formType === 'gender' || (form.formType === 'alphaother' && form.stableId && form.stableId.includes('female')) || (form.name && form.name.includes('-female'));
+            const isMale = !isFemale && ((form.name && form.name.includes('-male')) || (form.stableId && form.stableId.includes('male')) || genderForms.includes(nameToCheck));
+
+            if (isFormMighty) {
+              iconSrc = "/data/marks/mark-mightiest.png";
+              iconColor = "var(--accent)";
+              iconPadding = "1px";
+            } else if (isAlpha) {
+              if (isFemale) {
+                iconSrc = "/data/SidebarIcons/Alpha_Mark_Female.png";
+                iconColor = "#ef6491";
+                iconPadding = "2px";
+              } else if (isMale) {
+                iconSrc = "/data/SidebarIcons/Alpha_Mark_Male.png";
+                iconColor = "#316497";
+                iconPadding = "2px";
+              } else {
+                iconSrc = "/data/SidebarIcons/Alpha_Mark.png";
+                iconColor = "#e05555";
+                iconPadding = "2px";
+              }
+            } else {
+              if (isFemale) {
+                iconSrc = "/data/SidebarIcons/Female.svg";
+                iconColor = "#ef6491";
+                iconPadding = "5px";
+              } else if (isMale) {
+                iconSrc = "/data/SidebarIcons/Male.svg";
+                iconColor = "#316497";
+                iconPadding = "5px";
+              }
+            }
+
+            return (
+              <div
+                key={form.stableId || `${form.id}-${form.name}`}
+                className={`sidebar-form-item-card ${isClickable ? 'clickable' : ''}`}
+                onClick={() => isClickable && onPokemonSelect(form)}
+                title={formLabel}
+              >
+                <div className="sidebar-form-item-sprite-wrap">
+                  <img
+                    src={imgSrc}
+                    alt={form.name}
+                    className="sidebar-form-item-img"
+                    width={38}
+                    height={38}
+                  />
+                  {iconSrc && (
+                    <div
+                      className="sidebar-form-icon-overlay"
+                      style={{
+                        borderColor: iconColor,
+                        padding: iconPadding
+                      }}
+                    >
+                      <img src={iconSrc} alt="Form Icon" />
+                    </div>
+                  )}
+                </div>
+                <span className="sidebar-form-item-name">{formLabel}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div
+      data-tutorial-id="sidebar-overview"
       className={`sidebar-container ${closing ? 'sidebar-slide-out' : 'sidebar-slide-in'}`}
       onClick={(e) => e.stopPropagation()}
     >
-      <button className="sidebar-close-button" onClick={handleClose} aria-label="Close">
+      <button data-tutorial-id="close-sidebar" className="sidebar-close-button" onClick={handleClose} aria-label="Close">
         <span className="flex items-center justify-center">
           <svg
             width="40"
@@ -1395,1205 +2060,1045 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
         </span>
       </button>
 
-      {/* Top row: Image + Name */}
-      <div className="sidebar-header">
-        <div className="sidebar-pokemon-image">
+      {/* Top row: Condensed Header */}
+      <div className="sidebar-header-compact">
+        {/* Left: Avatar */}
+        <div className="sidebar-header-avatar-wrap">
           <img
             src={pokeImg}
             alt={pokeName}
-            className="w-22 h-22 object-contain image-render-pixelated"
-            width={88}
-            height={88}
-            style={{ imageRendering: 'pixelated' }}
+            className="sidebar-header-avatar-img"
+            width={82}
+            height={82}
           />
           {showShiny && (
             <div className="shiny-sparkles-overlay">
-              <Sparkles
-                size={16}
-                className="shiny-sparkles-icon"
-              />
+              <Sparkles size={14} className="shiny-sparkles-icon" />
             </div>
           )}
         </div>
-        <div className="flex-1">
-          <a
-            href={getExternalLink()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="sidebar-pokemon-name-link"
-            title={`View ${pokeName} on ${externalLinkPreference === 'serebii' ? 'Serebii' : externalLinkPreference === 'bulbapedia' ? 'Bulbapedia' : 'PokemonDB'}`}
-          >
-            <span className="sidebar-pokemon-name">{pokeName}</span>
-          </a>
+
+        {/* Center: Name + Number + Generation */}
+        <div className="sidebar-header-info">
+          <div className="sidebar-header-name-row">
+            <a
+              href={getExternalLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sidebar-pokemon-name-link"
+              title={`View ${pokeName} on ${externalLinkPreference === 'serebii' ? 'Serebii' : externalLinkPreference === 'bulbapedia' ? 'Bulbapedia' : 'PokemonDB'}`}
+            >
+              <span className="sidebar-pokemon-name">{pokeName}</span>
+            </a>
+          </div>
+          <div className="sidebar-header-meta">
+            <div className="sidebar-header-meta-row">
+              <span>#{pokemon?.id ? String(pokemon.id).padStart(4, "0") : "----"}</span>
+              <span className="sidebar-header-meta-dot">•</span>
+              <span>Gen {toRomanGen(pokemon?.gen)}</span>
+            </div>
+            <div className="sidebar-header-form-slot">
+              {pokemon && getFormDisplayName(pokemon) ? (
+                <span className="sidebar-header-form-badge">{getFormDisplayName(pokemon)}</span>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Type Badges */}
+        <div className="sidebar-header-right">
+          <div className="sidebar-header-types">
+            {pokeTypes.map(type => renderTypeBadge(type))}
+          </div>
         </div>
       </div>
 
-      {/* Second row: Meta (left) + Badges (right) */}
-      <div className="sidebar-meta-section">
-        <div className="sidebar-meta-info">
-          <div className="sidebar-meta-text">
-            #{pokemon?.id ? String(pokemon.id).padStart(4, "0") : "----"}
-          </div>
-          <div className="sidebar-meta-text">
-            Generation {pokemon?.gen ?? "?"}
-          </div>
-          <div className="sidebar-meta-text">
-            {pokemon ? getFormDisplayName(pokemon) : null}
-          </div>
-        </div>
-        <div className="sidebar-type-badges">
-          {pokeTypes.map(type => renderTypeBadge(type))}
-        </div>
-      </div>
-      {/* Caught info section */}
-      <div className="sidebar-content" style={{ top: '235px' }}>
-        <div className="flex w-full mb-4 border-b border-[var(--border-color)]">
-          <button
-            className={`flex-1 py-2 text-sm font-semibold transition-colors duration-200 ${
-              activeTab === 'caught'
-                ? 'text-[var(--accent)] border-b-2 border-[var(--accent)]'
-                : 'text-[var(--sidebar-text)] opacity-60 hover:opacity-100'
-            }`}
-            onClick={() => setActiveTab('caught')}
-          >
-            Data
-          </button>
-          <button
-            className={`flex-1 py-2 text-sm font-semibold transition-colors duration-200 ${
-              activeTab === 'info'
-                ? 'text-[var(--accent)] border-b-2 border-[var(--accent)]'
-                : 'text-[var(--sidebar-text)] opacity-60 hover:opacity-100'
-            }`}
-            onClick={() => setActiveTab('info')}
-          >
-            Info
-          </button>
-        </div>
-
-        {activeTab === 'caught' && (
-          <>
-            {!caughtInfo ? (
-          <div className="sidebar-not-caught">
-            <div className="sidebar-not-caught-text">
-              {readOnly && viewingUsername ? (
-                <>
-                  <div>{viewingUsername} has not caught</div>
-                  <div>{formatPokemonName(pokemon?.name)} yet</div>
-                </>
-              ) : (
-                "Not caught"
-              )}
+      {/* Relocated Entry Navigation Bar */}
+      <div className="sidebar-entry-bar">
+        {!caughtInfo ? (
+          <div className="sidebar-entry-uncaught">
+            <div className="sidebar-uncaught-badge">
+              <span className="sidebar-uncaught-dot" />
+              <span>
+                {readOnly && viewingUsername ? `${viewingUsername} has not caught this Pokémon` : "Not Caught"}
+              </span>
             </div>
             {!readOnly && (
-              <button className="sidebar-set-caught-button" onClick={handleSetCaught}>
-                Set as caught
+              <button className="sidebar-set-caught-btn" onClick={handleSetCaught}>
+                <Plus size={14} strokeWidth={2.5} />
+                <span>Set as caught</span>
               </button>
             )}
           </div>
-        ) : editing && !readOnly ? (
-          <form
-            className="sidebar-form"
-            onSubmit={e => {
-              e.preventDefault();
-              handleSaveEdit();
-            }}
-          >
-            <div className="sidebar-form-group">
-              <label className="sidebar-label">Nickname:</label>
-              <ContentFilterInput
-                id="nickname-input"
-                name="nickname"
-                type="text"
-                value={editData.nickname || ""}
-                onChange={handleEditChange}
-                configType="nickname"
-                placeholder="Enter nickname..."
-                maxLength={12}
-                className="sidebar-input"
-                autoComplete="off"
-              />
-            </div>
-            <div className="sidebar-form-group">
-              <label className="sidebar-label">Date caught:</label>
-              <div className="relative">
-                <input
-                  type="date"
-                  id="date-caught"
-                  name="date"
-                  value={editData.date}
-                  onChange={handleEditChange}
-                  className="sidebar-input pr-20"
-                  autoComplete="off"
-                />
-                <Calendar
-                  className="absolute right-3.5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--accent)] cursor-pointer hover:text-[var(--accent-hover)] transition-colors"
-                  onClick={() => document.getElementById('date-caught').showPicker?.() || document.getElementById('date-caught').click()}
-                  title="Open date picker"
-                />
-                {editData.date && (
+        ) : (
+          <div className="sidebar-entry-caught-wrap">
+            <div className="sidebar-entry-nav-group">
+              {!readOnly && localEntries.length > 1 && (
+                <button
+                  type="button"
+                  className="sidebar-entry-delete-btn"
+                  onClick={handleDeleteEntryClick}
+                  title="Delete current entry"
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
+              {localEntries.length > 1 ? (
+                <>
                   <button
                     type="button"
-                    onClick={() => handleEditChange({ target: { name: 'date', value: '' } })}
-                    className="p-1"
-                    title="Clear date"
+                    className="sidebar-entry-pill"
+                    onClick={() => { setSelectedEntryIndex(0); switchToEntry(0); }}
+                    disabled={selectedEntryIndex === 0}
+                    title="First entry"
                   >
-                    <X size={14} />
+                    1
                   </button>
-                )}
-              </div>
-            </div>
-
-            <div className="sidebar-form-group">
-              <label className="sidebar-label">Ball caught in:</label>
-              <SearchbarIconDropdown
-                id="ball-dropdown"
-                options={getFilteredBallOptions()}
-                value={editData.ball}
-                onChange={val => {
-                  // Auto-set game to Legends Arceus if a Hisuian ball is selected
-                  if (val && isHisuianBall(val)) {
-                    setEditData(edit => ({ ...edit, ball: val, game: "Legends Arceus", method: "", mark: "" }));
-                  } else {
-                    setEditData(edit => ({ ...edit, ball: val }));
-                  }
-                }}
-                placeholder="Select a ball..."
-                customBackground="var(--sidebar-edit-inputs)"
-                customBorder="var(--border-color)"
-                isSidebar={true}
-              />
-            </div>
-
-            <div className="sidebar-form-group">
-              <label className="sidebar-label">Game:</label>
-              <SearchbarIconDropdown
-                id="game-dropdown"
-                options={GAME_OPTIONS}
-                value={editData.game}
-                onChange={val => {
-                  // Clear ball selection if switching away from Legends Arceus and current ball is Hisuian
-                  const shouldClearBall = editData.game === "Legends Arceus" &&
-                    val !== "Legends Arceus" &&
-                    editData.ball &&
-                    isHisuianBall(editData.ball);
-                  setEditData(edit => ({
-                    ...edit,
-                    game: val,
-                    method: val === "Home" ? "Gift Pokemon" : "",
-                    mark: "",
-                    ball: shouldClearBall ? "" : edit.ball
-                  }));
-                }}
-                placeholder="Select a game..."
-                customBackground="var(--sidebar-edit-inputs)"
-                customBorder="var(--border-color)"
-                isSidebar={true}
-              />
-            </div>
-
-            <div className="sidebar-form-group">
-              <label className="sidebar-label">Method:</label>
-              <SearchbarIconDropdown
-                id="method-dropdown"
-                disabled={editData.game === "Home"}
-                options={[
-                  { name: "None", value: "" },
-                  ...availableMethods.map(method => ({ name: method.name, value: method.name })),
-                ]}
-                value={editData.method}
-                onChange={val => {
-                  setEditData(edit => {
-                    const updatedEdit = { ...edit, method: val };
-                    // Clear incompatible modifiers when method changes
-                    if (!edit.modifiers) edit.modifiers = { ...defaultEditData.modifiers };
-                    if (val !== "Breeding") {
-                      updatedEdit.modifiers = { ...updatedEdit.modifiers, shinyParents: false };
-                    }
-                    if (val !== "Catch Combo" && val !== "Random Encounters" && val !== "Soft Resets") {
-                      updatedEdit.modifiers = { ...updatedEdit.modifiers, lureActive: false };
-                    }
-                    // Clear sparkling levels if method changes away from ones that use them
-                    if (val !== "Random Encounters" && val !== "Mass Outbreaks" && val !== "Sandwich" && val !== "Hyperspaces") {
-                      updatedEdit.modifiers = {
-                        ...updatedEdit.modifiers,
-                        sparklingLv1: false,
-                        sparklingLv2: false,
-                        sparklingLv3: false
-                      };
-                    }
-                    return updatedEdit;
-                  });
-                }}
-                placeholder={editData.game ? "Select a method..." : "Select a game first"}
-                customBackground="var(--sidebar-edit-inputs)"
-                customBorder="var(--border-color)"
-                disabled={!editData.game}
-                isSidebar={true}
-              />
-            </div>
-
-            {/* Modifiers Section */}
-            {showShiny && editData.game && availableMethods.length > 0 && (
-              (gameModifiers["Shiny Charm"] > 0 && !(editData.method === "Fossil Revivals" && (editData.game === "Let's Go Pikachu" || editData.game === "Let's Go Eevee" || editData.game === "Sword" || editData.game === "Shield")) && !(editData.method === "Fossil Revivals" && editData.game === "Legends Z-A") && !(editData.method === "Dynamax Raids" && (editData.game === "Sword" || editData.game === "Shield")) && !(editData.method === "Gift Pokemon" && (editData.game === "Sword" || editData.game === "Shield" || editData.game === "Let's Go Eevee" || editData.game === "Let's Go Pikachu")) && !(editData.method === "Tera Raids" && (editData.game === "Scarlet" || editData.game === "Violet")) && !((editData.method === "Random Encounters" || editData.method === "Poke Radar" || editData.method === "Soft Resets" || editData.method === "Fossil Revivals" || editData.method === "Gift Pokemon" || editData.method === "Underground Diglett Hunt") && (editData.game === "Brilliant Diamond" || editData.game === "Shining Pearl")) && !(editData.method === "Poke Radar" && (editData.game === "X" || editData.game === "Y")) && !(editData.method === "Ultra Wormholes" && (editData.game === "Ultra Sun" || editData.game === "Ultra Moon"))) ||
-              (gameModifiers["Shiny Parents"] > 0 && editData.method === "Breeding") ||
-              (gameModifiers["Lure Active"] > 0 && (editData.method === "Catch Combo" || editData.method === "Random Encounters" || (editData.method === "Soft Resets" && editData.game !== "Let's Go Pikachu" && editData.game !== "Let's Go Eevee"))) ||
-              (gameModifiers["Research Lv 10"] > 0 && editData.game === "Legends Arceus") ||
-              (gameModifiers["Perfect Research"] > 0 && editData.game === "Legends Arceus") ||
-              (gameModifiers["Sparkling Lv 1"] > 0 && ((editData.game === "Scarlet" || editData.game === "Violet") && (editData.method === "Random Encounters" || editData.method === "Mass Outbreaks" || editData.method === "Sandwich") || (editData.game === "Legends Z-A" && editData.method === "Hyperspaces"))) ||
-              (gameModifiers["Sparkling Lv 2"] > 0 && ((editData.game === "Scarlet" || editData.game === "Violet") && (editData.method === "Random Encounters" || editData.method === "Mass Outbreaks" || editData.method === "Sandwich") || (editData.game === "Legends Z-A" && editData.method === "Hyperspaces"))) ||
-              (gameModifiers["Sparkling Lv 3"] > 0 && ((editData.game === "Scarlet" || editData.game === "Violet") && (editData.method === "Random Encounters" || editData.method === "Mass Outbreaks" || editData.method === "Sandwich") || (editData.game === "Legends Z-A" && editData.method === "Hyperspaces"))) ||
-              (gameModifiers["Event Boosted"] > 0 && editData.game === "Scarlet" && editData.method === "Mass Outbreaks") ||
-              (gameModifiers["Community Day"] > 0 && editData.game === "GO" && (editData.method === "Random Encounters" || editData.method === "Daily Adventure Incense")) ||
-              (gameModifiers["Raid Day"] > 0 && editData.game === "GO" && editData.method === "Raid Battles") ||
-              (gameModifiers["Research Day"] > 0 && editData.game === "GO" && editData.method === "Field Research") ||
-              (gameModifiers["Galar Birds"] > 0 && editData.game === "GO" && editData.method === "Daily Adventure Incense") ||
-              (gameModifiers["Hatch Day"] > 0 && editData.game === "GO" && editData.method === "Breeding")
-            ) && (
-                <div className="sidebar-form-group">
-                  <label className="sidebar-label">Modifiers:</label>
-                  <div className="flex flex-wrap gap-3">
-                    {gameModifiers["Shiny Charm"] > 0 && !(editData.method === "Fossil Revivals" && (editData.game === "Let's Go Pikachu" || editData.game === "Let's Go Eevee" || editData.game === "Sword" || editData.game === "Shield")) && !(editData.method === "Fossil Revivals" && editData.game === "Legends Z-A") && !(editData.method === "Dynamax Raids" && (editData.game === "Sword" || editData.game === "Shield")) && !(editData.method === "Gift Pokemon" && (editData.game === "Sword" || editData.game === "Shield" || editData.game === "Let's Go Eevee" || editData.game === "Let's Go Pikachu")) && !(editData.method === "Tera Raids" && (editData.game === "Scarlet" || editData.game === "Violet")) && !((editData.method === "Random Encounters" || editData.method === "Poke Radar" || editData.method === "Soft Resets" || editData.method === "Fossil Revivals" || editData.method === "Gift Pokemon" || editData.method === "Underground Diglett Hunt") && (editData.game === "Brilliant Diamond" || editData.game === "Shining Pearl")) && !(editData.method === "Poke Radar" && (editData.game === "X" || editData.game === "Y")) && !(editData.method === "Ultra Wormholes" && (editData.game === "Ultra Sun" || editData.game === "Ultra Moon")) && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.shinyCharm || false}
-                          onChange={(e) => {
-                            const newShinyCharm = e.target.checked;
-                            setEditData(edit => ({
-                              ...edit,
-                              modifiers: {
-                                ...edit.modifiers,
-                                shinyCharm: newShinyCharm,
-                                // Auto-check Research Lv 10 when Shiny Charm is checked in Legends Arceus
-                                researchLv10: newShinyCharm && editData.game === "Legends Arceus" ? true : edit.modifiers?.researchLv10 || false
-                              }
-                            }));
-                          }}
-                        />
-                        <span className="text-sm">Shiny Charm</span>
-                      </label>
-                    )}
-                    {gameModifiers["Shiny Parents"] > 0 && editData.method === "Breeding" && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.shinyParents || false}
-                          onChange={(e) => setEditData(edit => ({
-                            ...edit,
-                            modifiers: { ...edit.modifiers, shinyParents: e.target.checked }
-                          }))}
-                        />
-                        <span className="text-sm">Shiny Parents</span>
-                      </label>
-                    )}
-                    {gameModifiers["Lure Active"] > 0 && (editData.method === "Catch Combo" || editData.method === "Random Encounters" || (editData.method === "Soft Resets" && editData.game !== "Let's Go Pikachu" && editData.game !== "Let's Go Eevee")) && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.lureActive || false}
-                          onChange={(e) => setEditData(edit => ({
-                            ...edit,
-                            modifiers: { ...edit.modifiers, lureActive: e.target.checked }
-                          }))}
-                        />
-                        <span className="text-sm">Lure Active</span>
-                      </label>
-                    )}
-                    {gameModifiers["Research Lv 10"] > 0 && editData.game === "Legends Arceus" && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.researchLv10 || false}
-                          onChange={(e) => setEditData(edit => ({
-                            ...edit,
-                            modifiers: { ...edit.modifiers, researchLv10: e.target.checked }
-                          }))}
-                        />
-                        <span className="text-sm">Research Lv 10</span>
-                      </label>
-                    )}
-                    {gameModifiers["Perfect Research"] > 0 && editData.game === "Legends Arceus" && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.perfectResearch || false}
-                          onChange={(e) => setEditData(edit => ({
-                            ...edit,
-                            modifiers: { ...edit.modifiers, perfectResearch: e.target.checked }
-                          }))}
-                        />
-                        <span className="text-sm">Perfect Research</span>
-                      </label>
-                    )}
-                    {gameModifiers["Sparkling Lv 1"] > 0 && ((editData.game === "Scarlet" || editData.game === "Violet") && (editData.method === "Random Encounters" || editData.method === "Mass Outbreaks" || editData.method === "Sandwich") || (editData.game === "Legends Z-A" && editData.method === "Hyperspaces")) && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.sparklingLv1 || false}
-                          onChange={(e) => {
-                            const newSparklingLv1 = e.target.checked;
-                            setEditData(edit => ({
-                              ...edit,
-                              modifiers: {
-                                ...edit.modifiers,
-                                sparklingLv1: newSparklingLv1,
-                                sparklingLv2: newSparklingLv1 ? false : edit.modifiers?.sparklingLv2 || false,
-                                sparklingLv3: newSparklingLv1 ? false : edit.modifiers?.sparklingLv3 || false
-                              }
-                            }));
-                          }}
-                        />
-                        <span className="text-sm">Sparkling Lv 1</span>
-                      </label>
-                    )}
-                    {gameModifiers["Sparkling Lv 2"] > 0 && ((editData.game === "Scarlet" || editData.game === "Violet") && (editData.method === "Random Encounters" || editData.method === "Mass Outbreaks" || editData.method === "Sandwich") || (editData.game === "Legends Z-A" && editData.method === "Hyperspaces")) && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.sparklingLv2 || false}
-                          onChange={(e) => {
-                            const newSparklingLv2 = e.target.checked;
-                            setEditData(edit => ({
-                              ...edit,
-                              modifiers: {
-                                ...edit.modifiers,
-                                sparklingLv2: newSparklingLv2,
-                                sparklingLv1: newSparklingLv2 ? false : edit.modifiers?.sparklingLv1 || false,
-                                sparklingLv3: newSparklingLv2 ? false : edit.modifiers?.sparklingLv3 || false
-                              }
-                            }));
-                          }}
-                        />
-                        <span className="text-sm">Sparkling Lv 2</span>
-                      </label>
-                    )}
-                    {gameModifiers["Sparkling Lv 3"] > 0 && ((editData.game === "Scarlet" || editData.game === "Violet") && (editData.method === "Random Encounters" || editData.method === "Mass Outbreaks" || editData.method === "Sandwich") || (editData.game === "Legends Z-A" && editData.method === "Hyperspaces")) && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.sparklingLv3 || false}
-                          onChange={(e) => {
-                            const newSparklingLv3 = e.target.checked;
-                            setEditData(edit => ({
-                              ...edit,
-                              modifiers: {
-                                ...edit.modifiers,
-                                sparklingLv3: newSparklingLv3,
-                                sparklingLv1: newSparklingLv3 ? false : edit.modifiers?.sparklingLv1 || false,
-                                sparklingLv2: newSparklingLv3 ? false : edit.modifiers?.sparklingLv2 || false
-                              }
-                            }));
-                          }}
-                        />
-                        <span className="text-sm">Sparkling Lv 3</span>
-                      </label>
-                    )}
-                    {gameModifiers["Event Boosted"] > 0 && editData.game === "Scarlet" && editData.method === "Mass Outbreaks" && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.eventBoosted || false}
-                          onChange={(e) => setEditData(edit => ({
-                            ...edit,
-                            modifiers: { ...edit.modifiers, eventBoosted: e.target.checked }
-                          }))}
-                        />
-                        <span className="text-sm">Event Boosted</span>
-                      </label>
-                    )}
-                    {gameModifiers["Community Day"] > 0 && editData.game === "GO" && (editData.method === "Random Encounters" || editData.method === "Daily Adventure Incense") && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.communityDay || false}
-                          onChange={(e) => setEditData(edit => ({
-                            ...edit,
-                            modifiers: { ...edit.modifiers, communityDay: e.target.checked }
-                          }))}
-                        />
-                        <span className="text-sm">Community Day</span>
-                      </label>
-                    )}
-                    {gameModifiers["Raid Day"] > 0 && editData.game === "GO" && editData.method === "Raid Battles" && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.raidDay || false}
-                          onChange={(e) => setEditData(edit => ({
-                            ...edit,
-                            modifiers: { ...edit.modifiers, raidDay: e.target.checked }
-                          }))}
-                        />
-                        <span className="text-sm">Raid Day</span>
-                      </label>
-                    )}
-                    {gameModifiers["Research Day"] > 0 && editData.game === "GO" && editData.method === "Field Research" && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.researchDay || false}
-                          onChange={(e) => setEditData(edit => ({
-                            ...edit,
-                            modifiers: { ...edit.modifiers, researchDay: e.target.checked }
-                          }))}
-                        />
-                        <span className="text-sm">Research Day</span>
-                      </label>
-                    )}
-                    {gameModifiers["Galar Birds"] > 0 && editData.game === "GO" && editData.method === "Daily Adventure Incense" && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.galarBirds || false}
-                          onChange={(e) => setEditData(edit => ({
-                            ...edit,
-                            modifiers: { ...edit.modifiers, galarBirds: e.target.checked }
-                          }))}
-                        />
-                        <span className="text-sm">Galar Birds</span>
-                      </label>
-                    )}
-                    {gameModifiers["Hatch Day"] > 0 && editData.game === "GO" && editData.method === "Breeding" && (
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={editData.modifiers?.hatchDay || false}
-                          onChange={(e) => setEditData(edit => ({
-                            ...edit,
-                            modifiers: { ...edit.modifiers, hatchDay: e.target.checked }
-                          }))}
-                        />
-                        <span className="text-sm">Hatch Day</span>
-                      </label>
-                    )}
-                  </div>
-                </div>
+                  <button
+                    type="button"
+                    className="sidebar-entry-pill"
+                    onClick={() => {
+                      if (selectedEntryIndex > 0) {
+                        const newIdx = selectedEntryIndex - 1;
+                        setSelectedEntryIndex(newIdx);
+                        switchToEntry(newIdx);
+                      }
+                    }}
+                    disabled={selectedEntryIndex === 0}
+                    title="Previous entry"
+                  >
+                    <ChevronLeft size={14} />
+                  </button>
+                  <span className="sidebar-entry-current-badge">
+                    Entry {selectedEntryIndex + 1} of {localEntries.length}
+                  </span>
+                  <button
+                    type="button"
+                    className="sidebar-entry-pill"
+                    onClick={() => {
+                      if (selectedEntryIndex < localEntries.length - 1) {
+                        const newIdx = selectedEntryIndex + 1;
+                        setSelectedEntryIndex(newIdx);
+                        switchToEntry(newIdx);
+                      }
+                    }}
+                    disabled={selectedEntryIndex >= localEntries.length - 1}
+                    title="Next entry"
+                  >
+                    <ChevronRight size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    className="sidebar-entry-pill"
+                    onClick={() => {
+                      const newIdx = localEntries.length - 1;
+                      setSelectedEntryIndex(newIdx);
+                      switchToEntry(newIdx);
+                    }}
+                    disabled={selectedEntryIndex === localEntries.length - 1}
+                    title="Last entry"
+                  >
+                    {localEntries.length}
+                  </button>
+                </>
+              ) : (
+                <span className="sidebar-entry-current-badge">
+                  Entry 1 of 1
+                </span>
               )}
-
-            <div className="sidebar-form-group">
-              <label className="sidebar-label">Mark:</label>
-              <SearchbarIconDropdown
-                id="mark-dropdown"
-                options={MARK_OPTIONS}
-                value={editData.mark}
-                onChange={val => setEditData(edit => ({ ...edit, mark: val }))}
-                placeholder={marksAvailable ? "Select a mark..." : "Marks not available in this game"}
-                customBackground="var(--sidebar-edit-inputs)"
-                customBorder="var(--border-color)"
-                disabled={!marksAvailable}
-                isSidebar={true}
-              />
             </div>
 
-            <div className="sidebar-form-group">
-              <label className="sidebar-label">Checks:</label>
-              <div className="relative">
-                <input
-                  type="number"
-                  id="checks-input"
-                  name="checks"
-                  value={editData.checks}
-                  min="0"
-                  max="999999"
-                  onChange={handleEditChange}
-                  placeholder={editData.game === "Home" ? "Checks not available in this game" : "Number of checks"}
-                  className="sidebar-input pr-20"
-                  disabled={editData.game === "Home"}
-                  autoComplete="off"
-                />
-                {editData.game !== "Home" && (
-                  <>
-                    <div className="absolute right-3.5 top-1/2 transform -translate-y-1/2 flex flex-col gap-0">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newValue = Math.min(999999, (editData.checks || 0) + 1);
-                          handleEditChange({ target: { name: 'checks', value: newValue } });
-                        }}
-                        className="flex items-center justify-center p-0.5 transition-colors duration-200"
-                        title="Increase checks"
-                      >
-                        <ChevronUp className="w-4 h-4 text-[var(--accent)] hover:text-white transition-colors duration-200" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newValue = Math.max(0, (editData.checks || 0) - 1);
-                          handleEditChange({ target: { name: 'checks', value: newValue } });
-                        }}
-                        className="flex items-center justify-center p-0.5 transition-colors duration-200"
-                        title="Decrease checks"
-                      >
-                        <ChevronDown className="w-4 h-4 text-[var(--accent)] hover:text-white transition-colors duration-200" />
-                      </button>
+            {!readOnly && (
+              <button
+                type="button"
+                className={`sidebar-entry-add-btn ${localEntries.length >= 30 ? 'disabled' : ''}`}
+                onClick={handleAddEntry}
+                disabled={localEntries.length >= 30}
+                title={localEntries.length >= 30 ? "Maximum entries reached (30)" : "Add another entry (max 30)"}
+              >
+                <Plus size={15} />
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Tab Navigation - only rendered when Marks or Notes tab is visible */}
+      {(showMarksTab || showNotesTab) && (
+        <div className="sidebar-tabs-bar">
+          <button
+            type="button"
+            className={`sidebar-tab-btn ${activeTab === 'data' ? 'active' : ''}`}
+            onClick={() => setActiveTab('data')}
+          >
+            Data
+          </button>
+          {showMarksTab && (
+            <MarksTabButton
+              active={activeTab === 'marks'}
+              disabled={isMarksDisabled}
+              onClick={() => setActiveTab('marks')}
+            />
+          )}
+          {showNotesTab && (
+            <button
+              type="button"
+              className={`sidebar-tab-btn ${activeTab === 'notes' ? 'active' : ''}`}
+              onClick={() => setActiveTab('notes')}
+            >
+              Notes
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Scrollable Content Area + Pinned Footer Wrap */}
+      <div 
+        className="sidebar-body-container"
+        data-tutorial-id={editing ? "edit-form" : "sidebar-entries-overview"}
+        style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}
+      >
+        {/* Scrollable Content Area */}
+        <div className="sidebar-content-scrollable">
+        {/* --- DATA TAB --- */}
+        {activeTab === 'data' && (
+          <div className="flex flex-col w-full">
+            {/* Catch Info Accordion - only visible if editing or if caught with recorded data */}
+            {(editing || (caughtInfo && hasCatchData)) && (
+              <div className={`sidebar-accordion ${openAccordion === 'catch' ? 'open' : ''}`}>
+              <button
+                type="button"
+                className="sidebar-accordion-header"
+                onClick={() => setOpenAccordion(prev => prev === 'catch' ? null : 'catch')}
+              >
+                <span>CATCH INFO</span>
+                <ChevronDown size={16} className="sidebar-accordion-chevron" />
+              </button>
+
+              <div className="sidebar-accordion-collapse">
+                <div className="sidebar-accordion-inner">
+                  <div className="sidebar-accordion-body">
+                  {!caughtInfo ? (
+                    <div className="text-center py-3 text-sm text-[var(--sidebar-text)] opacity-70">
+                      Pokémon is currently not caught.
                     </div>
-                    {(editData.checks !== '' && editData.checks !== null && editData.checks !== undefined) && (
-                      <button
-                        type="button"
-                        onClick={() => handleEditChange({ target: { name: 'checks', value: '' } })}
-                        className="p-1"
-                        title="Clear checks"
-                      >
-                        <X size={14} />
-                      </button>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
+                  ) : editing && !readOnly ? (
+                    <div className="space-y-3">
+                      <div className="sidebar-form-group">
+                        <label className="sidebar-label">Nickname:</label>
+                        <ContentFilterInput
+                          id="nickname-input"
+                          name="nickname"
+                          type="text"
+                          value={editData.nickname || ""}
+                          onChange={handleEditChange}
+                          configType="nickname"
+                          placeholder="Enter nickname..."
+                          maxLength={12}
+                          className="sidebar-input"
+                          autoComplete="off"
+                        />
+                      </div>
+                      <div className="sidebar-form-group">
+                        <label className="sidebar-label">Date caught:</label>
+                        <div className="relative">
+                          <input
+                            type="date"
+                            id="date-caught"
+                            name="date"
+                            value={editData.date}
+                            onChange={handleEditChange}
+                            className="sidebar-input pr-20"
+                            autoComplete="off"
+                          />
+                          <Calendar
+                            className="absolute right-3.5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--accent)] cursor-pointer hover:text-[var(--accent-hover)] transition-colors"
+                            onClick={() => document.getElementById('date-caught').showPicker?.() || document.getElementById('date-caught').click()}
+                            title="Open date picker"
+                          />
+                          {editData.date && (
+                            <button
+                              type="button"
+                              onClick={() => handleEditChange({ target: { name: 'date', value: '' } })}
+                              className="p-1"
+                              title="Clear date"
+                            >
+                              <X size={14} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
 
-            <div className="sidebar-form-group">
-              <label className="sidebar-label">Notes/extras:</label>
-              <ContentFilterInput
-                id="notes-textarea"
-                name="notes"
-                type="textarea"
-                value={editData.notes}
-                onChange={handleEditChange}
-                placeholder="Add notes about this Pokemon..."
-                configType="notes"
-                showCharacterCount={true}
-                showRealTimeValidation={true}
-                className="sidebar-input"
-                autoComplete="off"
-              />
-            </div>
-
-            <div className="sidebar-form-buttons">
-              <button type="submit" className="sidebar-button">Save</button>
-              <button type="button" className="sidebar-button" onClick={handleCancelEdit}>Cancel</button>
-            </div>
-          </form>
-        ) : (
-          <div>
-            {/* Paginated entries display with page navigation */}
-            {localEntries.length > 0 && (
-              <div className="space-y-4">
-                {/* Entry info display - moved above the navigation */}
-                <div className="sidebar-entries-info">
-                  Entry {selectedEntryIndex + 1} of {localEntries.length}
-                </div>
-
-                <div className="sidebar-navigation">
-                  {/* Only show navigation buttons when there are multiple entries */}
-                  {localEntries.length > 1 ? (
-                    <>
-                      {/* Delete button for current entry - positioned on the left */}
-                      {!readOnly && (
-                        <button
-                          className="sidebar-delete-button"
-                          onClick={async (e) => {
-                            e.stopPropagation();
-
-                            const currentEntry = localEntries[selectedEntryIndex];
-                            // Check if this entry has any saved data
-                            const hasData = currentEntry.nickname || currentEntry.date || currentEntry.ball || currentEntry.game || currentEntry.mark ||
-                              currentEntry.method || currentEntry.checks || currentEntry.notes;
-
-                            // Only show confirmation if entry has data, otherwise delete immediately
-                            if (hasData) {
-                              setDeleteEntryModal({ show: true, entryIndex: selectedEntryIndex, entryNumber: selectedEntryIndex + 1 });
+                      <div className="sidebar-form-group">
+                        <label className="sidebar-label">Ball caught in:</label>
+                        <SearchbarIconDropdown
+                          id="ball-dropdown"
+                          options={getFilteredBallOptions()}
+                          value={editData.ball}
+                          onChange={val => {
+                            if (val && isHisuianBall(val)) {
+                              setEditData(edit => ({ ...edit, ball: val, game: "Legends Arceus", method: "", mark: "" }));
                             } else {
-                              const updatedEntries = localEntries.filter((_, i) => i !== selectedEntryIndex);
-                              if (updatedEntries.length === 0) {
-                                updateCaughtInfo(pokemon, null, showShiny);
-                                setLocalEntries([]);
-                              } else {
-                                updateCaughtInfo(pokemon, {
-                                  caught: true,
-                                  entries: updatedEntries
-                                }, showShiny);
-                                setLocalEntries(updatedEntries);
-
-                                // Adjust selectedEntryIndex if needed
-                                if (selectedEntryIndex >= updatedEntries.length) {
-                                  setSelectedEntryIndex(updatedEntries.length - 1);
-                                } else if (selectedEntryIndex > 0) {
-                                  setSelectedEntryIndex(selectedEntryIndex - 1);
-                                }
-                              }
+                              setEditData(edit => ({ ...edit, ball: val }));
                             }
                           }}
-                          title="Delete current entry"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                          placeholder="Select a ball..."
+                          customBackground="var(--sidebar-edit-inputs)"
+                          customBorder="var(--border-color)"
+                          isSidebar={true}
+                        />
+                      </div>
+
+                      <div className="sidebar-form-group">
+                        <label className="sidebar-label">Game:</label>
+                        <SearchbarIconDropdown
+                          id="game-dropdown"
+                          options={isMighty ? GAME_OPTIONS.filter(opt => opt.value === "Scarlet" || opt.value === "Violet") : GAME_OPTIONS}
+                          value={isMighty ? (editData.game === "Violet" ? "Violet" : "Scarlet") : editData.game}
+                          onChange={val => {
+                            if (isMighty) {
+                              setEditData(edit => ({
+                                ...edit,
+                                game: val === "Violet" ? "Violet" : "Scarlet",
+                                method: "Tera Raids",
+                                mark: "mightiest"
+                              }));
+                              return;
+                            }
+                            const shouldClearBall = editData.game === "Legends Arceus" &&
+                              val !== "Legends Arceus" &&
+                              editData.ball &&
+                              isHisuianBall(editData.ball);
+                            setEditData(edit => ({
+                              ...edit,
+                              game: val,
+                              method: val === "Home" ? "Gift Pokemon" : "",
+                              mark: "",
+                              ball: shouldClearBall ? "" : edit.ball
+                            }));
+                          }}
+                          placeholder={isMighty ? "Select Scarlet or Violet..." : "Select a game..."}
+                          customBackground="var(--sidebar-edit-inputs)"
+                          customBorder="var(--border-color)"
+                          isSidebar={true}
+                        />
+                      </div>
+
+                      <div className="sidebar-form-group">
+                        <label className="sidebar-label">Method:</label>
+                        <SearchbarIconDropdown
+                          id="method-dropdown"
+                          disabled={isMighty || editData.game === "Home" || !editData.game}
+                          options={isMighty ? [{ name: "Tera Raids", value: "Tera Raids" }] : [
+                            { name: "None", value: "" },
+                            ...availableMethods.map(method => ({ name: method.name, value: method.name })),
+                          ]}
+                          value={isMighty ? "Tera Raids" : editData.method}
+                          onChange={val => {
+                            if (isMighty) return;
+                            setEditData(edit => {
+                              const updatedEdit = { ...edit, method: val };
+                              if (!edit.modifiers) edit.modifiers = { ...defaultEditData.modifiers };
+                              if (val !== "Breeding") {
+                                updatedEdit.modifiers = { ...updatedEdit.modifiers, shinyParents: false };
+                              }
+                              if (val !== "Catch Combo" && val !== "Random Encounters" && val !== "Soft Resets") {
+                                updatedEdit.modifiers = { ...updatedEdit.modifiers, lureActive: false };
+                              }
+                              if (val !== "Random Encounters" && val !== "Mass Outbreaks" && val !== "Sandwich" && val !== "Hyperspaces") {
+                                updatedEdit.modifiers = {
+                                  ...updatedEdit.modifiers,
+                                  sparklingLv1: false,
+                                  sparklingLv2: false,
+                                  sparklingLv3: false
+                                };
+                              }
+                              return updatedEdit;
+                            });
+                          }}
+                          placeholder={isMighty ? "Tera Raids" : (editData.game ? "Select a method..." : "Select a game first")}
+                          customBackground="var(--sidebar-edit-inputs)"
+                          customBorder="var(--border-color)"
+                          isSidebar={true}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5">
+                      {editData.nickname && (
+                        <div className="sidebar-display-card">
+                          <div className="sidebar-display-info">
+                            <div className="sidebar-display-label">Nickname</div>
+                            <div className="sidebar-display-value">{editData.nickname}</div>
+                          </div>
+                          <div className="sidebar-display-icon">
+                            <img src="/data/SidebarIcons/Nickname.svg" alt="Nickname" className="w-full h-full object-contain" />
+                          </div>
+                        </div>
                       )}
 
-                      {/* Entry 1 button */}
-                      <button
-                        className="sidebar-nav-button"
-                        onClick={() => {
-                          setSelectedEntryIndex(0);
-                          switchToEntry(0);
-                        }}
-                        disabled={selectedEntryIndex === 0}
-                        title="Go to first entry"
-                      >
-                        1
-                      </button>
+                      {editData.date && (
+                        <div className="sidebar-display-card">
+                          <div className="sidebar-display-info">
+                            <div className="sidebar-display-label">Date</div>
+                            <div className="sidebar-display-value">{formatDate(editData.date)}</div>
+                          </div>
+                          <div className="sidebar-display-icon">
+                            <img src="/data/SidebarIcons/Date.svg" alt="Date" className="w-full h-full object-contain" />
+                          </div>
+                        </div>
+                      )}
 
-                      {/* Back 1 entry */}
-                      <button
-                        className="sidebar-nav-button"
-                        onClick={() => {
-                          if (selectedEntryIndex > 0) {
-                            const newIndex = selectedEntryIndex - 1;
-                            setSelectedEntryIndex(newIndex);
-                            switchToEntry(newIndex);
-                          }
-                        }}
-                        disabled={selectedEntryIndex === 0}
-                        title="Previous entry"
-                      >
-                        <ChevronLeft size={16} />
-                      </button>
+                      {ballObj && editData.ball && (
+                        <div className="sidebar-display-card">
+                          <div className="sidebar-display-info">
+                            <div className="sidebar-display-label">Ball</div>
+                            <div className="sidebar-display-value">{ballObj.name}</div>
+                          </div>
+                          <div className="sidebar-display-image">
+                            <img src={ballObj.image} alt="" className="w-full h-full object-contain" onError={e => (e.target.style.display = "none")} />
+                          </div>
+                        </div>
+                      )}
 
-                      {/* Current entry (highlighted) */}
-                      <button
-                        className="sidebar-current-entry"
-                        disabled
-                        title="Current entry"
-                      >
-                        {selectedEntryIndex + 1}
-                      </button>
+                      {gameObj && editData.game && (
+                        <div className="sidebar-display-card">
+                          <div className="sidebar-display-info">
+                            <div className="sidebar-display-label">Game</div>
+                            <div className="sidebar-display-value">{gameObj.name}</div>
+                          </div>
+                          <div className="sidebar-display-image">
+                            <img src={gameObj.image} alt="" className="w-full h-full object-contain" onError={e => (e.target.style.display = "none")} />
+                          </div>
+                        </div>
+                      )}
 
-                      {/* Forward 1 entry */}
-                      <button
-                        className="sidebar-nav-button"
-                        onClick={() => {
-                          if (selectedEntryIndex < localEntries.length - 1) {
-                            const newIndex = selectedEntryIndex + 1;
-                            setSelectedEntryIndex(newIndex);
-                            switchToEntry(newIndex);
-                          }
-                        }}
-                        disabled={selectedEntryIndex >= localEntries.length - 1}
-                        title="Next entry"
-                      >
-                        <ChevronRight size={16} />
-                      </button>
+                      {editData.method && editData.method !== "" && (
+                        <div className="sidebar-display-card">
+                          <div className="sidebar-display-info">
+                            <div className="sidebar-display-label">Method</div>
+                            <div className="sidebar-display-value">{editData.method}</div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            {editData.method === "Permutations" && editData.chartData && (
+                              <button
+                                type="button"
+                                onClick={() => setShowChartModal(true)}
+                                className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#2a2a2a] hover:bg-[#383838] border border-[#444] hover:border-[var(--accent)] text-[var(--accent)] transition-all duration-200 cursor-pointer"
+                                title="View Permutation Chart"
+                              >
+                                <ListTodo size={20} />
+                              </button>
+                            )}
+                            <div className="sidebar-display-icon">
+                              <img src="/data/SidebarIcons/Method.svg" alt="Method" className="w-full h-full object-contain" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
-                      {/* Last entry button */}
-                      <button
-                        className="sidebar-nav-button"
-                        onClick={() => {
-                          const newIndex = localEntries.length - 1;
-                          setSelectedEntryIndex(newIndex);
-                          switchToEntry(newIndex);
-                        }}
-                        disabled={selectedEntryIndex === localEntries.length - 1}
-                        title="Go to last entry"
-                      >
-                        {localEntries.length}
-                      </button>
-                    </>
-                  ) : (
-                    /* Show just the current entry display when there's only 1 entry */
-                    <button
-                      className="sidebar-current-entry"
-                      disabled
-                      title="Current entry"
-                    >
-                      1
-                    </button>
-                  )}
-
-                  {/* Add entry button - always show */}
-                  {!readOnly && (
-                    <button
-                      className={`sidebar-add-button ${localEntries.length >= 30 ? 'sidebar-add-button-disabled' : ''}`}
-                      onClick={() => {
-                        if (localEntries.length >= 30) return; // Prevent action if at max
-
-                        const newEntry = {
-                          nickname: "",
-                          date: "",
-                          ball: BALL_OPTIONS[0].value,
-                          mark: MARK_OPTIONS[0].value,
-                          method: METHOD_OPTIONS[0],
-                          game: GAME_OPTIONS[0].value,
-                          checks: "",
-                          notes: "",
-                          entryId: Math.random().toString(36).substr(2, 9)
-                        };
-
-                        const currentEntries = localEntries;
-                        const updatedInfo = {
-                          caught: true,
-                          caughtAt: Date.now(),
-                          entries: [...currentEntries, newEntry]
-                        };
-
-                        updateCaughtInfo(pokemon, updatedInfo, showShiny, true);
-                        setLocalEntries([...currentEntries, newEntry]);
-                        setSelectedEntryIndex(currentEntries.length); // Select the new entry
-                        setEditData(newEntry); // Update editData to show the new entry
-                      }}
-                      disabled={localEntries.length >= 30}
-                      title={localEntries.length >= 30 ? "Maximum entries reached (30)" : "Add another entry for this Pokémon (max 30)"}
-                    >
-                      <Plus size={16} />
-                    </button>
+                      {!editData.nickname && !editData.date && !editData.ball && !editData.game && !editData.method && (
+                        <div className="text-center py-2 text-xs text-[var(--sidebar-text)] opacity-60">
+                          No catch details recorded for this entry.
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
-            )}
+            </div>
+          </div>
+        )}
 
-            {/* Display info from the selected entry */}
-            <div className="sidebar-display-section">
-              {editData.nickname && (
-                <div className="sidebar-display-card">
-                  <div className="sidebar-display-info">
-                    <div className="sidebar-display-label">Nickname</div>
-                    <div className="sidebar-display-value">{editData.nickname}</div>
-                  </div>
-                  <div className="sidebar-display-icon">
-                    <img src="/data/SidebarIcons/Nickname.svg" alt="Nickname" className="w-full h-full object-contain" />
+            {/* Hunt Details Accordion - only visible if editing or if caught with recorded hunt data */}
+            {((editing && showShiny) || (caughtInfo && hasHuntData)) && (
+              <div className={`sidebar-accordion ${openAccordion === 'hunt' ? 'open' : ''}`}>
+                <button
+                  type="button"
+                  className="sidebar-accordion-header"
+                  onClick={() => setOpenAccordion(prev => prev === 'hunt' ? null : 'hunt')}
+                >
+                  <span>HUNT DETAILS</span>
+                  <ChevronDown size={16} className="sidebar-accordion-chevron" />
+                </button>
+
+                <div className="sidebar-accordion-collapse">
+                  <div className="sidebar-accordion-inner">
+                    <div className="sidebar-accordion-body">
+                    {editing && !readOnly ? (
+                      <div className="space-y-3">
+                        {showShiny && (
+                          <div className="sidebar-form-group">
+                            <label className="sidebar-label">Checks:</label>
+                            <div className="relative">
+                              <input
+                                type="number"
+                                id="checks-input"
+                                name="checks"
+                                value={editData.checks}
+                                min="0"
+                                max="999999"
+                                onChange={handleEditChange}
+                                placeholder={editData.game === "Home" ? "Checks not available in this game" : "Number of checks"}
+                                className="sidebar-input pr-20"
+                                disabled={editData.game === "Home"}
+                                autoComplete="off"
+                              />
+                              {editData.game !== "Home" && (
+                                <>
+                                  <div className="absolute right-3.5 top-1/2 transform -translate-y-1/2 flex flex-col gap-0">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const newValue = Math.min(999999, (editData.checks || 0) + 1);
+                                        handleEditChange({ target: { name: 'checks', value: newValue } });
+                                      }}
+                                      className="flex items-center justify-center p-0.5 transition-colors duration-200"
+                                      title="Increase checks"
+                                    >
+                                      <ChevronUp className="w-4 h-4 text-[var(--accent)] hover:text-white transition-colors duration-200" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const newValue = Math.max(0, (editData.checks || 0) - 1);
+                                        handleEditChange({ target: { name: 'checks', value: newValue } });
+                                      }}
+                                      className="flex items-center justify-center p-0.5 transition-colors duration-200"
+                                      title="Decrease checks"
+                                    >
+                                      <ChevronDown className="w-4 h-4 text-[var(--accent)] hover:text-white transition-colors duration-200" />
+                                    </button>
+                                  </div>
+                                  {(editData.checks !== '' && editData.checks !== null && editData.checks !== undefined) && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleEditChange({ target: { name: 'checks', value: '' } })}
+                                      className="p-1"
+                                      title="Clear checks"
+                                    >
+                                      <X size={14} />
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Modifiers checkboxes */}
+                        {showShiny && editData.game && availableMethods.length > 0 && (
+                          <div className="sidebar-form-group">
+                            <label className="sidebar-label">Modifiers:</label>
+                            <div className="flex flex-wrap gap-2 pt-1">
+                              {gameModifiers["Shiny Charm"] > 0 && !(editData.method === "Fossil Revivals" && (editData.game === "Let's Go Pikachu" || editData.game === "Let's Go Eevee" || editData.game === "Sword" || editData.game === "Shield")) && !(editData.method === "Fossil Revivals" && editData.game === "Legends Z-A") && !(editData.method === "Dynamax Raids" && (editData.game === "Sword" || editData.game === "Shield")) && !(editData.method === "Gift Pokemon" && (editData.game === "Sword" || editData.game === "Shield" || editData.game === "Let's Go Eevee" || editData.game === "Let's Go Pikachu")) && !(editData.method === "Tera Raids" && (editData.game === "Scarlet" || editData.game === "Violet")) && !((editData.method === "Random Encounters" || editData.method === "Poke Radar" || editData.method === "Soft Resets" || editData.method === "Fossil Revivals" || editData.method === "Gift Pokemon" || editData.method === "Underground Diglett Hunt") && (editData.game === "Brilliant Diamond" || editData.game === "Shining Pearl")) && !(editData.method === "Poke Radar" && (editData.game === "X" || editData.game === "Y")) && !(editData.method === "Ultra Wormholes" && (editData.game === "Ultra Sun" || editData.game === "Ultra Moon")) && (
+                                <label className="flex items-center gap-2 cursor-pointer bg-[#1e1e1e] border border-[#333] px-2.5 py-1.5 rounded-lg text-xs">
+                                  <input
+                                    type="checkbox"
+                                    checked={editData.modifiers?.shinyCharm || false}
+                                    onChange={(e) => {
+                                      const newShinyCharm = e.target.checked;
+                                      setEditData(edit => ({
+                                        ...edit,
+                                        modifiers: {
+                                          ...edit.modifiers,
+                                          shinyCharm: newShinyCharm,
+                                          researchLv10: newShinyCharm && editData.game === "Legends Arceus" ? true : edit.modifiers?.researchLv10 || false
+                                        }
+                                      }));
+                                    }}
+                                  />
+                                  <span>Shiny Charm</span>
+                                </label>
+                              )}
+                              {gameModifiers["Shiny Parents"] > 0 && editData.method === "Breeding" && (
+                                <label className="flex items-center gap-2 cursor-pointer bg-[#1e1e1e] border border-[#333] px-2.5 py-1.5 rounded-lg text-xs">
+                                  <input
+                                    type="checkbox"
+                                    checked={editData.modifiers?.shinyParents || false}
+                                    onChange={(e) => setEditData(edit => ({
+                                      ...edit,
+                                      modifiers: { ...edit.modifiers, shinyParents: e.target.checked }
+                                    }))}
+                                  />
+                                  <span>Shiny Parents</span>
+                                </label>
+                              )}
+                              {gameModifiers["Lure Active"] > 0 && (editData.method === "Catch Combo" || editData.method === "Random Encounters" || (editData.method === "Soft Resets" && editData.game !== "Let's Go Pikachu" && editData.game !== "Let's Go Eevee")) && (
+                                <label className="flex items-center gap-2 cursor-pointer bg-[#1e1e1e] border border-[#333] px-2.5 py-1.5 rounded-lg text-xs">
+                                  <input
+                                    type="checkbox"
+                                    checked={editData.modifiers?.lureActive || false}
+                                    onChange={(e) => setEditData(edit => ({
+                                      ...edit,
+                                      modifiers: { ...edit.modifiers, lureActive: e.target.checked }
+                                    }))}
+                                  />
+                                  <span>Lure Active</span>
+                                </label>
+                              )}
+                              {gameModifiers["Research Lv 10"] > 0 && editData.game === "Legends Arceus" && (
+                                <label className="flex items-center gap-2 cursor-pointer bg-[#1e1e1e] border border-[#333] px-2.5 py-1.5 rounded-lg text-xs">
+                                  <input
+                                    type="checkbox"
+                                    checked={editData.modifiers?.researchLv10 || false}
+                                    onChange={(e) => setEditData(edit => ({
+                                      ...edit,
+                                      modifiers: { ...edit.modifiers, researchLv10: e.target.checked }
+                                    }))}
+                                  />
+                                  <span>Research Lv 10</span>
+                                </label>
+                              )}
+                              {gameModifiers["Perfect Research"] > 0 && editData.game === "Legends Arceus" && (
+                                <label className="flex items-center gap-2 cursor-pointer bg-[#1e1e1e] border border-[#333] px-2.5 py-1.5 rounded-lg text-xs">
+                                  <input
+                                    type="checkbox"
+                                    checked={editData.modifiers?.perfectResearch || false}
+                                    onChange={(e) => setEditData(edit => ({
+                                      ...edit,
+                                      modifiers: { ...edit.modifiers, perfectResearch: e.target.checked }
+                                    }))}
+                                  />
+                                  <span>Perfect Research</span>
+                                </label>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-2.5">
+                        {/* Odds display */}
+                        {showShiny && editData.game && editData.method && (() => {
+                          if (editData.game === "Home" && editData.method === "Gift Pokemon") return null;
+                          try {
+                            const checkCount = editData.checks ? Number(editData.checks) : 0;
+                            const modifiers = editData.modifiers || {};
+                            const getOddsDisplay = () => {
+                              if (editData.method === "Ultra Wormholes" && (editData.game === "Ultra Sun" || editData.game === "Ultra Moon")) {
+                                return "1% → 36%";
+                              }
+                              let effectiveModifiers = { ...modifiers };
+                              if (editData.method === "Sandwich" && (editData.game === "Scarlet" || editData.game === "Violet")) {
+                                if (!effectiveModifiers.sparklingLv1 && !effectiveModifiers.sparklingLv2 && !effectiveModifiers.sparklingLv3) {
+                                  effectiveModifiers.sparklingLv3 = true;
+                                }
+                              }
+                              let effectiveCheckCount = checkCount;
+                              if (editData.method === "Mass Outbreaks" && checkCount === 0) {
+                                effectiveCheckCount = 60;
+                              }
+                              const calculatedOdds = getCurrentHuntOdds(editData.game, editData.method, effectiveModifiers, effectiveCheckCount);
+                              return `1/${calculatedOdds.toLocaleString()}`;
+                            };
+                            return (
+                              <div className="sidebar-display-card">
+                                <div className="sidebar-display-info">
+                                  <div className="sidebar-display-label">Odds</div>
+                                  <div className="sidebar-display-value">{getOddsDisplay()}</div>
+                                </div>
+                                <div className="sidebar-display-icon">
+                                  <img src="/data/SidebarIcons/Odds.svg" alt="Odds" className="w-full h-full object-contain" />
+                                </div>
+                              </div>
+                            );
+                          } catch (e) {
+                            return null;
+                          }
+                        })()}
+
+                        {/* Checks */}
+                        {showShiny && editData.checks !== undefined && editData.checks !== null && String(editData.checks).trim() !== "" && (
+                          <div className="sidebar-display-card">
+                            <div className="sidebar-display-info">
+                              <div className="sidebar-display-label">Checks</div>
+                              <div className="sidebar-display-value">{Number(editData.checks).toLocaleString()}</div>
+                            </div>
+                            <div className="sidebar-display-icon">
+                              <img src="/data/SidebarIcons/Checks.svg" alt="Checks" className="w-full h-full object-contain" />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Time */}
+                        {editData.time !== undefined && editData.time !== null && editData.time !== "" && editData.time !== 0 && (
+                          <div className="sidebar-display-card">
+                            <div className="sidebar-display-info">
+                              <div className="sidebar-display-label">Time</div>
+                              <div className="sidebar-display-value">{formatTimeFull(typeof editData.time === 'string' ? parseInt(editData.time) || 0 : (typeof editData.time === 'number' ? editData.time : 0))}</div>
+                            </div>
+                            <div className="sidebar-display-icon">
+                              <img src="/data/SidebarIcons/Time.svg" alt="Time" className="w-full h-full object-contain" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
-              )}
+              </div>
+            </div>
+          )}
 
-              {editData.date && (
-                <div className="sidebar-display-card">
-                  <div className="sidebar-display-info">
-                    <div className="sidebar-display-label">Date</div>
-                    <div className="sidebar-display-value">{formatDate(editData.date)}</div>
-                  </div>
-                  <div className="sidebar-display-icon">
-                    <img src="/data/SidebarIcons/Date.svg" alt="Date" className="w-full h-full object-contain" />
-                  </div>
+            {/* Additional Info Accordion */}
+            <div className={`sidebar-accordion ${openAccordion === 'additional' ? 'open' : ''}`}>
+              <button
+                type="button"
+                data-tutorial-id="info-accordion-header"
+                className="sidebar-accordion-header"
+                onClick={() => setOpenAccordion(prev => prev === 'additional' ? null : 'additional')}
+              >
+                <span>ADDITIONAL INFO</span>
+                <ChevronDown size={16} className="sidebar-accordion-chevron" />
+              </button>
+
+              <div className="sidebar-accordion-collapse">
+                <div className="sidebar-accordion-inner">
+                  <div className="sidebar-accordion-body" data-tutorial-id="sidebar-info-content">
+                  {/* Recommended Balls Section */}
+                  {pokemon?.recommended_balls && (
+                    <div className="sidebar-info-section" style={{ marginBottom: '8px' }}>
+                      <div className="sidebar-info-section-header">
+                        <Sparkles size={18} className="text-[var(--accent)]" />
+                        <span className="sidebar-info-section-title">RECOMMENDED BALLS</span>
+                      </div>
+                      <div className="sidebar-info-section-divider"></div>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '4px' }}>
+                        {((showShiny && pokemon.recommended_balls.shiny?.length > 0 ? pokemon.recommended_balls.shiny : pokemon.recommended_balls.default) || []).map((ballName, idx) => {
+                          const ballObj = BALL_OPTIONS.find(b => b.value === ballName);
+                          if (!ballObj) return null;
+                          return <RecommendedBallComponent key={idx} ballObj={ballObj} />;
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Obtainable In Section */}
+                  {pokemon && (
+                    <div className="sidebar-info-section" style={{ marginBottom: '8px' }}>
+                      <div className="sidebar-info-section-header">
+                        <Gamepad2 size={18} className="text-[var(--accent)]" />
+                        <span className="sidebar-info-section-title">OBTAINABLE IN</span>
+                      </div>
+                      <div className="sidebar-info-section-divider"></div>
+                      <div className="available-games-grid">
+                        {getGroupedGames(getAvailableGames(pokemon)).map((gameGroup, index) => (
+                          <GameTag
+                            key={`${gameGroup.displayName}-${index}`}
+                            gameGroup={gameGroup}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Evolution Chain */}
+                  {pokemon && <EvolutionChain pokemon={pokemon} showShiny={showShiny} onPokemonSelect={onPokemonSelect} dexPreferences={dexPreferences} />}
+
+                  {/* Related Forms Section */}
+                  {renderRelatedFormsSection()}
                 </div>
-              )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
-              {ballObj && editData.ball && (
-                <div className="sidebar-display-card">
-                  <div className="sidebar-display-info">
-                    <div className="sidebar-display-label">Ball</div>
-                    <div className="sidebar-display-value">{ballObj.name}</div>
-                  </div>
-                  <div className="sidebar-display-image">
-                    <img src={ballObj.image} alt="" className="w-full h-full object-contain" onError={e => (e.target.style.display = "none")} />
-                  </div>
-                </div>
-              )}
-
-              {gameObj && editData.game && (
-                <div className="sidebar-display-card">
-                  <div className="sidebar-display-info">
-                    <div className="sidebar-display-label">Game</div>
-                    <div className="sidebar-display-value">{gameObj.name}</div>
-                  </div>
-                  <div className="sidebar-display-image">
-                    <img src={gameObj.image} alt="" className="w-full h-full object-contain" onError={e => (e.target.style.display = "none")} />
-                  </div>
-                </div>
-              )}
-
-              {editData.method && editData.method !== "" && (
-                <div className="sidebar-display-card">
-                  <div className="sidebar-display-info">
-                    <div className="sidebar-display-label">Method</div>
-                    <div className="sidebar-display-value">{editData.method}</div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    {editData.method === "Permutations" && editData.chartData && (
+        {/* --- MARKS TAB --- */}
+        {activeTab === 'marks' && showMarksTab && (
+          <div className="sidebar-marks-tab-wrap">
+            {editing && !readOnly ? (
+              <>
+                {/* Current Active Marks Container */}
+                <div className="sidebar-current-marks-container">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-[var(--sidebar-text)] opacity-70 uppercase tracking-wide font-semibold">
+                      {selectedMarks.length > 0 ? `Assigned Marks (${selectedMarks.length})` : "Active Mark"}
+                    </div>
+                    {selectedMarks.length > 0 && !isMighty && (
                       <button
                         type="button"
-                        onClick={() => setShowChartModal(true)}
-                        className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#2a2a2a] hover:bg-[#383838] border border-[#444] hover:border-[var(--accent)] text-[var(--accent)] transition-all duration-200 cursor-pointer"
-                        title="View Permutation Chart"
+                        onClick={handleClearAllMarks}
+                        className="text-xs text-red-400 hover:text-red-300 font-semibold cursor-pointer transition-colors"
                       >
-                        <ListTodo size={20} />
+                        Clear All
                       </button>
                     )}
-                    <div className="sidebar-display-icon">
-                      <img src="/data/SidebarIcons/Method.svg" alt="Method" className="w-full h-full object-contain" />
-                    </div>
                   </div>
-                </div>
-              )}
 
-              {markObj && editData.mark && (
-                <div className="sidebar-display-card">
-                  <div className="sidebar-display-info">
-                    <div className="sidebar-display-label">Mark</div>
-                    <div className="sidebar-display-value">{markObj.name}</div>
-                  </div>
-                  <div className="sidebar-display-image-large">
-                    <img src={markObj.image} alt="" className="w-full h-full object-contain" onError={e => (e.target.style.display = "none")} />
-                  </div>
+                  {selectedMarks.length > 0 ? (
+                    <div className="sidebar-marks-chip-list">
+                      {selectedMarks.map((markVal) => {
+                        const mObj = MARK_OPTIONS.find(m => m.value === markVal);
+                        return (
+                          <div key={markVal} className="sidebar-active-mark-chip">
+                            {mObj?.image && (
+                              <img src={mObj.image} alt={mObj.name} className="w-5 h-5 object-contain" />
+                            )}
+                            <span className="text-xs font-bold text-white">
+                              {mObj ? mObj.name.replace(" Mark", "") : markVal}
+                            </span>
+                            {!isMighty && (
+                              <button
+                                type="button"
+                                onClick={() => handleSelectMark(markVal)}
+                                className="sidebar-mark-chip-remove"
+                                title="Remove mark"
+                              >
+                                <X size={11} />
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="py-2 text-center text-sm font-medium text-gray-400">
+                      No Marks Assigned
+                    </div>
+                  )}
                 </div>
-              )}
 
-              {(editData.checks !== undefined &&
-                editData.checks !== null &&
-                String(editData.checks).trim() !== "") && (
-                  <div className="sidebar-display-card">
-                    <div className="sidebar-display-info">
-                      <div className="sidebar-display-label">Checks</div>
-                      <div className="sidebar-display-value">{Number(editData.checks).toLocaleString()}</div>
-                    </div>
-                    <div className="sidebar-display-icon">
-                      <img src="/data/SidebarIcons/Checks.svg" alt="Checks" className="w-full h-full object-contain" />
-                    </div>
+                {/* Search Filter for Marks */}
+                {!isMighty && (
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search marks..."
+                      value={markSearchQuery}
+                      onChange={e => setMarkSearchQuery(e.target.value)}
+                      className="sidebar-input pr-8"
+                    />
+                    <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   </div>
                 )}
 
-              {/* Show shiny odds when applicable */}
-              {showShiny && editData.game && editData.method && (() => {
-                if (editData.game === "Home" && editData.method === "Gift Pokemon") return null;
-                try {
-                  const checkCount = editData.checks ? Number(editData.checks) : 0;
-                  const modifiers = editData.modifiers || {};
-                  
-                  // Helper function to format the odds display
-                  const getOddsDisplay = () => {
-                    // Ultra Wormhole special text
-                    if (editData.method === "Ultra Wormholes" && (editData.game === "Ultra Sun" || editData.game === "Ultra Moon")) {
-                      return "1% → 36%";
-                    }
-                    
-                    // Automatically apply Sparkling Lv 3 for Sandwich if no sparkling level is set
-                    let effectiveModifiers = { ...modifiers };
-                    if (editData.method === "Sandwich" && (editData.game === "Scarlet" || editData.game === "Violet")) {
-                      if (!effectiveModifiers.sparklingLv1 && !effectiveModifiers.sparklingLv2 && !effectiveModifiers.sparklingLv3) {
-                        effectiveModifiers.sparklingLv3 = true;
-                      }
-                    }
-
-                    // Maximize odds for Mass Outbreaks if no checks are provided
-                    let effectiveCheckCount = checkCount;
-                    if (editData.method === "Mass Outbreaks" && checkCount === 0) {
-                      effectiveCheckCount = 60; // Max checks for highest odds (e.g., 1/512 in S/V)
-                    }
-                    
-                    const calculatedOdds = getCurrentHuntOdds(editData.game, editData.method, effectiveModifiers, effectiveCheckCount);
-                    return `1/${calculatedOdds.toLocaleString()}`;
-                  };
-
+                {/* Marks Selection Grid */}
+                <div className="sidebar-marks-grid custom-scrollbar">
+                  {filteredMarks.map((m) => {
+                    const isSelected = selectedMarks.includes(m.value);
+                    return (
+                      <button
+                        key={m.value}
+                        type="button"
+                        onClick={() => handleSelectMark(m.value)}
+                        className={`sidebar-mark-item-btn ${isSelected ? 'selected' : ''}`}
+                        title={m.name}
+                      >
+                        {isSelected && (
+                          <div className="sidebar-mark-check-badge">
+                            <Check size={10} strokeWidth={3} />
+                          </div>
+                        )}
+                        <img src={m.image} alt={m.name} className="w-9 h-9 object-contain" />
+                        <span className="text-[10px] font-semibold text-center text-gray-200 line-clamp-2 leading-tight">
+                          {m.name.replace(" Mark", "")}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              /* View Mode: Only show active marks in clean square tiles */
+              <div className="sidebar-saved-marks-grid">
+                {selectedMarks.map((markVal) => {
+                  const mObj = MARK_OPTIONS.find(m => m.value === markVal);
                   return (
-                    <div className="sidebar-display-card">
-                      <div className="sidebar-display-info">
-                        <div className="sidebar-display-label">Odds</div>
-                        <div className="sidebar-display-value">{getOddsDisplay()}</div>
+                    <div key={markVal} className="sidebar-saved-mark-card" title={mObj ? mObj.name : markVal}>
+                      <div className="sidebar-saved-mark-img-wrap">
+                        {mObj?.image ? (
+                          <img src={mObj.image} alt={mObj.name} className="w-10 h-10 object-contain" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-white/10" />
+                        )}
                       </div>
-                      <div className="sidebar-display-icon">
-                        <img src="/data/SidebarIcons/Odds.svg" alt="Odds" className="w-full h-full object-contain" />
-                      </div>
+                      <span className="sidebar-saved-mark-name">
+                        {mObj ? mObj.name.replace(" Mark", "") : markVal}
+                      </span>
                     </div>
                   );
-                } catch (e) {
-                  return null;
-                }
-              })()}
-
-              {(editData.time !== undefined && editData.time !== null && editData.time !== "" && editData.time !== 0) && (
-                <div className="sidebar-display-card">
-                  <div className="sidebar-display-info">
-                    <div className="sidebar-display-label">Time</div>
-                    <div className="sidebar-display-value">{formatTimeFull(typeof editData.time === 'string' ? parseInt(editData.time) || 0 : (typeof editData.time === 'number' ? editData.time : 0))}</div>
-                  </div>
-                  <div className="sidebar-display-icon">
-                    <img src="/data/SidebarIcons/Time.svg" alt="Time" className="w-full h-full object-contain" />
-                  </div>
-                </div>
-              )}
-
-              {editData.notes && editData.notes !== "" && (
-                <div className="sidebar-display-card">
-                  <div className="sidebar-display-info flex-1 mr-4">
-                    <div className="sidebar-display-label">Notes</div>
-                    <div className="sidebar-display-value break-words">{editData.notes}</div>
-                  </div>
-                  <div className="sidebar-display-icon flex-shrink-0">
-                    <img src="/data/SidebarIcons/Notes.svg" alt="Notes" className="w-full h-full object-contain" />
-                  </div>
-                </div>
-              )}
-
-
-
-
-
-
-              {/* Show warning when viewing an entry with no data - only for read-only modes and multiple entries */}
-              {readOnly && localEntries.length > 1 && !editData.date && !editData.ball && !editData.game && !editData.mark &&
-                !editData.method && !editData.checks && !editData.notes && (
-                  <div className="sidebar-warning">
-                    <span className="sidebar-warning-text">This entry has no saved data</span>
-                  </div>
-                )}
-            </div>
-
-            {/* Edit button */}
-            {!readOnly && (
-              <div className="sidebar-edit-section">
-                <button
-                  className="sidebar-button"
-                  onClick={() => setEditing(true)}
-                >
-                  Edit Info
-                </button>
+                })}
               </div>
             )}
 
-            {/* Show message when caught but no data in read-only mode */}
-            {readOnly && viewingUsername && caughtInfo && (
-              !localEntries.length ||
-                localEntries.every(entry =>
-                  !entry.nickname &&
-                  !entry.date &&
-                  !entry.ball &&
-                  !entry.mark &&
-                  !entry.method &&
-                  !entry.game &&
-                  !entry.checks &&
-                  !entry.notes
-                ) ? (
-                <div className="sidebar-message">
-                  <div>{viewingUsername} has not set any data for {formatPokemonName(pokemon?.name)}</div>
-                </div>
-              ) : null
+            {readOnly && (
+              <div className="text-center py-4 text-sm text-[var(--sidebar-text)] opacity-70">
+                {viewingUsername ? `${viewingUsername}'s mark collection for this Pokémon` : "Viewing mode"}
+              </div>
             )}
+          </div>
+        )}
 
+        {/* --- NOTES TAB --- */}
+        {activeTab === 'notes' && showNotesTab && (
+          <div className="sidebar-notes-tab-wrap">
+            {editing && !readOnly ? (
+              <div className="space-y-3">
+                <div className="sidebar-form-group">
+                  <label className="sidebar-label">Notes / Extras:</label>
+                  <ContentFilterInput
+                    id="notes-textarea"
+                    name="notes"
+                    type="textarea"
+                    value={editData.notes}
+                    onChange={handleEditChange}
+                    placeholder="Add notes about this Pokemon..."
+                    configType="notes"
+                    showCharacterCount={true}
+                    showRealTimeValidation={true}
+                    className="sidebar-input"
+                    autoComplete="off"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {editData.notes ? (
+                  <div className="sidebar-notes-card">
+                    <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2 mb-1">
+                      <span className="text-xs font-semibold text-[var(--accent)] uppercase tracking-wider">Pokémon Notes</span>
+                      {!readOnly && (
+                        <button
+                          type="button"
+                          onClick={() => setEditing(true)}
+                          className="text-xs text-[var(--accent)] hover:underline font-semibold cursor-pointer"
+                        >
+                          Edit
+                        </button>
+                      )}
+                    </div>
+                    <div className="sidebar-notes-text">{editData.notes}</div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col items-center gap-3">
+                    <p className="text-sm text-[var(--sidebar-text)] opacity-70">No notes written for this Pokémon yet.</p>
+                    {!readOnly && caughtInfo && (
+                      <button
+                        type="button"
+                        onClick={() => setEditing(true)}
+                        className="px-4 py-2 bg-[var(--accent)] text-black font-bold rounded-lg text-xs hover:bg-[var(--accent-hover)] hover:text-white transition-all"
+                      >
+                        Add Notes
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
+      {/* Pinned Bottom Footer Action Bar - visible on all tabs */}
+      {!readOnly && caughtInfo && (
+        <div className="sidebar-footer-actions">
+          {editing ? (
+            <div className="sidebar-footer-button-col">
+              <button
+                type="button"
+                data-tutorial-id="save-entry-btn"
+                className="sidebar-btn-primary"
+                onClick={handleSaveEdit}
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                className="sidebar-btn-secondary"
+                onClick={handleCancelEdit}
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <div className="sidebar-footer-button-col">
+              {/* Row 1: Edit Information (Full Width) */}
+              <button
+                type="button"
+                data-tutorial-id="edit-info-btn"
+                className="sidebar-btn-primary"
+                onClick={() => {
+                  setEditing(true);
+                  setActiveTab('data');
+                  setOpenAccordion('catch');
+                }}
+              >
+                Edit Information
+              </button>
 
-            {!readOnly && (
-              ((localEntries.some(entry => entry.nickname && entry.nickname !== "")) ||
-                (localEntries.some(entry => entry.ball)) ||
-                (localEntries.some(entry => entry.game)) ||
-                (localEntries.some(entry => entry.mark)) ||
-                (localEntries.some(entry => entry.method && entry.method !== "" && entry.method !== METHOD_OPTIONS[0])) ||
-                (localEntries.some(entry => entry.checks && String(entry.checks).trim() !== "" && entry.checks !== 0)) ||
-                (localEntries.some(entry => entry.notes && entry.notes !== "")) ||
-                (localEntries.some(entry => entry.date && entry.date !== "")) ||
-                (localEntries.length > 1)) && (
-                <div className="sidebar-reset-section" style={{ display: 'flex', gap: '12px', width: '100%' }}>
-                  <button className="sidebar-reset-button flex items-center justify-center" style={{ flex: '1 1 0', margin: 0, padding: '8px', minWidth: 0 }} onClick={handleReset}>Reset</button>
-                  {hasEvolution() && (
-                    <button 
-                      className="sidebar-button flex items-center justify-center" 
-                      style={{ flex: '1 1 0', margin: 0, padding: '8px', minWidth: 0 }} 
-                      onClick={handleEvolve}
-                    >
-                      Evolve
-                    </button>
+              {/* Row 2: Evolve + More (...) */}
+              <div className="sidebar-footer-button-row">
+                <button
+                  type="button"
+                  className={`sidebar-btn-evolve ${!hasEvolution() ? 'disabled' : ''}`}
+                  onClick={hasEvolution() ? handleEvolve : undefined}
+                  disabled={!hasEvolution()}
+                  title={hasEvolution() ? "Evolve Pokémon" : "No further evolutions available"}
+                >
+                  <ChevronsUp size={18} />
+                  <span>Evolve</span>
+                </button>
+
+                <div className="sidebar-more-menu-container" ref={moreMenuRef}>
+                  <button
+                    type="button"
+                    className={`sidebar-btn-more ${showMoreMenu ? 'active' : ''}`}
+                    onClick={() => setShowMoreMenu(prev => !prev)}
+                    title="More actions"
+                    aria-label="More actions"
+                  >
+                    <MoreHorizontal size={20} />
+                  </button>
+
+                  {showMoreMenu && (
+                    <div className="sidebar-more-menu-dropdown">
+                      <button
+                        type="button"
+                        className="sidebar-more-menu-item"
+                        onClick={() => {
+                          setShowMoreMenu(false);
+                          handleDuplicateEntry();
+                        }}
+                      >
+                        <Copy size={16} />
+                        <span>Duplicate Entry</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="sidebar-more-menu-item"
+                        onClick={() => {
+                          setShowMoreMenu(false);
+                          handleCopySummary();
+                        }}
+                      >
+                        <FileText size={16} />
+                        <span>Copy Summary</span>
+                      </button>
+
+                      <div className="sidebar-more-menu-divider" />
+
+                      <button
+                        type="button"
+                        className="sidebar-more-menu-item danger"
+                        onClick={() => {
+                          setShowMoreMenu(false);
+                          handleReset();
+                        }}
+                      >
+                        <RotateCcw size={16} />
+                        <span>Reset Data</span>
+                      </button>
+                    </div>
                   )}
                 </div>
-              )
-            )}
-
-          </div>
-        )}
-          </>
-        )}
-
-        {activeTab === 'info' && (
-          <>
-            {/* Spacer for evolution chain */}
-            <div className="evolution-chain-spacer"></div>
-
-            {/* Available Games Section */}
-            {pokemon && (
-          <div className="available-games-section">
-            <h3 className="available-games-title">OBTAINABLE IN</h3>
-            <div className="available-games-divider"></div>
-            <div className="available-games-grid">
-              {getGroupedGames(getAvailableGames(pokemon)).map((gameGroup, index) => (
-                <GameTag
-                  key={`${gameGroup.displayName}-${index}`}
-                  gameGroup={gameGroup}
-                />
-              ))}
+              </div>
             </div>
-          </div>
-        )}
-
-        {pokemon && <EvolutionChain pokemon={pokemon} showShiny={showShiny} onPokemonSelect={onPokemonSelect} dexPreferences={dexPreferences} />}
-
-        {/* Related Forms Section */}
-        {pokemon && (() => {
-          let relatedForms = getRelatedForms(pokemon);
-
-          // Apply filtering based on preferences
-          if (dexPreferences) {
-            // Filter by form types (Gender, Alolan, etc.)
-            relatedForms = filterFormsByPreferences(relatedForms, dexPreferences);
-
-            // Filter by locked shinies if showing shiny
-            if (showShiny) {
-              const {
-                blockUnobtainableShinies,
-                blockGOExclusiveShinies,
-                blockNOOTExclusiveShinies
-              } = dexPreferences;
-
-              relatedForms = relatedForms.filter(form => {
-                const paddedId = String(form.id).padStart(4, '0');
-                const formName = form.name;
-
-                // Check Unobtainable Shinies
-                if (blockUnobtainableShinies) {
-                  if (UNOBTAINABLE_SHINY_DEX_NUMBERS.includes(paddedId)) return false;
-                  if (UNOBTAINABLE_SHINY_FORM_NAMES.includes(formName)) return false;
-                }
-
-                // Check GO Exclusive Shinies
-                if (blockGOExclusiveShinies) {
-                  if (GO_EXCLUSIVE_SHINY_DEX_NUMBERS.includes(paddedId)) return false;
-                  if (GO_EXCLUSIVE_SHINY_FORM_NAMES.includes(formName)) return false;
-                }
-
-                // Check NO OT Exclusive Shinies
-                if (blockNOOTExclusiveShinies) {
-                  if (NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.includes(paddedId)) return false;
-                  if (NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.includes(formName)) return false;
-                }
-
-                return true;
-              });
-            }
-          }
-
-          if (relatedForms.length === 0) return null;
-
-          const groups = [
-            { key: "REGIONAL FORMS", label: "REGIONAL FORMS", forms: [] },
-            { key: "MEGA EVOLUTIONS", label: "MEGA EVOLUTIONS", forms: [] },
-            { key: "GIGANTAMAX FORMS", label: "GIGANTAMAX FORMS", forms: [] },
-            { key: "ALPHA FORMS", label: "ALPHA FORMS", forms: [] },
-            { key: "GENDER FORMS", label: "GENDER FORMS", forms: [] },
-            { key: "OTHER FORMS", label: "RELATED FORMS", forms: [] }
-          ];
-
-          relatedForms.forEach(form => {
-            const name = form.name || "";
-            const type = form.formType || "";
-            const stableId = form.stableId || "";
-
-            let nameToCheck = name;
-            if (nameToCheck.includes("-alpha")) nameToCheck = nameToCheck.replace("-alpha", "");
-
-            const isFemale = type === 'gender' || (type === 'alphaother' && stableId.includes('female')) || name.includes('-female');
-            const isMale = !isFemale && ((name.includes('-male')) || (stableId.includes('male')) || genderForms.includes(nameToCheck));
-
-            const isAlpha = type === 'alpha' || type === 'alphaother' || name.includes('-alpha');
-            const isGmax = type === 'gmax' || name.includes('-gmax');
-            const isMega = type === 'mega' || name.includes('-mega') || name.includes('-primal');
-            const isRegional = type === 'regional' || name.includes('-alola') || name.includes('-galar') || name.includes('-hisui') || name.includes('-paldea');
-            
-            if (isAlpha) {
-              groups.find(g => g.key === "ALPHA FORMS").forms.push(form);
-            } else if (isGmax) {
-              groups.find(g => g.key === "GIGANTAMAX FORMS").forms.push(form);
-            } else if (isMega) {
-              groups.find(g => g.key === "MEGA EVOLUTIONS").forms.push(form);
-            } else if (isRegional) {
-              groups.find(g => g.key === "REGIONAL FORMS").forms.push(form);
-            } else if (type === 'gender' || isFemale || isMale) {
-              groups.find(g => g.key === "GENDER FORMS").forms.push(form);
-            } else {
-              groups.find(g => g.key === "OTHER FORMS").forms.push(form);
-            }
-          });
-
-          return (
-            <div className="flex flex-col w-full gap-4">
-              {groups.filter(g => g.forms.length > 0).map(group => (
-                <div key={group.key} className="related-forms-section">
-                  <div className="related-forms-title">{group.label}</div>
-                  <div className="related-forms-divider"></div>
-                  <div className="related-forms-grid">
-                    {group.forms.map((form, index) => {
-                      const imgSrc = getSpriteUrl(form, showShiny, dexPreferences?.useHomeSprites);
-
-                      const formLabel = getFormDisplayName(form) || formatPokemonName(form.name);
-                      const isClickable = onPokemonSelect !== null;
-
-                      // Determine overlay icon (Single Priority)
-                      let iconSrc = null;
-                      let iconColor = "#6b7280";
-                      let iconPadding = "2px";
-
-                      // Check attributes
-                      const isAlpha = form.formType === 'alpha' || form.formType === 'alphaother' || (form.name && form.name.includes('-alpha'));
-                      const isGmax = form.formType === 'gmax' || (form.name && form.name.includes('-gmax'));
-
-                      let nameToCheck = form.name || "";
-                      if (nameToCheck.includes("-alpha")) nameToCheck = nameToCheck.replace("-alpha", "");
-
-                      const isFemale = form.formType === 'gender' || (form.formType === 'alphaother' && form.stableId && form.stableId.includes('female')) || (form.name && form.name.includes('-female'));
-                      const isMale = !isFemale && ((form.name && form.name.includes('-male')) || (form.stableId && form.stableId.includes('male')) || genderForms.includes(nameToCheck));
-
-                      if (isAlpha) {
-                        if (isFemale) {
-                          iconSrc = "/data/SidebarIcons/Alpha_Mark_Female.png";
-                          iconColor = "#ef6491";
-                          iconPadding = "2px";
-                        } else if (isMale) {
-                          iconSrc = "/data/SidebarIcons/Alpha_Mark_Male.png";
-                          iconColor = "#316497";
-                          iconPadding = "2px";
-                        } else {
-                          iconSrc = "/data/SidebarIcons/Alpha_Mark.png";
-                          iconColor = "#e05555";
-                          iconPadding = "2px";
-                        }
-                      } else {
-                        if (isFemale) {
-                          iconSrc = "/data/SidebarIcons/Female.svg";
-                          iconColor = "#ef6491";
-                          iconPadding = "5px";
-                        } else if (isMale) {
-                          iconSrc = "/data/SidebarIcons/Male.svg";
-                          iconColor = "#316497";
-                          iconPadding = "5px";
-                        }
-                      }
-
-                      return (
-                        <div
-                          key={form.stableId || `${form.id}-${form.name}`}
-                          className={`evo-sprite ${isClickable ? 'evo-sprite-clickable' : ''}`}
-                          onClick={() => isClickable && onPokemonSelect(form)}
-                          style={{ cursor: isClickable ? 'pointer' : 'default' }}
-                        >
-                          <img
-                            src={imgSrc}
-                            alt={form.name}
-                            title={formLabel}
-                            className="evo-img"
-                            width={44}
-                            height={44}
-                            style={{ padding: isGmax ? '5px' : '0', objectFit: 'contain' }}
-                          />
-                          {iconSrc && (
-                            <div
-                              className="form-icon-overlay"
-                              style={{
-                                borderColor: iconColor,
-                                padding: iconPadding,
-                                top: '-6px',
-                                right: '-6px'
-                              }}
-                            >
-                              <img src={iconSrc} alt="Form Icon" />
-                            </div>
-                          )}
-                          <span className="related-form-tooltip">{formLabel}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          );
-        })()}
-          </>
-        )}
-
+          )}
+        </div>
+      )}
       </div>
 
       {/* Reset Pokémon Modal */}

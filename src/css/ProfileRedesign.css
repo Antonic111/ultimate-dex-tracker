@@ -1,0 +1,752 @@
+/* ==========================================================================
+   REDESIGN CSS (Overrides for new 3-tier layout)
+   ========================================================================== */
+
+/* 1. Hero Section */
+.profile-hero-section {
+  @apply relative w-full max-w-[1300px] flex rounded-xl p-8 mb-6;
+  background: var(--profile-card-bg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-color);
+}
+
+.profile-background-banner-placeholder {
+  /* For future gengar bg */
+  @apply absolute right-0 top-0 bottom-0 w-1/2 rounded-r-xl pointer-events-none;
+}
+
+.profile-hero-content {
+  @apply relative z-10 flex gap-8 w-full items-start;
+}
+
+.profile-hero-avatar-wrapper {
+  @apply flex-shrink-0 relative;
+}
+
+.profile-hero-avatar {
+  @apply w-[180px] h-[180px] rounded-full overflow-hidden bg-[var(--pokemon-box-bg)] flex justify-center items-center relative border-[3px] border-[var(--border-color)];
+}
+
+.profile-hero-avatar-img {
+  @apply w-full h-auto object-contain;
+  image-rendering: pixelated;
+  transform: scale(1.20) translateY(15%);
+  transform-origin: center bottom;
+}
+
+.profile-avatar-edit-overlay {
+  @apply absolute inset-0 bg-black/50 flex justify-center items-center text-white cursor-pointer;
+}
+
+.profile-hero-info {
+  @apply flex-1 flex flex-col justify-center;
+}
+
+.profile-hero-top-row {
+  @apply flex justify-between items-start;
+}
+
+.profile-hero-identity {
+  @apply flex flex-col gap-1.5;
+}
+
+.profile-hero-username {
+  @apply text-3xl font-bold m-0 flex items-center gap-2;
+  color: var(--profile-text);
+}
+
+.profile-hero-socials {
+  @apply flex items-center gap-3 mt-1;
+}
+
+.hero-social-link {
+  @apply flex items-center justify-center w-8 h-8 rounded-full bg-white/5 text-white transition hover:bg-white/20;
+  /* Reset browser button defaults so <button> matches <a> exactly */
+  box-sizing: border-box;
+  border: none;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.hero-social-link.twitch {
+  color: #a855f7;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+}
+
+.hero-social-link.twitch:hover {
+  background: rgba(168, 85, 247, 0.28);
+  border-color: rgba(168, 85, 247, 0.45);
+}
+
+.hero-social-link.youtube {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.hero-social-link.youtube:hover {
+  background: rgba(239, 68, 68, 0.28);
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+.hero-social-likes {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0 8px;
+  border-radius: 9999px;
+  position: relative;
+  /* Exact same height as the w-8 h-8 icon buttons */
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+.hero-like-btn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.hero-like-btn:hover {
+  color: #f87171;
+}
+
+.hero-like-btn.liked {
+  color: #ef4444;
+}
+
+.hero-like-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hero-like-btn.disabled:hover {
+  color: #9ca3af;
+}
+
+.hero-like-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e5e7eb;
+  line-height: 1;
+}
+
+.hero-like-btn .like-heart-anchor {
+  @apply relative inline-flex items-center justify-center;
+  width: 16px;
+  height: 16px;
+  overflow: visible;
+}
+
+.hero-like-btn .like-heart {
+  @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 scale-75 text-red-500 text-sm opacity-0 pointer-events-none;
+  transform: translate(-50%, -50%) scale(0.75) rotate(var(--rot, 0deg));
+  animation: like-burst 600ms ease-out forwards;
+}
+
+@keyframes like-burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.6) rotate(var(--rot, 0deg));
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, -60px))) scale(1.2) rotate(var(--rot, 0deg));
+  }
+}
+
+.profile-hero-date {
+  @apply flex items-center text-sm text-gray-400 mt-1;
+}
+
+.profile-hero-online-status {
+  @apply inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wider uppercase mt-2 px-2.5 py-1 rounded-full w-fit transition-all duration-200;
+}
+
+.profile-hero-online-status.online {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.16), rgba(16, 185, 129, 0.08));
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: #4ade80;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.12);
+}
+
+.profile-hero-online-status.offline {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #9ca3af;
+}
+
+.online-dot {
+  @apply w-2 h-2 rounded-full;
+}
+
+.online-dot.online {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e, 0 0 2px #4ade80;
+}
+
+.online-dot.offline {
+  background: #6b7280;
+  box-shadow: none;
+}
+
+.profile-hero-bio {
+  @apply mt-5 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] rounded-lg p-4 max-w-lg relative;
+}
+
+.bio-label {
+  @apply absolute -top-[11px] left-4 px-2.5 py-0.5 rounded text-[10px] font-bold text-gray-300 uppercase flex items-center gap-1;
+  background: #0f0f0f;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.bio-label .quote-mark {
+  @apply text-[13px] text-gray-300;
+  line-height: 0;
+  position: relative;
+  top: 1px;
+}
+
+.bio-content p {
+  @apply text-sm text-gray-300 m-0 leading-relaxed;
+}
+
+.bio-textarea {
+  @apply w-full bg-transparent text-white border-none resize-none text-sm outline-none min-h-[60px];
+}
+
+.profile-hero-actions {
+  @apply flex items-center gap-2;
+}
+
+.hero-back-btn,
+.hero-edit-btn,
+.hero-cancel-btn,
+.hero-creator-btn {
+  @apply flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition text-sm cursor-pointer border-none;
+}
+
+.hero-back-btn {
+  @apply bg-white/10 text-white hover:bg-white/20;
+}
+
+.hero-edit-btn {
+  @apply bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)];
+}
+
+.hero-cancel-btn {
+  @apply bg-white/10 text-white hover:bg-white/20;
+}
+
+.hero-creator-btn {
+  @apply bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)];
+}
+
+.hero-creator-btn:disabled {
+  @apply opacity-60 cursor-not-allowed hover:bg-[var(--accent)];
+}
+
+/* 2. Top Stats */
+.profile-top-stats-container {
+  @apply w-full max-w-[1300px] flex mb-6 bg-[var(--profile-card-bg)] rounded-xl border border-[var(--border-color)] overflow-hidden p-0;
+}
+
+.profile-top-stats-grid {
+  @apply flex flex-1 overflow-hidden;
+}
+
+.top-stat-card {
+  @apply flex-1 flex flex-col items-center pt-6 pb-6 px-4 relative;
+  justify-content: flex-start;
+}
+
+.top-stat-card.border-l-dark {
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.top-stat-label {
+  @apply flex items-center justify-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase mb-3 tracking-wider w-full;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.top-stat-value {
+  @apply text-4xl font-black text-white flex items-center justify-center h-16;
+}
+
+.top-stat-chart {
+  @apply relative flex justify-center items-center w-16 h-16;
+}
+
+.donut-chart {
+  @apply w-16 h-16 transform -rotate-90;
+}
+
+.donut-bg {
+  @apply fill-transparent stroke-white/5 stroke-[4px];
+}
+
+.donut-progress {
+  @apply fill-transparent stroke-[4px] transition-all duration-1000 ease-out;
+  stroke-linecap: round;
+}
+
+.donut-progress.pink {
+  stroke: #f472b6;
+}
+
+.donut-progress.gray {
+  stroke: #9ca3af;
+}
+
+.donut-progress.accent {
+  stroke: var(--accent);
+}
+
+.donut-text {
+  @apply absolute text-[13px] font-bold text-white;
+}
+
+.top-stat-accent-line {
+  @apply absolute bottom-0 left-0 right-0 h-1;
+}
+
+.top-stat-accent-line.pink {
+  background: linear-gradient(90deg, transparent, #f472b6 50%, transparent);
+  opacity: 0.5;
+}
+
+.top-stat-accent-line.gray {
+  background: linear-gradient(90deg, transparent, #9ca3af 50%, transparent);
+  opacity: 0.3;
+}
+
+.top-stat-accent-line.accent {
+  background: linear-gradient(90deg, transparent, var(--accent) 50%, transparent);
+  opacity: 0.6;
+}
+
+.profile-top-stats-links {
+  @apply flex flex-col w-[280px];
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.top-stat-link-btn {
+  @apply flex-1 flex items-center justify-between px-6 transition hover:bg-white/5 bg-transparent border-0 rounded-none;
+  text-decoration: none !important;
+}
+
+.top-stat-link-btn:first-child:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.link-btn-content {
+  @apply flex flex-col justify-center;
+}
+
+.link-btn-title {
+  @apply flex items-center gap-2 text-sm font-bold text-white;
+}
+
+.link-btn-subtitle {
+  @apply text-[10px] text-gray-400 font-medium;
+}
+
+/* 3. Columns */
+.profile-columns-container {
+  @apply w-full max-w-[1300px] flex gap-6;
+  align-items: stretch;
+}
+
+.profile-left-col {
+  @apply w-[650px] flex flex-col flex-shrink-0 bg-[var(--profile-card-bg)] rounded-xl border border-[var(--border-color)] overflow-hidden;
+}
+
+.profile-right-col {
+  @apply flex-1 flex flex-col gap-6 flex-shrink-0;
+  align-self: stretch;
+}
+
+/* Info Box */
+.profile-info-box-container {
+  @apply p-6 border-b border-[rgba(255,255,255,0.05)];
+}
+
+.profile-section-title {
+  @apply text-[14px] font-bold text-gray-300 uppercase tracking-wider mb-5 flex items-center gap-2 m-0;
+}
+
+.profile-section-title svg {
+  color: var(--accent) !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.profile-info-grid {
+  @apply flex flex-col gap-4;
+}
+
+.profile-info-row {
+  @apply flex flex-row items-center justify-between gap-4 w-full py-1.5;
+}
+
+.info-label {
+  @apply text-[11px] font-bold text-gray-500 uppercase flex items-center gap-1.5 tracking-wider flex-shrink-0;
+}
+
+.info-value,
+.info-edit-wrapper {
+  @apply flex-shrink-0 flex items-center justify-end;
+}
+
+.info-value {
+  @apply text-[14px] text-gray-200 text-right gap-1.5;
+}
+
+.info-edit-wrapper {
+  @apply w-[250px];
+}
+
+.profile-inline-input {
+  @apply w-full bg-[rgba(255,255,255,0.05)] border border-white/10 rounded-md px-3 py-1.5 text-sm text-white text-right focus:text-left transition-all;
+}
+
+/* Profile Favorites Section Background */
+.profile-favorites-section {
+  @apply p-6 border-b border-[rgba(255,255,255,0.05)] w-full mb-0 bg-transparent rounded-none;
+}
+
+.profile-favorites-section:last-child {
+  border-bottom: none;
+}
+
+/* Stats Grid Box */
+.profile-stats-grid {
+  @apply bg-[var(--profile-card-bg)] rounded-xl border border-[var(--border-color)] p-6;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex: 1;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Zero out all the default margins Profile.css puts on fields/titles */
+.profile-stats-grid .profile-field,
+.profile-stats-grid .profile-field.full-span,
+.profile-stats-grid .profile-section-title {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  flex: none !important;
+}
+
+
+/* Hide the old divider */
+.profile-divider {
+  display: none;
+}
+
+/* Adjustments for existing things to fit */
+.profile-ranking-group {
+  @apply m-0 flex flex-col w-full;
+}
+
+/* Recent Entries Styling */
+.recent-field-box {
+  @apply p-5 min-h-[175px] w-full rounded-lg;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.recent-pokemon-row {
+  @apply flex items-center justify-between gap-3 w-full my-0;
+}
+
+.recent-field .profile-rank-item,
+.recent-pokemon-item {
+  @apply relative flex-1 flex flex-col items-center justify-center px-2 py-2 rounded-xl transition-all duration-200;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: 115px;
+}
+
+.recent-field .profile-rank-item:hover,
+.recent-pokemon-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.16);
+  transform: translateY(-2px);
+}
+
+.recent-pokemon-box {
+  @apply w-full h-[72px] flex items-center justify-center relative mb-0.5;
+}
+
+.recent-field .pokemon-img,
+.recent-pokemon-box .pokemon-img {
+  @apply object-contain;
+  width: 76px;
+  height: 76px;
+  transform: scale(1.1);
+}
+
+.recent-field .rank-label,
+.recent-pokemon-name {
+  @apply text-xs font-semibold text-gray-200 text-center flex flex-col items-center mt-0.5 leading-tight;
+}
+
+.recent-field .newest-badge {
+  @apply absolute -top-2 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-[9px] font-black tracking-wider text-white px-2 py-0.5 rounded-full shadow-md z-10 border border-white/20 uppercase;
+}
+
+.recent-field .shiny-indicator {
+  @apply absolute -top-1 -left-1 flex items-center justify-center z-10;
+}
+
+.recent-field .shiny-sparkles-icon {
+  @apply text-yellow-400 w-4 h-4;
+  filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.6));
+}
+
+.recent-field .form-type-tag {
+  @apply mt-0.5 px-1.5 py-0.5 text-[10px] font-medium rounded-md;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Full Stats Button on Profile Header */
+.full-stats-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.full-stats-btn:hover {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* Mobile-only Back button — hidden on desktop, shown via media query below */
+.hero-back-btn-mobile {
+  display: none;
+}
+
+/* MOBILE RESPONSIVENESS OVERRIDES */
+@media (max-width: 1024px) {
+  .profile-hero-section {
+    @apply p-5;
+    position: relative;
+  }
+
+  /* Mobile-only back button: hidden by default, shown only inside this media query */
+  .hero-back-btn-mobile {
+    display: flex;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 20;
+  }
+
+
+  /* Hide the back button from the actions row on mobile */
+  .profile-hero-actions .hero-back-btn {
+    display: none !important;
+  }
+
+  .profile-hero-content {
+    @apply flex-col items-center text-center gap-4;
+  }
+
+  .profile-hero-avatar {
+    @apply w-[130px] h-[130px];
+  }
+
+  .profile-hero-info {
+    @apply w-full items-center;
+  }
+
+  .profile-hero-top-row {
+    @apply flex-col items-center gap-3 w-full;
+  }
+
+  .profile-hero-identity {
+    @apply items-center;
+  }
+
+  .profile-hero-socials {
+    @apply justify-center;
+    align-items: center;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  /* Lock all social row elements to exactly 32px on mobile */
+  .profile-hero-socials .hero-social-link {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    max-width: 32px !important;
+    max-height: 32px !important;
+    flex-shrink: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .profile-hero-socials .hero-social-likes {
+    display: inline-flex !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: max-content !important;
+    flex: 0 0 auto !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    align-self: center;
+    box-sizing: border-box !important;
+    padding: 0 12px 0 0px !important;
+    gap: 3px !important;
+  }
+
+  .profile-hero-date {
+    @apply justify-center;
+  }
+
+  .profile-hero-online-status {
+    @apply self-center;
+  }
+
+  /* Actions row: center on mobile */
+  .profile-hero-actions {
+    @apply justify-center flex-wrap mt-1;
+  }
+
+  .profile-hero-bio {
+    @apply w-full max-w-full mx-0 text-left;
+  }
+
+  .profile-top-stats-container {
+    @apply flex-col;
+  }
+
+  .profile-top-stats-links {
+    @apply w-full flex-row;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .top-stat-link-btn {
+    @apply py-4;
+  }
+
+  .profile-columns-container {
+    @apply flex-col;
+  }
+
+  .profile-left-col {
+    @apply w-full;
+  }
+
+  .top-stat-card {
+    @apply py-4 px-2;
+  }
+
+  /* Recent entries: 2-column grid on mobile, no scroll */
+  .recent-field-box {
+    @apply px-3 py-3;
+    overflow: visible !important;
+    min-height: unset !important;
+    height: auto !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+  }
+
+  .recent-pokemon-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    width: 100%;
+    /* Center the lone last card when count is odd */
+    justify-items: center;
+  }
+
+  /* Last item when it's the only one in its row (odd total) */
+  .recent-pokemon-row>.recent-pokemon-item:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    width: 50% !important;
+  }
+
+  .recent-field .profile-rank-item,
+  .recent-pokemon-item {
+    width: 100% !important;
+    min-height: 115px;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-top-stats-grid {
+    @apply flex-wrap;
+  }
+
+  .top-stat-card {
+    @apply w-1/2 flex-none;
+  }
+
+  .top-stat-card:nth-child(3),
+  .top-stat-card:nth-child(4) {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .top-stat-card:nth-child(even) {
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .top-stat-card.border-l-dark {
+    border-left: none;
+  }
+
+  .profile-top-stats-links {
+    @apply flex-col;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .top-stat-link-btn:first-child:not(:last-child) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: none;
+  }
+}

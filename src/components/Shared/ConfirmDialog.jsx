@@ -28,11 +28,17 @@ function ConfirmDialog({ message, root, container }) {
   const [closing, setClosing] = useState(false);
 
   useEffect(() => {
-    const body = document.body;
-    body.style.overflow = 'hidden';
+    const preventScroll = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    };
+    document.addEventListener('wheel', preventScroll, { passive: false });
+    document.addEventListener('touchmove', preventScroll, { passive: false });
     
     return () => {
-      body.style.overflow = '';
+      document.removeEventListener('wheel', preventScroll);
+      document.removeEventListener('touchmove', preventScroll);
     };
   }, []);
 

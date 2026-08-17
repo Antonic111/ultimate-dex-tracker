@@ -18,6 +18,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -39,6 +47,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -60,6 +76,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -81,6 +105,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball"
+      ],
+      "shiny": [
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -102,6 +134,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -123,6 +163,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -144,6 +192,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -165,6 +221,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Net Ball"
+      ],
+      "shiny": [
+        "Net Ball"
+      ]
     }
   },
   {
@@ -186,6 +250,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Lure Ball"
+      ]
     }
   },
   {
@@ -207,6 +279,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Heavy Ball"
+      ]
     }
   },
   {
@@ -228,6 +308,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball"
+      ],
+      "shiny": [
+        "Level Ball"
+      ]
     }
   },
   {
@@ -249,6 +337,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball"
+      ],
+      "shiny": [
+        "Great Ball"
+      ]
     }
   },
   {
@@ -270,6 +366,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -291,6 +395,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -312,6 +424,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball"
+      ],
+      "shiny": [
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -333,6 +453,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Fast Ball"
+      ]
     }
   },
   {
@@ -354,6 +482,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -375,6 +511,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Timer Ball",
+        "Cherish Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Timer Ball",
+        "Cherish Ball"
+      ]
     }
   },
   {
@@ -396,6 +544,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball",
+        "Cherish Ball"
+      ],
+      "shiny": [
+        "Poké Ball",
+        "Cherish Ball"
+      ]
     }
   },
   {
@@ -417,6 +575,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball"
+      ],
+      "shiny": [
+        "Friend Ball"
+      ]
     }
   }
 ]

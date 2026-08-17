@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useUser } from "../components/Shared/UserContext";
 import "../css/Profile.css";
 import { NotebookPen, Trophy, Mars, Venus, VenusAndMars, PencilLine, SquareX, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight, Video, Clock, Youtube, Twitch } from "lucide-react";
@@ -90,12 +91,20 @@ function getTimeAgo(dateString) {
 }
 
 const SWITCH_FC_RE = /^SW-\d{4}-\d{4}-\d{4}$/;
+const GO_FC_RE = /^\d{4} \d{4} \d{4}$/;
 
 function formatSwitchFCInput(value) {
     const digits = (value || "").replace(/\D/g, "").slice(0, 12);
     if (!digits) return "";
     const parts = digits.match(/.{1,4}/g) || [];
     return "SW-" + parts.join("-");
+}
+
+function formatGoFCInput(value) {
+    const digits = (value || "").replace(/\D/g, "").slice(0, 12);
+    if (!digits) return "";
+    const parts = digits.match(/.{1,4}/g) || [];
+    return parts.join(" ");
 }
 
 export default function Profile() {
@@ -170,6 +179,60 @@ export default function Profile() {
     }, [BASE_POKEMON_OPTIONS, FORM_POKEMON_OPTIONS]);
 
     const [isEditing, setIsEditing] = useState(false);
+    const [pendingNavigation, setPendingNavigation] = useState(null);
+
+    useEffect(() => {
+        if (!isEditing) return;
+
+        const handleBeforeUnload = (e) => {
+            e.preventDefault();
+            e.returnValue = '';
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        const handleClick = (e) => {
+            const link = e.target.closest('a');
+            
+            if (link && link.href && link.origin === window.location.origin) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Store the path they were trying to navigate to and show the modal
+                setPendingNavigation(link.getAttribute('href') || '/');
+            }
+        };
+
+        // Use capture phase so we intercept before React Router's delegated event listeners
+        document.addEventListener('click', handleClick, { capture: true });
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            document.removeEventListener('click', handleClick, { capture: true });
+        };
+    }, [isEditing]);
+
+    useEffect(() => {
+        const preventScroll = (e) => {
+            e.preventDefault();
+        };
+
+        if (pendingNavigation) {
+            document.body.style.overflow = 'hidden';
+            document.addEventListener('wheel', preventScroll, { passive: false });
+            document.addEventListener('touchmove', preventScroll, { passive: false });
+        } else {
+            document.body.style.overflow = '';
+            document.removeEventListener('wheel', preventScroll);
+            document.removeEventListener('touchmove', preventScroll);
+        }
+
+        return () => {
+            document.body.style.overflow = '';
+            document.removeEventListener('wheel', preventScroll);
+            document.removeEventListener('touchmove', preventScroll);
+        };
+    }, [pendingNavigation]);
+
     const [showGameModal, setShowGameModal] = useState(false);
     const [gameSlotIndex, setGameSlotIndex] = useState(null);
     const [showPokemonModal, setShowPokemonModal] = useState(false);
@@ -213,6 +276,7 @@ export default function Profile() {
         favoritePokemon: ["", "", "", "", ""],
         favoritePokemonShiny: [false, false, false, false, false],
         switchFriendCode: "",
+        goFriendCode: "",
         youtubeUrl: "",
         twitchUrl: "",
     });
@@ -260,6 +324,7 @@ export default function Profile() {
                     favoritePokemon: Array.isArray(data.favoritePokemon) ? [...data.favoritePokemon] : prev.favoritePokemon,
                     favoritePokemonShiny: Array.isArray(data.favoritePokemonShiny) ? [...data.favoritePokemonShiny] : prev.favoritePokemonShiny,
                     switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode,
+                    goFriendCode: data.goFriendCode ?? prev.goFriendCode,
                     youtubeUrl: data.youtubeUrl ?? prev.youtubeUrl,
                     twitchUrl: data.twitchUrl ?? prev.twitchUrl
                 }));
@@ -327,7 +392,7 @@ export default function Profile() {
                 ];
                 const shinyKeys = [
                     ...pokemonData.map(p => getCaughtKey(p, null, true)),
-                    ...filteredFormsData.map(p => getCaughtKey(p, null, true)),
+                    ...filteredFormsData.filter(p => p.formType !== 'mighty').map(p => getCaughtKey(p, null, true)),
                 ];
                 const totalRegular = regularKeys.length;
                 const totalShiny = shinyKeys.length;
@@ -587,22 +652,23 @@ export default function Profile() {
     useEffect(() => {
         if (!username) return;
 
-        const interval = setInterval(async () => {
+        const refreshLikes = async () => {
+            if (document.hidden) return;
             try {
                 const { hasLiked: userHasLiked, likeCount: count } = await profileAPI.getProfileLikes(username);
-                setLikeCount(prevCount => {
-                    if (prevCount !== count) {
-                        return count;
-                    }
-                    return prevCount;
-                });
+                setLikeCount(count);
                 setHasLiked(userHasLiked);
-            } catch (error) {
-                // Silently handle errors to avoid spam
-            }
-        }, 5000); // Reduced from 2 seconds to 5 seconds
+            } catch (error) {}
+        };
 
-        return () => clearInterval(interval);
+        const handleFocus = () => refreshLikes();
+        window.addEventListener('focus', handleFocus);
+        window.addEventListener('visibilitychange', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+            window.removeEventListener('visibilitychange', handleFocus);
+        };
     }, [username]);
 
     const handleCopyLink = async () => {
@@ -799,7 +865,7 @@ export default function Profile() {
     }
 
     return (
-        <div className="profile-wrapper page-container profile-page">
+        <div data-tutorial-id="profile-overview" className="profile-wrapper page-container profile-page">
             <div className="profile-header-bar">
                 <div className="profile-header-left">
                     <div className="profile-top-line">
@@ -897,7 +963,7 @@ export default function Profile() {
                                 title={creatorStatus === 'pending' ? "Request Pending" : "Request Content Creator Status"}
                             >
                                 {creatorStatus === 'pending' ? <Clock size={16} /> : <Video size={16} />}
-                                <span className="hidden md:inline">{creatorStatus === 'pending' ? "CC Request Pending" : "Request Creator Status"}</span>
+                                <span className="hidden md:inline">{creatorStatus === 'pending' ? "CC Request Pending" : "Request Creator"}</span>
                             </button>
                         )}
 
@@ -910,6 +976,13 @@ export default function Profile() {
 
                                     if (fc && !SWITCH_FC_RE.test(fc)) {
                                         showMessage("Friend code must be like: SW-1234-5678-9012", "error");
+                                        return;
+                                    }
+
+                                    const goFc = (form.goFriendCode || "").trim();
+
+                                    if (goFc && !GO_FC_RE.test(goFc)) {
+                                        showMessage("Pokémon GO Friend code must be like: 0000 0000 0000", "error");
                                         return;
                                     }
 
@@ -952,6 +1025,7 @@ export default function Profile() {
                                             favoritePokemon: reorderedPokemon,
                                             favoritePokemonShiny: reorderedShiny,
                                             switchFriendCode: fc,
+                                            goFriendCode: goFc,
                                             youtubeUrl: finalYoutube,
                                             twitchUrl: finalTwitch,
                                         });
@@ -965,6 +1039,7 @@ export default function Profile() {
                                             favoritePokemonShiny: reorderedShiny,
                                             profileTrainer: form.profileTrainer,
                                             switchFriendCode: fc,
+                                            goFriendCode: goFc,
                                             youtubeUrl: finalYoutube,
                                             twitchUrl: finalTwitch,
                                         }));
@@ -1120,17 +1195,18 @@ export default function Profile() {
                                 </div>
                             )}
                         </div>
+                    </div>
 
-                        <div className="profile-field full-span">
+                    <div className="profile-row-split">
+                        {(isEditing || form.switchFriendCode) && (
+                        <div className="profile-field">
                             <label>Nintendo Switch Friend Code</label>
                             {isEditing ? (
                                 <input
                                     type="text"
                                     placeholder="SW-1234-5678-9012"
                                     value={form.switchFriendCode}
-                                    onChange={(e) =>
-                                        setForm({ ...form, switchFriendCode: formatSwitchFCInput(e.target.value) })
-                                    }
+                                    onChange={(e) => setForm({ ...form, switchFriendCode: formatSwitchFCInput(e.target.value) })}
                                     onPaste={(e) => {
                                         e.preventDefault();
                                         const text = (e.clipboardData || window.clipboardData).getData("text");
@@ -1141,11 +1217,58 @@ export default function Profile() {
                                     maxLength={17}
                                     pattern="^SW-\d{4}-\d{4}-\d{4}$"
                                     title="Format: SW-1234-5678-9012"
+                                    style={{
+                                        backgroundImage: 'url(/data/friend_code_icons/switch.png)',
+                                        backgroundPosition: '12px center',
+                                        backgroundSize: '20px 20px',
+                                        backgroundRepeat: 'no-repeat',
+                                        paddingLeft: '40px'
+                                    }}
                                 />
                             ) : (
-                                <div className="field-display">{form.switchFriendCode || "N/A"}</div>
+                                <div className="field-display">
+                                    <img src="/data/friend_code_icons/switch.png" alt="Switch" className="w-5 h-5 object-contain" style={{ marginRight: "6px" }} />
+                                    <span>{form.switchFriendCode}</span>
+                                </div>
                             )}
                         </div>
+                        )}
+
+                        {(isEditing || form.goFriendCode) && (
+                            <div className="profile-field">
+                                <label>Pokémon GO Friend Code</label>
+                                {isEditing ? (
+                                    <input
+                                        type="text"
+                                        placeholder="0000 0000 0000"
+                                        value={form.goFriendCode}
+                                        onChange={(e) => setForm({ ...form, goFriendCode: formatGoFCInput(e.target.value) })}
+                                        onPaste={(e) => {
+                                            e.preventDefault();
+                                            const text = (e.clipboardData || window.clipboardData).getData("text");
+                                            setForm({ ...form, goFriendCode: formatGoFCInput(text) });
+                                        }}
+                                        inputMode="numeric"
+                                        autoComplete="off"
+                                        maxLength={14}
+                                        pattern="^\d{4} \d{4} \d{4}$"
+                                        title="Format: 0000 0000 0000"
+                                        style={{
+                                            backgroundImage: 'url(/data/friend_code_icons/go.png)',
+                                            backgroundPosition: '12px center',
+                                            backgroundSize: '20px 20px',
+                                            backgroundRepeat: 'no-repeat',
+                                            paddingLeft: '40px'
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="field-display">
+                                        <img src="/data/friend_code_icons/go.png" alt="Pokémon GO" className="w-5 h-5 object-contain" style={{ marginRight: "6px" }} />
+                                        <span>{form.goFriendCode}</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {isContentCreator && isEditing && (
                             <>
@@ -1476,6 +1599,44 @@ export default function Profile() {
                 max={1}
                 showHoverPreview
             />
+
+            {pendingNavigation && createPortal(
+                <div 
+                    className="fixed inset-0 z-[20000] animate-[fadeIn_0.3s_ease-out]"
+                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+                >
+                    <div className="bg-black/80 w-full h-full flex items-center justify-center">
+                        <div 
+                            className="bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl animate-[slideIn_0.3s_ease-out] text-center" 
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h2 className="text-xl font-semibold text-[var(--accent)] mb-4">Unsaved Changes</h2>
+                            <p className="text-gray-300 mb-6">
+                                You have unsaved changes. Are you sure you want to leave without saving?
+                            </p>
+                            <div className="flex gap-3 justify-center">
+                                <button 
+                                    className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
+                                    onClick={() => setPendingNavigation(null)}
+                                >
+                                    Stay
+                                </button>
+                                <button 
+                                    className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
+                                    onClick={() => {
+                                        setIsEditing(false);
+                                        setTimeout(() => navigate(pendingNavigation), 0);
+                                        setPendingNavigation(null);
+                                    }}
+                                >
+                                    Leave
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
         </div>
     );
 }

@@ -50,7 +50,12 @@ export const SANITIZATION_RULES = {
     minLength: 0,
     allowedChars: /^[a-zA-Z0-9\-]+$/,
     trim: true,
-    normalize: true,
+  },
+  goFriendCode: {
+    maxLength: 14,
+    minLength: 0,
+    allowedChars: /^[0-9\s]+$/,
+    trim: true,
   },
   profileTrainer: {
     maxLength: 50,
@@ -238,6 +243,7 @@ export function sanitizeProfileData(profileData) {
       else if (fieldName === 'location') fieldType = 'location';
       else if (fieldName === 'gender') fieldType = 'gender';
       else if (fieldName === 'switchFriendCode') fieldType = 'switchFriendCode';
+      else if (fieldName === 'goFriendCode') fieldType = 'goFriendCode';
       else if (fieldName === 'profileTrainer') fieldType = 'profileTrainer';
       else if (fieldName === 'huntHotkey') fieldType = 'huntHotkey';
       

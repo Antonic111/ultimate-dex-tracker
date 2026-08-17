@@ -262,7 +262,8 @@ export const METHOD_OPTIONS = [
   "Fossil Revivals",
   "Mystery Gift",
   "Permutations",
-  "Evolved"
+  "Evolved",
+  "Tera Raids"
 ];
 
 
@@ -661,6 +662,8 @@ export const specialCases = {
   "chi-yu": "Chi-Yu",
   "mr-mime": "Mr. Mime",
   "mime-jr": "Mime Jr.",
+  "mr-mime-galar-alphaother": "Mr. Mime",
+  "mr-mime-galar": "Mr. Mime",
   "type-null": "Type: Null",
   "jangmo-o": "Jangmo-o",
   "hakamo-o": "Hakamo-o",

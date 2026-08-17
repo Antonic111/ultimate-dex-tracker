@@ -51,10 +51,7 @@ const EmailSent = () => {
       
       // Set user data and navigate to home
       setUser({
-        username: data.user.username,
-        email: data.user.email,
-        createdAt: data.user.createdAt,
-        profileTrainer: data.user.profileTrainer
+        ...data.user
       });
       
       // Navigate to home page - App.jsx will handle authentication check

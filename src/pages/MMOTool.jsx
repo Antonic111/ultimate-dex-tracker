@@ -307,10 +307,12 @@ export default function MMOTool() {
       stableId: `${p.name}-main-${String(p.id).padStart(4, '0')}`
     }));
 
-    const formsList = formsData.map(f => ({
-      ...f,
-      stableId: f.stableId || `${f.name}-${f.formType}-${String(f.id).padStart(4, '0')}`
-    }));
+    const formsList = formsData
+      .filter(f => f.formType !== "mighty")
+      .map(f => ({
+        ...f,
+        stableId: f.stableId || `${f.name}-${f.formType}-${String(f.id).padStart(4, '0')}`
+      }));
 
     return [...baseList, ...formsList];
   }, []);
@@ -3027,7 +3029,7 @@ export default function MMOTool() {
                     <label className="sidebar-label">Mark:</label>
                     <SearchbarIconDropdown
                       id="completion-mark-dropdown"
-                      options={MARK_OPTIONS}
+                      options={MARK_OPTIONS.filter(m => m.value !== "mightiest")}
                       value={completionForm.mark}
                       onChange={val => setCompletionForm(prev => ({ ...prev, mark: val }))}
                       placeholder="Select a mark..."

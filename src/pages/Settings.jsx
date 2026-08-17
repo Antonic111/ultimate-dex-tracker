@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../css/Settings.css";
 import { User, Lock, Eye, EyeOff, Check, X, Loader, Mail } from "lucide-react";
 import { UserContext } from "../components/Shared/UserContext";
@@ -17,6 +18,7 @@ import { useUsernameCooldown } from "../hooks/useUsernameCooldown";
 
 export default function Settings() {
     const { username, email, setUser } = useContext(UserContext);
+    const navigate = useNavigate();
     const [newUsername, setNewUsername] = useState("");
     const [newEmail, setNewEmail] = useState("");
     const [emailPassword, setEmailPassword] = useState("");
@@ -70,7 +72,7 @@ export default function Settings() {
     const [deleting, setDeleting] = useState(false);
 
 
-    const accentOptions = ["yellow", "red", "orange", "green", "blue", "cyan", "purple", "pink", "brown"];
+    const accentOptions = ["yellow", "red", "orange", "green", "lime", "blue", "cyan", "purple", "lavender", "pink", "brown", "platinum"];
 
     useEffect(() => {
         (async () => {
@@ -206,7 +208,7 @@ export default function Settings() {
 
 
     return (
-        <div className="settings-page page-container fade-in-up">
+        <div data-tutorial-id="settings-overview" className="settings-page page-container fade-in-up">
             <h1 className="page-title">Settings</h1>
             <div className="app-divider" />
             <div className="settings-container">
@@ -420,6 +422,29 @@ export default function Settings() {
 
                     <div className="setting-divider" />
 
+                    {/* Tutorial */}
+                    <div className="setting-block">
+                        <h3>Interactive Tutorial</h3>
+                        <p style={{ marginBottom: '15px' }}>Replay the guided onboarding tutorial to learn how to use the tracker.</p>
+                        <button 
+                            style={{ padding: '10px 15px', background: 'var(--accent)', color: 'black', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
+                            onClick={async () => {
+                                try {
+                                    navigate("/");
+                                    await profileAPI.updateProfile({ onboarding: { isComplete: false, tutorialStep: 2 } });
+                                    setUser(prev => ({ ...prev, onboarding: { ...prev.onboarding, isComplete: false, tutorialStep: 2 } }));
+                                    showMessage("Tutorial started", "success");
+                                } catch(e) {
+                                    showMessage("Failed to start tutorial", "error");
+                                }
+                            }}
+                        >
+                            Replay Tutorial
+                        </button>
+                    </div>
+
+                    <div className="setting-divider" />
+
                     {/* Delete Account */}
                     <div className="setting-block danger-zone">
                         <h3>Delete Account</h3>
@@ -493,7 +518,8 @@ export default function Settings() {
                                                 left: '50%',
                                                 transform: 'translate(-50%, -50%)',
                                                 pointerEvents: 'none',
-                                                strokeWidth: 3
+                                                strokeWidth: 3,
+                                                color: '#000000'
                                             }}
                                         />
                                     )}

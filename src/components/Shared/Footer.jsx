@@ -52,7 +52,7 @@ export default function Footer() {
           <p>Track your Pokémon collection with Antonic's living dex tracker and stay organized through your hunting adventures.</p>
           <div className="social-links">
             <a 
-              href="https://www.youtube.com/Antonic111" 
+              href="https://www.youtube.com/@Official_Antonic" 
               target="_blank" 
               rel="noopener noreferrer"
               className="social-link youtube-link"
@@ -84,7 +84,7 @@ export default function Footer() {
               </svg>
             </a>
             <a 
-              href="https://www.twitch.tv/antonic111" 
+              href="https://www.twitch.tv/official_antonic" 
               target="_blank" 
               rel="noopener noreferrer"
               className="social-link twitch-link"
@@ -108,7 +108,7 @@ export default function Footer() {
               </svg>
             </a>
             <a 
-              href="https://www.instagram.com/yt_antonic" 
+              href="https://www.instagram.com/official_antonic" 
               target="_blank" 
               rel="noopener noreferrer"
               className="social-link instagram-link"
@@ -128,7 +128,7 @@ export default function Footer() {
               </svg>
             </a>
             <a 
-              href="https://www.tiktok.com/@yt_antonic" 
+              href="https://www.tiktok.com/@official_antonic" 
               target="_blank" 
               rel="noopener noreferrer"
               className="social-link tiktok-link"

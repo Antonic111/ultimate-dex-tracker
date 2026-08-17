@@ -63,17 +63,21 @@ export const getAvailableGamesForPokemonSidebar = (pokemon) => {
 
   // 1. Determine base availability (Hardcoded Forms vs Default)
   if (formType === "alpha" || formType === "alphaother") {
-    // Alpha Pokemon - check Legends Arceus / Legends Z-A only
-    const formattedId = String(pokemon.id).padStart(4, "0");
-    const legendsArceusIds = gamePokemonData["Legends Arceus"];
-    if (legendsArceusIds && legendsArceusIds.includes(formattedId)) {
-      availableGames.push("Legends Arceus");
+    if (pokemonName.includes("alolan") || pokemonName.includes("galarian") || pokemonName.includes("paldean") || pokemonName.includes("gmax") || pokemonName.includes("mega")) {
+      availableGames = [];
+    } else {
+      // Alpha Pokemon - check Legends Arceus / Legends Z-A only
+      const formattedId = String(pokemon.id).padStart(4, "0");
+      const legendsArceusIds = gamePokemonData["Legends Arceus"];
+      if (legendsArceusIds && legendsArceusIds.includes(formattedId)) {
+        availableGames.push("Legends Arceus");
+      }
+      const legendsZAIds = gamePokemonData["Legends Z-A"];
+      if (legendsZAIds && legendsZAIds.includes(formattedId)) {
+        availableGames.push("Legends Z-A");
+      }
+      if (availableGames.length === 0) availableGames = ["Legends Arceus"];
     }
-    const legendsZAIds = gamePokemonData["Legends Z-A"];
-    if (legendsZAIds && legendsZAIds.includes(formattedId)) {
-      availableGames.push("Legends Z-A");
-    }
-    if (availableGames.length === 0) availableGames = ["Legends Arceus"];
   }
   else if (pokemonName.includes("therian") || pokemonName.includes("therian-") || pokemonName.includes("-therian")) {
     availableGames = ["Legends Arceus", "GO"];
@@ -108,9 +112,9 @@ export const getAvailableGamesForPokemonSidebar = (pokemon) => {
       const alolanInSV_Only = ["geodude", "graveler", "golem", "grimer", "muk"];
 
       if (alolanInSV_SWSH.includes(baseName)) {
-        availableGames = ["Sun", "Moon", "Ultra Sun", "Ultra Moon", "Lets GO Pikachu", "Lets GO Eevee", "Sword", "Shield", "Legends Arceus", "Scarlet", "Violet", "GO"];
+        availableGames = ["Sun", "Moon", "Ultra Sun", "Ultra Moon", "Lets GO Pikachu", "Lets GO Eevee", "Sword", "Shield", "Scarlet", "Violet", "GO"];
       } else if (alolanInSV_Only.includes(baseName)) {
-        availableGames = ["Sun", "Moon", "Ultra Sun", "Ultra Moon", "Lets GO Pikachu", "Lets GO Eevee", "Legends Arceus", "Scarlet", "Violet", "GO"];
+        availableGames = ["Sun", "Moon", "Ultra Sun", "Ultra Moon", "Lets GO Pikachu", "Lets GO Eevee", "Scarlet", "Violet", "GO"];
       } else {
         availableGames = ["Sun", "Moon", "Ultra Sun", "Ultra Moon", "Lets GO Pikachu", "Lets GO Eevee", "GO"];
       }

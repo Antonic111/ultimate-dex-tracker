@@ -60,8 +60,9 @@ const RecentCatchesSidebar = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch initial catches
-    const fetchInitial = async () => {
+    // Fetch recent catches
+    const fetchRecent = async () => {
+      if (document.hidden) return;
       try {
         const res = await fetch(buildApiUrl('/recent-catches'));
         const data = await res.json();
@@ -72,25 +73,33 @@ const RecentCatchesSidebar = () => {
         console.error("Failed to fetch recent catches", e);
       }
     };
-    fetchInitial();
 
-    // Connect to SSE
-    const eventSource = new EventSource(buildApiUrl('/recent-catches/stream'));
+    fetchRecent();
 
-    eventSource.onmessage = (event) => {
-      try {
-        const newCatch = JSON.parse(event.data);
-        setCatches(prev => {
-          const updated = [newCatch, ...prev];
-          return updated.slice(0, 25);
-        });
-      } catch (e) {
-        console.error("Error parsing recent catch event", e);
-      }
+    // Refresh when tab becomes active / focused
+    const handleVisibility = () => {
+      if (!document.hidden) fetchRecent();
     };
+    window.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleVisibility);
+
+    // Refresh when user catches a Pokemon locally
+    const handleCatchChange = () => {
+      // Small delay to allow backend to persist before fetching
+      setTimeout(fetchRecent, 500);
+    };
+    window.addEventListener('caughtDataChanged', handleCatchChange);
+
+    // Gentle 60s background refresh only if page is visible
+    const interval = setInterval(() => {
+      if (!document.hidden) fetchRecent();
+    }, 60000);
 
     return () => {
-      eventSource.close();
+      window.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleVisibility);
+      window.removeEventListener('caughtDataChanged', handleCatchChange);
+      clearInterval(interval);
     };
   }, []);
 

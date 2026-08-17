@@ -91,7 +91,8 @@ export function getRelatedForms(pokemon) {
     'galarian': 6,
     'hisuian': 7,
     'paldean': 8,
-    'other': 9
+    'other': 9,
+    'mighty': 10
   };
 
   relatedForms.sort((a, b) => {
@@ -199,13 +200,13 @@ export function renderTypeBadge(type) {
   return (
     <span
       key={type}
-      className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-full text-white font-semibold text-xs border-2 w-20"
+      className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-full text-white font-semibold text-xs border-2 w-20 overflow-hidden"
       style={{ backgroundColor: bgColor, borderColor: borderColor, borderStyle: 'solid' }}
     >
       <img
         src={`/type-icons/${type.toLowerCase()}.png`}
         alt={type}
-        className="w-4 h-4"
+        className="w-4 h-4 object-contain scale-[1.35] flex-shrink-0"
         draggable={false}
       />
       <span className="text-sm">{type.charAt(0).toUpperCase() + type.slice(1)}</span>
@@ -383,7 +384,8 @@ export function getFormDisplayName(pokemon) {
     other: "Alt Form",
     alcremie: "Alcremie Variant",
     alpha: "Alpha Pokémon",
-    alphaother: "Alpha Female"
+    alphaother: "Alpha Female",
+    mighty: "Mighty Mark"
   };
 
   return formLabels[pokemon.formType] || "";

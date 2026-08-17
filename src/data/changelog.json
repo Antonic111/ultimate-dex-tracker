@@ -1,5 +1,45 @@
 [
   {
+    "date": "2026-08-03",
+    "version": "v1.1.9",
+    "type": "feature",
+    "title": "",
+    "description": "",
+    "features": [
+      "Completely revamped the profile page with a more polished and modern visual design.",
+      "Completely revamped the sidebar with a more polished and modern visual design and improved functionality.",
+      "Added two new sidebar actions: Duplicate Entry and Copy Summary.",
+      "Added an interactive onboarding tutorial for new users. Existing users can replay it anytime from the Settings page by clicking **Replay Tutorial**.",
+      "Added a 'Recommended Balls' section to each Pokémon's sidebar, displaying the best Poké Balls for both regular and shiny forms based on color matching.",
+      "The shiny toggle now becomes sticky beneath the header while scrolling, keeping it accessible as you browse the Pokédex.",
+      "Added the ability to display your Pokémon GO Friend Code on your profile page.",
+      "Added icons for Nintendo Switch Friend Code and Pokémon GO Friend Code to improve profile readability.",
+      "Added a **Show Full Box** toggle when searching for a Pokémon. When enabled, the entire box is displayed, making it easier to match and sort Pokémon with Pokémon HOME.",
+      "Added a new **Mighty Pokémon** category containing all Mightiest Mark event raid Pokémon (visible only when viewing the regular Pokédex).",
+      "Replaced traditional categories that rendered all 2,000+ Pokémon at once with category tabs, significantly improving performance and functionality.",
+      "Added more accent color options and improved the color selector visuals in both Settings and the onboarding setup.",
+      "Added a dedicated **Full Stats** page accessible from the Collection Overview section on trainer profiles, featuring in-depth analytics for generations (Gen 1-9), categories, Poké Ball vaults, marks & ribbons, games, and hunt methods.",
+      "Added a detailed stats page that can be shared publicly when your account is set to public.",
+      "Added a 1/8,192 chance to encounter a special Easter egg logo when visiting the site."
+    ],
+    "fixes": [
+      "Updated all social links to direct to antonic.ca instead of solo.to, and updated handles to reflect the username change from antonic111 to official-antonic.",
+      "Added a confirmation modal that warns users before leaving or refreshing the Profile Edit page with unsaved changes.",
+      "Collapsed categories now remain collapsed when switching between regular and shiny Pokémon.",
+      "Fixed an issue where the console would log an authentication error when accessing the site while not logged in.",
+      "Merged the public profile and personal profile pages into a single shared profile implementation.",
+      "Fixed Galarian Mr. Mime and Alpha Galarian Mr. Mime names to correctly include the period (.) in their names.",
+      "Fixed an issue where Pokémon Legends: Arceus modifiers were not being selected correctly when adding a Pokémon while the Legends: Arceus Shiny Charm was saved to the account.",
+      "Removed the Mightiest Mark option from every Pokemon besides the Mighty category.",
+      "Implemented numerous performance optimizations to reduce resource usage and hosting costs since I am paying out of pocket for this website and not making anything :)",
+      "Merged Alpha Gender's & Other's into the Alpha Forms category to simplify and clean up the category structure.",
+      "Split the site logo into three separate layers to enable future accent color customization and theming improvements.",
+      "Added a simple transition animation to Pokémon when switching between categories.",
+      "Fixed an issue where the sticky header would disappear while a modal was open.",
+      "Blended the obtainable game icons into the sidebar for a cleaner, more polished look."
+    ]
+  },
+  {
     "date": "2026-07-12",
     "version": "v1.1.8",
     "type": "feature",

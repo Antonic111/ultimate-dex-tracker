@@ -441,3 +441,95 @@ textarea:focus {
   0% { transform: translateY(-190px); }
   100% { transform: translateY(0); }
 }
+
+/* ==========================================================================
+   MULTI-LAYER DYNAMIC SITE LOGO
+   ========================================================================== */
+.site-logo-container {
+  position: relative;
+  display: block;
+  height: 65px;
+  aspect-ratio: 1120 / 446;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .site-logo-container {
+    height: 110px;
+  }
+}
+
+.site-logo-layer1,
+.site-logo-layer2,
+.site-logo-layer3-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Layer 1: Dark vs Light mode color shift */
+.site-logo-layer1 {
+  z-index: 1;
+  transition: filter var(--transition-speed);
+}
+
+[data-theme="light"] .site-logo-layer1 {
+  filter: brightness(0) saturate(100%) invert(8%);
+}
+
+.site-logo-layer2 {
+  z-index: 2;
+}
+
+/* Layer 3: Accent Color Overlay */
+.site-logo-layer3-mask {
+  z-index: 3;
+  background-color: var(--accent);
+  -webkit-mask-image: url(/Logo_Layer3.png);
+  mask-image: url(/Logo_Layer3.png);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  transition: background-color var(--transition-speed);
+}
+
+/* 1/8192 Shiny Animated Rainbow Logo Easter Egg */
+@keyframes rainbowFlow {
+  0% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
+  }
+  100% {
+    background-position: 200% 50%;
+    filter: hue-rotate(360deg) drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
+  }
+}
+
+.rainbow-logo-layer3 {
+  background: linear-gradient(
+    90deg,
+    #ff0055 0%,
+    #ff6b00 14%,
+    #ffc800 28%,
+    #00e676 42%,
+    #00b0ff 56%,
+    #7c4dff 70%,
+    #ff00b4 84%,
+    #ff0055 100%
+  ) !important;
+  background-size: 200% 100% !important;
+  animation: rainbowFlow 3s linear infinite !important;
+  will-change: filter, background-position;
+}
+
+

@@ -1,5 +1,6 @@
 import React from "react";
 import DexSection from "./DexSection";
+import DexCategoryTabs from "./DexCategoryTabs";
 import Sidebar from "./PokemonSidebar";
 import SearchBar from "../Shared/SearchBar";
 import ProgressManager from "../Progress/ProgressManager";
@@ -11,7 +12,7 @@ import pokemonData from "../../data/pokemon.json";
 import formsData from "../../utils/loadFormsData";
 import { getFilteredFormsData } from "../../utils/dexPreferences";
 import { Link } from "react-router-dom";
-import { ArrowBigLeft } from "lucide-react";
+import { ArrowBigLeft, Sparkles } from "lucide-react";
 import "../../css/PublicDex.css";
 
 const typeOptions = [
@@ -24,6 +25,22 @@ const GEN_OPTIONS = Array.from(new Set([
     ...getFilteredFormsData(formsData).map(p => p.gen),
 ])).filter(Boolean).sort((a, b) => a - b);
 
+const DEX_TABS_CONFIG = [
+    { key: "main", title: "Main Living Dex", sectionKeys: ["main"] },
+    { key: "gender", title: "Gender", sectionKeys: ["gender"] },
+    { key: "alolan", title: "Alola", sectionKeys: ["alolan"] },
+    { key: "galarian", title: "Galar", sectionKeys: ["galarian"] },
+    { key: "gmax", title: "Gmax", sectionKeys: ["gmax"] },
+    { key: "hisuian", title: "Hisui", sectionKeys: ["hisuian"] },
+    { key: "paldean", title: "Paldea", sectionKeys: ["paldean"] },
+    { key: "unown", title: "Unown", sectionKeys: ["unown"] },
+    { key: "other", title: "Other Forms", sectionKeys: ["other"] },
+    { key: "mighty", title: "Mighty Marks", sectionKeys: ["mighty"] },
+    { key: "alcremie", title: "Alcremie", sectionKeys: ["alcremie"] },
+    { key: "vivillon", title: "Vivillon", sectionKeys: ["vivillon"] },
+    { key: "alpha", title: "Alpha", sectionKeys: ["alpha", "alphaother"] }
+];
+
 // Create the same dex sections structure for ViewDex
 const createDexSections = () => {
     const FORM_TYPES = [
@@ -35,6 +52,7 @@ const createDexSections = () => {
         "paldean",
         "unown",
         "other",
+        "mighty",
         "alcremie",
         "vivillon",
         "alpha",
@@ -50,21 +68,28 @@ const createDexSections = () => {
             title: "Main Living Dex",
             getList: () => pokemonData
         },
-        ...FORM_TYPES.map(type => ({
-            key: type,
-            title: type === "alphaother" ? "Alpha Genders & Other's" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
-            getList: () => {
-                const filtered = filteredFormsData.filter(p => p.formType === type);
+        ...FORM_TYPES.map(type => {
+            let title = `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`;
+            if (type === "alphaother") title = "Alpha Genders & Other's";
+            else if (type === "mighty") title = "Mighty Marks";
+            else if (type === "other") title = "Other Forms";
 
-                // Special sorting for Alpha Forms - sort by Pokemon number (id)
-                if (type === "alpha" || type === "alphaother") {
-                    return filtered.sort((a, b) => (a.id || 0) - (b.id || 0));
+            return {
+                key: type,
+                title,
+                getList: () => {
+                    const filtered = filteredFormsData.filter(p => p.formType === type);
+
+                    // Special sorting for Alpha Forms - sort by Pokemon number (id)
+                    if (type === "alpha" || type === "alphaother") {
+                        return filtered.sort((a, b) => (a.id || 0) - (b.id || 0));
+                    }
+
+                    // Default sorting for other form types (by JSON order)
+                    return filtered;
                 }
-
-                // Default sorting for other form types (by JSON order)
-                return filtered;
-            }
-        }))
+            };
+        })
     ];
 };
 
@@ -111,6 +136,30 @@ export default function DexView({
     viewedUserShinyCharmGames = [], // Shiny charm games of the viewed user
     profileOwnerDexPreferences = null // Dex preferences of the profile owner (for progress bar counts)
 }) {
+    const searchBarRef = React.useRef(null);
+    const [showFloatingShiny, setShowFloatingShiny] = React.useState(false);
+
+    React.useEffect(() => {
+        const handleScroll = () => {
+            if (searchBarRef.current) {
+                const rect = searchBarRef.current.getBoundingClientRect();
+                // Show floating toggle when the search bar is scrolled up past the header area
+                if (rect.bottom < 80) {
+                    setShowFloatingShiny(true);
+                } else {
+                    setShowFloatingShiny(false);
+                }
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll(); // Check initial state
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
     // Handle sidebar open/close
     const handlePokemonSelect = React.useCallback((pokemon) => {
         setSelectedPokemon(pokemon);
@@ -239,6 +288,60 @@ export default function DexView({
         hasNoResults = hasActiveSearch && (pokemonList && pokemonList.length === 0);
     }
 
+    const [activeCategoryTab, setActiveCategoryTab] = React.useState("main");
+
+    const hasSearchFilters = !!(filters.searchTerm || (filters.game && filters.game.length > 0) || (filters.gameObtainable && filters.gameObtainable.length > 0) || (filters.ball && filters.ball.length > 0) || (filters.type && filters.type.length > 0) || (filters.gen && filters.gen.length > 0) || (filters.mark && filters.mark.length > 0) || (filters.method && filters.method.length > 0) || filters.caught || (filters.categories && filters.categories.length > 0));
+
+    const categorizedSections = React.useMemo(() => {
+        return dexSections
+            .filter(section => !showShiny || section.key !== 'mighty')
+            .map(section => {
+                const filteredMons = customFilterMons
+                    ? customFilterMons(section.getList(), showForms)
+                    : section.getList().filter(mon => {
+                        if (showShiny && mon.formType === 'mighty') return false;
+                        if (!showForms && mon.formType && mon.formType !== "main" && mon.formType !== "default") return false;
+                        return true;
+                    });
+
+                if (!filteredMons.length) return null;
+                return { section, filteredMons };
+            })
+            .filter(Boolean);
+    }, [dexSections, showShiny, customFilterMons, showForms]);
+
+    const availableTabs = React.useMemo(() => {
+        return DEX_TABS_CONFIG.map(tab => {
+            const matchingSections = categorizedSections.filter(({ section }) => tab.sectionKeys.includes(section.key));
+            const totalCount = matchingSections.reduce((acc, curr) => {
+                const hasExplicitMatch = curr.filteredMons.some(p => p._isSearchMatch !== undefined);
+                const matchCount = hasExplicitMatch
+                    ? curr.filteredMons.filter(p => p._isSearchMatch).length
+                    : curr.filteredMons.length;
+                return acc + matchCount;
+            }, 0);
+            if (totalCount === 0) return null;
+            return {
+                key: tab.key,
+                title: tab.title,
+                count: totalCount,
+                sections: matchingSections
+            };
+        }).filter(Boolean);
+    }, [categorizedSections]);
+
+    const effectiveActiveTab = React.useMemo(() => {
+        if (availableTabs.some(t => t.key === activeCategoryTab)) {
+            return activeCategoryTab;
+        }
+        return availableTabs[0]?.key || "main";
+    }, [availableTabs, activeCategoryTab]);
+
+    const activeSections = React.useMemo(() => {
+        const currentTabObj = availableTabs.find(t => t.key === effectiveActiveTab);
+        return currentTabObj?.sections || [];
+    }, [availableTabs, effectiveActiveTab]);
+
     return (
         <>
             {/* Profile Header - Only show when viewing someone else's profile */}
@@ -273,7 +376,7 @@ export default function DexView({
             </div>
 
             {/* Search Bar */}
-            <div className="search-bar-container page-animate-2">
+            <div className="search-bar-container page-animate-2" ref={searchBarRef}>
                 <SearchBar
                     filters={filters}
                     setFilters={setFilters}
@@ -284,6 +387,39 @@ export default function DexView({
                     viewingUsername={viewingUsername}
                     viewedUserShinyCharmGames={viewedUserShinyCharmGames || []}
                 />
+            </div>
+
+            {/* Floating Shiny Toggle */}
+            <div
+                className="floating-shiny-toggle"
+                style={{
+                    opacity: showFloatingShiny ? 1 : 0,
+                    visibility: showFloatingShiny ? 'visible' : 'hidden',
+                    transition: 'opacity 0.3s ease, visibility 0.3s ease',
+                    pointerEvents: showFloatingShiny ? 'auto' : 'none'
+                }}
+            >
+                <label className="flex items-center gap-2 cursor-pointer" title="Toggle all shiny sprites" style={{ margin: 0 }}>
+                    <div className="switch" style={{ margin: 0 }}>
+                        <input
+                            type="checkbox"
+                            className="switch-input"
+                            checked={showShiny}
+                            onChange={e => setShowShiny(e.target.checked)}
+                        />
+                        <div className="switch-slider" />
+                    </div>
+                    <span className="text-base font-medium flex items-center gap-2" style={{ color: 'var(--text)' }}>
+                        <Sparkles
+                            size={20}
+                            style={{
+                                color: showShiny ? '#fbbf24' : '#6b7280',
+                                filter: showShiny ? 'none' : 'grayscale(100%)'
+                            }}
+                        />
+                        Shiny
+                    </span>
+                </label>
             </div>
 
             {/* No Results Message - Show for both owner and viewer modes when there are no results */}
@@ -303,104 +439,34 @@ export default function DexView({
 
             {/* Main Dex Section */}
             <div className="main-bg page-animate-2">
-                {shouldUseCustomListUpdated ? (
-                    // ViewDex mode - use customFilterMons to filter and display sections
-                    dexSections.map(section => {
-                        const filteredMons = customFilterMons
-                            ? customFilterMons(section.getList(), showForms)
-                            : section.getList().filter(mon => {
-                                if (!showForms && mon.formType && mon.formType !== "main" && mon.formType !== "default") return false;
-                                return true;
-                            });
-
-                        if (!filteredMons.length) return null;
-
-                        return (
-                            <DexSection
-                                key={section.key}
-                                readOnly={true}
-                                allowCollapse={true}
-                                title={section.title}
-                                pokemonList={filteredMons}
-                                caughtInfoMapOverride={caughtInfoMap}
-                                onSelect={handlePokemonSelect}
-                                showShiny={showShiny}
-                                showForms={showForms}
-                                caught={caught || {}}
-                                isCaught={(poke) => (caught || {})[getCaughtKey(poke, null, showShiny)] || false}
-                                updateCaughtInfo={updateCaughtInfo || (() => { })}
-                                onToggleCaught={onToggleCaught || (() => { })}
-                                onMarkAll={onMarkAll || (() => { })}
-                            />
-                        );
-                    })
-                ) : (
-                    // Main App mode - multiple sections with filtering and collapsing
-                    <>
-                        {(filters.searchTerm || (filters.game && filters.game.length > 0) || (filters.gameObtainable && filters.gameObtainable.length > 0) || (filters.ball && filters.ball.length > 0) || (filters.type && filters.type.length > 0) || (filters.gen && filters.gen.length > 0) || (filters.mark && filters.mark.length > 0) || (filters.method && filters.method.length > 0) || filters.caught || (filters.categories && filters.categories.length > 0))
-                            ? dexSections.map(section => {
-                                const filteredMons = customFilterMons
-                                    ? customFilterMons(section.getList(), showForms)
-                                    : section.getList().filter(mon => {
-                                        // Basic filtering if no custom function provided
-                                        if (!showForms && mon.formType) return false;
-                                        return true;
-                                    });
-
-                                if (!filteredMons.length) return null;
-
-                                return (
-                                    <DexSection
-                                        readOnly={readOnly}
-                                        caughtInfoMap={caughtInfoMap}
-                                        updateCaughtInfo={updateCaughtInfo}
-                                        key={section.key}
-                                        sidebarOpen={sidebarOpen}
-                                        title={section.title}
-                                        pokemonList={filteredMons}
-                                        caught={caught}
-                                        isCaught={(poke) => (caught || {})[getCaughtKey(poke, null, showShiny)] || false}
-                                        onMarkAll={onMarkAll}
-                                        onToggleCaught={onToggleCaught}
-                                        onSelect={onSelectPokemon || handlePokemonSelect}
-                                        showShiny={showShiny}
-                                        showForms={showForms}
-                                        allowCollapse={true}
-                                    />
-                                );
-                            })
-                            : dexSections.map(section => {
-                                const filteredMons = customFilterMons
-                                    ? customFilterMons(section.getList(), showForms)
-                                    : section.getList().filter(mon => {
-                                        if (!showForms && mon.formType) return false;
-                                        return true;
-                                    });
-
-                                if (!filteredMons.length) return null;
-
-                                return (
-                                    <DexSection
-                                        readOnly={readOnly}
-                                        caughtInfoMap={caughtInfoMap}
-                                        updateCaughtInfo={updateCaughtInfo}
-                                        key={section.key}
-                                        sidebarOpen={sidebarOpen}
-                                        title={section.title}
-                                        pokemonList={filteredMons}
-                                        caught={caught}
-                                        isCaught={(poke) => (caught || {})[getCaughtKey(poke, null, showShiny)] || false}
-                                        onMarkAll={onMarkAll}
-                                        onToggleCaught={onToggleCaught}
-                                        onSelect={onSelectPokemon || handlePokemonSelect}
-                                        showShiny={showShiny}
-                                        showForms={showForms}
-                                        allowCollapse={true}
-                                    />
-                                );
-                            })}
-                    </>
-                )}
+                <DexCategoryTabs
+                    tabs={availableTabs}
+                    activeTab={effectiveActiveTab}
+                    onTabSelect={setActiveCategoryTab}
+                    isSearching={hasSearchFilters}
+                />
+                <div key={effectiveActiveTab} className="category-tab-content-animate">
+                    {activeSections.map(({ section, filteredMons }) => (
+                        <DexSection
+                            readOnly={readOnly || shouldUseCustomListUpdated}
+                            caughtInfoMap={caughtInfoMap}
+                            caughtInfoMapOverride={shouldUseCustomListUpdated ? caughtInfoMap : undefined}
+                            updateCaughtInfo={updateCaughtInfo || (() => { })}
+                            key={section.key}
+                            sidebarOpen={sidebarOpen}
+                            title={section.title}
+                            pokemonList={filteredMons}
+                            caught={caught || {}}
+                            isCaught={(poke) => (caught || {})[getCaughtKey(poke, null, showShiny)] || false}
+                            onMarkAll={onMarkAll || (() => { })}
+                            onToggleCaught={onToggleCaught || (() => { })}
+                            onSelect={onSelectPokemon || handlePokemonSelect}
+                            showShiny={showShiny}
+                            showForms={showForms}
+                            allowCollapse={activeSections.length > 1}
+                        />
+                    ))}
+                </div>
             </div>
 
             {/* Sidebar - Only render when not in ViewDex mode (when viewingUsername is null) */}

@@ -8,6 +8,7 @@ import {
     Gamepad2,
     Hash,
     ListCollapse,
+    Package,
     Search as SearchIcon,
     Sparkles,
     Star,
@@ -242,12 +243,17 @@ export function SearchbarIconDropdown({ id, options, value, onChange, placeholde
                                 >
                                     <div className="flex items-center">
                                         {opt.image && (
-                                            <img
-                                                src={opt.image}
-                                                alt=""
-                                                className="w-6 h-6 mr-2 rounded"
-                                                onError={e => (e.target.style.display = "none")}
-                                            />
+                                            <div 
+                                                className={`w-6 h-6 mr-2 flex items-center justify-center overflow-hidden flex-shrink-0 ${(opt.isType || opt.image?.includes('/type-icons/')) ? "rounded-full" : "rounded"}`}
+                                            >
+                                                <img
+                                                    src={opt.image}
+                                                    alt=""
+                                                    className="w-full h-full object-cover"
+                                                    style={(opt.isType || opt.image?.includes('/type-icons/')) ? { transform: "scale(1.35)", transformOrigin: "center" } : {}}
+                                                    onError={e => (e.target.style.display = "none")}
+                                                />
+                                            </div>
                                         )}
                                         {!opt.image && opt.icon && (
                                             <span className="w-6 h-6 mr-2 flex items-center justify-center">
@@ -459,12 +465,17 @@ export function SearchbarMultiSelectDropdown({ id, options, selectedValues = [],
                                             style={{ accentColor: 'var(--accent)' }}
                                         />
                                         {opt.image && (
-                                            <img
-                                                src={opt.image}
-                                                alt=""
-                                                className="w-6 h-6 mr-2 rounded"
-                                                onError={e => (e.target.style.display = "none")}
-                                            />
+                                            <div 
+                                                className={`w-6 h-6 mr-2 flex items-center justify-center overflow-hidden flex-shrink-0 ${(opt.isType || opt.image?.includes('/type-icons/')) ? "rounded-full" : "rounded"}`}
+                                            >
+                                                <img
+                                                    src={opt.image}
+                                                    alt=""
+                                                    className="w-full h-full object-cover"
+                                                    style={(opt.isType || opt.image?.includes('/type-icons/')) ? { transform: "scale(1.35)", transformOrigin: "center" } : {}}
+                                                    onError={e => (e.target.style.display = "none")}
+                                                />
+                                            </div>
                                         )}
                                         {!opt.image && opt.icon && (
                                             <span className="w-6 h-6 mr-2 flex items-center justify-center">
@@ -538,7 +549,7 @@ export default function SearchBar({
                 viewedUserShinyCharmGames={viewedUserShinyCharmGames}
                 viewedUsername={viewingUsername}
             />
-            <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-4 rounded-lg shadow-sm max-w-[1300px] mx-auto" style={{ backgroundColor: 'var(--searchbar-bg)', border: '1px solid var(--border-color)' }} onSubmit={e => e.preventDefault()} autoComplete="off">
+            <form data-tutorial-id="search-bar" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-4 rounded-lg shadow-sm max-w-[1300px] mx-auto" style={{ backgroundColor: 'var(--searchbar-bg)', border: '1px solid var(--border-color)' }} onSubmit={e => e.preventDefault()} autoComplete="off">
                 {/* Mobile-only header */}
                 <div className="md:hidden col-span-full mb-4 flex items-center justify-between">
                     <h2 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Search & Filters</h2>
@@ -653,7 +664,8 @@ export default function SearchBar({
                                 options={typeOptions.filter(Boolean).map(t => ({
                                     name: t.charAt(0).toUpperCase() + t.slice(1),
                                     value: t,
-                                    image: `/type-icons/${t.toLowerCase()}.png`
+                                    image: `/type-icons/${t.toLowerCase()}.png`,
+                                    isType: true
                                 }))}
                                 selectedValues={filters.type || []}
                                 onChange={values => setFilters(f => ({ ...f, type: values }))}
@@ -755,9 +767,20 @@ export default function SearchBar({
                     </button>
 
                     {/* Centered switches */}
-                    <div className={`flex items-center gap-6 ${isMobile ? 'self-center' : ''}`}>
+                    <div className={`flex items-center flex-wrap justify-center ${isMobile ? 'gap-x-4 gap-y-2 w-full' : 'gap-6'}`}>
                         {/* Shiny Switch */}
-                        <label className="flex items-center gap-2 cursor-pointer" title="Toggle all shiny sprites">
+                        <label 
+                            data-tutorial-id="shiny-toggle" 
+                            className="flex items-center gap-1.5 cursor-pointer" 
+                            title="Toggle all shiny sprites"
+                            onClick={(e) => {
+                                // Guarantee the toggle works if they click the text during the tutorial
+                                if (e.target.tagName !== 'INPUT' && document.body.classList.contains('tutorial-force-info') === false) {
+                                    setShowShiny(!showShiny);
+                                    e.preventDefault();
+                                }
+                            }}
+                        >
                             <div className="switch">
                                 <input
                                     type="checkbox"
@@ -767,9 +790,9 @@ export default function SearchBar({
                                 />
                                 <div className="switch-slider" />
                             </div>
-                            <span className="text-base font-medium flex items-center gap-2" style={{ color: 'var(--text)' }}>
+                            <span className={`font-medium flex items-center gap-1.5 ${isMobile ? 'text-sm' : 'text-base gap-2'}`} style={{ color: 'var(--text)' }}>
                                 <Sparkles
-                                    size={20}
+                                    size={isMobile ? 16 : 20}
                                     style={{
                                         color: showShiny ? '#fbbf24' : '#6b7280',
                                         filter: showShiny ? 'none' : 'grayscale(100%)'
@@ -781,7 +804,7 @@ export default function SearchBar({
 
                         {/* Show Evolutions Switch - show when there's a search term OR a category that supports evolutions is selected */}
                         {(filters.searchTerm || ['pseudo-legendary', 'starter', 'fossil', 'baby'].some(c => (filters.categories || []).includes(c))) && (
-                            <label className="flex items-center gap-2 cursor-pointer" title="Show evolution chain members in search results">
+                            <label className="flex items-center gap-1.5 cursor-pointer" title="Show evolution chain members in search results">
                                 <div className="switch">
                                     <input
                                         type="checkbox"
@@ -791,15 +814,40 @@ export default function SearchBar({
                                     />
                                     <div className="switch-slider" />
                                 </div>
-                                <span className="text-base font-medium flex items-center gap-2" style={{ color: 'var(--text)' }}>
+                                <span className={`font-medium flex items-center gap-1.5 ${isMobile ? 'text-sm' : 'text-base gap-2'}`} style={{ color: 'var(--text)' }}>
                                     <Dna
-                                        size={20}
+                                        size={isMobile ? 16 : 20}
                                         style={{
                                             color: filters.showEvolutions ? 'var(--accent)' : '#6b7280',
                                             filter: filters.showEvolutions ? 'none' : 'grayscale(100%)'
                                         }}
                                     />
                                     Show Evolutions
+                                </span>
+                            </label>
+                        )}
+
+                        {/* Show Full Box Switch - show when there is a search term */}
+                        {filters.searchTerm && (
+                            <label className="flex items-center gap-1.5 cursor-pointer" title="Show complete box containing search results">
+                                <div className="switch">
+                                    <input
+                                        type="checkbox"
+                                        className="switch-input"
+                                        checked={filters.showFullBox || false}
+                                        onChange={e => setFilters(f => ({ ...f, showFullBox: e.target.checked }))}
+                                    />
+                                    <div className="switch-slider" />
+                                </div>
+                                <span className={`font-medium flex items-center gap-1.5 ${isMobile ? 'text-sm' : 'text-base gap-2'}`} style={{ color: 'var(--text)' }}>
+                                    <Package
+                                        size={isMobile ? 16 : 20}
+                                        style={{
+                                            color: filters.showFullBox ? 'var(--accent)' : '#6b7280',
+                                            filter: filters.showFullBox ? 'none' : 'grayscale(100%)'
+                                        }}
+                                    />
+                                    Show Full Box
                                 </span>
                             </label>
                         )}

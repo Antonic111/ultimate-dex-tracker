@@ -16,6 +16,7 @@ import alcremieForms from '../data/forms/alcremie.json';
 import vivillonForms from '../data/forms/vivillon.json';
 import alphaForms from '../data/forms/alpha.json';
 import alphaotherForms from '../data/forms/alphaother.json';
+import mightyForms from '../data/forms/mighty.json';
 
 /**
  * Combine all forms into a single array
@@ -35,6 +36,7 @@ function combineFormsData() {
     ...(Array.isArray(vivillonForms) ? vivillonForms : []),
     ...(Array.isArray(alphaForms) ? alphaForms : []),
     ...(Array.isArray(alphaotherForms) ? alphaotherForms : []),
+    ...(Array.isArray(mightyForms) ? mightyForms : []),
   ];
 }
 

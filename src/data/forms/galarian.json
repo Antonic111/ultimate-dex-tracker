@@ -23,6 +23,16 @@
           "how": "Level Up to 28"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -49,6 +59,18 @@
           "how": "Level Up to 40"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Dive Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -74,6 +96,18 @@
         "how": "Level Up to 40"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Dive Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -105,6 +139,16 @@
           "how": "Use Galarica Wreath"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Quick Ball",
+        "Level Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -131,6 +175,16 @@
         "how": "Use Galarica Cuff"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Quick Ball"
+      ]
     }
   },
   {
@@ -157,6 +211,16 @@
           "how": "three critical hits"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -182,6 +246,15 @@
         "how": "Level 35 in Galar Region"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -213,6 +286,18 @@
           "how": "Level Up to 42"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Net Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Net Ball",
+        "Moon Ball"
+      ]
     }
   },
   {
@@ -234,6 +319,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Cherish Ball"
+      ]
     }
   },
   {
@@ -255,6 +350,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Luxury Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Cherish Ball"
+      ]
     }
   },
   {
@@ -276,6 +382,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Dusk Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Poke Ball",
+        "Ultra Ball",
+        "Cherish Ball"
+      ]
     }
   },
   {
@@ -302,6 +420,17 @@
         "how": "Use Galarica Wreath"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -327,6 +456,16 @@
           "name": "cursola",
           "how": "Level up to 38"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Premier Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Timer Ball"
       ]
     }
   },
@@ -354,6 +493,18 @@
           "name": "linoone-galar",
           "how": "Level Up to 20"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Luxury Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Lure Ball",
+        "Great Ball",
+        "Sport Ball"
       ]
     }
   },
@@ -386,6 +537,18 @@
           "how": "Level Up to 34"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Luxury Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Lure Ball",
+        "Great Ball",
+        "Sport Ball"
+      ]
     }
   },
   {
@@ -412,6 +575,14 @@
           "how": "Use Ice Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -436,6 +607,16 @@
         "how": "Use Ice Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -463,6 +644,16 @@
           "how": "Take 49+ HP damage & pass under Stone Sculpture in Dusty Bowl"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -484,6 +675,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Quick Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Quick Ball",
+        "Moon Ball",
+        "Safari Ball"
+      ]
     }
   }
 ]

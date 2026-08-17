@@ -58,6 +58,13 @@ export const SANITIZATION_RULES = {
     trim: true,
     normalize: true,
   },
+  goFriendCode: {
+    maxLength: 14,
+    minLength: 0,
+    allowedChars: /^[0-9\s]+$/,
+    trim: true,
+    normalize: true,
+  },
   profileTrainer: {
     maxLength: 50,
     minLength: 0,
@@ -220,6 +227,7 @@ export function sanitizeProfileData(profileData) {
     location: 'location',
     gender: 'gender',
     switchFriendCode: 'switchFriendCode',
+    goFriendCode: 'goFriendCode',
     profileTrainer: 'profileTrainer',
     favoriteGames: 'general',
     favoritePokemon: 'general',

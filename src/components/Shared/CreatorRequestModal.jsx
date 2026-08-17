@@ -26,17 +26,14 @@ export default function CreatorRequestModal({ isOpen, onClose, onSubmitted }) {
         };
 
         if (isOpen) {
-            document.body.style.overflow = 'hidden';
             document.addEventListener('wheel', preventScroll, { passive: false });
             document.addEventListener('touchmove', preventScroll, { passive: false });
         } else {
-            document.body.style.overflow = '';
             document.removeEventListener('wheel', preventScroll);
             document.removeEventListener('touchmove', preventScroll);
         }
         
         return () => {
-            document.body.style.overflow = '';
             document.removeEventListener('wheel', preventScroll);
             document.removeEventListener('touchmove', preventScroll);
         };

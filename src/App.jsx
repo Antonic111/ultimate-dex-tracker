@@ -11,6 +11,7 @@ import formsData from "./utils/loadFormsData";
 import detectivePikachu from "./data/pikachu.png";
 import pokemonData from "./data/pokemon.json";
 import DexSection from "./components/Dex/DexSection";
+import DexCategoryTabs from "./components/Dex/DexCategoryTabs";
 import Sidebar from "./components/Dex/PokemonSidebar";
 import ProgressManager from "./components/Progress/ProgressManager";
 import SearchBar from "./components/Shared/SearchBar";
@@ -34,13 +35,13 @@ const EmailSent = lazy(() => import("./pages/EmailSent"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const EnterResetCode = lazy(() => import("./pages/EnterResetCode"));
-const Profile = lazy(() => import("./pages/Profile"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const ProfileStatsPage = lazy(() => import("./pages/ProfileStatsPage"));
 const PublicHome = lazy(() => import("./pages/PublicHome"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Backup = lazy(() => import("./pages/Backup"));
 const Trainers = lazy(() => import("./pages/Trainers"));
 const Counters = lazy(() => import("./pages/Counters"));
-const PublicProfile = lazy(() => import("./pages/PublicProfile"));
 const ViewDex = lazy(() => import("./pages/ViewDex.jsx"));
 const Changelog = lazy(() => import("./pages/Changelog"));
 const Feedback = lazy(() => import("./pages/Feedback"));
@@ -55,11 +56,12 @@ import Footer from "./components/Shared/Footer";
 import CustomScrollbar from "./components/Shared/CustomScrollbar";
 import MaintenanceScreen from "./components/Shared/MaintenanceScreen";
 import RecentCatchesSidebar from "./components/Shared/RecentCatchesSidebar";
+import OnboardingManager from "./components/Onboarding/OnboardingManager";
 import { buildApiUrl } from "./config/api.js";
 import { getFilteredFormsData, getDexPreferences } from "./utils/dexPreferences";
 import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "./data/blockedShinies";
 import { createPortal } from "react-dom";
-import { RotateCcw, TriangleAlert } from "lucide-react";
+import { RotateCcw, TriangleAlert, Sparkles } from "lucide-react";
 import { getAvailableGamesForPokemonSidebar, normalizeGameName } from "./utils/pokemonAvailability";
 
 // Mobile Keyboard Handler Hook
@@ -226,10 +228,27 @@ const FORM_TYPES = [
   "paldean",
   "unown",
   "other",
+  "mighty",
   "alcremie",
   "vivillon",
   "alpha",
   "alphaother"
+];
+
+const DEX_TABS_CONFIG = [
+  { key: "main", title: "Main Living Dex", sectionKeys: ["main"] },
+  { key: "gender", title: "Gender", sectionKeys: ["gender"] },
+  { key: "alolan", title: "Alola", sectionKeys: ["alolan"] },
+  { key: "galarian", title: "Galar", sectionKeys: ["galarian"] },
+  { key: "gmax", title: "Gmax", sectionKeys: ["gmax"] },
+  { key: "hisuian", title: "Hisui", sectionKeys: ["hisuian"] },
+  { key: "paldean", title: "Paldea", sectionKeys: ["paldean"] },
+  { key: "unown", title: "Unown", sectionKeys: ["unown"] },
+  { key: "other", title: "Other Forms", sectionKeys: ["other"] },
+  { key: "mighty", title: "Mighty Marks", sectionKeys: ["mighty"] },
+  { key: "alcremie", title: "Alcremie", sectionKeys: ["alcremie"] },
+  { key: "vivillon", title: "Vivillon", sectionKeys: ["vivillon"] },
+  { key: "alpha", title: "Alpha", sectionKeys: ["alpha", "alphaother"] }
 ];
 
 // Function to get filtered forms data based on current user preferences
@@ -245,21 +264,28 @@ const createDexSections = () => {
       title: "Main Living Dex",
       getList: () => pokemonData
     },
-    ...FORM_TYPES.map(type => ({
-      key: type,
-      title: type === "alphaother" ? "Alpha Genders & Other's" : `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`,
-      getList: () => {
-        const filtered = currentFilteredFormsData.filter(p => p.formType === type);
+    ...FORM_TYPES.map(type => {
+      let title = `${type.charAt(0).toUpperCase() + type.slice(1)} Forms`;
+      if (type === "alphaother") title = "Alpha Genders & Other's";
+      else if (type === "mighty") title = "Mighty Marks";
+      else if (type === "other") title = "Other Forms";
 
-        // Special sorting for Alpha Forms - sort by Pokemon number (id)
-        if (type === "alpha" || type === "alphaother") {
-          return filtered.sort((a, b) => (a.id || 0) - (b.id || 0));
+      return {
+        key: type,
+        title,
+        getList: () => {
+          const filtered = currentFilteredFormsData.filter(p => p.formType === type);
+
+          // Special sorting for Alpha Forms - sort by Pokemon number (id)
+          if (type === "alpha" || type === "alphaother") {
+            return filtered.sort((a, b) => (a.id || 0) - (b.id || 0));
+          }
+
+          // Default sorting for other form types (by JSON order)
+          return filtered;
         }
-
-        // Default sorting for other form types (by JSON order)
-        return filtered;
-      }
-    }))
+      };
+    })
   ];
 };
 
@@ -283,11 +309,12 @@ function hasMeaningfulInfo(info) {
 
   // Handle new entries format
   if (info.entries && Array.isArray(info.entries)) {
+    if (info.entries.length > 1) return true;
     return info.entries.some(entry => hasMeaningfulInfo(entry));
   }
 
-  // Handle old format (direct fields)
-  const { nickname, date, ball, mark, method, game, checks, notes } = info;
+  // Handle entry object or old format (direct fields)
+  const { nickname, date, ball, mark, marks, method, game, checks, notes, time, chartData, modifiers } = info;
 
   // nickname filled?
   if (nickname && String(nickname).trim() !== "") return true;
@@ -295,19 +322,35 @@ function hasMeaningfulInfo(info) {
   // date filled?
   if (date && String(date).trim() !== "") return true;
 
-  // ball / mark / game values — these are option values; if not "", they're meaningful
-  if (ball) return true;
-  if (mark) return true;
-  if (game) return true;
+  // ball filled? (not empty and not "None")
+  if (ball && String(ball).trim() !== "" && ball !== "None") return true;
 
-  // method text
-  if (method && String(method).trim() !== "") return true;
+  // mark / marks filled?
+  if (mark && String(mark).trim() !== "" && mark !== "None" && mark !== "none") return true;
+  if (Array.isArray(marks) && marks.some(m => m && m !== "none" && m !== "" && m !== "None")) return true;
+
+  // game filled? (not empty and not "None")
+  if (game && String(game).trim() !== "" && game !== "None") return true;
+
+  // method text (not empty and not "None")
+  if (method && String(method).trim() !== "" && method !== "None") return true;
 
   // numeric or string checks
-  if (checks !== undefined && checks !== null && String(checks).trim() !== "" && Number(checks) !== 0) return true;
+  if (checks !== undefined && checks !== null && String(checks).trim() !== "" && String(checks).trim() !== "0" && Number(checks) !== 0) return true;
+
+  // time (hunt stopwatch/timer duration)
+  if (time !== undefined && time !== null && String(time).trim() !== "" && Number(time) !== 0) return true;
+
+  // chartData
+  if (chartData && (Array.isArray(chartData) ? chartData.length > 0 : Object.keys(chartData).length > 0)) return true;
 
   // notes
   if (notes && String(notes).trim() !== "") return true;
+
+  // modifiers
+  if (modifiers && typeof modifiers === 'object') {
+    if (Object.values(modifiers).some(val => Boolean(val))) return true;
+  }
 
   return false;
 }
@@ -359,6 +402,21 @@ function AppThemeSync({ username }) {
   return null;
 }
 
+const DEFAULT_FILTERS = {
+  searchTerm: "",
+  game: [],
+  gameObtainable: [],
+  ball: [],
+  type: [],
+  gen: [],
+  mark: [],
+  method: [],
+  categories: [],
+  caught: "",
+  showEvolutions: false,
+  showFullBox: false
+};
+
 export default function App() {
   const [user, setUser] = useState({
     username: null,
@@ -367,6 +425,7 @@ export default function App() {
     profileTrainer: null,
     verified: false,
     progressBars: [],
+    onboarding: null,
   });
   const [showMenu, setShowMenu] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -378,6 +437,41 @@ export default function App() {
   const [currentDexPreferences, setCurrentDexPreferences] = useState(() => getDexPreferences());
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceStartTime, setMaintenanceStartTime] = useState(null);
+
+  const [isTutorialActive, setIsTutorialActive] = useState(false);
+  const [tutorialBulbasaurCaught, setTutorialBulbasaurCaught] = useState(false);
+  const [tutorialBulbasaurInfo, setTutorialBulbasaurInfo] = useState(null);
+
+  const [activeCategoryTab, setActiveCategoryTab] = useState(() => localStorage.getItem("activeDexTab") || "main");
+  const handleSelectCategoryTab = useCallback((tabKey) => {
+    if (isTutorialActive) return;
+    setActiveCategoryTab(tabKey);
+    localStorage.setItem("activeDexTab", tabKey);
+  }, [isTutorialActive]);
+
+  const searchBarRef = useRef(null);
+  const [showFloatingShiny, setShowFloatingShiny] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (searchBarRef.current) {
+        const rect = searchBarRef.current.getBoundingClientRect();
+        // Show floating toggle when the search bar is scrolled up past the header area
+        if (rect.bottom < 80) {
+          setShowFloatingShiny(true);
+        } else {
+          setShowFloatingShiny(false);
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Check initial state
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // Mobile keyboard handling
   useMobileKeyboardHandler();
@@ -676,6 +770,18 @@ export default function App() {
     return () => window.removeEventListener("pageshow", onPageShow);
   }, [user?.username, user?.verified, justLoggedIn]);
 
+  // Reset sandbox tutorial state and force UI settings when tutorial starts/stops
+  useEffect(() => {
+    setTutorialBulbasaurCaught(false);
+    setTutorialBulbasaurInfo(null);
+    if (isTutorialActive) {
+      setSelectedPokemon(null); // Close sidebar
+      setShowShiny(false); // Force shiny off
+      setActiveCategoryTab("main"); // Force Main Living Dex tab for tutorial
+      localStorage.setItem("activeDexTab", "main");
+      setFilters(DEFAULT_FILTERS);
+    }
+  }, [isTutorialActive]);
 
   const [caught, setCaught] = useState({});
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -697,16 +803,36 @@ export default function App() {
   const showShiny = toggles.showShiny;
   const showForms = toggles.showForms;
 
+  useEffect(() => {
+    if (isTutorialActive) {
+      setShowShiny(false);
+      setTutorialBulbasaurCaught(false);
+    }
+  }, [isTutorialActive]);
 
-  const setShowShiny = val => setToggles(prev => {
-    const updated = { ...prev, showShiny: val };
-    saveDexToggles(updated);
+  const setShowShiny = val => {
+    if (val && selectedPokemon?.formType === "mighty") {
+      setSelectedPokemon(null);
+      setSidebarOpen(false);
+    }
+    return setToggles(prev => {
+      const updated = { ...prev, showShiny: val };
+      saveDexToggles(updated);
 
-    // Dispatch custom event to notify ViewDex component
-    window.dispatchEvent(new CustomEvent('dexTogglesChanged', { detail: updated }));
+      // Dispatch custom event to notify ViewDex component
+      window.dispatchEvent(new CustomEvent('dexTogglesChanged', { detail: updated }));
 
-    return updated;
-  });
+      return updated;
+    });
+  };
+
+  // Close sidebar immediately if switching to shiny mode while on a Mighty Pokemon
+  useEffect(() => {
+    if (showShiny && selectedPokemon?.formType === "mighty") {
+      setSelectedPokemon(null);
+      setSidebarOpen(false);
+    }
+  }, [showShiny, selectedPokemon]);
   const setShowForms = val => setToggles(prev => {
     const updated = { ...prev, showForms: val };
     saveDexToggles(updated);
@@ -830,19 +956,7 @@ export default function App() {
   }, []);
 
 
-  const [filters, setFilters] = useState({
-    searchTerm: "",
-    game: [],
-    gameObtainable: [],
-    ball: [],
-    type: [],
-    gen: [],
-    mark: [],
-    method: [],
-    categories: [],
-    caught: "",
-    showEvolutions: false
-  });
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
   useEffect(() => {
     if (!user?.username) return;
@@ -941,9 +1055,24 @@ export default function App() {
   ];
 
   const totalCount = getAllMonKeys().length;
-  const caughtCount = Object.values(caught).filter(Boolean).length;
-
   const [caughtInfoMap, setCaughtInfoMap] = useState({});
+
+  // When tutorial is active, provide a temporary visual-only sandbox state so everything starts uncaught
+  const visualCaught = useMemo(() => {
+    if (!isTutorialActive) return caught;
+    if (tutorialBulbasaurCaught) {
+      return { "1-null-regular": true, "1": true };
+    }
+    return {};
+  }, [isTutorialActive, caught, tutorialBulbasaurCaught]);
+
+  const visualCaughtInfoMap = useMemo(() => {
+    if (!isTutorialActive) return caughtInfoMap;
+    if (tutorialBulbasaurCaught && tutorialBulbasaurInfo) {
+      return { "1-null-regular": tutorialBulbasaurInfo, "1": tutorialBulbasaurInfo };
+    }
+    return {};
+  }, [isTutorialActive, caughtInfoMap, tutorialBulbasaurCaught, tutorialBulbasaurInfo]);
 
   // Load cached caught info immediately for seamless refreshes
   useEffect(() => {
@@ -983,6 +1112,17 @@ export default function App() {
       localStorage.setItem(`caughtInfoMap:${user.username}`, JSON.stringify(caughtInfoMap));
     } catch { }
   }, [caughtInfoMap, user?.username]);
+
+  const caughtRef = useRef(caught);
+  const caughtInfoMapRef = useRef(caughtInfoMap);
+
+  useEffect(() => {
+    caughtRef.current = caught;
+  }, [caught]);
+
+  useEffect(() => {
+    caughtInfoMapRef.current = caughtInfoMap;
+  }, [caughtInfoMap]);
 
   // Migration: Convert old caught data to new format when component mounts
   useEffect(() => {
@@ -1057,28 +1197,37 @@ export default function App() {
     };
   }, []);
 
-  // Prevent scrolling when reset modal is open
+  // Prevent scrolling when reset modal is open without breaking sticky header
   useEffect(() => {
     const preventScroll = (e) => {
+      if (e.target.closest('.modal-content') || e.target.closest('[role="dialog"]')) return;
       e.preventDefault();
       e.stopPropagation();
       return false;
     };
 
+    const preventKeyScroll = (e) => {
+      if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && !e.target.closest('[role="dialog"]')) {
+          e.preventDefault();
+        }
+      }
+    };
+
     if (resetModal.show) {
-      document.body.style.overflow = 'hidden';
       document.addEventListener('wheel', preventScroll, { passive: false });
       document.addEventListener('touchmove', preventScroll, { passive: false });
+      document.addEventListener('keydown', preventKeyScroll, { passive: false });
     } else {
-      document.body.style.overflow = '';
       document.removeEventListener('wheel', preventScroll);
       document.removeEventListener('touchmove', preventScroll);
+      document.removeEventListener('keydown', preventKeyScroll);
     }
 
     return () => {
-      document.body.style.overflow = '';
       document.removeEventListener('wheel', preventScroll);
       document.removeEventListener('touchmove', preventScroll);
+      document.removeEventListener('keydown', preventKeyScroll);
     };
   }, [resetModal.show]);
 
@@ -1098,16 +1247,17 @@ export default function App() {
   }, [resetModal.show]);
 
   const filterMons = useCallback((list, forceShowForms = false, isShiny = false) => {
-    return list.flatMap(poke => {
+    const testPokemon = (poke) => {
       // 🧬 Respect toggle or force flag
       if (!forceShowForms && !showForms && poke.formType && poke.formType !== "main" && poke.formType !== "default") {
-        return [];
+        return { match: false, poke, isSearchMatch: false };
       }
 
-      // Compute blocked state without mutating the shared source object.
-      // Previously poke._isBlocked was set directly on the original object, which
-      // caused flickering: multiple useMemo passes (shiny vs non-shiny) ran in the
-      // same render cycle and overwrote each other's mutations on the same reference.
+      // Mighty Pokemon cannot be shiny
+      if (isShiny && poke.formType === "mighty") {
+        return { match: false, poke, isSearchMatch: false };
+      }
+
       let blocked = false;
       if (isShiny && currentDexPreferences) {
         // Check if Pokemon should be blocked by ID
@@ -1128,7 +1278,7 @@ export default function App() {
         if (isBlockedUnobtainable || isBlockedGO || isBlockedNOOT) {
           // If hideLockedShinies is enabled, completely filter out this Pokemon
           if (currentDexPreferences.hideLockedShinies) {
-            return [];
+            return { match: false, poke, isSearchMatch: false };
           }
           blocked = true;
         }
@@ -1138,11 +1288,11 @@ export default function App() {
       const poke2 = blocked === poke._isBlocked ? poke : { ...poke, _isBlocked: blocked };
 
       // Get caught info for the appropriate shiny status
-      const info = caughtInfoMap[getCaughtKey(poke, null, isShiny)] || {};
-
-      // Get the first entry for filtering (or use old structure for backward compatibility)
+      const effectiveInfoMap = isTutorialActive ? visualCaughtInfoMap : caughtInfoMap;
+      const info = effectiveInfoMap[getCaughtKey(poke, null, isShiny)] || {};
       const firstEntry = info.entries?.[0] || info;
 
+      let isSearchMatch = false;
       // Search by name/dex
       if (filters.searchTerm) {
         const term = filters.searchTerm.toLowerCase();
@@ -1157,35 +1307,40 @@ export default function App() {
           dexMatch = poke.id.toString().padStart(4, "0").includes(term);
         }
 
-        // If showEvolutions is enabled, check if any pokemon in the evolution chain matches
-        if (!nameMatch && !dexMatch) {
-          if (filters.showEvolutions) {
-            const chainIds = getEvolutionChainIds(poke);
-            // Check if any pokemon in the chain matches the search
-            const chainMatches = chainIds.some(chainId => {
-              const chainPoke = findPokemon(chainId);
-              if (!chainPoke) return false;
-              const chainNameMatch = chainPoke.name.toLowerCase().includes(term);
-              let chainDexMatch = false;
-              if (!isNaN(Number(term))) {
-                chainDexMatch =
-                  chainPoke.id.toString() === term ||
-                  chainPoke.id.toString().padStart(4, "0") === term;
-              } else {
-                chainDexMatch = chainPoke.id.toString().padStart(4, "0").includes(term);
-              }
-              return chainNameMatch || chainDexMatch;
-            });
-            if (!chainMatches) return [];
-          } else {
-            return [];
+        if (nameMatch || dexMatch) {
+          isSearchMatch = true;
+        } else if (filters.showEvolutions) {
+          const chainIds = getEvolutionChainIds(poke);
+          const chainMatches = chainIds.some(chainId => {
+            const chainPoke = findPokemon(chainId);
+            if (!chainPoke) return false;
+            const chainNameMatch = chainPoke.name.toLowerCase().includes(term);
+            let chainDexMatch = false;
+            if (!isNaN(Number(term))) {
+              chainDexMatch =
+                chainPoke.id.toString() === term ||
+                chainPoke.id.toString().padStart(4, "0") === term;
+            } else {
+              chainDexMatch = chainPoke.id.toString().padStart(4, "0").includes(term);
+            }
+            return chainNameMatch || chainDexMatch;
+          });
+          if (chainMatches) {
+            isSearchMatch = true;
           }
         }
+
+        if (!isSearchMatch) {
+          return { match: false, poke: poke2, isSearchMatch: false };
+        }
+      } else {
+        isSearchMatch = true;
       }
+
       // Game (multi-select)
       if (filters.game && filters.game.length > 0) {
         const matchesGame = filters.game.some(game => firstEntry.game === game);
-        if (!matchesGame) return [];
+        if (!matchesGame) return { match: false, poke: poke2, isSearchMatch: false };
       }
       // Game obtainable in (multi-select)
       if (filters.gameObtainable && filters.gameObtainable.length > 0) {
@@ -1194,41 +1349,44 @@ export default function App() {
         const matchesGame = filters.gameObtainable.some(game =>
           normalizedAvailable.has(normalizeGameName(game))
         );
-        if (!matchesGame) return [];
+        if (!matchesGame) return { match: false, poke: poke2, isSearchMatch: false };
       }
       // Ball (multi-select)
       if (filters.ball && filters.ball.length > 0) {
         const matchesBall = filters.ball.some(ball => firstEntry.ball === ball);
-        if (!matchesBall) return [];
+        if (!matchesBall) return { match: false, poke: poke2, isSearchMatch: false };
       }
       // Mark (multi-select)
       if (filters.mark && filters.mark.length > 0) {
-        const matchesMark = filters.mark.some(mark => firstEntry.mark === mark);
-        if (!matchesMark) return [];
+        const entryMarks = Array.isArray(firstEntry.marks)
+          ? firstEntry.marks
+          : (firstEntry.mark ? [firstEntry.mark] : []);
+        const matchesMark = filters.mark.some(filterMark => entryMarks.includes(filterMark));
+        if (!matchesMark) return { match: false, poke: poke2, isSearchMatch: false };
       }
       // Method (multi-select)
       if (filters.method && filters.method.length > 0) {
         const matchesMethod = filters.method.some(method => firstEntry.method === method);
-        if (!matchesMethod) return [];
+        if (!matchesMethod) return { match: false, poke: poke2, isSearchMatch: false };
       }
       // Type (multi-select - must match at least one)
       if (filters.type && filters.type.length > 0) {
         const matchesType = filters.type.some(type => (poke.types || []).includes(type));
-        if (!matchesType) return [];
+        if (!matchesType) return { match: false, poke: poke2, isSearchMatch: false };
       }
       // Gen (multi-select)
       if (filters.gen && filters.gen.length > 0) {
         const matchesGen = filters.gen.some(gen => String(poke.gen) === String(gen));
-        if (!matchesGen) return [];
+        if (!matchesGen) return { match: false, poke: poke2, isSearchMatch: false };
       }
       // Caught/uncaught - check the appropriate shiny status
       const caughtKey = getCaughtKey(poke, null, isShiny);
-      if (filters.caught === "caught" && !caught[caughtKey]) return [];
-      if (filters.caught === "uncaught" && caught[caughtKey]) return [];
+      const effectiveCaughtMap = isTutorialActive ? visualCaught : caught;
+      if (filters.caught === "caught" && !effectiveCaughtMap[caughtKey]) return { match: false, poke: poke2, isSearchMatch: false };
+      if (filters.caught === "uncaught" && effectiveCaughtMap[caughtKey]) return { match: false, poke: poke2, isSearchMatch: false };
 
       // Category filtering
       if (filters.categories && filters.categories.length > 0) {
-        const pokemonCategory = getPokemonCategory(poke);
         const matchesAnyCategory = filters.categories.some(category => {
           switch (category) {
             case "legendary":
@@ -1254,20 +1412,279 @@ export default function App() {
           }
         });
 
-        if (!matchesAnyCategory) return [];
+        if (!matchesAnyCategory) return { match: false, poke: poke2, isSearchMatch: false };
       }
 
-      return [poke2];
+      return { match: true, poke: poke2, isSearchMatch };
+    };
+
+    // When Show Full Box and a search term are active, chunk into boxes of 30 and keep full boxes that contain matches
+    if (filters.searchTerm && filters.showFullBox) {
+      if (!forceShowForms && !showForms && list[0]?.formType && list[0]?.formType !== "main" && list[0]?.formType !== "default") {
+        return [];
+      }
+
+      const boxSize = 30;
+      const result = [];
+      for (let i = 0; i < list.length; i += boxSize) {
+        const boxIndex = Math.floor(i / boxSize);
+        const boxSlice = list.slice(i, i + boxSize);
+        const testedBox = boxSlice.map(p => {
+          const res = testPokemon(p);
+          return {
+            ...res.poke,
+            _isSearchMatch: res.match && res.isSearchMatch,
+            _boxIndex: boxIndex
+          };
+        });
+
+        const hasMatch = testedBox.some(p => p._isSearchMatch);
+        if (hasMatch) {
+          result.push(...testedBox);
+        }
+      }
+      return result;
+    }
+
+    // Standard filtering: return only matching Pokemon
+    return list.flatMap(poke => {
+      const res = testPokemon(poke);
+      if (!res.match) return [];
+      return [res.poke];
     });
+  }, [caught, caughtInfoMap, currentDexPreferences, filters, showForms, isTutorialActive, visualCaught, visualCaughtInfoMap]);
 
+  // --- Catch / Form Toggles ---
+  const handleToggleCaught = useCallback(async (poke, isShiny = false) => {
+    // Mighty Pokemon cannot be caught as shiny under any circumstances
+    if (isShiny && poke?.formType === "mighty") {
+      return;
+    }
 
+    if (isTutorialActive) {
+      if (poke.id === 1) {
+        setTutorialBulbasaurCaught(prev => {
+          const willBeCaught = !prev;
+          if (willBeCaught) {
+            setTutorialBulbasaurInfo({
+              caught: true,
+              caughtAt: Date.now(),
+              entries: [{
+                nickname: "", 
+                date: "", 
+                ball: "", 
+                mark: "", 
+                method: "", 
+                game: "", 
+                checks: "", 
+                notes: "", 
+                entryId: Math.random().toString(36).substr(2, 9)
+              }]
+            });
+          } else {
+            setTutorialBulbasaurInfo(null);
+          }
+          return willBeCaught;
+        });
+      }
+      return;
+    }
 
-  }, [caught, caughtInfoMap, currentDexPreferences, filters, showForms]);
+    const key = getCaughtKey(poke, null, isShiny);
+    if (!key) return;
 
+    const currentCaught = caughtRef.current || caught;
+    const currentInfoMap = caughtInfoMapRef.current || caughtInfoMap;
+    const isCurrentlyCaught = !!currentCaught[key] || !!(currentInfoMap[key] && currentInfoMap[key].caught !== false);
+    const info = currentInfoMap[key];
 
+    if (isCurrentlyCaught && hasMeaningfulInfo(info)) {
+      // Show reset modal instead of old confirm dialog
+      setResetModal({
+        show: true,
+        pokemon: poke,
+        pokemonName: formatPokemonName(poke?.name),
+        isShiny: isShiny
+      });
+      setResetModalClosing(false);
+      return;
+    }
+
+    // Determine what will happen before touching state so we can pass data in the event.
+    const wasAlreadyCaught = isCurrentlyCaught;
+    let freshInfo = null;
+
+    if (!wasAlreadyCaught) {
+      const newEntry = {
+        nickname: "",
+        date: "",
+        ball: BALL_OPTIONS[0].value,
+        mark: MARK_OPTIONS[0].value,
+        method: METHOD_OPTIONS[0],
+        game: GAME_OPTIONS[0].value,
+        checks: "",
+        notes: "",
+        entryId: Math.random().toString(36).substr(2, 9)
+      };
+      freshInfo = {
+        caught: true,
+        caughtAt: Date.now(),
+        entries: [newEntry]
+      };
+      setCaughtInfoMap(prevInfoMap => ({
+        ...prevInfoMap,
+        [key]: freshInfo
+      }));
+      if (user?.username) {
+        const pokeName = formatPokemonName(poke.name);
+        const formName = getFormDisplayName(poke) || null;
+        const sprite = getSpriteUrl(poke, isShiny, currentDexPreferences?.useHomeSprites);
+        const newCatchTrigger = { pokemonName: pokeName, formName: formName, sprite: sprite, username: user.username, profileTrainer: user.profileTrainer };
+        updateCaughtData(user.username, key, freshInfo, newCatchTrigger);
+      }
+    } else {
+      setCaughtInfoMap(prevInfoMap => {
+        const updated = { ...prevInfoMap };
+        delete updated[key];
+        return updated;
+      });
+      if (user?.username) {
+        updateCaughtData(user.username, key, null);
+      }
+    }
+
+    setCaught(prev => ({ ...prev, [key]: !wasAlreadyCaught }));
+
+    // keep sidebar in sync - switch to newly caught pokemon
+    if (sidebarOpen && selectedPokemon) {
+      // Check if it's a different Pokémon (different ID) or different form (same ID but different name/formType)
+      const isDifferentPokemon = selectedPokemon.id !== poke.id;
+      const isDifferentForm = selectedPokemon.id === poke.id && selectedPokemon.name !== poke.name;
+
+      if (isDifferentPokemon || isDifferentForm) {
+        console.log("Sidebar is open, switching to newly toggled pokemon:", poke.name, "form:", poke.formType);
+        setSelectedPokemon(poke);
+      }
+    }
+
+    // Persist the most-recent-catch order to sessionStorage so Profile.jsx can read it on
+    // mount even when it was unmounted during the catch (e.g. user was on the dex page).
+    try {
+      const existing = JSON.parse(sessionStorage.getItem('recentCatchOrder') || '[]');
+      let updated;
+      if (!wasAlreadyCaught) {
+        // Prepend the new catch, remove duplicates, keep top 5
+        updated = [
+          { stableId: poke.stableId, isShiny },
+          ...existing.filter(c => !(c.stableId === poke.stableId && !!c.isShiny === !!isShiny))
+        ].slice(0, 5);
+      } else {
+        // Remove the uncaught Pokémon from the order
+        updated = existing.filter(c => !(c.stableId === poke.stableId && !!c.isShiny === !!isShiny));
+      }
+      sessionStorage.setItem('recentCatchOrder', JSON.stringify(updated));
+    } catch { /* sessionStorage unavailable — silently ignore */ }
+
+    // Notify other pages (e.g. Profile's Recent Entries) that caught data changed.
+    // Pass freshInfo so Profile can optimistically prepend without a server fetch race.
+    // Tag with source:'app' so App.jsx's own listener skips it.
+    window.dispatchEvent(new CustomEvent('caughtDataChanged', {
+      detail: {
+        pokemon: poke,
+        caughtKey: key,
+        caughtInfo: wasAlreadyCaught ? null : freshInfo,
+        wasCaught: wasAlreadyCaught,
+        isShiny,
+        source: 'app'
+      }
+    }));
+  }, [caught, caughtInfoMap, sidebarOpen, selectedPokemon, showShiny, user?.username, currentDexPreferences?.useHomeSprites, isTutorialActive]);
+
+  // Handle reset confirmation from grid click or bulk operations
+  const handleResetConfirm = () => {
+    // Close modal with animation
+    setResetModalClosing(true);
+    setTimeout(() => {
+      setResetModal({
+        show: false,
+        pokemon: null,
+        pokemonName: '',
+        isShiny: false,
+        isBulkReset: false,
+        box: null
+      });
+      setResetModalClosing(false);
+    }, 300);
+
+    if (resetModal.isBulkReset && resetModal.box) {
+      // Handle bulk reset (Unmark All)
+      const newCaughtMap = { ...caught };
+      const newInfoMap = { ...caughtInfoMap };
+      const delta = {};
+
+      resetModal.box.forEach(p => {
+        const key = getCaughtKey(p, null, resetModal.isShiny);
+        newCaughtMap[key] = false;
+        newInfoMap[key] = null;
+        delta[key] = null;
+      });
+
+      setCaught(newCaughtMap);
+      setCaughtInfoMap(newInfoMap);
+
+      // Send changes to server
+      if (user?.username) {
+        try {
+          const { caughtAPI } = require('./utils/api.js');
+          caughtAPI.patchCaughtData({ changes: delta });
+        } catch (e) {
+          // Fallback to full save
+          updateCaughtData(user.username, null, newInfoMap);
+        }
+      }
+
+      // Close sidebar if any of these Pokémon were selected
+      if (selectedPokemon && resetModal.box.some(p => getCaughtKey(p, null, resetModal.isShiny) === getCaughtKey(selectedPokemon, null, showShiny))) {
+        setSelectedPokemon(null);
+        setSidebarOpen(false);
+      }
+    } else if (resetModal.pokemon) {
+      // Handle individual reset (grid click)
+      const key = getCaughtKey(resetModal.pokemon, null, resetModal.isShiny);
+
+      // Actually reset the Pokémon data
+      setCaught(prev => ({ ...prev, [key]: false }));
+      setCaughtInfoMap(prev => ({ ...prev, [key]: null }));
+      if (user?.username) {
+        updateCaughtData(user.username, key, null);
+      }
+
+      // Close sidebar if this Pokémon was selected
+      if (selectedPokemon && getCaughtKey(selectedPokemon, null, showShiny) === key) {
+        setSelectedPokemon(null);
+        setSidebarOpen(false);
+      }
+    }
+
+    // Notify other pages (e.g. Profile's Recent Entries) that caught data changed.
+    // Tag with source:'app' so App.jsx's own listener skips it.
+    window.dispatchEvent(new CustomEvent('caughtDataChanged', { detail: { source: 'app' } }));
+  };
 
 
   const updateCaughtInfo = useCallback((poke, info, isShiny = false, isNewEntryArg = false) => {
+    // Mighty Pokemon cannot be caught as shiny under any circumstances
+    if (isShiny && poke?.formType === "mighty") {
+      return;
+    }
+
+    // Intercept tutorial action:
+    if (isTutorialActive && poke.id === 1) {
+      setTutorialBulbasaurInfo(info);
+      setTutorialBulbasaurCaught(info !== null);
+      return;
+    }
+
     const key = getCaughtKey(poke, null, isShiny);
     if (!key) return;
 
@@ -1358,11 +1775,16 @@ export default function App() {
   }, [user?.username, sidebarOpen, selectedPokemon]);
 
   const handleSelectPokemon = useCallback((poke) => {
+    if (showShiny && poke?.formType === "mighty") {
+      return;
+    }
     setSidebarOpen(true);
     setSelectedPokemon(poke);
-  }, []);
+  }, [showShiny]);
 
   const handleMarkAll = useCallback(async (box, isShiny = false) => {
+    if (isTutorialActive) return;
+
     // Helper function to check if a Pokemon is locked
     const isPokemonLocked = (poke) => {
       // Only check for locked Pokemon if we're in shiny mode and lock settings are enabled
@@ -1472,14 +1894,7 @@ export default function App() {
         const { caughtAPI } = await import('./utils/api.js');
         await caughtAPI.patchCaughtData({ changes: delta });
       } else if (user?.username) {
-        let newCatchTrigger = null;
-        if (isNewEntryArg) {
-          const pokeName = formatPokemonName(poke.name);
-          const formName = getFormDisplayName(poke) || null;
-          const sprite = getSpriteUrl(poke, isShiny, currentDexPreferences?.useHomeSprites);
-          newCatchTrigger = { pokemonName: pokeName, formName: formName, sprite: sprite, username: user.username, profileTrainer: user.profileTrainer };
-        }
-        await updateCaughtData(user.username, null, newInfoMap, newCatchTrigger);
+        await updateCaughtData(user.username, null, newInfoMap);
       }
     } catch (e) {
       // swallow; UI already updated optimistically
@@ -1494,190 +1909,12 @@ export default function App() {
 
 
 
-  // App.jsx
-  const handleToggleCaught = useCallback(async (poke, isShiny = false) => {
-    const key = getCaughtKey(poke, null, isShiny);
-
-    if (caught[key]) {
-      const info = caughtInfoMap[key];
-      if (hasMeaningfulInfo(info)) {
-        // Show reset modal instead of old confirm dialog
-        setResetModal({
-          show: true,
-          pokemon: poke,
-          pokemonName: formatPokemonName(poke?.name),
-          isShiny: isShiny
-        });
-        setResetModalClosing(false);
-        return;
-      }
-    }
-
-    // Determine what will happen before touching state so we can pass data in the event.
-    const wasAlreadyCaught = !!caught[key];
-    let freshInfo = null;
-
-    if (!wasAlreadyCaught) {
-      const newEntry = {
-        nickname: "",
-        date: "",
-        ball: BALL_OPTIONS[0].value,
-        mark: MARK_OPTIONS[0].value,
-        method: METHOD_OPTIONS[0],
-        game: GAME_OPTIONS[0].value,
-        checks: "",
-        notes: "",
-        entryId: Math.random().toString(36).substr(2, 9)
-      };
-      freshInfo = {
-        caught: true,
-        caughtAt: Date.now(),
-        entries: [newEntry]
-      };
-      setCaughtInfoMap(prevInfoMap => ({
-        ...prevInfoMap,
-        [key]: freshInfo
-      }));
-      if (user?.username) {
-        const pokeName = formatPokemonName(poke.name);
-        const formName = getFormDisplayName(poke) || null;
-        const sprite = getSpriteUrl(poke, isShiny, currentDexPreferences?.useHomeSprites);
-        const newCatchTrigger = { pokemonName: pokeName, formName: formName, sprite: sprite, username: user.username, profileTrainer: user.profileTrainer };
-        updateCaughtData(user.username, key, freshInfo, newCatchTrigger);
-      }
-    } else {
-      setCaughtInfoMap(prevInfoMap => {
-        const updated = { ...prevInfoMap };
-        delete updated[key];
-        return updated;
-      });
-      if (user?.username) {
-        updateCaughtData(user.username, key, null);
-      }
-    }
-
-    setCaught(prev => ({ ...prev, [key]: !wasAlreadyCaught }));
-
-    // keep sidebar in sync - switch to newly caught pokemon
-    if (sidebarOpen && selectedPokemon) {
-      // Check if it's a different Pokémon (different ID) or different form (same ID but different name/formType)
-      const isDifferentPokemon = selectedPokemon.id !== poke.id;
-      const isDifferentForm = selectedPokemon.id === poke.id && selectedPokemon.name !== poke.name;
-
-      if (isDifferentPokemon || isDifferentForm) {
-        console.log("Sidebar is open, switching to newly toggled pokemon:", poke.name, "form:", poke.formType);
-        setSelectedPokemon(poke);
-      }
-    }
-
-    // Persist the most-recent-catch order to sessionStorage so Profile.jsx can read it on
-    // mount even when it was unmounted during the catch (e.g. user was on the dex page).
-    try {
-      const existing = JSON.parse(sessionStorage.getItem('recentCatchOrder') || '[]');
-      let updated;
-      if (!wasAlreadyCaught) {
-        // Prepend the new catch, remove duplicates, keep top 5
-        updated = [
-          { stableId: poke.stableId, isShiny },
-          ...existing.filter(c => !(c.stableId === poke.stableId && !!c.isShiny === !!isShiny))
-        ].slice(0, 5);
-      } else {
-        // Remove the uncaught Pokémon from the order
-        updated = existing.filter(c => !(c.stableId === poke.stableId && !!c.isShiny === !!isShiny));
-      }
-      sessionStorage.setItem('recentCatchOrder', JSON.stringify(updated));
-    } catch { /* sessionStorage unavailable — silently ignore */ }
-
-    // Notify other pages (e.g. Profile's Recent Entries) that caught data changed.
-    // Pass freshInfo so Profile can optimistically prepend without a server fetch race.
-    // Tag with source:'app' so App.jsx's own listener skips it.
-    window.dispatchEvent(new CustomEvent('caughtDataChanged', {
-      detail: {
-        pokemon: poke,
-        caughtKey: key,
-        caughtInfo: wasAlreadyCaught ? null : freshInfo,
-        wasCaught: wasAlreadyCaught,
-        isShiny,
-        source: 'app'
-      }
-    }));
-  }, [caught, caughtInfoMap, sidebarOpen, selectedPokemon, showShiny, user?.username]);
-
-  // Handle reset confirmation from grid click or bulk operations
-  const handleResetConfirm = () => {
-    // Close modal with animation
-    setResetModalClosing(true);
-    setTimeout(() => {
-      setResetModal({
-        show: false,
-        pokemon: null,
-        pokemonName: '',
-        isShiny: false,
-        isBulkReset: false,
-        box: null
-      });
-      setResetModalClosing(false);
-    }, 300);
-
-    if (resetModal.isBulkReset && resetModal.box) {
-      // Handle bulk reset (Unmark All)
-      const newCaughtMap = { ...caught };
-      const newInfoMap = { ...caughtInfoMap };
-      const delta = {};
-
-      resetModal.box.forEach(p => {
-        const key = getCaughtKey(p, null, resetModal.isShiny);
-        newCaughtMap[key] = false;
-        newInfoMap[key] = null;
-        delta[key] = null;
-      });
-
-      setCaught(newCaughtMap);
-      setCaughtInfoMap(newInfoMap);
-
-      // Send changes to server
-      if (user?.username) {
-        try {
-          const { caughtAPI } = import('./utils/api.js');
-          caughtAPI.patchCaughtData({ changes: delta });
-        } catch (e) {
-          // Fallback to full save
-          updateCaughtData(user.username, null, newInfoMap);
-        }
-      }
-
-      // Close sidebar if any of these Pokémon were selected
-      if (selectedPokemon && resetModal.box.some(p => getCaughtKey(p, null, resetModal.isShiny) === getCaughtKey(selectedPokemon, null, showShiny))) {
-        setSelectedPokemon(null);
-        setSidebarOpen(false);
-      }
-    } else if (resetModal.pokemon) {
-      // Handle individual reset (grid click)
-      const key = getCaughtKey(resetModal.pokemon, null, resetModal.isShiny);
-
-      // Actually reset the Pokémon data
-      setCaught(prev => ({ ...prev, [key]: false }));
-      setCaughtInfoMap(prev => ({ ...prev, [key]: null }));
-      if (user?.username) {
-        updateCaughtData(user.username, key, null);
-      }
-
-      // Close sidebar if this Pokémon was selected
-      if (selectedPokemon && getCaughtKey(selectedPokemon, null, showShiny) === key) {
-        setSelectedPokemon(null);
-        setSidebarOpen(false);
-      }
-    }
-
-    // Notify other pages (e.g. Profile's Recent Entries) that caught data changed.
-    // Tag with source:'app' so App.jsx's own listener skips it.
-    window.dispatchEvent(new CustomEvent('caughtDataChanged', { detail: { source: 'app' } }));
-  };
-
   // Helper function to get unified pokemon list for unified view mode
   const getUnifiedPokemonList = useCallback((isShiny = false, applyFilters = false) => {
-    // Collect all Pokemon from all sections
-    const allMons = dexSections.flatMap(section => section.getList());
+    // Collect all Pokemon from all sections (exclude mighty for shiny)
+    const allMons = dexSections
+      .filter(section => !isShiny || section.key !== "mighty")
+      .flatMap(section => section.getList());
 
     // Remove duplicates by using getCaughtKey
     const seenKeys = new Set();
@@ -1704,6 +1941,7 @@ export default function App() {
 
   // Use current shiny state for search suggestions
   mergedMons = dexSections
+    .filter(section => !showShiny || section.key !== "mighty")
     .flatMap(section => filterMons(section.getList(), showForms, showShiny))
     .filter(mon => {
       const key = getCaughtKey(mon, null, showShiny);
@@ -1720,8 +1958,9 @@ export default function App() {
 
   const shinySectionsWithFilters = useMemo(() => {
     return dexSections
+      .filter(section => section.key !== "mighty")
       .map(section => {
-        const filteredMons = filterMons(section.getList(), showForms, true).sort((a, b) => a.id - b.id);
+        const filteredMons = filterMons(section.getList(), showForms, true);
         if (!filteredMons.length) return null;
         return { section, filteredMons };
       })
@@ -1730,18 +1969,18 @@ export default function App() {
 
   const shinySectionsNoFilters = useMemo(() => {
     return dexSections
-      .map(section => {
-        const filteredMons = filterMons(section.getList(), false, true);
-        if (!filteredMons.length) return null;
-        return { section, filteredMons };
-      })
-      .filter(Boolean);
-  }, [dexSections, filterMons]);
+      .filter(section => section.key !== "mighty")
+      .map(section => ({
+        section,
+        filteredMons: section.getList()
+      }))
+      .filter(s => s.filteredMons.length > 0);
+  }, [dexSections]);
 
   const regularSectionsWithFilters = useMemo(() => {
     return dexSections
       .map(section => {
-        const filteredMons = filterMons(section.getList(), showForms, false).sort((a, b) => a.id - b.id);
+        const filteredMons = filterMons(section.getList(), showForms, false);
         if (!filteredMons.length) return null;
         return { section, filteredMons };
       })
@@ -1750,13 +1989,51 @@ export default function App() {
 
   const regularSectionsNoFilters = useMemo(() => {
     return dexSections
-      .map(section => {
-        const filteredMons = filterMons(section.getList(), false, false);
-        if (!filteredMons.length) return null;
-        return { section, filteredMons };
-      })
-      .filter(Boolean);
-  }, [dexSections, filterMons]);
+      .map(section => ({
+        section,
+        filteredMons: section.getList()
+      }))
+      .filter(s => s.filteredMons.length > 0);
+  }, [dexSections]);
+
+  const categorizedSections = useMemo(() => {
+    return showShiny 
+      ? (hasSearchFilters ? shinySectionsWithFilters : shinySectionsNoFilters)
+      : (hasSearchFilters ? regularSectionsWithFilters : regularSectionsNoFilters);
+  }, [showShiny, hasSearchFilters, shinySectionsWithFilters, shinySectionsNoFilters, regularSectionsWithFilters, regularSectionsNoFilters]);
+
+  const availableCategoryTabs = useMemo(() => {
+    return DEX_TABS_CONFIG.map(tab => {
+      const matchingSections = categorizedSections.filter(({ section }) => tab.sectionKeys.includes(section.key));
+      const totalCount = matchingSections.reduce((acc, curr) => {
+        const hasExplicitMatch = curr.filteredMons.some(p => p._isSearchMatch !== undefined);
+        const matchCount = hasExplicitMatch
+          ? curr.filteredMons.filter(p => p._isSearchMatch).length
+          : curr.filteredMons.length;
+        return acc + matchCount;
+      }, 0);
+      if (totalCount === 0) return null;
+      return {
+        key: tab.key,
+        title: tab.title,
+        count: totalCount,
+        sections: matchingSections
+      };
+    }).filter(Boolean);
+  }, [categorizedSections]);
+
+  const effectiveActiveCategoryTab = useMemo(() => {
+    if (isTutorialActive) return "main";
+    if (availableCategoryTabs.some(t => t.key === activeCategoryTab)) {
+      return activeCategoryTab;
+    }
+    return availableCategoryTabs[0]?.key || "main";
+  }, [availableCategoryTabs, activeCategoryTab, isTutorialActive]);
+
+  const activeCategorySections = useMemo(() => {
+    const currentTabObj = availableCategoryTabs.find(t => t.key === effectiveActiveCategoryTab);
+    return currentTabObj?.sections || [];
+  }, [availableCategoryTabs, effectiveActiveCategoryTab]);
 
   // Check if we have any active search criteria
   const hasActiveSearch = filters.searchTerm || (filters.game && filters.game.length > 0) || (filters.gameObtainable && filters.gameObtainable.length > 0) || (filters.ball && filters.ball.length > 0) || (filters.mark && filters.mark.length > 0) || (filters.method && filters.method.length > 0) || (filters.type && filters.type.length > 0) || (filters.gen && filters.gen.length > 0) || filters.caught || (filters.categories && filters.categories.length > 0);
@@ -1857,6 +2134,10 @@ export default function App() {
                 {/* Location Listener for detecting navigation to home page */}
                 <LocationListener onNavigateToHome={refreshDexPreferences} />
 
+                {user?.username && (
+                  <OnboardingManager onTutorialActiveChange={setIsTutorialActive} />
+                )}
+
                 <main className="flex-grow">
                   <Routes>
                     {/* Main App */}
@@ -1874,7 +2155,7 @@ export default function App() {
                             <div className="progress-manager-container page-animate-1">
                               <ProgressManager
                                 allMons={[...pokemonData, ...getFilteredFormsData(formsData, currentDexPreferences)]}
-                                caughtInfoMap={caughtInfoMap}
+                                caughtInfoMap={visualCaughtInfoMap}
                                 progressBarsOverride={user.progressBars}
                                 showShiny={showShiny}
                                 dexPreferences={currentDexPreferences}
@@ -1883,7 +2164,7 @@ export default function App() {
 
                             </div>
 
-                            <div className="search-bar-container page-animate-2">
+                            <div className="search-bar-container page-animate-2" ref={searchBarRef}>
                               <SearchBar
                                 filters={filters}
                                 setFilters={setFilters}
@@ -1892,6 +2173,39 @@ export default function App() {
                                 showShiny={showShiny}
                                 setShowShiny={setShowShiny}
                               />
+                            </div>
+
+                            {/* Floating Shiny Toggle */}
+                            <div
+                              className="floating-shiny-toggle"
+                              style={{
+                                opacity: showFloatingShiny ? 1 : 0,
+                                visibility: showFloatingShiny ? 'visible' : 'hidden',
+                                transition: 'opacity 0.3s ease, visibility 0.3s ease',
+                                pointerEvents: showFloatingShiny ? 'auto' : 'none'
+                              }}
+                            >
+                              <label className="flex items-center gap-2 cursor-pointer" title="Toggle all shiny sprites" style={{ margin: 0 }}>
+                                <div className="switch" style={{ margin: 0 }}>
+                                  <input
+                                    type="checkbox"
+                                    className="switch-input"
+                                    checked={showShiny}
+                                    onChange={e => setShowShiny(e.target.checked)}
+                                  />
+                                  <div className="switch-slider" />
+                                </div>
+                                <span className="text-base font-medium flex items-center gap-2" style={{ color: 'var(--text)' }}>
+                                  <Sparkles
+                                    size={20}
+                                    style={{
+                                      color: showShiny ? '#fbbf24' : '#6b7280',
+                                      filter: showShiny ? 'none' : 'grayscale(100%)'
+                                    }}
+                                  />
+                                  Shiny
+                                </span>
+                              </label>
                             </div>
 
                             {/* Mobile tip below the entire search section, above categories/grid */}
@@ -1919,65 +2233,60 @@ export default function App() {
                                   {!unifiedList.length ? null : (
                                     <DexSection
                                       readOnly={false}
-                                      caughtInfoMap={caughtInfoMap}
+                                      caughtInfoMap={visualCaughtInfoMap}
                                       updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, showShiny)}
-                                      key={`unified_${showShiny ? 'shiny' : 'regular'}`}
+                                      key="unified"
                                       sidebarOpen={sidebarOpen}
                                       title={showShiny ? "Complete Shiny Dex" : "Complete Living Dex"}
                                       pokemonList={unifiedList}
-                                      caught={caught}
-                                      isCaught={(poke) => caught[getCaughtKey(poke, null, showShiny)] || false}
+                                      caught={visualCaught}
+                                      isCaught={(poke) => {
+                                        if (isTutorialActive) return poke.id === 1 ? tutorialBulbasaurCaught : false;
+                                        return caught[getCaughtKey(poke, null, showShiny)] || false;
+                                      }}
                                       onMarkAll={(box) => handleMarkAll(box, showShiny)}
                                       onToggleCaught={(poke) => handleToggleCaught(poke, showShiny)}
                                       onSelect={handleSelectPokemon}
                                       showShiny={showShiny}
                                       showForms={showForms}
+                                      isTutorialActive={isTutorialActive}
                                     />
                                   )}
                                 </div>
-                              ) : showShiny ? (
-                                // CATEGORIZED VIEW - Show Shiny Pokémon Grid
-                                <div className="dex-grid-section">
-                                  {(hasSearchFilters ? shinySectionsWithFilters : shinySectionsNoFilters).map(({ section, filteredMons }) => (
-                                    <DexSection
-                                      readOnly={false}
-                                      caughtInfoMap={caughtInfoMap}
-                                      updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, true)}
-                                      key={`shiny_${section.key}`}
-                                      sidebarOpen={sidebarOpen}
-                                      title={section.title}
-                                      pokemonList={filteredMons}
-                                      caught={caught}
-                                      isCaught={(poke) => caught[getCaughtKey(poke, null, true)] || false}
-                                      onMarkAll={(box) => handleMarkAll(box, true)}
-                                      onToggleCaught={(poke) => handleToggleCaught(poke, true)}
-                                      onSelect={handleSelectPokemon}
-                                      showShiny={true}
-                                      showForms={showForms}
-                                    />
-                                  ))}
-                                </div>
                               ) : (
-                                // CATEGORIZED VIEW - Show Regular Pokémon Grid
-                                <div className="dex-grid-section">
-                                  {(hasSearchFilters ? regularSectionsWithFilters : regularSectionsNoFilters).map(({ section, filteredMons }) => (
-                                    <DexSection
-                                      readOnly={false}
-                                      caughtInfoMap={caughtInfoMap}
-                                      updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, false)}
-                                      key={`regular_${section.key}`}
-                                      sidebarOpen={sidebarOpen}
-                                      title={section.title}
-                                      pokemonList={filteredMons}
-                                      caught={caught}
-                                      isCaught={(poke) => caught[getCaughtKey(poke, null, false)] || false}
-                                      onMarkAll={(box) => handleMarkAll(box, false)}
-                                      onToggleCaught={(poke) => handleToggleCaught(poke, false)}
-                                      onSelect={handleSelectPokemon}
-                                      showShiny={false}
-                                      showForms={showForms}
-                                    />
-                                  ))}
+                                // CATEGORIZED VIEW - Show Tab Bar & Active Category Grid
+                                <div className="dex-grid-section" data-tutorial-id="all-categories">
+                                  <DexCategoryTabs
+                                    tabs={availableCategoryTabs}
+                                    activeTab={effectiveActiveCategoryTab}
+                                    onTabSelect={handleSelectCategoryTab}
+                                    isSearching={hasSearchFilters}
+                                  />
+                                  <div key={effectiveActiveCategoryTab} className="category-tab-content-animate">
+                                    {activeCategorySections.map(({ section, filteredMons }) => (
+                                      <DexSection
+                                        readOnly={false}
+                                        caughtInfoMap={visualCaughtInfoMap}
+                                        updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, showShiny)}
+                                        key={section.key}
+                                        sidebarOpen={sidebarOpen}
+                                        title={section.title}
+                                        pokemonList={filteredMons}
+                                        caught={visualCaught}
+                                        isCaught={(poke) => {
+                                          if (isTutorialActive) return poke.id === 1 ? tutorialBulbasaurCaught : false;
+                                          return caught[getCaughtKey(poke, null, showShiny)] || false;
+                                        }}
+                                        onMarkAll={(box) => handleMarkAll(box, showShiny)}
+                                        onToggleCaught={(poke) => handleToggleCaught(poke, showShiny)}
+                                        onSelect={handleSelectPokemon}
+                                        showShiny={showShiny}
+                                        showForms={showForms}
+                                        isTutorialActive={isTutorialActive}
+                                        allowCollapse={activeCategorySections.length > 1}
+                                      />
+                                    ))}
+                                  </div>
                                 </div>
                               )}
                             </div>
@@ -1994,19 +2303,21 @@ export default function App() {
 
                             {selectedPokemon && (() => {
                               const key = getCaughtKey(selectedPokemon, null, showShiny);
-                              const caughtInfo = caughtInfoMap[key];
+                              const isTutorialTarget = isTutorialActive && selectedPokemon.id === 1;
+                              const caughtInfo = isTutorialActive ? (isTutorialTarget ? tutorialBulbasaurInfo : null) : caughtInfoMap[key];
                               return (
                                 <Sidebar
                                   open={!!selectedPokemon}
                                   pokemon={selectedPokemon}
                                   onClose={() => setSelectedPokemon(null)}
                                   caughtInfo={caughtInfo}
-                                  caughtInfoMap={caughtInfoMap}
+                                  caughtInfoMap={visualCaughtInfoMap}
                                   updateCaughtInfo={updateCaughtInfo}
                                   showShiny={showShiny}
                                   onPokemonSelect={setSelectedPokemon}
                                   externalLinkPreference={externalLinkPreference}
                                   dexPreferences={currentDexPreferences}
+                                  isTutorialActive={isTutorialActive}
                                 />
                               );
                             })()}
@@ -2072,7 +2383,7 @@ export default function App() {
                       element={
                         <RequireAuth loading={loading} authReady={authReady} user={user}>
                           <Suspense fallback={<LoadingSpinner fullScreen text="Loading your profile..." />}>
-                            <Profile />
+                            <ProfilePage />
                           </Suspense>
                         </RequireAuth>
                       }
@@ -2150,7 +2461,7 @@ export default function App() {
                       path="/u/:username"
                       element={
                         <Suspense fallback={<LoadingSpinner fullScreen text="Loading trainer profile..." />}>
-                          <PublicProfile />
+                          <ProfilePage />
                         </Suspense>
                       }
                     />
@@ -2168,6 +2479,24 @@ export default function App() {
                         <Suspense fallback={<LoadingSpinner fullScreen text="Loading Bingo..." />}>
                           <Bingo />
                         </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/u/:username/stats"
+                      element={
+                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading trainer stats..." />}>
+                          <ProfileStatsPage />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/profile/stats"
+                      element={
+                        <RequireAuth loading={loading} authReady={authReady} user={user}>
+                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading your stats..." />}>
+                            <ProfileStatsPage />
+                          </Suspense>
+                        </RequireAuth>
                       }
                     />
 

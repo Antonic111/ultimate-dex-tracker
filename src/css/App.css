@@ -54,14 +54,22 @@ body {
   padding: 1rem 1.5rem !important;
 }
 
+/* Logo height — responsive via class */
+.site-logo-img {
+  display: block;
+  height: 110px;
+  width: auto;
+  max-width: 550px;
+}
+
 /* Mobile Header Styles */
 @media (max-width: 768px) {
 
-  /* Increase header height and padding on mobile */
+  /* Clean header height and padding on mobile */
   header {
     height: 80px !important;
     max-height: 80px !important;
-    padding-bottom: 42px !important;
+    padding-bottom: 0 !important;
   }
 
   /* Make header container more flexible */
@@ -72,9 +80,8 @@ body {
     padding-right: 0.5rem !important;
   }
 
-  /* Scale up logo on mobile */
-  header img {
-    height: 65px !important;
+  .site-logo-img {
+    height: 58px !important;
     max-width: 200px !important;
   }
 
@@ -91,10 +98,43 @@ body {
     font-size: 0.7rem !important;
   }
 
-  /* Scale down navigation icons */
-  header nav svg {
+  /* Override global SVG rules for dropdown icons */
+  header nav svg:not(.lucide-chevron-down) {
     width: 8px !important;
     height: 8px !important;
+  }
+
+  /* Right-side container for profile and help buttons */
+  .header-right-buttons {
+    gap: 0.375rem !important;
+  }
+
+  /* Scale down help and feedback buttons on mobile */
+  .header-right-buttons button {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .header-right-buttons svg {
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  /* Scale down profile dropdown on mobile */
+  .header-right-buttons .profile-dropdown-btn {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .header-right-buttons .profile-dropdown-btn svg {
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  /* Dropdown icon shouldn't be shrunk as much */
+  .header-right-buttons .lucide-chevron-down {
+    width: 10px !important;
+    height: 10px !important;
   }
 
   /* Override global SVG rules for dropdown icons */
@@ -178,7 +218,7 @@ body {
   header {
     height: 70px !important;
     max-height: 70px !important;
-    padding-bottom: 42px !important;
+    padding-bottom: 0 !important;
   }
 
   header>div {
@@ -189,9 +229,9 @@ body {
   }
 
   /* Smaller logo */
-  header img {
-    height: 55px !important;
-    max-width: 180px !important;
+  .site-logo-img {
+    height: 50px !important;
+    max-width: 160px !important;
   }
 
   /* Tighter navigation but still usable */
@@ -592,4 +632,36 @@ body {
 .pokemon-slot-hover:hover {
   transform: scale(1.05);
   z-index: 50;
+}
+
+/* Floating Shiny Toggle (Sticky under header) */
+.floating-shiny-toggle {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 90;
+  background-color: var(--searchbar-bg, var(--bg-color));
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  /* Desktop default */
+  top: 150px;
+}
+
+@media (max-width: 1024px) {
+  .floating-shiny-toggle {
+    top: 130px;
+  }
+}
+
+@media (max-width: 768px) {
+  .floating-shiny-toggle {
+    /* Mobile header is shorter, so it doesn't need to be pushed down as much */
+    top: 90px;
+  }
 }

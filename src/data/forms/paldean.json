@@ -17,6 +17,14 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -38,6 +46,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -59,6 +77,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Dive Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Dive Ball",
+        "Heavy Ball"
+      ]
     }
   },
   {
@@ -85,6 +115,17 @@
           "name": "clodsire",
           "how": "Level Up to 20"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Safari Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
       ]
     }
   }

@@ -1,99 +1,99 @@
-/* Evolution Chain - Tailwind CSS Version */
+/* Evolution Chain Component Styles */
 
-/* Note: CSS variables are defined in theme.css for both light and dark themes */
-
-/* Evolution Chain Spacer */
-.evolution-chain-spacer {
-  height: 1rem;
-  border: none;
-}
-
-/* Evolution Chain Container */
 .evolution-chain-section {
-  @apply px-3 pt-3 pb-4;
-  transition: background-color var(--transition-speed);
-}
-
-/* Evolution Chain Title */
-.evo-chain-title {
-  @apply font-bold text-white mb-3 text-center;
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* Evolution Chain Divider */
-.evo-chain-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, var(--border-color) 20%, var(--border-color) 80%, transparent 100%);
-  margin-bottom: 1rem;
-  margin-top: 0.75rem;
+  padding: 8px 0;
+  width: 100%;
 }
 
 /* Evolution Chain Layout */
 .evo-chain-table {
-  @apply flex flex-row items-center justify-center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  overflow-x: auto;
+  padding: 4px 0 8px 0;
 }
 
 .evo-chain-row {
-  @apply flex flex-row items-center justify-center gap-2;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .evo-chain-leaf {
-  @apply flex flex-col items-center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .evo-chain-parent {
-  @apply flex flex-col items-center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .evo-chain-split {
-  @apply flex flex-row items-center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
 }
 
 .evo-chain-children {
-  @apply flex flex-col gap-2 items-start;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
 }
 
 .evo-chain-child-row {
-  @apply flex flex-row items-center gap-2;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Evolution Sprites */
 .evo-sprite {
-  @apply flex flex-col items-center rounded-full transition-all duration-200 bg-transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  background: transparent;
   position: relative;
+  width: 44px;
+  height: 44px;
 }
 
 .evo-img {
-  @apply object-contain;
+  object-fit: contain;
   pointer-events: none;
 }
 
 .evo-sprite.blank {
-  @apply border-none bg-none opacity-0;
+  border: none;
+  background: none;
+  opacity: 0;
 }
 
 /* Clickable sprites */
 .evo-sprite-clickable {
-  @apply hover:scale-105 transition-transform duration-200;
-}
-
-.evo-sprite-clickable:hover {
-  @apply shadow-lg;
+  cursor: pointer;
 }
 
 /* Selected sprite indicator */
-.evo-sprite-selected {
-  /* Remove Tailwind ring to avoid blue color conflict */
-}
-
 .evo-sprite-selection-indicator {
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
   pointer-events: none;
 }
 
@@ -102,71 +102,26 @@
   height: 100%;
   border: 2px solid var(--accent);
   border-radius: 50%;
-  animation: subtlePulse 4s infinite;
 }
-
-@keyframes subtlePulse {
-  0% {
-    box-shadow: 0 0 0 0 var(--accent);
-  }
-
-  50% {
-    box-shadow: 0 0 0 1px var(--accent);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 var(--accent);
-  }
-}
-
-
 
 /* Evolution Arrows */
 .evo-arrow {
-  @apply flex items-center justify-center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .evo-arrow-symbol {
-  @apply text-3xl text-[var(--evo-arrow)] transition-colors duration-200 select-none;
-}
-
-/* Tooltip */
-.evo-tooltip {
-  @apply hidden absolute left-1/2 bottom-8 transform -translate-x-1/2 bg-black bg-opacity-95 text-white text-base font-medium px-3 py-2 rounded-lg shadow-xl z-50 max-w-96 min-w-36 break-words text-center;
-}
-
-.evo-arrow-wrapper {
-  @apply relative;
-}
-
-.evo-arrow-wrapper:hover .evo-tooltip {
-  @apply block;
-}
-
-/* No Evolutions State */
-.evo-chain-none-wrapper {
-  @apply flex flex-col items-center justify-center gap-1;
-}
-
-.evo-chain-none {
-  @apply text-base text-[var(--evo-text)] transition-colors duration-200 italic;
+  font-size: 1.5rem;
+  color: var(--evo-arrow, #9ca3af);
+  transition: color 0.2s ease;
+  user-select: none;
+  cursor: default;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .evolution-chain-section {
-    @apply p-2;
-  }
-
-  .evo-chain-title {
-    @apply text-base mb-2;
-  }
-
   .evo-arrow-symbol {
-    @apply text-2xl;
-  }
-
-  .evo-tooltip {
-    @apply max-w-80 min-w-32 text-sm px-2 py-1;
+    font-size: 1.25rem;
   }
 }

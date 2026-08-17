@@ -24,6 +24,17 @@
           "how": "Level Up to 20 at night"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Luxury Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Poké Ball",
+        "Timer Ball"
+      ]
     }
   },
   {
@@ -49,6 +60,17 @@
         "how": "Level Up to 20 at night"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Luxury Ball",
+        "Timer Ball"
+      ],
+      "shiny": [
+        "Poké Ball",
+        "Timer Ball"
+      ]
     }
   },
   {
@@ -74,6 +96,17 @@
         "how": "Use Thunder Stone in Alola"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Ultra Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -101,6 +134,15 @@
           "how": "Ice Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -126,6 +168,14 @@
         "how": "Ice Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -152,6 +202,16 @@
           "how": "Ice Stone"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -177,6 +237,16 @@
         "how": "Ice Stone"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Heavy Ball"
+      ]
     }
   },
   {
@@ -204,6 +274,16 @@
           "how": "Level Up to 26"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Lure Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -229,6 +309,17 @@
         "how": "Level Up to 26"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Lure Ball",
+        "Moon Ball",
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -255,6 +346,16 @@
           "how": "Level Up with high friendship"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -279,6 +380,17 @@
         "how": "Level Up with high friendship"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Luxury Ball",
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -305,6 +417,16 @@
           "name": "graveler-alolan",
           "how": "Level Up to 25"
         }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Repeat Ball",
+        "Luxury Ball"
       ]
     }
   },
@@ -337,6 +459,16 @@
           "how": "Trade"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Repeat Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -362,6 +494,17 @@
         "how": "Trade"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Ultra Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -389,6 +532,17 @@
           "how": "Level Up to 38"
         }
       ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Dream Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -414,6 +568,16 @@
         "how": "Level Up to 38"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -439,6 +603,16 @@
         "how": "Leaf Stone in Alola"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -464,6 +638,16 @@
         "how": "Level Up to 28 at night in Alola"
       },
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball"
+      ]
     }
   }
 ]

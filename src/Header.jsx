@@ -11,6 +11,46 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [hasNewUpdate, setHasNewUpdate] = useState(false);
 
+  // 1/8192 Shiny Logo Easter Egg (persists for 1 hour once triggered)
+  const [isRainbowLogo, setIsRainbowLogo] = useState(() => {
+    try {
+      const stored = localStorage.getItem('shinyLogoEasterEggUntil');
+      if (stored) {
+        const expiresAt = parseInt(stored, 10);
+        if (Date.now() < expiresAt) {
+          return true;
+        } else {
+          localStorage.removeItem('shinyLogoEasterEggUntil');
+        }
+      }
+      // 1 in 8,192 shiny chance
+      const roll = Math.floor(Math.random() * 8192);
+      if (roll === 0) {
+        const expiresAt = Date.now() + 60 * 60 * 1000; // 1 hour duration
+        localStorage.setItem('shinyLogoEasterEggUntil', expiresAt.toString());
+        return true;
+      }
+    } catch {
+      // Fallback
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    window.triggerShinyLogo = (enable = true) => {
+      if (enable) {
+        const expiresAt = Date.now() + 60 * 60 * 1000;
+        localStorage.setItem('shinyLogoEasterEggUntil', expiresAt.toString());
+        setIsRainbowLogo(true);
+        console.log('✨ 1/8192 Shiny Logo Easter Egg ACTIVATED for 1 hour!');
+      } else {
+        localStorage.removeItem('shinyLogoEasterEggUntil');
+        setIsRainbowLogo(false);
+        console.log('Shiny Logo Easter Egg deactivated.');
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (!changelogData || changelogData.length === 0) return;
     const latestVersion = changelogData[0].version;
@@ -26,6 +66,32 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
 
   // Close the menu after login/logout or on any navigation
   useEffect(() => { setShowMenu(false); }, [user?.username, location.pathname]);
+
+  // Automatically open the profile menu when tutorial targets it
+  useEffect(() => {
+    const handleTutorialStep = (e) => {
+      const targetId = e.detail?.targetId;
+      
+      const isMobileNavTarget = ['nav-trainers', 'nav-counters', 'nav-mmo', 'nav-bingo'].includes(targetId);
+      const isProfileNavTarget = ['nav-settings', 'nav-profile'].includes(targetId);
+
+      if (isProfileNavTarget) {
+        setShowMenu(true);
+      } else {
+        setShowMenu(false);
+      }
+      
+      if (isMobileNavTarget) {
+        if (window.innerWidth < 1280) {
+          setShowMobileNav(true);
+        }
+      } else {
+        setShowMobileNav(false);
+      }
+    };
+    window.addEventListener('tutorialStepChange', handleTutorialStep);
+    return () => window.removeEventListener('tutorialStepChange', handleTutorialStep);
+  }, []);
 
   // Close mobile nav on navigation
   useEffect(() => { setShowMobileNav(false); }, [location.pathname]);
@@ -93,6 +159,9 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!showMenu && !showMobileNav) return;
+      
+      // Let the tutorial strictly manage menu states while active
+      if (document.body.classList.contains('tutorial-active')) return;
 
       // Check if click is outside the user menu wrapper
       if (showMenu && userMenuRef.current && !userMenuRef.current.contains(event.target)) {
@@ -114,21 +183,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
     }
   }, [showMenu, showMobileNav]);
 
-  const { theme, accent } = useTheme(); // has "dark"/"light" + your accent color
-  const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : "Yellow");
-
-  // Build primary + fallback logo paths (place files in /public)
-  const base = `/Logo${cap(accent)}`;
-  const primary = `${base}${theme === "light" ? "Light" : ""}.png`; // e.g. /LogoYellowLight.png
-
-  const [logoSrc, setLogoSrc] = useState(primary);
-  useEffect(() => setLogoSrc(primary), [primary]);
-
-  const handleLogoError = () => {
-    // 1) try non-Light version, 2) fall back to /Logo.png
-    if (logoSrc !== `${base}.png`) setLogoSrc(`${base}.png`);
-    else if (logoSrc !== "/Logo.png") setLogoSrc("/Logo.png");
-  };
+  const { theme, resolvedTheme, accent } = useTheme(); // has "dark"/"light" + your accent color
 
   const handleOpenMenu = () => {
     setShowMenu(true);
@@ -159,7 +214,52 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
               window.dispatchEvent(new CustomEvent('refreshDexPreferences'));
             }}
           >
-            <img src={logoSrc} onError={handleLogoError} alt="" className="h-[65px] md:h-[110px] w-auto max-w-[340px] md:max-w-[450px] lg:max-w-[550px]" />
+            {/* 3-layer logo — Layer1 sets natural size, layers 2+3 overlay on top */}
+            <div style={{ position: 'relative', display: 'inline-block', lineHeight: 0, flexShrink: 0 }}>
+              {/* Layer 1: natural-flow img — defines the container's real width & height */}
+              <img
+                src="/Logo_Layer1.png"
+                alt="Ultimate Dex Tracker"
+                className="site-logo-img"
+                style={{
+                  filter: resolvedTheme === 'light' ? 'brightness(0) saturate(100%) invert(8%)' : 'none',
+                  transition: 'filter var(--transition-speed)',
+                  userSelect: 'none',
+                  pointerEvents: 'none',
+                }}
+              />
+
+              {/* Layer 2: Static Details (Pokeball / secondary accents) */}
+              <img
+                src="/Logo_Layer2.png"
+                alt=""
+                style={{
+                  position: 'absolute',
+                  top: 0, left: 0,
+                  width: '100%', height: '100%',
+                  objectFit: 'contain',
+                  pointerEvents: 'none',
+                  userSelect: 'none',
+                }}
+              />
+
+              {/* Layer 3: Dynamic Accent Color Overlay / Rainbow Easter Egg */}
+              <div
+                className={isRainbowLogo ? "rainbow-logo-layer3" : ""}
+                style={{
+                  position: 'absolute',
+                  top: 0, left: 0,
+                  width: '100%', height: '100%',
+                  WebkitMask: 'url(/Logo_Layer3.png) no-repeat center / contain',
+                  mask: 'url(/Logo_Layer3.png) no-repeat center / contain',
+                  pointerEvents: 'none',
+                  ...(isRainbowLogo ? {} : {
+                    backgroundColor: 'var(--accent)',
+                    transition: 'background-color var(--transition-speed)'
+                  })
+                }}
+              />
+            </div>
           </Link>
 
           {/* Mobile Hamburger Menu Button */}
@@ -184,6 +284,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
             <div className="flex items-center gap-1 pointer-events-auto">
 
               <Link
+                data-tutorial-id="nav-trainers"
                 to="/trainers"
                 className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/trainers'
                   ? 'text-[var(--accent)]'
@@ -198,6 +299,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
 
               {user?.username && (
                 <Link
+                  data-tutorial-id="nav-counters"
                   to="/counters"
                   className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/counters'
                     ? 'text-[var(--accent)]'
@@ -213,6 +315,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
 
               {user?.username && (
                 <Link
+                  data-tutorial-id="nav-mmo"
                   to="/mmo-tool"
                   className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/mmo-tool'
                     ? 'text-[var(--accent)]'
@@ -228,6 +331,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
 
               {user?.username && (
                 <Link
+                  data-tutorial-id="nav-bingo"
                   to="/bingo"
                   className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/bingo'
                     ? 'text-[var(--accent)]'
@@ -286,6 +390,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
         {showMobileNav && !['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password'].includes(location.pathname) && (
           <div className="mobile-nav-dropdown xl:hidden fixed top-[90px] left-4 right-4 bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-xl py-2 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow)] z-50 backdrop-blur-[10px] animate-[dropdownOpen_0.2s_ease-out]">
             <Link
+              data-tutorial-id="nav-trainers"
               to="/trainers"
               className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/trainers' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
               onClick={() => setShowMobileNav(false)}
@@ -299,6 +404,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
             {user?.username && (
               <>
                 <Link
+                  data-tutorial-id="nav-counters"
                   to="/counters"
                   className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/counters' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
                   onClick={() => setShowMobileNav(false)}
@@ -310,6 +416,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                 </Link>
 
                 <Link
+                  data-tutorial-id="nav-mmo"
                   to="/mmo-tool"
                   className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/mmo-tool' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
                   onClick={() => setShowMobileNav(false)}
@@ -321,6 +428,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                 </Link>
 
                 <Link
+                  data-tutorial-id="nav-bingo"
                   to="/bingo"
                   className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/bingo' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
                   onClick={() => setShowMobileNav(false)}
@@ -366,7 +474,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
         {user?.username && (
           <nav className="ml-auto pr-2 md:pr-4">
             <div className="relative flex items-center" ref={userMenuRef}>
-              <div className="flex items-center gap-3 cursor-pointer" onClick={() => {
+              <div data-tutorial-id="nav-profile-menu" className="flex items-center gap-3 cursor-pointer" onClick={() => {
                 if (showMenu) {
                   handleCloseMenu();
                 } else {
@@ -387,13 +495,13 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
 
               {showMenu && (
                 <div className="absolute top-[calc(100%+20px)] right-0 bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-xl py-2 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow)] z-10 min-w-[140px] backdrop-blur-[10px] animate-[dropdownOpen_0.2s_ease-out]">
-                  <Link to="/profile" className="flex items-center w-full gap-3 px-[18px] py-3 text-[var(--dropdown-item-text)] text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)] relative overflow-hidden" onClick={handleCloseMenu}>
+                  <Link data-tutorial-id="nav-profile" to="/profile" className="flex items-center w-full gap-3 px-[18px] py-3 text-[var(--dropdown-item-text)] text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)] relative overflow-hidden" onClick={handleCloseMenu}>
                     <div className="flex items-center gap-3">
                       <User size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
                       Profile
                     </div>
                   </Link>
-                  <Link to="/settings" className="flex items-center w-full gap-3 px-[18px] py-3 text-[var(--dropdown-item-text)] text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)] relative overflow-hidden" onClick={handleCloseMenu}>
+                  <Link data-tutorial-id="nav-settings" to="/settings" className="flex items-center w-full gap-3 px-[18px] py-3 text-[var(--dropdown-item-text)] text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)] relative overflow-hidden" onClick={handleCloseMenu}>
                     <div className="flex items-center gap-3">
                       <Settings size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
                       Settings

@@ -1,0 +1,166 @@
+.dex-category-tabs-wrapper {
+  width: 100%;
+  max-width: 1300px;
+  margin: 12px auto 20px auto;
+  position: relative;
+  z-index: 10;
+  padding: 0;
+}
+
+.dex-category-tabs-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  background: var(--searchbar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  position: relative;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Subtle divider between category tabs */
+.dex-category-divider {
+  width: 1px;
+  height: 16px;
+  background-color: var(--border-color);
+  opacity: 0.6;
+  flex-shrink: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Sliding active background pill using accent color */
+.dex-category-sliding-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), 0 0 16px var(--accent);
+  pointer-events: none;
+  z-index: 1;
+  will-change: transform, width, height;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+              width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+              height 0.25s ease,
+              opacity 0.2s ease;
+}
+
+/* Tab Button */
+.dex-category-tab-btn {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  white-space: nowrap;
+  user-select: none;
+  transition: color 0.25s ease, transform 0.2s ease;
+}
+
+.dex-category-tab-btn:hover {
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.dex-category-tab-btn:active {
+  transform: translateY(0);
+}
+
+/* Active State */
+.dex-category-tab-btn.active {
+  color: #000000;
+  font-weight: 700;
+}
+
+.dex-category-tab-text {
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Match Count Badge (Shown during search) */
+.dex-category-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  background: var(--border-color);
+  color: var(--text);
+  transition: all 0.25s ease;
+}
+
+.dex-category-count-badge.active {
+  background: rgba(0, 0, 0, 0.25);
+  color: #000000;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .dex-category-tabs-wrapper {
+    margin: 8px auto 14px auto;
+  }
+
+  .dex-category-tabs-bar {
+    padding: 8px 6px;
+    gap: 4px;
+    border-radius: 0.5rem;
+  }
+
+  .dex-category-divider {
+    height: 13px;
+    opacity: 0.45;
+  }
+
+  .dex-category-tab-btn {
+    padding: 6px 11px;
+    font-size: 0.8rem;
+    border-radius: 5px;
+  }
+
+  .dex-category-sliding-pill {
+    border-radius: 5px;
+  }
+
+  .dex-category-count-badge {
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.68rem;
+  }
+}
+
+/* Smooth, elegant category content entry animation with transform (no black flash) */
+@keyframes categoryContentFadeIn {
+  0% {
+    opacity: 0.45;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.category-tab-content-animate {
+  animation: categoryContentFadeIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+
+
+
+

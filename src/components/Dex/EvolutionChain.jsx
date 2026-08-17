@@ -1,4 +1,7 @@
+import { useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import "../../css/EvolutionChain.css";
+import { Dna } from "lucide-react";
 import { findPokemon, getRelatedForms } from "../../utils";
 import { getSpriteUrl } from "../../utils/spriteUtils";
 
@@ -28,8 +31,6 @@ export default function EvolutionChain({ pokemon, showShiny = false, onPokemonSe
     return null;
   }
 
-
-
   // Find the true base (walk backward)
   let base = evoSource;
   while (base.evolution?.pre) {
@@ -40,8 +41,11 @@ export default function EvolutionChain({ pokemon, showShiny = false, onPokemonSe
 
   return (
     <div className="evolution-chain-section">
-      <div className="evo-chain-title">Evolution Chain</div>
-      <div className="evo-chain-divider"></div>
+      <div className="sidebar-info-section-header">
+        <Dna size={18} className="text-[var(--accent)]" />
+        <span className="sidebar-info-section-title">EVOLUTION CHAIN</span>
+      </div>
+      <div className="sidebar-info-section-divider"></div>
       <div className="evo-chain-table">
         <EvoChainNode
           mon={base}
@@ -75,12 +79,6 @@ function EvoSprite({ mon, size = 44, showShiny = false, onPokemonSelect = null, 
   const isSelected = currentPokemon && mon.id === currentPokemon.id && mon.name === currentPokemon.name;
   const isClickable = onPokemonSelect !== null;
 
-  // Check if this Pokemon has evolutions (either pre or next)
-  const hasEvolutions = mon.evolution && (
-    (mon.evolution.pre && mon.evolution.pre !== null) ||
-    (mon.evolution.next && mon.evolution.next.length > 0)
-  );
-
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -94,6 +92,7 @@ function EvoSprite({ mon, size = 44, showShiny = false, onPokemonSelect = null, 
       className={`evo-sprite ${isClickable ? 'evo-sprite-clickable' : ''} ${isSelected ? 'evo-sprite-selected' : ''}`}
       onClick={handleClick}
       style={{ cursor: isClickable ? 'pointer' : 'default' }}
+      title={mon.name}
     >
       <img
         src={imgSrc}
@@ -113,14 +112,73 @@ function EvoSprite({ mon, size = 44, showShiny = false, onPokemonSelect = null, 
 }
 
 function EvoArrow({ how }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const arrowRef = useRef(null);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+
+  const updatePosition = () => {
+    if (arrowRef.current) {
+      const rect = arrowRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.top,
+        left: rect.left + rect.width / 2
+      });
+    }
+  };
+
+  const handleMouseEnter = () => {
+    if (!how) return;
+    updatePosition();
+    setShowTooltip(true);
+  };
+
   return (
     <div className="evo-arrow">
-      <span className="evo-arrow-wrapper">
-        <span className="evo-arrow-symbol">→</span>
-        {how ? (
-          <span className="evo-tooltip">{how}</span>
-        ) : null}
+      <span
+        ref={arrowRef}
+        className="evo-arrow-symbol"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={() => setShowTooltip(false)}
+        style={{ cursor: how ? 'help' : 'default' }}
+      >
+        →
       </span>
+      {showTooltip && how && createPortal(
+        <div
+          style={{
+            position: 'fixed',
+            top: Math.round(coords.top - 10),
+            left: Math.round(coords.left),
+            transform: 'translate(-50%, -100%)',
+            zIndex: 99999,
+            pointerEvents: 'none',
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            color: 'white',
+            padding: '6px 10px',
+            borderRadius: '6px',
+            fontSize: '12px',
+            fontWeight: 500,
+            whiteSpace: 'nowrap',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+            textShadow: 'none'
+          }}
+        >
+          {how}
+          <div
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              border: '6px solid transparent',
+              borderTopColor: 'rgba(0, 0, 0, 0.95)',
+              width: 0,
+              height: 0
+            }}
+          />
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

@@ -53,33 +53,32 @@ export default function ShinyCharmModal({ isOpen, onClose, readOnly = false, vie
     }
   }, [isOpen, readOnly, viewedUserShinyCharmGames]);
 
-  // Prevent body scrolling when modal is open
+  // Prevent body scrolling when modal is open without breaking sticky header
   useEffect(() => {
     if (isOpen) {
-      const html = document.documentElement;
-      const body = document.body;
-      const scrollY = window.scrollY;
+      const preventScroll = (e) => {
+        if (e.target.closest('[role="dialog"]') || e.target.closest('.custom-scrollbar')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      };
 
-      // Prevent scrolling without using position:fixed on body
-      // This avoids breaking fixed-position modals during page transitions
-      html.style.overflow = 'hidden';
-      body.style.overflow = 'hidden';
-      html.style.height = '100vh';
-      body.style.height = '100vh';
-      body.style.marginTop = `-${scrollY}px`;
-      body.style.paddingTop = `${scrollY}px`;
-      body.dataset.scrollY = scrollY;
+      const preventKeyScroll = (e) => {
+        if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) {
+          if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && !e.target.closest('[role="dialog"]')) {
+            e.preventDefault();
+          }
+        }
+      };
+
+      document.addEventListener('wheel', preventScroll, { passive: false });
+      document.addEventListener('touchmove', preventScroll, { passive: false });
+      document.addEventListener('keydown', preventKeyScroll, { passive: false });
 
       return () => {
-        html.style.overflow = '';
-        body.style.overflow = '';
-        html.style.height = '';
-        body.style.height = '';
-        body.style.marginTop = '';
-        body.style.paddingTop = '';
-
-        // Restore scroll position
-        window.scrollTo(0, scrollY);
+        document.removeEventListener('wheel', preventScroll);
+        document.removeEventListener('touchmove', preventScroll);
+        document.removeEventListener('keydown', preventKeyScroll);
       };
     }
   }, [isOpen]);

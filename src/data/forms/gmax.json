@@ -18,6 +18,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Lure Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -39,6 +50,15 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Timer Ball"
+      ]
     }
   },
   {
@@ -59,6 +79,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball",
+        "Moon Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Safari Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -80,6 +112,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Master Ball",
+        "Heal Ball"
+      ],
+      "shiny": [
+        "Timer Ball",
+        "Dream Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -100,6 +144,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Ultra Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Ultra Ball",
+        "Fast Ball"
+      ]
     }
   },
   {
@@ -120,6 +176,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Ultra Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -140,6 +207,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Heavy Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball"
+      ]
     }
   },
   {
@@ -161,6 +239,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Dusk Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -181,6 +270,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Poké Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball"
+      ]
     }
   },
   {
@@ -202,6 +301,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dive Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Heal Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -222,6 +331,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Dive Ball"
+      ]
     }
   },
   {
@@ -242,6 +361,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Net Ball",
+        "Heavy Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Heavy Ball",
+        "Moon Ball",
+        "Great Ball"
+      ]
     }
   },
   {
@@ -262,6 +393,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball"
+      ],
+      "shiny": [
+        "Moon Ball",
+        "Heavy Ball",
+        "Net Ball"
+      ]
     }
   },
   {
@@ -282,6 +423,16 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Cherish Ball",
+        "Poké Ball"
+      ],
+      "shiny": [
+        "Ultra Ball"
+      ]
     }
   },
   {
@@ -302,6 +453,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dusk Ball",
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -322,6 +485,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Luxury Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Fast Ball",
+        "Premier Ball",
+        "Repeat Ball"
+      ]
     }
   },
   {
@@ -342,6 +517,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Moon Ball",
+        "Quick Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Lure Ball",
+        "Heal Ball"
+      ]
     }
   },
   {
@@ -363,6 +550,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Moon Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Heavy Ball",
+        "Level Ball"
+      ]
     }
   },
   {
@@ -384,6 +583,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Great Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Great Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -405,6 +616,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Lure Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -426,6 +649,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Repeat Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Heavy Ball",
+        "Net Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -447,6 +682,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Sport Ball",
+        "Friend Ball",
+        "Poké Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -468,6 +715,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Nest Ball",
+        "Friend Ball",
+        "Safari Ball"
+      ]
     }
   },
   {
@@ -488,6 +747,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Safari Ball",
+        "Nest Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Safari Ball",
+        "Heavy Ball"
+      ]
     }
   },
   {
@@ -509,6 +780,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Quick Ball",
+        "Dream Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Dream Ball",
+        "Quick Ball",
+        "Master Ball"
+      ]
     }
   },
   {
@@ -530,6 +813,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Fast Ball",
+        "Repeat Ball",
+        "Luxury Ball"
+      ],
+      "shiny": [
+        "Fast Ball",
+        "Repeat Ball",
+        "Luxury Ball"
+      ]
     }
   },
   {
@@ -551,6 +846,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heal Ball",
+        "Dream Ball"
+      ],
+      "shiny": [
+        "Love Ball",
+        "Premier Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -572,6 +878,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dusk Ball",
+        "Friend Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Love Ball",
+        "Dream Ball"
+      ]
     }
   },
   {
@@ -592,6 +909,15 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Poké Ball"
+      ]
     }
   },
   {
@@ -612,6 +938,18 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Repeat Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Ultra Ball",
+        "Repeat Ball",
+        "Dusk Ball"
+      ]
     }
   },
   {
@@ -633,6 +971,17 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Timer Ball",
+        "Heavy Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Heavy Ball",
+        "Premier Ball"
+      ]
     }
   },
   {
@@ -654,6 +1003,13 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Luxury Ball"
+      ],
+      "shiny": []
     }
   },
   {
@@ -675,6 +1031,13 @@
     "evolution": {
       "pre": null,
       "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Ultra Ball",
+        "Luxury Ball"
+      ],
+      "shiny": []
     }
   }
 ]

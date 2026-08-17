@@ -84,17 +84,14 @@ export default function DeleteAccountModal({ isOpen, email, username, onClose, o
     };
 
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
       document.addEventListener('wheel', preventScroll, { passive: false });
       document.addEventListener('touchmove', preventScroll, { passive: false });
     } else {
-      document.body.style.overflow = '';
       document.removeEventListener('wheel', preventScroll);
       document.removeEventListener('touchmove', preventScroll);
     }
     
     return () => {
-      document.body.style.overflow = '';
       document.removeEventListener('wheel', preventScroll);
       document.removeEventListener('touchmove', preventScroll);
     };

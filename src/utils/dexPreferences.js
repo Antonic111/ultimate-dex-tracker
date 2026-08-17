@@ -53,6 +53,8 @@ export const filterFormsByPreferences = (forms, preferences) => {
                 return preferences.showAlphaForms;
             case 'alphaother':
                 return preferences.showAlphaOtherForms;
+            case 'mighty':
+                return preferences.showMightyForms;
             default:
                 return true;
         }
@@ -82,6 +84,7 @@ export const getDexPreferences = () => {
                 showVivillonForms: true,
                 showAlphaForms: true,
                 showAlphaOtherForms: true,
+                showMightyForms: true,
                 blockUnobtainableShinies: false,
                 blockGOExclusiveShinies: false,
                 blockNOOTExclusiveShinies: false,
@@ -107,6 +110,7 @@ export const getDexPreferences = () => {
         showVivillonForms: true,
         showAlphaForms: true,
         showAlphaOtherForms: true,
+        showMightyForms: true,
         blockUnobtainableShinies: false,
         blockGOExclusiveShinies: false,
         blockNOOTExclusiveShinies: false,

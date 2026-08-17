@@ -371,6 +371,7 @@ export const authAPI = {
 
     // Clear backup user data to prevent "half logged in" state on mobile
     localStorage.removeItem('mobileUserBackup');
+    localStorage.removeItem('bingo-grid-state-v1');
     sessionStorage.removeItem('iosUserBackup');
 
     return response;

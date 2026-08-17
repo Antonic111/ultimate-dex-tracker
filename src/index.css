@@ -84,4 +84,21 @@ body {
 img[src*="/Home/"],
 img[src*="/other/home/"] {
   image-rendering: auto !important;
-}
+}
+
+/* Search match highlight for Show Full Box mode */
+.search-match-highlight {
+  box-shadow: 0 0 14px var(--accent), 0 0 4px var(--accent) !important;
+  border-color: var(--accent) !important;
+  animation: search-highlight-pulse 2s infinite ease-in-out;
+}
+
+@keyframes search-highlight-pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px var(--accent), 0 0 2px var(--accent);
+  }
+  50% {
+    box-shadow: 0 0 18px var(--accent), 0 0 6px var(--accent);
+  }
+}
+

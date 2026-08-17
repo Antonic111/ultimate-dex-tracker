@@ -25,10 +25,13 @@ function PokemonGridItem({
 }) {
   return (
     <div
-      className={`group relative flex flex-col items-center justify-center p-2 rounded-lg border transition-all duration-100 pokemon-slot-hover${readOnly ? " hover:bg-gray-700 dark:hover:bg-gray-600" : ""}${isBlocked ? " cursor-not-allowed" : " cursor-pointer"}`}
+      data-tutorial-id="pokemon-card"
+      className={`group relative flex flex-col items-center justify-center p-2 rounded-lg border transition-all duration-100 pokemon-slot-hover${readOnly ? " hover:bg-gray-700 dark:hover:bg-gray-600" : ""}${isBlocked ? " cursor-not-allowed" : " cursor-pointer"}${poke?._isSearchMatch ? " search-match-highlight" : ""}`}
       style={{
         background: isCaught ? "linear-gradient(to top, rgba(21, 128, 61, 0.4), rgba(34, 197, 94, 0.2))" : "var(--searchbar-inputs)",
-        border: isCaught ? "2px solid rgb(34, 197, 94)" : "2px solid var(--border-color)",
+        border: poke?._isSearchMatch
+          ? "2px solid var(--accent)"
+          : (isCaught ? "2px solid rgb(34, 197, 94)" : "2px solid var(--border-color)"),
         width: "clamp(60px, 15vw, 100px)",
         height: "clamp(60px, 15vw, 100px)",
         WebkitTouchCallout: "none",
@@ -37,6 +40,7 @@ function PokemonGridItem({
         touchAction: "manipulation",
         opacity: isBlocked ? 0.5 : 1,
         position: "relative",
+        zIndex: poke?._isSearchMatch ? 5 : 1,
       }}
       data-caught={isCaught}
       data-readonly={readOnly}
@@ -88,6 +92,7 @@ function PokemonGridItem({
 
       {!readOnly && onSelect && !isBlocked && (
         <button
+          data-tutorial-id={poke.id === 1 ? "info-button" : undefined}
           className="absolute bottom-0.5 right-0.5 p-0.25 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 z-20 hidden md:block"
           style={{
             color: "white",
@@ -112,6 +117,7 @@ function PokemonGridItem({
           width={64}
           height={64}
           loading={priorityLoad ? "eager" : "lazy"}
+          decoding="async"
           draggable={false}
           onError={(e) => (e.currentTarget.style.display = "none")}
           style={{ filter: isBlocked ? "grayscale(100%)" : "none" }}
@@ -138,12 +144,15 @@ function PokemonGridItem({
 export default memo(PokemonGridItem, (prev, next) => {
   return (
     prev.poke === next.poke &&
+    prev.poke?._isSearchMatch === next.poke?._isSearchMatch &&
     prev.isCaught === next.isCaught &&
     prev.isBlocked === next.isBlocked &&
     prev.sprite === next.sprite &&
     prev.readOnly === next.readOnly &&
     prev.displayName === next.displayName &&
     prev.dexNumber === next.dexNumber &&
-    prev.priorityLoad === next.priorityLoad
+    prev.priorityLoad === next.priorityLoad &&
+    prev.onToggleCaught === next.onToggleCaught &&
+    prev.onSelect === next.onSelect
   );
 });
