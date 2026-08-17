@@ -1,6 +1,6 @@
 [
   {
-    "date": "2026-08-03",
+    "date": "2026-08-17",
     "version": "v1.1.9",
     "type": "feature",
     "title": "",
@@ -19,7 +19,6 @@
       "Replaced traditional categories that rendered all 2,000+ Pokémon at once with category tabs, significantly improving performance and functionality.",
       "Added more accent color options and improved the color selector visuals in both Settings and the onboarding setup.",
       "Added a dedicated **Full Stats** page accessible from the Collection Overview section on trainer profiles, featuring in-depth analytics for generations (Gen 1-9), categories, Poké Ball vaults, marks & ribbons, games, and hunt methods.",
-      "Added a detailed stats page that can be shared publicly when your account is set to public.",
       "Added a 1/8,192 chance to encounter a special Easter egg logo when visiting the site."
     ],
     "fixes": [
@@ -36,7 +35,8 @@
       "Split the site logo into three separate layers to enable future accent color customization and theming improvements.",
       "Added a simple transition animation to Pokémon when switching between categories.",
       "Fixed an issue where the sticky header would disappear while a modal was open.",
-      "Blended the obtainable game icons into the sidebar for a cleaner, more polished look."
+      "Blended the obtainable game icons into the sidebar for a cleaner, more polished look.",
+      "Replaced the Pokémon HOME sprite toggle in the settings with a visual selector that includes sprite previews."
     ]
   },
   {

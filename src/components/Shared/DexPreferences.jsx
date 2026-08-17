@@ -165,6 +165,39 @@ export default function DexPreferences() {
         }
     };
 
+    const handleSetPreference = async (key, value) => {
+        if (preferences[key] === value) return;
+        const previous = preferences;
+        const newPreferences = {
+            ...defaultPreferences,
+            ...preferences,
+            [key]: value
+        };
+
+        setPreferences(newPreferences);
+
+        // Save to localStorage immediately for responsive UI
+        localStorage.setItem('dexPreferences', JSON.stringify(newPreferences));
+
+        // Save to server
+        try {
+            setSaving(true);
+            await profileAPI.updateDexPreferences(newPreferences);
+            showMessage("Dex preferences updated!", "success");
+
+            // Dispatch event to notify App component of preference changes
+            window.dispatchEvent(new CustomEvent('dexPreferencesChanged'));
+        } catch (error) {
+            console.error('Failed to save dex preferences:', error);
+            showMessage("Failed to save preferences", "error");
+            // Revert on error
+            setPreferences(previous);
+            localStorage.setItem('dexPreferences', JSON.stringify(previous));
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const handleExternalLinkChange = async (preference) => {
         setExternalLinkPreference(preference);
 
@@ -349,24 +382,61 @@ export default function DexPreferences() {
             <div className="setting-divider" />
 
             <div className="visual-preferences-section">
-                <h4 className="preference-section-header">Visuals</h4>
+                <h4 className="preference-section-header">Sprites</h4>
                 <p className="setting-description">
-                    Customize the visual appearance of Pokémon in the app.
+                    Customize the visual appearance of Pokémon in the site.
                 </p>
 
-                <div className="dex-preferences-grid">
-                    {visualOptions.map(({ key, label }) => (
-                        <div key={key} className="preference-item">
-                            <label className="preference-checkbox">
-                                <input
-                                    type="checkbox"
-                                    checked={!!preferences[key]}
-                                    onChange={() => handleToggle(key)}
-                                />
-                                <span className="preference-label">{label}</span>
-                            </label>
-                        </div>
-                    ))}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginTop: '15px' }}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            background: 'var(--searchbar-dropdown)',
+                            padding: '16px',
+                            borderRadius: '12px',
+                            border: !preferences.useHomeSprites ? '2px solid var(--accent)' : '2px solid var(--border-color)',
+                            transition: 'all 0.2s ease',
+                            cursor: 'pointer',
+                            userSelect: 'none'
+                        }}
+                        onClick={() => handleSetPreference('useHomeSprites', false)}
+                    >
+                        <span style={{ fontSize: '0.9rem', textAlign: 'center', color: !preferences.useHomeSprites ? 'var(--text)' : 'var(--text-muted)', fontWeight: 'bold', marginBottom: '12px', transition: 'color 0.2s' }}>
+                            GEN 5 PIXEL SPRITES
+                        </span>
+                        <img
+                            src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/384.png"
+                            alt="Rayquaza Pixel"
+                            style={{ width: '80px', height: '80px', objectFit: 'contain' }}
+                        />
+                    </div>
+
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            background: 'var(--searchbar-dropdown)',
+                            padding: '16px',
+                            borderRadius: '12px',
+                            border: preferences.useHomeSprites ? '2px solid var(--accent)' : '2px solid var(--border-color)',
+                            transition: 'all 0.2s ease',
+                            cursor: 'pointer',
+                            userSelect: 'none'
+                        }}
+                        onClick={() => handleSetPreference('useHomeSprites', true)}
+                    >
+                        <span style={{ fontSize: '0.9rem', textAlign: 'center', color: preferences.useHomeSprites ? 'var(--text)' : 'var(--text-muted)', fontWeight: 'bold', marginBottom: '12px', transition: 'color 0.2s' }}>
+                            HOME 3D SPRITES
+                        </span>
+                        <img
+                            src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/384.png"
+                            alt="Rayquaza Home"
+                            style={{ width: '80px', height: '80px', objectFit: 'contain' }}
+                        />
+                    </div>
                 </div>
             </div>
 

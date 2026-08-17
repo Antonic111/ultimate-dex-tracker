@@ -2777,6 +2777,17 @@ body.popout-mode .complete-hunt-btn {
   width: auto !important;
 }
 
+body.popout-mode div[id^="kofi-widget-overlay"],
+body.popout-mode iframe[src*="ko-fi"],
+body.popout-mode .floatingchat-container-wrap,
+body.popout-mode .floatingchat-container-wrap-mobi,
+body.popout-mode .floating-chat-kofi-popup-iframe {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
 /* 5. POPOUT OVERLAY BUTTON (Counters Page) */
 .popout-overlay-btn {
   position: absolute;

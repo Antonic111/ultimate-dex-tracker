@@ -106,6 +106,198 @@
     "formType": "mighty"
   },
   {
+    "id": 25,
+    "name": "pikachu",
+    "stableId": "mighty-pikachu-0025",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/25.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/25.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/25.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 172,
+        "name": "pichu",
+        "how": "Level up with high friendship"
+      },
+      "next": [
+        {
+          "id": 26,
+          "name": "raichu",
+          "how": "Use Thunder Stone"
+        },
+        {
+          "id": 26,
+          "name": "raichu-alolan",
+          "how": "Use Thunder Stone in Alola"
+        }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Ultra Ball",
+        "Fast Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Ultra Ball",
+        "Fast Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
+    "id": 129,
+    "name": "magikarp",
+    "stableId": "mighty-magikarp-0129",
+    "types": [
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/129.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/129.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/129.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/129.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 130,
+          "name": "gyarados",
+          "how": "Level Up to 20"
+        }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Repeat Ball",
+        "Poké Ball",
+        "Sport Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Ultra Ball",
+        "Repeat Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
+    "id": 133,
+    "name": "eevee",
+    "stableId": "mighty-eevee-0133",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/133.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/133.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/133.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": null,
+      "next": [
+        {
+          "id": 134,
+          "name": "vaporeon",
+          "how": "Use Water Stone"
+        },
+        {
+          "id": 135,
+          "name": "jolteon",
+          "how": "Use Thunder Stone"
+        },
+        {
+          "id": 136,
+          "name": "flareon",
+          "how": "Use Fire Stone"
+        },
+        {
+          "id": 196,
+          "name": "espeon",
+          "how": "Evolve with high friendship during the day"
+        },
+        {
+          "id": 197,
+          "name": "umbreon",
+          "how": "Evolve with high friendship during the night"
+        },
+        {
+          "id": 470,
+          "name": "leafeon",
+          "how": "Use Leaf Stone or leveling up near a Moss Rock (in older games)"
+        },
+        {
+          "id": 471,
+          "name": "glaceon",
+          "how": "Use Ice Stone or leveling up near a Ice Rock (in older games)"
+        },
+        {
+          "id": 700,
+          "name": "sylveon",
+          "how": "High friendship + have a Fairy move"
+        }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Nest Ball",
+        "Safari Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Dive Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
+    "id": 149,
+    "name": "dragonite",
+    "stableId": "mighty-dragonite-0149",
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/149.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/149.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/149.png"
+    },
+    "gen": 1,
+    "evolution": {
+      "pre": {
+        "id": 148,
+        "name": "dragonair",
+        "how": "Level Up to 55"
+      },
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Fast Ball",
+        "Repeat Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Nest Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
     "id": 150,
     "name": "mewtwo",
     "stableId": "mighty-mewtwo-0150",
@@ -308,6 +500,83 @@
     "formType": "mighty"
   },
   {
+    "id": 233,
+    "name": "porygon2",
+    "stableId": "mighty-porygon2-0233",
+    "types": [
+      "normal"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/233.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/233.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/233.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/233.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 137,
+        "name": "porygon",
+        "how": "Trade"
+      },
+      "next": [
+        {
+          "id": 474,
+          "name": "porygon-z",
+          "how": "Trade"
+        }
+      ]
+    },
+    "recommended_balls": {
+      "default": [
+        "Lure Ball",
+        "Great Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Great Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
+    "id": 248,
+    "name": "tyranitar",
+    "stableId": "mighty-tyranitar-0248",
+    "types": [
+      "rock",
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/248.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/248.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/248.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/248.png"
+    },
+    "gen": 2,
+    "evolution": {
+      "pre": {
+        "id": 247,
+        "name": "pupitar",
+        "how": "Level Up to 55"
+      },
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Nest Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Luxury Ball",
+        "Dusk Ball",
+        "Safari Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
     "id": 254,
     "name": "sceptile",
     "stableId": "mighty-sceptile-0254",
@@ -417,6 +686,76 @@
     "formType": "mighty"
   },
   {
+    "id": 373,
+    "name": "salamence",
+    "stableId": "mighty-salamence-373",
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/373.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/373.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/373.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/373.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 372,
+        "name": "shelgon",
+        "how": "Level Up to 50"
+      },
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Dusk Ball",
+        "Nest Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
+    "id": 376,
+    "name": "metagross",
+    "stableId": "mighty-metagross-376",
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/376.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/376.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/376.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/376.png"
+    },
+    "gen": 3,
+    "evolution": {
+      "pre": {
+        "id": 375,
+        "name": "metang",
+        "how": "Level Up to 45"
+      },
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Net Ball",
+        "Heavy Ball"
+      ],
+      "shiny": [
+        "Luxury Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
     "id": 389,
     "name": "torterra",
     "stableId": "mighty-torterra-389",
@@ -520,6 +859,43 @@
         "Dive Ball",
         "Quick Ball",
         "Strange Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
+    "id": 445,
+    "name": "garchomp",
+    "stableId": "mighty-garchomp-445",
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/445.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/445.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/445.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/445.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": {
+        "id": 444,
+        "name": "gabite",
+        "how": "Level Up to 48"
+      },
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Lure Ball",
+        "Level Ball"
+      ],
+      "shiny": [
+        "Great Ball",
+        "Moon Ball",
+        "Level Ball"
       ]
     },
     "formType": "mighty"
@@ -668,6 +1044,42 @@
     }
   },
   {
+    "id": 635,
+    "name": "hydreigon",
+    "stableId": "mighty-hydreigon-635",
+    "types": [
+      "dark",
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/635.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/635.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/635.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/635.png"
+    },
+    "gen": 5,
+    "evolution": {
+      "pre": {
+        "id": 634,
+        "name": "zweilous",
+        "how": "Level Up to 64"
+      },
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Heavy Ball",
+        "Dusk Ball"
+      ],
+      "shiny": [
+        "Friend Ball",
+        "Master Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
     "id": 652,
     "name": "chesnaught",
     "stableId": "mighty-chesnaught-652",
@@ -771,6 +1183,40 @@
       "shiny": [
         "Luxury Ball",
         "Moon Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
+    "id": 706,
+    "name": "goodra",
+    "stableId": "mighty-goodra-706",
+    "types": [
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/706.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/706.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/706.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/706.png"
+    },
+    "gen": 6,
+    "evolution": {
+      "pre": {
+        "id": 705,
+        "name": "sliggoo",
+        "how": "Level Up to 50"
+      },
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Dream Ball",
+        "Dusk Ball",
+        "Master Ball"
+      ],
+      "shiny": [
+        "Heal Ball"
       ]
     },
     "formType": "mighty"
@@ -924,6 +1370,42 @@
     "formType": "mighty"
   },
   {
+    "id": 784,
+    "name": "kommo-o",
+    "stableId": "mighty-kommo-o-784",
+    "types": [
+      "dragon",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/784.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/784.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/784.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/784.png"
+    },
+    "gen": 7,
+    "evolution": {
+      "pre": {
+        "id": 783,
+        "name": "hakamo-o",
+        "how": "Level Up to 45"
+      },
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Luxury Ball",
+        "Level Ball",
+        "Ultra Ball"
+      ],
+      "shiny": [
+        "Heal Ball",
+        "Love Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
     "id": 812,
     "name": "rillaboom",
     "stableId": "mighty-rillaboom-812",
@@ -960,6 +1442,42 @@
     "formType": "mighty"
   },
   {
+    "id": 815,
+    "name": "cinderace",
+    "stableId": "mighty-cinderace-815",
+    "types": [
+      "fire"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/815.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/815.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/815.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/815.png"
+    },
+    "gen": 8,
+    "evolution": {
+      "pre": {
+        "id": 814,
+        "name": "raboot",
+        "how": "Level Up to 35"
+      },
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Level Ball",
+        "Luxury Ball",
+        "Repeat Ball"
+      ],
+      "shiny": [
+        "Fast Ball",
+        "Premier Ball",
+        "Repeat Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
     "id": 818,
     "name": "inteleon",
     "stableId": "mighty-inteleon-818",
@@ -991,520 +1509,6 @@
         "Great Ball",
         "Lure Ball",
         "Heal Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 991,
-    "name": "iron-bundle",
-    "stableId": "mighty-iron-bundle-991",
-    "types": [
-      "ice",
-      "water"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/991.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/991.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/991.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/991.png"
-    },
-    "gen": 9,
-    "evolution": {
-      "pre": null,
-      "next": []
-    },
-    "recommended_balls": {
-      "default": [
-        "Poké Ball",
-        "Timer Ball",
-        "Premier Ball"
-      ],
-      "shiny": [
-        "Heavy Ball",
-        "Dive Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 25,
-    "name": "pikachu",
-    "stableId": "mighty-pikachu-0025",
-    "types": [
-      "electric"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/25.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/25.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/25.png"
-    },
-    "gen": 1,
-    "evolution": {
-      "pre": {
-        "id": 172,
-        "name": "pichu",
-        "how": "Level up with high friendship"
-      },
-      "next": [
-        {
-          "id": 26,
-          "name": "raichu",
-          "how": "Use Thunder Stone"
-        },
-        {
-          "id": 26,
-          "name": "raichu-alolan",
-          "how": "Use Thunder Stone in Alola"
-        }
-      ]
-    },
-    "recommended_balls": {
-      "default": [
-        "Level Ball",
-        "Ultra Ball",
-        "Fast Ball"
-      ],
-      "shiny": [
-        "Level Ball",
-        "Ultra Ball",
-        "Fast Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 129,
-    "name": "magikarp",
-    "stableId": "mighty-magikarp-0129",
-    "types": [
-      "water"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/129.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/129.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/129.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/129.png"
-    },
-    "gen": 1,
-    "evolution": {
-      "pre": null,
-      "next": [
-        {
-          "id": 130,
-          "name": "gyarados",
-          "how": "Level Up to 20"
-        }
-      ]
-    },
-    "recommended_balls": {
-      "default": [
-        "Repeat Ball",
-        "Poké Ball",
-        "Sport Ball"
-      ],
-      "shiny": [
-        "Luxury Ball",
-        "Ultra Ball",
-        "Repeat Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 133,
-    "name": "eevee",
-    "stableId": "mighty-eevee-0133",
-    "types": [
-      "normal"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/133.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/133.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/133.png"
-    },
-    "gen": 1,
-    "evolution": {
-      "pre": null,
-      "next": [
-        {
-          "id": 134,
-          "name": "vaporeon",
-          "how": "Use Water Stone"
-        },
-        {
-          "id": 135,
-          "name": "jolteon",
-          "how": "Use Thunder Stone"
-        },
-        {
-          "id": 136,
-          "name": "flareon",
-          "how": "Use Fire Stone"
-        },
-        {
-          "id": 196,
-          "name": "espeon",
-          "how": "Evolve with high friendship during the day"
-        },
-        {
-          "id": 197,
-          "name": "umbreon",
-          "how": "Evolve with high friendship during the night"
-        },
-        {
-          "id": 470,
-          "name": "leafeon",
-          "how": "Use Leaf Stone or leveling up near a Moss Rock (in older games)"
-        },
-        {
-          "id": 471,
-          "name": "glaceon",
-          "how": "Use Ice Stone or leveling up near a Ice Rock (in older games)"
-        },
-        {
-          "id": 700,
-          "name": "sylveon",
-          "how": "High friendship + have a Fairy move"
-        }
-      ]
-    },
-    "recommended_balls": {
-      "default": [
-        "Nest Ball",
-        "Safari Ball"
-      ],
-      "shiny": [
-        "Premier Ball",
-        "Dive Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 149,
-    "name": "dragonite",
-    "stableId": "mighty-dragonite-0149",
-    "types": [
-      "dragon",
-      "flying"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/149.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/149.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/149.png"
-    },
-    "gen": 1,
-    "evolution": {
-      "pre": {
-        "id": 148,
-        "name": "dragonair",
-        "how": "Level Up to 55"
-      },
-      "next": []
-    },
-    "recommended_balls": {
-      "default": [
-        "Fast Ball",
-        "Repeat Ball",
-        "Level Ball"
-      ],
-      "shiny": [
-        "Friend Ball",
-        "Nest Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 233,
-    "name": "porygon2",
-    "stableId": "mighty-porygon2-0233",
-    "types": [
-      "normal"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/233.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/233.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/233.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/233.png"
-    },
-    "gen": 2,
-    "evolution": {
-      "pre": {
-        "id": 137,
-        "name": "porygon",
-        "how": "Trade"
-      },
-      "next": [
-        {
-          "id": 474,
-          "name": "porygon-z",
-          "how": "Trade"
-        }
-      ]
-    },
-    "recommended_balls": {
-      "default": [
-        "Lure Ball",
-        "Great Ball"
-      ],
-      "shiny": [
-        "Heal Ball",
-        "Great Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 248,
-    "name": "tyranitar",
-    "stableId": "mighty-tyranitar-0248",
-    "types": [
-      "rock",
-      "dark"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/248.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/248.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/248.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/248.png"
-    },
-    "gen": 2,
-    "evolution": {
-      "pre": {
-        "id": 247,
-        "name": "pupitar",
-        "how": "Level Up to 55"
-      },
-      "next": []
-    },
-    "recommended_balls": {
-      "default": [
-        "Friend Ball",
-        "Nest Ball",
-        "Dusk Ball"
-      ],
-      "shiny": [
-        "Luxury Ball",
-        "Dusk Ball",
-        "Safari Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 373,
-    "name": "salamence",
-    "stableId": "mighty-salamence-373",
-    "types": [
-      "dragon",
-      "flying"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/373.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/373.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/373.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/373.png"
-    },
-    "gen": 3,
-    "evolution": {
-      "pre": {
-        "id": 372,
-        "name": "shelgon",
-        "how": "Level Up to 50"
-      },
-      "next": []
-    },
-    "recommended_balls": {
-      "default": [
-        "Great Ball"
-      ],
-      "shiny": [
-        "Friend Ball",
-        "Dusk Ball",
-        "Nest Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 376,
-    "name": "metagross",
-    "stableId": "mighty-metagross-376",
-    "types": [
-      "steel",
-      "psychic"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/376.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/376.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/376.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/376.png"
-    },
-    "gen": 3,
-    "evolution": {
-      "pre": {
-        "id": 375,
-        "name": "metang",
-        "how": "Level Up to 45"
-      },
-      "next": []
-    },
-    "recommended_balls": {
-      "default": [
-        "Great Ball",
-        "Net Ball",
-        "Heavy Ball"
-      ],
-      "shiny": [
-        "Luxury Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 445,
-    "name": "garchomp",
-    "stableId": "mighty-garchomp-445",
-    "types": [
-      "dragon",
-      "ground"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/445.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/445.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/445.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/445.png"
-    },
-    "gen": 4,
-    "evolution": {
-      "pre": {
-        "id": 444,
-        "name": "gabite",
-        "how": "Level Up to 48"
-      },
-      "next": []
-    },
-    "recommended_balls": {
-      "default": [
-        "Great Ball",
-        "Lure Ball",
-        "Level Ball"
-      ],
-      "shiny": [
-        "Great Ball",
-        "Moon Ball",
-        "Level Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 635,
-    "name": "hydreigon",
-    "stableId": "mighty-hydreigon-635",
-    "types": [
-      "dark",
-      "dragon"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/635.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/635.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/635.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/635.png"
-    },
-    "gen": 5,
-    "evolution": {
-      "pre": {
-        "id": 634,
-        "name": "zweilous",
-        "how": "Level Up to 64"
-      },
-      "next": []
-    },
-    "recommended_balls": {
-      "default": [
-        "Great Ball",
-        "Heavy Ball",
-        "Dusk Ball"
-      ],
-      "shiny": [
-        "Friend Ball",
-        "Master Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 706,
-    "name": "goodra",
-    "stableId": "mighty-goodra-706",
-    "types": [
-      "dragon"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/706.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/706.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/706.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/706.png"
-    },
-    "gen": 6,
-    "evolution": {
-      "pre": {
-        "id": 705,
-        "name": "sliggoo",
-        "how": "Level Up to 50"
-      },
-      "next": []
-    },
-    "recommended_balls": {
-      "default": [
-        "Dream Ball",
-        "Dusk Ball",
-        "Master Ball"
-      ],
-      "shiny": [
-        "Heal Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 784,
-    "name": "kommo-o",
-    "stableId": "mighty-kommo-o-784",
-    "types": [
-      "dragon",
-      "fighting"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/784.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/784.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/784.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/784.png"
-    },
-    "gen": 7,
-    "evolution": {
-      "pre": {
-        "id": 783,
-        "name": "hakamo-o",
-        "how": "Level Up to 45"
-      },
-      "next": []
-    },
-    "recommended_balls": {
-      "default": [
-        "Luxury Ball",
-        "Level Ball",
-        "Ultra Ball"
-      ],
-      "shiny": [
-        "Heal Ball",
-        "Love Ball"
       ]
     },
     "formType": "mighty"
@@ -1723,108 +1727,6 @@
     "formType": "mighty"
   },
   {
-    "id": 998,
-    "name": "baxcalibur",
-    "stableId": "mighty-baxcalibur-998",
-    "types": [
-      "dragon",
-      "ice"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/998.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/998.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/998.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/998.png"
-    },
-    "gen": 9,
-    "evolution": {
-      "pre": {
-        "id": 997,
-        "name": "arctibax",
-        "how": "Level Up to 54"
-      },
-      "next": []
-    },
-    "recommended_balls": {
-      "default": [
-        "Heavy Ball",
-        "Dive Ball",
-        "Moon Ball"
-      ],
-      "shiny": [
-        "Dive Ball",
-        "Net Ball",
-        "Beast Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 1005,
-    "name": "roaring-moon",
-    "stableId": "mighty-roaring-moon-1005",
-    "types": [
-      "dragon",
-      "dark"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1005.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1005.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1005.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1005.png"
-    },
-    "gen": 9,
-    "evolution": {
-      "pre": null,
-      "next": []
-    },
-    "recommended_balls": {
-      "default": [
-        "Great Ball",
-        "Moon Ball",
-        "Lure Ball"
-      ],
-      "shiny": [
-        "Level Ball",
-        "Moon Ball",
-        "Friend Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
-    "id": 1006,
-    "name": "iron-valiant",
-    "stableId": "mighty-iron-valiant-1006",
-    "types": [
-      "fairy",
-      "fighting"
-    ],
-    "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1006.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1006.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1006.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1006.png"
-    },
-    "gen": 9,
-    "evolution": {
-      "pre": null,
-      "next": []
-    },
-    "recommended_balls": {
-      "default": [
-        "Friend Ball",
-        "Premier Ball",
-        "Love Ball"
-      ],
-      "shiny": [
-        "Premier Ball",
-        "Timer Ball"
-      ]
-    },
-    "formType": "mighty"
-  },
-  {
     "id": 979,
     "name": "annihilape",
     "stableId": "mighty-annihilape-979",
@@ -1929,6 +1831,140 @@
         "Luxury Ball",
         "Moon Ball",
         "Great Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
+    "id": 991,
+    "name": "iron-bundle",
+    "stableId": "mighty-iron-bundle-991",
+    "types": [
+      "ice",
+      "water"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/991.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/991.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/991.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/991.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Poké Ball",
+        "Timer Ball",
+        "Premier Ball"
+      ],
+      "shiny": [
+        "Heavy Ball",
+        "Dive Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
+    "id": 998,
+    "name": "baxcalibur",
+    "stableId": "mighty-baxcalibur-998",
+    "types": [
+      "dragon",
+      "ice"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/998.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/998.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/998.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/998.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": {
+        "id": 997,
+        "name": "arctibax",
+        "how": "Level Up to 54"
+      },
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Heavy Ball",
+        "Dive Ball",
+        "Moon Ball"
+      ],
+      "shiny": [
+        "Dive Ball",
+        "Net Ball",
+        "Beast Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
+    "id": 1005,
+    "name": "roaring-moon",
+    "stableId": "mighty-roaring-moon-1005",
+    "types": [
+      "dragon",
+      "dark"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1005.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1005.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1005.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1005.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Great Ball",
+        "Moon Ball",
+        "Lure Ball"
+      ],
+      "shiny": [
+        "Level Ball",
+        "Moon Ball",
+        "Friend Ball"
+      ]
+    },
+    "formType": "mighty"
+  },
+  {
+    "id": 1006,
+    "name": "iron-valiant",
+    "stableId": "mighty-iron-valiant-1006",
+    "types": [
+      "fairy",
+      "fighting"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1006.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1006.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1006.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1006.png"
+    },
+    "gen": 9,
+    "evolution": {
+      "pre": null,
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Friend Ball",
+        "Premier Ball",
+        "Love Ball"
+      ],
+      "shiny": [
+        "Premier Ball",
+        "Timer Ball"
       ]
     },
     "formType": "mighty"

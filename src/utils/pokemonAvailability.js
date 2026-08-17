@@ -62,6 +62,10 @@ export const getAvailableGamesForPokemonSidebar = (pokemon) => {
   let availableGames = [];
 
   // 1. Determine base availability (Hardcoded Forms vs Default)
+  if (formType === "mighty" && Number(pokemon.id) !== 151 && pokemonName !== "mew") {
+    return ["Scarlet", "Violet"];
+  }
+
   if (formType === "alpha" || formType === "alphaother") {
     if (pokemonName.includes("alolan") || pokemonName.includes("galarian") || pokemonName.includes("paldean") || pokemonName.includes("gmax") || pokemonName.includes("mega")) {
       availableGames = [];
