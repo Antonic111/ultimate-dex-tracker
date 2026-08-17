@@ -19,7 +19,8 @@
       "Replaced traditional categories that rendered all 2,000+ Pokémon at once with category tabs, significantly improving performance and functionality.",
       "Added more accent color options and improved the color selector visuals in both Settings and the onboarding setup.",
       "Added a dedicated **Full Stats** page accessible from the Collection Overview section on trainer profiles, featuring in-depth analytics for generations (Gen 1-9), categories, Poké Ball vaults, marks & ribbons, games, and hunt methods.",
-      "Added a 1/8,192 chance to encounter a special Easter egg logo when visiting the site."
+      "Added a 1/8,192 chance to encounter a special Easter egg logo when visiting the site.",
+      "Visually improved all emails sent by the site, including authentication and password reset emails, for a cleaner and more polished look."
     ],
     "fixes": [
       "Updated all social links to direct to antonic.ca instead of solo.to, and updated handles to reflect the username change from antonic111 to official-antonic.",

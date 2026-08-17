@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
 import { getSpriteUrl } from "../utils/spriteUtils";
+import { buildApiUrl } from "../config/api";
 import "../css/PublicHome.css";
 
 export default function PublicHome() {
@@ -12,11 +13,8 @@ export default function PublicHome() {
   const [displayCount, setDisplayCount] = useState(0);
   const animFrameRef = useRef(null);
 
-
-
   useEffect(() => {
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-    fetch(`${API_BASE}/api/profiles/stats/total-caught`)
+    fetch(buildApiUrl('/profiles/stats/total-caught'))
       .then(r => r.json())
       .then(data => {
         if (typeof data.total === 'number') {
@@ -25,6 +23,7 @@ export default function PublicHome() {
       })
       .catch(() => {/* silently fail */});
   }, []);
+
 
   // Animate count-up when totalCaught arrives
   useEffect(() => {
