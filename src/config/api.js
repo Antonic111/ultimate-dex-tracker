@@ -3,11 +3,6 @@ import { currentConfig } from './environment.js';
 
 let rawEnvUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
 
-// If a legacy Render URL is still present in Vercel env vars, ignore it so Vercel uses its own serverless backend (/api/...)
-if (rawEnvUrl && rawEnvUrl.includes('onrender.com')) {
-  rawEnvUrl = '';
-}
-
 export const API_BASE_URL = rawEnvUrl !== undefined ? rawEnvUrl : (currentConfig?.API_BASE_URL ?? '');
 
 // Helper function to build full API URLs

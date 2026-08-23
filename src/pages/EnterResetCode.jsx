@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useMessage } from "../components/Shared/MessageContext";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { KeyRound } from "lucide-react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { KeyRound, Lock, CheckCircle2, RotateCw, ArrowLeft } from "lucide-react";
 import { authAPI } from "../utils/api";
+import TextField from "../components/Shared/FormField/TextField";
+import Button from "../components/Shared/Button";
 import "../css/EnterResetCode.css";
 
-const EnterResetCode = () => {
+export default function EnterResetCode() {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const cooldownRef = useRef(null);
 
@@ -20,7 +23,7 @@ const EnterResetCode = () => {
 
   useEffect(() => {
     if (!email) {
-              showMessage("Missing email in URL", "error");
+      showMessage("Missing email in URL", "error");
       navigate("/forgot-password");
     } else {
       sessionStorage.setItem("resetEmail", email); // persist for refreshes
@@ -31,7 +34,7 @@ const EnterResetCode = () => {
   useEffect(() => {
     if (resendCooldown > 0) {
       cooldownRef.current = setTimeout(() => {
-        setResendCooldown(resendCooldown - 1);
+        setResendCooldown((prev) => prev - 1);
       }, 1000);
     }
     return () => clearTimeout(cooldownRef.current);
@@ -42,27 +45,35 @@ const EnterResetCode = () => {
     if (clickedRef.current || loading) return; // 🛑 prevent spam
     clickedRef.current = true;
 
-    if (!email || !code) {
-              showMessage("Email or code missing", "error");
+    const trimmedCode = code.trim();
+    if (!email || !trimmedCode) {
+      showMessage("Please enter the 6-digit code", "error");
+      clickedRef.current = false;
+      return;
+    }
+
+    if (trimmedCode.length !== 6) {
+      showMessage("Code must be 6 digits", "error");
+      clickedRef.current = false;
       return;
     }
 
     setLoading(true);
     try {
-      const data = await authAPI.verifyResetCode(email, code);
+      const data = await authAPI.verifyResetCode(email, trimmedCode);
 
-      if (data.status === 429 || data.message === "Too many requests, please try again later.") {
+      if (data?.status === 429 || data?.message === "Too many requests, please try again later.") {
         showMessage("Too many requests, please try again later.", "error");
         return;
       }
-      if (data.success) {
+      if (data?.success) {
         showMessage("Code verified! Reset your password.", "success");
-        navigate(`/reset-password?email=${encodeURIComponent(email)}&code=${code}`);
+        navigate(`/reset-password?email=${encodeURIComponent(email)}&code=${encodeURIComponent(trimmedCode)}`);
       } else {
-        showMessage(`${data.error || "Invalid code"}`, "error");
+        showMessage(`${data?.error || "Invalid code"}`, "error");
       }
     } catch (err) {
-              showMessage("Server error", "error");
+      showMessage("Server error. Please try again.", "error");
     } finally {
       setLoading(false);
       setTimeout(() => {
@@ -72,60 +83,110 @@ const EnterResetCode = () => {
   };
 
   const handleResend = async () => {
-    if (resendCooldown > 0) return;
+    if (resendCooldown > 0 || resendLoading) return;
+    setResendLoading(true);
 
     try {
       const data = await authAPI.forgotPassword(email);
 
-      if (data.success) {
-        showMessage("Reset code resent!", "success");
+      if (data?.success) {
+        showMessage("Reset code resent to your email!", "success");
         setResendCooldown(30); // Start 30-second cooldown
       } else {
-        showMessage(`${data.error || "Failed to resend email"}`, "error");
+        showMessage(`${data?.error || "Failed to resend email"}`, "error");
       }
     } catch {
-              showMessage("Failed to resend email", "error");
+      showMessage("Failed to resend email", "error");
+    } finally {
+      setResendLoading(false);
     }
   };
 
   return (
-    <div className="enter-reset-code-form page-container auth-page">
-      <h2 className="enter-reset-code-title">ENTER RESET CODE</h2>
-      <form onSubmit={handleSubmit} className="enter-reset-code-form-fields">
-        <p className="auth-subtext">
-          A 6-digit code was sent to:<br />
-          <strong>{email}</strong>
-        </p>
-        <div className="input-icon-wrapper">
-          <KeyRound className="auth-icon" size={20} />
-          <input
-            type="text"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="Enter 6-digit code"
-            className="enter-reset-code-input"
-            required
-            maxLength={6}
-          />
+    <div className="reset-code-page-container">
+      <div className="reset-code-card">
+        
+        {/* Glowing Key Badge + Lock */}
+        <div className="reset-code-hero-graphic" aria-hidden="true">
+          <div className="reset-code-key-badge">
+            <KeyRound size={36} />
+            <div className="reset-code-sub-badge">
+              <Lock size={13} />
+            </div>
+          </div>
         </div>
 
-        <button type="submit" className="enter-reset-code-button" disabled={loading}>
-          {loading ? "Verifying..." : "Verify Code"}
-        </button>
+        {/* Title & Subtitle */}
+        <h1 className="reset-code-title">
+          ENTER <span className="reset-code-title-accent">RESET CODE</span>
+        </h1>
+        
+        <p className="reset-code-description">
+          We sent a 6-digit verification code to:<br />
+          <strong className="reset-code-description-accent">{email}</strong>
+        </p>
 
-        <button
-          type="button"
-          onClick={handleResend}
-          disabled={resendCooldown > 0}
-          className="resend-button"
-        >
-          {resendCooldown > 0
-            ? `Resend Email (${resendCooldown}s)`
-            : "Resend Email"}
-        </button>
-      </form>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="reset-code-form" noValidate>
+          <div className="reset-code-input-wrapper">
+            <TextField
+              id="reset-code-input"
+              name="code"
+              type="text"
+              inputMode="numeric"
+              placeholder="000000"
+              value={code}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                setCode(val);
+              }}
+              startIcon={<KeyRound size={18} />}
+              maxLength={6}
+              autoComplete="one-time-code"
+              size="md"
+              fullWidth
+              required
+            />
+          </div>
+
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            fullWidth
+            loading={loading}
+            icon={<CheckCircle2 size={16} />}
+            className="reset-code-submit-btn"
+          >
+            Verify Code
+          </Button>
+
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={resendCooldown > 0 || resendLoading}
+            className="reset-code-resend-btn"
+          >
+            <RotateCw size={15} className={resendLoading ? "animate-spin" : ""} />
+            <span>
+              {resendCooldown > 0
+                ? `Resend Code (${resendCooldown}s)`
+                : resendLoading
+                ? "Resending..."
+                : "Resend Code"}
+            </span>
+          </button>
+
+          <div className="reset-code-divider">
+            <span>or</span>
+          </div>
+
+          <Link to="/login" className="reset-code-back-btn">
+            <ArrowLeft size={16} />
+            <span>Back to Login</span>
+          </Link>
+        </form>
+      </div>
     </div>
   );
-};
-
-export default EnterResetCode;
+}

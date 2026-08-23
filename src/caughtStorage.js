@@ -1,5 +1,7 @@
 // caughtStorage.js
 import { caughtAPI } from './utils/api.js';
+import pokemonData from './data/pokemon.json';
+import formsData from './utils/loadFormsData';
 
 /**
  * Get the storage key for a Pokemon
@@ -9,8 +11,48 @@ export function getCaughtKey(pokeOrId, fallbackFormType, isShiny = false) {
   if (typeof pokeOrId === "object" && pokeOrId?.stableId) {
     return isShiny ? `${pokeOrId.stableId}_shiny` : pokeOrId.stableId;
   }
+
+  // If pokeOrId is a Pokemon object with id/name, resolve its stableId
+  if (typeof pokeOrId === "object" && pokeOrId) {
+    const id = pokeOrId.id;
+    const name = pokeOrId.name;
+    const formType = pokeOrId.formType || fallbackFormType;
+
+    // Check formsData if formType exists or if isForm is set
+    if (formType || pokeOrId.isForm) {
+      const matchForm = formsData.find(f =>
+        (f.stableId && f.stableId === pokeOrId.stableId) ||
+        (f.id === id && f.name === name) ||
+        (f.id === id && formType && f.formType === formType)
+      );
+      if (matchForm?.stableId) {
+        return isShiny ? `${matchForm.stableId}_shiny` : matchForm.stableId;
+      }
+    }
+
+    // Check base pokemonData
+    const matchBase = pokemonData.find(p => p.id === id && (!name || p.name === name));
+    if (matchBase?.stableId) {
+      return isShiny ? `${matchBase.stableId}_shiny` : matchBase.stableId;
+    }
+
+    // Fallback search formsData
+    const matchAnyForm = formsData.find(f => f.id === id && (!name || f.name === name));
+    if (matchAnyForm?.stableId) {
+      return isShiny ? `${matchAnyForm.stableId}_shiny` : matchAnyForm.stableId;
+    }
+  }
+
+  if (typeof pokeOrId === "number" || typeof pokeOrId === "string") {
+    const numId = Number(pokeOrId);
+    if (!isNaN(numId)) {
+      const matchBase = pokemonData.find(p => p.id === numId);
+      if (matchBase?.stableId) {
+        return isShiny ? `${matchBase.stableId}_shiny` : matchBase.stableId;
+      }
+    }
+  }
   
-  // If no stableId, return null (shouldn't happen after migration)
   return null;
 }
 
@@ -99,19 +141,24 @@ export function migrateOldCaughtData(oldCaughtMap) {
     if (info.entries && Array.isArray(info.entries) && info.entries.length > 0) {
       // Already properly migrated with data, keep as is
       newCaughtMap[key] = info;
-    } else if (info.hasOwnProperty('ball') || info.hasOwnProperty('mark') || info.hasOwnProperty('method') || info.hasOwnProperty('game') || info.hasOwnProperty('checks') || info.hasOwnProperty('date') || info.hasOwnProperty('notes')) {
+    } else if (info.hasOwnProperty('ball') || info.hasOwnProperty('mark') || info.hasOwnProperty('marks') || info.hasOwnProperty('method') || info.hasOwnProperty('game') || info.hasOwnProperty('checks') || info.hasOwnProperty('date') || info.hasOwnProperty('notes')) {
       // This is old format data, migrate it regardless of key
       newCaughtMap[key] = migrateToEntriesFormat(info);
     } else if (info.entries && Array.isArray(info.entries) && info.entries.length === 0) {
       // Has entries structure but empty - this is a broken migration
       // Check if there's old format data at the root level that should be moved into entries
-      if (info.hasOwnProperty('ball') || info.hasOwnProperty('mark') || info.hasOwnProperty('method') || info.hasOwnProperty('game') || info.hasOwnProperty('checks') || info.hasOwnProperty('date') || info.hasOwnProperty('notes')) {
+      if (info.hasOwnProperty('ball') || info.hasOwnProperty('mark') || info.hasOwnProperty('marks') || info.hasOwnProperty('method') || info.hasOwnProperty('game') || info.hasOwnProperty('checks') || info.hasOwnProperty('date') || info.hasOwnProperty('notes')) {
         // Move the old data into the first entry
+        const markVal = info.mark || (Array.isArray(info.marks) ? info.marks[0] : "") || "";
+        const marksVal = (Array.isArray(info.marks) && info.marks.length > 0)
+          ? info.marks
+          : (markVal ? [markVal] : []);
         const fixedData = {
           ...info,
           entries: [{
             ball: info.ball || "",
-            mark: info.mark || "",
+            marks: marksVal,
+            mark: markVal,
             method: info.method || "",
             game: info.game || "",
             checks: info.checks || "",
@@ -123,6 +170,7 @@ export function migrateOldCaughtData(oldCaughtMap) {
         // Clear the old fields from the root level
         delete fixedData.ball;
         delete fixedData.mark;
+        delete fixedData.marks;
         delete fixedData.method;
         delete fixedData.game;
         delete fixedData.checks;
@@ -137,6 +185,7 @@ export function migrateOldCaughtData(oldCaughtMap) {
             ...info,
             entries: [{
               ball: "",
+              marks: [],
               mark: "",
               method: "",
               game: "",
@@ -158,6 +207,7 @@ export function migrateOldCaughtData(oldCaughtMap) {
         caught: true,
         entries: [{
           ball: "",
+          marks: [],
           mark: "",
           method: "",
           game: "",
@@ -190,12 +240,17 @@ function migrateToEntriesFormat(oldInfo) {
   }
   
   // If it's the old format (has ball, mark, etc. directly), convert to entries
-  if (oldInfo.hasOwnProperty('ball') || oldInfo.hasOwnProperty('mark') || oldInfo.hasOwnProperty('method') || oldInfo.hasOwnProperty('game') || oldInfo.hasOwnProperty('checks') || oldInfo.hasOwnProperty('date') || oldInfo.hasOwnProperty('notes')) {
+  if (oldInfo.hasOwnProperty('ball') || oldInfo.hasOwnProperty('mark') || oldInfo.hasOwnProperty('marks') || oldInfo.hasOwnProperty('method') || oldInfo.hasOwnProperty('game') || oldInfo.hasOwnProperty('checks') || oldInfo.hasOwnProperty('date') || oldInfo.hasOwnProperty('notes')) {
+    const markVal = oldInfo.mark || (Array.isArray(oldInfo.marks) ? oldInfo.marks[0] : "") || "";
+    const marksVal = (Array.isArray(oldInfo.marks) && oldInfo.marks.length > 0)
+      ? oldInfo.marks
+      : (markVal ? [markVal] : []);
     const newFormat = {
       caught: true,
       entries: [{
         ball: oldInfo.ball || "",
-        mark: oldInfo.mark || "",
+        marks: marksVal,
+        mark: markVal,
         method: oldInfo.method || "",
         game: oldInfo.game || "",
         checks: oldInfo.checks || "",

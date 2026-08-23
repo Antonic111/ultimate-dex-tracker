@@ -1,57 +1,69 @@
 import { useState, useEffect, useContext, useMemo, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-
-// Simple timer component that updates every second
-function TimerDisplay({ huntId, lastCheckTime, isPaused, onTimeUpdate }) {
-  const [seconds, setSeconds] = useState(0);
-  const intervalRef = useRef(null);
-
-  useEffect(() => {
-    if (isPaused) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      return;
-    }
-
-    // Start timer
-    intervalRef.current = setInterval(() => {
-      setSeconds(prev => prev + 1);
-    }, 1000);
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [isPaused]);
-
-  // Update parent with current seconds value
-  useEffect(() => {
-    if (onTimeUpdate && !isPaused) {
-      onTimeUpdate(huntId, seconds * 1000);
-    }
-  }, [seconds, huntId, onTimeUpdate, isPaused]);
-
-  // Reset timer when lastCheckTime changes (new hunt or add check)
-  useEffect(() => {
-    setSeconds(0);
-  }, [lastCheckTime]);
-
-  if (isPaused) {
-    return "Paused";
-  }
-
-  return `${seconds}s`;
-}
-import { Search, X, Plus, Minus, Check, Trash2, Settings, Save, Info, RotateCcw, Pause, Play, CheckCircle, Edit, Maximize2 } from "lucide-react";
-import { BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
-import { getMethodsForGame, calculateOdds, getAllGames, getModifiersForGame, getCurrentHuntOdds } from "../utils/huntSystem";
-import { GAME_OPTIONS } from "../Constants";
-import { formatPokemonName, getFormDisplayName, renderTypeBadge } from "../utils";
+import {
+  Search,
+  X,
+  Plus,
+  Minus,
+  Check,
+  Trash2,
+  Settings,
+  Info,
+  RotateCcw,
+  Pause,
+  Play,
+  CheckCircle,
+  Edit,
+  Maximize2,
+  Sparkles,
+  Flag,
+  AlertCircle,
+  History,
+  Clock,
+  Flame,
+  ChevronDown,
+  ChevronUp,
+  MoreVertical,
+  Sliders,
+  Award,
+  BarChart3,
+  HelpCircle,
+  BadgeCheck,
+  HeartCrack,
+  ArrowRight,
+  ArrowLeft,
+  ChevronRight,
+  ChevronLeft,
+  RefreshCw,
+  Trophy,
+  XCircle
+} from "lucide-react";
+import { BALL_OPTIONS, MARK_OPTIONS, GAME_OPTIONS } from "../Constants";
+import {
+  getMethodsForGame,
+  calculateOdds,
+  getModifiersForGame,
+  getCurrentHuntOdds,
+  calculateMassOutbreakOdds,
+  calculateCatchComboOdds,
+  calculateSOSOdds,
+  calculateKOOdds,
+  calculatePokeRadarOdds,
+  calculatePokeRadarBDSPOdds,
+  calculatePokeRadarXYOdds,
+  calculateDexNavOdds,
+  calculateChainFishingXYOdds
+} from "../utils/huntSystem";
+import { formatPokemonName, getFormDisplayName, findPokemon } from "../utils";
+import {
+  DetailedHuntCard,
+  OddsBreakdownModal,
+  AdjustHuntModal,
+  ShinyEncounterModal,
+  HuntIdentityOddsCard,
+  HuntHistoryModal
+} from "../components/Counters";
 import { getCaughtKey } from "../caughtStorage";
 import { SearchbarIconDropdown } from "../components/Shared/SearchBar";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
@@ -60,77 +72,732 @@ import { useTheme } from "../components/Shared/ThemeContext";
 import { getSpriteUrl } from "../utils/spriteUtils";
 import { UserContext } from "../components/Shared/UserContext";
 import { useMessage } from "../components/Shared/MessageContext";
-import { huntAPI, profileAPI, caughtAPI } from "../utils/api";
+import { huntAPI, profileAPI } from "../utils/api";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
+import { getValidBallNamesForGame } from "../data/gameBalls";
 import gamePokemonData from "../data/gamePokemon.json";
 import { getAvailableGamesForPokemon } from "../utils/gameMapping";
-import { getFilteredFormsData } from "../utils/dexPreferences";
+import { getFilteredFormsData, getDexPreferences } from "../utils/dexPreferences";
+import { getAvailableGamesForPokemonSidebar, normalizeGameName } from "../utils/pokemonAvailability";
+import { Modal, ConfirmModal } from "../components/Shared/Modal";
+import { Button } from "../components/Shared/Button";
+import { TextField, SelectField, NumberField, TextArea, SearchField } from "../components/Shared/FormField";
+import {
+  formatDigitalTime,
+  formatIntervalTime,
+  getHuntElapsedTime,
+  normalizeHunt,
+  updateHuntWithAction,
+  applyHuntActionToState,
+  createHuntChannel,
+  getCachedHuntsData,
+  setCachedHuntsData
+} from "../utils/huntSync";
 import "../css/Counters.css";
+import "../css/Onboarding.css";
+
+const getGamesForPokemon = (pokemon) => {
+  if (!pokemon || !pokemon.id) return ["Scarlet", "Violet"];
+  try {
+    const games = getAvailableGamesForPokemon(pokemon.id, gamePokemonData);
+    return games && games.length > 0 ? games : ["Scarlet", "Violet"];
+  } catch {
+    return ["Scarlet", "Violet"];
+  }
+};
+
+const normalizeGameKey = (str = "") => String(str).toLowerCase().replace(/['’\s\-_]/g, "");
+
+const getGameImage = (gameName) => {
+  if (!gameName) return null;
+  const targetKey = normalizeGameKey(gameName);
+  const match = GAME_OPTIONS.find(g =>
+    g.value === gameName ||
+    g.name === gameName ||
+    normalizeGameKey(g.value) === targetKey ||
+    normalizeGameKey(g.name) === targetKey
+  );
+  return match?.image || null;
+};
+
+export const getPhaseEntryDisplayInfo = (phase, allPhases = []) => {
+  if (!phase) return { label: "Phase 1:", title: "", isFail: false, isTarget: false, count: 1 };
+  const phaseIdx = allPhases.indexOf(phase);
+  const preceding = phaseIdx >= 0 ? allPhases.slice(0, phaseIdx + 1) : [phase];
+
+  const isTarget = !!phase.isTarget;
+  const isFailed = phase.outcome === "failed";
+
+  if (isTarget && isFailed) {
+    const count = preceding.filter(p => p.isTarget && p.outcome === "failed").length || 1;
+    return {
+      type: "target_failed",
+      label: `Target Failed ${count}:`,
+      title: `Target Failed ${count}: ${formatPokemonName(phase.pokemon?.name)}`,
+      badgeText: "Target Failed",
+      isFail: true,
+      isTarget: true,
+      count
+    };
+  } else if (!isTarget && isFailed) {
+    const count = preceding.filter(p => !p.isTarget && p.outcome === "failed").length || 1;
+    return {
+      type: "phase_failed",
+      label: `Phase Failed ${count}:`,
+      title: `Phase Failed ${count}: ${formatPokemonName(phase.pokemon?.name)}`,
+      badgeText: "Phase Failed",
+      isFail: true,
+      isTarget: false,
+      count
+    };
+  } else {
+    // Non-target phase caught
+    const count = preceding.filter(p => !p.isTarget && p.outcome === "caught").length || phase.phaseNumber || (phaseIdx + 1);
+    return {
+      type: "phase_caught",
+      label: `Phase ${count}:`,
+      title: `Phase ${count}: ${formatPokemonName(phase.pokemon?.name)}`,
+      badgeText: "✓ Caught",
+      isFail: false,
+      isTarget: false,
+      count
+    };
+  }
+};
+
+export const getPhaseDisplayChecks = (phase, allPhases = []) => {
+  if (!phase) return { intervalChecks: 0, totalChecks: 0 };
+  const idx = allPhases.indexOf(phase);
+  const total = phase.totalChecks !== undefined
+    ? phase.totalChecks
+    : (phase.phaseChecks || phase.checks || 0);
+
+  let interval = phase.phaseChecks !== undefined ? phase.phaseChecks : (phase.checks || 0);
+
+  if (idx > 0) {
+    const prev = allPhases[idx - 1];
+    const prevTotal = prev.totalChecks !== undefined
+      ? prev.totalChecks
+      : (prev.phaseChecks || prev.checks || 0);
+
+    if (total >= prevTotal && total > 0) {
+      interval = total - prevTotal;
+    }
+  } else if (phase.phaseChecks !== undefined) {
+    interval = phase.phaseChecks;
+  } else {
+    interval = total;
+  }
+
+  return {
+    intervalChecks: Math.max(0, interval),
+    totalChecks: total
+  };
+};
+
+// Check if a pokemon or form is obtainable/huntable in targetGame
+const isPokemonAvailableInGame = (pokemon, targetGame) => {
+  if (!pokemon || !targetGame) return true;
+  const games = getAvailableGamesForPokemonSidebar(pokemon);
+  const targetKey = normalizeGameName(targetGame);
+  return games.some(g => normalizeGameName(g) === targetKey);
+};
+
+// Best possible odds summary
+function getBestPossibleOdds(game, method) {
+  if (!game) return "1 / 4,096";
+
+  if (game === "Red" || game === "Blue" || game === "Green" || game === "Yellow") {
+    return "1 / 8,192 (Base Rate)";
+  }
+  if (game === "Gold" || game === "Silver" || game === "Crystal") {
+    if (method === "Breeding") return "1 / 64 (Shiny Parent)";
+    if (method === "Odd Egg") return "1 / 10 (Odd Egg)";
+    return "1 / 8,192 (Base Rate)";
+  }
+  if (game === "Ruby" || game === "Sapphire" || game === "Emerald" || game === "Fire Red" || game === "Leaf Green") {
+    return "1 / 8,192 (Base Rate)";
+  }
+  if (game === "Diamond" || game === "Pearl") {
+    if (method === "Poke Radar") return "1 / 200 (40+ Chain)";
+    if (method === "Masuda Method") return "1 / 1,638 (Foreign Parent)";
+    return "1 / 8,192 (Base Rate)";
+  }
+  if (game === "Platinum" || game === "Heart Gold" || game === "Soul Silver") {
+    if (method === "Poke Radar") return "1 / 200 (40+ Chain)";
+    if (method === "Masuda Method") return "1 / 1,638 (Foreign Parent)";
+    return "1 / 8,192 (Base Rate)";
+  }
+  if (game === "Black" || game === "White") {
+    if (method === "Masuda Method") return "1 / 1,365 (Foreign Parent)";
+    return "1 / 8,192 (Base Rate)";
+  }
+  if (game === "Black 2" || game === "White 2") {
+    if (method === "Masuda Method") return "1 / 1,024 (Charm + Masuda)";
+    return "1 / 2,731 (Shiny Charm)";
+  }
+  if (game === "X" || game === "Y") {
+    if (method === "Chain Fishing") return "1 / 96 (20+ Streak + Charm)";
+    if (method === "Poke Radar") return "1 / 99 (40+ Chain + Charm)";
+    if (method === "Friend Safari") return "1 / 585 (Flat Safari Rate + Charm)";
+    if (method === "Masuda Method") return "1 / 512 (Charm + Masuda)";
+    return "1 / 1,365 (Shiny Charm)";
+  }
+  if (game === "Omega Ruby" || game === "Alpha Sapphire") {
+    if (method === "Chain Fishing") return "1 / 96 (20+ Streak + Charm)";
+    if (method === "DexNav") return "1 / 181 (901-999 Search + Charm)";
+    if (method === "Masuda Method") return "1 / 512 (Charm + Masuda)";
+    return "1 / 1,365 (Shiny Charm)";
+  }
+  if (game === "Sun" || game === "Moon" || game.startsWith("Ultra Sun") || game.startsWith("Ultra Moon")) {
+    if (method === "Ultra Wormhole") return "Up to 36% (~1 / 3)";
+    if (method === "SOS" || method === "SOS Chaining") return "1 / 274 (31+ Chain + Charm)";
+    if (method === "Masuda Method") return "1 / 512 (Charm + Masuda)";
+    return "1 / 1,365 (Shiny Charm)";
+  }
+  if (game.startsWith("Let's Go") || game.startsWith("Lets GO")) {
+    if (method === "Catch Combo") return "1 / 273 (31+ Streak + Lure + Charm)";
+    if (method === "Random Encounters") return "1 / 1,024 (Lure + Charm)";
+    if (method === "Soft Resets") return "1 / 1,365 (Shiny Charm)";
+    if (method === "Fossil Revivals" || method === "Gift Pokemon") return "1 / 4,096 (Base Rate)";
+    return "1 / 1,365 (Shiny Charm)";
+  }
+  if (game === "Sword" || game === "Shield") {
+    if (method === "Dynamax Adventures") return "1 / 100 (Shiny Charm)";
+    if (method === "Masuda Method") return "1 / 512 (Foreign Parent + Charm)";
+    if (method === "KO Method" || method === "Number Battled") return "1 / 456 (500+ Battled + Charm)";
+    if (method === "Dynamax Raids" || method === "Fossil Revivals" || method === "Gift Pokemon") return "1 / 4,096 (Base Rate)";
+    return "1 / 1,365 (Shiny Charm)";
+  }
+  if (game === "Brilliant Diamond" || game === "Shining Pearl") {
+    if (method === "Poke Radar") return "1 / 99 (40+ Chain)";
+    if (method === "Grand Underground" || method === "Underground Diglett Hunt") return "1 / 2,048 (40/40 Diglett)";
+    if (method === "Masuda Method") return "1 / 512 (Charm + Masuda)";
+    if (method === "Breeding") return "1 / 2,048 (Shiny Charm)";
+    return "1 / 4,096 (Base Rate)";
+  }
+  if (game === "Legends Arceus") {
+    if (method === "Mass Outbreaks") return "1 / 128 (Perfect + Charm + Outbreak)";
+    if (method === "Massive Mass Outbreaks") return "1 / 216 (Perfect + Charm + MMO)";
+    return "1 / 585 (Perfect Research + Charm)";
+  }
+  if (game === "Legends Z-A") {
+    if (method === "Hyperspaces") return "1 / 683 (Charm + Spark 3)";
+    if (method === "Fossil Revivals") return "1 / 4,096 (Base Rate)";
+    return "1 / 1,365 (Shiny Charm)";
+  }
+  if (game === "Scarlet" || game === "Violet") {
+    if (method === "Mass Outbreaks") return "1 / 512 (60+ KOs + Charm + Spark 3)";
+    if (method === "Masuda Method") return "1 / 512 (Foreign Ditto + Charm)";
+    if (method === "Sandwich / Sparkling" || method === "Sandwich") return "1 / 683 (Charm + Spark 3)";
+    if (method === "Tera Raids") return "1 / 4,103 (Base Rate)";
+    return "1 / 1,365 (Shiny Charm)";
+  }
+  if (game === "Pokemon GO" || game === "Pokémon GO" || game === "GO") {
+    if (method === "Community Day") return "1 / 25 (Active Event)";
+    if (method === "Raid Day") return "1 / 10 (Event Boost)";
+    return "1 / 512 (Base GO Rate)";
+  }
+
+  const gameData = HUNT_SYSTEM[game];
+  const methodData = gameData?.methods?.find(m => m.name === method);
+  const base = methodData?.baseOdds || 4096;
+  const charmRolls = gameData?.modifiers?.["Shiny Charm"] || 0;
+  if (charmRolls > 0) {
+    const charmOdds = Math.round(base / (charmRolls + 1));
+    return `1 / ${charmOdds.toLocaleString()} (Shiny Charm)`;
+  }
+  return `1 / ${base.toLocaleString()} (Base Rate)`;
+}
+
+function getModifierSubtext(game, method, modifiers = {}, checks = 0) {
+  const parts = [];
+  if (modifiers.shinyCharm) parts.push("Shiny Charm");
+  if (modifiers.sparklingLv3) parts.push("Sparkling Lv 3");
+  else if (modifiers.sparklingLv2) parts.push("Sparkling Lv 2");
+  else if (modifiers.sparklingLv1) parts.push("Sparkling Lv 1");
+  if (modifiers.eventBoosted) parts.push("Event Boosted");
+  if (modifiers.lureActive) parts.push("Lure");
+  if (modifiers.perfectResearch) parts.push("Perfect Research");
+  else if (modifiers.researchLv10) parts.push("Research Lv 10");
+  if (modifiers.shinyParents) parts.push("Shiny Parent");
+  if (modifiers.communityDay) parts.push("Community Day");
+  if (modifiers.raidDay) parts.push("Raid Day");
+  if (parts.length === 0) return "";
+  return `Active: ${parts.join(" • ")}`;
+}
+
+// Human-readable summary time (e.g. 3h 21m)
+const formatSummaryTime = (milliseconds = 0) => {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  if (minutes > 0) {
+    return `${minutes}m`;
+  }
+  return `${totalSeconds}s`;
+};
+
+// Common Fail Causes for Shiny Hunting
+const FAIL_CAUSES = [
+  { value: "fainted", label: "Fainted / Knocked Out" },
+  { value: "ran_away", label: "Ran Away / Fled" },
+  { value: "self_destruct", label: "Self-Destruct / Explosion / Memento" },
+  { value: "recoil", label: "Recoil Damage / Life Orb / Crash" },
+  { value: "struggle", label: "Out of PP / Struggle" },
+  { value: "roar", label: "Roar / Whirlwind / Teleport" },
+  { value: "crash", label: "Game Crash / Battery Died" },
+  { value: "other", label: "Other / Unspecified" }
+];
+
+
+
+// ── Progressive Odds Matrix & Scaled Tiers Table ─────────────────────────────
+function OddsMatrixView({ game = "Scarlet", method = "Random Encounters", modifiers = {}, checks = 0 }) {
+  const isUltraWormhole = (game === "Ultra Sun" || game === "Ultra Moon") && (method === "Ultra Wormholes" || method === "Ultra Wormhole");
+  const isSVOutbreak = (game === "Scarlet" || game === "Violet") && method === "Mass Outbreaks";
+  const isLetsGoCombo = (game.startsWith("Let's Go") || game.startsWith("Lets GO")) && (method === "Catch Combo" || !method);
+  const isGen7SOS = (game === "Sun" || game === "Moon" || game === "Ultra Sun" || game === "Ultra Moon") && (method === "SOS" || method === "SOS Chaining");
+  const isPokeRadar = method === "Poke Radar" || method === "Poké Radar";
+  const isDexNav = (game === "Omega Ruby" || game === "Alpha Sapphire") && method === "DexNav";
+  const isChainFishing = method === "Chain Fishing";
+  const isSwShKO = (game === "Sword" || game === "Shield") && (method === "KO Method" || method === "Number Battled");
+
+  if (!isUltraWormhole && !isSVOutbreak && !isLetsGoCombo && !isGen7SOS && !isPokeRadar && !isDexNav && !isChainFishing && !isSwShKO) {
+    return null;
+  }
+
+  if (isUltraWormhole) {
+    return (
+      <div className="hunt-modal-card overflow-hidden !p-0">
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10 bg-white/[0.02]">
+          <span className="text-xs font-extrabold uppercase tracking-wider text-white">
+            Current Odds:
+          </span>
+        </div>
+        <div className="w-full bg-black/50 p-4 flex flex-col items-center justify-center gap-2.5 shadow-inner">
+          <div className="flex items-center justify-center gap-3">
+            <div className="px-4 py-2 rounded-xl border border-emerald-500/80 bg-black/60 text-emerald-400 font-extrabold text-lg font-mono shadow-sm">
+              1%
+            </div>
+            <span className="text-white text-base font-bold">→</span>
+            <div className="px-4 py-2 rounded-xl border border-emerald-500/80 bg-black/60 text-emerald-400 font-extrabold text-lg font-mono shadow-sm">
+              36%
+            </div>
+          </div>
+          <p className="text-xs text-gray-300 italic text-center font-medium">
+            Odds increase with distance traveled
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  let title = "Progressive Odds Chart";
+  let buffSummary = "";
+  let rows = [];
+  let note = "";
+
+  if (isSVOutbreak) {
+    title = "Outbreak KO Progression";
+    const sparklingLevel = modifiers?.sparklingLv3 ? 3 : modifiers?.sparklingLv2 ? 2 : modifiers?.sparklingLv1 ? 1 : 0;
+    const hasCharm = !!modifiers?.shinyCharm;
+    const isEvent = !!modifiers?.eventBoosted;
+
+    const buffs = [];
+    if (sparklingLevel > 0) buffs.push(`Sparkling Lv ${sparklingLevel}`);
+    else buffs.push("No Sandwich");
+    if (hasCharm) buffs.push("Shiny Charm");
+    if (isEvent) buffs.push("Event Boost");
+    buffSummary = buffs.join(" • ");
+
+    rows = [
+      { trigger: "0 – 29 KOs", odds: calculateMassOutbreakOdds(0, sparklingLevel, hasCharm, isEvent), isCurrent: checks >= 0 && checks <= 29 },
+      { trigger: "30 – 59 KOs", odds: calculateMassOutbreakOdds(30, sparklingLevel, hasCharm, isEvent), isCurrent: checks >= 30 && checks <= 59 },
+      { trigger: "60+ KOs (Max)", odds: calculateMassOutbreakOdds(60, sparklingLevel, hasCharm, isEvent), isCurrent: checks >= 60 }
+    ];
+  } else if (isLetsGoCombo) {
+    title = "Catch Combo Odds";
+    const hasCharm = !!modifiers?.shinyCharm;
+    const hasLure = !!modifiers?.lureActive;
+
+    const buffs = [];
+    if (hasCharm) buffs.push("Shiny Charm");
+    if (hasLure) buffs.push("Lure Active");
+    buffSummary = buffs.length > 0 ? buffs.join(" • ") : "No Modifiers";
+
+    rows = [
+      { trigger: "0-10", odds: calculateCatchComboOdds(0, hasCharm, hasLure), isCurrent: checks >= 0 && checks <= 10 },
+      { trigger: "11-20", odds: calculateCatchComboOdds(11, hasCharm, hasLure), isCurrent: checks >= 11 && checks <= 20 },
+      { trigger: "21-30", odds: calculateCatchComboOdds(21, hasCharm, hasLure), isCurrent: checks >= 21 && checks <= 30 },
+      { trigger: "31+", odds: calculateCatchComboOdds(31, hasCharm, hasLure), isCurrent: checks >= 31 }
+    ];
+  } else if (isGen7SOS) {
+    title = "SOS Chain Odds";
+    const hasCharm = !!modifiers?.shinyCharm;
+    buffSummary = hasCharm ? "Shiny Charm" : "No Modifiers";
+
+    rows = [
+      { trigger: "0-10", odds: hasCharm ? 1366 : 4096, isCurrent: checks >= 0 && checks <= 10 },
+      { trigger: "11-20", odds: hasCharm ? 586 : 820, isCurrent: checks >= 11 && checks <= 20 },
+      { trigger: "21-30", odds: hasCharm ? 373 : 456, isCurrent: checks >= 21 && checks <= 30 },
+      { trigger: "31+", odds: hasCharm ? 274 : 316, isCurrent: checks >= 31 }
+    ];
+  } else if (isPokeRadar) {
+    const isGen4 = game === "Diamond" || game === "Pearl" || game === "Platinum";
+    const isBDSP = game === "Brilliant Diamond" || game === "Shining Pearl";
+    const isXY = game === "X" || game === "Y";
+    const hasCharm = !!modifiers?.shinyCharm;
+    const radarFn = isBDSP
+      ? calculatePokeRadarBDSPOdds
+      : isXY
+      ? (c) => calculatePokeRadarXYOdds(c, hasCharm)
+      : calculatePokeRadarOdds;
+    title = "Poké Radar Chain Odds";
+    buffSummary = isBDSP ? "BDSP Formula" : isXY ? (hasCharm ? "Gen 6 + Shiny Charm" : "Gen 6 Formula") : "Gen 4 Formula";
+
+    if (isGen4) {
+      rows = [
+        { trigger: "0", odds: 8200, isCurrent: checks < 10 },
+        { trigger: "10", odds: calculatePokeRadarOdds(10), isCurrent: checks >= 10 && checks < 20 },
+        { trigger: "20", odds: calculatePokeRadarOdds(20), isCurrent: checks >= 20 && checks < 30 },
+        { trigger: "30", odds: calculatePokeRadarOdds(30), isCurrent: checks >= 30 && checks < 35 },
+        { trigger: "35", odds: calculatePokeRadarOdds(35), isCurrent: checks >= 35 && checks < 40 },
+        { trigger: "40+", odds: calculatePokeRadarOdds(40), isCurrent: checks >= 40 }
+      ];
+    } else if (isXY) {
+      rows = [
+        { trigger: "0", odds: calculatePokeRadarXYOdds(0, hasCharm), isCurrent: checks < 10 },
+        { trigger: "10", odds: calculatePokeRadarXYOdds(10, hasCharm), isCurrent: checks >= 10 && checks < 20 },
+        { trigger: "20", odds: calculatePokeRadarXYOdds(20, hasCharm), isCurrent: checks >= 20 && checks < 30 },
+        { trigger: "30", odds: calculatePokeRadarXYOdds(30, hasCharm), isCurrent: checks >= 30 && checks < 40 },
+        { trigger: "40+", odds: calculatePokeRadarXYOdds(40, hasCharm), isCurrent: checks >= 40 }
+      ];
+    } else {
+      rows = [
+        { trigger: "0", odds: radarFn(0), isCurrent: checks < 10 },
+        { trigger: "10", odds: radarFn(10), isCurrent: checks >= 10 && checks < 20 },
+        { trigger: "20", odds: radarFn(20), isCurrent: checks >= 20 && checks < 30 },
+        { trigger: "30", odds: radarFn(30), isCurrent: checks >= 30 && checks < 40 },
+        { trigger: "40+", odds: radarFn(40), isCurrent: checks >= 40 }
+      ];
+    }
+  } else if (isChainFishing) {
+    title = "Chain Fishing Odds";
+    const hasCharm = !!modifiers?.shinyCharm;
+    buffSummary = hasCharm ? "Shiny Charm" : "No Modifiers";
+
+    rows = [
+      { trigger: "0", odds: calculateChainFishingXYOdds(0, hasCharm), isCurrent: checks < 5 },
+      { trigger: "5", odds: calculateChainFishingXYOdds(5, hasCharm), isCurrent: checks >= 5 && checks < 10 },
+      { trigger: "10", odds: calculateChainFishingXYOdds(10, hasCharm), isCurrent: checks >= 10 && checks < 20 },
+      { trigger: "20+", odds: calculateChainFishingXYOdds(20, hasCharm), isCurrent: checks >= 20 }
+    ];
+  } else if (isSwShKO) {
+    title = "KO Method Odds";
+    const hasCharm = !!modifiers?.shinyCharm;
+    buffSummary = hasCharm ? "Shiny Charm" : "No Modifiers";
+
+    rows = [
+      { trigger: "0-49", odds: calculateKOOdds(0, hasCharm), isCurrent: checks >= 0 && checks <= 49 },
+      { trigger: "50-99", odds: calculateKOOdds(50, hasCharm), isCurrent: checks >= 50 && checks <= 99 },
+      { trigger: "100-199", odds: calculateKOOdds(100, hasCharm), isCurrent: checks >= 100 && checks <= 199 },
+      { trigger: "200-299", odds: calculateKOOdds(200, hasCharm), isCurrent: checks >= 200 && checks <= 299 },
+      { trigger: "300-499", odds: calculateKOOdds(300, hasCharm), isCurrent: checks >= 300 && checks <= 499 },
+      { trigger: "500+", odds: calculateKOOdds(500, hasCharm), isCurrent: checks >= 500 }
+    ];
+  } else if (isDexNav) {
+    title = "DexNav Search Level Odds";
+    const hasCharm = !!modifiers?.shinyCharm;
+    buffSummary = hasCharm ? "Shiny Charm" : "No Modifiers";
+
+    rows = [
+      { trigger: "0", odds: hasCharm ? 1366 : 4096, isCurrent: checks === 0 },
+      { trigger: "1-16", odds: hasCharm ? 969 : 2906, isCurrent: checks >= 1 && checks <= 16 },
+      { trigger: "17-33", odds: hasCharm ? 751 : 2252, isCurrent: checks >= 17 && checks <= 33 },
+      { trigger: "34-50", odds: hasCharm ? 613 : 1838, isCurrent: checks >= 34 && checks <= 50 },
+      { trigger: "84-100", odds: hasCharm ? 395 : 1185, isCurrent: checks >= 51 && checks <= 100 },
+      { trigger: "101-150", odds: hasCharm ? 353 : 1059, isCurrent: checks >= 101 && checks <= 150 },
+      { trigger: "201-300", odds: hasCharm ? 291 : 874, isCurrent: checks >= 151 && checks <= 300 },
+      { trigger: "401-500", odds: hasCharm ? 248 : 744, isCurrent: checks >= 301 && checks <= 500 },
+      { trigger: "701-800", odds: hasCharm ? 203 : 608, isCurrent: checks >= 501 && checks <= 800 },
+      { trigger: "901-999", odds: hasCharm ? 181 : 542, isCurrent: checks >= 801 }
+    ];
+
+    note = "Each encounter has a 4% chance for random shiny odds boost. Encounters at multiples of 50 and 100 have additional boosted odds (not dynamically tracked).";
+  }
+
+  const isTableStyle = isDexNav || isGen7SOS || isLetsGoCombo || isSwShKO || isPokeRadar || isChainFishing || isSVOutbreak;
+  const firstColHeader = (isGen7SOS || isLetsGoCombo || isPokeRadar) ? "Chain" : isChainFishing ? "Streak" : isSVOutbreak ? "KOs Defeated" : isDexNav ? "Search Level" : isSwShKO ? "Number Battled" : "Milestone";
+
+  return (
+    <div className="hunt-modal-card overflow-hidden !p-0">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10 bg-white/[0.02]">
+        <span className="text-xs font-extrabold uppercase tracking-wider text-white">
+          {title}
+        </span>
+        {buffSummary && (
+          <span className="text-[11px] font-semibold text-gray-300 bg-white/[0.06] border border-white/10 px-2 py-0.5 rounded-md">
+            {buffSummary}
+          </span>
+        )}
+      </div>
+
+      {isTableStyle ? (
+        <div className="w-full bg-black/50">
+          <table className="w-full text-xs border-collapse">
+            <thead>
+              <tr className="bg-[var(--accent)] text-black font-extrabold uppercase tracking-wider">
+                <th className="py-2.5 px-4 text-left w-1/2">{firstColHeader}</th>
+                <th className="py-2.5 px-4 text-right w-1/2">Odds</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5 font-semibold">
+              {rows.map((r, i) => {
+                const isCurrent = r.isCurrent;
+                return (
+                  <tr
+                    key={i}
+                    className={`transition ${
+                      isCurrent
+                        ? "bg-[var(--accent)]/15 font-bold"
+                        : "hover:bg-white/[0.02] text-gray-300"
+                    }`}
+                  >
+                    <td className="py-2.5 px-4 text-left">
+                      <div className="flex items-center gap-1.5">
+                        <span className={isCurrent ? "text-[var(--accent)] font-extrabold" : "text-white"}>
+                          {r.trigger}
+                        </span>
+                        {isCurrent && (
+                          <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-[var(--accent)] text-black">
+                            Current
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className={`py-2.5 px-4 text-right font-mono font-bold ${isCurrent ? "text-[var(--accent)] font-black" : "text-white"}`}>
+                      1 / {r.odds.toLocaleString()}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {note && (
+            <div className="p-3 text-center text-[11px] text-gray-400 italic border-t border-white/10 bg-black/25 leading-relaxed">
+              {note}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="p-3.5 bg-black/50">
+          <div className="grid grid-cols-2 gap-2">
+            {rows.map((r, i) => {
+              const isCurrent = r.isCurrent;
+              return (
+                <div
+                  key={i}
+                  className={`flex items-center justify-between sm:flex-col sm:items-start p-2.5 rounded-xl border transition ${
+                    isCurrent
+                      ? "bg-[var(--accent)]/10 border-[var(--accent)]/50"
+                      : "bg-black/30 border-white/5"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span className={`text-xs font-bold ${isCurrent ? "text-[var(--accent)]" : "text-gray-300"}`}>
+                      {r.trigger}
+                    </span>
+                    {isCurrent && (
+                      <span className="text-[9px] font-extrabold uppercase px-1 py-0.2 rounded bg-[var(--accent)] text-black">
+                        Current
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-sm font-extrabold text-white font-mono sm:mt-1">
+                    1 / {r.odds.toLocaleString()}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const MARKS_GAMES = ["Scarlet", "Violet", "Sword", "Shield"];
 
 export default function Counters() {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedPokemon, setSelectedPokemon] = useState(null);
-  const [huntDetails, setHuntDetails] = useState({
+  const user = useContext(UserContext);
+  const username = user?.username;
+  const { showMessage } = useMessage();
+
+  // ── Modals & Wizard State ────────────────────────────────────────────────
+  const [huntWizard, setHuntWizard] = useState({
+    isOpen: false,
+    step: 0,
     game: "",
-    ball: "",
-    mark: "",
     method: "",
-    notes: ""
+    formTab: "all",
+    phaseFormTab: "all",
+    modifiers: {
+      shinyCharm: false,
+      sparklingLv1: false,
+      sparklingLv2: false,
+      sparklingLv3: false,
+      eventBoosted: false,
+      lureActive: false,
+      researchLv10: false,
+      perfectResearch: false,
+      shinyParents: false,
+      communityDay: false,
+      raidDay: false,
+      researchDay: false
+    },
+    searchTerm: "",
+    selectedPokemon: null,
+    phaseSearchTerm: "",
+    possiblePhases: [],
+    allowAnyPhase: true,
+    startingChecks: 0,
+    increment: 1,
+    targetPhasesNotes: ""
   });
-  const [modifiers, setModifiers] = useState({
-    shinyCharm: false,
-    shinyParents: false,
-    lureActive: false,
-    researchLv10: false,
-    perfectResearch: false,
-    sparklingLv1: false,
-    sparklingLv2: false,
-    sparklingLv3: false,
-    eventBoosted: false,
-    communityDay: false,
-    raidDay: false,
-    researchDay: false,
-    galarBirds: false,
-    hatchDay: false
+
+  // ── Global Raw Active Hunts (shared with MMO Tool) ────────────────────────
+  const [allActiveHunts, setAllActiveHunts] = useState(() => {
+    const cached = getCachedHuntsData();
+    return cached.activeHunts ? cached.activeHunts.map(normalizeHunt) : [];
   });
-  const [currentChecks, setCurrentChecks] = useState(0);
-  const [showPokemonModal, setShowPokemonModal] = useState(false);
-  const [showHuntModal, setShowHuntModal] = useState(false);
-  const [activeHunts, setActiveHunts] = useState([]);
+
+  // Filter out Legends Arceus Permutations hunts (handled exclusively in MMO Tool)
+  const activeHunts = useMemo(() => {
+    return (allActiveHunts || []).filter(h => !(h.game === "Legends Arceus" && h.method === "Permutations"));
+  }, [allActiveHunts]);
+
+  const [currentHuntId, setCurrentHuntId] = useState(() => {
+    try {
+      const saved = localStorage.getItem("currentHuntId");
+      return saved ? (isNaN(saved) ? saved : Number(saved)) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Persist currentHuntId across reloads
+  useEffect(() => {
+    if (currentHuntId != null) {
+      try {
+        localStorage.setItem("currentHuntId", String(currentHuntId));
+      } catch {}
+    }
+  }, [currentHuntId]);
+
+  // Derived Current Hunt and Other Hunts queue
+  const currentHunt = useMemo(() => {
+    if (!activeHunts || activeHunts.length === 0) return null;
+    if (currentHuntId != null) {
+      const match = activeHunts.find(
+        h => String(h.id) === String(currentHuntId) || String(h.huntId) === String(currentHuntId)
+      );
+      if (match) return match;
+    }
+    return activeHunts[0];
+  }, [activeHunts, currentHuntId]);
+
+  const otherHunts = useMemo(() => {
+    if (!activeHunts || activeHunts.length <= 1 || !currentHunt) return [];
+    return activeHunts.filter(
+      h => String(h.id) !== String(currentHunt.id) && String(h.huntId) !== String(currentHunt.id)
+    );
+  }, [activeHunts, currentHunt]);
+
+  // Keep currentHuntId synchronized when hunts load or if the current hunt was deleted/completed
+  const initialHuntsLoadedRef = useRef(false);
+  useEffect(() => {
+    if (activeHunts.length > 0) {
+      initialHuntsLoadedRef.current = true;
+      const exists = activeHunts.some(
+        h => String(h.id) === String(currentHuntId) || String(h.huntId) === String(currentHuntId)
+      );
+      if (!exists && activeHunts[0]) {
+        setCurrentHuntId(activeHunts[0].id);
+      }
+    } else if (initialHuntsLoadedRef.current && currentHuntId != null) {
+      setCurrentHuntId(null);
+    }
+  }, [activeHunts, currentHuntId]);
+
   const [huntTimers, setHuntTimers] = useState({});
   const [lastCheckTimes, setLastCheckTimes] = useState({});
   const [totalCheckTimes, setTotalCheckTimes] = useState({});
   const [pausedHunts, setPausedHunts] = useState(new Set());
-  const [expandedHunts, setExpandedHunts] = useState(new Set());
-  const [currentBottomTimers, setCurrentBottomTimers] = useState({});
   const [huntIncrements, setHuntIncrements] = useState({});
+
+  // Context Menu Dropdown state
+  const [openMenuHuntId, setOpenMenuHuntId] = useState(null);
+
+  // Modals state
   const [resetModal, setResetModal] = useState({ show: false, hunt: null });
   const [deleteModal, setDeleteModal] = useState({ show: false, hunt: null });
   const [settingsModal, setSettingsModal] = useState({ show: false, hunt: null });
   const [editModal, setEditModal] = useState({ show: false, hunt: null });
-  const [completionModal, setCompletionModal] = useState({ show: false, hunt: null });
-  const [resetModalClosing, setResetModalClosing] = useState(false);
-  const [deleteModalClosing, setDeleteModalClosing] = useState(false);
-  const [settingsModalClosing, setSettingsModalClosing] = useState(false);
-  const [editModalClosing, setEditModalClosing] = useState(false);
-  const [pokemonModalClosing, setPokemonModalClosing] = useState(false);
-  const [huntModalClosing, setHuntModalClosing] = useState(false);
-  const [backdropClosing, setBackdropClosing] = useState(false);
-  const [completionModalClosing, setCompletionModalClosing] = useState(false);
-  const [settingsForm, setSettingsForm] = useState({
-    manualChecks: '',
-    manualTotalTime: '',
-    manualIncrements: ''
+  const [shinyEncounterModal, setShinyEncounterModal] = useState({
+    show: false,
+    hunt: null,
+    step: 1, // 1: "What appeared?", 2: "What happened?", 3: "Outcome Summary"
+    selectedPokemon: null,
+    isTarget: true,
+    outcome: null, // "caught" | "failed"
+    ball: "",
+    mark: "",
+    notes: "",
+    addedToCollection: false,
+    searchTerm: "",
+    formTab: "all",
+    phaseResult: null
   });
+  const [phaseHistoryModal, setPhaseHistoryModal] = useState({ show: false, hunt: null });
+  const [abandonHuntModal, setAbandonHuntModal] = useState({ show: false, hunt: null });
+  const [oddsModal, setOddsModal] = useState({ show: false, hunt: null });
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [historySearch, setHistorySearch] = useState("");
+  const [historyTab, setHistoryTab] = useState("all"); // "all" | "completed" | "fails"
+  const [deleteHistoryModal, setDeleteHistoryModal] = useState({ show: false, entry: null });
+  const [clearAllHistoryModal, setClearAllHistoryModal] = useState(false);
+  const [hotkeyModal, setHotkeyModal] = useState(false);
 
-  const [showOptionsIndex, setShowOptionsIndex] = useState(null);
-  const optionsMenuRef = useRef(null);
-  
+  // Hotkey state
+  const [hotkey, setHotkey] = useState(() => {
+    try {
+      return localStorage.getItem("huntHotkey") || " ";
+    } catch {
+      return " ";
+    }
+  }); // Default Spacebar for Increment
+  const [decrementHotkey, setDecrementHotkey] = useState(() => {
+    try {
+      return localStorage.getItem("huntDecrementHotkey") || "-";
+    } catch {
+      return "-";
+    }
+  }); // Default Minus for Decrement
+  const [listeningFor, setListeningFor] = useState(null); // 'increment' | 'decrement' | null
+  const [hotkeyError, setHotkeyError] = useState("");
+  const [shinyCharmGames, setShinyCharmGames] = useState([]);
+  const lastSaveTime = useRef(0);
+
+  // Home sprite user preference
   const [useHomeSprites, setUseHomeSprites] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false;
+      return JSON.parse(localStorage.getItem("dexPreferences"))?.useHomeSprites || false;
     } catch {
       return false;
     }
@@ -139,3636 +806,3870 @@ export default function Counters() {
   useEffect(() => {
     const handlePrefsChange = () => {
       try {
-        setUseHomeSprites(JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false);
+        setUseHomeSprites(JSON.parse(localStorage.getItem("dexPreferences"))?.useHomeSprites || false);
       } catch { }
     };
-    window.addEventListener('dexPreferencesChanged', handlePrefsChange);
-    return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
+    window.addEventListener("dexPreferencesChanged", handlePrefsChange);
+    return () => window.removeEventListener("dexPreferencesChanged", handlePrefsChange);
   }, []);
 
+  // Close context menus on outside click
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (!e.target.closest(".hunt-menu-container")) {
+        setOpenMenuHuntId(null);
+      }
+    };
+    window.addEventListener("click", handleOutsideClick);
+    return () => window.removeEventListener("click", handleOutsideClick);
+  }, []);
+
+  // ── Forms ────────────────────────────────────────────────────────────────
+  const [settingsForm, setSettingsForm] = useState({
+    manualChecks: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    manualTotalTime: "",
+    manualIncrements: "1"
+  });
+
   const [editForm, setEditForm] = useState({
-    game: '',
-    method: '',
+    game: "",
+    method: "",
     pokemon: null,
-    modifiers: {
-      shinyCharm: false,
-      shinyParents: false,
-      lureActive: false,
-      researchLv10: false,
-      perfectResearch: false,
-      sparklingLv1: false,
-      sparklingLv2: false,
-      sparklingLv3: false,
-      eventBoosted: false,
-      communityDay: false,
-      raidDay: false,
-      researchDay: false,
-      galarBirds: false,
-      hatchDay: false
+    modifiers: {}
+  });
+
+  const [completionForm, setCompletionForm] = useState({
+    ball: "",
+    mark: "",
+    notes: ""
+  });
+
+  const [phaseForm, setPhaseForm] = useState({
+    pokemon: null,
+    checks: 0,
+    ball: "",
+    notes: "",
+    searchTerm: ""
+  });
+
+  const [failForm, setFailForm] = useState({
+    cause: "fainted",
+    checks: 0,
+    notes: ""
+  });
+
+  const [metricMode, setMetricMode] = useState(() => {
+    try {
+      return localStorage.getItem("dex_hunt_metric_mode") || "phase";
+    } catch {
+      return "phase";
     }
   });
-  const [isEditingPokemon, setIsEditingPokemon] = useState(false);
-  const [completionForm, setCompletionForm] = useState({
-    ball: '',
-    mark: '',
-    notes: ''
+
+  const [collapsedPhasesMap, setCollapsedPhasesMap] = useState(() => {
+    try {
+      const saved = localStorage.getItem("dex_hunt_collapsed_phases");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
   });
-  const [hotkey, setHotkey] = useState('a');
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [historyModalClosing, setHistoryModalClosing] = useState(false);
-  const [deleteHistoryModal, setDeleteHistoryModal] = useState({ show: false, caughtKey: null, entryId: null });
-  const [deleteHistoryModalClosing, setDeleteHistoryModalClosing] = useState(false);
   const [huntHistory, setHuntHistory] = useState([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  // Function to identify Hisuian balls
-  const isHisuianBall = (ballValue) => {
-    const hisuianBalls = [
-      "Feather Ball", "Wing Ball", "Jet Ball", "Heavy Ball (Hisui)",
-      "Leaden Ball", "Gigaton Ball", "Poké Ball (Hisui)",
-      "Great Ball (Hisui)", "Ultra Ball (Hisui)", "Origin Ball"
-    ];
-    return hisuianBalls.includes(ballValue);
-  };
-
-  // Filter ball options based on selected game for completion modal
-  const getCompletionBallOptions = () => {
-    if (completionModal.hunt && completionModal.hunt.game === "Legends Arceus") {
-      // Show only Hisuian balls for Legends Arceus
-      return BALL_OPTIONS.filter(ball =>
-        ball.value === "" || ball.value === "Strange Ball" || isHisuianBall(ball.value)
-      );
-    }
-    return BALL_OPTIONS;
-  };
-  const lastPauseAction = useRef({});
-  // Track open popout windows so we can push state updates to them
-  const popoutWindowsRef = useRef({});
-  const lastSaveTime = useRef(0);
-  const { username } = useContext(UserContext);
-  const { showMessage } = useMessage();
-  const [shinyCharmGames, setShinyCharmGames] = useState([]);
-
-  // Save hunt data to server - immediate save with current state and throttling
-  const saveHuntData = useCallback(async (huntDataOverride = null) => {
-    if (!username) return; // Don't save if user is not logged in
-
-    // Only throttle automatic saves (when no explicit data provided)
-    // Allow immediate saves when explicit data is provided (like from handleAddCheck)
-    const now = Date.now();
-    if (!huntDataOverride && now - lastSaveTime.current < 500) {
-      return; // Skip this save if it's too soon (only for automatic saves)
-    }
-    lastSaveTime.current = now;
-
-    try {
-      const huntData = huntDataOverride || {
-        activeHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-      };
-
-      await huntAPI.updateHuntData(huntData);
-    } catch (error) {
-      console.error('Failed to save hunt data:', error);
-      showMessage('Failed to save hunt data', 'error');
-    }
-  }, [username, showMessage]);
-
-
-  // Load user's profile data
-  const loadProfileData = useCallback(async () => {
-    if (!username) return;
-
-    try {
-      const profile = await profileAPI.getProfile();
-      setShinyCharmGames(profile.shinyCharmGames || []);
-      if (profile.huntHotkey) {
-        setHotkey(profile.huntHotkey);
-      }
-    } catch (error) {
-      console.error('Failed to load profile data:', error);
-    }
-  }, [username]);
-
+  const countersHistoryCount = useMemo(() => {
+    return (huntHistory || []).filter(h => !(h.game === "Legends Arceus" && h.method === "Permutations") && h.method !== "Permutations").length;
+  }, [huntHistory]);
+  // Check for auto-paused notice on mount
   useEffect(() => {
-    loadProfileData();
-
-    // Listen for updates from ShinyCharmModal
-    const handleShinyCharmUpdate = (event) => {
-      if (event.detail?.shinyCharmGames) {
-        setShinyCharmGames(event.detail.shinyCharmGames);
-      } else {
-        // Reload from server if detail not provided
-        loadProfileData();
+    try {
+      const flag = localStorage.getItem("dex_hunt_auto_paused");
+      if (flag) {
+        localStorage.removeItem("dex_hunt_auto_paused");
+        showMessage("Hunt was automatically paused when you left.", "info");
       }
-    };
+    } catch { }
+  }, [showMessage]);
 
-    window.addEventListener('shinyCharmGamesUpdated', handleShinyCharmUpdate);
-    return () => {
-      window.removeEventListener('shinyCharmGamesUpdated', handleShinyCharmUpdate);
-    };
-  }, [username, loadProfileData]);
-
-  // Load hunt data on component mount
-  useEffect(() => {
-    const loadHuntData = async () => {
-      if (!username) return;
-
+  const toggleMetricMode = useCallback(() => {
+    setMetricMode(prev => {
+      const next = prev === "total" ? "phase" : "total";
       try {
-        const data = await huntAPI.getHuntData();
-
-        if (data.activeHunts) {
-          // Ensure each hunt has modifiers field for backward compatibility
-          const huntsWithModifiers = data.activeHunts.map(hunt => ({
-            ...hunt,
-            modifiers: hunt.modifiers || {
-              shinyCharm: false,
-              shinyParents: false,
-              lureActive: false,
-              researchLv10: false,
-              perfectResearch: false,
-              sparklingLv1: false,
-              sparklingLv2: false,
-              sparklingLv3: false,
-              eventBoosted: false
-            }
-          }));
-          setActiveHunts(huntsWithModifiers);
-        }
-        if (data.huntTimers) {
-          setHuntTimers(data.huntTimers);
-        }
-        if (data.lastCheckTimes) {
-          setLastCheckTimes(data.lastCheckTimes);
-        }
-        if (data.totalCheckTimes) {
-          setTotalCheckTimes(data.totalCheckTimes);
-        }
-        if (data.huntIncrements) {
-          setHuntIncrements(data.huntIncrements);
-        }
-
-        // Always set all hunts to paused on page load/refresh
-        if (data.activeHunts && data.activeHunts.length > 0) {
-          const allHuntIds = data.activeHunts.map(hunt => hunt.id);
-          setPausedHunts(new Set(allHuntIds));
-        } else {
-          setPausedHunts(new Set());
-        }
-      } catch (error) {
-        console.error('Failed to load hunt data:', error);
-        // Don't show error message for initial load failure
-      }
-    };
-
-    loadHuntData();
-  }, [username]);
-
-  // Auto-check/uncheck shiny charm modifier when game is selected or shinyCharmGames changes (new hunt)
-  useEffect(() => {
-    if (huntDetails.game) {
-      const shouldHaveCharm = shinyCharmGames.includes(huntDetails.game);
-      setModifiers(prev => {
-        let changed = false;
-        const newModifiers = { ...prev };
-        
-        if (prev.shinyCharm !== shouldHaveCharm) {
-          newModifiers.shinyCharm = shouldHaveCharm;
-          changed = true;
-        }
-        
-        if (huntDetails.game === "Legends Arceus" && shouldHaveCharm && !prev.researchLv10) {
-          newModifiers.researchLv10 = true;
-          changed = true;
-        }
-        
-        return changed ? newModifiers : prev;
-      });
-    }
-  }, [huntDetails.game, shinyCharmGames]);
-
-  // Get all Pokemon data (main + forms) using the same logic as the main app
-  const allPokemon = useMemo(() => {
-    // Use the same filtered forms data as the main app, excluding mighty forms (since hunts are shiny hunts)
-    const filteredFormsData = getFilteredFormsData(formsData).filter(p => p.formType !== "mighty");
-
-    // Combine main Pokemon with filtered forms data
-    return [...pokemonData, ...filteredFormsData];
+        localStorage.setItem("dex_hunt_metric_mode", next);
+      } catch { }
+      return next;
+    });
   }, []);
 
-  // Filter Pokemon based on search term
-  const filteredPokemon = useMemo(() => {
-    if (!searchTerm.trim()) return allPokemon;
+  // ── All Pokemon List ──────────────────────────────────────────────────────
+  const allPokemon = useMemo(() => {
+    let currentPrefs = null;
+    try {
+      currentPrefs = JSON.parse(localStorage.getItem("dexPreferences"));
+    } catch { }
 
-    return allPokemon.filter(pokemon => {
-      if (!pokemon || !pokemon.name || !pokemon.id) return false;
+    const baseList = pokemonData.map(p => ({
+      ...p,
+      formType: "main",
+      stableId: p.stableId || `${p.name}-${String(p.id).padStart(4, "0")}`
+    }));
 
-      const searchLower = searchTerm.toLowerCase();
-      const nameMatch = pokemon.name.toLowerCase().includes(searchLower);
-      const idMatch = pokemon.id.toString().includes(searchLower);
+    const formsList = getFilteredFormsData(formsData, currentPrefs)
+      .filter(f => f.formType !== "mighty" && !f.stableId?.startsWith("origin-ball-") && !f.name?.startsWith("origin-ball-"))
+      .map(f => ({
+        ...f,
+        stableId: f.stableId || `${f.name}-${f.formType}-${String(f.id).padStart(4, "0")}`
+      }));
 
-      return nameMatch || idMatch;
+    return [...baseList, ...formsList];
+  }, []);
+
+  const getPokemonImage = useCallback((pokemon, useHomeSpritesOverride = useHomeSprites) => {
+    if (!pokemon) return "/fallback.png";
+    return getSpriteUrl(pokemon, true, useHomeSpritesOverride);
+  }, [useHomeSprites]);
+
+  // Dynamic Form Tabs for a Game (only show tabs with available Pokémon)
+  const getTabsForGame = useCallback((gameName) => {
+    if (!gameName) return [{ id: "all", label: "All" }];
+    const inGame = allPokemon.filter(p => isPokemonAvailableInGame(p, gameName));
+
+    const counts = {
+      all: inGame.length,
+      main: inGame.filter(p => !p.formType || p.formType === "main").length,
+      alolan: inGame.filter(p => p.formType === "alolan").length,
+      galarian: inGame.filter(p => p.formType === "galarian").length,
+      hisuian: inGame.filter(p => p.formType === "hisuian").length,
+      paldean: inGame.filter(p => p.formType === "paldean").length,
+      gmax: inGame.filter(p => p.formType === "gmax").length,
+      gender: inGame.filter(p => p.formType === "gender").length,
+      unown: inGame.filter(p => p.formType === "unown").length,
+      vivillon: inGame.filter(p => p.formType === "vivillon").length,
+      alcremie: inGame.filter(p => p.formType === "alcremie").length,
+      alpha: inGame.filter(p => p.formType === "alpha" || p.formType === "alphaother").length,
+      other: inGame.filter(p => p.formType === "other").length
+    };
+
+    const definitions = [
+      { id: "all", label: "All Forms" },
+      { id: "main", label: "Base Species" },
+      { id: "alolan", label: "Alola" },
+      { id: "galarian", label: "Galar" },
+      { id: "hisuian", label: "Hisui" },
+      { id: "paldean", label: "Paldea" },
+      { id: "gmax", label: "Gigantamax" },
+      { id: "gender", label: "Gender" },
+      { id: "unown", label: "Unown" },
+      { id: "vivillon", label: "Vivillon" },
+      { id: "alcremie", label: "Alcremie" },
+      { id: "alpha", label: "Alpha" },
+      { id: "other", label: "Other" }
+    ];
+
+    return definitions.filter(d => d.id === "all" || (counts[d.id] && counts[d.id] > 0));
+  }, [allPokemon]);
+
+  const availableFormTabs = useMemo(() => {
+    return getTabsForGame(huntWizard.game);
+  }, [getTabsForGame, huntWizard.game]);
+
+  const availablePhaseFormTabs = useMemo(() => {
+    return getTabsForGame(huntWizard.game);
+  }, [getTabsForGame, huntWizard.game]);
+
+  // Filtered Pokemon for Step 2 (Target Pokémon - only obtainable in huntWizard.game)
+  const wizardGamePokemon = useMemo(() => {
+    if (!huntWizard.game) return [];
+    const targetGame = huntWizard.game;
+    let inGame = allPokemon.filter(p => isPokemonAvailableInGame(p, targetGame));
+
+    if (huntWizard.formTab && huntWizard.formTab !== "all") {
+      if (huntWizard.formTab === "main") {
+        inGame = inGame.filter(p => !p.formType || p.formType === "main");
+      } else if (huntWizard.formTab === "alpha") {
+        inGame = inGame.filter(p => p.formType === "alpha" || p.formType === "alphaother");
+      } else {
+        inGame = inGame.filter(p => p.formType === huntWizard.formTab);
+      }
+    }
+
+    if (!huntWizard.searchTerm.trim()) return inGame;
+    const q = huntWizard.searchTerm.toLowerCase();
+    return inGame.filter(p =>
+      p && p.name && (p.name.toLowerCase().includes(q) || String(p.id).includes(q))
+    );
+  }, [allPokemon, huntWizard.game, huntWizard.formTab, huntWizard.searchTerm]);
+
+  // Filtered Pokemon for Step 3 (Possible Phases - only obtainable in huntWizard.game)
+  const wizardGamePhasePokemon = useMemo(() => {
+    if (!huntWizard.game) return [];
+    const targetGame = huntWizard.game;
+    let inGame = allPokemon.filter(p => isPokemonAvailableInGame(p, targetGame));
+
+    if (huntWizard.phaseFormTab && huntWizard.phaseFormTab !== "all") {
+      if (huntWizard.phaseFormTab === "main") {
+        inGame = inGame.filter(p => !p.formType || p.formType === "main");
+      } else if (huntWizard.phaseFormTab === "alpha") {
+        inGame = inGame.filter(p => p.formType === "alpha" || p.formType === "alphaother");
+      } else {
+        inGame = inGame.filter(p => p.formType === huntWizard.phaseFormTab);
+      }
+    }
+
+    if (!huntWizard.phaseSearchTerm.trim()) return inGame;
+    const q = huntWizard.phaseSearchTerm.toLowerCase();
+    return inGame.filter(p =>
+      p && p.name && (p.name.toLowerCase().includes(q) || String(p.id).includes(q))
+    );
+  }, [allPokemon, huntWizard.game, huntWizard.phaseFormTab, huntWizard.phaseSearchTerm]);
+
+  const availableShinyEncounterFormTabs = useMemo(() => {
+    return getTabsForGame(shinyEncounterModal.hunt?.game);
+  }, [getTabsForGame, shinyEncounterModal.hunt?.game]);
+
+  // Filtered Pokemon for Shiny Encounter Search (excludes the main target which is featured at the top)
+  const shinyEncounterAvailablePokemon = useMemo(() => {
+    if (!shinyEncounterModal.hunt) return [];
+    const targetGame = shinyEncounterModal.hunt.game;
+    const targetStableId = shinyEncounterModal.hunt.pokemon?.stableId || shinyEncounterModal.hunt.pokemon?.id;
+    const targetName = shinyEncounterModal.hunt.pokemon?.name?.toLowerCase();
+    const targetForm = shinyEncounterModal.hunt.pokemon?.formType || "main";
+
+    let inGame = allPokemon.filter(p => {
+      if (!isPokemonAvailableInGame(p, targetGame)) return false;
+      if (targetStableId && (p.stableId || p.id) === targetStableId) return false;
+      if (p.name?.toLowerCase() === targetName && (p.formType || "main") === targetForm) return false;
+      return true;
     });
-  }, [allPokemon, searchTerm]);
 
-  // Load hunt history from caught data
-  const loadHuntHistory = useCallback(async () => {
+    if (shinyEncounterModal.formTab && shinyEncounterModal.formTab !== "all") {
+      if (shinyEncounterModal.formTab === "main") {
+        inGame = inGame.filter(p => !p.formType || p.formType === "main");
+      } else if (shinyEncounterModal.formTab === "alpha") {
+        inGame = inGame.filter(p => p.formType === "alpha" || p.formType === "alphaother");
+      } else {
+        inGame = inGame.filter(p => p.formType === shinyEncounterModal.formTab);
+      }
+    }
+
+    if (!shinyEncounterModal.searchTerm?.trim()) return inGame;
+    const q = shinyEncounterModal.searchTerm.toLowerCase();
+    return inGame.filter(p =>
+      p && p.name && (p.name.toLowerCase().includes(q) || String(p.id).includes(q))
+    );
+  }, [allPokemon, shinyEncounterModal.hunt, shinyEncounterModal.formTab, shinyEncounterModal.searchTerm]);
+
+  // Open Wizard Helper
+  const handleOpenHuntWizard = (preselected = null) => {
+    const defaultGame = preselected ? (getAvailableGamesForPokemonSidebar(preselected)[0] || "") : "";
+    const defaultMethod = defaultGame ? (getMethodsForGame(defaultGame)[0]?.name || "") : "";
+    const availableMods = defaultGame ? (getModifiersForGame(defaultGame) || {}) : {};
+    const gameHasCharm = (availableMods["Shiny Charm"] || 0) > 0;
+
+    setHuntWizard({
+      isOpen: true,
+      step: 0,
+      game: defaultGame,
+      method: defaultMethod,
+      formTab: "all",
+      phaseFormTab: "all",
+      modifiers: {
+        shinyCharm: defaultGame ? (gameHasCharm && shinyCharmGames.includes(defaultGame)) : false,
+        sparklingLv1: false,
+        sparklingLv2: false,
+        sparklingLv3: false,
+        eventBoosted: false,
+        lureActive: false,
+        researchLv10: defaultGame === "Legends Arceus" && Boolean(gameHasCharm && shinyCharmGames.includes(defaultGame)),
+        perfectResearch: false,
+        shinyParents: false,
+        communityDay: false,
+        raidDay: false,
+        researchDay: false
+      },
+      searchTerm: "",
+      selectedPokemon: preselected,
+      phaseSearchTerm: "",
+      possiblePhases: [],
+      startingChecks: 0,
+      increment: 1,
+      startHours: "",
+      startMinutes: "",
+      startSeconds: "",
+      estimatedPaceSec: "",
+      targetPhasesNotes: ""
+    });
+  };
+
+  // ── Global Stats & Derived Timers ─────────────────────────────────────────
+  const activeCount = activeHunts.length;
+
+  // Lightweight UI render tick (zero mutations, derived from Date.now())
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => setTick(t => t + 1), 500);
+    return () => clearInterval(timer);
+  }, []);
+
+  const totalHuntingTimeMs = useMemo(() => {
+    return activeHunts.reduce((acc, h) => acc + getHuntElapsedTime(h), 0);
+  }, [activeHunts, tick]);
+
+  const totalChecksToday = useMemo(() => {
+    return activeHunts.reduce((acc, h) => acc + (h.checks || 0), 0);
+  }, [activeHunts]);
+
+  // ── BroadcastChannel Real-Time Sync & Recovery ────────────────────────────
+  const channelRef = useRef(null);
+  const allActiveHuntsRef = useRef(allActiveHunts);
+  allActiveHuntsRef.current = allActiveHunts;
+
+  const saveTimeoutRef = useRef(null);
+  const debouncedSave = useCallback((huntsToSave, nextCurrentHuntId = currentHuntId) => {
     if (!username) return;
+    setCachedHuntsData({ activeHunts: huntsToSave });
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(async () => {
+      try {
+        await huntAPI.updateHuntData({ activeHunts: huntsToSave, currentHuntId: nextCurrentHuntId });
+      } catch (err) {
+        console.error("Failed to save hunts to backend:", err);
+      }
+    }, 450);
+  }, [username, currentHuntId]);
+
+  const handleToggleCollapsePhases = useCallback((huntId) => {
+    setCollapsedPhasesMap(prev => {
+      const nextVal = !prev[huntId];
+      const nextMap = { ...prev, [huntId]: nextVal };
+      try {
+        localStorage.setItem("dex_hunt_collapsed_phases", JSON.stringify(nextMap));
+      } catch { }
+
+      setAllActiveHunts(currentList => {
+        const updated = currentList.map(h => String(h.id) === String(huntId) ? { ...h, isPhasesCollapsed: nextVal } : h);
+        setCachedHuntsData({ activeHunts: updated });
+        debouncedSave(updated);
+        return updated;
+      });
+
+      return nextMap;
+    });
+  }, [debouncedSave]);
+
+  useEffect(() => {
+    const channel = createHuntChannel((msg) => {
+      if (!msg) return;
+
+      if (msg.type === "REQUEST_HUNT_STATE") {
+        channel.broadcast({
+          type: "RESPONSE_HUNT_STATE",
+          hunts: allActiveHuntsRef.current
+        });
+        return;
+      }
+
+      if (msg.type === "HUNT_ACTION" && msg.action) {
+        setAllActiveHunts(prev => {
+          const next = applyHuntActionToState(prev, msg.action, msg.action.timestamp || Date.now());
+          setCachedHuntsData({ activeHunts: next });
+          return next;
+        });
+        return;
+      }
+
+      if (msg.type === "HUNT_UPDATED" && msg.hunt) {
+        setAllActiveHunts(prev => {
+          const targetId = String(msg.hunt.id);
+          const existing = prev.find(h => String(h.id) === targetId);
+          if (existing && (existing.version || 0) > (msg.hunt.version || 0)) {
+            return prev; // Ignore out-of-order stale update
+          }
+          const next = prev.some(h => String(h.id) === targetId)
+            ? prev.map(h => String(h.id) === targetId ? msg.hunt : h)
+            : [msg.hunt, ...prev];
+          setCachedHuntsData({ activeHunts: next });
+          return next;
+        });
+      }
+    });
+
+    channelRef.current = channel;
+    return () => channel.close();
+  }, []);
+
+  // Load profile & initial hunt data
+  useEffect(() => {
+    if (!username) return;
+
+    profileAPI.getProfile().then(profile => {
+      const charmGames = profile.shinyCharmGames || [];
+      setShinyCharmGames(charmGames);
+      if (profile.huntHotkey) {
+        setHotkey(profile.huntHotkey);
+        try { localStorage.setItem("huntHotkey", profile.huntHotkey); } catch {}
+      }
+      if (profile.huntDecrementHotkey) {
+        setDecrementHotkey(profile.huntDecrementHotkey);
+        try { localStorage.setItem("huntDecrementHotkey", profile.huntDecrementHotkey); } catch {}
+      }
+    }).catch(() => { });
+
+    // Local recovery first for instant UI response
+    const cached = getCachedHuntsData();
+    if (cached?.activeHunts && cached.activeHunts.length > 0) {
+      const normalized = cached.activeHunts.map(h => normalizeHunt(h));
+      setAllActiveHunts(normalized);
+      const savedCollapsed = {};
+      normalized.forEach(h => {
+        if (h.isPhasesCollapsed !== undefined) {
+          savedCollapsed[h.id] = !!h.isPhasesCollapsed;
+        }
+      });
+      if (Object.keys(savedCollapsed).length > 0) {
+        setCollapsedPhasesMap(prev => ({ ...savedCollapsed, ...prev }));
+      }
+    }
+
+    // Backend canonical fetch
+    huntAPI.getHuntData().then(data => {
+      if (data?.activeHunts) {
+        const normalized = data.activeHunts.map(h =>
+          normalizeHunt(h, Date.now(), data.totalCheckTimes || {}, data.lastCheckTimes || {}, new Set(data.pausedHunts || []))
+        );
+        setAllActiveHunts(normalized);
+        setCachedHuntsData({ activeHunts: normalized });
+
+        const savedCollapsed = {};
+        normalized.forEach(h => {
+          if (h.isPhasesCollapsed !== undefined) {
+            savedCollapsed[h.id] = !!h.isPhasesCollapsed;
+          }
+        });
+        if (Object.keys(savedCollapsed).length > 0) {
+          setCollapsedPhasesMap(prev => ({ ...savedCollapsed, ...prev }));
+        }
+
+        if (data.currentHuntId != null) {
+          const standardActive = normalized.filter(h => !(h.game === "Legends Arceus" && h.method === "Permutations"));
+          const exists = standardActive.some(h => String(h.id) === String(data.currentHuntId) || String(h.huntId) === String(data.currentHuntId));
+          if (exists) {
+            setCurrentHuntId(data.currentHuntId);
+            try {
+              localStorage.setItem("currentHuntId", String(data.currentHuntId));
+            } catch {}
+          }
+        }
+      }
+      if (data?.huntIncrements) setHuntIncrements(data.huntIncrements);
+    }).catch(() => { });
+  }, [username]);
+
+  const getHistoryPokemon = useCallback((entry) => {
+    if (entry.pokemon && (entry.pokemon.image || entry.pokemon.sprites || entry.pokemon.id)) {
+      return entry.pokemon;
+    }
+    const cleanName = (entry.pokemonName || (entry.caughtKey ? entry.caughtKey.split("-")[0] : "") || "").trim();
+    const base = pokemonData.find(p => p.name?.toLowerCase() === cleanName.toLowerCase());
+    const form = formsData.find(f => (f.stableId && f.stableId === cleanName) || f.name?.toLowerCase() === cleanName.toLowerCase());
+    return form || base || (findPokemon ? findPokemon(1, cleanName) : null) || { name: cleanName, id: 1 };
+  }, []);
+
+  const loadHuntHistory = useCallback(async () => {
     setIsLoadingHistory(true);
     try {
-      const response = await caughtAPI.getCaughtData();
-      const caughtData = response || {};
+      const historyList = [];
+      const blacklistKey = `deleted_hunt_history_ids:${username || "global"}`;
+      let deletedIds = [];
+      try {
+        deletedIds = JSON.parse(localStorage.getItem(blacklistKey) || "[]").map(String);
+      } catch {}
 
-      const history = [];
-      Object.keys(caughtData).forEach(key => {
-        const info = caughtData[key];
-        if (info && info.entries && Array.isArray(info.entries)) {
-          info.entries.forEach(entry => {
-            if (entry.isHuntTracker) {
-              const pkmn = allPokemon.find(p => getCaughtKey(p, null, true) === key);
-              if (pkmn) {
-                history.push({
-                  ...entry,
-                  pokemonName: pkmn.name,
-                  pokemonIcon: getPokemonImage(pkmn),
-                  sortDate: new Date(entry.date || 0).getTime(),
-                  caughtKey: key
+      const isItemDeleted = (item) => {
+        if (!item) return true;
+        if (item.entryId && deletedIds.includes(String(item.entryId))) return true;
+        if (item.id && deletedIds.includes(String(item.id))) return true;
+        if (item.timestamp && deletedIds.includes(String(item.timestamp))) return true;
+        return false;
+      };
+
+      // 1. Load from local completed hunts storage
+      const storageKeys = [
+        username ? `completedHunts:${username}` : null,
+        "completedHunts"
+      ].filter(Boolean);
+
+      storageKeys.forEach(k => {
+        try {
+          const raw = localStorage.getItem(k);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              parsed.forEach(h => {
+                if (!isItemDeleted(h) && !historyList.some(e => (e.entryId && e.entryId === h.entryId) || (e.id && e.id === h.id))) {
+                  historyList.push({
+                    ...h,
+                    source: "completedHunts",
+                    timestamp: h.timestamp || (h.date ? new Date(h.date).getTime() : 0)
+                  });
+                }
+              });
+            }
+          }
+        } catch {}
+      });
+
+      // 2. Load from local completed fails storage
+      const failStorageKeys = [
+        username ? `completedFails:${username}` : null,
+        "completedFails"
+      ].filter(Boolean);
+
+      failStorageKeys.forEach(k => {
+        try {
+          const raw = localStorage.getItem(k);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              parsed.forEach(f => {
+                if (!isItemDeleted(f) && !historyList.some(e => (e.entryId && e.entryId === f.entryId) || (e.id && e.id === f.id))) {
+                  historyList.push({
+                    ...f,
+                    source: "completedFails",
+                    outcome: "failed",
+                    isFail: true,
+                    timestamp: f.timestamp || (f.date ? new Date(f.date).getTime() : 0)
+                  });
+                }
+              });
+            }
+          }
+        } catch {}
+      });
+
+      // 3. Load from Living Dex caught data
+      let caughtData = null;
+      if (username) {
+        try {
+          const { fetchCaughtData } = await import("../api/caught");
+          caughtData = await fetchCaughtData(username);
+        } catch {}
+        if (!caughtData) {
+          try {
+            caughtData = JSON.parse(localStorage.getItem(`caughtInfoMap:${username}`) || "{}");
+          } catch {}
+        }
+      } else {
+        try {
+          caughtData = JSON.parse(localStorage.getItem("caughtInfoMap") || "{}");
+        } catch {}
+      }
+
+      if (caughtData && typeof caughtData === "object") {
+        Object.entries(caughtData).forEach(([caughtKey, info]) => {
+          if (info && Array.isArray(info.entries)) {
+            info.entries.forEach(entry => {
+              if (entry.isHuntTracker && !isItemDeleted(entry)) {
+                const entryId = entry.entryId;
+                const matchIndex = historyList.findIndex(h =>
+                  (entryId && h.entryId === entryId) ||
+                  (h.caughtKey === caughtKey && h.date === entry.date && (h.totalChecks === entry.totalChecks || h.checks === entry.checks))
+                );
+
+                if (matchIndex >= 0) {
+                  historyList[matchIndex].addedToLivingDex = true;
+                  historyList[matchIndex].caughtKey = caughtKey;
+                } else {
+                  historyList.push({
+                    ...entry,
+                    caughtKey,
+                    pokemonName: entry.pokemonName || caughtKey.split("-")[0],
+                    pokemon: entry.pokemon || null,
+                    timestamp: entry.timestamp || (entry.date ? new Date(entry.date).getTime() : 0),
+                    addedToLivingDex: true
+                  });
+                }
+              }
+            });
+          }
+
+          if (info && Array.isArray(info.fails)) {
+            info.fails.forEach(failEntry => {
+              if (!isItemDeleted(failEntry)) {
+                const entryId = failEntry.entryId;
+                const matchIndex = historyList.findIndex(h =>
+                  (entryId && h.entryId === entryId) ||
+                  (h.caughtKey === caughtKey && h.date === failEntry.date && (h.totalChecks === failEntry.totalChecks || h.checks === failEntry.checks))
+                );
+
+                if (matchIndex >= 0) {
+                  historyList[matchIndex].addedToLivingDex = true;
+                  historyList[matchIndex].caughtKey = caughtKey;
+                  historyList[matchIndex].isFail = true;
+                  historyList[matchIndex].outcome = "failed";
+                } else {
+                  historyList.push({
+                    ...failEntry,
+                    caughtKey,
+                    pokemonName: failEntry.pokemonName || caughtKey.split("-")[0],
+                    pokemon: failEntry.pokemon || null,
+                    timestamp: failEntry.timestamp || (failEntry.date ? new Date(failEntry.date).getTime() : 0),
+                    addedToLivingDex: true,
+                    outcome: "failed",
+                    isFail: true
+                  });
+                }
+              }
+            });
+          }
+        });
+      }
+
+      // 4. Also scan activeHunts phases for any fails
+      if (Array.isArray(activeHunts)) {
+        activeHunts.forEach(h => {
+          if (Array.isArray(h.phases)) {
+            h.phases.forEach(p => {
+              if ((p.outcome === "failed" || p.isFail) && !isItemDeleted(p) && !historyList.some(e => (e.entryId && e.entryId === p.entryId) || (e.id && e.id === p.id))) {
+                historyList.push({
+                  ...p,
+                  pokemonName: p.pokemonName || h.pokemon?.name,
+                  pokemon: p.pokemon || h.pokemon,
+                  game: p.game || h.game,
+                  method: p.method || h.method,
+                  outcome: "failed",
+                  isFail: true,
+                  timestamp: p.timestamp || (p.date ? new Date(p.date).getTime() : 0)
                 });
               }
-            }
+            });
+          }
+        });
+      }
+
+      historyList.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+      setHuntHistory(historyList);
+    } catch (e) {
+      console.error("Failed to load history:", e);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  }, [username, activeHunts]);
+
+  const handleDeleteHistoryEntry = useCallback(async (entryToDelete) => {
+    if (!entryToDelete) return;
+    const entryId = entryToDelete.entryId || entryToDelete.id;
+    const entryTimestamp = entryToDelete.timestamp || (entryToDelete.date ? new Date(entryToDelete.date).getTime() : 0);
+    const pokemonName = entryToDelete.pokemonName || entryToDelete.pokemon?.name;
+
+    // 1. Immediately update UI state
+    setHuntHistory(prev => prev.filter(e => {
+      const eId = e.entryId || e.id;
+      if (entryId && eId === entryId) return false;
+      if (entryTimestamp && (e.timestamp === entryTimestamp || (e.date && new Date(e.date).getTime() === entryTimestamp))) {
+        const name = e.pokemonName || e.pokemon?.name;
+        if (name && pokemonName && name.toLowerCase() === pokemonName.toLowerCase()) return false;
+      }
+      return true;
+    }));
+
+    // 2. Add to deleted IDs blacklist
+    try {
+      const blacklistKey = `deleted_hunt_history_ids:${username || "global"}`;
+      const existingBlacklist = JSON.parse(localStorage.getItem(blacklistKey) || "[]");
+      const idsToAdd = [entryId, entryToDelete.id, entryToDelete.entryId, entryTimestamp].filter(Boolean).map(String);
+      let changed = false;
+      idsToAdd.forEach(id => {
+        if (!existingBlacklist.includes(id)) {
+          existingBlacklist.push(id);
+          changed = true;
+        }
+      });
+      if (changed) {
+        localStorage.setItem(blacklistKey, JSON.stringify(existingBlacklist));
+      }
+    } catch {}
+
+    // 3. Clean completed hunts & completed fails in localStorage
+    try {
+      const storageKey = username ? `completedHunts:${username}` : "completedHunts";
+      const failStorageKey = username ? `completedFails:${username}` : "completedFails";
+
+      const cleanStorage = (key) => {
+        const raw = localStorage.getItem(key);
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            const updated = parsed.filter(e => {
+              const eId = e.entryId || e.id;
+              if (entryId && eId === entryId) return false;
+              if (entryTimestamp && (e.timestamp === entryTimestamp || (e.date && new Date(e.date).getTime() === entryTimestamp))) {
+                const name = e.pokemonName || e.pokemon?.name;
+                if (name && pokemonName && name.toLowerCase() === pokemonName.toLowerCase()) return false;
+              }
+              return true;
+            });
+            localStorage.setItem(key, JSON.stringify(updated));
+          }
+        } catch {}
+      };
+
+      cleanStorage(storageKey);
+      cleanStorage(failStorageKey);
+      if (username) {
+        cleanStorage("completedHunts");
+        cleanStorage("completedFails");
+      }
+    } catch {}
+
+    // 4. Clean from Living Dex caught data
+    try {
+      const { updateCaughtData } = await import("../api/caught");
+      const caughtMapKey = username ? `caughtInfoMap:${username}` : "caughtInfoMap";
+      let localMap = {};
+      try {
+        localMap = JSON.parse(localStorage.getItem(caughtMapKey) || localStorage.getItem("caughtInfoMap") || "{}");
+      } catch {}
+
+      Object.entries(localMap).forEach(async ([key, info]) => {
+        if (!info) return;
+        let modified = false;
+        let updatedInfo = { ...info };
+
+        if (Array.isArray(updatedInfo.entries)) {
+          const prevLen = updatedInfo.entries.length;
+          updatedInfo.entries = updatedInfo.entries.filter(e => {
+            const eId = e.entryId || e.id;
+            if (entryId && eId === entryId) return false;
+            if (entryTimestamp && (e.timestamp === entryTimestamp || (e.date && new Date(e.date).getTime() === entryTimestamp))) return false;
+            return true;
+          });
+          if (updatedInfo.entries.length !== prevLen) modified = true;
+        }
+
+        if (Array.isArray(updatedInfo.fails)) {
+          const prevLen = updatedInfo.fails.length;
+          updatedInfo.fails = updatedInfo.fails.filter(f => {
+            const fId = f.entryId || f.id;
+            if (entryId && fId === entryId) return false;
+            if (entryTimestamp && (f.timestamp === entryTimestamp || (f.date && new Date(f.date).getTime() === entryTimestamp))) return false;
+            return true;
+          });
+          if (updatedInfo.fails.length !== prevLen) modified = true;
+        }
+
+        if (modified) {
+          localMap[key] = updatedInfo;
+          try {
+            localStorage.setItem(caughtMapKey, JSON.stringify(localMap));
+            localStorage.setItem("caughtInfoMap", JSON.stringify(localMap));
+          } catch {}
+
+          if (username) {
+            try {
+              await updateCaughtData(username, key, updatedInfo);
+            } catch {}
+          }
+
+          window.dispatchEvent(new CustomEvent("caughtDataChanged", {
+            detail: { caughtKey: key, caughtInfo: updatedInfo }
+          }));
+        }
+      });
+    } catch (e) {
+      console.error("Failed to clean caught data:", e);
+    }
+
+    // 5. Clean from active hunts phases
+    try {
+      setAllActiveHunts(prevHunts => {
+        let anyPhaseRemoved = false;
+        const nextHunts = prevHunts.map(h => {
+          if (!Array.isArray(h.phases)) return h;
+          const prevPhaseCount = h.phases.length;
+          const filteredPhases = h.phases.filter(p => {
+            const pId = p.entryId || p.id;
+            if (entryId && pId === entryId) return false;
+            if (entryTimestamp && (p.timestamp === entryTimestamp || (p.date && new Date(p.date).getTime() === entryTimestamp))) return false;
+            return true;
+          });
+          if (filteredPhases.length !== prevPhaseCount) {
+            anyPhaseRemoved = true;
+            return { ...h, phases: filteredPhases };
+          }
+          return h;
+        });
+
+        if (anyPhaseRemoved) {
+          setCachedHuntsData({ activeHunts: nextHunts });
+          debouncedSave(nextHunts);
+        }
+        return nextHunts;
+      });
+    } catch {}
+
+    showMessage("Entry permanently removed from history", "success");
+  }, [username, showMessage]);
+
+  const handleClearAllHistory = useCallback((clearMode = "counters") => {
+    const storageKey = username ? `completedHunts:${username}` : "completedHunts";
+    const failStorageKey = username ? `completedFails:${username}` : "completedFails";
+
+    const isMatch = (item) => {
+      const isMMOHunt = item.game === "Legends Arceus" && (item.method === "Permutations" || item.method === "Massive Mass Outbreak" || item.method === "Massive Mass Outbreaks");
+      return clearMode === "mmo" ? isMMOHunt : !isMMOHunt;
+    };
+
+    setHuntHistory(prev => prev.filter(h => !isMatch(h)));
+
+    const filterStorage = (key) => {
+      const raw = localStorage.getItem(key);
+      if (!raw) return;
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const updated = parsed.filter(h => !isMatch(h));
+          localStorage.setItem(key, JSON.stringify(updated));
+        }
+      } catch {}
+    };
+
+    filterStorage(storageKey);
+    filterStorage(failStorageKey);
+    if (username) {
+      filterStorage("completedHunts");
+      filterStorage("completedFails");
+    }
+
+    showMessage("Hunt history cleared", "success");
+  }, [username, showMessage]);
+
+  // ── Auto-Pause on Page Departure / Close ──────────────────────────────────
+  const autoPauseRunningHunts = useCallback(() => {
+    const currentHunts = allActiveHuntsRef.current;
+    if (!currentHunts || currentHunts.length === 0) return;
+
+    const now = Date.now();
+    const runningHunts = currentHunts.filter(
+      h => h.status === "running" || (!h.isPaused && h.status !== "paused")
+    );
+
+    if (runningHunts.length === 0) return;
+
+    let updatedHunts = currentHunts;
+    runningHunts.forEach(rh => {
+      const action = { type: "PAUSE", huntId: rh.id, timestamp: now };
+      updatedHunts = applyHuntActionToState(updatedHunts, action, now);
+    });
+
+    setAllActiveHunts(updatedHunts);
+    setCachedHuntsData({ activeHunts: updatedHunts });
+    try {
+      localStorage.setItem("dex_hunt_auto_paused", "true");
+    } catch { }
+
+    if (username) {
+      huntAPI.updateHuntData({ activeHunts: updatedHunts, currentHuntId }).catch(() => { });
+    }
+
+    if (channelRef.current) {
+      runningHunts.forEach(rh => {
+        channelRef.current.broadcast({
+          type: "HUNT_ACTION",
+          huntId: rh.id,
+          action: { type: "PAUSE", huntId: rh.id, timestamp: now }
+        });
+      });
+    }
+  }, [username, currentHuntId]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      autoPauseRunningHunts();
+    };
+
+    const handlePageHide = () => {
+      autoPauseRunningHunts();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("pagehide", handlePageHide);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("pagehide", handlePageHide);
+      // Auto-pause when user navigates away to another page in React Router
+      autoPauseRunningHunts();
+    };
+  }, [autoPauseRunningHunts]);
+
+  // ── Canonical Action Handlers ─────────────────────────────────────────────
+  const handleAddCheck = (huntId, customDelta = null) => {
+    const delta = customDelta !== null ? customDelta : (huntIncrements[huntId] || 1);
+    const now = Date.now();
+    const action = {
+      type: "INCREMENT",
+      huntId,
+      amount: delta,
+      timestamp: now
+    };
+
+    const nextHunts = applyHuntActionToState(allActiveHunts, action, now);
+    setAllActiveHunts(nextHunts);
+    setCachedHuntsData({ activeHunts: nextHunts });
+
+    if (channelRef.current) {
+      channelRef.current.broadcast({
+        type: "HUNT_ACTION",
+        huntId,
+        action
+      });
+    }
+
+    debouncedSave(nextHunts);
+  };
+
+  const handleDecreaseCheck = (huntId) => {
+    const delta = huntIncrements[huntId] || 1;
+    const now = Date.now();
+    const action = {
+      type: "DECREMENT",
+      huntId,
+      amount: delta,
+      timestamp: now
+    };
+
+    const nextHunts = applyHuntActionToState(allActiveHunts, action, now);
+    setAllActiveHunts(nextHunts);
+    setCachedHuntsData({ activeHunts: nextHunts });
+
+    if (channelRef.current) {
+      channelRef.current.broadcast({
+        type: "HUNT_ACTION",
+        huntId,
+        action
+      });
+    }
+
+    debouncedSave(nextHunts);
+  };
+
+  const handleTogglePause = (huntId) => {
+    const now = Date.now();
+    const action = {
+      type: "TOGGLE_PAUSE",
+      huntId,
+      timestamp: now
+    };
+
+    const nextHunts = applyHuntActionToState(allActiveHunts, action, now);
+    setAllActiveHunts(nextHunts);
+    setCachedHuntsData({ activeHunts: nextHunts });
+
+    if (channelRef.current) {
+      channelRef.current.broadcast({
+        type: "HUNT_ACTION",
+        huntId,
+        action
+      });
+    }
+
+    debouncedSave(nextHunts);
+  };
+
+  const handleConfirmResetTimer = (huntId) => {
+    const now = Date.now();
+    const action = {
+      type: "RESET_STATS",
+      huntId,
+      timestamp: now
+    };
+
+    const nextHunts = applyHuntActionToState(allActiveHunts, action, now);
+    setAllActiveHunts(nextHunts);
+    setCachedHuntsData({ activeHunts: nextHunts });
+    setResetModal({ show: false, hunt: null });
+    showMessage("Hunt timer and stats reset", "success");
+
+    if (channelRef.current) {
+      channelRef.current.broadcast({
+        type: "HUNT_ACTION",
+        huntId,
+        action
+      });
+    }
+
+    debouncedSave(nextHunts);
+  };
+
+  const handleSwitchCurrentHunt = (newHuntId) => {
+    if (!newHuntId || String(newHuntId) === String(currentHuntId)) return;
+
+    const now = Date.now();
+    let updatedHunts = allActiveHunts;
+    // Pause any currently running hunts so nothing is left running in Other Hunts
+    const runningHunts = allActiveHunts.filter(h => h.status === "running" || (!h.isPaused && h.status !== "paused"));
+
+    if (runningHunts.length > 0) {
+      runningHunts.forEach(rh => {
+        const action = { type: "PAUSE", huntId: rh.id, timestamp: now };
+        updatedHunts = applyHuntActionToState(updatedHunts, action, now);
+        if (channelRef.current) {
+          channelRef.current.broadcast({
+            type: "HUNT_ACTION",
+            huntId: rh.id,
+            action
           });
         }
       });
 
-      history.sort((a, b) => (b.sortDate || 0) - (a.sortDate || 0));
-      setHuntHistory(history);
-    } catch (error) {
-      console.error('Failed to load hunt history:', error);
-    } finally {
-      setIsLoadingHistory(false);
+      setAllActiveHunts(updatedHunts);
+      setCachedHuntsData({ activeHunts: updatedHunts });
     }
-  }, [username, allPokemon]);
 
-  const handleRemoveFromHistoryClick = (caughtKey, entryId) => {
-    setDeleteHistoryModal({ show: true, caughtKey, entryId });
-  };
-
-  const handleRemoveFromHistoryConfirm = async () => {
-    const { caughtKey, entryId } = deleteHistoryModal;
-    if (!username || !caughtKey || !entryId) return;
-
-    setDeleteHistoryModalClosing(true);
-
+    setCurrentHuntId(newHuntId);
     try {
-      const { fetchCaughtData, updateCaughtData } = await import('../api/caught');
-      const existingCaughtData = await fetchCaughtData(username);
-      const existingCaughtInfo = existingCaughtData[caughtKey];
-
-      if (existingCaughtInfo && existingCaughtInfo.entries) {
-        // Change isHuntTracker to false instead of deleting the whole entry
-        const updatedEntries = existingCaughtInfo.entries.map(e =>
-          e.entryId === entryId ? { ...e, isHuntTracker: false } : e
-        );
-
-        const updatedCaughtInfo = {
-          ...existingCaughtInfo,
-          entries: updatedEntries
-        };
-
-        await updateCaughtData(username, caughtKey, updatedCaughtInfo);
-
-        // Remove from local state immediately for fast UI feedback
-        setHuntHistory(prev => prev.filter(h => h.entryId !== entryId));
-      }
-    } catch (error) {
-      console.error('Failed to remove from history:', error);
-      showMessage("Failed to remove from history", "error");
-    } finally {
-      setTimeout(() => {
-        setDeleteHistoryModal({ show: false, caughtKey: null, entryId: null });
-        setDeleteHistoryModalClosing(false);
-        showMessage("Removed from history", "info");
-      }, 300);
-    }
+      localStorage.setItem("currentHuntId", String(newHuntId));
+    } catch {}
+    debouncedSave(updatedHunts, newHuntId);
   };
 
-  // Bulk add checks for all unpaused hunts (used by hotkey)
-  const handleBulkAddChecks = useCallback(() => {
-    const unpausedHunts = activeHunts.filter(h => !pausedHunts.has(h.id));
-    if (unpausedHunts.length === 0) return;
+  // ── Hotkey Helpers & Validation ──────────────────────────────────────────
+  const DISALLOWED_HOTKEYS = useMemo(() => new Set([
+    "Escape",
+    "Tab",
+    "Meta",
+    "OS",
+    "Alt",
+    "Control",
+    "Shift",
+    "CapsLock",
+    "ContextMenu",
+    "Unidentified",
+    "NumLock",
+    "ScrollLock",
+    "Pause",
+    "PrintScreen"
+  ]), []);
 
-    const now = Date.now();
-    const updatedHunts = [...activeHunts];
-    const updatedLastCheckTimes = { ...lastCheckTimes };
-    const updatedTotalCheckTimes = { ...totalCheckTimes };
+  const formatHotkeyLabel = useCallback((key) => {
+    if (!key) return "NONE";
+    if (key === " " || key.toLowerCase() === "space") return "SPACE";
+    if (key === "ArrowUp") return "↑ UP";
+    if (key === "ArrowDown") return "↓ DOWN";
+    if (key === "ArrowLeft") return "← LEFT";
+    if (key === "ArrowRight") return "→ RIGHT";
+    if (key === "Enter") return "ENTER";
+    if (key === "Backspace") return "BACKSPACE";
+    if (key === "+") return "+";
+    if (key === "-") return "−";
+    if (key.length === 1) return key.toUpperCase();
+    return key.toUpperCase();
+  }, []);
 
-    unpausedHunts.forEach(hunt => {
-      const incrementValue = huntIncrements[hunt.id] || 1;
-      const bottomTimerValue = currentBottomTimers[hunt.id] || 0;
+  const isKeyMatch = useCallback((e, targetKey) => {
+    if (!targetKey) return false;
+    if (targetKey === " " && (e.code === "Space" || e.key === " " || e.key === "Spacebar")) return true;
+    if (targetKey === "+" && (e.key === "+" || e.key === "Add" || e.code === "NumpadAdd" || (e.key === "=" && e.shiftKey))) return true;
+    if (targetKey === "-" && (e.key === "-" || e.key === "Subtract" || e.code === "NumpadSubtract" || e.code === "Minus")) return true;
+    if (e.key.toLowerCase() === targetKey.toLowerCase()) return true;
+    if (e.code.toLowerCase() === targetKey.toLowerCase()) return true;
+    return false;
+  }, []);
 
-      const huntIndex = updatedHunts.findIndex(h => h.id === hunt.id);
-      if (huntIndex !== -1) {
-        updatedHunts[huntIndex] = {
-          ...updatedHunts[huntIndex],
-          checks: updatedHunts[huntIndex].checks + incrementValue
-        };
-        updatedLastCheckTimes[hunt.id] = now;
-        updatedTotalCheckTimes[hunt.id] = (updatedTotalCheckTimes[hunt.id] || 0) + bottomTimerValue;
+  const normalizeAssignedKey = useCallback((e) => {
+    if (e.code === "Space" || e.key === " " || e.key === "Spacebar") return " ";
+    if (e.key === "+" || e.code === "NumpadAdd") return "+";
+    if (e.key === "-" || e.code === "NumpadSubtract") return "-";
+    if (e.key.length === 1) return e.key.toLowerCase();
+    return e.key;
+  }, []);
+
+  // ── Hotkey Recording Listener (in Modal) ──────────────────────────────────
+  useEffect(() => {
+    if (!hotkeyModal || !listeningFor) return;
+
+    const handleCaptureKey = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (e.key === "Escape") {
+        setListeningFor(null);
+        setHotkeyError("");
+        return;
       }
-    });
 
-    setActiveHunts(updatedHunts);
-    setLastCheckTimes(updatedLastCheckTimes);
-    setTotalCheckTimes(updatedTotalCheckTimes);
+      if (DISALLOWED_HOTKEYS.has(e.key)) {
+        setHotkeyError(`The key "${e.key}" cannot be used as a hotkey. Please press a letter, number, arrow key, symbol, or Spacebar.`);
+        return;
+      }
 
-    if (username) {
-      const huntData = {
-        activeHunts: updatedHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-  }, [activeHunts, pausedHunts, huntIncrements, currentBottomTimers, username, huntTimers, saveHuntData, lastCheckTimes, totalCheckTimes]);
+      const assigned = normalizeAssignedKey(e);
+      const otherKey = listeningFor === "increment" ? decrementHotkey : hotkey;
 
-  // Handle hotkey for counters
+      if (otherKey && (assigned === otherKey || (assigned.length === 1 && otherKey.length === 1 && assigned.toLowerCase() === otherKey.toLowerCase()))) {
+        setHotkeyError(`"${formatHotkeyLabel(assigned)}" is already assigned to the other action. Please pick a different key.`);
+        return;
+      }
+
+      if (listeningFor === "increment") {
+        setHotkey(assigned);
+        try { localStorage.setItem("huntHotkey", assigned); } catch {}
+        profileAPI.updateProfile({ huntHotkey: assigned }).catch(() => {});
+        showMessage(`Increment hotkey (+) set to ${formatHotkeyLabel(assigned)}`, "success");
+      } else {
+        setDecrementHotkey(assigned);
+        try { localStorage.setItem("huntDecrementHotkey", assigned); } catch {}
+        profileAPI.updateProfile({ huntDecrementHotkey: assigned }).catch(() => {});
+        showMessage(`Decrement hotkey (−) set to ${formatHotkeyLabel(assigned)}`, "success");
+      }
+
+      setListeningFor(null);
+      setHotkeyError("");
+    };
+
+    window.addEventListener("keydown", handleCaptureKey, true);
+    return () => window.removeEventListener("keydown", handleCaptureKey, true);
+  }, [hotkeyModal, listeningFor, hotkey, decrementHotkey, DISALLOWED_HOTKEYS, normalizeAssignedKey, formatHotkeyLabel, showMessage]);
+
+  // ── Global Hotkey Listener (Encounter Trigger) ───────────────────────────
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) || document.activeElement.contentEditable === 'true') {
+      if (
+        document.activeElement?.tagName === "INPUT" ||
+        document.activeElement?.tagName === "TEXTAREA" ||
+        document.activeElement?.tagName === "SELECT" ||
+        document.activeElement?.isContentEditable
+      ) {
         return;
       }
 
-      if (e.key.toLowerCase() === hotkey.toLowerCase()) {
-        handleBulkAddChecks();
+      if (
+        huntWizard.isOpen ||
+        shinyEncounterModal.show ||
+        phaseHistoryModal.show ||
+        abandonHuntModal.show ||
+        oddsModal.show ||
+        resetModal.show ||
+        deleteModal.show ||
+        settingsModal.show ||
+        editModal.show ||
+        hotkeyModal ||
+        showHistoryModal ||
+        deleteHistoryModal.show ||
+        clearAllHistoryModal
+      ) {
+        return;
       }
-    };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [hotkey, handleBulkAddChecks]);
-
-  // Track the previous game in edit modal to detect manual game changes (not modal open)
-  const prevEditGameRef = useRef(editForm.game);
-  const editModalJustOpenedRef = useRef(false);
-
-  // Auto-check shiny charm modifier ONLY when user manually changes the game in edit modal
-  useEffect(() => {
-    // Skip if this is from the modal opening (not a manual game change)
-    if (editModalJustOpenedRef.current) {
-      editModalJustOpenedRef.current = false;
-      prevEditGameRef.current = editForm.game;
-      return;
-    }
-
-    // Only auto-check if the game actually changed (user action, not data load)
-    if (prevEditGameRef.current !== editForm.game && editForm.game) {
-      prevEditGameRef.current = editForm.game;
-
-      // Only auto-check shiny charm if user has this game in their shiny charm list
-      if (shinyCharmGames.includes(editForm.game)) {
-        setEditForm(prev => {
-          const newModifiers = { ...prev.modifiers, shinyCharm: true };
-          if (editForm.game === "Legends Arceus") {
-            newModifiers.researchLv10 = true;
-          }
-          return {
-            ...prev,
-            modifiers: newModifiers
-          };
-        });
-      }
-    }
-  }, [editForm.game, shinyCharmGames]);
-
-  // Save immediately on page unload
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (username && activeHunts.length > 0) {
-        // Use sendBeacon for reliable saving on page unload
-        const huntData = {
-          activeHunts,
-          huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-          lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes).map(([k, v]) => [k, v])),
-          totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes).map(([k, v]) => [k, v])),
-          pausedHunts: Array.from(pausedHunts),
-          huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-        };
-
-        // Try to save synchronously on page unload
-        try {
-          const xhr = new XMLHttpRequest();
-          xhr.open('PUT', '/api/hunts', false); // Synchronous request
-          xhr.setRequestHeader('Content-Type', 'application/json');
-          xhr.setRequestHeader('Authorization', `Bearer ${localStorage.getItem('authToken')}`);
-          xhr.send(JSON.stringify(huntData));
-        } catch (error) {
-          console.error('Failed to save on page unload:', error);
-        }
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [username, activeHunts, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements]);
-
-
-  const handlePokemonSelect = (pokemon) => {
-    if (!pokemonModalClosing) {
-      setSelectedPokemon(pokemon);
-      setPokemonModalClosing(true);
-      setTimeout(() => {
-        setShowPokemonModal(false);
-        setPokemonModalClosing(false);
-
-        if (isEditingPokemon) {
-          // If we're editing, update the edit form and return to edit modal
-          setEditForm(prev => ({ ...prev, pokemon: pokemon }));
-          setIsEditingPokemon(false);
-          // Restore the edit modal with the original hunt data
-          setEditModal(prev => ({ ...prev, show: true }));
-        } else {
-          // Normal flow - go to hunt modal
-          setShowHuntModal(true);
-        }
-      }, 300);
-    }
-  };
-
-  // OLD COMPLEX SCROLL PREVENTION - DISABLED
-  // Disable body scrolling when modals are open
-  useEffect(() => {
-    const hasOpenModal = showPokemonModal || showHuntModal || resetModal.show || deleteModal.show || settingsModal.show || completionModal.show;
-
-    if (hasOpenModal) {
-      const preventScroll = (e) => {
-        // Check if the scroll event is happening inside modal content or dropdown
-        const target = e.target;
-        const isInsideModalContent = target.closest('.hunt-modal-content, .pokemon-modal-content');
-        const isInsideDropdown = target.closest('.dropdown, .dropdown-content, .select-dropdown, [role="listbox"], [role="option"]');
-
-        // Only allow scrolling inside modal content or dropdowns
-        if (isInsideModalContent || isInsideDropdown) {
-          return;
-        }
-
-        // Prevent all other scrolling when modal is open
+      if (isKeyMatch(e, hotkey)) {
         e.preventDefault();
-        e.stopPropagation();
-        return false;
+        const target = currentHunt || activeHunts[0];
+        if (target) {
+          const isRunning = target.status === "running" || (!target.isPaused && target.status !== "paused");
+          if (isRunning) {
+            handleAddCheck(target.id);
+          }
+        }
+        return;
+      }
+
+      if (isKeyMatch(e, decrementHotkey)) {
+        e.preventDefault();
+        const target = currentHunt || activeHunts[0];
+        if (target) {
+          const isRunning = target.status === "running" || (!target.isPaused && target.status !== "paused");
+          if (isRunning) {
+            handleDecreaseCheck(target.id);
+          }
+        }
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [
+    hotkey,
+    decrementHotkey,
+    currentHunt,
+    activeHunts,
+    huntWizard.isOpen,
+    shinyEncounterModal.show,
+    phaseHistoryModal.show,
+    abandonHuntModal.show,
+    oddsModal.show,
+    resetModal.show,
+    deleteModal.show,
+    settingsModal.show,
+    editModal.show,
+    hotkeyModal,
+    showHistoryModal,
+    deleteHistoryModal.show,
+    clearAllHistoryModal,
+    isKeyMatch
+  ]);
+
+  // ── Start Wizard Hunt Handler ─────────────────────────────────────────────
+  const handleStartWizardHunt = () => {
+    if (!huntWizard.selectedPokemon) return;
+    const game = huntWizard.game || "Scarlet";
+    const method = huntWizard.method || "Mass Outbreaks";
+    const odds = calculateOdds(game, method, huntWizard.modifiers);
+    const now = Date.now();
+    const startChecks = Math.max(0, parseInt(huntWizard.startingChecks, 10) || 0);
+    const huntIncrement = Math.max(1, parseInt(huntWizard.increment, 10) || 1);
+
+    const startH = Math.max(0, parseInt(huntWizard.startHours, 10) || 0);
+    const startM = Math.max(0, parseInt(huntWizard.startMinutes, 10) || 0);
+    const startS = Math.max(0, parseInt(huntWizard.startSeconds, 10) || 0);
+    let startElapsedMs = ((startH * 3600) + (startM * 60) + startS) * 1000;
+
+    const estimatedPaceSec = parseFloat(huntWizard.estimatedPaceSec) || 0;
+    if (startElapsedMs === 0 && startChecks > 0 && estimatedPaceSec > 0) {
+      startElapsedMs = Math.round(startChecks * estimatedPaceSec * 1000);
+    }
+
+    const startedAt = now - startElapsedMs;
+
+    let initialStats = {};
+    if (estimatedPaceSec > 0) {
+      initialStats = {
+        lastIntervalSec: estimatedPaceSec,
+        fastestIntervalSec: estimatedPaceSec,
+        recentIntervals: [estimatedPaceSec],
+        last10AvgSec: estimatedPaceSec
       };
+    } else if (startChecks > 0 && startElapsedMs > 0) {
+      const avgPace = parseFloat((startElapsedMs / 1000 / startChecks).toFixed(1));
+      initialStats = {
+        lastIntervalSec: avgPace,
+        fastestIntervalSec: avgPace,
+        recentIntervals: [avgPace],
+        last10AvgSec: avgPace
+      };
+    }
 
-      const preventKeyboardScroll = (e) => {
-        // Check if the keydown event is happening inside modal content or dropdown
-        const target = e.target;
-        const isInsideModalContent = target.closest('.hunt-modal-content, .pokemon-modal-content');
-        const isInsideDropdown = target.closest('.dropdown, .dropdown-content, .select-dropdown, [role="listbox"], [role="option"]');
-        const isInputField = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.contentEditable === 'true';
+    const newHunt = normalizeHunt({
+      id: now,
+      huntId: now,
+      pokemon: huntWizard.selectedPokemon,
+      game,
+      method,
+      ball: "",
+      mark: "",
+      notes: huntWizard.targetPhasesNotes || "",
+      checks: startChecks,
+      odds,
+      startDate: new Date().toISOString(),
+      startedAt,
+      startTime: startedAt,
+      pausedAt: now,
+      totalPausedMs: 0,
+      status: "paused",
+      isPaused: true,
+      increment: huntIncrement,
+      currentPhase: 1,
+      phases: [],
+      possiblePhases: huntWizard.possiblePhases || [],
+      allowAnyPhase: huntWizard.allowAnyPhase !== false,
+      fails: [],
+      modifiers: { ...huntWizard.modifiers },
+      stats: initialStats,
+      version: 1,
+      updatedAt: now
+    }, now);
 
-        // Only allow keyboard scrolling inside modal content, dropdowns, or input fields
-        if (isInsideModalContent || isInsideDropdown || isInputField) {
+    // Pause any previously running hunts so nothing is left running in Other Hunts
+    let normalizedActiveHunts = allActiveHunts;
+    const runningHunts = allActiveHunts.filter(h => h.status === "running" || (!h.isPaused && h.status !== "paused"));
+    if (runningHunts.length > 0) {
+      runningHunts.forEach(rh => {
+        const action = { type: "PAUSE", huntId: rh.id, timestamp: now };
+        normalizedActiveHunts = applyHuntActionToState(normalizedActiveHunts, action, now);
+        if (channelRef.current) {
+          channelRef.current.broadcast({
+            type: "HUNT_ACTION",
+            huntId: rh.id,
+            action
+          });
+        }
+      });
+    }
+
+    const updatedHunts = [newHunt, ...normalizedActiveHunts];
+    const updatedIncrements = { ...huntIncrements, [now]: huntIncrement };
+
+    setAllActiveHunts(updatedHunts);
+    setCurrentHuntId(now);
+    setHuntIncrements(updatedIncrements);
+    setCachedHuntsData({ activeHunts: updatedHunts });
+
+    setHuntWizard(prev => ({ ...prev, isOpen: false }));
+    showMessage(`Started hunting shiny ${formatPokemonName(huntWizard.selectedPokemon.name)}! (Paused)`, "success");
+
+    if (channelRef.current) {
+      channelRef.current.broadcast({
+        type: "HUNT_UPDATED",
+        hunt: newHunt
+      });
+    }
+
+    debouncedSave(updatedHunts);
+  };
+
+  // ── Unified Shiny Encounter & Phase System ───────────────────────────────
+  const handleOpenShinyEncounterModal = (hunt) => {
+    if (!hunt) return;
+
+    // Immediately pause active hunt time, pace, and encounters in the background
+    let activeHuntObj = hunt;
+    if (hunt.status === "running" || (!hunt.isPaused && hunt.status !== "paused")) {
+      const now = Date.now();
+      const action = { type: "PAUSE", huntId: hunt.id, timestamp: now };
+      const nextHunts = applyHuntActionToState(allActiveHunts, action, now);
+      setAllActiveHunts(nextHunts);
+      setCachedHuntsData({ activeHunts: nextHunts });
+      if (channelRef.current) {
+        channelRef.current.broadcast({
+          type: "HUNT_ACTION",
+          huntId: hunt.id,
+          action
+        });
+      }
+      debouncedSave(nextHunts);
+      activeHuntObj = nextHunts.find(h => String(h.id) === String(hunt.id)) || hunt;
+    }
+
+    setShinyEncounterModal({
+      show: true,
+      hunt: activeHuntObj,
+      step: 1,
+      selectedPokemon: activeHuntObj.pokemon,
+      isTarget: true,
+      outcome: null,
+      nickname: "",
+      ball: activeHuntObj.ball || "",
+      mark: activeHuntObj.mark || "",
+      notes: "",
+      addedToCollection: false,
+      searchTerm: "",
+      formTab: "all",
+      phaseResult: null
+    });
+    setOpenMenuHuntId(null);
+  };
+
+  const handleSelectShinyPokemon = (pokemon, isTargetOverride) => {
+    const hunt = shinyEncounterModal.hunt;
+    if (!hunt || !pokemon) return;
+    const isTarget = isTargetOverride !== undefined
+      ? isTargetOverride
+      : ((pokemon.stableId || pokemon.id) === (hunt.pokemon?.stableId || hunt.pokemon?.id));
+
+    setShinyEncounterModal(prev => ({
+      ...prev,
+      selectedPokemon: pokemon,
+      isTarget,
+      step: 2
+    }));
+  };
+
+  const handleConfirmShinyOutcome = (outcome) => {
+    const hunt = shinyEncounterModal.hunt;
+    if (!hunt || !shinyEncounterModal.selectedPokemon) return;
+
+    const isTarget = shinyEncounterModal.isTarget;
+    const selectedPokemon = shinyEncounterModal.selectedPokemon;
+    const now = Date.now();
+    const totalElapsedMs = getHuntElapsedTime(hunt);
+
+    const phases = hunt.phases || [];
+    const lastPhase = phases.length > 0 ? phases[phases.length - 1] : null;
+    const lastTotalChecks = lastPhase
+      ? (lastPhase.totalChecks !== undefined ? lastPhase.totalChecks : (lastPhase.phaseChecks || lastPhase.checks || 0))
+      : 0;
+
+    const currentChecks = hunt.checks || 0;
+
+    let totalOverallChecks = currentChecks;
+    let intervalChecks = currentChecks;
+
+    if (lastPhase) {
+      if (currentChecks >= lastTotalChecks) {
+        // Continuous counter (e.g. 10 -> 20 on subsequent target fail)
+        totalOverallChecks = currentChecks;
+        intervalChecks = currentChecks - lastTotalChecks;
+      } else {
+        // Phased counter (e.g. 0 -> 10 after phase caught)
+        totalOverallChecks = lastTotalChecks + currentChecks;
+        intervalChecks = currentChecks;
+      }
+    } else {
+      totalOverallChecks = currentChecks;
+      intervalChecks = currentChecks;
+    }
+
+    const dynamicOddsNum = getCurrentHuntOdds(hunt.game, hunt.method, hunt.modifiers || {}, intervalChecks || currentChecks);
+    const phaseNumber = phases.length + 1;
+
+    if (outcome === "caught") {
+      const rawNickname = (shinyEncounterModal.nickname || "").trim();
+      const rawNotes = (shinyEncounterModal.notes || "").trim();
+
+      if (rawNickname) {
+        const nicknameValidation = validateContent(rawNickname, "nickname");
+        if (!nicknameValidation.isValid) {
+          showMessage(nicknameValidation.error, "error");
           return;
         }
+      }
 
-        // Prevent keyboard scrolling everywhere else
-        if ([32, 33, 34, 35, 36, 37, 38, 39, 40].includes(e.keyCode)) {
-          e.preventDefault();
+      if (rawNotes) {
+        const notesValidation = validateContent(rawNotes, "notes");
+        if (!notesValidation.isValid) {
+          showMessage(notesValidation.error, "error");
+          return;
         }
-      };
-
-      // Add event listeners to prevent scrolling - use capture phase to catch all events
-      document.addEventListener('wheel', preventScroll, { passive: false, capture: true });
-      document.addEventListener('touchmove', preventScroll, { passive: false, capture: true });
-      document.addEventListener('keydown', preventKeyboardScroll, { capture: true });
-
-      // Also add event listeners to modal backdrops to ensure they catch scroll events
-      const modalBackdrops = document.querySelectorAll('.pokemon-modal-backdrop, .hunt-modal-backdrop');
-      modalBackdrops.forEach(backdrop => {
-        backdrop.addEventListener('wheel', preventScroll, { passive: false });
-        backdrop.addEventListener('touchmove', preventScroll, { passive: false });
-      });
-
-      return () => {
-        document.removeEventListener('wheel', preventScroll, { capture: true });
-        document.removeEventListener('touchmove', preventScroll, { capture: true });
-        document.removeEventListener('keydown', preventKeyboardScroll, { capture: true });
-
-        // Remove backdrop event listeners
-        modalBackdrops.forEach(backdrop => {
-          backdrop.removeEventListener('wheel', preventScroll);
-          backdrop.removeEventListener('touchmove', preventScroll);
-        });
-      };
-    }
-  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, settingsModal.show, editModal.show, completionModal.show]);
-
-  // Simple body scroll disable when modals are open
-  useEffect(() => {
-    const hasOpenModal = showPokemonModal || showHuntModal || resetModal.show || deleteModal.show || settingsModal.show || editModal.show || completionModal.show;
-
-    if (hasOpenModal) {
-      const html = document.documentElement;
-      const body = document.body;
-      // Store the current scroll position
-      const scrollY = window.scrollY;
-      body.dataset.scrollY = scrollY;
-
-      // Prevent scrolling without using position:fixed on body
-      // This avoids breaking fixed-position modals during page transitions
-      html.style.overflow = 'hidden';
-      body.style.overflow = 'hidden';
-      html.style.height = '100vh';
-      body.style.height = '100vh';
-      body.style.marginTop = `-${scrollY}px`;
-      body.style.paddingTop = `${scrollY}px`;
-
-      return () => {
-        // Re-enable body scrolling
-        html.style.overflow = '';
-        body.style.overflow = '';
-        html.style.height = '';
-        body.style.height = '';
-        body.style.marginTop = '';
-        body.style.paddingTop = '';
-
-        // Restore scroll position
-        const savedScrollY = parseInt(body.dataset.scrollY || '0', 10);
-        window.scrollTo(0, savedScrollY);
-      };
-    }
-  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, settingsModal.show, editModal.show, completionModal.show]);
-
-  // Add CSS to prevent scroll chaining on modal content
-  useEffect(() => {
-    const hasOpenModal = showPokemonModal || showHuntModal || resetModal.show || deleteModal.show || settingsModal.show || editModal.show || completionModal.show;
-
-    if (hasOpenModal) {
-      // Add CSS to prevent scroll chaining
-      const style = document.createElement('style');
-      style.textContent = `
-        .hunt-modal-content, .pokemon-modal-content {
-          overscroll-behavior: contain;
-        }
-      `;
-      document.head.appendChild(style);
-
-      return () => {
-        document.head.removeChild(style);
-      };
-    }
-  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, settingsModal.show, editModal.show, completionModal.show]);
-
-
-  const handleAddHunt = () => {
-    setSearchTerm("");
-    setPokemonModalClosing(false);
-    setIsEditingPokemon(false); // Reset editing state to ensure we start a new hunt
-    setShowPokemonModal(true);
-  };
-
-  const handleStartHunt = () => {
-    if (!selectedPokemon || huntModalClosing) return;
-
-    // Calculate the odds for this hunt
-    const huntOdds = huntDetails.game && huntDetails.method
-      ? calculateOdds(huntDetails.game, huntDetails.method, modifiers)
-      : null; // Use null to indicate no odds available
-
-    const startTime = Date.now();
-    const huntId = startTime;
-
-    const newHunt = {
-      id: huntId,
-      pokemon: selectedPokemon,
-      game: huntDetails.game,
-      ball: huntDetails.ball,
-      mark: huntDetails.mark,
-      method: huntDetails.method,
-      notes: huntDetails.notes,
-      checks: 0,
-      odds: huntOdds,
-      startDate: new Date().toISOString(),
-      startTime: startTime,
-      increment: 1,
-      modifiers: { ...modifiers } // Store modifiers with each hunt
-    };
-
-    const updatedActiveHunts = [...activeHunts, newHunt];
-    const updatedHuntTimers = { ...huntTimers, [huntId]: startTime };
-    const updatedLastCheckTimes = { ...lastCheckTimes, [huntId]: startTime };
-    const updatedTotalCheckTimes = { ...totalCheckTimes, [huntId]: 0 };
-    const updatedHuntIncrements = { ...huntIncrements, [huntId]: 1 };
-    const updatedPausedHunts = new Set([...pausedHunts, huntId]);
-
-    setActiveHunts(updatedActiveHunts);
-    setHuntTimers(updatedHuntTimers);
-    setLastCheckTimes(updatedLastCheckTimes);
-    setTotalCheckTimes(updatedTotalCheckTimes);
-    setHuntIncrements(updatedHuntIncrements);
-    setPausedHunts(updatedPausedHunts);
-
-    // Save immediately with updated state
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(updatedHuntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(updatedPausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(updatedHuntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-
-    // Close hunt modal with animation
-    setHuntModalClosing(true);
-    setBackdropClosing(true);
-    setTimeout(() => {
-      setShowHuntModal(false);
-      setHuntModalClosing(false);
-      setBackdropClosing(false);
-
-      // Reset form states after animation completes
-      setHuntDetails({
-        game: "",
-        ball: "",
-        mark: "",
-        method: "",
-        notes: ""
-      });
-      setModifiers({
-        shinyCharm: false,
-        shinyParents: false,
-        lureActive: false,
-        researchLv10: false,
-        perfectResearch: false,
-        sparklingLv1: false,
-        sparklingLv2: false,
-        sparklingLv3: false,
-        eventBoosted: false,
-        communityDay: false,
-        raidDay: false,
-        researchDay: false,
-        galarBirds: false,
-        hatchDay: false
-      });
-      setSelectedPokemon(null);
-      showMessage("Hunt started!", "success");
-    }, 300);
-  };
-
-  const handleAddCheck = (huntId) => {
-    const now = Date.now();
-    const isPaused = pausedHunts.has(huntId);
-
-    // Get the current bottom timer value (what's actually displayed)
-    const bottomTimerValue = currentBottomTimers[huntId] || 0;
-
-    // Only add the bottom timer value if hunt is not currently paused
-    const timeToAdd = isPaused ? 0 : bottomTimerValue;
-
-    // Get the increment value for this hunt (default to 1 if not set)
-    const incrementValue = huntIncrements[huntId] || 1;
-
-    const updatedActiveHunts = activeHunts.map(hunt =>
-      hunt.id === huntId
-        ? { ...hunt, checks: hunt.checks + incrementValue }
-        : hunt
-    );
-    const updatedLastCheckTimes = { ...lastCheckTimes, [huntId]: now };
-    const updatedTotalCheckTimes = {
-      ...totalCheckTimes,
-      [huntId]: (totalCheckTimes[huntId] || 0) + timeToAdd
-    };
-
-    setActiveHunts(updatedActiveHunts);
-    setLastCheckTimes(updatedLastCheckTimes);
-    setTotalCheckTimes(updatedTotalCheckTimes);
-
-    // Save immediately for critical actions like adding checks
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-  };
-
-  const handleDecreaseCheck = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    if (!hunt || hunt.checks <= 0) return; // Don't go below 0
-
-    // Get the increment value for this hunt (default to 1 if not set)
-    const incrementValue = huntIncrements[huntId] || 1;
-
-    const updatedActiveHunts = activeHunts.map(h =>
-      h.id === huntId
-        ? { ...h, checks: Math.max(0, h.checks - incrementValue) } // Ensure it doesn't go below 0
-        : h
-    );
-
-    setActiveHunts(updatedActiveHunts);
-
-    // Save immediately for critical actions like decreasing checks
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-  };
-
-  const handleCompleteHunt = (hunt) => {
-    // Open completion modal to get final details
-    setCompletionModal({ show: true, hunt });
-    setCompletionForm({
-      ball: hunt.ball || '',
-      mark: hunt.mark || '',
-      notes: hunt.notes || ''
-    });
-  };
-
-  const handleCompletionConfirm = async () => {
-    if (!completionModal.hunt) return;
-
-    // Validate notes content before proceeding (silent validation - no toast)
-    const validation = validateContent(String(completionForm.notes || ''), 'notes');
-    if (!validation.isValid) {
-      // Don't show toast here since ContentFilterInput already showed it
-      return;
-    }
-
-    // Get the current hunt data from activeHunts (in case it was edited)
-    const currentHunt = activeHunts.find(h => h.id === completionModal.hunt.id);
-    if (!currentHunt) {
-      showMessage('Hunt not found', 'error');
-      return;
-    }
-
-    const hunt = currentHunt;
-    const huntId = hunt.id;
-
-    // Ensure pokemon object has stableId for users with older activeHunts that lack it
-    let workingPokemon = hunt.pokemon;
-    if (!workingPokemon.stableId) {
-      const fullPokemon = allPokemon.find(p => p.id === workingPokemon.id && p.name === workingPokemon.name);
-      if (fullPokemon && fullPokemon.stableId) {
-        workingPokemon = { ...workingPokemon, stableId: fullPokemon.stableId };
-      } else {
-        showMessage('Error: Could not determine stable ID for this Pokemon', 'error');
-        return;
       }
     }
 
-    // Create the caught entry with completion details
-    const caughtEntry = {
-      date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
-      ball: completionForm.ball || "",
-      mark: completionForm.mark || "",
+    const uniquePhaseEntryId = Math.random().toString(36).substr(2, 9);
+    const phaseRecord = {
+      id: now,
+      entryId: uniquePhaseEntryId,
+      phaseNumber,
+      pokemon: selectedPokemon,
+      isTarget,
+      outcome, // "caught" | "failed"
+      phaseChecks: Math.max(0, intervalChecks),
+      totalChecks: totalOverallChecks,
+      elapsedMs: totalElapsedMs,
+      odds: dynamicOddsNum,
       game: hunt.game,
       method: hunt.method,
-      checks: hunt.checks || "",
-      time: totalCheckTimes[huntId] || 0, // Store time in milliseconds
-      notes: completionForm.notes || "",
-      entryId: Math.random().toString(36).substr(2, 9),
-      modifiers: hunt.modifiers || {}, // Store modifiers with the entry
-      isHuntTracker: true // Flag to identify this was completed from the tracker
+      modifiers: { ...(hunt.modifiers || {}) },
+      nickname: outcome === "caught" ? (shinyEncounterModal.nickname || "").trim() : "",
+      ball: outcome === "caught" ? (shinyEncounterModal.ball || "") : "",
+      mark: outcome === "caught" ? (shinyEncounterModal.mark || "") : "",
+      notes: shinyEncounterModal.notes || "",
+      date: new Date().toISOString(),
+      timestamp: now,
+      addedToCollection: false
     };
 
-    // Get the caught key for this Pokemon - all hunts in the Counters page are shiny hunts
-    const caughtKey = getCaughtKey(workingPokemon, null, true); // Always true since this is a shiny hunting tracker
+    setShinyEncounterModal(prev => ({
+      ...prev,
+      outcome,
+      phaseResult: phaseRecord,
+      step: 3
+    }));
+  };
 
-    // First, fetch existing caught data from the database
+  const handleAddShinyToCollection = async (pokemon, phaseRecord, huntParam = null, silent = false) => {
+    const hunt = huntParam || shinyEncounterModal.hunt;
+    if (!hunt || !pokemon || !phaseRecord || phaseRecord.outcome === "failed") return false;
+
+    // Resolve canonical Pokémon object from dataset to ensure clean, accurate stableId
+    const isFormPokemon = pokemon.formType && pokemon.formType !== "main";
+    const canonicalForm = isFormPokemon
+      ? formsData.find(f => (f.stableId && f.stableId === pokemon.stableId) || (f.id === pokemon.id && f.name?.toLowerCase() === pokemon.name?.toLowerCase()) || (f.id === pokemon.id && f.formType === pokemon.formType))
+      : null;
+    const canonicalBase = pokemonData.find(p => p.id === pokemon.id && (!pokemon.name || p.name?.toLowerCase() === pokemon.name?.toLowerCase()));
+
+    const workingPokemon = canonicalForm || canonicalBase || (findPokemon(pokemon.id, pokemon.name) || pokemon);
+    const caughtKey = getCaughtKey(workingPokemon, null, true);
+
+    if (!caughtKey) {
+      console.error("Failed to determine caughtKey for", workingPokemon);
+      if (!silent) {
+        showMessage("Could not save to Living Dex: unknown Pokémon key", "error");
+      }
+      return false;
+    }
+
+    const caughtEntry = {
+      date: new Date().toISOString().split("T")[0],
+      nickname: phaseRecord.nickname || (shinyEncounterModal.nickname || "").trim(),
+      ball: phaseRecord.ball || shinyEncounterModal.ball || "",
+      mark: phaseRecord.mark || shinyEncounterModal.mark || "",
+      game: hunt.game,
+      method: hunt.method,
+      checks: phaseRecord.phaseChecks || 0,
+      totalChecks: phaseRecord.totalChecks || 0,
+      time: phaseRecord.elapsedMs || 0,
+      phases: hunt.phases || [],
+      fails: [
+        ...((hunt.phases || []).filter(p => p.outcome === "failed")),
+        ...(phaseRecord.outcome === "failed" ? [phaseRecord] : [])
+      ],
+      phaseCount: phaseRecord.phaseNumber || (hunt.phases ? hunt.phases.length + 1 : 1),
+      notes: phaseRecord.notes || shinyEncounterModal.notes || "",
+      entryId: Math.random().toString(36).substr(2, 9),
+      modifiers: hunt.modifiers || {},
+      isHuntTracker: true
+    };
+
+    if (caughtEntry.nickname) {
+      const nickVal = validateContent(caughtEntry.nickname, "nickname");
+      if (!nickVal.isValid) {
+        if (!silent) showMessage(nickVal.error, "error");
+        return false;
+      }
+    }
+    if (caughtEntry.notes) {
+      const noteVal = validateContent(caughtEntry.notes, "notes");
+      if (!noteVal.isValid) {
+        if (!silent) showMessage(noteVal.error, "error");
+        return false;
+      }
+    }
+
     try {
-      const { fetchCaughtData } = await import('../api/caught');
-      const existingCaughtData = await fetchCaughtData(username);
-      const existingCaughtInfo = existingCaughtData[caughtKey] || null;
+      const { fetchCaughtData, updateCaughtData } = await import("../api/caught");
+      const existingData = await fetchCaughtData(username);
+      const existingInfo = existingData[caughtKey] || null;
 
-      // Create or update caught info
-      let updatedCaughtInfo;
-      if (existingCaughtInfo && existingCaughtInfo.entries) {
-        // Pokemon is already caught, add new entry
-        updatedCaughtInfo = {
-          ...existingCaughtInfo,
-          caught: true,
-          caughtAt: Date.now(),
-          entries: [...existingCaughtInfo.entries, caughtEntry]
-        };
-      } else {
-        // Pokemon is not caught yet, create new caught info
-        updatedCaughtInfo = {
-          caught: true,
-          caughtAt: Date.now(),
-          entries: [caughtEntry]
-        };
+      const updatedInfo = {
+        caught: true,
+        caughtAt: Date.now(),
+        entries: (existingInfo?.entries && Array.isArray(existingInfo.entries))
+          ? [...existingInfo.entries, caughtEntry]
+          : [caughtEntry]
+      };
+
+      if (username) {
+        const isFeedPublic = user?.isGlobalFeedPublic !== false;
+        const pokeName = formatPokemonName(workingPokemon.name);
+        const formName = getFormDisplayName(workingPokemon) || null;
+        const sprite = getSpriteUrl(workingPokemon, true, useHomeSprites);
+        const newCatchTrigger = isFeedPublic ? { pokemonName: pokeName, formName, sprite, username, profileTrainer: user?.profileTrainer } : null;
+        await updateCaughtData(username, caughtKey, updatedInfo, newCatchTrigger);
+
+        try {
+          const raw = localStorage.getItem(`caughtInfoMap:${username}`);
+          const cached = raw ? JSON.parse(raw) : {};
+          cached[caughtKey] = updatedInfo;
+          localStorage.setItem(`caughtInfoMap:${username}`, JSON.stringify(cached));
+        } catch {}
       }
 
-      // Save to database using the same system as the main grid
-      const { updateCaughtData } = await import('../api/caught');
-      await updateCaughtData(username, caughtKey, updatedCaughtInfo);
+      try {
+        const localMap = JSON.parse(localStorage.getItem("caughtInfoMap") || "{}");
+        localMap[caughtKey] = updatedInfo;
+        localStorage.setItem("caughtInfoMap", JSON.stringify(localMap));
 
-      // Dispatch custom event to notify other components of caught data change
-      window.dispatchEvent(new CustomEvent('caughtDataChanged', {
+        const localCaught = JSON.parse(localStorage.getItem("caught") || "{}");
+        localCaught[caughtKey] = true;
+        localStorage.setItem("caught", JSON.stringify(localCaught));
+      } catch {}
+
+      try {
+        const rawToggles = localStorage.getItem("dexToggles");
+        const currentToggles = rawToggles ? JSON.parse(rawToggles) : {};
+        const updatedToggles = { ...currentToggles, showShiny: true };
+        localStorage.setItem("dexToggles", JSON.stringify(updatedToggles));
+        window.dispatchEvent(new CustomEvent("dexTogglesChanged", { detail: updatedToggles }));
+      } catch {}
+
+      try {
+        const existing = JSON.parse(sessionStorage.getItem('recentCatchOrder') || '[]');
+        const updated = [
+          { stableId: workingPokemon.stableId, isShiny: true },
+          ...existing.filter(c => !(c.stableId === workingPokemon.stableId && c.isShiny === true))
+        ].slice(0, 5);
+        sessionStorage.setItem('recentCatchOrder', JSON.stringify(updated));
+      } catch {}
+
+      window.dispatchEvent(new CustomEvent("caughtDataChanged", {
         detail: {
           pokemon: workingPokemon,
-          caughtInfo: updatedCaughtInfo,
-          caughtKey: caughtKey
+          caughtInfo: updatedInfo,
+          caughtKey,
+          wasCaught: !!existingInfo,
+          isShiny: true
         }
       }));
-    } catch (error) {
-      console.error('Failed to save caught data to database:', error);
-      showMessage('Failed to save to collection', 'error');
-      return; // Don't proceed with hunt cleanup if save failed
-    }
 
-    // Remove from active hunts
-    const updatedActiveHunts = activeHunts.filter(h => h.id !== huntId);
-    const updatedTotalCheckTimes = { ...totalCheckTimes };
-    delete updatedTotalCheckTimes[huntId];
-    const updatedLastCheckTimes = { ...lastCheckTimes };
-    delete updatedLastCheckTimes[huntId];
-    const updatedHuntTimers = { ...huntTimers };
-    delete updatedHuntTimers[huntId];
-    const updatedHuntIncrements = { ...huntIncrements };
-    delete updatedHuntIncrements[huntId];
-    const updatedPausedHunts = new Set(pausedHunts);
-    updatedPausedHunts.delete(huntId);
-
-    setActiveHunts(updatedActiveHunts);
-    setTotalCheckTimes(updatedTotalCheckTimes);
-    setLastCheckTimes(updatedLastCheckTimes);
-    setHuntTimers(updatedHuntTimers);
-    setHuntIncrements(updatedHuntIncrements);
-    setPausedHunts(updatedPausedHunts);
-
-    // Save the updated hunt data to the database immediately
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(updatedHuntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(updatedPausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(updatedHuntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-
-    // Refresh history so the newly completed hunt immediately shows up
-    loadHuntHistory();
-
-    // Close modal with animation
-    setCompletionModalClosing(true);
-    setTimeout(() => {
-      setCompletionModal({ show: false, hunt: null });
-      setCompletionModalClosing(false);
-      setCompletionForm({ ball: '', mark: '', notes: '' });
-      showMessage(`${formatPokemonName(hunt.pokemon.name)} hunt completed and added to collection!`, "success");
-    }, 300);
-  };
-
-  const handleDeleteHunt = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    setDeleteModal({ show: true, hunt });
-  };
-
-  const handleDeleteConfirm = () => {
-    if (!deleteModal.hunt) return;
-
-    const huntId = deleteModal.hunt.id;
-
-    // Apply deletion immediately
-    const updatedActiveHunts = activeHunts.filter(h => h.id !== huntId);
-    const updatedTotalCheckTimes = { ...totalCheckTimes };
-    delete updatedTotalCheckTimes[huntId];
-    const updatedLastCheckTimes = { ...lastCheckTimes };
-    delete updatedLastCheckTimes[huntId];
-    const updatedHuntTimers = { ...huntTimers };
-    delete updatedHuntTimers[huntId];
-    const updatedHuntIncrements = { ...huntIncrements };
-    delete updatedHuntIncrements[huntId];
-    const updatedPausedHunts = new Set(pausedHunts);
-    updatedPausedHunts.delete(huntId);
-
-    setActiveHunts(updatedActiveHunts);
-    setTotalCheckTimes(updatedTotalCheckTimes);
-    setCurrentBottomTimers(prev => {
-      const newTimers = { ...prev };
-      delete newTimers[huntId];
-      return newTimers;
-    });
-    setLastCheckTimes(updatedLastCheckTimes);
-    setHuntTimers(updatedHuntTimers);
-    setHuntIncrements(updatedHuntIncrements);
-    setPausedHunts(updatedPausedHunts);
-
-    // Save the updated hunt data to the database immediately
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(updatedHuntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(updatedPausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(updatedHuntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-
-    // Close modal with animation
-    setDeleteModalClosing(true);
-    setTimeout(() => {
-      setDeleteModal({ show: false, hunt: null });
-      setDeleteModalClosing(false);
-      showMessage("Hunt deleted", "info");
-    }, 300);
-  };
-
-  const handleInfoHunt = (huntId) => {
-    setExpandedHunts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(huntId)) {
-        newSet.delete(huntId);
-      } else {
-        newSet.add(huntId);
+      setShinyEncounterModal(prev => ({ ...prev, addedToCollection: true }));
+      if (!silent) {
+        showMessage(`Added Shiny ${formatPokemonName(workingPokemon.name)} to your Living Dex!`, "success");
       }
-      return newSet;
-    });
-  };
-
-  const handleResetHunt = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    setResetModal({ show: true, hunt });
-  };
-
-  const handleResetConfirm = () => {
-    if (!resetModal.hunt) return;
-
-    setResetModalClosing(true);
-    setTimeout(() => {
-      const now = Date.now();
-      const huntId = resetModal.hunt.id;
-
-      // Compute updated values before setting state
-      const updatedActiveHunts = activeHunts.map(hunt =>
-        hunt.id === huntId ? { ...hunt, checks: 0 } : hunt
-      );
-      const updatedTotalCheckTimes = { ...totalCheckTimes, [huntId]: 0 };
-      const updatedLastCheckTimes = { ...lastCheckTimes, [huntId]: now };
-
-      setActiveHunts(updatedActiveHunts);
-      setTotalCheckTimes(updatedTotalCheckTimes);
-      setCurrentBottomTimers(prev => ({ ...prev, [huntId]: 0 }));
-      setLastCheckTimes(updatedLastCheckTimes);
-
-      // Save immediately with the updated data
-      if (username) {
-        const huntData = {
-          activeHunts: updatedActiveHunts,
-          huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-          lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
-          totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-          pausedHunts: Array.from(pausedHunts),
-          huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-        };
-        saveHuntData(huntData);
+      return true;
+    } catch (e) {
+      console.error("Failed to save shiny to collection:", e);
+      if (!silent) {
+        showMessage("Failed to save to Living Dex", "error");
       }
-
-      setResetModal({ show: false, hunt: null });
-      setResetModalClosing(false);
-      showMessage("Hunt reset", "info");
-    }, 300);
-  };
-
-  const handleBottomTimerUpdate = useCallback((huntId, timeInMs) => {
-    setCurrentBottomTimers(prev => ({ ...prev, [huntId]: timeInMs }));
-  }, []);
-
-  const handleSettingsHunt = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    setSettingsModal({ show: true, hunt });
-    setSettingsForm({
-      manualChecks: hunt.checks.toString(),
-      manualTotalTime: formatTime(totalCheckTimes[huntId] || 0),
-      manualIncrements: (huntIncrements[huntId] || 1).toString()
-    });
-  };
-
-  const handleEditHunt = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    setEditModal({ show: true, hunt });
-    // Mark that we're opening the modal (not a manual game change)
-    editModalJustOpenedRef.current = true;
-    setEditForm({
-      game: hunt.game || '',
-      method: hunt.method || '',
-      pokemon: hunt.pokemon || null,
-      modifiers: hunt.modifiers || {
-        shinyCharm: false,
-        shinyParents: false,
-        lureActive: false,
-        researchLv10: false,
-        perfectResearch: false,
-        sparklingLv1: false,
-        sparklingLv2: false,
-        sparklingLv3: false,
-        eventBoosted: false,
-        communityDay: false,
-        raidDay: false,
-        researchDay: false,
-        galarBirds: false,
-        hatchDay: false
-      }
-    });
-  };
-
-  const handleSettingsConfirm = () => {
-    if (!settingsModal.hunt) return;
-
-    const huntId = settingsModal.hunt.id;
-
-    // Parse and apply manual checks
-    const newChecks = parseInt(settingsForm.manualChecks) || 0;
-
-    // Parse and apply manual total time (convert from "1h 2m 3s" format to milliseconds)
-    const timeStr = settingsForm.manualTotalTime;
-    let totalMs = 0;
-    if (timeStr) {
-      const hours = (timeStr.match(/(\d+)h/) || [0, 0])[1];
-      const minutes = (timeStr.match(/(\d+)m/) || [0, 0])[1];
-      const seconds = (timeStr.match(/(\d+)s/) || [0, 0])[1];
-      totalMs = (parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds)) * 1000;
+      return false;
     }
-
-    // Parse and apply manual increments (default to 1 if invalid)
-    const newIncrements = parseInt(settingsForm.manualIncrements) || 1;
-
-    // Compute updated values before setting state
-    const updatedActiveHunts = activeHunts.map(hunt =>
-      hunt.id === huntId ? { ...hunt, checks: newChecks } : hunt
-    );
-    const updatedTotalCheckTimes = { ...totalCheckTimes, [huntId]: totalMs };
-    const updatedHuntIncrements = { ...huntIncrements, [huntId]: newIncrements };
-
-    // Apply changes to state
-    setActiveHunts(updatedActiveHunts);
-    setTotalCheckTimes(updatedTotalCheckTimes);
-    setHuntIncrements(updatedHuntIncrements);
-
-    // Save immediately with the updated data (must pass explicitly to avoid stale closure values)
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(updatedHuntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-
-    // Close modal with animation
-    setSettingsModalClosing(true);
-    setTimeout(() => {
-      setSettingsModal({ show: false, hunt: null });
-      setSettingsModalClosing(false);
-      showMessage("Hunt settings updated", "success");
-    }, 300);
   };
 
-  const handleEditConfirm = () => {
-    if (!editModal.hunt) return;
+  const handleAddShinyFailToCollection = async (pokemon, phaseRecord, huntParam = null) => {
+    const hunt = huntParam || shinyEncounterModal.hunt;
+    if (!hunt || !pokemon || !phaseRecord) return false;
 
-    const huntId = editModal.hunt.id;
-
-    // Calculate new odds based on the updated game, method, and modifiers
-    const newOdds = editForm.game && editForm.method
-      ? calculateOdds(editForm.game, editForm.method, editForm.modifiers)
+    // Resolve canonical Pokémon object from dataset to ensure clean, accurate stableId
+    const isFormPokemon = pokemon.formType && pokemon.formType !== "main";
+    const canonicalForm = isFormPokemon
+      ? formsData.find(f => (f.stableId && f.stableId === pokemon.stableId) || (f.id === pokemon.id && f.name?.toLowerCase() === pokemon.name?.toLowerCase()) || (f.id === pokemon.id && f.formType === pokemon.formType))
       : null;
+    const canonicalBase = pokemonData.find(p => p.id === pokemon.id && (!pokemon.name || p.name?.toLowerCase() === pokemon.name?.toLowerCase()));
 
-    // Update the hunt with new game, method, pokemon, modifiers, and recalculated odds
-    const updatedActiveHunts = activeHunts.map(hunt =>
-      hunt.id === huntId ? {
-        ...hunt,
-        game: editForm.game,
-        method: editForm.method,
-        pokemon: editForm.pokemon,
-        modifiers: editForm.modifiers,
-        odds: newOdds
-      } : hunt
+    const workingPokemon = canonicalForm || canonicalBase || (findPokemon(pokemon.id, pokemon.name) || pokemon);
+    const caughtKey = getCaughtKey(workingPokemon, null, true);
+
+    if (!caughtKey) {
+      console.error("Failed to determine caughtKey for", workingPokemon);
+      showMessage("Could not save to Living Dex: unknown Pokémon key", "error");
+      return false;
+    }
+
+    const failEntry = {
+      date: phaseRecord.date ? phaseRecord.date.split("T")[0] : new Date().toISOString().split("T")[0],
+      game: hunt.game,
+      method: hunt.method,
+      checks: phaseRecord.phaseChecks || 0,
+      totalChecks: phaseRecord.totalChecks || 0,
+      time: phaseRecord.elapsedMs || 0,
+      odds: phaseRecord.odds || calculateOdds(hunt.game, hunt.method, hunt.modifiers || {}) || 4096,
+      notes: phaseRecord.notes || (shinyEncounterModal.notes || "").trim() || "",
+      modifiers: hunt.modifiers || {},
+      outcome: "failed",
+      isTarget: phaseRecord.isTarget,
+      phaseNumber: phaseRecord.phaseNumber,
+      id: phaseRecord.id || Date.now(),
+      entryId: phaseRecord.entryId || phaseRecord.id || Math.random().toString(36).substr(2, 9),
+      isHuntTracker: true
+    };
+
+    if (failEntry.notes) {
+      const noteVal = validateContent(failEntry.notes, "notes");
+      if (!noteVal.isValid) {
+        showMessage(noteVal.error, "error");
+        return false;
+      }
+    }
+
+    try {
+      const { fetchCaughtData, updateCaughtData } = await import("../api/caught");
+      const existingData = await fetchCaughtData(username);
+      const existingInfo = existingData[caughtKey] || null;
+      const isAlreadyCaught = !!(existingInfo && existingInfo.caught !== false && (existingInfo.entries?.length > 0 || existingInfo.caught === true));
+
+      const existingFails = Array.isArray(existingInfo?.fails) ? existingInfo.fails : [];
+      const updatedInfo = {
+        ...(existingInfo || {}),
+        caught: isAlreadyCaught, // Uncaught remains false!
+        fails: [...existingFails, failEntry]
+      };
+
+      if (username) {
+        await updateCaughtData(username, caughtKey, updatedInfo);
+
+        try {
+          const raw = localStorage.getItem(`caughtInfoMap:${username}`);
+          const cached = raw ? JSON.parse(raw) : {};
+          cached[caughtKey] = updatedInfo;
+          localStorage.setItem(`caughtInfoMap:${username}`, JSON.stringify(cached));
+        } catch {}
+      }
+
+      try {
+        const localMap = JSON.parse(localStorage.getItem("caughtInfoMap") || "{}");
+        localMap[caughtKey] = updatedInfo;
+        localStorage.setItem("caughtInfoMap", JSON.stringify(localMap));
+
+        // If not already caught, ensure local 'caught' map does NOT mark it as caught
+        if (!isAlreadyCaught) {
+          const localCaught = JSON.parse(localStorage.getItem("caught") || "{}");
+          if (localCaught[caughtKey]) {
+            delete localCaught[caughtKey];
+            localStorage.setItem("caught", JSON.stringify(localCaught));
+          }
+        }
+      } catch {}
+
+      try {
+        const rawToggles = localStorage.getItem("dexToggles");
+        const currentToggles = rawToggles ? JSON.parse(rawToggles) : {};
+        const updatedToggles = { ...currentToggles, showShiny: true };
+        localStorage.setItem("dexToggles", JSON.stringify(updatedToggles));
+        window.dispatchEvent(new CustomEvent("dexTogglesChanged", { detail: updatedToggles }));
+      } catch {}
+
+      window.dispatchEvent(new CustomEvent("caughtDataChanged", {
+        detail: {
+          pokemon: workingPokemon,
+          caughtInfo: updatedInfo,
+          caughtKey,
+          wasCaught: isAlreadyCaught,
+          isShiny: true
+        }
+      }));
+
+      setShinyEncounterModal(prev => ({ ...prev, addedToCollection: true }));
+      showMessage(`Saved Shiny ${formatPokemonName(workingPokemon.name)} fail to Living Dex!`, "success");
+      return true;
+    } catch (e) {
+      console.error("Failed to save fail to collection:", e);
+      showMessage("Failed to save to Living Dex", "error");
+      return false;
+    }
+  };
+
+  const handleContinueAfterPhase = (phaseRecord) => {
+    const hunt = shinyEncounterModal.hunt;
+    if (!hunt || !phaseRecord) return;
+    const now = Date.now();
+
+    const action = {
+      type: "LOG_SHINY_PHASE",
+      huntId: hunt.id,
+      phaseEvent: phaseRecord,
+      timestamp: now
+    };
+
+    const updatedHunts = applyHuntActionToState(allActiveHunts, action, now);
+    setAllActiveHunts(updatedHunts);
+    setCachedHuntsData({ activeHunts: updatedHunts });
+
+    if (phaseRecord.outcome === "failed") {
+      const failEntry = {
+        id: phaseRecord.id || now,
+        entryId: phaseRecord.entryId || phaseRecord.id || Math.random().toString(36).substr(2, 9),
+        pokemon: shinyEncounterModal.selectedPokemon || hunt.pokemon,
+        pokemonName: (shinyEncounterModal.selectedPokemon || hunt.pokemon)?.name || "Unknown",
+        game: hunt.game,
+        method: hunt.method,
+        checks: phaseRecord.phaseChecks || 0,
+        totalChecks: phaseRecord.totalChecks || hunt.checks || 0,
+        elapsedMs: phaseRecord.elapsedMs || 0,
+        time: phaseRecord.elapsedMs || 0,
+        odds: phaseRecord.odds || hunt.odds || null,
+        reason: phaseRecord.reason || (shinyEncounterModal.notes || "").trim() || "Failed Encounter",
+        notes: phaseRecord.notes || (shinyEncounterModal.notes || "").trim() || "",
+        date: phaseRecord.date || new Date().toISOString(),
+        timestamp: now,
+        outcome: "failed",
+        isFail: true,
+        isHuntTracker: true,
+        addedToLivingDex: Boolean(shinyEncounterModal.addedToCollection)
+      };
+
+      try {
+        const storageKey = username ? `completedFails:${username}` : "completedFails";
+        const existing = JSON.parse(localStorage.getItem(storageKey) || "[]");
+        const updated = [failEntry, ...existing.filter(e => e.entryId !== failEntry.entryId)];
+        localStorage.setItem(storageKey, JSON.stringify(updated));
+        if (username) {
+          localStorage.setItem("completedFails", JSON.stringify(updated));
+        }
+        setHuntHistory(prev => [failEntry, ...prev.filter(e => e.entryId !== failEntry.entryId)]);
+      } catch {}
+    }
+
+    setShinyEncounterModal({
+      show: false,
+      hunt: null,
+      step: 1,
+      selectedPokemon: null,
+      isTarget: true,
+      outcome: null,
+      nickname: "",
+      ball: "",
+      mark: "",
+      notes: "",
+      addedToCollection: false,
+      searchTerm: "",
+      phaseResult: null
+    });
+
+    showMessage(
+      phaseRecord.outcome === "failed"
+        ? `Phase recorded. Keep hunting, the shiny will return!`
+        : `Phase ${phaseRecord.phaseNumber} logged! Continuing hunt for Shiny ${formatPokemonName(hunt.pokemon?.name)}...`,
+      "success"
     );
 
-    setActiveHunts(updatedActiveHunts);
-
-    // Save immediately with the updated hunt data
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(huntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-
-    // Close modal with animation
-    setEditModalClosing(true);
-    setTimeout(() => {
-      setEditModal({ show: false, hunt: null });
-      setEditModalClosing(false);
-      showMessage("Hunt updated", "success");
-    }, 300);
-  };
-
-  const handlePauseHunt = (huntId) => {
-    const now = Date.now();
-    const lastAction = lastPauseAction.current[huntId];
-
-    // Prevent duplicate calls within 500ms
-    if (lastAction && now - lastAction < 500) {
-      return;
-    }
-
-    lastPauseAction.current[huntId] = now;
-
-    const wasPaused = pausedHunts.has(huntId);
-
-    setPausedHunts(prev => {
-      const newSet = new Set(prev);
-      if (wasPaused) {
-        newSet.delete(huntId);
-      } else {
-        newSet.add(huntId);
-      }
-      return newSet;
-    });
-
-    // Show message after state update
-    if (wasPaused) {
-      showMessage("Hunt resumed", "info");
-    } else {
-      showMessage("Hunt paused", "info");
-    }
-  };
-
-  // Listen for actions coming from popout windows via BroadcastChannel
-  // (placed here so handleAddCheck, handleDecreaseCheck, handlePauseHunt are all defined)
-  useEffect(() => {
-    const channels = {};
-
-    const subscribe = (huntId) => {
-      if (channels[huntId]) return;
-      const ch = new BroadcastChannel(`hunt-popout-${huntId}`);
-      channels[huntId] = ch;
-      ch.onmessage = (e) => {
-        const { type, action } = e.data;
-        if (type !== 'ACTION') return;
-        if (action === 'ADD') handleAddCheck(huntId);
-        if (action === 'MINUS') handleDecreaseCheck(huntId);
-        if (action === 'PAUSE') handlePauseHunt(huntId);
-        if (action === 'RESUME') handlePauseHunt(huntId);
-      };
-    };
-
-    activeHunts.forEach(h => subscribe(h.id));
-
-    return () => {
-      Object.values(channels).forEach(ch => ch.close());
-    };
-  }, [activeHunts, handleAddCheck, handleDecreaseCheck, handlePauseHunt]);
-
-  // Push state updates to active popout windows whenever data changes
-  useEffect(() => {
-    activeHunts.forEach(hunt => {
-      const ch = new BroadcastChannel(`hunt-popout-${hunt.id}`);
-      ch.postMessage({
-        type: "STATE_UPDATE",
-        payload: {
-          checks: hunt.checks,
-          totalTime: totalCheckTimes[hunt.id] || 0,
-          isPaused: pausedHunts.has(hunt.id),
-          lastCheckTime: lastCheckTimes[hunt.id]
-        }
+    if (channelRef.current) {
+      channelRef.current.broadcast({
+        type: "HUNT_ACTION",
+        huntId: hunt.id,
+        action
       });
-      ch.close();
+      channelRef.current.broadcast({
+        type: "HUNT_UPDATED",
+        hunt: updatedHunts.find(h => String(h.id) === String(hunt.id))
+      });
+    }
+
+    debouncedSave(updatedHunts);
+  };
+
+  const handleCompleteTargetHunt = async (hunt, phaseRecord) => {
+    if (!hunt || !phaseRecord) return;
+    const workingPokemon = hunt.pokemon;
+    const huntId = hunt.id;
+
+    const calculatedOdds = phaseRecord.odds || hunt.odds || calculateOdds(hunt.game, hunt.method, hunt.modifiers || {}) || 4096;
+
+    const isFail = phaseRecord.outcome === "failed";
+
+    // Archive completed hunt into persistent history
+    const completedEntry = {
+      id: Date.now(),
+      entryId: phaseRecord.entryId || Math.random().toString(36).substr(2, 9),
+      pokemon: workingPokemon,
+      pokemonName: workingPokemon.name,
+      game: hunt.game,
+      method: hunt.method,
+      checks: phaseRecord.phaseChecks || 0,
+      totalChecks: phaseRecord.totalChecks || hunt.checks || 0,
+      elapsedMs: phaseRecord.elapsedMs || hunt.elapsedMs || 0,
+      time: phaseRecord.elapsedMs || hunt.elapsedMs || 0,
+      odds: calculatedOdds,
+      modifiers: hunt.modifiers || {},
+      phases: hunt.phases || [],
+      phaseCount: (hunt.phases ? hunt.phases.length + 1 : 1),
+      nickname: (phaseRecord.nickname || shinyEncounterModal.nickname || "").trim(),
+      ball: phaseRecord.ball || shinyEncounterModal.ball || "",
+      mark: phaseRecord.mark || shinyEncounterModal.mark || "",
+      notes: phaseRecord.notes || (shinyEncounterModal.notes || "").trim(),
+      date: new Date().toISOString(),
+      timestamp: Date.now(),
+      outcome: isFail ? "failed" : "caught",
+      isFail,
+      addedToLivingDex: Boolean(shinyEncounterModal.addedToCollection),
+      isHuntTracker: true
+    };
+
+    try {
+      const storageKey = isFail
+        ? (username ? `completedFails:${username}` : "completedFails")
+        : (username ? `completedHunts:${username}` : "completedHunts");
+      const existing = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      const updated = [completedEntry, ...existing.filter(e => e.entryId !== completedEntry.entryId)];
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+      if (username) {
+        localStorage.setItem(isFail ? "completedFails" : "completedHunts", JSON.stringify(updated));
+      }
+      setHuntHistory(prev => [completedEntry, ...prev.filter(e => e.entryId !== completedEntry.entryId)]);
+    } catch {}
+
+    // Cleanup from active hunts
+    const nextHunts = allActiveHunts.filter(h => String(h.id) !== String(huntId));
+    const nextStandard = nextHunts.filter(h => !(h.game === "Legends Arceus" && h.method === "Permutations"));
+    const nextCurrentId = String(currentHuntId) === String(huntId) ? (nextStandard[0]?.id || null) : currentHuntId;
+
+    setAllActiveHunts(nextHunts);
+    setCurrentHuntId(nextCurrentId);
+    try {
+      if (nextCurrentId != null) localStorage.setItem("currentHuntId", String(nextCurrentId));
+      else localStorage.removeItem("currentHuntId");
+    } catch {}
+
+    setCachedHuntsData({ activeHunts: nextHunts });
+    setShinyEncounterModal({
+      show: false,
+      hunt: null,
+      step: 1,
+      selectedPokemon: null,
+      isTarget: true,
+      outcome: null,
+      nickname: "",
+      ball: "",
+      mark: "",
+      notes: "",
+      addedToCollection: false,
+      searchTerm: "",
+      phaseResult: null
     });
-  }, [activeHunts, totalCheckTimes, pausedHunts, lastCheckTimes]);
 
-  const formatTime = (milliseconds) => {
-    const seconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
+    showMessage(`Completed Hunt for Shiny ${formatPokemonName(workingPokemon.name)} in ${phaseRecord.totalChecks.toLocaleString()} checks!`, "success");
 
-    if (hours > 0) {
-      return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
-    } else if (minutes > 0) {
-      return `${minutes}m ${seconds % 60}s`;
-    } else {
-      return `${seconds}s`;
+    if (channelRef.current) {
+      channelRef.current.broadcast({
+        type: "HUNT_ACTION",
+        huntId,
+        action: { type: "DELETE", huntId, timestamp: Date.now() }
+      });
     }
+
+    debouncedSave(nextHunts, nextCurrentId);
   };
 
-  const formatTimeCompact = (milliseconds) => {
-    const seconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
+  const handleEndHuntWithoutTarget = (hunt) => {
+    if (!hunt) return;
+    const huntId = hunt.id;
+    const nextHunts = allActiveHunts.filter(h => String(h.id) !== String(huntId));
+    const nextStandard = nextHunts.filter(h => !(h.game === "Legends Arceus" && h.method === "Permutations"));
+    const nextCurrentId = String(currentHuntId) === String(huntId) ? (nextStandard[0]?.id || null) : currentHuntId;
 
-    if (hours > 0) {
-      const mins = minutes % 60;
-      return mins > 0 ? `${hours}h${mins}m` : `${hours}h`;
-    } else if (minutes > 0) {
-      return `${minutes}m`;
-    } else {
-      return `${seconds}s`;
+    setAllActiveHunts(nextHunts);
+    setCurrentHuntId(nextCurrentId);
+    try {
+      if (nextCurrentId != null) localStorage.setItem("currentHuntId", String(nextCurrentId));
+      else localStorage.removeItem("currentHuntId");
+    } catch {}
+
+    setCachedHuntsData({ activeHunts: nextHunts });
+    setAbandonHuntModal({ show: false, hunt: null });
+    setOpenMenuHuntId(null);
+    showMessage(`Ended hunt for ${formatPokemonName(hunt.pokemon?.name)}.`, "info");
+
+    if (channelRef.current) {
+      channelRef.current.broadcast({
+        type: "HUNT_ACTION",
+        huntId,
+        action: { type: "DELETE", huntId, timestamp: Date.now() }
+      });
     }
+
+    debouncedSave(nextHunts, nextCurrentId);
   };
 
-  const getPokemonImage = (pokemon) => {
-    if (!pokemon) return "";
+  // ── Delete Hunt ───────────────────────────────────────────────────────────
+  const handleDeleteHunt = (huntId) => {
+    const nextHunts = allActiveHunts.filter(h => String(h.id) !== String(huntId));
+    const nextStandard = nextHunts.filter(h => !(h.game === "Legends Arceus" && h.method === "Permutations"));
+    const nextCurrentId = String(currentHuntId) === String(huntId) ? (nextStandard[0]?.id || null) : currentHuntId;
 
-    // Always show shiny sprites for hunt tracking
-    return getSpriteUrl(pokemon, true, useHomeSprites);
+    setAllActiveHunts(nextHunts);
+    setCurrentHuntId(nextCurrentId);
+    try {
+      if (nextCurrentId != null) localStorage.setItem("currentHuntId", String(nextCurrentId));
+      else localStorage.removeItem("currentHuntId");
+    } catch {}
+
+    setCachedHuntsData({ activeHunts: nextHunts });
+    setDeleteModal({ show: false, hunt: null });
+    setOpenMenuHuntId(null);
+    showMessage("Hunt deleted", "info");
+
+    if (channelRef.current) {
+      channelRef.current.broadcast({
+        type: "HUNT_ACTION",
+        huntId,
+        action: { type: "DELETE", huntId, timestamp: Date.now() }
+      });
+      channelRef.current.broadcast({
+        type: "RESPONSE_HUNT_STATE",
+        hunts: nextHunts
+      });
+    }
+
+    debouncedSave(nextHunts, nextCurrentId);
   };
 
-  // Get available methods for selected game
-  const availableMethods = useMemo(() => {
-    if (!huntDetails.game) return [];
-    return getMethodsForGame(huntDetails.game);
-  }, [huntDetails.game]);
+  // ── Popout Window ─────────────────────────────────────────────────────────
+  const handleOpenPopout = (hunt) => {
+    setOpenMenuHuntId(null);
+    const w = 540;
+    const h = 530;
+    const left = Math.max(0, Math.floor(window.screen.width / 2 - w / 2));
+    const top = Math.max(0, Math.floor(window.screen.height / 2 - h / 2));
+    window.open(`/hunt-popout/${hunt.id}`, `hunt_popout_${hunt.id}`, `width=${w},height=${h},top=${top},left=${left},resizable=yes`);
+  };
 
-  // Get current odds based on selected method and modifiers
-  const currentOdds = useMemo(() => {
-    if (!huntDetails.game || !huntDetails.method) return "NA";
-    if (huntDetails.game === "Home" && huntDetails.method === "Gift Pokemon") return "hide";
-
-    // Special case for Poke Radar in Diamond/Pearl/Platinum - show table
-    if (huntDetails.method === "Poke Radar" && (huntDetails.game === "Diamond" || huntDetails.game === "Pearl" || huntDetails.game === "Platinum")) {
-      return "pokeradarDPP"; // Special flag to show Poke Radar table in display
+  // Available games / ball options
+  const gameBallOptions = useMemo(() => {
+    const game = shinyEncounterModal.hunt?.game || huntWizard.game || "Scarlet";
+    const validNames = getValidBallNamesForGame(game);
+    if (validNames?.length) {
+      return BALL_OPTIONS.filter(b => b.value === "" || validNames.includes(b.value));
     }
+    return BALL_OPTIONS;
+  }, [shinyEncounterModal.hunt, huntWizard.game]);
 
-    // Special case for Poke Radar in X/Y - show table
-    if (huntDetails.method === "Poke Radar" && (huntDetails.game === "X" || huntDetails.game === "Y")) {
-      return "pokeradarXY"; // Special flag to show X/Y Poke Radar table in display
-    }
+  // ── Dynamic Modifiers Form Helper ─────────────────────────────────────────
+  const renderModifiersForm = (selectedGame, selectedMethod, currentMods, setMods) => {
+    if (!selectedGame) return null;
 
-    // Special case for Poke Radar in Brilliant Diamond/Shining Pearl - show table
-    if (huntDetails.method === "Poke Radar" && (huntDetails.game === "Brilliant Diamond" || huntDetails.game === "Shining Pearl")) {
-      return "pokeradarBDSP"; // Special flag to show BDSP Poke Radar table in display
-    }
+    const availableMods = getModifiersForGame(selectedGame) || {};
+    const hasGameCharm = !!(availableMods["Shiny Charm"] && availableMods["Shiny Charm"] > 0);
+    const isSV = selectedGame === "Scarlet" || selectedGame === "Violet";
+    const isLetsGo = selectedGame === "Let's Go Pikachu" || selectedGame === "Let's Go Eevee";
+    const isPLA = selectedGame === "Legends Arceus";
+    const isGen2Breeding = (selectedGame === "Gold" || selectedGame === "Silver" || selectedGame === "Crystal") && selectedMethod === "Breeding";
+    const isGO = selectedGame === "Pokemon GO" || selectedGame === "Pokémon GO" || selectedGame === "GO";
 
-    // Special case for Chain Fishing in X/Y - show table
-    if (huntDetails.method === "Chain Fishing" && (huntDetails.game === "X" || huntDetails.game === "Y")) {
-      return "chainFishingXY"; // Special flag to show X/Y Chain Fishing table in display
-    }
+    // Method exemptions where Shiny Charm does not apply
+    const isLetsGoCharmExempt = isLetsGo && (selectedMethod === "Fossil Revivals" || selectedMethod === "Gift Pokemon");
+    const isSwShCharmExempt = (selectedGame === "Sword" || selectedGame === "Shield") && (selectedMethod === "Fossil Revivals" || selectedMethod === "Gift Pokemon" || selectedMethod === "Dynamax Raids");
+    const isBDSPCharmExempt = (selectedGame === "Brilliant Diamond" || selectedGame === "Shining Pearl") && (selectedMethod === "Random Encounters" || selectedMethod === "Poke Radar" || selectedMethod === "Soft Resets" || selectedMethod === "Fossil Revivals" || selectedMethod === "Gift Pokemon" || selectedMethod === "Underground Diglett Hunt");
+    const isSVCharmExempt = isSV && selectedMethod === "Tera Raids";
+    const isUSUMCharmExempt = (selectedGame === "Ultra Sun" || selectedGame === "Ultra Moon") && selectedMethod === "Ultra Wormholes";
+    const isXYCharmExempt = (selectedGame === "X" || selectedGame === "Y") && selectedMethod === "Poke Radar";
+    const isZACharmExempt = selectedGame === "Legends Z-A" && selectedMethod === "Fossil Revivals";
 
-    // Special case for Chain Fishing in Omega Ruby/Alpha Sapphire - show table
-    if (huntDetails.method === "Chain Fishing" && (huntDetails.game === "Omega Ruby" || huntDetails.game === "Alpha Sapphire")) {
-      return "chainFishingORAS"; // Special flag to show ORAS Chain Fishing table in display
-    }
+    const isMethodCharmExempt = isLetsGoCharmExempt || isSwShCharmExempt || isBDSPCharmExempt || isSVCharmExempt || isUSUMCharmExempt || isXYCharmExempt || isZACharmExempt;
+    const hasCharm = hasGameCharm && !isMethodCharmExempt;
 
-    // Special case for DexNav in Omega Ruby/Alpha Sapphire - show chart
-    if (huntDetails.method === "DexNav" && (huntDetails.game === "Omega Ruby" || huntDetails.game === "Alpha Sapphire")) {
-      return "dexNavORAS"; // Special flag to show DexNav chart in display
-    }
+    // Lure in Let's Go only applies to Catch Combo and Random Encounters (cannot be used on Soft Resets, Fossil Revivals, or Gift Pokemon)
+    const isLetsGoLure = isLetsGo && (selectedMethod === "Catch Combo" || selectedMethod === "Random Encounters");
 
-    // Special case for SOS method in Sun/Moon and Ultra Sun/Ultra Moon - show chart
-    if (huntDetails.method === "SOS" && (huntDetails.game === "Sun" || huntDetails.game === "Moon" || huntDetails.game === "Ultra Sun" || huntDetails.game === "Ultra Moon")) {
-      return "sosSMUSUM"; // Special flag to show SOS chart in display
-    }
+    const currentSparklingLevel = currentMods.sparklingLv3 ? 3 : currentMods.sparklingLv2 ? 2 : currentMods.sparklingLv1 ? 1 : 0;
 
-    // Special case for Ultra Wormholes in Ultra Sun/Ultra Moon - show percentage odds
-    if (huntDetails.method === "Ultra Wormholes" && (huntDetails.game === "Ultra Sun" || huntDetails.game === "Ultra Moon")) {
-      return "ultraWormholes"; // Special flag to show Ultra Wormhole percentage in display
-    }
+    return (
+      <div className="space-y-3">
+        <label className="hunt-modal-label !text-white text-white font-bold">
+          Active Modifiers & Boosts
+        </label>
 
-    // Special case for KO Method in Sword/Shield - show dynamic odds
-    if (huntDetails.method === "KO Method" && (huntDetails.game === "Sword" || huntDetails.game === "Shield")) {
-      return "koMethod"; // Special flag to show KO method dynamic odds in display
-    }
-
-    // Special case for Horde Encounters - show odds with note
-    if (huntDetails.method === "Horde Encounters") {
-      return "hordeEncounters"; // Special flag to show Horde Encounters with note
-    }
-
-    // Special case for Catch Combo in Let's Go games - show table
-    if (huntDetails.method === "Catch Combo" && (huntDetails.game === "Let's Go Pikachu" || huntDetails.game === "Let's Go Eevee")) {
-      return "catchComboLetsGo"; // Special flag to show Catch Combo table in display
-    }
-
-    // Special case for Mass Outbreaks in Scarlet/Violet - show table
-    if (huntDetails.method === "Mass Outbreaks" && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet")) {
-      return "massOutbreaksSV"; // Special flag to show Mass Outbreaks table in display
-    }
-
-    // Special case for Random Encounters and Daily Adventure Incense in Pokemon Go - show odds with note
-    if ((huntDetails.method === "Random Encounters" || huntDetails.method === "Daily Adventure Incense") && huntDetails.game === "GO") {
-      return "pokemonGoRandom"; // Special flag to show Pokemon Go Random Encounters/Daily Adventure Incense with note
-    }
-
-    return calculateOdds(huntDetails.game, huntDetails.method, modifiers);
-  }, [huntDetails.game, huntDetails.method, modifiers]);
-
-  // Get all available games (use GAME_OPTIONS with images)
-  const allGames = useMemo(() => {
-    return GAME_OPTIONS.filter(g => g.value !== "Home");
-  }, []);
-
-  // Get modifiers for the selected game
-  const gameModifiers = useMemo(() => {
-    return getModifiersForGame(huntDetails.game);
-  }, [huntDetails.game]);
-
-  return (
-    <>
-      <div className="container page-container counters-page">
-        <div className="counters-header-row">
-          <h1 className="page-title">Hunt Tracker</h1>
-          <div className="counters-header-actions">
-            <div className="hotkey-setting">
-              <span className="hotkey-label">Hotkey:</span>
-              <div
-                className="hotkey-input-container"
-                title="Click and press any key to set the hotkey"
-              >
-                <input
-                  type="text"
-                  className="hotkey-input"
-                  value={hotkey === ' ' ? 'Space' : hotkey}
-                  readOnly
-                  onKeyDown={async (e) => {
-                    e.preventDefault();
-                    const key = e.key;
-                    // Ignore some keys that would be problematic
-                    if (['Escape', 'Tab', 'CapsLock'].includes(key)) return;
-                    setHotkey(key);
-
-                    if (username) {
-                      try {
-                        await profileAPI.updateProfile({ huntHotkey: key });
-                      } catch (error) {
-                        console.error('Failed to save hotkey to profile:', error);
-                      }
-                    }
-                  }}
-                  placeholder="Key"
-                />
-              </div>
-            </div>
+        <div className="hunt-modifiers-box space-y-3">
+          {/* 1. Shiny Charm Toggle or No Shiny Charm Notice */}
+          {hasCharm ? (
             <button
-              className="hunt-history-btn"
-              onClick={() => {
-                loadHuntHistory();
-                setShowHistoryModal(true);
-              }}
+              type="button"
+              className={`modifier-select-btn ${currentMods.shinyCharm ? "is-active" : ""}`}
+              onClick={() => setMods(prev => {
+                const nextCharm = !prev.shinyCharm;
+                return {
+                  ...prev,
+                  shinyCharm: nextCharm,
+                  ...(isPLA && nextCharm ? { researchLv10: true } : {})
+                };
+              })}
             >
-              <RotateCcw size={16} />
-              History
+              <span className="modifier-btn-left">
+                <img src="/modifier_images/shinycharm.png" alt="" className="w-5 h-5 object-contain shrink-0" />
+                <span>Shiny Charm Active</span>
+              </span>
+              <span className="modifier-btn-status">
+                {currentMods.shinyCharm ? "Active ✓" : "Off"}
+              </span>
             </button>
-          </div>
-        </div>
-        <div className="app-divider" />
+          ) : hasGameCharm && isMethodCharmExempt ? (
+            <div className="flex items-center gap-2 px-1 py-0.5 text-xs text-gray-300 font-medium">
+              <Info size={16} className="text-[var(--accent)] shrink-0" strokeWidth={2.5} />
+              <span>Shiny Charm does not affect {selectedMethod || "this method"}.</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 px-1 py-0.5 text-xs text-gray-300 font-medium">
+              <Info size={16} className="text-[var(--accent)] shrink-0" strokeWidth={2.5} />
+              <span>This game does not have a Shiny Charm.</span>
+            </div>
+          )}
 
-        {/* Active Hunts Section */}
-        <div className="active-hunts-section">
-          <div className="hunts-grid">
-            {activeHunts.map((hunt) => (
-              <div key={hunt.id} className="hunt-card" style={{ position: 'relative' }}>
-                {hunt.method !== "Permutations" && (
+          {/* 2. Scarlet / Violet Sparkling Power */}
+          {isSV && (
+            <div className="sparkling-power-card">
+              <div className="sparkling-power-header">
+                <span className="sparkling-power-title">
+                  <img src="/modifier_images/sandwich.png" alt="" className="w-5 h-5 object-contain shrink-0" />
+                  <span>Sparkling Power Sandwich</span>
+                </span>
+                <span className="sparkling-power-badge">
+                  {currentSparklingLevel === 0 ? "Off" : `Level ${currentSparklingLevel}`}
+                </span>
+              </div>
+              <div className="sparkling-level-stepper">
+                {[
+                  { level: 0, label: "Off" },
+                  { level: 1, label: "Lv 1" },
+                  { level: 2, label: "Lv 2" },
+                  { level: 3, label: "Lv 3" }
+                ].map(({ level, label }) => (
                   <button
-                    className="popout-overlay-btn"
-                    title="Popout hunt window"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(
-                        `/hunt-popout?huntId=${hunt.id}`,
-                        `hunt-popout-${hunt.id}`,
-                        'width=500,height=400,resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,status=no'
-                      );
+                    key={level}
+                    type="button"
+                    className={`sparkling-level-tab ${currentSparklingLevel === level ? "is-active" : ""}`}
+                    onClick={() => {
+                      setMods(prev => ({
+                        ...prev,
+                        sparklingLv1: level === 1,
+                        sparklingLv2: level === 2,
+                        sparklingLv3: level === 3
+                      }));
                     }}
                   >
-                    <Maximize2 size={20} />
+                    {label}
                   </button>
-                )}
-                <div className="hunt-header">
-                  {!expandedHunts.has(hunt.id) ? (
-                    // Normal view: Pokemon name and sprite
-                    <>
-                      <div className="hunt-pokemon">
-                        <img
-                          src={getPokemonImage(hunt.pokemon)}
-                          alt={formatPokemonName(hunt.pokemon.name)}
-                          className="hunt-pokemon-image"
-                        />
-                        <div className="hunt-pokemon-info">
-                          <h3>{formatPokemonName(hunt.pokemon.name)}</h3>
-                          {hunt.pokemon.formType && hunt.pokemon.formType !== "main" && (
-                            <div className="hunt-pokemon-form">
-                              {hunt.pokemon.formType === "alpha" || hunt.pokemon.formType === "alphaother"
-                                ? "Alpha"
-                                : hunt.pokemon.formType === "alphaother"
-                                  ? "Alpha Forms"
-                                  : hunt.pokemon.formType === "gmax"
-                                    ? "Gigantamax"
-                                    : hunt.pokemon.formType === "alolan"
-                                      ? "Alolan"
-                                      : hunt.pokemon.formType === "galarian"
-                                        ? "Galarian"
-                                        : hunt.pokemon.formType === "hisuian"
-                                          ? "Hisuian"
-                                          : hunt.pokemon.formType === "paldean"
-                                            ? "Paldean"
-                                            : hunt.pokemon.formType === "therian"
-                                              ? "Therian"
-                                              : hunt.pokemon.formType === "ash-cap" || hunt.pokemon.formType === "partner-cap"
-                                                ? "Partner Cap"
-                                                : hunt.pokemon.formType}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="hunt-actions">
-                        {!expandedHunts.has(hunt.id) ? (
-                          <>
-                            {hunt.method !== "Permutations" && (
-                              <button
-                                onClick={() => handleResetHunt(hunt.id)}
-                                className="hunt-reset-btn"
-                                title="Reset hunt"
-                              >
-                                <RotateCcw size={16} />
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleDeleteHunt(hunt.id)}
-                              className="hunt-delete-btn"
-                              title="Delete hunt"
-                              style={hunt.method === "Permutations" ? { gridColumn: '2', gridRow: '1' } : {}}
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                            {hunt.method !== "Permutations" && (
-                              <button
-                                onClick={() => handleSettingsHunt(hunt.id)}
-                                className="hunt-settings-btn"
-                                title="Hunt settings"
-                              >
-                                <Settings size={16} />
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleInfoHunt(hunt.id)}
-                              className="hunt-info-btn"
-                              title="Show hunt details"
-                              style={hunt.method === "Permutations" ? { gridColumn: '2', gridRow: '2' } : {}}
-                            >
-                              <Info size={16} />
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              onClick={() => handleEditHunt(hunt.id)}
-                              className="hunt-edit-btn"
-                              title="Edit hunt"
-                            >
-                              <Edit size={16} />
-                            </button>
-                            <button
-                              onClick={() => handleInfoHunt(hunt.id)}
-                              className="hunt-info-btn"
-                              title="Hide hunt details"
-                            >
-                              <X size={16} />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </>
-                  ) : (
-                    // Expanded view: Game and method details
-                    <>
-                      <div className="hunt-details">
-                        <div className="hunt-detail-item">Game: {hunt.game || "NA"}</div>
-                        <div className="hunt-detail-item">Method: {hunt.method || "NA"}</div>
-                      </div>
-                      <div className="hunt-actions expanded-view">
-                        <button
-                          onClick={() => handleEditHunt(hunt.id)}
-                          className="hunt-edit-btn"
-                          title="Edit hunt"
-                          style={{ gridColumn: '2', gridRow: '1' }}
-                        >
-                          <Edit size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleInfoHunt(hunt.id)}
-                          className="hunt-info-btn"
-                          title="Hide hunt details"
-                          style={{ gridColumn: '2', gridRow: '2' }}
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {hunt.method === "Permutations" ? (
-                  <div className="hunt-checks mmo-redirect" style={{ padding: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <button
-                      className="mmo-redirect-btn"
-                      onClick={() => navigate('/mmo-tool')}
-                      style={{
-                        width: '100%',
-                        padding: '13px',
-                        fontSize: '1.1rem',
-                        backgroundColor: 'var(--accent)',
-                        color: 'var(--bg-color)',
-                        borderRadius: '8px',
-                        border: 'none',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        transition: 'transform 0.2s, opacity 0.2s',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.opacity = '0.9';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.opacity = '1';
-                      }}
-                    >
-                      <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>Permutation chart</span>
-                    </button>
-                  </div>
-                ) : (
-                  <div className="hunt-checks">
-                    <div className="checks-display">
-                      <span className="checks-count">{hunt.checks}</span>
-                      <button
-                        onClick={() => handleDecreaseCheck(hunt.id)}
-                        className="decrease-check-btn"
-                        title="Decrease check"
-                        disabled={hunt.checks <= 0}
-                      >
-                        <Minus size={12} />
-                      </button>
-                    </div>
-                    <div className="timer-display">
-                      <div className="total-time">
-                        {formatTime(totalCheckTimes[hunt.id] || 0)}
-                      </div>
-                      <div className="last-check-time">
-                        <TimerDisplay
-                          huntId={hunt.id}
-                          lastCheckTime={lastCheckTimes[hunt.id] || huntTimers[hunt.id]}
-                          isPaused={pausedHunts.has(hunt.id)}
-                          onTimeUpdate={handleBottomTimerUpdate}
-                        />
-                      </div>
-                    </div>
-                    <div className="checks-buttons">
-                      <button
-                        onClick={() => handlePauseHunt(hunt.id)}
-                        className="pause-btn"
-                        title={pausedHunts.has(hunt.id) ? "Resume hunt" : "Pause hunt"}
-                      >
-                        {pausedHunts.has(hunt.id) ? <Play size={16} /> : <Pause size={16} />}
-                      </button>
-                      <button
-                        onClick={() => handleDecreaseCheck(hunt.id)}
-                        className="decrease-check-btn"
-                        title="Decrease check"
-                        disabled={hunt.checks <= 0}
-                      >
-                        <Minus size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleAddCheck(hunt.id)}
-                        className="add-check-btn"
-                        title="Add check"
-                      >
-                        <Plus size={16} />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                <div className="hunt-complete">
-                  <div 
-                    className="hunt-odds-display" 
-                    style={hunt.method === "Permutations" ? { flex: 1, justifyContent: "center" } : {}}
-                  >
-                    <span className="odds-label">Odds:</span>
-                    <span className="odds-value">
-                      {(() => {
-                        // Special case for Ultra Wormholes in Ultra Sun/Ultra Moon
-                        if (hunt.method === "Ultra Wormholes" && (hunt.game === "Ultra Sun" || hunt.game === "Ultra Moon")) {
-                          return "1% - 36%";
-                        }
-
-                        // Use the hunt's own modifiers instead of global modifiers
-                        // Provide default modifiers if not present (for backward compatibility)
-                        const huntModifiers = hunt.modifiers || {
-                          shinyCharm: false,
-                          shinyParents: false,
-                          lureActive: false,
-                          researchLv10: false,
-                          perfectResearch: false,
-                          sparklingLv1: false,
-                          sparklingLv2: false,
-                          sparklingLv3: false,
-                          eventBoosted: false,
-                          communityDay: false,
-                          raidDay: false,
-                          researchDay: false,
-                          galarBirds: false,
-                          hatchDay: false
-                        };
-
-                        // For Poke Radar in Diamond/Pearl/Platinum, calculate current odds based on chain length
-                        if (hunt.method === "Poke Radar" && (hunt.game === "Diamond" || hunt.game === "Pearl" || hunt.game === "Platinum")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For Poke Radar in X/Y, calculate current odds based on chain length
-                        if (hunt.method === "Poke Radar" && (hunt.game === "X" || hunt.game === "Y")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For Poke Radar in Brilliant Diamond/Shining Pearl, calculate current odds based on chain length
-                        if (hunt.method === "Poke Radar" && (hunt.game === "Brilliant Diamond" || hunt.game === "Shining Pearl")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For Chain Fishing in X/Y, calculate current odds based on streak length
-                        if (hunt.method === "Chain Fishing" && (hunt.game === "X" || hunt.game === "Y")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For Chain Fishing in Omega Ruby/Alpha Sapphire, calculate current odds based on streak length
-                        if (hunt.method === "Chain Fishing" && (hunt.game === "Omega Ruby" || hunt.game === "Alpha Sapphire")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For DexNav in Omega Ruby/Alpha Sapphire, calculate current odds based on search level
-                        if (hunt.method === "DexNav" && (hunt.game === "Omega Ruby" || hunt.game === "Alpha Sapphire")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For SOS method in Sun/Moon and Ultra Sun/Ultra Moon, calculate current odds based on chain length
-                        if (hunt.method === "SOS" && (hunt.game === "Sun" || hunt.game === "Moon" || hunt.game === "Ultra Sun" || hunt.game === "Ultra Moon")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For KO Method in Sword/Shield, calculate current odds based on KO count
-                        if (hunt.method === "KO Method" && (hunt.game === "Sword" || hunt.game === "Shield")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For Catch Combo in Let's Go games, calculate current odds based on combo count
-                        if (hunt.method === "Catch Combo" && (hunt.game === "Let's Go Pikachu" || hunt.game === "Let's Go Eevee")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For Mass Outbreaks in Scarlet/Violet, calculate current odds based on checks cleared
-                        if (hunt.method === "Mass Outbreaks" && (hunt.game === "Scarlet" || hunt.game === "Violet")) {
-                          return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, hunt.checks)}`;
-                        }
-                        // For all other methods, use the stored odds
-                        if (hunt.odds === null) {
-                          return "NA";
-                        }
-                        return `1/${hunt.odds || 4096}`;
-                      })()}
-                    </span>
-                  </div>
-                  {hunt.method !== "Permutations" && (
-                    <button
-                      onClick={() => handleCompleteHunt(hunt)}
-                      className="complete-hunt-btn"
-                    >
-                      <Check size={16} />
-                      Complete Hunt
-                    </button>
-                  )}
-                </div>
+                ))}
               </div>
-            ))}
+            </div>
+          )}
 
-            {/* Add Hunt Card - always at the end */}
-            <div className="add-hunt-card" onClick={handleAddHunt}>
-              <div className="add-hunt-content">
-                <div className="add-hunt-icon">
-                  <Plus size={32} />
-                </div>
-                <h3>Start New Hunt</h3>
-              </div>
+          {/* 3. Event Outbreak Boost */}
+          {isSV && selectedMethod === "Mass Outbreaks" && (
+            <button
+              type="button"
+              className={`modifier-select-btn ${currentMods.eventBoosted ? "is-active" : ""}`}
+              onClick={() => setMods(prev => ({ ...prev, eventBoosted: !prev.eventBoosted }))}
+            >
+              <span className="modifier-btn-left">
+                <img src="/modifier_images/eventboosted.png" alt="" className="w-5 h-5 object-contain shrink-0" />
+                <span>Event Outbreak Boost (+1 Roll)</span>
+              </span>
+              <span className="modifier-btn-status">
+                {currentMods.eventBoosted ? "Active ✓" : "Off"}
+              </span>
+            </button>
+          )}
+
+          {/* 4. Let's Go Lure */}
+          {isLetsGoLure && (
+            <button
+              type="button"
+              className={`modifier-select-btn ${currentMods.lureActive ? "is-active" : ""}`}
+              onClick={() => setMods(prev => ({ ...prev, lureActive: !prev.lureActive }))}
+            >
+              <span className="modifier-btn-left">
+                <img src="/modifier_images/lure.png" alt="" className="w-5 h-5 object-contain shrink-0" />
+                <span>Active Lure (+1 Roll)</span>
+              </span>
+              <span className="modifier-btn-status">
+                {currentMods.lureActive ? "Active ✓" : "Off"}
+              </span>
+            </button>
+          )}
+
+          {/* 5. Legends Arceus Research */}
+          {isPLA && (
+            <>
+              <button
+                type="button"
+                className={`modifier-select-btn ${currentMods.researchLv10 ? "is-active" : ""}`}
+                onClick={() => setMods(prev => {
+                  const nextLv10 = !prev.researchLv10;
+                  return {
+                    ...prev,
+                    researchLv10: nextLv10,
+                    ...(!nextLv10 ? { perfectResearch: false, shinyCharm: false } : {})
+                  };
+                })}
+              >
+                <span className="modifier-btn-left">
+                  <img src="/modifier_images/research.png" alt="" className="w-5 h-5 object-contain shrink-0" />
+                  <span>Research Level 10</span>
+                </span>
+                <span className="modifier-btn-status">
+                  {currentMods.researchLv10 ? "Active ✓" : "Off"}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className={`modifier-select-btn ${currentMods.perfectResearch ? "is-active" : ""}`}
+                onClick={() => setMods(prev => {
+                  const nextPerfect = !prev.perfectResearch;
+                  return {
+                    ...prev,
+                    perfectResearch: nextPerfect,
+                    ...(nextPerfect ? { researchLv10: true } : {})
+                  };
+                })}
+              >
+                <span className="modifier-btn-left">
+                  <img src="/modifier_images/perfectresearch.png" alt="" className="w-5 h-5 object-contain shrink-0" />
+                  <span>Perfect Research Entry</span>
+                </span>
+                <span className="modifier-btn-status">
+                  {currentMods.perfectResearch ? "Active ✓" : "Off"}
+                </span>
+              </button>
+            </>
+          )}
+
+          {/* 6. Gen 2 Shiny Parents */}
+          {isGen2Breeding && (
+            <button
+              type="button"
+              className={`modifier-select-btn ${currentMods.shinyParents ? "is-active" : ""}`}
+              onClick={() => setMods(prev => ({ ...prev, shinyParents: !prev.shinyParents }))}
+            >
+              <span className="modifier-btn-left">
+                <img src="/modifier_images/shinyparents.png" alt="" className="w-5 h-5 object-contain shrink-0" />
+                <span>Shiny Parent (1/64)</span>
+              </span>
+              <span className="modifier-btn-status">
+                {currentMods.shinyParents ? "Active ✓" : "Off"}
+              </span>
+            </button>
+          )}
+
+          {/* 7. Pokémon GO Events */}
+          {isGO && (
+            <>
+              <button
+                type="button"
+                className={`modifier-select-btn ${currentMods.communityDay ? "is-active" : ""}`}
+                onClick={() => setMods(prev => ({
+                  ...prev,
+                  communityDay: !prev.communityDay,
+                  ...(!prev.communityDay ? { raidDay: false, researchDay: false } : {})
+                }))}
+              >
+                <span className="modifier-btn-left">
+                  <span>Community Day (1/25)</span>
+                </span>
+                <span className="modifier-btn-status">
+                  {currentMods.communityDay ? "Active ✓" : "Off"}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className={`modifier-select-btn ${currentMods.raidDay ? "is-active" : ""}`}
+                onClick={() => setMods(prev => ({
+                  ...prev,
+                  raidDay: !prev.raidDay,
+                  ...(!prev.raidDay ? { communityDay: false, researchDay: false } : {})
+                }))}
+              >
+                <span className="modifier-btn-left">
+                  <span>Raid Day (1/10)</span>
+                </span>
+                <span className="modifier-btn-status">
+                  {currentMods.raidDay ? "Active ✓" : "Off"}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className={`modifier-select-btn ${currentMods.researchDay ? "is-active" : ""}`}
+                onClick={() => setMods(prev => ({
+                  ...prev,
+                  researchDay: !prev.researchDay,
+                  ...(!prev.researchDay ? { communityDay: false, raidDay: false } : {})
+                }))}
+              >
+                <span className="modifier-btn-left">
+                  <span>Research Day (1/10)</span>
+                </span>
+                <span className="modifier-btn-status">
+                  {currentMods.researchDay ? "Active ✓" : "Off"}
+                </span>
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderDetailedHuntCard = (hunt) => {
+    if (!hunt) return null;
+    return (
+      <DetailedHuntCard
+        hunt={hunt}
+        isPopout={false}
+        getPokemonImage={getPokemonImage}
+        useHomeSprites={useHomeSprites}
+        getFormDisplayName={getFormDisplayName}
+        hotkey={hotkey}
+        decrementHotkey={decrementHotkey}
+        huntIncrement={huntIncrements[hunt.id] || 1}
+        metricMode={metricMode}
+        onToggleMetricMode={toggleMetricMode}
+        isPhasesCollapsed={!!collapsedPhasesMap[hunt.id]}
+        onToggleCollapsePhases={() => handleToggleCollapsePhases(hunt.id)}
+        isMenuOpen={openMenuHuntId === hunt.id}
+        onToggleMenu={() => setOpenMenuHuntId(openMenuHuntId === hunt.id ? null : hunt.id)}
+        onAddCheck={handleAddCheck}
+        onDecreaseCheck={handleDecreaseCheck}
+        onTogglePause={handleTogglePause}
+        onReset={(h) => setResetModal({ show: true, hunt: h })}
+        onLogShiny={handleOpenShinyEncounterModal}
+        onOpenOdds={(h) => setOddsModal({ show: true, hunt: h })}
+        onOpenHistory={(h) => setPhaseHistoryModal({ show: true, hunt: h })}
+        onAdjustValues={(h, elapsedMs) => {
+          const totalSec = Math.floor(elapsedMs / 1000);
+          const hours = Math.floor(totalSec / 3600);
+          const minutes = Math.floor((totalSec % 3600) / 60);
+          const seconds = totalSec % 60;
+          setSettingsForm({
+            manualChecks: h.checks,
+            hours,
+            minutes,
+            seconds,
+            manualIncrements: huntIncrements[h.id] || huntIncrements[String(h.id)] || 1
+          });
+          setSettingsModal({ show: true, hunt: h });
+        }}
+        onPopout={handleOpenPopout}
+        onDelete={(h) => setDeleteModal({ show: true, hunt: h })}
+      />
+    );
+  };
+
+  const renderCompactHuntCard = (hunt) => {
+    const formLabel = getFormDisplayName(hunt.pokemon);
+    const phaseCount = (hunt.phases?.length || 0) + 1;
+
+    return (
+      <button
+        key={hunt.id}
+        type="button"
+        className="compact-hunt-card is-paused"
+        onClick={() => handleSwitchCurrentHunt(hunt.id)}
+        title={`Select shiny ${formatPokemonName(hunt.pokemon?.name)} as Current Hunt`}
+      >
+        <div className="compact-hunt-main">
+          <div className="compact-hunt-sprite-well">
+            <img
+              src={getPokemonImage(hunt.pokemon)}
+              alt={hunt.pokemon?.name || "Pokemon"}
+              className={`compact-hunt-sprite ${!useHomeSprites ? "pixelated" : ""}`}
+              style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+            />
+          </div>
+
+          <div className="compact-hunt-info">
+            <div className="compact-hunt-name-row">
+              <span className="compact-hunt-name">
+                {formatPokemonName(hunt.pokemon?.name)}
+              </span>
+              {formLabel && (
+                <span className="text-[10px] text-[var(--accent)] font-semibold truncate max-w-[120px]">
+                  {formLabel}
+                </span>
+              )}
+            </div>
+
+            <div className="compact-hunt-meta">
+              <span className="font-semibold text-white/90">{hunt.game}</span>
+              <span>•</span>
+              <span className="truncate max-w-[130px]">{hunt.method}</span>
+              {phaseCount > 1 && (
+                <>
+                  <span>•</span>
+                  <span className="text-[var(--accent)] font-bold">Phase {phaseCount}</span>
+                </>
+              )}
             </div>
           </div>
         </div>
 
+        <div className="compact-hunt-end">
+          <div className="flex flex-col items-end gap-0.5">
+            <span className="compact-hunt-checks">
+              {hunt.checks.toLocaleString()} checks
+            </span>
+            <span className="compact-hunt-status paused">
+              Paused
+            </span>
+          </div>
+
+          <ChevronRight size={18} className="text-gray-400 shrink-0" />
+        </div>
+      </button>
+    );
+  };
+
+  return (
+    <div className={`counters-page fade-in-content ${!useHomeSprites ? "using-gen5-sprites" : ""}`}>
+      {/* ============================================================
+          1. HEADER & LIVE QUICK STATS BAR
+          ============================================================ */}
+      <div className="counters-header-row">
+        <div className="counters-title-block">
+          <h1 className="counters-page-title">
+            Counters
+          </h1>
+        </div>
+
+        {/* Global Live Summary Chips */}
+        <div className="counters-stats-banner">
+          <div className="stat-chip active-hunts" title="Total active ongoing hunts">
+            <span className="stat-chip-icon"><Flame size={18} /></span>
+            <span><strong className="stat-chip-value">{activeCount}</strong> Active Hunts</span>
+          </div>
+
+          <div className="stat-chip today-checks" title="Encounters checked across hunts">
+            <span className="stat-chip-icon"><CheckCircle size={18} /></span>
+            <span><strong className="stat-chip-value">{totalChecksToday.toLocaleString()}</strong> Total Checks</span>
+          </div>
+
+          <div className="stat-chip total-time" title="Total accumulated hunt timer">
+            <span className="stat-chip-icon"><Clock size={18} /></span>
+            <span><strong className="stat-chip-value">{formatSummaryTime(totalHuntingTimeMs)}</strong> Hunting</span>
+          </div>
+        </div>
+
+        {/* Top Right Controls: Hotkey + Action Buttons */}
+        <div className="counters-header-actions">
+          <div
+            className="hotkey-badge-pill cursor-pointer flex items-center gap-1.5"
+            onClick={() => setHotkeyModal(true)}
+            title="Click to configure quick check hotkeys"
+          >
+            <span>Hotkeys:</span>
+            <span className="hotkey-tag decrement-tag" title="Subtract Encounters Hotkey">
+              {formatHotkeyLabel(decrementHotkey)}
+            </span>
+            <span className="hotkey-tag increment-tag" title="Add Encounters Hotkey">
+              {formatHotkeyLabel(hotkey)}
+            </span>
+          </div>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              loadHuntHistory();
+              setShowHistoryModal(true);
+            }}
+            icon={<History size={16} />}
+          >
+            <span>History</span>
+            {countersHistoryCount > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-black bg-white/15 text-white border border-white/10 leading-none">
+                {countersHistoryCount}
+              </span>
+            )}
+          </Button>
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => handleOpenHuntWizard()}
+            icon={<Plus size={16} strokeWidth={2.5} />}
+          >
+            New Hunt
+          </Button>
+        </div>
       </div>
 
-      {/* Combined Modal Backdrop - Persistent between Pokemon and Hunt modals */}
-      {((showPokemonModal || pokemonModalClosing) || (showHuntModal || huntModalClosing) || backdropClosing) && (
-        <div
-          className={`pokemon-modal-backdrop ${backdropClosing ? 'closing' : ''}`}
-        >
-          {/* Pokemon Selection Modal */}
-          {(showPokemonModal || pokemonModalClosing) && (
-            <div className={`pokemon-modal ${pokemonModalClosing ? 'closing' : ''}`}>
-              <div className="pokemon-modal-header">
-                <h2>Select Pokemon to Hunt</h2>
-                <button
-                  onClick={() => {
-                    if (!pokemonModalClosing) {
-                      setPokemonModalClosing(true);
-                      setBackdropClosing(true);
-                      setIsEditingPokemon(false); // Reset editing state when closing modal
-                      setTimeout(() => {
-                        setShowPokemonModal(false);
-                        setPokemonModalClosing(false);
-                        setBackdropClosing(false);
-                      }, 300);
-                    }
-                  }}
-                  className="close-btn"
-                  aria-label="Close"
-                >
-                  <span className="sidebar-close-icon">
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="20" cy="20" r="18" fill="#fff" stroke="#232323" strokeWidth="2" />
-                      <path d="M2 20a18 18 0 0 1 36 0" fill="#e62829" stroke="#232323" strokeWidth="2" />
-                      <rect x="2" y="19" width="36" height="2" fill="#232323" />
-                      <circle cx="20" cy="20" r="7" fill="#ffffffff" stroke="#232323" strokeWidth="2" />
-                      <circle cx="20" cy="20" r="3.5" fill="#fff" stroke="#232323" strokeWidth="1.5" />
-                    </svg>
-                  </span>
-                </button>
+      <div className="counters-divider" />
+
+      {/* ============================================================
+          2. HUNT LAYOUT: CURRENT HUNT + COMPACT HUNT QUEUE
+          ============================================================ */}
+      {activeHunts.length === 0 ? (
+        <div className="hunts-empty-state">
+          <div className="hunts-empty-logo-stack">
+            <img
+              src="/counters_logos/counters_logo1.png"
+              alt=""
+              className="hunts-empty-logo-layer base-layer"
+              draggable={false}
+            />
+            <div
+              className="hunts-empty-logo-layer accent-layer"
+              aria-hidden="true"
+            />
+          </div>
+
+          <div className="hunts-empty-text-group">
+            <h3 className="empty-state-title">Ready for your next hunt?</h3>
+            <p className="empty-state-description">
+              Track encounters, time, and odds
+              <br />
+              all in one place.
+            </p>
+          </div>
+
+          <Button
+            variant="primary"
+            size="lg"
+            className="empty-state-start-btn"
+            onClick={() => handleOpenHuntWizard()}
+            icon={<Plus size={18} strokeWidth={2.5} />}
+          >
+            Start New Hunt
+          </Button>
+        </div>
+      ) : (
+        <div className="counters-hunt-layout">
+          {/* CURRENT HUNT SECTION */}
+          <section className="current-hunt-section">
+            <div className="counters-section-header">
+              <h2 className="counters-section-title">
+                CURRENT HUNT
+              </h2>
+            </div>
+
+            <div className="current-hunt-container">
+              {currentHunt && (() => {
+                const isPhasesCollapsed = !!collapsedPhasesMap[currentHunt.id];
+                const hasPhasesOrFails = (currentHunt.phases?.length || 0) > 0;
+                const showPhasesPanel = hasPhasesOrFails && !isPhasesCollapsed;
+
+                return (
+                  <div key={currentHunt.id} className={`current-hunt-wrapper ${showPhasesPanel ? "has-phases-panel" : ""}`}>
+                    <div className="current-hunt-card-box">
+                      {renderDetailedHuntCard(currentHunt)}
+                    </div>
+
+                    {hasPhasesOrFails && (
+                      <div className={`current-hunt-phases-box ${showPhasesPanel ? "is-open" : "is-closed"}`}>
+                        <div className="hunt-phases-panel">
+                          <div className="hunt-phases-panel-header">
+                            <div className="flex items-center gap-2">
+                              <History size={17} className="text-[var(--accent)]" />
+                              <h3 className="hunt-phases-panel-title">FAILS & PHASES</h3>
+                            </div>
+                            <span className="hunt-phases-count-badge">
+                              {currentHunt.phases.length}
+                            </span>
+                          </div>
+
+                          <div className="hunt-phases-panel-list custom-scrollbar">
+                            {currentHunt.phases.map((phase, idx) => {
+                              const info = getPhaseEntryDisplayInfo(phase, currentHunt.phases);
+                              const displayChecks = getPhaseDisplayChecks(phase, currentHunt.phases);
+                              return (
+                                <div
+                                  key={phase.id || idx}
+                                  className={`hunt-phase-card-item ${info.isFail ? "is-failed" : "is-caught"}`}
+                                >
+                                  <div className="hunt-phase-item-sprite-well">
+                                    <img
+                                      src={getPokemonImage(phase.pokemon)}
+                                      alt=""
+                                      className={`hunt-phase-item-sprite ${!useHomeSprites ? "pixelated" : ""}`}
+                                      style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                                      onError={(e) => { e.currentTarget.src = "/fallback.png"; }}
+                                    />
+                                  </div>
+
+                                  <div className="hunt-phase-item-body">
+                                    <div className="hunt-phase-item-top">
+                                      <span className={`hunt-phase-item-label ${info.isFail ? "text-rose-400" : "text-[var(--accent)]"}`}>
+                                        {info.label}
+                                      </span>
+                                      <span className="hunt-phase-item-name">
+                                        {formatPokemonName(phase.pokemon?.name)}
+                                      </span>
+                                    </div>
+
+                                    <div className="hunt-phase-item-metrics">
+                                      <span>{displayChecks.intervalChecks.toLocaleString()} checks</span>
+                                      <span>•</span>
+                                      <span>Total: {displayChecks.totalChecks.toLocaleString()}</span>
+                                      {phase.elapsedMs > 0 && (
+                                        <>
+                                          <span>•</span>
+                                          <span className="font-mono">{formatDigitalTime(phase.elapsedMs)}</span>
+                                        </>
+                                      )}
+                                    </div>
+
+                                    {phase.notes && (
+                                      <p className="hunt-phase-item-notes">"{phase.notes}"</p>
+                                    )}
+                                  </div>
+
+                                  {phase.ball && (
+                                    <span className="hunt-phase-item-ball-badge" title={`Caught in ${phase.ball}`}>
+                                      {phase.ball}
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          </section>
+
+          {/* OTHER HUNTS QUEUE */}
+          {otherHunts.length > 0 && (
+            <section className="other-hunts-section">
+              <div className="counters-section-header other-hunts-header">
+                <h2 className="counters-section-title">
+                  OTHER HUNTS <span className="counters-section-count">{otherHunts.length}</span>
+                </h2>
               </div>
 
-              <div className="pokemon-modal-content">
-                <div className="pokemon-modal-search-row">
-                  <div className="relative flex-1">
-                    <input
-                      type="text"
-                      placeholder="Search Pokemon..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="search-input"
-                    />
-                    {searchTerm && (
+              <div className="other-hunts-grid">
+                {otherHunts.map(hunt => renderCompactHuntCard(hunt))}
+              </div>
+            </section>
+          )}
+        </div>
+      )}
+
+      {/* ============================================================
+          MODALS & DIALOGS (WITH UNIVERSAL FORM SYSTEM)
+          ============================================================ */}
+
+      {/* ============================================================
+          1. UNIFIED 4-STEP HUNT SETUP WIZARD (UNIVERSAL MODAL)
+          ============================================================ */}
+      <Modal
+        isOpen={huntWizard.isOpen}
+        onClose={() => setHuntWizard(prev => ({ ...prev, isOpen: false }))}
+        title="Shiny Hunt Setup"
+        subtitle={`Step ${huntWizard.step + 1} of 5: ${
+          huntWizard.step === 0 ? "Game, Method & Modifiers" :
+          huntWizard.step === 1 ? (huntWizard.game ? `Target Pokémon (${huntWizard.game})` : "Target Pokémon") :
+          huntWizard.step === 2 ? "Possible Phases — Optional" :
+          huntWizard.step === 3 ? "Counter & Initial Settings" :
+          "Review Hunt & Live Odds"
+        }`}
+        icon={<Sparkles size={22} />}
+        size="md"
+        className="!max-w-[700px]"
+        closeOnBackdrop={false}
+        footer={({ close }) => (
+          <div className="flex items-center justify-between w-full">
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={close}
+            >
+              Cancel
+            </Button>
+
+            <div className="flex items-center gap-2.5">
+              {huntWizard.step > 0 && (
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={() => setHuntWizard(prev => ({ ...prev, step: prev.step - 1 }))}
+                >
+                  Back
+                </Button>
+              )}
+              <Button
+                variant="primary"
+                size="md"
+                onClick={huntWizard.step === 4 ? handleStartWizardHunt : () => setHuntWizard(prev => ({ ...prev, step: prev.step + 1 }))}
+                disabled={
+                  (huntWizard.step === 0 && (!huntWizard.game || !huntWizard.method)) ||
+                  (huntWizard.step === 1 && !huntWizard.selectedPokemon)
+                }
+                icon={huntWizard.step === 4 ? <Sparkles size={16} strokeWidth={2.5} /> : undefined}
+              >
+                {huntWizard.step === 4
+                  ? "Start Hunting"
+                  : huntWizard.step === 2 && huntWizard.possiblePhases.length === 0
+                  ? "Skip"
+                  : "Next"}
+              </Button>
+            </div>
+          </div>
+        )}
+      >
+        <div>
+          {/* Styled Progress Stepper Header */}
+          <div className="onboarding-progress-container hunt-wizard-progress-container">
+            <div className="onboarding-progress-track" />
+            <div
+              className="onboarding-progress-fill"
+              style={{ width: `calc(${(huntWizard.step / 4)} * (100% - 86px))` }}
+            />
+
+            {[
+              { id: "game", shortLabel: "GAME", title: "Game & Modifiers" },
+              { id: "hunt", shortLabel: "HUNT", title: "Target Pokémon" },
+              { id: "phases", shortLabel: "PHASES", title: "Phase Encounters" },
+              { id: "settings", shortLabel: "COUNTER", title: "Counter & Settings" },
+              { id: "preview", shortLabel: "PREVIEW", title: "Review Hunt & Live Odds" }
+            ].map((step, i) => {
+              const isActive = i === huntWizard.step;
+              const isCompleted = i < huntWizard.step;
+              const isUpcoming = i > huntWizard.step;
+              const isDisabled = (i > 0 && (!huntWizard.game || !huntWizard.method)) || (i > 1 && !huntWizard.selectedPokemon);
+
+              return (
+                <button
+                  key={step.id}
+                  type="button"
+                  className="onboarding-step-wrapper"
+                  disabled={isDisabled}
+                  onClick={() => {
+                    if (isDisabled) return;
+                    setHuntWizard(prev => ({ ...prev, step: i }));
+                  }}
+                  title={`Go to Step ${i + 1}: ${step.title}`}
+                >
+                  <div className={`onboarding-step-circle ${isActive ? 'active' : isCompleted ? 'completed' : 'upcoming'}`}>
+                    {isCompleted ? <Check size={14} strokeWidth={3} /> : i + 1}
+                  </div>
+                  <span className={`onboarding-step-label ${isActive ? 'active' : isCompleted ? 'completed' : 'upcoming'}`}>
+                    {step.shortLabel}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Dynamic Step Content */}
+          <div style={{ minHeight: '120px' }}>
+            {/* Step 1: Game, Method & Modifiers */}
+            {huntWizard.step === 0 && (
+              <div className="space-y-4">
+                <div className="hunt-modal-grid">
+                  <SelectField
+                    label="Game Version"
+                    options={GAME_OPTIONS.filter(g => g.value && g.name !== "None").map(g => ({
+                      value: g.value,
+                      label: g.name,
+                      image: g.image
+                    }))}
+                    value={huntWizard.game}
+                    placeholder="Select a game..."
+                    onChange={(nextGame) => {
+                      const defaultMethod = nextGame ? (getMethodsForGame(nextGame)[0]?.name || "") : "";
+                      const availableMods = nextGame ? (getModifiersForGame(nextGame) || {}) : {};
+                      const gameHasCharm = Object.prototype.hasOwnProperty.call(availableMods, "Shiny Charm");
+
+                      setHuntWizard(prev => {
+                        const keepPokemon = prev.selectedPokemon && isPokemonAvailableInGame(prev.selectedPokemon, nextGame) ? prev.selectedPokemon : null;
+                        const keepPhases = (prev.possiblePhases || []).filter(p => isPokemonAvailableInGame(p, nextGame));
+
+                        return {
+                          ...prev,
+                          game: nextGame,
+                          method: defaultMethod,
+                          selectedPokemon: keepPokemon,
+                          possiblePhases: keepPhases,
+                          modifiers: {
+                            shinyCharm: gameHasCharm && shinyCharmGames.includes(nextGame),
+                            sparklingLv1: false,
+                            sparklingLv2: false,
+                            sparklingLv3: false,
+                            eventBoosted: false,
+                            lureActive: false,
+                            researchLv10: nextGame === "Legends Arceus" && Boolean(gameHasCharm && shinyCharmGames.includes(nextGame)),
+                            perfectResearch: false,
+                            shinyParents: false,
+                            communityDay: false,
+                            raidDay: false,
+                            researchDay: false
+                          }
+                        };
+                      });
+                    }}
+                    searchable
+                    fullWidth
+                  />
+
+                  <SelectField
+                    label="Hunting Method"
+                    options={huntWizard.game ? (getMethodsForGame(huntWizard.game) || []).map(m => ({
+                      value: m.name,
+                      label: m.name
+                    })) : []}
+                    value={huntWizard.method}
+                    placeholder={huntWizard.game ? "Select a method..." : "Select a game first"}
+                    disabled={!huntWizard.game}
+                    onChange={(val) => setHuntWizard(prev => ({ ...prev, method: val }))}
+                    fullWidth
+                  />
+                </div>
+
+                {/* Modifiers selector */}
+                {renderModifiersForm(
+                  huntWizard.game,
+                  huntWizard.method,
+                  huntWizard.modifiers,
+                  (callback) => {
+                    setHuntWizard(prev => ({
+                      ...prev,
+                      modifiers: typeof callback === "function" ? callback(prev.modifiers) : callback
+                    }));
+                  }
+                )}
+              </div>
+            )}
+
+            {/* Step 2: HUNT (Target Pokémon) */}
+            {huntWizard.step === 1 && (
+              <div className="space-y-3">
+                <SearchField
+                  value={huntWizard.searchTerm}
+                  onChange={(val) => setHuntWizard(prev => ({ ...prev, searchTerm: typeof val === "string" ? val : val?.target?.value || "" }))}
+                  placeholder={`Search Pokémon in ${huntWizard.game} by name or #dex...`}
+                  fullWidth
+                  autoFocus
+                />
+
+                {/* Form Tabs */}
+                {availableFormTabs.length > 1 && (
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none custom-scrollbar">
+                    {availableFormTabs.map(tab => {
+                      const isActive = (huntWizard.formTab || "all") === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+                            isActive
+                              ? "bg-[var(--accent)] text-black shadow-sm"
+                              : "bg-white/[0.04] text-gray-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]"
+                          }`}
+                          onClick={() => setHuntWizard(prev => ({ ...prev, formTab: tab.id }))}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between text-xs text-gray-400 px-1">
+                  <span>Showing <strong>{wizardGamePokemon.length}</strong> obtainable in <strong>{huntWizard.game}</strong></span>
+                  {huntWizard.selectedPokemon && (
+                    <span className="text-[var(--accent)] font-bold flex items-center gap-1">
+                      Selected: {formatPokemonName(huntWizard.selectedPokemon.name)} ✓
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 max-h-[360px] overflow-y-auto custom-scrollbar pr-1 overscroll-contain">
+                  {wizardGamePokemon.map(pokemon => {
+                    const isSelected = (huntWizard.selectedPokemon?.stableId || huntWizard.selectedPokemon?.name) === (pokemon.stableId || pokemon.name);
+                    const formLabel = getFormDisplayName(pokemon);
+                    const dexNum = pokemon.id != null ? `#${String(pokemon.id).padStart(4, "0")}` : "";
+
+                    return (
+                      <button
+                        key={pokemon.stableId || `${pokemon.id}-${pokemon.name}`}
+                        type="button"
+                        className={`flex flex-col items-center pt-0 pb-2 px-1.5 rounded-xl border transition group text-left relative overflow-hidden ${
+                          isSelected
+                            ? "bg-[var(--accent)]/15 border-[var(--accent)]"
+                            : "bg-white/[0.03] border-white/[0.08] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10"
+                        }`}
+                        onClick={() => {
+                          setHuntWizard(prev => ({
+                            ...prev,
+                            selectedPokemon: pokemon
+                          }));
+                        }}
+                        onDoubleClick={() => {
+                          setHuntWizard(prev => ({
+                            ...prev,
+                            selectedPokemon: pokemon,
+                            step: 2
+                          }));
+                        }}
+                      >
+                        <img
+                          src={getPokemonImage(pokemon)}
+                          alt={pokemon.name}
+                          className={`w-14 h-14 object-contain group-hover:scale-110 transition-transform ${!useHomeSprites ? "pixelated" : ""}`}
+                          style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                        />
+                        <div className="flex flex-col items-center w-full -mt-2.5 relative z-10">
+                          <span className="text-xs font-bold text-white text-center line-clamp-1 max-w-[95%]">
+                            {formatPokemonName(pokemon.name)}
+                          </span>
+                          {dexNum && (
+                            <span className="text-[10px] font-mono text-gray-400 font-medium leading-tight mt-0.5">
+                              {dexNum}
+                            </span>
+                          )}
+                          {formLabel && (
+                            <span className="text-[10px] text-[var(--accent)] font-semibold truncate max-w-[95%] text-center leading-tight mt-0.5">
+                              {formLabel}
+                            </span>
+                          )}
+                        </div>
+                        {isSelected && (
+                          <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[var(--accent)] text-black flex items-center justify-center shrink-0 aspect-square shadow-sm pointer-events-none z-20">
+                            <Check size={11} strokeWidth={3.5} />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: PHASES (Possible Phase Encounters - Optional) */}
+            {huntWizard.step === 2 && (
+              <div className="space-y-3.5">
+                {/* 1. Search Bar */}
+                <SearchField
+                  value={huntWizard.phaseSearchTerm}
+                  onChange={(val) => setHuntWizard(prev => ({ ...prev, phaseSearchTerm: typeof val === "string" ? val : val?.target?.value || "" }))}
+                  placeholder={`Search and add Pokémon in ${huntWizard.game}...`}
+                  fullWidth
+                />
+
+                {/* 2. Form Tabs for Phases */}
+                {availablePhaseFormTabs.length > 1 && (
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none custom-scrollbar">
+                    {availablePhaseFormTabs.map(tab => {
+                      const isActive = (huntWizard.phaseFormTab || "all") === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+                            isActive
+                              ? "bg-[var(--accent)] text-black shadow-sm"
+                              : "bg-white/[0.04] text-gray-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]"
+                          }`}
+                          onClick={() => setHuntWizard(prev => ({ ...prev, phaseFormTab: tab.id }))}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* 3. Selected Phases Header & Chips */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-black text-white">
+                        Selected Phases
+                      </span>
+                      <span className="text-sm font-bold text-[var(--accent)]">
+                        {huntWizard.possiblePhases.length}/10
+                      </span>
+                    </div>
+                    {huntWizard.possiblePhases.length > 0 && (
                       <button
                         type="button"
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 transition-colors"
-                        style={{ color: 'var(--accent)' }}
-                        onMouseEnter={(e) => {
-                          e.target.style.color = 'var(--text)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.color = 'var(--accent)';
-                        }}
-                        onClick={() => setSearchTerm("")}
-                        title="Clear search"
+                        className="text-xs text-[var(--accent)] hover:underline font-bold transition cursor-pointer"
+                        onClick={() => setHuntWizard(prev => ({ ...prev, possiblePhases: [] }))}
                       >
-                        <X size={14} />
+                        Clear All
                       </button>
                     )}
                   </div>
+
+                  {/* Selected Chips Shelf */}
+                  {huntWizard.possiblePhases.length > 0 && (
+                    <div className="flex flex-wrap gap-2 max-h-[80px] overflow-y-auto custom-scrollbar pr-1">
+                      {huntWizard.possiblePhases.map(pkm => (
+                        <div
+                          key={pkm.stableId || `${pkm.id}-${pkm.name}`}
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10 text-xs font-bold text-white shadow-sm hover:border-white/20 transition group"
+                        >
+                          <span>{formatPokemonName(pkm.name)}</span>
+                          <button
+                            type="button"
+                            className="text-gray-400 hover:text-rose-400 transition p-0.5 rounded cursor-pointer"
+                            title="Remove"
+                            onClick={() => {
+                              setHuntWizard(prev => ({
+                                ...prev,
+                                possiblePhases: prev.possiblePhases.filter(
+                                  p => (p.stableId || p.id) !== (pkm.stableId || pkm.id)
+                                )
+                              }));
+                            }}
+                          >
+                            <X size={13} strokeWidth={2.5} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                <div className="pokemon-grid">
-                  {filteredPokemon.map((pokemon, index) => (
-                    <button
-                      key={`pokemon-${pokemon?.id || 'unknown'}-${pokemon?.name || 'unknown'}-${pokemon?.formType || 'main'}-${index}`}
-                      type="button"
-                      className="pokemon-item"
-                      onClick={() => handlePokemonSelect(pokemon)}
-                    >
-                      <img
-                        src={getPokemonImage(pokemon)}
-                        alt={formatPokemonName(String(pokemon?.name || ''))}
-                        className="pokemon-img"
-                      />
-                      <div className="pokemon-text-container">
-                        <div className="pokemon-label">
-                          {pokemon?.name && pokemon.name === "unown"
-                            ? "Unown A" // Main Unown is Unown A
-                            : (pokemon?.name && pokemon.name === "unown-alpha")
-                              ? "Unown A" // Alpha Unown A
-                              : (pokemon?.formType && pokemon.formType !== "main" && pokemon.name && pokemon.name.includes('unown-'))
-                                ? `Unown ${pokemon.name.split('-')[1].toUpperCase()}` // Show "Unown B", "Unown C", etc.
-                                : (pokemon?.formType && pokemon.formType !== "main")
-                                  ? formatPokemonName(String(pokemon?.name || '').split('-')[0])
-                                  : formatPokemonName(String(pokemon?.name || ''))}
+                {/* 4. Grid of Pokémon in this game (multi-select) */}
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1 overscroll-contain">
+                  {wizardGamePhasePokemon.map(pkm => {
+                    const isAdded = huntWizard.possiblePhases.some(
+                      p => (p.stableId || p.id) === (pkm.stableId || pkm.id)
+                    );
+                    const formLabel = getFormDisplayName(pkm);
+                    const dexNum = pkm.id != null ? `#${String(pkm.id).padStart(4, "0")}` : "";
+
+                    return (
+                      <button
+                        key={pkm.stableId || `${pkm.id}-${pkm.name}`}
+                        type="button"
+                        className={`flex flex-col items-center pt-0 pb-2 px-1.5 rounded-xl border transition group text-left relative overflow-hidden ${
+                          isAdded
+                            ? "bg-[var(--accent)]/15 border-[var(--accent)]"
+                            : "bg-white/[0.03] border-white/[0.08] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10"
+                        }`}
+                        onClick={() => {
+                          setHuntWizard(prev => ({
+                            ...prev,
+                            possiblePhases: isAdded
+                              ? prev.possiblePhases.filter(p => (p.stableId || p.id) !== (pkm.stableId || pkm.id))
+                              : prev.possiblePhases.length >= 10
+                              ? prev.possiblePhases
+                              : [...prev.possiblePhases, pkm]
+                          }));
+                        }}
+                      >
+                        <img
+                          src={getPokemonImage(pkm)}
+                          alt={pkm.name}
+                          className={`w-14 h-14 object-contain group-hover:scale-110 transition-transform ${!useHomeSprites ? "pixelated" : ""}`}
+                          style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                        />
+                        <div className="flex flex-col items-center w-full -mt-2.5 relative z-10">
+                          <span className="text-xs font-bold text-white text-center line-clamp-1 max-w-[95%]">
+                            {formatPokemonName(pkm.name)}
+                          </span>
+                          {dexNum && (
+                            <span className="text-[10px] font-mono text-gray-400 font-medium leading-tight mt-0.5">
+                              {dexNum}
+                            </span>
+                          )}
+                          {formLabel && (
+                            <span className="text-[10px] text-[var(--accent)] font-semibold truncate max-w-[95%] text-center leading-tight mt-0.5">
+                              {formLabel}
+                            </span>
+                          )}
                         </div>
-                        {pokemon?.formType && pokemon.formType !== "main" && (
-                          <div className="pokemon-form">
-                            {String(pokemon.formType) === "alpha" ? "Alpha" :
-                              String(pokemon.formType) === "alphaother" ? "Alpha Forms" :
-                                (pokemon.name && pokemon.name.toLowerCase().includes('-alpha')) ? "Alpha" :
-                                  String(pokemon.formType) === "hisuian" ? "Hisuian" :
-                                    String(pokemon.formType) === "galarian" ? "Galarian" :
-                                      String(pokemon.formType) === "alolan" ? "Alolan" :
-                                        String(pokemon.formType) === "paldean" ? "Paldean" :
-                                          String(pokemon.formType) === "gmax" ? "Gigantamax" :
-                                            String(pokemon.formType) === "gender" ? "Gender" :
-                                              String(pokemon.formType) === "unown" ? "Unown" :
-                                                String(pokemon.formType) === "other" ? "Other" :
-                                                  String(pokemon.formType) === "alcremie" ? "Alcremie" :
-                                                    String(pokemon.formType) === "vivillon" ? "Vivillon" :
-                                                      String(pokemon.formType)}
+                        {isAdded && (
+                          <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-[var(--accent)] text-black flex items-center justify-center shrink-0 aspect-square shadow-sm pointer-events-none z-20">
+                            <Check size={11} strokeWidth={3.5} />
                           </div>
                         )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* 5. Bottom Toggle Row */}
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 transition text-left cursor-pointer group"
+                  onClick={() => setHuntWizard(prev => ({ ...prev, allowAnyPhase: prev.allowAnyPhase === false }))}
+                >
+                  <div className="flex items-center gap-2 text-gray-300 font-medium text-xs">
+                    <span className="text-[var(--accent)] font-black text-sm leading-none">+</span>
+                    <span>Any obtainable Pokémon can phase at any time</span>
+                  </div>
+                  <div className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 shrink-0 ${
+                    huntWizard.allowAnyPhase !== false
+                      ? "bg-[var(--accent)]"
+                      : "bg-white/20"
+                  }`}>
+                    <div className={`w-4 h-4 rounded-full bg-black shadow-sm transition-transform ${
+                      huntWizard.allowAnyPhase !== false ? "translate-x-4" : "translate-x-0"
+                    }`} />
+                  </div>
+                </button>
+              </div>
+            )}
+
+            {/* Step 4: COUNTER & INITIAL SETTINGS */}
+            {huntWizard.step === 3 && (
+              <div className="space-y-4">
+                <div className="hunt-modal-card space-y-3 p-4">
+                  <div className="text-xs font-extrabold uppercase tracking-wider text-white">
+                    Counter & Initial Settings
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* 1. Starting Encounters */}
+                    <div>
+                      <label className="hunt-modal-label !text-white text-white font-bold">
+                        Starting Encounters
+                      </label>
+                      <p className="text-[11px] text-gray-400 mb-1.5">
+                        Already started hunting before tracking here? Enter your existing check count.
+                      </p>
+                      <div className="flex items-stretch rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden">
+                        <input
+                          type="number"
+                          min="0"
+                          className="w-full bg-transparent pl-3 pr-2 py-2 text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          value={huntWizard.startingChecks}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            if (v === "") {
+                              setHuntWizard(prev => ({ ...prev, startingChecks: "" }));
+                            } else {
+                              const n = parseInt(v, 10);
+                              setHuntWizard(prev => ({ ...prev, startingChecks: isNaN(n) ? 0 : Math.max(0, n) }));
+                            }
+                          }}
+                          onBlur={() => setHuntWizard(prev => ({ ...prev, startingChecks: Math.max(0, parseInt(prev.startingChecks, 10) || 0) }))}
+                          placeholder="0"
+                        />
+                        <div className="flex flex-col border-l border-white/10 divide-y divide-white/10 shrink-0">
+                          <button
+                            type="button"
+                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            onClick={() => setHuntWizard(prev => ({ ...prev, startingChecks: (parseInt(prev.startingChecks, 10) || 0) + 1 }))}
+                            title="Increment"
+                          >
+                            <ChevronUp size={11} strokeWidth={3} />
+                          </button>
+                          <button
+                            type="button"
+                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            onClick={() => setHuntWizard(prev => ({ ...prev, startingChecks: Math.max(0, (parseInt(prev.startingChecks, 10) || 0) - 1) }))}
+                            title="Decrement"
+                          >
+                            <ChevronDown size={11} strokeWidth={3} />
+                          </button>
+                        </div>
                       </div>
+                    </div>
+
+                    {/* 2. Step Increment */}
+                    <div>
+                      <label className="hunt-modal-label !text-white text-white font-bold">
+                        Step Increment
+                      </label>
+                      <p className="text-[11px] text-gray-400 mb-1.5">
+                        How many encounters are added per count increment (default 1).
+                      </p>
+                      <div className="flex items-stretch rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden">
+                        <input
+                          type="number"
+                          min="1"
+                          className="w-full bg-transparent pl-3 pr-2 py-2 text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          value={huntWizard.increment}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            if (v === "") {
+                              setHuntWizard(prev => ({ ...prev, increment: "" }));
+                            } else {
+                              const n = parseInt(v, 10);
+                              setHuntWizard(prev => ({ ...prev, increment: isNaN(n) ? 1 : Math.max(1, n) }));
+                            }
+                          }}
+                          onBlur={() => setHuntWizard(prev => ({ ...prev, increment: Math.max(1, parseInt(prev.increment, 10) || 1) }))}
+                          placeholder="1"
+                        />
+                        <div className="flex flex-col border-l border-white/10 divide-y divide-white/10 shrink-0">
+                          <button
+                            type="button"
+                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            onClick={() => setHuntWizard(prev => ({ ...prev, increment: (parseInt(prev.increment, 10) || 1) + 1 }))}
+                            title="Increment"
+                          >
+                            <ChevronUp size={11} strokeWidth={3} />
+                          </button>
+                          <button
+                            type="button"
+                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            onClick={() => setHuntWizard(prev => ({ ...prev, increment: Math.max(1, (parseInt(prev.increment, 10) || 1) - 1) }))}
+                            title="Decrement"
+                          >
+                            <ChevronDown size={11} strokeWidth={3} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 3. Starting Elapsed Time */}
+                    <div>
+                      <label className="hunt-modal-label !text-white text-white font-bold">
+                        Starting Elapsed Time
+                      </label>
+                      <p className="text-[11px] text-gray-400 mb-1.5">
+                        Time already spent on this hunt (Hours, Minutes, Seconds).
+                      </p>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="flex items-center rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden px-2.5 py-1.5">
+                          <input
+                            type="number"
+                            min="0"
+                            className="w-full bg-transparent text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            placeholder="0"
+                            value={huntWizard.startHours}
+                            onChange={(e) => setHuntWizard(prev => ({ ...prev, startHours: e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value, 10) || 0) }))}
+                          />
+                          <span className="text-xs text-gray-400 font-bold ml-1">h</span>
+                        </div>
+                        <div className="flex items-center rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden px-2.5 py-1.5">
+                          <input
+                            type="number"
+                            min="0"
+                            max="59"
+                            className="w-full bg-transparent text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            placeholder="0"
+                            value={huntWizard.startMinutes}
+                            onChange={(e) => setHuntWizard(prev => ({ ...prev, startMinutes: e.target.value === "" ? "" : Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)) }))}
+                          />
+                          <span className="text-xs text-gray-400 font-bold ml-1">m</span>
+                        </div>
+                        <div className="flex items-center rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden px-2.5 py-1.5">
+                          <input
+                            type="number"
+                            min="0"
+                            max="59"
+                            className="w-full bg-transparent text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            placeholder="0"
+                            value={huntWizard.startSeconds}
+                            onChange={(e) => setHuntWizard(prev => ({ ...prev, startSeconds: e.target.value === "" ? "" : Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)) }))}
+                          />
+                          <span className="text-xs text-gray-400 font-bold ml-1">s</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 4. Estimated Checks per Second / Pace */}
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <label className="hunt-modal-label !text-white text-white font-bold">
+                          Estimated Check Pace
+                        </label>
+                        {(() => {
+                          const h = parseInt(huntWizard.startHours, 10) || 0;
+                          const m = parseInt(huntWizard.startMinutes, 10) || 0;
+                          const s = parseInt(huntWizard.startSeconds, 10) || 0;
+                          const totalSec = (h * 3600) + (m * 60) + s;
+                          const checks = parseInt(huntWizard.startingChecks, 10) || 0;
+                          if (totalSec > 0 && checks > 0) {
+                            const calcPace = (totalSec / checks).toFixed(1);
+                            return (
+                              <button
+                                type="button"
+                                className="text-[10px] text-[var(--accent)] hover:underline font-bold"
+                                onClick={() => setHuntWizard(prev => ({ ...prev, estimatedPaceSec: calcPace }))}
+                              >
+                                Auto: {calcPace}s/check
+                              </button>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </div>
+                      <p className="text-[11px] text-gray-400 mb-1.5">
+                        Average duration in seconds per check (e.g. 10.5s / check).
+                      </p>
+                      <div className="flex items-center rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden px-3 py-2">
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0.1"
+                          className="w-full bg-transparent text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          placeholder="e.g. 10.5"
+                          value={huntWizard.estimatedPaceSec}
+                          onChange={(e) => setHuntWizard(prev => ({ ...prev, estimatedPaceSec: e.target.value }))}
+                        />
+                        <span className="text-xs text-gray-400 font-bold whitespace-nowrap ml-2">
+                          s / check
+                        </span>
+                      </div>
+                      {parseFloat(huntWizard.estimatedPaceSec) > 0 && (
+                        <span className="text-[10px] text-gray-400 mt-1 block">
+                          ≈ {(1 / parseFloat(huntWizard.estimatedPaceSec)).toFixed(2)} checks / sec
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 5: PREVIEW (Identity, Live Odds & Summary) */}
+            {huntWizard.step === 4 && (
+              <div className="space-y-4 max-h-[440px] overflow-y-auto custom-scrollbar pr-1 overscroll-contain">
+                {/* Hero Identity & Live Odds Card */}
+                <HuntIdentityOddsCard
+                  pokemon={huntWizard.selectedPokemon}
+                  game={huntWizard.game}
+                  method={huntWizard.method}
+                  modifiers={huntWizard.modifiers}
+                  checks={parseInt(huntWizard.startingChecks, 10) || 0}
+                  customImage={getPokemonImage(huntWizard.selectedPokemon)}
+                  useHomeSprites={useHomeSprites}
+                />
+
+                {/* Initial Counter & Pacing Settings Summary Card */}
+                <div className="hunt-modal-card space-y-2.5 p-3.5 bg-white/[0.03] border border-white/10 rounded-xl">
+                  <div className="flex items-center justify-between text-xs border-b border-white/[0.08] pb-2">
+                    <span className="font-extrabold text-white uppercase tracking-wider flex items-center gap-1.5">
+                      <Clock size={13} className="text-[var(--accent)]" /> Counter & Pacing Settings
+                    </span>
+                    <span className="text-gray-400 text-[11px]">Configured for hunt start</span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-left">
+                    <div className="p-2.5 rounded-lg bg-black/30 border border-white/5 flex flex-col justify-between">
+                      <span className="text-[10px] uppercase font-bold text-gray-400 block">Starting Checks</span>
+                      <span className="text-sm font-extrabold text-white mt-1">
+                        {(parseInt(huntWizard.startingChecks, 10) || 0).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-black/30 border border-white/5 flex flex-col justify-between">
+                      <span className="text-[10px] uppercase font-bold text-gray-400 block">Step Increment</span>
+                      <span className="text-sm font-extrabold text-[var(--accent)] mt-1">
+                        +{huntWizard.increment || 1}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-black/30 border border-white/5 flex flex-col justify-between">
+                      <span className="text-[10px] uppercase font-bold text-gray-400 block">Starting Elapsed</span>
+                      <span className="text-sm font-extrabold text-white mt-1">
+                        {(() => {
+                          const h = parseInt(huntWizard.startHours, 10) || 0;
+                          const m = parseInt(huntWizard.startMinutes, 10) || 0;
+                          const s = parseInt(huntWizard.startSeconds, 10) || 0;
+                          const totalMs = ((h * 3600) + (m * 60) + s) * 1000;
+                          return totalMs > 0 ? formatDigitalTime(totalMs) : "00:00:00";
+                        })()}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-black/30 border border-white/5 flex flex-col justify-between">
+                      <span className="text-[10px] uppercase font-bold text-gray-400 block">Estimated Pace</span>
+                      <span className="text-sm font-extrabold text-emerald-400 mt-1">
+                        {parseFloat(huntWizard.estimatedPaceSec) > 0
+                          ? `${huntWizard.estimatedPaceSec}s / check`
+                          : "Dynamic"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Configured Phases Showcase */}
+                {huntWizard.possiblePhases.length > 0 && (
+                  <div className="hunt-modal-card space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-extrabold text-gray-300 uppercase tracking-wider">
+                        Configured Phase Targets ({huntWizard.possiblePhases.length})
+                      </span>
+                      <span className="text-gray-400 text-[11px]">Tracked alongside main target</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {huntWizard.possiblePhases.map(pkm => (
+                        <div key={pkm.stableId || `${pkm.id}-${pkm.name}`} className="flex items-center gap-1.5 bg-white/[0.04] border border-white/[0.08] rounded-lg px-2 py-1 text-xs text-white">
+                          <img src={getPokemonImage(pkm)} alt="" className={`w-4 h-4 object-contain ${!useHomeSprites ? "pixelated" : ""}`} style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined} />
+                          <span className="font-semibold">{formatPokemonName(pkm.name)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Progressive Odds Matrix */}
+                <OddsMatrixView
+                  game={huntWizard.game}
+                  method={huntWizard.method}
+                  modifiers={huntWizard.modifiers}
+                  checks={parseInt(huntWizard.startingChecks, 10) || 0}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </Modal>
+
+      {/* 3. Edit Hunt Modal */}
+      <Modal
+        isOpen={editModal.show}
+        onClose={() => setEditModal({ show: false, hunt: null })}
+        title={`Edit Hunt: ${editModal.hunt ? formatPokemonName(editModal.hunt.pokemon?.name) : ""}`}
+        subtitle="Modify game, method, and active shiny boosts"
+        icon={<Edit size={22} />}
+        size="md"
+        footer={({ close }) => (
+          <>
+            <Button variant="secondary" onClick={close}>Cancel</Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                if (!editModal.hunt) return;
+                const newOdds = calculateOdds(editForm.game, editForm.method, editForm.modifiers);
+                const updatedHunts = allActiveHunts.map(h => {
+                  if (h.id === editModal.hunt.id) {
+                    return {
+                      ...h,
+                      game: editForm.game,
+                      method: editForm.method,
+                      modifiers: editForm.modifiers,
+                      odds: newOdds
+                    };
+                  }
+                  return h;
+                });
+                setAllActiveHunts(updatedHunts);
+                setCachedHuntsData({ activeHunts: updatedHunts });
+                close();
+                showMessage("Hunt settings updated", "success");
+                debouncedSave(updatedHunts);
+              }}
+              icon={<Check size={16} strokeWidth={2.5} />}
+            >
+              Save Changes
+            </Button>
+          </>
+        )}
+      >
+        {editModal.hunt && (
+          <div className="space-y-4">
+            <div className="hunt-modal-grid">
+              <SelectField
+                label="Game Version"
+                options={getGamesForPokemon(editModal.hunt.pokemon).map(g => ({
+                  value: g,
+                  label: g,
+                  image: getGameImage(g)
+                }))}
+                value={editForm.game}
+                onChange={(nextGame) => {
+                  const defaultMethod = getMethodsForGame(nextGame)[0]?.name || "Random Encounters";
+                  setEditForm(prev => ({ ...prev, game: nextGame, method: defaultMethod }));
+                }}
+                searchable
+                fullWidth
+              />
+
+              <SelectField
+                label="Hunting Method"
+                options={(getMethodsForGame(editForm.game || "Scarlet") || []).map(m => ({
+                  value: m.name,
+                  label: m.name
+                }))}
+                value={editForm.method}
+                onChange={(val) => setEditForm(prev => ({ ...prev, method: val }))}
+                fullWidth
+              />
+            </div>
+
+            {/* Modifiers */}
+            {renderModifiersForm(
+              editForm.game,
+              editForm.method,
+              editForm.modifiers,
+              (callback) => {
+                setEditForm(prev => ({
+                  ...prev,
+                  modifiers: typeof callback === "function" ? callback(prev.modifiers) : callback
+                }));
+              }
+            )}
+          </div>
+        )}
+      </Modal>
+
+      {/* 4. Dedicated Odds Breakdown & Matrix Chart Modal */}
+      <OddsBreakdownModal
+        isOpen={oddsModal.show}
+        onClose={() => setOddsModal(prev => ({ ...prev, show: false }))}
+        hunt={oddsModal.hunt}
+        totalCheckTimes={totalCheckTimes}
+      />
+
+      {/* ============================================================
+          5. UNIFIED SHINY ENCOUNTER MODAL (PHASE & COMPLETION FLOW)
+          ============================================================ */}
+      <ShinyEncounterModal
+        isOpen={shinyEncounterModal.show}
+        onClose={() => setShinyEncounterModal(prev => ({ ...prev, show: false }))}
+        hunt={shinyEncounterModal.hunt}
+        allPokemon={allPokemon}
+        formsData={formsData}
+        useHomeSprites={useHomeSprites}
+        username={username}
+        showMessage={showMessage}
+        onCompleteTargetHunt={handleCompleteTargetHunt}
+        onContinueAfterPhase={handleContinueAfterPhase}
+        onAddShinyToCollection={handleAddShinyToCollection}
+        onAddShinyFailToCollection={handleAddShinyFailToCollection}
+      />
+
+      {/* ============================================================
+          6. PHASE HISTORY MODAL
+          ============================================================ */}
+      <Modal
+        isOpen={phaseHistoryModal.show}
+        onClose={() => setPhaseHistoryModal({ show: false, hunt: null })}
+        title="FAILS & PHASES History"
+        subtitle={phaseHistoryModal.hunt ? `Hunt: Shiny ${formatPokemonName(phaseHistoryModal.hunt.pokemon?.name)} (${(phaseHistoryModal.hunt.phases?.length || 0)} recorded)` : "Encounter History"}
+        icon={<History size={22} className="text-[var(--accent)]" />}
+        size="md"
+        footer={({ close }) => <Button variant="secondary" onClick={close}>Close</Button>}
+      >
+        <div className="space-y-4">
+          {(!phaseHistoryModal.hunt?.phases || phaseHistoryModal.hunt.phases.length === 0) ? (
+            <div className="text-center py-8 text-gray-400 space-y-2">
+              <Sparkles size={32} className="mx-auto text-gray-600 mb-2" />
+              <p className="font-semibold text-sm">No fails or phases logged yet for this hunt.</p>
+              <p className="text-xs text-gray-500">
+                When you encounter a non-target shiny or a shiny fails, click <strong className="text-[var(--accent)]">Log Shiny</strong> on your hunt card.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2.5 max-h-[400px] overflow-y-auto custom-scrollbar pr-1">
+              {phaseHistoryModal.hunt.phases.map((phase, idx) => {
+                const info = getPhaseEntryDisplayInfo(phase, phaseHistoryModal.hunt.phases);
+                const displayChecks = getPhaseDisplayChecks(phase, phaseHistoryModal.hunt.phases);
+                return (
+                  <div
+                    key={phase.id || idx}
+                    className={`p-3 rounded-xl border flex items-center justify-between gap-3 ${
+                      info.isFail
+                        ? "bg-rose-500/[0.06] border-rose-500/30"
+                        : "bg-white/[0.03] border-white/[0.08]"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <img src={getPokemonImage(phase.pokemon)} alt="" className={`w-12 h-12 object-contain ${!useHomeSprites ? "pixelated" : ""}`} style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined} />
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs font-black uppercase ${info.isFail ? "text-rose-400" : "text-[var(--accent)]"}`}>
+                            {info.label.replace(":", "")}
+                          </span>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                            info.isFail ? "bg-rose-500/20 text-rose-300" : "bg-emerald-500/20 text-emerald-300"
+                          }`}>
+                            {info.isFail ? (
+                              <>
+                                <HeartCrack size={11} className="text-rose-400" strokeWidth={2.5} />
+                                <span>{info.isTarget ? "Target Failed" : "Phase Failed"}</span>
+                              </>
+                            ) : (
+                              "✓ Caught"
+                            )}
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-white text-sm">
+                          Shiny {formatPokemonName(phase.pokemon?.name)}
+                        </h4>
+                        <p className="text-[11px] text-gray-400">
+                          {new Date(phase.date).toLocaleDateString()} • {displayChecks.intervalChecks.toLocaleString()} checks
+                          <span> (Total: {displayChecks.totalChecks.toLocaleString()})</span>
+                        </p>
+                        {phase.notes && (
+                          <p className="text-[11px] text-gray-400 italic mt-0.5">"{phase.notes}"</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {phase.ball && (
+                      <span className="text-xs font-semibold text-gray-300 bg-white/5 px-2.5 py-1 rounded-lg border border-white/10 flex-shrink-0">
+                        {phase.ball}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </Modal>
+
+      {/* ============================================================
+          7. END HUNT WITHOUT FINDING TARGET MODAL
+          ============================================================ */}
+      <Modal
+        isOpen={abandonHuntModal.show}
+        onClose={() => setAbandonHuntModal({ show: false, hunt: null })}
+        title="End Hunt Without Finding Target?"
+        subtitle={abandonHuntModal.hunt ? `Abandon hunt for Shiny ${formatPokemonName(abandonHuntModal.hunt.pokemon?.name)}` : ""}
+        icon={<X size={22} className="text-rose-400" />}
+        size="sm"
+        footer={({ close }) => (
+          <>
+            <Button variant="secondary" onClick={close}>
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                close();
+                setTimeout(() => {
+                  handleEndHuntWithoutTarget(abandonHuntModal.hunt);
+                }, 280);
+              }}
+              icon={<X size={16} strokeWidth={2.5} />}
+            >
+              End Hunt
+            </Button>
+          </>
+        )}
+      >
+        <div className="space-y-3 text-sm text-gray-300">
+          <p>
+            Are you sure you want to end this active hunt?
+          </p>
+          <p className="text-xs text-gray-400">
+            Any phase catches you have already added to your Living Dex will remain in your collection.
+          </p>
+        </div>
+      </Modal>
+
+      {/* 8. Settings / Manual Adjust Modal */}
+      <AdjustHuntModal
+        isOpen={settingsModal.show}
+        onClose={() => setSettingsModal({ show: false, hunt: null })}
+        hunt={settingsModal.hunt}
+        huntIncrements={huntIncrements}
+        onSaveAdjustments={(huntId, payload) => {
+          const now = Date.now();
+          const action = {
+            type: "UPDATE_PROPERTIES",
+            huntId,
+            payload,
+            timestamp: now
+          };
+          const updatedHunts = applyHuntActionToState(allActiveHunts, action, now);
+          const updatedIncrements = { ...huntIncrements, [huntId]: payload.increment, [String(huntId)]: payload.increment };
+
+          setAllActiveHunts(updatedHunts);
+          setHuntIncrements(updatedIncrements);
+          setCachedHuntsData({ activeHunts: updatedHunts });
+          showMessage("Hunt values and timer updated", "success");
+
+          if (channelRef.current) {
+            channelRef.current.broadcast({
+              type: "HUNT_ACTION",
+              huntId,
+              action
+            });
+          }
+
+          debouncedSave(updatedHunts);
+        }}
+      />
+
+      {/* 9. Hotkey Configuration Modal */}
+      <Modal
+        isOpen={hotkeyModal}
+        onClose={() => {
+          setHotkeyModal(false);
+          setListeningFor(null);
+          setHotkeyError("");
+        }}
+        title="Configure Counter Hotkeys"
+        subtitle="Assign custom keyboard shortcuts to quickly increment or decrement encounters"
+        icon={<Clock size={22} className="text-[var(--accent)]" />}
+        size="md"
+        className="!max-w-[580px]"
+        footer={({ close }) => (
+          <div className="flex items-center justify-end w-full gap-2">
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={() => {
+                setListeningFor(null);
+                setHotkeyError("");
+                close();
+              }}
+            >
+              Done
+            </Button>
+          </div>
+        )}
+      >
+        <div className="space-y-4 py-2">
+          {hotkeyError && (
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2 animate-pulse">
+              <AlertCircle size={16} className="shrink-0 text-rose-400" />
+              <span>{hotkeyError}</span>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Decrement (-1) Hotkey Card */}
+            <div className={`hotkey-config-card ${listeningFor === "decrement" ? "is-listening" : ""}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center text-xs font-black">
+                    −
+                  </span>
+                  <span className="text-xs font-black text-white uppercase tracking-wider">
+                    Subtract Check
+                  </span>
+                </div>
+                {decrementHotkey && (
+                  <button
+                    type="button"
+                    className="text-[11px] text-gray-400 hover:text-rose-400 font-semibold transition-colors"
+                    onClick={() => {
+                      setDecrementHotkey(null);
+                      try { localStorage.removeItem("huntDecrementHotkey"); } catch {}
+                      profileAPI.updateProfile({ huntDecrementHotkey: "" }).catch(() => {});
+                      showMessage("Decrement hotkey cleared", "info");
+                    }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center justify-center py-2">
+                {listeningFor === "decrement" ? (
+                  <div className="hotkey-key-badge-lg animate-pulse text-xs sm:text-sm font-bold text-center">
+                    Press any key...
+                  </div>
+                ) : (
+                  <div className="hotkey-key-badge-lg">
+                    {formatHotkeyLabel(decrementHotkey)}
+                  </div>
+                )}
+              </div>
+
+              <Button
+                variant={listeningFor === "decrement" ? "accent" : "secondary"}
+                size="sm"
+                className="w-full font-bold"
+                onClick={() => {
+                  setHotkeyError("");
+                  setListeningFor(listeningFor === "decrement" ? null : "decrement");
+                }}
+              >
+                {listeningFor === "decrement" ? "Cancel Listening" : "Record New Key"}
+              </Button>
+
+              <div className="pt-1 border-t border-white/5">
+                <span className="text-[10px] uppercase font-extrabold text-gray-400 block mb-1.5">Quick Presets:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { label: "−", value: "-" },
+                    { label: "Z", value: "z" },
+                    { label: "S", value: "s" },
+                    { label: "↓ DOWN", value: "ArrowDown" }
+                  ].map(preset => (
+                    <button
+                      key={preset.value}
+                      type="button"
+                      disabled={hotkey === preset.value}
+                      className={`px-2 py-1 rounded-md text-[11px] font-bold border transition-all ${
+                        decrementHotkey === preset.value
+                          ? "bg-[var(--accent)] text-black border-[var(--accent)]"
+                          : hotkey === preset.value
+                          ? "opacity-30 cursor-not-allowed bg-white/5 border-white/5 text-gray-500"
+                          : "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white"
+                      }`}
+                      onClick={() => {
+                        setDecrementHotkey(preset.value);
+                        setListeningFor(null);
+                        setHotkeyError("");
+                        try { localStorage.setItem("huntDecrementHotkey", preset.value); } catch {}
+                        profileAPI.updateProfile({ huntDecrementHotkey: preset.value }).catch(() => {});
+                        showMessage(`Decrement hotkey set to ${preset.label}`, "success");
+                      }}
+                    >
+                      {preset.label}
                     </button>
                   ))}
                 </div>
               </div>
-
-              <div className="pokemon-modal-footer">
-              </div>
             </div>
-          )}
 
-          {/* Hunt Details Modal */}
-          {(showHuntModal || huntModalClosing) && selectedPokemon && (
-            <div
-              className={`hunt-modal ${huntModalClosing ? 'closing' : ''}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="hunt-modal-header">
-                <div className="hunt-pokemon-info">
-                  <div className="hunt-pokemon-image-container">
-                    <img
-                      src={getPokemonImage(selectedPokemon)}
-                      alt={formatPokemonName(selectedPokemon.name)}
-                      className="hunt-pokemon-image"
-                    />
-                  </div>
-                  <div className="hunt-pokemon-details">
-                    <h2 className="hunt-pokemon-name">{formatPokemonName(selectedPokemon.name)}</h2>
-                    <p className="hunt-pokemon-number">#{selectedPokemon.id ? selectedPokemon.id.toString().padStart(4, "0") : "????"}</p>
-                    {selectedPokemon?.formType && selectedPokemon.formType !== "main" && (
-                      <p className="hunt-pokemon-form">
-                        {String(selectedPokemon.formType) === "alpha" ? "Alpha" :
-                          String(selectedPokemon.formType) === "alphaother" ? "Alpha Forms" :
-                            (selectedPokemon.name && selectedPokemon.name.toLowerCase().includes('-alpha')) ? "Alpha" :
-                              String(selectedPokemon.formType) === "hisuian" ? "Hisuian" :
-                                String(selectedPokemon.formType) === "galarian" ? "Galarian" :
-                                  String(selectedPokemon.formType) === "alolan" ? "Alolan" :
-                                    String(selectedPokemon.formType) === "paldean" ? "Paldean" :
-                                      String(selectedPokemon.formType) === "gmax" ? "Gigantamax" :
-                                        String(selectedPokemon.formType) === "gender" ? "Gender" :
-                                          String(selectedPokemon.formType) === "partner-cap" ? "Partner Cap" :
-                                            String(selectedPokemon.formType) === "level-100" ? "Level 100" :
-                                              String(selectedPokemon.formType) === "therian" ? "Therian" :
-                                                String(selectedPokemon.formType) === "unown" ? "Unown" :
-                                                  String(selectedPokemon.formType)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    if (!huntModalClosing) {
-                      setHuntModalClosing(true);
-                      setBackdropClosing(true);
-                      setTimeout(() => {
-                        setShowHuntModal(false);
-                        setHuntModalClosing(false);
-                        setBackdropClosing(false);
-                      }, 300);
-                    }
-                  }}
-                  className="close-btn"
-                  aria-label="Close"
-                >
-                  <span className="sidebar-close-icon">
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="20" cy="20" r="18" fill="#fff" stroke="#232323" strokeWidth="2" />
-                      <path d="M2 20a18 18 0 0 1 36 0" fill="#e62829" stroke="#232323" strokeWidth="2" />
-                      <rect x="2" y="19" width="36" height="2" fill="#232323" />
-                      <circle cx="20" cy="20" r="7" fill="#ffffffff" stroke="#232323" strokeWidth="2" />
-                    </svg>
+            {/* Increment (+1) Hotkey Card */}
+            <div className={`hotkey-config-card ${listeningFor === "increment" ? "is-listening" : ""}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-xs font-black">
+                    +
                   </span>
-                </button>
-              </div>
-
-              <div className="hunt-modal-content">
-                <div className="hunt-form">
-                  <div className="hunt-form-group">
-                    <label className="hunt-label">Game:</label>
-                    <SearchbarIconDropdown
-                      id="hunt-game-dropdown"
-                      options={allGames}
-                      value={huntDetails.game}
-                      onChange={val => setHuntDetails(prev => ({ ...prev, game: val, method: "" }))}
-                      placeholder="Select a game..."
-                      customBackground="var(--sidebar-edit-inputs)"
-                      customBorder="var(--border-color)"
-                    />
-                  </div>
-
-                  <div className="hunt-form-group">
-                    <label className="hunt-label">Method:</label>
-                    <SearchbarIconDropdown
-                      id="hunt-method-dropdown"
-                      options={[
-                        { name: "None", value: "" },
-                        ...availableMethods.map(method => ({
-                          name: method.name,
-                          value: method.name
-                        })),
-                      ]}
-                      value={huntDetails.method}
-                      onChange={val => {
-                        setHuntDetails(prev => ({ ...prev, method: val }));
-                        // Clear modifiers when method changes
-                        if (val !== "Breeding") {
-                          setModifiers(prev => ({ ...prev, shinyParents: false }));
-                        }
-                        if (val !== "Catch Combo" && val !== "Random Encounters" && val !== "Soft Resets") {
-                          setModifiers(prev => ({ ...prev, lureActive: false }));
-                        }
-                        // For Sandwich method: automatically set Sparkling Lv 3
-                        if (val === "Sandwich" && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet")) {
-                          setModifiers(prev => ({
-                            ...prev,
-                            sparklingLv1: false,
-                            sparklingLv2: false,
-                            sparklingLv3: true
-                          }));
-                        }
-                      }}
-                      placeholder={huntDetails.game ? "Select a method..." : "Select a game first"}
-                      customBackground="var(--sidebar-edit-inputs)"
-                      customBorder="var(--border-color)"
-                      disabled={!huntDetails.game}
-                    />
-                  </div>
-
-                  {/* Modifiers Section */}
-                  {huntDetails.game && availableMethods.length > 0 && (
-                    (gameModifiers["Shiny Charm"] > 0 && !(huntDetails.method === "Fossil Revivals" && (huntDetails.game === "Let's Go Pikachu" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Fossil Revivals" && huntDetails.game === "Legends Z-A") && !(huntDetails.method === "Dynamax Raids" && (huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Gift Pokemon" && (huntDetails.game === "Sword" || huntDetails.game === "Shield" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Let's Go Pikachu")) && !(huntDetails.method === "Tera Raids" && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet")) && !((huntDetails.method === "Random Encounters" || huntDetails.method === "Poke Radar" || huntDetails.method === "Soft Resets" || huntDetails.method === "Fossil Revivals" || huntDetails.method === "Gift Pokemon" || huntDetails.method === "Underground Diglett Hunt") && (huntDetails.game === "Brilliant Diamond" || huntDetails.game === "Shining Pearl")) && !(huntDetails.method === "Poke Radar" && (huntDetails.game === "X" || huntDetails.game === "Y")) && !(huntDetails.method === "Ultra Wormholes" && (huntDetails.game === "Ultra Sun" || huntDetails.game === "Ultra Moon"))) ||
-                    (gameModifiers["Shiny Parents"] > 0 && huntDetails.method === "Breeding") ||
-                    (gameModifiers["Lure Active"] > 0 && (huntDetails.method === "Catch Combo" || huntDetails.method === "Random Encounters" || (huntDetails.method === "Soft Resets" && huntDetails.game !== "Let's Go Pikachu" && huntDetails.game !== "Let's Go Eevee"))) ||
-                    (gameModifiers["Research Lv 10"] > 0 && huntDetails.game === "Legends Arceus") ||
-                    (gameModifiers["Perfect Research"] > 0 && huntDetails.game === "Legends Arceus") ||
-                    (gameModifiers["Sparkling Lv 1"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces"))) ||
-                    (gameModifiers["Sparkling Lv 2"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces"))) ||
-                    (gameModifiers["Sparkling Lv 3"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces"))) ||
-                    (gameModifiers["Event Boosted"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && huntDetails.method === "Mass Outbreaks") ||
-                    (gameModifiers["Community Day"] > 0 && huntDetails.game === "GO" && (huntDetails.method === "Random Encounters" || huntDetails.method === "Daily Adventure Incense")) ||
-                    (gameModifiers["Raid Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Raid Battles") ||
-                    (gameModifiers["Research Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Field Research") ||
-                    (gameModifiers["Galar Birds"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Daily Adventure Incense") ||
-                    (gameModifiers["Hatch Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Breeding")
-                  ) && (
-                      <div className="hunt-form-group">
-                        <label className="hunt-label">Modifiers:</label>
-                        <div className="modifiers-section">
-                          {gameModifiers["Shiny Charm"] > 0 && !(huntDetails.method === "Fossil Revivals" && (huntDetails.game === "Let's Go Pikachu" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Fossil Revivals" && huntDetails.game === "Legends Z-A") && !(huntDetails.method === "Dynamax Raids" && (huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Gift Pokemon" && (huntDetails.game === "Sword" || huntDetails.game === "Shield" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Let's Go Pikachu")) && !(huntDetails.method === "Tera Raids" && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet")) && !((huntDetails.method === "Random Encounters" || huntDetails.method === "Poke Radar" || huntDetails.method === "Soft Resets" || huntDetails.method === "Fossil Revivals" || huntDetails.method === "Gift Pokemon" || huntDetails.method === "Underground Diglett Hunt") && (huntDetails.game === "Brilliant Diamond" || huntDetails.game === "Shining Pearl")) && !(huntDetails.method === "Poke Radar" && (huntDetails.game === "X" || huntDetails.game === "Y")) && !(huntDetails.method === "Ultra Wormholes" && (huntDetails.game === "Ultra Sun" || huntDetails.game === "Ultra Moon")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.shinyCharm}
-                                onChange={(e) => {
-                                  const newShinyCharm = e.target.checked;
-                                  setModifiers(prev => {
-                                    const newModifiers = { ...prev, shinyCharm: newShinyCharm };
-                                    // Auto-check Research Lv 10 when Shiny Charm is checked in Legends Arceus
-                                    if (newShinyCharm && huntDetails.game === "Legends Arceus" && !prev.researchLv10) {
-                                      newModifiers.researchLv10 = true;
-                                    }
-                                    return newModifiers;
-                                  });
-                                }}
-                              />
-                              <span>Shiny Charm</span>
-                            </label>
-                          )}
-                          {gameModifiers["Shiny Parents"] > 0 && huntDetails.method === "Breeding" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.shinyParents}
-                                onChange={(e) => setModifiers(prev => ({ ...prev, shinyParents: e.target.checked }))}
-                              />
-                              <span>Shiny Parents</span>
-                            </label>
-                          )}
-                          {gameModifiers["Lure Active"] > 0 && (huntDetails.method === "Catch Combo" || huntDetails.method === "Random Encounters" || (huntDetails.method === "Soft Resets" && huntDetails.game !== "Let's Go Pikachu" && huntDetails.game !== "Let's Go Eevee")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.lureActive}
-                                onChange={(e) => setModifiers(prev => ({ ...prev, lureActive: e.target.checked }))}
-                              />
-                              <span>Lure Active</span>
-                            </label>
-                          )}
-                          {gameModifiers["Research Lv 10"] > 0 && huntDetails.game === "Legends Arceus" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.researchLv10}
-                                onChange={(e) => {
-                                  const newResearchLv10 = e.target.checked;
-                                  setModifiers(prev => {
-                                    const newModifiers = { ...prev, researchLv10: newResearchLv10 };
-                                    // Auto-uncheck Shiny Charm and Perfect Research when Research Lv 10 is unchecked in Legends Arceus
-                                    if (!newResearchLv10 && huntDetails.game === "Legends Arceus") {
-                                      if (prev.shinyCharm) {
-                                        newModifiers.shinyCharm = false;
-                                      }
-                                      if (prev.perfectResearch) {
-                                        newModifiers.perfectResearch = false;
-                                      }
-                                    }
-                                    return newModifiers;
-                                  });
-                                }}
-                              />
-                              <span>Research Lv 10</span>
-                            </label>
-                          )}
-                          {gameModifiers["Perfect Research"] > 0 && huntDetails.game === "Legends Arceus" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.perfectResearch}
-                                onChange={(e) => {
-                                  const newPerfectResearch = e.target.checked;
-                                  setModifiers(prev => {
-                                    const newModifiers = { ...prev, perfectResearch: newPerfectResearch };
-                                    // Auto-check Research Lv 10 when Perfect Research is checked in Legends Arceus
-                                    if (newPerfectResearch && huntDetails.game === "Legends Arceus" && !prev.researchLv10) {
-                                      newModifiers.researchLv10 = true;
-                                    }
-                                    return newModifiers;
-                                  });
-                                }}
-                              />
-                              <span>Perfect Research</span>
-                            </label>
-                          )}
-                          {gameModifiers["Sparkling Lv 1"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.sparklingLv1}
-                                onChange={(e) => {
-                                  const newSparklingLv1 = e.target.checked;
-                                  setModifiers(prev => {
-                                    const newModifiers = {
-                                      ...prev,
-                                      sparklingLv1: newSparklingLv1,
-                                      sparklingLv2: newSparklingLv1 ? false : prev.sparklingLv2,
-                                      sparklingLv3: newSparklingLv1 ? false : prev.sparklingLv3
-                                    };
-
-                                    // For Sandwich method: if turning off Lv 1 and no other sparkling is active, default to Lv 3
-                                    if (huntDetails.method === "Sandwich" && !newSparklingLv1 && !newModifiers.sparklingLv2 && !newModifiers.sparklingLv3) {
-                                      newModifiers.sparklingLv3 = true;
-                                    }
-
-                                    return newModifiers;
-                                  });
-                                }}
-                              />
-                              <span>Sparkling Lv 1</span>
-                            </label>
-                          )}
-                          {gameModifiers["Sparkling Lv 2"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.sparklingLv2}
-                                onChange={(e) => {
-                                  const newSparklingLv2 = e.target.checked;
-                                  setModifiers(prev => {
-                                    const newModifiers = {
-                                      ...prev,
-                                      sparklingLv2: newSparklingLv2,
-                                      sparklingLv1: newSparklingLv2 ? false : prev.sparklingLv1,
-                                      sparklingLv3: newSparklingLv2 ? false : prev.sparklingLv3
-                                    };
-
-                                    // For Sandwich method: if turning off Lv 2 and no other sparkling is active, default to Lv 3
-                                    if (huntDetails.method === "Sandwich" && !newSparklingLv2 && !newModifiers.sparklingLv1 && !newModifiers.sparklingLv3) {
-                                      newModifiers.sparklingLv3 = true;
-                                    }
-
-                                    return newModifiers;
-                                  });
-                                }}
-                              />
-                              <span>Sparkling Lv 2</span>
-                            </label>
-                          )}
-                          {gameModifiers["Sparkling Lv 3"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.sparklingLv3}
-                                onChange={(e) => {
-                                  const newSparklingLv3 = e.target.checked;
-                                  setModifiers(prev => {
-                                    const newModifiers = {
-                                      ...prev,
-                                      sparklingLv3: newSparklingLv3,
-                                      sparklingLv1: newSparklingLv3 ? false : prev.sparklingLv1,
-                                      sparklingLv2: newSparklingLv3 ? false : prev.sparklingLv2
-                                    };
-
-                                    // For Sandwich method: if turning off Lv 3 and no other sparkling is active, default back to Lv 3
-                                    if (huntDetails.method === "Sandwich" && !newSparklingLv3 && !newModifiers.sparklingLv1 && !newModifiers.sparklingLv2) {
-                                      newModifiers.sparklingLv3 = true;
-                                    }
-
-                                    return newModifiers;
-                                  });
-                                }}
-                              />
-                              <span>Sparkling Lv 3</span>
-                            </label>
-                          )}
-                          {gameModifiers["Event Boosted"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && huntDetails.method === "Mass Outbreaks" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.eventBoosted}
-                                onChange={(e) => setModifiers(prev => ({ ...prev, eventBoosted: e.target.checked }))}
-                              />
-                              <span>Event Boosted</span>
-                            </label>
-                          )}
-                          {gameModifiers["Community Day"] > 0 && huntDetails.game === "GO" && (huntDetails.method === "Random Encounters" || huntDetails.method === "Daily Adventure Incense") && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.communityDay}
-                                onChange={(e) => {
-                                  const newCommunityDay = e.target.checked;
-                                  setModifiers(prev => ({
-                                    ...prev,
-                                    communityDay: newCommunityDay,
-                                    raidDay: newCommunityDay ? false : prev.raidDay, // Uncheck Raid Day if Community Day is checked
-                                    researchDay: newCommunityDay ? false : prev.researchDay, // Uncheck Research Day if Community Day is checked
-                                    galarBirds: newCommunityDay ? false : prev.galarBirds, // Uncheck Galar Birds if Community Day is checked
-                                    hatchDay: newCommunityDay ? false : prev.hatchDay // Uncheck Hatch Day if Community Day is checked
-                                  }));
-                                }}
-                              />
-                              <span>Community Day</span>
-                            </label>
-                          )}
-                          {gameModifiers["Raid Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Raid Battles" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.raidDay}
-                                onChange={(e) => {
-                                  const newRaidDay = e.target.checked;
-                                  setModifiers(prev => ({
-                                    ...prev,
-                                    raidDay: newRaidDay,
-                                    communityDay: newRaidDay ? false : prev.communityDay, // Uncheck Community Day if Raid Day is checked
-                                    researchDay: newRaidDay ? false : prev.researchDay // Uncheck Research Day if Raid Day is checked
-                                  }));
-                                }}
-                              />
-                              <span>Raid Day</span>
-                            </label>
-                          )}
-                          {gameModifiers["Research Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Field Research" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.researchDay}
-                                onChange={(e) => {
-                                  const newResearchDay = e.target.checked;
-                                  setModifiers(prev => ({
-                                    ...prev,
-                                    researchDay: newResearchDay,
-                                    communityDay: newResearchDay ? false : prev.communityDay, // Uncheck Community Day if Research Day is checked
-                                    raidDay: newResearchDay ? false : prev.raidDay // Uncheck Raid Day if Research Day is checked
-                                  }));
-                                }}
-                              />
-                              <span>Research Day</span>
-                            </label>
-                          )}
-                          {gameModifiers["Galar Birds"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Daily Adventure Incense" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.galarBirds}
-                                onChange={(e) => {
-                                  const newGalarBirds = e.target.checked;
-                                  setModifiers(prev => ({
-                                    ...prev,
-                                    galarBirds: newGalarBirds,
-                                    communityDay: newGalarBirds ? false : prev.communityDay // Uncheck Community Day if Galar Birds is checked
-                                  }));
-                                }}
-                              />
-                              <span>Galar Birds</span>
-                            </label>
-                          )}
-                          {gameModifiers["Hatch Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Breeding" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.hatchDay}
-                                onChange={(e) => {
-                                  const newHatchDay = e.target.checked;
-                                  setModifiers(prev => ({
-                                    ...prev,
-                                    hatchDay: newHatchDay,
-                                    communityDay: newHatchDay ? false : prev.communityDay // Uncheck Community Day if Hatch Day is checked
-                                  }));
-                                }}
-                              />
-                              <span>Hatch Day</span>
-                            </label>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                  {/* Odds Display */}
-                  {currentOdds !== "hide" && ((huntDetails.game && huntDetails.method && availableMethods.length > 0) || (!huntDetails.game || !huntDetails.method)) && (
-                    <div className="hunt-form-group">
-                      <label className="hunt-label">Current Odds:</label>
-                      <div className="odds-display">
-                        {currentOdds === "pokeradarXY" ? (
-                          // Special display for Poke Radar in X/Y - show table every 5 checks up to 40
-                          <div className="pokeradar-odds">
-                            <div className="pokeradar-odds-table">
-                              <div className="pokeradar-odds-table-header">
-                                <div className="pokeradar-odds-cell">Chain</div>
-                                <div className="pokeradar-odds-cell">Odds</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">0</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 0).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">5</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 5).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">10</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 10).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">15</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 15).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">20</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 20).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">25</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 25).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">30</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 30).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">35</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 35).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">40+</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 40).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "chainFishingXY" ? (
-                          // Special display for Chain Fishing in X/Y - show table every 5 checks up to 20
-                          <div className="chainfishing-odds">
-                            <div className="chainfishing-odds-table">
-                              <div className="chainfishing-odds-table-header">
-                                <div className="chainfishing-odds-cell">Chain</div>
-                                <div className="chainfishing-odds-cell">Odds</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">0</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 0).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">5</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 5).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">10</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 10).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">15</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 15).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">20+</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 20).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "chainFishingORAS" ? (
-                          // Special display for Chain Fishing in Omega Ruby/Alpha Sapphire - show table every 5 checks up to 20
-                          <div className="chainfishing-odds">
-                            <div className="chainfishing-odds-table">
-                              <div className="chainfishing-odds-table-header">
-                                <div className="chainfishing-odds-cell">Chain</div>
-                                <div className="chainfishing-odds-cell">Odds</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">0</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 0).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">5</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 5).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">10</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 10).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">15</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 15).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">20+</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 20).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "dexNavORAS" ? (
-                          // Special display for DexNav in Omega Ruby/Alpha Sapphire - show chart with key milestones
-                          <div className="dexnav-odds">
-                            <div className="dexnav-odds-table">
-                              <div className="dexnav-odds-table-header">
-                                <div className="dexnav-odds-cell">Search Level</div>
-                                <div className="dexnav-odds-cell">Odds</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">0</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "1,366" : "4,096"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">1-16</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "969" : "2,906"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">17-33</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "751" : "2,252"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">34-50</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "613" : "1,838"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">84-100</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "395" : "1,185"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">101-150</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "353" : "1,059"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">201-300</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "291" : "874"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">401-500</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "248" : "744"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">701-800</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "203" : "608"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">901-999</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "181" : "542"}</div>
-                              </div>
-                            </div>
-                            <div className="dexnav-odds-note">
-                              <span className="dexnav-odds-note-text">Each encounter has a 4% chance for random shiny odds boost. Encounters at multiples of 50 and 100 have additional boosted odds (not dynamically tracked).</span>
-                            </div>
-                          </div>
-                        ) : currentOdds === "sosSMUSUM" ? (
-                          // Special display for SOS method in Sun/Moon and Ultra Sun/Ultra Moon - show chart with chain ranges
-                          <div className="sos-odds">
-                            <div className="sos-odds-table">
-                              <div className="sos-odds-table-header">
-                                <div className="sos-odds-cell">Chain</div>
-                                <div className="sos-odds-cell">Odds</div>
-                              </div>
-                              <div className="sos-odds-table-row">
-                                <div className="sos-odds-cell">0-10</div>
-                                <div className="sos-odds-cell">1/{modifiers.shinyCharm ? "1,366" : "4,096"}</div>
-                              </div>
-                              <div className="sos-odds-table-row">
-                                <div className="sos-odds-cell">11-20</div>
-                                <div className="sos-odds-cell">1/{modifiers.shinyCharm ? "586" : "820"}</div>
-                              </div>
-                              <div className="sos-odds-table-row">
-                                <div className="sos-odds-cell">21-30</div>
-                                <div className="sos-odds-cell">1/{modifiers.shinyCharm ? "373" : "456"}</div>
-                              </div>
-                              <div className="sos-odds-table-row">
-                                <div className="sos-odds-cell">31+</div>
-                                <div className="sos-odds-cell">1/{modifiers.shinyCharm ? "274" : "316"}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "ultraWormholes" ? (
-                          // Special display for Ultra Wormholes in Ultra Sun/Ultra Moon
-                          <div className="ultra-wormhole-odds">
-                            <div className="ultra-wormhole-main">
-                              <span className="ultra-wormhole-base">1%</span>
-                              <span className="ultra-wormhole-separator">→</span>
-                              <span className="ultra-wormhole-max">36%</span>
-                            </div>
-                            <div className="ultra-wormhole-note">
-                              <span className="ultra-wormhole-note-text">Odds increase with distance traveled</span>
-                            </div>
-                          </div>
-                        ) : currentOdds === "koMethod" ? (
-                          // Special display for KO Method in Sword/Shield - show full chart
-                          <div className="ko-method-odds">
-                            <div className="ko-odds-table">
-                              <div className="ko-odds-table-header">
-                                <div className="ko-odds-cell">KOs</div>
-                                <div className="ko-odds-cell">Odds</div>
-                              </div>
-                              <div className="ko-odds-table-row">
-                                <div className="ko-odds-cell">1</div>
-                                <div className="ko-odds-cell">{modifiers.shinyCharm ? "1/1,024" : "1/2,048"}</div>
-                              </div>
-                              <div className="ko-odds-table-row">
-                                <div className="ko-odds-cell">50</div>
-                                <div className="ko-odds-cell">{modifiers.shinyCharm ? "1/820" : "1/1,366"}</div>
-                              </div>
-                              <div className="ko-odds-table-row">
-                                <div className="ko-odds-cell">100</div>
-                                <div className="ko-odds-cell">{modifiers.shinyCharm ? "1/683" : "1/1,025"}</div>
-                              </div>
-                              <div className="ko-odds-table-row">
-                                <div className="ko-odds-cell">200</div>
-                                <div className="ko-odds-cell">{modifiers.shinyCharm ? "1/586" : "1/820"}</div>
-                              </div>
-                              <div className="ko-odds-table-row">
-                                <div className="ko-odds-cell">300</div>
-                                <div className="ko-odds-cell">{modifiers.shinyCharm ? "1/512" : "1/683"}</div>
-                              </div>
-                              <div className="ko-odds-table-row">
-                                <div className="ko-odds-cell">500+</div>
-                                <div className="ko-odds-cell">{modifiers.shinyCharm ? "1/456" : "1/586"}</div>
-                              </div>
-                            </div>
-                            <div className="ko-odds-note">
-                              <span className="ko-odds-note-text">Odds only apply to brilliant aura Pokemon</span>
-                            </div>
-                          </div>
-                        ) : currentOdds === "pokeradarDPP" ? (
-                          // Special display for Poke Radar in Diamond/Pearl/Platinum - show table every 5 checks up to 40
-                          <div className="pokeradar-odds">
-                            <div className="pokeradar-odds-table">
-                              <div className="pokeradar-odds-table-header">
-                                <div className="pokeradar-odds-cell">Chain</div>
-                                <div className="pokeradar-odds-cell">Odds</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">0</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 0).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">5</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 5).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">10</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 10).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">15</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 15).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">20</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 20).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">25</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 25).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">30</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 30).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">35</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 35).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">40+</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 40).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "pokeradarBDSP" ? (
-                          // Special display for Poke Radar in Brilliant Diamond/Shining Pearl - show table every 5 checks up to 40
-                          <div className="pokeradar-odds">
-                            <div className="pokeradar-odds-table">
-                              <div className="pokeradar-odds-table-header">
-                                <div className="pokeradar-odds-cell">Chain</div>
-                                <div className="pokeradar-odds-cell">Odds</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">0</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 0).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">5</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 5).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">10</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 10).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">15</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 15).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">20</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 20).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">25</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 25).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">30</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 30).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">35</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 35).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">40+</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 40).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "catchComboLetsGo" ? (
-                          // Special display for Catch Combo in Let's Go games - show table with combo ranges
-                          <div className="catchcombo-odds">
-                            <div className="catchcombo-odds-table">
-                              <div className="catchcombo-odds-table-header">
-                                <div className="catchcombo-odds-cell">Combo</div>
-                                <div className="catchcombo-odds-cell">Odds</div>
-                              </div>
-                              <div className="catchcombo-odds-table-row">
-                                <div className="catchcombo-odds-cell">0-10</div>
-                                <div className="catchcombo-odds-cell">1/{modifiers.shinyCharm && modifiers.lureActive ? "1,024" : modifiers.shinyCharm ? "1,365" : modifiers.lureActive ? "2,048" : "4,096"}</div>
-                              </div>
-                              <div className="catchcombo-odds-table-row">
-                                <div className="catchcombo-odds-cell">11-20</div>
-                                <div className="catchcombo-odds-cell">1/{modifiers.shinyCharm && modifiers.lureActive ? "585" : modifiers.shinyCharm ? "683" : modifiers.lureActive ? "819" : "1,024"}</div>
-                              </div>
-                              <div className="catchcombo-odds-table-row">
-                                <div className="catchcombo-odds-cell">21-30</div>
-                                <div className="catchcombo-odds-cell">1/{modifiers.shinyCharm && modifiers.lureActive ? "372" : modifiers.shinyCharm ? "410" : modifiers.lureActive ? "455" : "512"}</div>
-                              </div>
-                              <div className="catchcombo-odds-table-row">
-                                <div className="catchcombo-odds-cell">31+</div>
-                                <div className="catchcombo-odds-cell">1/{modifiers.shinyCharm && modifiers.lureActive ? "273" : modifiers.shinyCharm ? "293" : modifiers.lureActive ? "315" : "341"}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "hordeEncounters" ? (
-                          // Special display for Horde Encounters - show odds with note
-                          <div className="horde-encounters-odds">
-                            <span className="odds-text">1 in {calculateOdds(huntDetails.game, huntDetails.method, modifiers).toLocaleString()}</span>
-                            <div className="horde-encounters-note">
-                              <span className="horde-encounters-note-text">Odds apply to each full horde encounter, not individual Pokemon</span>
-                            </div>
-                          </div>
-                        ) : currentOdds === "massOutbreaksSV" ? (
-                          // Special display for Mass Outbreaks in Scarlet/Violet - show table with sparkling power levels
-                          <div className="massoutbreak-odds">
-                            <div className="massoutbreak-odds-table">
-                              <div className="massoutbreak-odds-table-header">
-                                <div className="massoutbreak-odds-cell">Checks Cleared</div>
-                                <div className="massoutbreak-odds-cell">Odds</div>
-                              </div>
-                              <div className="massoutbreak-odds-table-row">
-                                <div className="massoutbreak-odds-cell">0-29</div>
-                                <div className="massoutbreak-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 15).toLocaleString()}</div>
-                              </div>
-                              <div className="massoutbreak-odds-table-row">
-                                <div className="massoutbreak-odds-cell">30-59</div>
-                                <div className="massoutbreak-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 45).toLocaleString()}</div>
-                              </div>
-                              <div className="massoutbreak-odds-table-row">
-                                <div className="massoutbreak-odds-cell">60+</div>
-                                <div className="massoutbreak-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 75).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "pokemonGoRandom" ? (
-                          // Special display for Pokemon Go Random Encounters and Daily Adventure Incense - show odds with note (hidden for Galar Birds)
-                          <div className="pokemon-go-random-odds">
-                            <span className="odds-text">1 in {calculateOdds(huntDetails.game, huntDetails.method, modifiers).toLocaleString()}</span>
-                            {!modifiers.galarBirds && (
-                              <div className="pokemon-go-random-note">
-                                <span className="pokemon-go-random-note-text">Pokemon Go shiny odds vary significantly between species and events. This represents the most common base rate, but actual odds may differ.</span>
-                              </div>
-                            )}
-                          </div>
-                        ) : currentOdds === "NA" ? (
-                          // Display NA when no game/method selected
-                          <span className="odds-text">NA</span>
-                        ) : (
-                          // Standard display for other methods
-                          <span className="odds-text">1 in {currentOdds.toLocaleString()}</span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* No Hunt Data Available Message */}
-                  {huntDetails.game && availableMethods.length === 0 && (
-                    <div className="hunt-form-group">
-                      <div className="no-hunt-data-message">
-                        <p>No hunt data available for {huntDetails.game} yet.</p>
-                        <p>Hunt methods and odds will be added as data is provided.</p>
-                      </div>
-                    </div>
-                  )}
+                  <span className="text-xs font-black text-white uppercase tracking-wider">
+                    Add Check
+                  </span>
                 </div>
-              </div>
-
-              <div className="hunt-modal-footer">
-                <button
-                  onClick={handleStartHunt}
-                  className="hunt-start-btn"
-                >
-                  <Plus size={16} />
-                  Start Hunt
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Reset Hunt Modal */}
-      {resetModal.show && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${resetModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${resetModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                  <RotateCcw className="w-5 h-5 text-red-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--accent)]">Reset Hunt</h3>
-                  <p className="text-sm text-[var(--progressbar-info)]">This action cannot be undone</p>
-                </div>
-              </div>
-              <p className="text-gray-300 mb-6">
-                Are you sure you want to reset this hunt for <span className="font-semibold text-[var(--accent)]">{resetModal.hunt ? formatPokemonName(resetModal.hunt.pokemon.name) : ''}</span>?
-                This will reset the check count and timer.
-              </p>
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setResetModalClosing(true);
-                    setTimeout(() => {
-                      setResetModal({ show: false, hunt: null });
-                      setResetModalClosing(false);
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleResetConfirm}
-                  className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
-                >
-                  Reset Hunt
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* Delete Hunt Modal */}
-      {deleteModal.show && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${deleteModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${deleteModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                  <Trash2 className="w-5 h-5 text-red-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--accent)]">Delete Hunt</h3>
-                  <p className="text-sm text-[var(--progressbar-info)]">This action cannot be undone</p>
-                </div>
-              </div>
-              <p className="text-gray-300 mb-6">
-                Are you sure you want to delete this hunt for <span className="font-semibold text-[var(--accent)]">{deleteModal.hunt ? formatPokemonName(deleteModal.hunt.pokemon.name) : ''}</span>?
-                This will permanently delete all hunt data.
-              </p>
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setDeleteModalClosing(true);
-                    setTimeout(() => {
-                      setDeleteModal({ show: false, hunt: null });
-                      setDeleteModalClosing(false);
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDeleteConfirm}
-                  className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors font-semibold"
-                >
-                  Delete Hunt
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* Settings Hunt Modal */}
-      {settingsModal.show && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${settingsModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${settingsModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
-                  <Settings className="w-5 h-5 text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--accent)]">Hunt Settings</h3>
-                  <p className="text-sm text-[var(--progressbar-info)]">Manually adjust hunt values</p>
-                </div>
-              </div>
-
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Adjust Encounter Count
-                  </label>
-                  <div className="settings-number-input-wrapper">
-                    <input
-                      type="number"
-                      value={settingsForm.manualChecks}
-                      onChange={(e) => setSettingsForm(prev => ({ ...prev, manualChecks: e.target.value }))}
-                      className="settings-number-input"
-                      placeholder="Enter encounter count"
-                      min="0"
-                    />
-                    <div className="settings-number-buttons">
-                      <button
-                        type="button"
-                        className="settings-number-btn settings-number-btn-up"
-                        onClick={() => setSettingsForm(prev => ({ ...prev, manualChecks: String(Math.max(0, (parseInt(prev.manualChecks) || 0) + 1)) }))}
-                      >
-                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
-                          <path d="M5 0L10 6H0L5 0Z" />
-                        </svg>
-                      </button>
-                      <button
-                        type="button"
-                        className="settings-number-btn settings-number-btn-down"
-                        onClick={() => setSettingsForm(prev => ({ ...prev, manualChecks: String(Math.max(0, (parseInt(prev.manualChecks) || 0) - 1)) }))}
-                      >
-                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
-                          <path d="M5 6L0 0H10L5 6Z" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Adjust Timer (format: 1h 2m 3s)
-                  </label>
-                  <input
-                    type="text"
-                    value={settingsForm.manualTotalTime}
-                    onChange={(e) => setSettingsForm(prev => ({ ...prev, manualTotalTime: e.target.value }))}
-                    className="w-full px-3 py-2 bg-[var(--searchbar-bg)] border border-[var(--border-color)] rounded-lg text-white focus:outline-none focus:border-[var(--accent)]"
-                    placeholder="e.g., 1h 30m 45s"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Adjust Increments
-                  </label>
-                  <div className="settings-number-input-wrapper">
-                    <input
-                      type="number"
-                      value={settingsForm.manualIncrements}
-                      onChange={(e) => setSettingsForm(prev => ({ ...prev, manualIncrements: e.target.value }))}
-                      className="settings-number-input"
-                      placeholder="Enter increment value (default: 1)"
-                      min="1"
-                    />
-                    <div className="settings-number-buttons">
-                      <button
-                        type="button"
-                        className="settings-number-btn settings-number-btn-up"
-                        onClick={() => setSettingsForm(prev => ({ ...prev, manualIncrements: String(Math.max(1, (parseInt(prev.manualIncrements) || 1) + 1)) }))}
-                      >
-                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
-                          <path d="M5 0L10 6H0L5 0Z" />
-                        </svg>
-                      </button>
-                      <button
-                        type="button"
-                        className="settings-number-btn settings-number-btn-down"
-                        onClick={() => setSettingsForm(prev => ({ ...prev, manualIncrements: String(Math.max(1, (parseInt(prev.manualIncrements) || 1) - 1)) }))}
-                      >
-                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
-                          <path d="M5 6L0 0H10L5 6Z" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-400 mt-1">
-                    How many encounters to add each time you click the + button
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setSettingsModalClosing(true);
-                    setTimeout(() => {
-                      setSettingsModal({ show: false, hunt: null });
-                      setSettingsModalClosing(false);
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSettingsConfirm}
-                  className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
-                >
-                  Apply Settings
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* Edit Hunt Modal */}
-      {editModal.show && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${editModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${editModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
-                  <Edit className="w-5 h-5 text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--accent)]">Edit Hunt</h3>
-                  <p className="text-sm text-[var(--progressbar-info)]">Change game, method, or Pokemon</p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {/* Pokemon Selection */}
-                <div className="hunt-form-group">
-                  <label className="hunt-label">Pokemon:</label>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 px-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--sidebar-edit-inputs)] text-[var(--text)]">
-                      {editForm.pokemon ? formatPokemonName(editForm.pokemon.name) : "Select Pokemon"}
-                    </div>
-                    <button
-                      onClick={() => {
-                        setIsEditingPokemon(true);
-                        setEditModalClosing(true);
-                        setTimeout(() => {
-                          setEditModal(prev => ({ ...prev, show: false }));
-                          setEditModalClosing(false);
-                          setShowPokemonModal(true);
-                        }, 300);
-                      }}
-                      className="px-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--sidebar-edit-inputs)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors flex items-center justify-center h-[42px]"
-                      title="Change Pokemon"
-                    >
-                      <Edit size={20} className="text-[var(--accent)]" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Game Selection */}
-                <div className="hunt-form-group">
-                  <label className="hunt-label">Game:</label>
-                  <SearchbarIconDropdown
-                    id="edit-game-dropdown"
-                    options={GAME_OPTIONS.filter(g => g.value !== "Home")}
-                    value={editForm.game}
-                    onChange={val => setEditForm(prev => ({ ...prev, game: val }))}
-                    placeholder="Select a game..."
-                    customBackground="var(--sidebar-edit-inputs)"
-                    customBorder="var(--border-color)"
-                  />
-                </div>
-
-                {/* Method Selection */}
-                <div className="hunt-form-group">
-                  <label className="hunt-label">Method:</label>
-                  <SearchbarIconDropdown
-                    id="edit-method-dropdown"
-                    options={[
-                      { name: "None", value: "" },
-                      ...(editForm.game ? getMethodsForGame(editForm.game).map(method => ({
-                        name: method.name,
-                        value: method.name
-                      })) : [])
-                    ]}
-                    value={editForm.method}
-                    onChange={val => setEditForm(prev => ({ ...prev, method: val }))}
-                    placeholder={editForm.game ? "Select a method..." : "Select a game first"}
-                    customBackground="var(--sidebar-edit-inputs)"
-                    customBorder="var(--border-color)"
-                    disabled={!editForm.game}
-                  />
-                </div>
-
-                {/* Modifiers Section */}
-                {editForm.game && (() => {
-                  const editAvailableMethods = getMethodsForGame(editForm.game);
-                  const editGameModifiers = getModifiersForGame(editForm.game);
-
-                  return (
-                    (editGameModifiers["Shiny Charm"] > 0 && !(editForm.method === "Fossil Revivals" && (editForm.game === "Let's Go Pikachu" || editForm.game === "Let's Go Eevee" || editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Fossil Revivals" && editForm.game === "Legends Z-A") && !(editForm.method === "Dynamax Raids" && (editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Gift Pokemon" && (editForm.game === "Sword" || editForm.game === "Shield" || editForm.game === "Let's Go Eevee" || editForm.game === "Let's Go Pikachu")) && !(editForm.method === "Tera Raids" && (editForm.game === "Scarlet" || editForm.game === "Violet")) && !((editForm.method === "Random Encounters" || editForm.method === "Poke Radar" || editForm.method === "Soft Resets" || editForm.method === "Fossil Revivals" || editForm.method === "Gift Pokemon" || editForm.method === "Underground Diglett Hunt") && (editForm.game === "Brilliant Diamond" || editForm.game === "Shining Pearl")) && !(editForm.method === "Poke Radar" && (editForm.game === "X" || editForm.game === "Y")) && !(editForm.method === "Ultra Wormholes" && (editForm.game === "Ultra Sun" || editForm.game === "Ultra Moon"))) ||
-                    (editGameModifiers["Shiny Parents"] > 0 && editForm.method === "Breeding") ||
-                    (editGameModifiers["Lure Active"] > 0 && (editForm.method === "Catch Combo" || editForm.method === "Random Encounters" || (editForm.method === "Soft Resets" && editForm.game !== "Let's Go Pikachu" && editForm.game !== "Let's Go Eevee"))) ||
-                    (editGameModifiers["Research Lv 10"] > 0 && editForm.game === "Legends Arceus") ||
-                    (editGameModifiers["Perfect Research"] > 0 && editForm.game === "Legends Arceus") ||
-                    (editGameModifiers["Sparkling Lv 1"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces"))) ||
-                    (editGameModifiers["Sparkling Lv 2"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces"))) ||
-                    (editGameModifiers["Sparkling Lv 3"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces"))) ||
-                    (editGameModifiers["Event Boosted"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && editForm.method === "Mass Outbreaks") ||
-                    (editGameModifiers["Community Day"] > 0 && editForm.game === "GO" && (editForm.method === "Random Encounters" || editForm.method === "Daily Adventure Incense")) ||
-                    (editGameModifiers["Raid Day"] > 0 && editForm.game === "GO" && editForm.method === "Raid Battles") ||
-                    (editGameModifiers["Research Day"] > 0 && editForm.game === "GO" && editForm.method === "Field Research") ||
-                    (editGameModifiers["Galar Birds"] > 0 && editForm.game === "GO" && editForm.method === "Daily Adventure Incense") ||
-                    (editGameModifiers["Hatch Day"] > 0 && editForm.game === "GO" && editForm.method === "Breeding")
-                  ) && editAvailableMethods.length > 0 && (
-                      <div className="hunt-form-group">
-                        <label className="hunt-label">Modifiers:</label>
-                        <div className="modifiers-section">
-                          {editGameModifiers["Shiny Charm"] > 0 && !(editForm.method === "Fossil Revivals" && (editForm.game === "Let's Go Pikachu" || editForm.game === "Let's Go Eevee" || editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Fossil Revivals" && editForm.game === "Legends Z-A") && !(editForm.method === "Dynamax Raids" && (editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Gift Pokemon" && (editForm.game === "Sword" || editForm.game === "Shield" || editForm.game === "Let's Go Eevee" || editForm.game === "Let's Go Pikachu")) && !(editForm.method === "Tera Raids" && (editForm.game === "Scarlet" || editForm.game === "Violet")) && !((editForm.method === "Random Encounters" || editForm.method === "Poke Radar" || editForm.method === "Soft Resets" || editForm.method === "Fossil Revivals" || editForm.method === "Gift Pokemon" || editForm.method === "Underground Diglett Hunt") && (editForm.game === "Brilliant Diamond" || editForm.game === "Shining Pearl")) && !(editForm.method === "Poke Radar" && (editForm.game === "X" || editForm.game === "Y")) && !(editForm.method === "Ultra Wormholes" && (editForm.game === "Ultra Sun" || editForm.game === "Ultra Moon")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.shinyCharm}
-                                onChange={(e) => {
-                                  const newShinyCharm = e.target.checked;
-                                  setEditForm(prev => {
-                                    const newModifiers = { ...prev.modifiers, shinyCharm: newShinyCharm };
-                                    // Auto-check Research Lv 10 when Shiny Charm is checked in Legends Arceus
-                                    if (newShinyCharm && editForm.game === "Legends Arceus" && !prev.modifiers.researchLv10) {
-                                      newModifiers.researchLv10 = true;
-                                    }
-                                    return { ...prev, modifiers: newModifiers };
-                                  });
-                                }}
-                              />
-                              <span>Shiny Charm</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Shiny Parents"] > 0 && editForm.method === "Breeding" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.shinyParents}
-                                onChange={(e) => setEditForm(prev => ({ ...prev, modifiers: { ...prev.modifiers, shinyParents: e.target.checked } }))}
-                              />
-                              <span>Shiny Parents</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Lure Active"] > 0 && (editForm.method === "Catch Combo" || editForm.method === "Random Encounters" || (editForm.method === "Soft Resets" && editForm.game !== "Let's Go Pikachu" && editForm.game !== "Let's Go Eevee")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.lureActive}
-                                onChange={(e) => setEditForm(prev => ({ ...prev, modifiers: { ...prev.modifiers, lureActive: e.target.checked } }))}
-                              />
-                              <span>Lure Active</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Research Lv 10"] > 0 && editForm.game === "Legends Arceus" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.researchLv10}
-                                onChange={(e) => {
-                                  const newResearchLv10 = e.target.checked;
-                                  setEditForm(prev => {
-                                    const newModifiers = { ...prev.modifiers, researchLv10: newResearchLv10 };
-                                    // Auto-uncheck Shiny Charm and Perfect Research when Research Lv 10 is unchecked in Legends Arceus
-                                    if (!newResearchLv10 && editForm.game === "Legends Arceus") {
-                                      if (prev.modifiers.shinyCharm) {
-                                        newModifiers.shinyCharm = false;
-                                      }
-                                      if (prev.modifiers.perfectResearch) {
-                                        newModifiers.perfectResearch = false;
-                                      }
-                                    }
-                                    return { ...prev, modifiers: newModifiers };
-                                  });
-                                }}
-                              />
-                              <span>Research Lv 10</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Perfect Research"] > 0 && editForm.game === "Legends Arceus" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.perfectResearch}
-                                onChange={(e) => {
-                                  const newPerfectResearch = e.target.checked;
-                                  setEditForm(prev => {
-                                    const newModifiers = { ...prev.modifiers, perfectResearch: newPerfectResearch };
-                                    // Auto-check Research Lv 10 when Perfect Research is checked in Legends Arceus
-                                    if (newPerfectResearch && editForm.game === "Legends Arceus" && !prev.modifiers.researchLv10) {
-                                      newModifiers.researchLv10 = true;
-                                    }
-                                    return { ...prev, modifiers: newModifiers };
-                                  });
-                                }}
-                              />
-                              <span>Perfect Research</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Sparkling Lv 1"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.sparklingLv1}
-                                onChange={(e) => {
-                                  const newSparklingLv1 = e.target.checked;
-                                  setEditForm(prev => {
-                                    const newModifiers = {
-                                      ...prev.modifiers,
-                                      sparklingLv1: newSparklingLv1,
-                                      sparklingLv2: newSparklingLv1 ? false : prev.modifiers.sparklingLv2,
-                                      sparklingLv3: newSparklingLv1 ? false : prev.modifiers.sparklingLv3
-                                    };
-
-                                    // For Sandwich method: if turning off Lv 1 and no other sparkling is active, default to Lv 3
-                                    if (editForm.method === "Sandwich" && !newSparklingLv1 && !newModifiers.sparklingLv2 && !newModifiers.sparklingLv3) {
-                                      newModifiers.sparklingLv3 = true;
-                                    }
-
-                                    return { ...prev, modifiers: newModifiers };
-                                  });
-                                }}
-                              />
-                              <span>Sparkling Lv 1</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Sparkling Lv 2"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.sparklingLv2}
-                                onChange={(e) => {
-                                  const newSparklingLv2 = e.target.checked;
-                                  setEditForm(prev => {
-                                    const newModifiers = {
-                                      ...prev.modifiers,
-                                      sparklingLv2: newSparklingLv2,
-                                      sparklingLv1: newSparklingLv2 ? false : prev.modifiers.sparklingLv1,
-                                      sparklingLv3: newSparklingLv2 ? false : prev.modifiers.sparklingLv3
-                                    };
-
-                                    // For Sandwich method: if turning off Lv 2 and no other sparkling is active, default to Lv 3
-                                    if (editForm.method === "Sandwich" && !newSparklingLv2 && !newModifiers.sparklingLv1 && !newModifiers.sparklingLv3) {
-                                      newModifiers.sparklingLv3 = true;
-                                    }
-
-                                    return { ...prev, modifiers: newModifiers };
-                                  });
-                                }}
-                              />
-                              <span>Sparkling Lv 2</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Sparkling Lv 3"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.sparklingLv3}
-                                onChange={(e) => {
-                                  const newSparklingLv3 = e.target.checked;
-                                  setEditForm(prev => {
-                                    const newModifiers = {
-                                      ...prev.modifiers,
-                                      sparklingLv3: newSparklingLv3,
-                                      sparklingLv1: newSparklingLv3 ? false : prev.modifiers.sparklingLv1,
-                                      sparklingLv2: newSparklingLv3 ? false : prev.modifiers.sparklingLv2
-                                    };
-
-                                    // For Sandwich method: if turning off Lv 3 and no other sparkling is active, default back to Lv 3
-                                    if (editForm.method === "Sandwich" && !newSparklingLv3 && !newModifiers.sparklingLv1 && !newModifiers.sparklingLv2) {
-                                      newModifiers.sparklingLv3 = true;
-                                    }
-
-                                    return { ...prev, modifiers: newModifiers };
-                                  });
-                                }}
-                              />
-                              <span>Sparkling Lv 3</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Event Boosted"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && editForm.method === "Mass Outbreaks" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.eventBoosted}
-                                onChange={(e) => setEditForm(prev => ({ ...prev, modifiers: { ...prev.modifiers, eventBoosted: e.target.checked } }))}
-                              />
-                              <span>Event Boosted</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Community Day"] > 0 && editForm.game === "GO" && (editForm.method === "Random Encounters" || editForm.method === "Daily Adventure Incense") && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.communityDay}
-                                onChange={(e) => {
-                                  const newCommunityDay = e.target.checked;
-                                  setEditForm(prev => ({
-                                    ...prev,
-                                    modifiers: {
-                                      ...prev.modifiers,
-                                      communityDay: newCommunityDay,
-                                      raidDay: newCommunityDay ? false : prev.modifiers.raidDay,
-                                      researchDay: newCommunityDay ? false : prev.modifiers.researchDay,
-                                      galarBirds: newCommunityDay ? false : prev.modifiers.galarBirds,
-                                      hatchDay: newCommunityDay ? false : prev.modifiers.hatchDay
-                                    }
-                                  }));
-                                }}
-                              />
-                              <span>Community Day</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Raid Day"] > 0 && editForm.game === "GO" && editForm.method === "Raid Battles" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.raidDay}
-                                onChange={(e) => {
-                                  const newRaidDay = e.target.checked;
-                                  setEditForm(prev => ({
-                                    ...prev,
-                                    modifiers: {
-                                      ...prev.modifiers,
-                                      raidDay: newRaidDay,
-                                      communityDay: newRaidDay ? false : prev.modifiers.communityDay,
-                                      researchDay: newRaidDay ? false : prev.modifiers.researchDay
-                                    }
-                                  }));
-                                }}
-                              />
-                              <span>Raid Day</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Research Day"] > 0 && editForm.game === "GO" && editForm.method === "Field Research" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.researchDay}
-                                onChange={(e) => {
-                                  const newResearchDay = e.target.checked;
-                                  setEditForm(prev => ({
-                                    ...prev,
-                                    modifiers: {
-                                      ...prev.modifiers,
-                                      researchDay: newResearchDay,
-                                      communityDay: newResearchDay ? false : prev.modifiers.communityDay,
-                                      raidDay: newResearchDay ? false : prev.modifiers.raidDay
-                                    }
-                                  }));
-                                }}
-                              />
-                              <span>Research Day</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Galar Birds"] > 0 && editForm.game === "GO" && editForm.method === "Daily Adventure Incense" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.galarBirds}
-                                onChange={(e) => {
-                                  const newGalarBirds = e.target.checked;
-                                  setEditForm(prev => ({
-                                    ...prev,
-                                    modifiers: {
-                                      ...prev.modifiers,
-                                      galarBirds: newGalarBirds,
-                                      communityDay: newGalarBirds ? false : prev.modifiers.communityDay
-                                    }
-                                  }));
-                                }}
-                              />
-                              <span>Galar Birds</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Hatch Day"] > 0 && editForm.game === "GO" && editForm.method === "Breeding" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.hatchDay}
-                                onChange={(e) => {
-                                  const newHatchDay = e.target.checked;
-                                  setEditForm(prev => ({
-                                    ...prev,
-                                    modifiers: {
-                                      ...prev.modifiers,
-                                      hatchDay: newHatchDay,
-                                      communityDay: newHatchDay ? false : prev.modifiers.communityDay
-                                    }
-                                  }));
-                                }}
-                              />
-                              <span>Hatch Day</span>
-                            </label>
-                          )}
-                        </div>
-                      </div>
-                    );
-                })()}
-              </div>
-
-              <div className="flex gap-3 justify-end mt-6">
-                <button
-                  onClick={() => {
-                    setEditModalClosing(true);
-                    setTimeout(() => {
-                      setEditModal({ show: false, hunt: null });
-                      setEditModalClosing(false);
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleEditConfirm}
-                  className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
-                >
-                  Update Hunt
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* Completion Hunt Modal */}
-      {completionModal.show && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${completionModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${completionModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--accent)]">Complete Hunt</h3>
-                  <p className="text-sm text-[var(--progressbar-info)]">Add final hunt details</p>
-                </div>
-              </div>
-
-              {/* Display existing hunt info */}
-              {completionModal.hunt && (
-                <div className="bg-[var(--searchbar-bg)] border border-[var(--border-color)] rounded-lg p-4 mb-4">
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <span className="text-gray-400">Pokemon:</span>
-                      <div className="font-medium text-white">{formatPokemonName(completionModal.hunt.pokemon.name)}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Form:</span>
-                      <div className="font-medium text-white">{getFormDisplayName(completionModal.hunt.pokemon) || "None"}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Method:</span>
-                      <div className="font-medium text-white">{completionModal.hunt.method}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Game:</span>
-                      <div className="font-medium text-white">{completionModal.hunt.game}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Date:</span>
-                      <div className="font-medium text-white">{new Date().toLocaleDateString()}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Final Check:</span>
-                      <div className="font-medium text-white">
-                        {completionModal.hunt.checks} in {formatTimeCompact(totalCheckTimes[completionModal.hunt.id] || 0)}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-4 mb-6">
-                <div className="sidebar-form-group">
-                  <label className="sidebar-label">Ball Used:</label>
-                  <SearchbarIconDropdown
-                    id="completion-ball-dropdown"
-                    options={getCompletionBallOptions()}
-                    value={completionForm.ball}
-                    onChange={val => setCompletionForm(prev => ({ ...prev, ball: val }))}
-                    placeholder="Select a ball..."
-                    customBackground="var(--sidebar-edit-inputs)"
-                    customBorder="var(--border-color)"
-                  />
-                </div>
-
-                {/* Only show mark field for games that support marks */}
-                {completionModal.hunt && ['Sword', 'Shield', 'Scarlet', 'Violet'].includes(completionModal.hunt.game) && (
-                  <div className="sidebar-form-group">
-                    <label className="sidebar-label">Mark:</label>
-                    <SearchbarIconDropdown
-                      id="completion-mark-dropdown"
-                      options={MARK_OPTIONS.filter(m => m.value !== "mightiest")}
-                      value={completionForm.mark}
-                      onChange={val => setCompletionForm(prev => ({ ...prev, mark: val }))}
-                      placeholder="Select a mark..."
-                      customBackground="var(--sidebar-edit-inputs)"
-                      customBorder="var(--border-color)"
-                    />
-                  </div>
+                {hotkey && (
+                  <button
+                    type="button"
+                    className="text-[11px] text-gray-400 hover:text-rose-400 font-semibold transition-colors"
+                    onClick={() => {
+                      setHotkey(null);
+                      try { localStorage.removeItem("huntHotkey"); } catch {}
+                      profileAPI.updateProfile({ huntHotkey: "" }).catch(() => {});
+                      showMessage("Increment hotkey cleared", "info");
+                    }}
+                  >
+                    Clear
+                  </button>
                 )}
-
-                <div className="sidebar-form-group">
-                  <label className="sidebar-label">Notes/extras:</label>
-                  <ContentFilterInput
-                    id="completion-notes-textarea"
-                    name="notes"
-                    type="textarea"
-                    value={completionForm.notes}
-                    onChange={(e) => setCompletionForm(prev => ({ ...prev, notes: e.target.value }))}
-                    placeholder="Add notes about this hunt..."
-                    configType="notes"
-                    showCharacterCount={true}
-                    showRealTimeValidation={true}
-                    className="sidebar-input"
-                    autoComplete="off"
-                  />
-                </div>
               </div>
 
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setCompletionModalClosing(true);
-                    setTimeout(() => {
-                      setCompletionModal({ show: false, hunt: null });
-                      setCompletionModalClosing(false);
-                      setCompletionForm({ ball: '', mark: '', notes: '' });
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleCompletionConfirm}
-                  className="sidebar-button"
-                >
-                  Complete Hunt
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* Hunt History Modal */}
-      {showHistoryModal && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${historyModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center p-4">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-4xl w-full max-h-[80vh] flex flex-col shadow-xl ${historyModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-[var(--accent)]/20 rounded-full flex items-center justify-center">
-                    <RotateCcw className="w-5 h-5 text-[var(--accent)]" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-[var(--accent)]">Hunt History</h3>
-                    <p className="text-sm text-[var(--progressbar-info)]">View your completed hunts</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setHistoryModalClosing(true);
-                    setTimeout(() => {
-                      setShowHistoryModal(false);
-                      setHistoryModalClosing(false);
-                    }, 300);
-                  }}
-                  className="close-btn"
-                  aria-label="Close"
-                >
-                  <span className="sidebar-close-icon">
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="20" cy="20" r="18" fill="#fff" stroke="#232323" strokeWidth="2" />
-                      <path d="M2 20a18 18 0 0 1 36 0" fill="#e62829" stroke="#232323" strokeWidth="2" />
-                      <rect x="2" y="19" width="36" height="2" fill="#232323" />
-                      <circle cx="20" cy="20" r="7" fill="#ffffffff" stroke="#232323" strokeWidth="2" />
-                    </svg>
-                  </span>
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto px-1 custom-scrollbar">
-                {isLoadingHistory ? (
-                  <div className="flex justify-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)]"></div>
-                  </div>
-                ) : huntHistory.length === 0 ? (
-                  <div className="text-center py-12 text-gray-400">
-                    <p>No completed hunts found in your history yet.</p>
+              <div className="flex items-center justify-center py-2">
+                {listeningFor === "increment" ? (
+                  <div className="hotkey-key-badge-lg animate-pulse text-xs sm:text-sm font-bold text-center">
+                    Press any key...
                   </div>
                 ) : (
-                  <div className="grid gap-4">
-                    {huntHistory.map((hunt, idx) => (
-                      <div key={hunt.entryId || idx} className="history-item">
-                        <div className="history-pokemon">
-                          <img src={hunt.pokemonIcon} alt={hunt.pokemonName} className="history-icon" />
-                          <div className="history-details">
-                            <span className="history-name">{formatPokemonName(hunt.pokemonName)}</span>
-                            <span className="history-meta">{hunt.game} • {hunt.method}</span>
-                          </div>
-                        </div>
-                        <div className="history-stats">
-                          <div className="history-stat">
-                            <span className="history-stat-label">Checks:</span>
-                            <span className="history-stat-value text-[var(--accent)]">{hunt.checks || '-'}</span>
-                          </div>
-                          <div className="history-stat">
-                            <span className="history-stat-label">Time:</span>
-                            <span className="history-stat-value text-blue-400">{formatTimeCompact(hunt.time || 0)}</span>
-                          </div>
-                          <div className="history-stat date-stat">
-                            <span className="history-stat-label">Date:</span>
-                            <span className="history-stat-value opacity-60">{hunt.date}</span>
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemoveFromHistoryClick(hunt.caughtKey, hunt.entryId);
-                            }}
-                            className="hover:bg-black/30 rounded-md transition-colors text-gray-500 hover:text-[var(--accent)] ml-2 history-delete-btn flex items-center justify-center"
-                            title="Remove from history"
-                            style={{ padding: '2px' }}
-                          >
-                            <Trash2 size={20} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="hotkey-key-badge-lg">
+                    {formatHotkeyLabel(hotkey)}
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
 
-      {/* Delete History Item Modal */}
-      {deleteHistoryModal.show && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${deleteHistoryModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${deleteHistoryModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-[var(--accent)]/20 rounded-full flex items-center justify-center">
-                  <Trash2 className="w-5 h-5 text-[var(--accent)]" />
+              <Button
+                variant={listeningFor === "increment" ? "accent" : "secondary"}
+                size="sm"
+                className="w-full font-bold"
+                onClick={() => {
+                  setHotkeyError("");
+                  setListeningFor(listeningFor === "increment" ? null : "increment");
+                }}
+              >
+                {listeningFor === "increment" ? "Cancel Listening" : "Record New Key"}
+              </Button>
+
+              <div className="pt-1 border-t border-white/5">
+                <span className="text-[10px] uppercase font-extrabold text-gray-400 block mb-1.5">Quick Presets:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { label: "SPACE", value: " " },
+                    { label: "+", value: "+" },
+                    { label: "A", value: "a" },
+                    { label: "↑ UP", value: "ArrowUp" }
+                  ].map(preset => (
+                    <button
+                      key={preset.value}
+                      type="button"
+                      disabled={decrementHotkey === preset.value}
+                      className={`px-2 py-1 rounded-md text-[11px] font-bold border transition-all ${
+                        hotkey === preset.value
+                          ? "bg-[var(--accent)] text-black border-[var(--accent)]"
+                          : decrementHotkey === preset.value
+                          ? "opacity-30 cursor-not-allowed bg-white/5 border-white/5 text-gray-500"
+                          : "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white"
+                      }`}
+                      onClick={() => {
+                        setHotkey(preset.value);
+                        setListeningFor(null);
+                        setHotkeyError("");
+                        try { localStorage.setItem("huntHotkey", preset.value); } catch {}
+                        profileAPI.updateProfile({ huntHotkey: preset.value }).catch(() => {});
+                        showMessage(`Increment hotkey set to ${preset.label}`, "success");
+                      }}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--accent)]">Remove from History</h3>
-                  <p className="text-sm text-[var(--progressbar-info)]">This removes the entry from the History List only</p>
-                </div>
-              </div>
-              <p className="text-gray-300 mb-6">
-                Are you sure you want to remove this hunt from your history?
-                (The hunt check data and caught status inside your Living Dex collection will <strong>not</strong> be deleted.)
-              </p>
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setDeleteHistoryModalClosing(true);
-                    setTimeout(() => {
-                      setDeleteHistoryModal({ show: false, caughtKey: null, entryId: null });
-                      setDeleteHistoryModalClosing(false);
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleRemoveFromHistoryConfirm}
-                  className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
-                >
-                  Remove
-                </button>
               </div>
             </div>
           </div>
-        </div>,
-        document.body
-      )}
-    </>
+
+          <p className="text-center text-[11px] text-gray-400 font-medium">
+            💡 Hotkeys work anywhere on the tracker page while not typing in an input field.
+          </p>
+        </div>
+      </Modal>
+
+      {/* 10. Completed Hunts & Fails History Modal */}
+      <HuntHistoryModal
+        isOpen={showHistoryModal}
+        onClose={() => setShowHistoryModal(false)}
+        huntHistory={huntHistory}
+        mode="counters"
+        onDeleteEntry={handleDeleteHistoryEntry}
+        onClearAll={handleClearAllHistory}
+        onOpenWizard={handleOpenHuntWizard}
+        useHomeSprites={useHomeSprites}
+        formsData={formsData}
+      />
+
+      {/* 11. Reset Confirmation Modal */}
+      <ConfirmModal
+        isOpen={resetModal.show}
+        onClose={() => setResetModal(prev => ({ ...prev, show: false }))}
+        onConfirm={() => resetModal.hunt && handleConfirmResetTimer(resetModal.hunt.id)}
+        title="Reset Hunt Timer & Stats"
+        subtitle="Reset elapsed time & seconds per check"
+        message={`Are you sure you want to reset the elapsed time and seconds-per-check metrics for Shiny ${resetModal.hunt ? formatPokemonName(resetModal.hunt.pokemon?.name) : ""}? Your encounter counts will NOT be deleted.`}
+        confirmText="Reset Timer"
+        cancelText="Cancel"
+        variant="warning"
+      />
+
+      {/* 12. Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteModal.show}
+        onClose={() => setDeleteModal(prev => ({ ...prev, show: false }))}
+        onConfirm={() => deleteModal.hunt && handleDeleteHunt(deleteModal.hunt.id)}
+        title="Delete Hunt"
+        message={`Are you sure you want to delete your hunt for Shiny ${deleteModal.hunt ? formatPokemonName(deleteModal.hunt.pokemon?.name) : ""}? This cannot be undone.`}
+        confirmText="Delete Hunt"
+        variant="danger"
+      />
+    </div>
   );
 }

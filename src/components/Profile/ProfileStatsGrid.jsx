@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Sparkles, BarChart2 } from "lucide-react";
+import { Button } from "../Shared/Button";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../../Constants";
 import { getSpriteUrl } from "../../utils/spriteUtils";
 import { formatPokemonName } from "../../utils";
 
 const STAT_PAGE_SIZE = 10;
 
-export default function ProfileStatsGrid({ stats, recentAdded, useHomeSprites, targetUsername }) {
+export default function ProfileStatsGrid({ stats, recentAdded, useHomeSprites, targetUsername, isStatsPublic = true, isOwner = false }) {
     const [statPage, setStatPage] = useState({ games: 0, balls: 0, marks: 0 });
 
     if (!stats) return null;
@@ -18,14 +19,17 @@ export default function ProfileStatsGrid({ stats, recentAdded, useHomeSprites, t
                 <h3 className="profile-section-title" style={{ margin: 0 }}>
                     <div className="flex items-center gap-1.5"><Sparkles size={18} className="text-gray-400" /> COLLECTION OVERVIEW</div>
                 </h3>
-                {targetUsername && (
-                    <Link 
+                {targetUsername && (isOwner || isStatsPublic !== false) && (
+                    <Button 
+                        as={Link}
                         to={`/u/${targetUsername}/stats`}
+                        variant="secondary"
+                        size="sm"
+                        icon={<BarChart2 size={15} />}
                         className="full-stats-btn"
                     >
-                        <BarChart2 size={15} />
                         Full Stats
-                    </Link>
+                    </Button>
                 )}
             </div>
 
@@ -35,13 +39,25 @@ export default function ProfileStatsGrid({ stats, recentAdded, useHomeSprites, t
                     <label>GAMES HUNTED IN ({stats.gamesPlayed}/{GAME_OPTIONS_TWO.length})</label>
                     {stats.allGames && stats.allGames.length > STAT_PAGE_SIZE && (
                         <div className="stat-page-controls">
-                            <button className="stat-page-btn" disabled={statPage.games === 0} onClick={() => setStatPage(p => ({ ...p, games: p.games - 1 }))}>
-                                <ChevronLeft size={14} />
-                            </button>
+                            <Button 
+                                variant="secondary"
+                                size="sm"
+                                className="stat-page-btn" 
+                                disabled={statPage.games === 0} 
+                                onClick={() => setStatPage(p => ({ ...p, games: p.games - 1 }))}
+                                icon={<ChevronLeft size={14} />}
+                                aria-label="Previous page"
+                            />
                             <span className="stat-page-info">{statPage.games + 1}/{Math.ceil(stats.allGames.length / STAT_PAGE_SIZE)}</span>
-                            <button className="stat-page-btn" disabled={(statPage.games + 1) * STAT_PAGE_SIZE >= stats.allGames.length} onClick={() => setStatPage(p => ({ ...p, games: p.games + 1 }))}>
-                                <ChevronRight size={14} />
-                            </button>
+                            <Button 
+                                variant="secondary"
+                                size="sm"
+                                className="stat-page-btn" 
+                                disabled={(statPage.games + 1) * STAT_PAGE_SIZE >= stats.allGames.length} 
+                                onClick={() => setStatPage(p => ({ ...p, games: p.games + 1 }))}
+                                icon={<ChevronRight size={14} />}
+                                aria-label="Next page"
+                            />
                         </div>
                     )}
                 </div>
@@ -68,13 +84,25 @@ export default function ProfileStatsGrid({ stats, recentAdded, useHomeSprites, t
                     <label>POKÉ BALLS USED ({(stats.allBalls || []).length}/{BALL_OPTIONS.length - 1})</label>
                     {stats.allBalls && stats.allBalls.length > STAT_PAGE_SIZE && (
                         <div className="stat-page-controls">
-                            <button className="stat-page-btn" disabled={statPage.balls === 0} onClick={() => setStatPage(p => ({ ...p, balls: p.balls - 1 }))}>
-                                <ChevronLeft size={14} />
-                            </button>
+                            <Button 
+                                variant="secondary"
+                                size="sm"
+                                className="stat-page-btn" 
+                                disabled={statPage.balls === 0} 
+                                onClick={() => setStatPage(p => ({ ...p, balls: p.balls - 1 }))}
+                                icon={<ChevronLeft size={14} />}
+                                aria-label="Previous page"
+                            />
                             <span className="stat-page-info">{statPage.balls + 1}/{Math.ceil(stats.allBalls.length / STAT_PAGE_SIZE)}</span>
-                            <button className="stat-page-btn" disabled={(statPage.balls + 1) * STAT_PAGE_SIZE >= stats.allBalls.length} onClick={() => setStatPage(p => ({ ...p, balls: p.balls + 1 }))}>
-                                <ChevronRight size={14} />
-                            </button>
+                            <Button 
+                                variant="secondary"
+                                size="sm"
+                                className="stat-page-btn" 
+                                disabled={(statPage.balls + 1) * STAT_PAGE_SIZE >= stats.allBalls.length} 
+                                onClick={() => setStatPage(p => ({ ...p, balls: p.balls + 1 }))}
+                                icon={<ChevronRight size={14} />}
+                                aria-label="Next page"
+                            />
                         </div>
                     )}
                 </div>
@@ -101,13 +129,25 @@ export default function ProfileStatsGrid({ stats, recentAdded, useHomeSprites, t
                     <label>MARKS OBTAINED ({(stats.allMarks || []).length}/{MARK_OPTIONS.length - 1})</label>
                     {stats.allMarks && stats.allMarks.length > STAT_PAGE_SIZE && (
                         <div className="stat-page-controls">
-                            <button className="stat-page-btn" disabled={statPage.marks === 0} onClick={() => setStatPage(p => ({ ...p, marks: p.marks - 1 }))}>
-                                <ChevronLeft size={14} />
-                            </button>
+                            <Button 
+                                variant="secondary"
+                                size="sm"
+                                className="stat-page-btn" 
+                                disabled={statPage.marks === 0} 
+                                onClick={() => setStatPage(p => ({ ...p, marks: p.marks - 1 }))}
+                                icon={<ChevronLeft size={14} />}
+                                aria-label="Previous page"
+                            />
                             <span className="stat-page-info">{statPage.marks + 1}/{Math.ceil(stats.allMarks.length / STAT_PAGE_SIZE)}</span>
-                            <button className="stat-page-btn" disabled={(statPage.marks + 1) * STAT_PAGE_SIZE >= stats.allMarks.length} onClick={() => setStatPage(p => ({ ...p, marks: p.marks + 1 }))}>
-                                <ChevronRight size={14} />
-                            </button>
+                            <Button 
+                                variant="secondary"
+                                size="sm"
+                                className="stat-page-btn" 
+                                disabled={(statPage.marks + 1) * STAT_PAGE_SIZE >= stats.allMarks.length} 
+                                onClick={() => setStatPage(p => ({ ...p, marks: p.marks + 1 }))}
+                                icon={<ChevronRight size={14} />}
+                                aria-label="Next page"
+                            />
                         </div>
                     )}
                 </div>

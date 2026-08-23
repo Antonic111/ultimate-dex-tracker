@@ -1,94 +1,161 @@
-import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
+import React, { useState } from "react";
 import { profileAPI } from "../../utils/api";
-import { PlayCircle } from "lucide-react";
+import { Sparkles, Compass, BookOpen, BarChart2 } from "lucide-react";
+import { Modal } from "../Shared/Modal";
+import { Button } from "../Shared/Button";
 import "../../css/Onboarding.css";
 
 export default function TutorialPromptModal({ onSkip, onAccept }) {
-  const [closing, setClosing] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const handleSkip = async () => {
+  const handleSkip = async (closeModal) => {
     setSaving(true);
     try {
-      // Mark onboarding fully complete
       await profileAPI.updateProfile({
         onboarding: { isComplete: true, tutorialStep: 0 }
       });
-      setClosing(true);
-      setTimeout(() => onSkip(), 250);
+      if (typeof closeModal === "function") {
+        closeModal(() => onSkip());
+      } else {
+        onSkip();
+      }
     } catch (err) {
       console.error("Failed to update onboarding state:", err);
-      // Fallback: still skip
-      setClosing(true);
-      setTimeout(() => onSkip(), 250);
+      if (typeof closeModal === "function") {
+        closeModal(() => onSkip());
+      } else {
+        onSkip();
+      }
     } finally {
       setSaving(false);
     }
   };
 
-  const handleAccept = async () => {
-    setClosing(true);
-    setTimeout(() => onAccept(), 250);
+  const handleAccept = (closeModal) => {
+    if (typeof closeModal === "function") {
+      closeModal(() => onAccept());
+    } else {
+      onAccept();
+    }
   };
 
-  // Lock background body scroll cleanly
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
-
-  return createPortal(
-    <div className={`onboarding-setup-backdrop ${closing ? "closing" : ""}`}>
-      <div className={`onboarding-setup-modal ${closing ? "closing" : ""}`} style={{ maxWidth: '440px' }}>
-        
-        {/* Header */}
-        <div className="onboarding-setup-header" style={{ justifyContent: 'center' }}>
-          <div className="onboarding-title" style={{ fontSize: '1.25rem' }}>
-            <PlayCircle size={22} color="var(--accent)" />
-            <span>You're All Set!</span>
-          </div>
-        </div>
-
-        {/* Modal Body */}
-        <div className="onboarding-setup-body" style={{ textAlign: 'center', padding: '24px 20px' }}>
-          <p className="onboarding-subtitle" style={{ fontSize: '0.98rem', lineHeight: '1.6', margin: '0 auto', maxWidth: '360px', color: 'var(--text)' }}>
-            Would you like a quick interactive walkthrough of the tracker?
-            <br /><br />
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              It takes under two minutes and can always be replayed anytime from Settings.
-            </span>
-          </p>
-        </div>
-
-        {/* Footer Actions */}
-        <div className="onboarding-setup-footer" style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-          <button 
-            type="button"
-            className="onboarding-btn-back" 
-            onClick={handleSkip} 
-            disabled={saving}
-            style={{ flex: 1, textAlign: 'center', padding: '10px 14px' }}
+  return (
+    <Modal
+      isOpen={true}
+      size="md"
+      showCloseButton={false}
+      preventScroll={true}
+      className="tutorial-prompt-modal-panel"
+      footer={({ close }) => (
+        <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
+          <Button 
+            variant="secondary" 
+            size="md"
+            onClick={() => handleSkip(close)} 
+            loading={saving}
+            fullWidth
           >
-            {saving ? "Skipping..." : "Skip Tutorial"}
-          </button>
+            Skip Tutorial
+          </Button>
           
-          <button 
-            type="button"
-            className="onboarding-btn-next" 
-            onClick={handleAccept} 
+          <Button 
+            variant="primary" 
+            size="md"
+            icon={<Compass size={18} />}
+            iconPosition="right"
+            onClick={() => handleAccept(close)} 
             disabled={saving}
-            style={{ flex: 1, textAlign: 'center', padding: '10px 14px' }}
+            fullWidth
           >
             Start Tutorial
-          </button>
+          </Button>
+        </div>
+      )}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '10px 4px 6px' }}>
+        {/* Glowing Hero Badge */}
+        <div
+          style={{
+            width: '68px',
+            height: '68px',
+            borderRadius: '50%',
+            background: 'color-mix(in srgb, var(--accent, #38bdf8) 15%, transparent)',
+            border: '1.5px solid color-mix(in srgb, var(--accent, #38bdf8) 40%, transparent)',
+            boxShadow: '0 0 28px color-mix(in srgb, var(--accent, #38bdf8) 28%, transparent)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '16px',
+            color: 'var(--accent)',
+            animation: 'onboardingPulse 2.5s infinite ease-in-out'
+          }}
+        >
+          <Sparkles size={32} />
         </div>
 
+        {/* Title & Subtitle */}
+        <h2 style={{ margin: '0 0 8px 0', fontSize: '1.45rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em' }}>
+          You're All Set!
+        </h2>
+        <p style={{ margin: '0 0 20px 0', fontSize: '0.94rem', color: 'var(--text-muted, #9ca3af)', lineHeight: '1.5', maxWidth: '380px' }}>
+          Your initial tracker preferences have been saved. Would you like a quick interactive walkthrough?
+        </p>
+
+        {/* Feature Highlights Card */}
+        <div
+          style={{
+            width: '100%',
+            background: 'var(--searchbar-dropdown, rgba(255, 255, 255, 0.03))',
+            border: '1px solid var(--border-color, rgba(255, 255, 255, 0.08))',
+            borderRadius: '14px',
+            padding: '14px 16px',
+            textAlign: 'left',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent)', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.3px', textTransform: 'uppercase' }}>
+            <Compass size={16} />
+            <span>Interactive Tour Highlights</span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+            {[
+              { icon: <BookOpen size={20} color="var(--accent)" />, label: "Dex Controls" },
+              { icon: <Sparkles size={20} color="var(--accent)" />, label: "Catch Info" },
+              { icon: <BarChart2 size={20} color="var(--accent)" />, label: "Stats & Tools" }
+            ].map((item, i) => (
+              <div
+                key={i}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderRadius: '10px',
+                  padding: '10px 6px',
+                  textAlign: 'center',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  color: 'var(--text)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {item.icon}
+                </div>
+                <span>{item.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.4', textAlign: 'center' }}>
+            Takes under 2 minutes • Can be replayed anytime in Settings
+          </p>
+        </div>
       </div>
-    </div>,
-    document.body
+    </Modal>
   );
 }

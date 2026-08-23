@@ -1,305 +1,249 @@
-import { useState, useEffect, useContext, useMemo, useRef, useCallback } from "react";
-import { createPortal } from "react-dom";
+import { useState, useEffect, useContext, useMemo, useCallback } from "react";
 import {
-  Plus, Minus, Check, Trash2, Settings, RotateCcw, Pause, Play,
-  Info, Edit, X, BarChart3, Sparkles, Zap, CheckCircle
+  Plus,
+  Check,
+  Edit,
+  Sparkles,
+  History,
+  Clock,
+  Flame,
+  ChevronDown,
+  ChevronUp,
+  ChevronRight,
+  CheckCircle,
+  X,
+  Layers
 } from "lucide-react";
-import { calculateOdds, getMethodsForGame, getModifiersForGame } from "../utils/huntSystem";
+import { GAME_OPTIONS } from "../Constants";
+import { calculateOdds, getModifiersForGame } from "../utils/huntSystem";
 import { formatPokemonName, getFormDisplayName } from "../utils";
-import { getCaughtKey } from "../caughtStorage";
+import {
+  DetailedHuntCard,
+  OddsBreakdownModal,
+  AdjustHuntModal,
+  ShinyEncounterModal,
+  HuntIdentityOddsCard,
+  HuntHistoryModal,
+  useHuntManager
+} from "../components/Counters";
+import { getSpriteUrl } from "../utils/spriteUtils";
 import { UserContext } from "../components/Shared/UserContext";
 import { useMessage } from "../components/Shared/MessageContext";
-import { huntAPI, profileAPI, caughtAPI } from "../utils/api";
-import { BALL_OPTIONS, MARK_OPTIONS, GAME_OPTIONS } from "../Constants";
-import { getSpriteUrl } from "../utils/spriteUtils";
 import pokemonData from "../data/pokemon.json";
-import gamePokemonData from "../data/gamePokemon.json";
 import formsData from "../utils/loadFormsData";
-import { getFilteredFormsData } from "../utils/dexPreferences";
-import ContentFilterInput from "../components/Shared/ContentFilterInput";
-import { validateContent } from "../../shared/contentFilter";
-import { SearchbarIconDropdown } from "../components/Shared/SearchBar";
 import { getAvailableGamesForPokemonSidebar } from "../utils/pokemonAvailability";
 import PermutationTable from "../components/MMO/PermutationTable";
+import { Modal, ConfirmModal } from "../components/Shared/Modal";
+import { Button } from "../components/Shared/Button";
+import { Tooltip } from "../components/Shared/Tooltip";
+import { TextArea, SearchField } from "../components/Shared/FormField";
+import {
+  formatDigitalTime,
+  getHuntElapsedTime,
+  setCachedHuntsData
+} from "../utils/huntSync";
 import "../css/Counters.css";
+import "../css/Onboarding.css";
 import "../css/MMOTool.css";
 
-// ─── Inline timer (same pattern as Counters) ─────────────────────────────────
-function TimerDisplay({ huntId, lastCheckTime, isPaused, onTimeUpdate }) {
-  const [seconds, setSeconds] = useState(0);
-  const intervalRef = useRef(null);
+const normalizeGameKey = (str = "") => String(str).toLowerCase().replace(/['’\s\-_]/g, "");
 
-  useEffect(() => {
-    if (isPaused) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-      return;
-    }
-    intervalRef.current = setInterval(() => setSeconds(p => p + 1), 1000);
-    return () => clearInterval(intervalRef.current);
-  }, [isPaused]);
-
-  useEffect(() => {
-    if (onTimeUpdate && !isPaused) onTimeUpdate(huntId, seconds * 1000);
-  }, [seconds, huntId, onTimeUpdate, isPaused]);
-
-  useEffect(() => { setSeconds(0); }, [lastCheckTime]);
-
-  if (isPaused) return "Paused";
-  return `${seconds}s`;
-}
-
-// ─── Legends Arceus permutation ball filter ──────────────────────────────────
-const HISUIAN_BALLS = [
-  "Feather Ball","Wing Ball","Jet Ball","Heavy Ball (Hisui)",
-  "Leaden Ball","Gigaton Ball","Poké Ball (Hisui)",
-  "Great Ball (Hisui)","Ultra Ball (Hisui)","Origin Ball"
-];
-
-function formatTime(ms) {
-  const s = Math.floor(ms / 1000);
-  const m = Math.floor(s / 60);
-  const h = Math.floor(m / 60);
-  if (h > 0) return `${h}h ${m % 60}m ${s % 60}s`;
-  if (m > 0) return `${m}m ${s % 60}s`;
-  return `${s}s`;
-}
-
-const formatTimeCompact = (milliseconds) => {
-  const seconds = Math.floor(milliseconds / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-
-  if (hours > 0) {
-    const mins = minutes % 60;
-    return mins > 0 ? `${hours}h${mins}m` : `${hours}h`;
-  } else if (minutes > 0) {
-    return `${minutes}m`;
-  } else {
-    return `${seconds}s`;
-  }
+const getGameImage = (gameName) => {
+  if (!gameName) return null;
+  const targetKey = normalizeGameKey(gameName);
+  const match = GAME_OPTIONS.find(g =>
+    g.value === gameName ||
+    g.name === gameName ||
+    normalizeGameKey(g.value) === targetKey ||
+    normalizeGameKey(g.name) === targetKey
+  );
+  return match?.image || null;
 };
 
-function getPokemonImage(pokemon, useHomeSprites = false) {
-  if (!pokemon) return "";
-  return getSpriteUrl(pokemon, true, useHomeSprites);
-}
+export const getPhaseEntryDisplayInfo = (phase, allPhases = []) => {
+  if (!phase) return { label: "Phase 1:", title: "", isFail: false, isTarget: false, count: 1 };
+  const phaseIdx = allPhases.indexOf(phase);
+  const preceding = phaseIdx >= 0 ? allPhases.slice(0, phaseIdx + 1) : [phase];
 
-// ─── Main component ───────────────────────────────────────────────────────────
-export default function MMOTool() {
-  const { username } = useContext(UserContext);
+  const isTarget = !!phase.isTarget;
+  const isFailed = phase.outcome === "failed";
+
+  if (isTarget && isFailed) {
+    const count = preceding.filter(p => p.isTarget && p.outcome === "failed").length || 1;
+    return {
+      type: "target_failed",
+      label: `Target Failed ${count}:`,
+      title: `Target Failed ${count}: ${formatPokemonName(phase.pokemon?.name)}`,
+      badgeText: "Target Failed",
+      isFail: true,
+      isTarget: true,
+      count
+    };
+  }
+
+  if (isFailed) {
+    const count = preceding.filter(p => !p.isTarget && p.outcome === "failed").length || 1;
+    return {
+      type: "phase_failed",
+      label: `Phase ${phase.phaseNumber || (phaseIdx + 1)} Failed:`,
+      title: `Phase ${phase.phaseNumber || (phaseIdx + 1)} Failed: ${formatPokemonName(phase.pokemon?.name)}`,
+      badgeText: "Failed",
+      isFail: true,
+      isTarget: false,
+      count
+    };
+  }
+
+  if (!isTarget) {
+    const count = preceding.filter(p => !p.isTarget && p.outcome === "caught").length || 1;
+    return {
+      type: "phase_caught",
+      label: `Phase ${phase.phaseNumber || (phaseIdx + 1)}:`,
+      title: `Phase ${phase.phaseNumber || (phaseIdx + 1)}: ${formatPokemonName(phase.pokemon?.name)}`,
+      badgeText: "Phase Caught",
+      isFail: false,
+      isTarget: false,
+      count
+    };
+  }
+
+  return {
+    type: "target_caught",
+    label: "Target Caught:",
+    title: `Target Caught: ${formatPokemonName(phase.pokemon?.name)}`,
+    badgeText: "Caught",
+    isFail: false,
+    isTarget: true,
+    count: 1
+  };
+};
+
+export const getPhaseDisplayChecks = (phase, allPhases = []) => {
+  if (!phase) return { intervalChecks: 0, totalChecks: 0 };
+  const phaseIdx = allPhases.indexOf(phase);
+  const priorPhases = phaseIdx > 0 ? allPhases.slice(0, phaseIdx) : [];
+  const priorTotal = priorPhases.reduce((sum, p) => sum + (p.phaseChecks || p.checks || 0), 0);
+
+  const rawChecks = phase.phaseChecks !== undefined ? phase.phaseChecks : (phase.checks || 0);
+  const rawTotal = phase.totalChecks !== undefined ? phase.totalChecks : (priorTotal + rawChecks);
+
+  let intervalChecks = rawChecks;
+  if (rawChecks > priorTotal && priorTotal > 0 && phase.totalChecks === undefined) {
+    intervalChecks = rawChecks - priorTotal;
+  }
+
+  return {
+    intervalChecks: Math.max(0, intervalChecks),
+    totalChecks: Math.max(0, rawTotal)
+  };
+};
+
+export default function MMOTool({ useHomeSprites = false }) {
+  const { user } = useContext(UserContext);
   const { showMessage } = useMessage();
 
-  // ── Hunt state (shared with Counters via huntAPI) ─────────────────────────
-  const [activeHunts, setActiveHunts]         = useState([]);
-  const [huntTimers, setHuntTimers]           = useState({});
-  const [lastCheckTimes, setLastCheckTimes]   = useState({});
-  const [totalCheckTimes, setTotalCheckTimes] = useState({});
-  const [pausedHunts, setPausedHunts]         = useState(new Set());
-  const [huntIncrements, setHuntIncrements]   = useState({});
-  const [currentBottomTimers, setCurrentBottomTimers] = useState({});
-  const [expandedHunts, setExpandedHunts]     = useState(new Set());
-  const [shinyCharmGames, setShinyCharmGames] = useState([]);
-
-  const lastSaveTime = useRef(0);
-
-  // ── Modal state ───────────────────────────────────────────────────────────
-  const [showPokemonModal, setShowPokemonModal] = useState(false);
-  const [showHuntModal, setShowHuntModal]       = useState(false);
-  const [searchTerm, setSearchTerm]             = useState("");
-  const [selectedPokemon, setSelectedPokemon]   = useState(null);
-  const [huntDetails, setHuntDetails] = useState({ game: "Legends Arceus", method: "Permutations", modifiers: {} });
-
-  const [resetModal, setResetModal]     = useState({ show: false, hunt: null });
-  const [deleteModal, setDeleteModal]   = useState({ show: false, hunt: null });
-  const [completionModal, setCompletionModal] = useState({ show: false, hunt: null });
-
-  const [pokemonModalClosing, setPokemonModalClosing]     = useState(false);
-  const [huntModalClosing, setHuntModalClosing]           = useState(false);
-  const [backdropClosing, setBackdropClosing]             = useState(false);
-  const [resetModalClosing, setResetModalClosing]         = useState(false);
-  const [deleteModalClosing, setDeleteModalClosing]       = useState(false);
-  const [completionModalClosing, setCompletionModalClosing]= useState(false);
-
-  const isHisuianBall = (ballValue) => {
-    return HISUIAN_BALLS.includes(ballValue);
-  };
-
-  const getCompletionBallOptions = () => {
-    if (completionModal.hunt && completionModal.hunt.game === "Legends Arceus") {
-      return BALL_OPTIONS.filter(ball =>
-        ball.value === "" || ball.value === "Strange Ball" || isHisuianBall(ball.value)
-      );
-    }
-    return BALL_OPTIONS;
-  };
-
-  const [modifiers, setModifiers] = useState({
-    shinyCharm: false,
-    researchLv10: false,
-    perfectResearch: false,
+  // ── Unified Hunt Manager Hook (Hotkeys Disabled for MMO Tool) ─────────────
+  const huntManager = useHuntManager({
+    mode: "mmo",
+    enableHotkeys: false,
+    user,
+    pokemonData,
+    formsData,
+    useHomeSprites,
+    showMessage
   });
 
-  const [useHomeSprites, setUseHomeSprites] = useState(() => {
+  const {
+    activeHunts,
+    currentHunt,
+    otherHunts,
+    currentHuntId,
+    setCurrentHuntId,
+    huntIncrements,
+    collapsedPhasesMap,
+    metricModeMap,
+    activeMenuHuntId,
+    setActiveMenuHuntId,
+    handleAddCheck,
+    handleDecreaseCheck,
+    handleTogglePause,
+    handleConfirmResetTimer,
+    handleDeleteHunt,
+    handleToggleCollapsePhases,
+    handleToggleMetricMode,
+    handleSaveAdjustValues,
+    handleOpenPopout,
+    debouncedSave,
+    setAllActiveHunts,
+    shinyEncounterModal,
+    setShinyEncounterModal,
+    handleOpenShinyEncounterModal,
+    handleCompleteTargetHunt,
+    handleContinueAfterPhase,
+    handleAddShinyToCollection,
+    handleAddShinyFailToCollection,
+    huntWizard,
+    setHuntWizard,
+    handleOpenHuntWizard,
+    handleStartWizardHunt,
+    huntHistory,
+    historyBadgeCount,
+    loadHuntHistory,
+    handleDeleteHistoryEntry,
+    handleClearAllHistory,
+    showHistoryModal,
+    setShowHistoryModal,
+    phaseHistoryModal,
+    setPhaseHistoryModal,
+    oddsModal,
+    setOddsModal,
+    resetModal,
+    setResetModal,
+    deleteModal,
+    setDeleteModal,
+    settingsModal,
+    setSettingsModal
+  } = huntManager;
+
+  // ── Permutation Table Local Preferences ───────────────────────────────────
+  const [spawnCheckMode, setSpawnCheckMode] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false;
+      return localStorage.getItem("mmo_spawn_check_mode") === "spawn" ? "spawn" : "permutation";
     } catch {
-      return false;
+      return "permutation";
     }
   });
 
-  useEffect(() => {
-    const handlePrefsChange = () => {
-      try {
-        setUseHomeSprites(JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false);
-      } catch { }
-    };
-    window.addEventListener('dexPreferencesChanged', handlePrefsChange);
-    return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
-  }, []);
+  const toggleSpawnCheckMode = () => {
+    setSpawnCheckMode(prev => {
+      const next = prev === "spawn" ? "permutation" : "spawn";
+      try { localStorage.setItem("mmo_spawn_check_mode", next); } catch {}
+      return next;
+    });
+  };
 
-  const [settingsForm, setSettingsForm] = useState({
-    manualChecks: '',
-    manualTotalTime: '',
-    manualIncrements: '',
+  const [legendColors, setLegendColors] = useState(() => {
+    try {
+      const saved = localStorage.getItem("mmo_legend_colors");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
   });
 
-  const [settingsModal, setSettingsModal] = useState({ show: false, hunt: null });
-  const [settingsModalClosing, setSettingsModalClosing] = useState(false);
-  const [completionForm, setCompletionForm] = useState({ ball: '', mark: '', notes: '' });
-  const [editModal, setEditModal] = useState({ show: false, hunt: null });
-  const [editModalClosing, setEditModalClosing] = useState(false);
-  const [editForm, setEditForm] = useState({
-    game: '',
-    method: '',
+  const [editModal, setEditModal] = useState({
+    show: false,
+    hunt: null,
     pokemon: null,
     modifiers: {
       shinyCharm: false,
-      shinyParents: false,
-      lureActive: false,
       researchLv10: false,
-      perfectResearch: false,
-      sparklingLv1: false,
-      sparklingLv2: false,
-      sparklingLv3: false,
-      eventBoosted: false,
-      communityDay: false,
-      raidDay: false,
-      researchDay: false,
-      galarBirds: false,
-      hatchDay: false
-    }
+      perfectResearch: false
+    },
+    notes: ""
   });
-  const currentOdds = useMemo(() => {
-    if (!huntDetails.game || !huntDetails.method) return "NA";
 
-    // Special case for Poke Radar in Diamond/Pearl/Platinum - show table
-    if (huntDetails.method === "Poke Radar" && (huntDetails.game === "Diamond" || huntDetails.game === "Pearl" || huntDetails.game === "Platinum")) {
-      return "pokeradarDPP"; // Special flag to show Poke Radar table in display
-    }
-
-    // Special case for Poke Radar in X/Y - show table
-    if (huntDetails.method === "Poke Radar" && (huntDetails.game === "X" || huntDetails.game === "Y")) {
-      return "pokeradarXY"; // Special flag to show X/Y Poke Radar table in display
-    }
-
-    // Special case for Poke Radar in Brilliant Diamond/Shining Pearl - show table
-    if (huntDetails.method === "Poke Radar" && (huntDetails.game === "Brilliant Diamond" || huntDetails.game === "Shining Pearl")) {
-      return "pokeradarBDSP"; // Special flag to show BDSP Poke Radar table in display
-    }
-
-    // Special case for Chain Fishing in X/Y - show table
-    if (huntDetails.method === "Chain Fishing" && (huntDetails.game === "X" || huntDetails.game === "Y")) {
-      return "chainFishingXY"; // Special flag to show X/Y Chain Fishing table in display
-    }
-
-    // Special case for Chain Fishing in Omega Ruby/Alpha Sapphire - show table
-    if (huntDetails.method === "Chain Fishing" && (huntDetails.game === "Omega Ruby" || huntDetails.game === "Alpha Sapphire")) {
-      return "chainFishingORAS"; // Special flag to show ORAS Chain Fishing table in display
-    }
-
-    // Special case for DexNav in Omega Ruby/Alpha Sapphire - show chart
-    if (huntDetails.method === "DexNav" && (huntDetails.game === "Omega Ruby" || huntDetails.game === "Alpha Sapphire")) {
-      return "dexNavORAS"; // Special flag to show DexNav chart in display
-    }
-
-    // Special case for SOS method in Sun/Moon and Ultra Sun/Ultra Moon - show chart
-    if (huntDetails.method === "SOS" && (huntDetails.game === "Sun" || huntDetails.game === "Moon" || huntDetails.game === "Ultra Sun" || huntDetails.game === "Ultra Moon")) {
-      return "sosSMUSUM"; // Special flag to show SOS chart in display
-    }
-
-    // Special case for Ultra Wormholes in Ultra Sun/Ultra Moon - show percentage odds
-    if (huntDetails.method === "Ultra Wormholes" && (huntDetails.game === "Ultra Sun" || huntDetails.game === "Ultra Moon")) {
-      return "ultraWormholes"; // Special flag to show Ultra Wormhole percentage in display
-    }
-
-    // Special case for KO Method in Sword/Shield - show dynamic odds
-    if (huntDetails.method === "KO Method" && (huntDetails.game === "Sword" || huntDetails.game === "Shield")) {
-      return "koMethod"; // Special flag to show KO method dynamic odds in display
-    }
-
-    // Special case for Horde Encounters - show odds with note
-    if (huntDetails.method === "Horde Encounters") {
-      return "hordeEncounters"; // Special flag to show Horde Encounters with note
-    }
-
-    // Special case for Catch Combo in Let's Go games - show table
-    if (huntDetails.method === "Catch Combo" && (huntDetails.game === "Let's Go Pikachu" || huntDetails.game === "Let's Go Eevee")) {
-      return "catchComboLetsGo"; // Special flag to show Catch Combo table in display
-    }
-
-    // Special case for Mass Outbreaks in Scarlet/Violet - show table
-    if (huntDetails.method === "Mass Outbreaks" && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet")) {
-      return "massOutbreaksSV"; // Special flag to show Mass Outbreaks table in display
-    }
-
-    // Special case for Random Encounters and Daily Adventure Incense in Pokemon Go - show odds with note
-    if ((huntDetails.method === "Random Encounters" || huntDetails.method === "Daily Adventure Incense") && huntDetails.game === "GO") {
-      return "pokemonGoRandom"; // Special flag to show Pokemon Go Random Encounters/Daily Adventure Incense with note
-    }
-
-    return calculateOdds(huntDetails.game, huntDetails.method, modifiers);
-  }, [huntDetails.game, huntDetails.method, modifiers]);
-
-  const [isEditingPokemon, setIsEditingPokemon] = useState(false);
-  const [selectedHuntId, setSelectedHuntId] = useState(null);
-  const [multiCheckEnabled, setMultiCheckEnabled] = useState(false);
-  const [legendColors, setLegendColors] = useState({});
-  const [isSaveOrder, setIsSaveOrder] = useState(false);
-  const [showSecondWave, setShowSecondWave] = useState(true);
-  const [showGhostChecks, setShowGhostChecks] = useState(true);
-  const [isAdvanced, setIsAdvanced] = useState(false);
-  const [secondSpawn, setSecondSpawn] = useState(6);
-
-  const isInitialMount = useRef(true);
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    if (!username) return;
-    const timer = setTimeout(() => {
-      huntAPI.updateHuntData({
-        mmoSettings: {
-          multiCheckEnabled,
-          legendColors,
-          isSaveOrder,
-          showSecondWave,
-          showGhostChecks,
-          isAdvanced,
-          secondSpawn
-        }
-      });
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [multiCheckEnabled, legendColors, isSaveOrder, showSecondWave, showGhostChecks, isAdvanced, secondSpawn, username]);
-
-
-  const lastPauseAction = useRef({});
-  const prevEditGameRef = useRef(editForm.game);
-  const editModalJustOpenedRef = useRef(false);
-
-  // ── All pokemon list ──────────────────────────────────────────────────────
+  // ── All Pokémon List & Filtering for Legends Arceus ───────────────────────
   const allPokemon = useMemo(() => {
     const baseList = pokemonData.map(p => ({
       ...p,
@@ -317,2773 +261,1416 @@ export default function MMOTool() {
     return [...baseList, ...formsList];
   }, []);
 
-  const filteredPokemon = useMemo(() => {
-    const laPokemon = allPokemon.filter(p => {
-      const availableGames = getAvailableGamesForPokemonSidebar(p);
-      return availableGames.includes("Legends Arceus");
-    });
-    if (!searchTerm.trim()) return laPokemon;
-    const q = searchTerm.toLowerCase();
-    return laPokemon.filter(p =>
+  const isPokemonAvailableInGame = useCallback((pokemon, targetGame = "Legends Arceus") => {
+    if (!pokemon || !targetGame) return true;
+    const games = getAvailableGamesForPokemonSidebar(pokemon);
+    return games.includes(targetGame);
+  }, []);
+
+  const getPokemonImage = useCallback((pokemon, useHomeSpritesOverride = useHomeSprites) => {
+    if (!pokemon) return "/fallback.png";
+    return getSpriteUrl(pokemon, true, useHomeSpritesOverride);
+  }, [useHomeSprites]);
+
+  // Form Tabs for PLA
+  const availableFormTabs = useMemo(() => {
+    const inGame = allPokemon.filter(p => isPokemonAvailableInGame(p, "Legends Arceus"));
+    const counts = {
+      all: inGame.length,
+      main: inGame.filter(p => !p.formType || p.formType === "main").length,
+      hisuian: inGame.filter(p => p.formType === "hisuian").length,
+      alpha: inGame.filter(p => p.formType === "alpha" || p.formType === "alphaother").length,
+      unown: inGame.filter(p => p.formType === "unown").length,
+      alolan: inGame.filter(p => p.formType === "alolan").length,
+      gender: inGame.filter(p => p.formType === "gender").length,
+      other: inGame.filter(p => p.formType === "other").length
+    };
+
+    const definitions = [
+      { id: "all", label: "All Forms" },
+      { id: "main", label: "Base Species" },
+      { id: "alpha", label: "Alpha" },
+      { id: "hisuian", label: "Hisui" },
+      { id: "unown", label: "Unown" },
+      { id: "alolan", label: "Alola" },
+      { id: "gender", label: "Gender" },
+      { id: "other", label: "Other" }
+    ];
+
+    return definitions.filter(d => d.id === "all" || (counts[d.id] && counts[d.id] > 0));
+  }, [allPokemon, isPokemonAvailableInGame]);
+
+  const availablePhaseFormTabs = availableFormTabs;
+
+  // Filtered Pokémon for Wizard Target
+  const wizardGamePokemon = useMemo(() => {
+    let inGame = allPokemon.filter(p => isPokemonAvailableInGame(p, "Legends Arceus"));
+
+    if (huntWizard.formTab && huntWizard.formTab !== "all") {
+      if (huntWizard.formTab === "main") {
+        inGame = inGame.filter(p => !p.formType || p.formType === "main");
+      } else if (huntWizard.formTab === "alpha") {
+        inGame = inGame.filter(p => p.formType === "alpha" || p.formType === "alphaother");
+      } else {
+        inGame = inGame.filter(p => p.formType === huntWizard.formTab);
+      }
+    }
+
+    if (!huntWizard.searchTerm?.trim()) return inGame;
+    const q = huntWizard.searchTerm.toLowerCase();
+    return inGame.filter(p =>
       p && p.name && (p.name.toLowerCase().includes(q) || String(p.id).includes(q))
     );
-  }, [allPokemon, searchTerm]);
+  }, [allPokemon, isPokemonAvailableInGame, huntWizard.formTab, huntWizard.searchTerm]);
 
-  // ── Only permutation hunts from Legends Arceus ────────────────────────────
-  const permutationHunts = useMemo(() =>
-    activeHunts.filter(h => h.game === "Legends Arceus" && h.method === "Permutations"),
-    [activeHunts]
-  );
+  // Filtered Pokémon for Wizard Phases
+  const wizardGamePhasePokemon = useMemo(() => {
+    let inGame = allPokemon.filter(p => isPokemonAvailableInGame(p, "Legends Arceus"));
 
-  useEffect(() => {
-    if (selectedHuntId && !permutationHunts.find(h => h.id === selectedHuntId)) {
-      setSelectedHuntId(null);
-    }
-  }, [permutationHunts, selectedHuntId]);
-
-
-  // ── Save hunt data ────────────────────────────────────────────────────────
-  const saveHuntData = useCallback(async (override = null) => {
-    if (!username) return;
-    const now = Date.now();
-    if (!override && now - lastSaveTime.current < 500) return;
-    lastSaveTime.current = now;
-    try {
-      const data = override || {
-        activeHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers)),
-        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes)),
-        totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes)),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(huntIncrements)),
-      };
-      await huntAPI.updateHuntData(data);
-    } catch {
-      showMessage('Failed to save hunt data', 'error');
-    }
-  }, [username, activeHunts, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements, showMessage]);
-
-  // ── Load on mount ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!username) return;
-    (async () => {
-      try {
-        const data = await huntAPI.getHuntData();
-        if (data.activeHunts) {
-          setActiveHunts(data.activeHunts.map(h => ({
-            ...h,
-            modifiers: h.modifiers || { shinyCharm: false, researchLv10: false, perfectResearch: false }
-          })));
-        }
-        if (data.huntTimers)      setHuntTimers(data.huntTimers);
-        if (data.lastCheckTimes)  setLastCheckTimes(data.lastCheckTimes);
-        if (data.totalCheckTimes) setTotalCheckTimes(data.totalCheckTimes);
-        if (data.huntIncrements)  setHuntIncrements(data.huntIncrements);
-        if (data.mmoSettings) {
-          if (data.mmoSettings.multiCheckEnabled !== undefined) setMultiCheckEnabled(data.mmoSettings.multiCheckEnabled);
-          if (data.mmoSettings.legendColors) setLegendColors(data.mmoSettings.legendColors);
-          if (data.mmoSettings.isSaveOrder !== undefined) setIsSaveOrder(data.mmoSettings.isSaveOrder);
-          if (data.mmoSettings.showSecondWave !== undefined) setShowSecondWave(data.mmoSettings.showSecondWave);
-          if (data.mmoSettings.showGhostChecks !== undefined) setShowGhostChecks(data.mmoSettings.showGhostChecks);
-          if (data.mmoSettings.isAdvanced !== undefined) setIsAdvanced(data.mmoSettings.isAdvanced);
-          if (data.mmoSettings.secondSpawn !== undefined) setSecondSpawn(data.mmoSettings.secondSpawn);
-        }
-        // Start all paused
-        if (data.activeHunts?.length) {
-          setPausedHunts(new Set(data.activeHunts.map(h => h.id)));
-        }
-      } catch { /* silently ignore */ }
-    })();
-  }, [username]);
-
-  // ── Load profile (shiny charm) ────────────────────────────────────────────
-  useEffect(() => {
-    if (!username) return;
-    profileAPI.getProfile()
-      .then(p => setShinyCharmGames(p.shinyCharmGames || []))
-      .catch(() => {});
-  }, [username]);
-
-  // Auto-set shiny charm when modifiers opened
-  const hasCharmForLA = shinyCharmGames.includes("Legends Arceus");
-
-  // Auto-check/uncheck shiny charm modifier when game is selected or shinyCharmGames changes (new hunt)
-  useEffect(() => {
-    if (huntDetails.game) {
-      const shouldHaveCharm = shinyCharmGames.includes(huntDetails.game);
-      setModifiers(prev => {
-        let changed = false;
-        const newModifiers = { ...prev };
-        
-        if (prev.shinyCharm !== shouldHaveCharm) {
-          newModifiers.shinyCharm = shouldHaveCharm;
-          changed = true;
-        }
-        
-        if (huntDetails.game === "Legends Arceus" && shouldHaveCharm && !prev.researchLv10) {
-          newModifiers.researchLv10 = true;
-          changed = true;
-        }
-        
-        return changed ? newModifiers : prev;
-      });
-    }
-  }, [huntDetails.game, shinyCharmGames]);
-
-  // Auto-check shiny charm modifier ONLY when user manually changes the game in edit modal
-  useEffect(() => {
-    // Skip if this is from the modal opening (not a manual game change)
-    if (editModalJustOpenedRef.current) {
-      editModalJustOpenedRef.current = false;
-      prevEditGameRef.current = editForm.game;
-      return;
-    }
-
-    // Only auto-check if the game actually changed (user action, not data load)
-    if (prevEditGameRef.current !== editForm.game && editForm.game) {
-      prevEditGameRef.current = editForm.game;
-
-      // Only auto-check shiny charm if user has this game in their shiny charm list
-      if (shinyCharmGames.includes(editForm.game)) {
-        setEditForm(prev => {
-          const newModifiers = { ...prev.modifiers, shinyCharm: true };
-          if (editForm.game === "Legends Arceus") {
-            newModifiers.researchLv10 = true;
-          }
-          return {
-            ...prev,
-            modifiers: newModifiers
-          };
-        });
+    if (huntWizard.phaseFormTab && huntWizard.phaseFormTab !== "all") {
+      if (huntWizard.phaseFormTab === "main") {
+        inGame = inGame.filter(p => !p.formType || p.formType === "main");
+      } else if (huntWizard.phaseFormTab === "alpha") {
+        inGame = inGame.filter(p => p.formType === "alpha" || p.formType === "alphaother");
+      } else {
+        inGame = inGame.filter(p => p.formType === huntWizard.phaseFormTab);
       }
     }
-  }, [editForm.game, shinyCharmGames]);
 
-  // ── Body scroll lock while modal open ────────────────────────────────────
+    if (!huntWizard.phaseSearchTerm?.trim()) return inGame;
+    const q = huntWizard.phaseSearchTerm.toLowerCase();
+    return inGame.filter(p =>
+      p && p.name && (p.name.toLowerCase().includes(q) || String(p.id).includes(q))
+    );
+  }, [allPokemon, isPokemonAvailableInGame, huntWizard.phaseFormTab, huntWizard.phaseSearchTerm]);
+
+  // ── Global Stats & Derived Timers ─────────────────────────────────────────
+  const activeCount = activeHunts.length;
+  const [, setTick] = useState(0);
+
   useEffect(() => {
-    const open = showPokemonModal || showHuntModal || resetModal.show ||
-      deleteModal.show || completionModal.show || editModal.show || settingsModal.show;
-    if (open) {
-      const scrollY = window.scrollY;
-      document.body.dataset.scrollY = scrollY;
-      document.documentElement.style.overflow = 'hidden';
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-      const saved = parseInt(document.body.dataset.scrollY || '0', 10);
-      window.scrollTo(0, saved);
-    }
-  }, [showPokemonModal, showHuntModal, resetModal.show, deleteModal.show, completionModal.show, editModal.show, settingsModal.show]);
+    const timer = setInterval(() => setTick(t => t + 1), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
-  const handleEditHunt = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    setEditModal({ show: true, hunt });
-    // Mark that we're opening the modal (not a manual game change)
-    editModalJustOpenedRef.current = true;
-    setEditForm({
-      game: hunt.game || '',
-      method: hunt.method || '',
-      pokemon: hunt.pokemon || null,
-      modifiers: hunt.modifiers || {
-        shinyCharm: false,
-        shinyParents: false,
-        lureActive: false,
-        researchLv10: false,
-        perfectResearch: false,
-        sparklingLv1: false,
-        sparklingLv2: false,
-        sparklingLv3: false,
-        eventBoosted: false,
-        communityDay: false,
-        raidDay: false,
-        researchDay: false,
-        galarBirds: false,
-        hatchDay: false
-      }
-    });
+  const totalChecksToday = useMemo(() => {
+    return activeHunts.reduce((sum, h) => sum + (h.checks || 0), 0);
+  }, [activeHunts]);
+
+  const totalHuntingTimeMs = useMemo(() => {
+    return activeHunts.reduce((sum, h) => sum + getHuntElapsedTime(h), 0);
+  }, [activeHunts]);
+
+  const formatSummaryTime = (totalMs) => {
+    const totalSec = Math.floor(totalMs / 1000);
+    const hours = Math.floor(totalSec / 3600);
+    const minutes = Math.floor((totalSec % 3600) / 60);
+    return `${hours}h ${minutes}m`;
   };
 
-  const handleEditConfirm = () => {
-    if (!editModal.hunt) return;
+  // ── Permutation Chart Update Handlers ─────────────────────────────────────
+  const handleChartUpdate = (chartData) => {
+    if (!currentHunt) return;
+    const huntId = currentHunt.id;
 
-    const huntId = editModal.hunt.id;
-
-    // Calculate new odds based on the updated game, method, and modifiers
-    const newOdds = editForm.game && editForm.method
-      ? calculateOdds(editForm.game, editForm.method, editForm.modifiers)
-      : null;
-
-    // Update the hunt with new game, method, pokemon, modifiers, and recalculated odds
-    const updatedActiveHunts = activeHunts.map(hunt =>
-      hunt.id === huntId ? {
-        ...hunt,
-        game: editForm.game,
-        method: editForm.method,
-        pokemon: editForm.pokemon,
-        modifiers: editForm.modifiers,
-        odds: newOdds
-      } : hunt
-    );
-
-    setActiveHunts(updatedActiveHunts);
-
-    // Save immediately with the updated hunt data
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(huntTimers)),
-        lastCheckTimes: Object.fromEntries(Object.entries(lastCheckTimes)),
-        totalCheckTimes: Object.fromEntries(Object.entries(totalCheckTimes)),
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(huntIncrements))
-      };
-      saveHuntData(huntData);
-    }
-
-    // Close modal with animation
-    setEditModalClosing(true);
-    setTimeout(() => {
-      setEditModal({ show: false, hunt: null });
-      setEditModalClosing(false);
-      showMessage("Hunt updated", "success");
-    }, 300);
-  };
-
-  const handleAddHunt = () => {
-    setIsEditingPokemon(false);
-    setSelectedPokemon(null);
-    setEditForm({
-      game: "Legends Arceus",
-      method: "Permutations",
-      odds: 4096,
-      charms: 0,
-      shinyCharm: false,
-      lure: false,
-      modifiers: {}
-    });
-    setHuntDetails({
-      game: "Legends Arceus",
-      method: "Permutations",
-      modifiers: {}
-    });
-    setHuntModalClosing(false);
-    setPokemonModalClosing(false);
-    setBackdropClosing(false);
-    setShowPokemonModal(true);
-  };
-
-  const handlePokemonSelect = (pokemon) => {
-    if (pokemonModalClosing) return;
-    setSelectedPokemon(pokemon);
-    setPokemonModalClosing(true);
-    setTimeout(() => {
-      setShowPokemonModal(false);
-      setPokemonModalClosing(false);
-      setShowHuntModal(true);
-    }, 280);
-  };
-
-  const handleStartHunt = () => {
-    if (!selectedPokemon || huntModalClosing) return;
-
-    // Calculate the odds for this hunt
-    const huntOdds = huntDetails.game && huntDetails.method
-      ? calculateOdds(huntDetails.game, huntDetails.method, modifiers)
-      : null; // Use null to indicate no odds available
-
-    const startTime = Date.now();
-    const huntId = startTime;
-
-    const newHunt = {
-      id: huntId,
-      pokemon: selectedPokemon,
-      game: huntDetails.game,
-      ball: huntDetails.ball,
-      mark: huntDetails.mark,
-      method: huntDetails.method,
-      notes: huntDetails.notes,
-      checks: 0,
-      odds: huntOdds,
-      startDate: new Date().toISOString(),
-      startTime: startTime,
-      increment: 1,
-      modifiers: { ...modifiers } // Store modifiers with each hunt
-    };
-
-    const updatedActiveHunts = [...activeHunts, newHunt];
-    const updatedHuntTimers = { ...huntTimers, [huntId]: startTime };
-    const updatedLastCheckTimes = { ...lastCheckTimes, [huntId]: startTime };
-    const updatedTotalCheckTimes = { ...totalCheckTimes, [huntId]: 0 };
-    const updatedHuntIncrements = { ...huntIncrements, [huntId]: 1 };
-    const updatedPausedHunts = new Set([...pausedHunts, huntId]);
-
-    setActiveHunts(updatedActiveHunts);
-    setHuntTimers(updatedHuntTimers);
-    setLastCheckTimes(updatedLastCheckTimes);
-    setTotalCheckTimes(updatedTotalCheckTimes);
-    setHuntIncrements(updatedHuntIncrements);
-    setPausedHunts(updatedPausedHunts);
-
-    // Save immediately with updated state
-    if (username) {
-      const huntData = {
-        activeHunts: updatedActiveHunts,
-        huntTimers: Object.fromEntries(Object.entries(updatedHuntTimers).map(([k, v]) => [k, v])),
-        lastCheckTimes: Object.fromEntries(Object.entries(updatedLastCheckTimes).map(([k, v]) => [k, v])),
-        totalCheckTimes: Object.fromEntries(Object.entries(updatedTotalCheckTimes).map(([k, v]) => [k, v])),
-        pausedHunts: Array.from(updatedPausedHunts),
-        huntIncrements: Object.fromEntries(Object.entries(updatedHuntIncrements).map(([k, v]) => [k, v]))
-      };
-      saveHuntData(huntData);
-    }
-
-    // Close hunt modal with animation
-    setHuntModalClosing(true);
-    setBackdropClosing(true);
-    setTimeout(() => {
-      setShowHuntModal(false);
-      setHuntModalClosing(false);
-      setBackdropClosing(false);
-
-      // Reset form states after animation completes
-      setHuntDetails({
-        game: "Legends Arceus",
-        ball: "",
-        mark: "",
-        method: "Permutations",
-        notes: ""
-      });
-      setModifiers({
-        shinyCharm: false,
-        shinyParents: false,
-        lureActive: false,
-        researchLv10: false,
-        perfectResearch: false,
-        sparklingLv1: false,
-        sparklingLv2: false,
-        sparklingLv3: false,
-        eventBoosted: false,
-        communityDay: false,
-        raidDay: false,
-        researchDay: false,
-        galarBirds: false,
-        hatchDay: false
-      });
-      setSelectedPokemon(null);
-      showMessage("Hunt started!", "success");
-    }, 300);
-  };
-
-  const handleAddCheck = useCallback((huntId) => {
-    const now = Date.now();
-    const isPaused = pausedHunts.has(huntId);
-    const bottomTimerValue = currentBottomTimers[huntId] || 0;
-    const timeToAdd = isPaused ? 0 : bottomTimerValue;
-    const increment = huntIncrements[huntId] || 1;
-
-    const updatedHunts = activeHunts.map(h =>
-      h.id === huntId ? { ...h, checks: h.checks + increment } : h
-    );
-    const updatedLastCheck  = { ...lastCheckTimes,  [huntId]: now };
-    const updatedTotalTimes = { ...totalCheckTimes, [huntId]: (totalCheckTimes[huntId] || 0) + timeToAdd };
-
-    setActiveHunts(updatedHunts);
-    setLastCheckTimes(updatedLastCheck);
-    setTotalCheckTimes(updatedTotalTimes);
-
-    if (username) {
-      saveHuntData({
-        activeHunts: updatedHunts,
-        huntTimers: { ...huntTimers },
-        lastCheckTimes: { ...updatedLastCheck },
-        totalCheckTimes: { ...updatedTotalTimes },
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: { ...huntIncrements },
-      });
-    }
-  }, [activeHunts, pausedHunts, currentBottomTimers, huntIncrements, lastCheckTimes, totalCheckTimes, huntTimers, username, saveHuntData]);
-
-  const handleChartConfigUpdate = useCallback((newConfig) => {
-    if (!selectedHuntId) return;
-
-    if (newConfig.isSaveOrder !== undefined) setIsSaveOrder(newConfig.isSaveOrder);
-    if (newConfig.showSecondWave !== undefined) setShowSecondWave(newConfig.showSecondWave);
-    if (newConfig.showGhostChecks !== undefined) setShowGhostChecks(newConfig.showGhostChecks);
-    if (newConfig.isAdvanced !== undefined) setIsAdvanced(newConfig.isAdvanced);
-    if (newConfig.secondSpawn !== undefined) setSecondSpawn(newConfig.secondSpawn);
-
-    const updatedHunts = activeHunts.map(h => 
-      h.id === selectedHuntId ? { ...h, chartConfig: newConfig } : h
-    );
-    setActiveHunts(updatedHunts);
-    if (username) {
-      saveHuntData({ activeHunts: updatedHunts, huntTimers: { ...huntTimers }, lastCheckTimes: { ...lastCheckTimes }, totalCheckTimes: { ...totalCheckTimes }, pausedHunts: Array.from(pausedHunts), huntIncrements: { ...huntIncrements } });
-    }
-  }, [selectedHuntId, activeHunts, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements, username, saveHuntData]);
-
-  const handleChartUpdate = useCallback((newChartData) => {
-    if (!selectedHuntId) return;
-    
-    const oldChartData = activeHunts.find(h => h.id === selectedHuntId)?.chartData || {};
-    const oldKeysCount = Object.keys(oldChartData).filter(k => oldChartData[k]).length;
-    const newKeysCount = Object.keys(newChartData).filter(k => newChartData[k]).length;
-    const diff = newKeysCount - oldKeysCount;
-
-    if (diff === 0) {
-      const updatedHunts = activeHunts.map(h => 
-        h.id === selectedHuntId ? { ...h, chartData: newChartData } : h
-      );
-      setActiveHunts(updatedHunts);
-      if (username) {
-        saveHuntData({
-          activeHunts: updatedHunts,
-          huntTimers: { ...huntTimers },
-          lastCheckTimes: { ...lastCheckTimes },
-          totalCheckTimes: { ...totalCheckTimes },
-          pausedHunts: Array.from(pausedHunts),
-          huntIncrements: { ...huntIncrements },
-        });
-      }
-      return;
-    }
-
-    const isAdding = diff > 0;
-    const now = Date.now();
-    const isPaused = pausedHunts.has(selectedHuntId);
-    const bottomTimerValue = currentBottomTimers[selectedHuntId] || 0;
-    const timeToAdd = isPaused ? 0 : bottomTimerValue;
-
-    const activeHuntConfig = activeHunts.find(h => h.id === selectedHuntId)?.chartConfig || {};
-    const currentSecondSpawn = activeHuntConfig.secondSpawn ?? 6;
-    const incrementValue = multiCheckEnabled ? currentSecondSpawn : 1;
-    const totalIncrement = Math.abs(diff) * incrementValue;
-
-    const updatedHunts = activeHunts.map(h => {
-      if (h.id !== selectedHuntId) return h;
-      const newChecks = isAdding ? h.checks + totalIncrement : Math.max(0, h.checks - totalIncrement);
-      return { ...h, checks: newChecks, chartData: newChartData };
-    });
-
-    const updatedLastCheck = { ...lastCheckTimes, [selectedHuntId]: now };
-    const updatedTotalTimes = { ...totalCheckTimes, [selectedHuntId]: (totalCheckTimes[selectedHuntId] || 0) + timeToAdd };
-
-    setActiveHunts(updatedHunts);
-    if (isAdding) {
-      setLastCheckTimes(updatedLastCheck);
-      setTotalCheckTimes(updatedTotalTimes);
-    }
-
-    if (username) {
-      saveHuntData({
-        activeHunts: updatedHunts,
-        huntTimers: { ...huntTimers },
-        lastCheckTimes: isAdding ? { ...updatedLastCheck } : { ...lastCheckTimes },
-        totalCheckTimes: isAdding ? { ...updatedTotalTimes } : { ...totalCheckTimes },
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: { ...huntIncrements },
-      });
-    }
-  }, [selectedHuntId, activeHunts, pausedHunts, currentBottomTimers, lastCheckTimes, totalCheckTimes, huntTimers, username, saveHuntData, huntIncrements, multiCheckEnabled]);
-
-
-
-  const handleDecreaseCheck = useCallback((huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    if (!hunt || hunt.checks <= 0) return;
-    const increment = huntIncrements[huntId] || 1;
-    const updatedHunts = activeHunts.map(h =>
-      h.id === huntId ? { ...h, checks: Math.max(0, h.checks - increment) } : h
-    );
-    setActiveHunts(updatedHunts);
-    if (username) {
-      saveHuntData({
-        activeHunts: updatedHunts,
-        huntTimers: { ...huntTimers },
-        lastCheckTimes: { ...lastCheckTimes },
-        totalCheckTimes: { ...totalCheckTimes },
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: { ...huntIncrements },
-      });
-    }
-  }, [activeHunts, huntIncrements, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, username, saveHuntData]);
-
-  const handlePauseHunt = useCallback((huntId) => {
-    const now = Date.now();
-    const last = lastPauseAction.current[huntId];
-    if (last && now - last < 500) return;
-    lastPauseAction.current[huntId] = now;
-    const wasPaused = pausedHunts.has(huntId);
-    setPausedHunts(prev => {
-      const s = new Set(prev);
-      wasPaused ? s.delete(huntId) : s.add(huntId);
-      return s;
-    });
-    showMessage(wasPaused ? "Hunt resumed" : "Hunt paused", "info");
-  }, [pausedHunts, showMessage]);
-
-  const handleResetHunt = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    setResetModal({ show: true, hunt });
-  };
-
-  const handleResetConfirm = () => {
-    if (!resetModal.hunt) return;
-    setResetModalClosing(true);
-    setTimeout(() => {
-      const now = Date.now();
-      const huntId = resetModal.hunt.id;
-      const updatedHunts      = activeHunts.map(h => h.id === huntId ? { ...h, checks: 0 } : h);
-      const updatedLastCheck  = { ...lastCheckTimes,  [huntId]: now };
-      const updatedTotalTimes = { ...totalCheckTimes, [huntId]: 0 };
-      setActiveHunts(updatedHunts);
-      setLastCheckTimes(updatedLastCheck);
-      setTotalCheckTimes(updatedTotalTimes);
-      setCurrentBottomTimers(p => ({ ...p, [huntId]: 0 }));
-      if (username) {
-        saveHuntData({
-          activeHunts: updatedHunts,
-          huntTimers: { ...huntTimers },
-          lastCheckTimes: { ...updatedLastCheck },
-          totalCheckTimes: { ...updatedTotalTimes },
-          pausedHunts: Array.from(pausedHunts),
-          huntIncrements: { ...huntIncrements },
-        });
-      }
-      setResetModal({ show: false, hunt: null });
-      setResetModalClosing(false);
-      showMessage("Hunt reset", "info");
-    }, 280);
-  };
-
-  const handleDeleteHunt = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    setDeleteModal({ show: true, hunt });
-  };
-
-  const handleDeleteConfirm = () => {
-    if (!deleteModal.hunt) return;
-    const huntId = deleteModal.hunt.id;
-
-    const updatedHunts      = activeHunts.filter(h => h.id !== huntId);
-    const updatedLastCheck  = { ...lastCheckTimes };  delete updatedLastCheck[huntId];
-    const updatedTotalTimes = { ...totalCheckTimes }; delete updatedTotalTimes[huntId];
-    const updatedTimers     = { ...huntTimers };       delete updatedTimers[huntId];
-    const updatedIncrements = { ...huntIncrements };   delete updatedIncrements[huntId];
-    const updatedPaused     = new Set(pausedHunts);    updatedPaused.delete(huntId);
-
-    setActiveHunts(updatedHunts);
-    setLastCheckTimes(updatedLastCheck);
-    setTotalCheckTimes(updatedTotalTimes);
-    setHuntTimers(updatedTimers);
-    setHuntIncrements(updatedIncrements);
-    setPausedHunts(updatedPaused);
-    setCurrentBottomTimers(p => { const n = { ...p }; delete n[huntId]; return n; });
-
-    if (username) {
-      saveHuntData({
-        activeHunts: updatedHunts,
-        huntTimers: updatedTimers,
-        lastCheckTimes: updatedLastCheck,
-        totalCheckTimes: updatedTotalTimes,
-        pausedHunts: Array.from(updatedPaused),
-        huntIncrements: updatedIncrements,
-      });
-    }
-
-    setDeleteModalClosing(true);
-    setTimeout(() => {
-      setDeleteModal({ show: false, hunt: null });
-      setDeleteModalClosing(false);
-      showMessage("Hunt deleted", "info");
-    }, 280);
-  };
-
-  const handleSettingsHunt = (huntId) => {
-    const hunt = activeHunts.find(h => h.id === huntId);
-    setSettingsModal({ show: true, hunt });
-    setSettingsForm({
-      manualChecks: hunt.checks.toString(),
-      manualTotalTime: formatTime(totalCheckTimes[huntId] || 0),
-      manualIncrements: (huntIncrements[huntId] || 1).toString(),
-    });
-  };
-
-  const handleSettingsConfirm = () => {
-    if (!settingsModal.hunt) return;
-    const huntId = settingsModal.hunt.id;
-    const newChecks = parseInt(settingsForm.manualChecks) || 0;
-    const timeStr = settingsForm.manualTotalTime;
-    let totalMs = 0;
-    if (timeStr) {
-      const h = (timeStr.match(/(\d+)h/) || [0,0])[1];
-      const m = (timeStr.match(/(\d+)m/) || [0,0])[1];
-      const s = (timeStr.match(/(\d+)s/) || [0,0])[1];
-      totalMs = (parseInt(h)*3600 + parseInt(m)*60 + parseInt(s)) * 1000;
-    }
-    const newIncrements = parseInt(settingsForm.manualIncrements) || 1;
-
-    const updatedHunts      = activeHunts.map(h => h.id === huntId ? { ...h, checks: newChecks } : h);
-    const updatedTotalTimes = { ...totalCheckTimes, [huntId]: totalMs };
-    const updatedIncrements = { ...huntIncrements,  [huntId]: newIncrements };
-
-    setActiveHunts(updatedHunts);
-    setTotalCheckTimes(updatedTotalTimes);
-    setHuntIncrements(updatedIncrements);
-
-    if (username) {
-      saveHuntData({
-        activeHunts: updatedHunts,
-        huntTimers: { ...huntTimers },
-        lastCheckTimes: { ...lastCheckTimes },
-        totalCheckTimes: updatedTotalTimes,
-        pausedHunts: Array.from(pausedHunts),
-        huntIncrements: updatedIncrements,
-      });
-    }
-
-    setSettingsModalClosing(true);
-    setTimeout(() => {
-      setSettingsModal({ show: false, hunt: null });
-      setSettingsModalClosing(false);
-      showMessage("Hunt settings updated", "success");
-    }, 280);
-  };
-
-  const handleCompleteHunt = (hunt) => {
-    setCompletionModal({ show: true, hunt });
-    setCompletionForm({ ball: hunt.ball || '', mark: hunt.mark || '', notes: hunt.notes || '' });
-  };
-
-  const handleCompletionConfirm = async () => {
-    if (!completionModal.hunt) return;
-    const validation = validateContent(String(completionForm.notes || ''), 'notes');
-    if (!validation.isValid) return;
-
-    const hunt = activeHunts.find(h => h.id === completionModal.hunt.id);
-    if (!hunt) { showMessage('Hunt not found', 'error'); return; }
-
-    let workingPokemon = hunt.pokemon;
-    if (!workingPokemon.stableId) {
-      const full = allPokemon.find(p => p.id === workingPokemon.id && p.name === workingPokemon.name);
-      if (full?.stableId) workingPokemon = { ...workingPokemon, stableId: full.stableId };
-      else { showMessage('Error: Could not determine stable ID', 'error'); return; }
-    }
-
-    const caughtEntry = {
-      date: new Date().toISOString().split('T')[0],
-      ball: completionForm.ball || "",
-      mark: completionForm.mark || "",
-      game: hunt.game,
-      method: hunt.method,
-      checks: hunt.checks || "",
-      time: totalCheckTimes[hunt.id] || 0,
-      notes: completionForm.notes || "",
-      entryId: Math.random().toString(36).substr(2, 9),
-      modifiers: hunt.modifiers || {},
-      isHuntTracker: true,
-      ...(hunt.method === "Permutations" && {
-        chartData: hunt.chartData || {},
+    setAllActiveHunts(prev => {
+      const existingHunt = prev.find(h => String(h.id) === String(huntId));
+      if (!existingHunt) return prev;
+      const updated = {
+        ...existingHunt,
+        chartData,
         chartConfig: {
-          firstSpawn: hunt.chartConfig?.firstSpawn ?? 8,
-          secondSpawn: hunt.chartConfig?.secondSpawn ?? secondSpawn,
-          isAdvanced,
-          isSaveOrder,
-          showSecondWave,
-          showGhostChecks,
-          legendColors: legendColors
-        }
-      })
-    };
-
-    const caughtKey = getCaughtKey(workingPokemon, null, true);
-
-    try {
-      const { fetchCaughtData, updateCaughtData } = await import('../api/caught');
-      const existing = await fetchCaughtData(username);
-      const existingInfo = existing[caughtKey] || null;
-
-      const updatedInfo = existingInfo?.entries
-        ? { ...existingInfo, caught: true, caughtAt: Date.now(), entries: [...existingInfo.entries, caughtEntry] }
-        : { caught: true, caughtAt: Date.now(), entries: [caughtEntry] };
-
-      await updateCaughtData(username, caughtKey, updatedInfo);
-      window.dispatchEvent(new CustomEvent('caughtDataChanged', {
-        detail: { pokemon: workingPokemon, caughtInfo: updatedInfo, caughtKey, wasCaught: !!existingInfo, isShiny: true }
-      }));
-    } catch {
-      showMessage('Failed to save to collection', 'error');
-      return;
-    }
-
-    const huntId = hunt.id;
-    const updatedHunts      = activeHunts.filter(h => h.id !== huntId);
-    const updatedLastCheck  = { ...lastCheckTimes };  delete updatedLastCheck[huntId];
-    const updatedTotalTimes = { ...totalCheckTimes }; delete updatedTotalTimes[huntId];
-    const updatedTimers     = { ...huntTimers };       delete updatedTimers[huntId];
-    const updatedIncrements = { ...huntIncrements };   delete updatedIncrements[huntId];
-    const updatedPaused     = new Set(pausedHunts);    updatedPaused.delete(huntId);
-
-    setActiveHunts(updatedHunts);
-    setLastCheckTimes(updatedLastCheck);
-    setTotalCheckTimes(updatedTotalTimes);
-    setHuntTimers(updatedTimers);
-    setHuntIncrements(updatedIncrements);
-    setPausedHunts(updatedPaused);
-
-    if (username) {
-      saveHuntData({
-        activeHunts: updatedHunts,
-        huntTimers: updatedTimers,
-        lastCheckTimes: updatedLastCheck,
-        totalCheckTimes: updatedTotalTimes,
-        pausedHunts: Array.from(updatedPaused),
-        huntIncrements: updatedIncrements,
-      });
-    }
-
-    setCompletionModalClosing(true);
-    setTimeout(() => {
-      setCompletionForm({ ball: '', mark: '', notes: '' });
-      showMessage(`${formatPokemonName(hunt.pokemon.name)} caught and added to collection!`, "success");
-      setCompletionModal({ show: false, hunt: null });
-      setCompletionModalClosing(false);
-    }, 280);
-  };
-
-  const handleInfoHunt = (huntId) => {
-    setExpandedHunts(prev => {
-      const s = new Set(prev);
-      s.has(huntId) ? s.delete(huntId) : s.add(huntId);
-      return s;
+          firstSpawn: existingHunt.chartConfig?.firstSpawn ?? 8,
+          secondSpawn: existingHunt.chartConfig?.secondSpawn ?? 6,
+          isAdvanced: existingHunt.chartConfig?.isAdvanced ?? false,
+          isSaveOrder: existingHunt.chartConfig?.isSaveOrder ?? false,
+          showSecondWave: existingHunt.chartConfig?.showSecondWave ?? false,
+          showGhostChecks: existingHunt.chartConfig?.showGhostChecks ?? false,
+          ...(existingHunt.chartConfig || {})
+        },
+        version: (existingHunt.version || 0) + 1
+      };
+      const next = prev.map(h => String(h.id) === String(huntId) ? updated : h);
+      setCachedHuntsData({ activeHunts: next });
+      debouncedSave(next);
+      return next;
     });
   };
 
-  const handleBottomTimerUpdate = useCallback((huntId, ms) => {
-    setCurrentBottomTimers(p => ({ ...p, [huntId]: ms }));
-  }, []);
 
-  // ── Computed odds for new hunt modal ──────────────────────────────────────
-  const newHuntOdds = useMemo(() =>
-    calculateOdds("Legends Arceus", "Permutations", modifiers),
-    [modifiers]
-  );
+  const handleChartConfigUpdate = (config) => {
+    if (!currentHunt) return;
+    const huntId = currentHunt.id;
 
-  // ── Ball options for completion (Hisui only) ──────────────────────────────
-  const hisuiBalls = BALL_OPTIONS.filter(b => b.value === "" || b.value === "Strange Ball" || HISUIAN_BALLS.includes(b.value));
+    setAllActiveHunts(prev => {
+      const existingHunt = prev.find(h => String(h.id) === String(huntId));
+      if (!existingHunt) return prev;
+      const updated = {
+        ...existingHunt,
+        chartConfig: {
+          firstSpawn: existingHunt.chartConfig?.firstSpawn ?? 8,
+          secondSpawn: existingHunt.chartConfig?.secondSpawn ?? 6,
+          isAdvanced: existingHunt.chartConfig?.isAdvanced ?? false,
+          isSaveOrder: existingHunt.chartConfig?.isSaveOrder ?? false,
+          showSecondWave: existingHunt.chartConfig?.showSecondWave ?? false,
+          showGhostChecks: existingHunt.chartConfig?.showGhostChecks ?? false,
+          ...(existingHunt.chartConfig || {}),
+          ...config
+        },
+        version: (existingHunt.version || 0) + 1
+      };
+      const next = prev.map(h => String(h.id) === String(huntId) ? updated : h);
+      setCachedHuntsData({ activeHunts: next });
+      debouncedSave(next);
+      return next;
+    });
+  };
 
-  // Get all available games (use GAME_OPTIONS with images)
-  const allGames = useMemo(() => {
-    return GAME_OPTIONS.filter(g => g.value !== "Home");
-  }, []);
 
-  // Get modifiers for the selected game
-  const gameModifiers = useMemo(() => {
-    if (!huntDetails.game) return [];
-    return getModifiersForGame(huntDetails.game);
-  }, [huntDetails.game]);
+  // ── Dynamic Modifiers Form Helper ─────────────────────────────────────────
+  const renderModifiersForm = (selectedGame, selectedMethod, currentMods, setMods) => {
+    const availableMods = getModifiersForGame(selectedGame || "Legends Arceus") || {};
+    const hasCharm = !!(availableMods["Shiny Charm"] && availableMods["Shiny Charm"] > 0);
 
-  // Get methods for the selected game
-  const availableMethods = useMemo(() => {
-    if (!huntDetails.game) return [];
-    return getMethodsForGame(huntDetails.game);
-  }, [huntDetails.game]);
+    return (
+      <div className="space-y-3">
+        <label className="hunt-modal-label !text-white text-white font-bold">
+          Active Modifiers & Boosts (Legends: Arceus)
+        </label>
 
-
-  // ─────────────────────────────────────────────────────────────────────────
-  return (
-    <>
-      <div className="container page-container mmo-page">
-        {/* MMO Tool Header */}
-        <div className="mmo-header">
-          <div className="mmo-title-block">
-            <h1 className="mmo-page-title">
-              MMO Tool
-            </h1>
-          </div>
-        </div>
-
-        <div className="app-divider" />
-
-        <div className="mmo-section-header">
-          <div className="mmo-section-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-            <div>
-              Active Permutation Hunts
-              <span className="mmo-section-count">{permutationHunts.length}</span>
-            </div>
-            <label className="modifier-checkbox" style={{ fontSize: '0.9rem', margin: 0, padding: '4px 10px', backgroundColor: 'var(--bg-color)', borderRadius: '6px' }}>
-              <input
-                type="checkbox"
-                checked={multiCheckEnabled}
-                onChange={(e) => setMultiCheckEnabled(e.target.checked)}
-              />
-              +{activeHunts.find(h => h.id === selectedHuntId)?.chartConfig?.secondSpawn ?? 6} Checks per Chart Click
-            </label>
-          </div>
-        </div>
-
-        <div className={`hunts-grid ${selectedHuntId ? 'single-hunt-active' : ''}`}>
-          {permutationHunts
-            .filter(hunt => !selectedHuntId || hunt.id === selectedHuntId)
-            .map(hunt => (
-            <div key={hunt.id} className="hunt-card" style={{ position: 'relative' }}>
-              <div className="hunt-header">
-                {!expandedHunts.has(hunt.id) ? (
-                  <>
-                    <div className="hunt-pokemon">
-                      <img
-                        src={getPokemonImage(hunt.pokemon, useHomeSprites)}
-                        alt={formatPokemonName(hunt.pokemon.name)}
-                        className="hunt-pokemon-image"
-                      />
-                      <div className="hunt-pokemon-info">
-                        <h3>{formatPokemonName(hunt.pokemon.name)}</h3>
-                        {hunt.pokemon.formType && hunt.pokemon.formType !== "main" && (
-                          <div className="hunt-pokemon-form">
-                            {hunt.pokemon.formType === "alpha" || hunt.pokemon.formType === "alphaother"
-                              ? "Alpha"
-                              : hunt.pokemon.formType === "gmax"
-                                ? "Gigantamax"
-                                : hunt.pokemon.formType === "alolan"
-                                  ? "Alolan"
-                                  : hunt.pokemon.formType === "galarian"
-                                    ? "Galarian"
-                                    : hunt.pokemon.formType === "hisuian"
-                                      ? "Hisuian"
-                                      : hunt.pokemon.formType === "paldean"
-                                        ? "Paldean"
-                                        : hunt.pokemon.formType === "mega"
-                                          ? "Mega"
-                                          : hunt.pokemon.formType === "primal"
-                                            ? "Primal"
-                                            : hunt.pokemon.formType === "gender"
-                                              ? "Gender"
-                                              : hunt.pokemon.formType === "therian"
-                                                ? "Therian"
-                                                : hunt.pokemon.formType === "ash-cap" || hunt.pokemon.formType === "partner-cap"
-                                                  ? "Partner Cap"
-                                                  : hunt.pokemon.formType}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="hunt-actions">
-                      <button
-                        onClick={() => handleResetHunt(hunt.id)}
-                        className="hunt-reset-btn"
-                        title="Reset hunt"
-                      >
-                        <RotateCcw size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteHunt(hunt.id)}
-                        className="hunt-delete-btn"
-                        title="Delete hunt"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleSettingsHunt(hunt.id)}
-                        className="hunt-settings-btn"
-                        title="Hunt settings"
-                      >
-                        <Settings size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleInfoHunt(hunt.id)}
-                        className="hunt-info-btn"
-                        title="Show hunt details"
-                      >
-                        <Info size={16} />
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="hunt-details">
-                      <div className="hunt-detail-item">Game: {hunt.game || "NA"}</div>
-                      <div className="hunt-detail-item">Method: {hunt.method || "NA"}</div>
-                    </div>
-                    <div className="hunt-actions expanded-view">
-                      <button
-                        onClick={() => handleEditHunt(hunt.id)}
-                        className="hunt-edit-btn"
-                        title="Edit hunt"
-                        style={{ gridColumn: '2', gridRow: '1' }}
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleInfoHunt(hunt.id)}
-                        className="hunt-info-btn"
-                        title="Hide hunt details"
-                        style={{ gridColumn: '2', gridRow: '2' }}
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              <div className="hunt-checks">
-                <div className="checks-display">
-                  <span className="checks-count">{hunt.checks}</span>
-                </div>
-                <div className="timer-display">
-                  <div className="total-time">
-                    {formatTime(totalCheckTimes[hunt.id] || 0)}
-                  </div>
-                  <div className="last-check-time">
-                    <TimerDisplay
-                      huntId={hunt.id}
-                      lastCheckTime={lastCheckTimes[hunt.id] || huntTimers[hunt.id]}
-                      isPaused={pausedHunts.has(hunt.id)}
-                      onTimeUpdate={handleBottomTimerUpdate}
-                    />
-                  </div>
-                </div>
-                <div className="checks-buttons">
-                  <button
-                    onClick={() => handlePauseHunt(hunt.id)}
-                    className="pause-btn"
-                    title={pausedHunts.has(hunt.id) ? "Resume hunt" : "Pause hunt"}
-                  >
-                    {pausedHunts.has(hunt.id) ? <Play size={16} /> : <Pause size={16} />}
-                  </button>
-                  <button
-                    onClick={() => handleDecreaseCheck(hunt.id)}
-                    className="decrease-check-btn"
-                    title="Decrease check"
-                    disabled={hunt.checks <= 0}
-                  >
-                    <Minus size={16} />
-                  </button>
-                  <button
-                    onClick={() => setSelectedHuntId(selectedHuntId === hunt.id ? null : hunt.id)}
-                    className="pause-btn"
-                    title={selectedHuntId === hunt.id ? "Unlink from Chart" : "Link to Chart"}
-                    style={{
-                      backgroundColor: selectedHuntId === hunt.id ? '#ff4444' : undefined,
-                      borderColor: selectedHuntId === hunt.id ? '#ff4444' : undefined
-                    }}
-                  >
-                    {selectedHuntId === hunt.id ? <X size={16} strokeWidth={3} color="#ffffff" /> : <Check size={16} strokeWidth={3} />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="hunt-complete">
-                <div className="hunt-odds-display">
-                  <span className="odds-label">Odds:</span>
-                  <span className="odds-value">
-                    1/{hunt.odds || 4096}
-                  </span>
-                </div>
-                <button
-                  className="complete-hunt-btn"
-                  onClick={() => handleCompleteHunt(hunt)}
-                  title="Mark as caught"
-                >
-                  <Check size={20} />
-                  Complete Hunt
-                </button>
-              </div>
-            </div>
-          ))}
-
-          {/* ─ Add Hunt Card ─ */}
-          {!selectedHuntId && (
-          <div className="add-hunt-card" onClick={handleAddHunt}>
-            <div className="add-hunt-content">
-              <div className="add-hunt-icon">
-                <Plus size={32} />
-              </div>
-              <h3>Start New Hunt</h3>
-            </div>
-          </div>
+        <div className="hunt-modifiers-box space-y-3">
+          {/* 1. Shiny Charm Toggle */}
+          {hasCharm && (
+            <button
+              type="button"
+              className={`modifier-select-btn ${currentMods.shinyCharm ? "is-active" : ""}`}
+              onClick={() => setMods(prev => {
+                const nextCharm = !prev.shinyCharm;
+                return {
+                  ...prev,
+                  shinyCharm: nextCharm,
+                  ...(nextCharm ? { researchLv10: true } : {})
+                };
+              })}
+            >
+              <span className="modifier-btn-left">
+                <img src="/modifier_images/shinycharm.png" alt="" className="w-5 h-5 object-contain shrink-0" />
+                <span>Shiny Charm Active</span>
+              </span>
+              <span className="modifier-btn-status">
+                {currentMods.shinyCharm ? "Active ✓" : "Off"}
+              </span>
+            </button>
           )}
+
+          {/* 2. Research Level 10 */}
+          <button
+            type="button"
+            className={`modifier-select-btn ${currentMods.researchLv10 ? "is-active" : ""}`}
+            onClick={() => setMods(prev => {
+              const nextLv10 = !prev.researchLv10;
+              return {
+                ...prev,
+                researchLv10: nextLv10,
+                ...(!nextLv10 ? { perfectResearch: false, shinyCharm: false } : {})
+              };
+            })}
+          >
+            <span className="modifier-btn-left">
+              <img src="/modifier_images/research.png" alt="" className="w-5 h-5 object-contain shrink-0" />
+              <span>Research Level 10</span>
+            </span>
+            <span className="modifier-btn-status">
+              {currentMods.researchLv10 ? "Active ✓" : "Off"}
+            </span>
+          </button>
+
+          {/* 3. Perfect Research */}
+          <button
+            type="button"
+            className={`modifier-select-btn ${currentMods.perfectResearch ? "is-active" : ""}`}
+            onClick={() => setMods(prev => {
+              const nextPerfect = !prev.perfectResearch;
+              return {
+                ...prev,
+                perfectResearch: nextPerfect,
+                ...(nextPerfect ? { researchLv10: true } : {})
+              };
+            })}
+          >
+            <span className="modifier-btn-left">
+              <img src="/modifier_images/perfectresearch.png" alt="" className="w-5 h-5 object-contain shrink-0" />
+              <span>Perfect Research Entry</span>
+            </span>
+            <span className="modifier-btn-status">
+              {currentMods.perfectResearch ? "Active ✓" : "Off"}
+            </span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // ── Render Card Helpers ───────────────────────────────────────────────────
+  const renderDetailedHuntCard = (hunt) => {
+    return (
+      <DetailedHuntCard
+        hunt={hunt}
+        isPopout={false}
+        getPokemonImage={getPokemonImage}
+        useHomeSprites={useHomeSprites}
+        getFormDisplayName={getFormDisplayName}
+        hotkey=""
+        decrementHotkey=""
+        huntIncrement={huntIncrements[hunt.id] || hunt.increment || 1}
+        metricMode={metricModeMap[hunt.id] || "phase"}
+        onToggleMetricMode={() => handleToggleMetricMode(hunt.id)}
+        isPhasesCollapsed={!!collapsedPhasesMap[hunt.id]}
+        onToggleCollapsePhases={() => handleToggleCollapsePhases(hunt.id)}
+        isMenuOpen={activeMenuHuntId === hunt.id}
+        onToggleMenu={() => setActiveMenuHuntId(prev => prev === hunt.id ? null : hunt.id)}
+        onCloseMenu={() => setActiveMenuHuntId(null)}
+        onAddCheck={() => handleAddCheck(hunt.id)}
+        onDecreaseCheck={() => handleDecreaseCheck(hunt.id)}
+        onTogglePause={() => handleTogglePause(hunt.id)}
+        onReset={(h) => setResetModal({ show: true, hunt: h })}
+        onLogShiny={handleOpenShinyEncounterModal}
+        onOpenOdds={(h) => setOddsModal({ show: true, hunt: h })}
+        onOpenHistory={(h) => setPhaseHistoryModal({ show: true, hunt: h })}
+        onAdjustValues={(h) => setSettingsModal({ show: true, hunt: h })}
+        onPopout={handleOpenPopout}
+        onDelete={(h) => setDeleteModal({ show: true, hunt: h })}
+      />
+    );
+  };
+
+  const renderCompactHuntCard = (hunt) => {
+    const isCurrent = currentHunt && String(currentHunt.id) === String(hunt.id);
+    const formLabel = getFormDisplayName(hunt.pokemon);
+
+    return (
+      <button
+        key={hunt.id}
+        type="button"
+        className={`compact-hunt-card ${isCurrent ? "is-current" : ""}`}
+        onClick={() => setCurrentHuntId(hunt.id)}
+      >
+        <div className="compact-hunt-start">
+          <div className="compact-hunt-sprite-box">
+            <img
+              src={getPokemonImage(hunt.pokemon)}
+              alt={hunt.pokemon?.name || "Pokémon"}
+              className={`compact-hunt-sprite ${!useHomeSprites ? "pixelated" : ""}`}
+              style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+              onError={(e) => { e.currentTarget.src = "/fallback.png"; }}
+            />
+          </div>
+
+          <div className="compact-hunt-info">
+            <div className="flex items-center gap-1.5">
+              <span className="compact-hunt-name">
+                Shiny {formatPokemonName(hunt.pokemon?.name)}
+              </span>
+            </div>
+
+            <div className="compact-hunt-meta">
+              <span className="compact-hunt-tag">
+                {getGameImage("Legends Arceus") && <img src={getGameImage("Legends Arceus")} alt="" />}
+                <span>Legends Arceus</span>
+              </span>
+              <span className="compact-hunt-tag">
+                <span>Permutations</span>
+              </span>
+              {formLabel && (
+                <span className="compact-hunt-tag text-[var(--accent)]">
+                  <span>{formLabel}</span>
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
-        {permutationHunts.length === 0 && (
-          <div style={{
-            marginTop: '3rem',
-            marginBottom: '2rem',
-            padding: '3rem 2rem',
-            textAlign: 'center',
-            backgroundColor: 'var(--card-background)',
-            border: '2px dashed var(--border-color)',
-            borderRadius: '16px',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
-          }}>
-            <p style={{
-              fontSize: '1.4rem',
-              fontWeight: '600',
-              color: 'var(--text)',
-              margin: 0,
-              letterSpacing: '0.5px'
-            }}>
-              No active permutation hunts - click the card above to start one!
-            </p>
+        <div className="compact-hunt-end">
+          <div className="flex flex-col items-end gap-0.5">
+            <span className="compact-hunt-checks">
+              {hunt.checks.toLocaleString()} checks
+            </span>
+            <span className={`compact-hunt-status ${hunt.status === "paused" || hunt.isPaused ? "paused" : "active"}`}>
+              {hunt.status === "paused" || hunt.isPaused ? "Paused" : "Hunting"}
+            </span>
           </div>
-        )}
 
-        {permutationHunts.length > 0 && !selectedHuntId && (
-          <div style={{
-            marginTop: '3rem',
-            marginBottom: '2rem',
-            padding: '3rem 2rem',
-            textAlign: 'center',
-            backgroundColor: 'var(--card-background)',
-            border: '2px dashed var(--border-color)',
-            borderRadius: '16px',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
-          }}>
-            <p style={{
-              fontSize: '1.4rem',
-              fontWeight: '600',
-              color: 'var(--text)',
-              margin: 0,
-              letterSpacing: '0.5px'
-            }}>
-              Select a hunt to show the permutation chart
-            </p>
+          <ChevronRight size={18} className="text-gray-400 shrink-0" />
+        </div>
+      </button>
+    );
+  };
+
+  return (
+    <div className={`counters-page fade-in-content ${!useHomeSprites ? "using-gen5-sprites" : ""}`}>
+      {/* ============================================================
+          1. HEADER & LIVE QUICK STATS BAR
+          ============================================================ */}
+      <div className="counters-header-row">
+        <div className="counters-title-block">
+          <h1 className="counters-page-title">
+            MMO Tool
+          </h1>
+        </div>
+
+        {/* Global Live Summary Chips */}
+        <div className="counters-stats-banner">
+          <div className="stat-chip active-hunts" title="Total active ongoing outbreaks">
+            <span className="stat-chip-icon"><Flame size={18} /></span>
+            <span><strong className="stat-chip-value">{activeCount}</strong> Active Hunts</span>
           </div>
-        )}
 
-        {/* ── Permutation Table ─────────────────────────────────── */}
-        {selectedHuntId && (() => {
-          const selectedHunt = activeHunts.find(h => h.id === selectedHuntId);
-          return (
-            <div className="mmo-graph-section">
-              <PermutationTable 
-                chartData={selectedHunt?.chartData || {}} 
-                chartConfig={{
-                  firstSpawn: selectedHunt?.chartConfig?.firstSpawn ?? 8,
-                  secondSpawn: selectedHunt?.chartConfig?.secondSpawn ?? secondSpawn,
-                  isAdvanced: isAdvanced,
-                  isSaveOrder: isSaveOrder,
-                  showSecondWave: showSecondWave,
-                  showGhostChecks: showGhostChecks
-                }}
-                legendColors={legendColors}
-                setLegendColors={setLegendColors}
-                onChartUpdate={handleChartUpdate} 
-                onChartConfigUpdate={handleChartConfigUpdate} />
-            </div>
-          );
-        })()}
+          <div className="stat-chip today-checks" title="Encounters checked across MMO outbreaks">
+            <span className="stat-chip-icon"><CheckCircle size={18} /></span>
+            <span><strong className="stat-chip-value">{totalChecksToday.toLocaleString()}</strong> Total Checks</span>
+          </div>
 
+          <div className="stat-chip total-time" title="Total accumulated hunt timer">
+            <span className="stat-chip-icon"><Clock size={18} /></span>
+            <span><strong className="stat-chip-value">{formatSummaryTime(totalHuntingTimeMs)}</strong> Hunting</span>
+          </div>
+        </div>
+
+        {/* Top Right Controls: Action Buttons (No Hotkeys) */}
+        <div className="counters-header-actions">
+          <Tooltip
+            content={
+              <span>
+                When <strong>ON</strong>, each permutation row you check counts as{" "}
+                <strong>{currentHunt?.chartConfig?.secondSpawn ?? 6} encounters</strong>{" "}
+                (matching your Second Wave spawn count).<br />
+                When <strong>OFF</strong>, each row counts as <strong>1 encounter</strong>.
+              </span>
+            }
+            position="bottom"
+            align="end"
+            maxWidth={280}
+            wrap
+          >
+            <Button
+              variant={spawnCheckMode === "spawn" ? "primary" : "secondary"}
+              size="sm"
+              onClick={toggleSpawnCheckMode}
+              icon={<Layers size={16} />}
+            >
+              Count Each Spawn as a Check
+            </Button>
+          </Tooltip>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              loadHuntHistory();
+              setShowHistoryModal(true);
+            }}
+            icon={<History size={16} />}
+          >
+            <span>History</span>
+            {historyBadgeCount > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-black bg-white/15 text-white border border-white/10 leading-none">
+                {historyBadgeCount}
+              </span>
+            )}
+          </Button>
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => handleOpenHuntWizard()}
+            icon={<Plus size={16} strokeWidth={2.5} />}
+          >
+            New Hunt
+          </Button>
+        </div>
       </div>
 
-      {/* Combined Modal Backdrop - Persistent between Pokemon and Hunt modals */}
-      {((showPokemonModal || pokemonModalClosing) || (showHuntModal || huntModalClosing) || backdropClosing) && (
-        <div
-          className={`pokemon-modal-backdrop ${backdropClosing ? 'closing' : ''}`}
-        >
-          {/* Pokemon Selection Modal */}
-          {(showPokemonModal || pokemonModalClosing) && (
-            <div className={`pokemon-modal ${pokemonModalClosing ? 'closing' : ''}`}>
-              <div className="pokemon-modal-header">
-                <h2>Select Pokemon to Hunt</h2>
-                <button
-                  onClick={() => {
-                    if (!pokemonModalClosing) {
-                      setPokemonModalClosing(true);
-                      setBackdropClosing(true);
-                      setIsEditingPokemon(false); // Reset editing state when closing modal
-                      setTimeout(() => {
-                        setShowPokemonModal(false);
-                        setPokemonModalClosing(false);
-                        setBackdropClosing(false);
-                      }, 300);
-                    }
-                  }}
-                  className="close-btn"
-                  aria-label="Close"
-                >
-                  <span className="sidebar-close-icon">
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="20" cy="20" r="18" fill="#fff" stroke="#232323" strokeWidth="2" />
-                      <path d="M2 20a18 18 0 0 1 36 0" fill="#e62829" stroke="#232323" strokeWidth="2" />
-                      <rect x="2" y="19" width="36" height="2" fill="#232323" />
-                      <circle cx="20" cy="20" r="7" fill="#ffffffff" stroke="#232323" strokeWidth="2" />
-                      <circle cx="20" cy="20" r="3.5" fill="#fff" stroke="#232323" strokeWidth="1.5" />
-                    </svg>
-                  </span>
-                </button>
-              </div>
+      <div className="counters-divider" />
 
-              <div className="pokemon-modal-content">
-                <div className="pokemon-modal-search-row">
-                  <div className="relative flex-1">
-                    <input
-                      type="text"
-                      placeholder="Search Pokemon..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="search-input"
-                    />
-                    {searchTerm && (
-                      <button
-                        type="button"
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 transition-colors"
-                        style={{ color: 'var(--accent)' }}
-                        onMouseEnter={(e) => {
-                          e.target.style.color = 'var(--text)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.color = 'var(--accent)';
-                        }}
-                        onClick={() => setSearchTerm("")}
-                        title="Clear search"
-                      >
-                        <X size={14} />
-                      </button>
+      {/* ============================================================
+          2. HUNT LAYOUT: CURRENT HUNT + COMPACT HUNT QUEUE + PERMUTATIONS
+          ============================================================ */}
+      {activeHunts.length === 0 ? (
+        <div className="hunts-empty-state">
+          <div className="hunts-empty-logo-stack">
+            <img
+              src="/counters_logos/counters_logo1.png"
+              alt=""
+              className="hunts-empty-logo-layer base-layer"
+              draggable={false}
+            />
+            <div
+              className="hunts-empty-logo-layer accent-layer"
+              aria-hidden="true"
+            />
+          </div>
+
+          <div className="hunts-empty-text-group">
+            <h3 className="empty-state-title">Ready for your next MMO hunt?</h3>
+            <p className="empty-state-description">
+              Track permutation trees, bonus waves, and shiny encounters
+              <br />
+              all in one place.
+            </p>
+          </div>
+
+          <Button
+            variant="primary"
+            size="lg"
+            className="empty-state-start-btn"
+            onClick={() => handleOpenHuntWizard()}
+            icon={<Plus size={18} strokeWidth={2.5} />}
+          >
+            Start New Hunt
+          </Button>
+        </div>
+      ) : (
+        <div className="counters-hunt-layout">
+          {/* CURRENT HUNT SECTION */}
+          <section className="current-hunt-section">
+            <div className="counters-section-header">
+              <h2 className="counters-section-title">
+                CURRENT HUNT
+              </h2>
+            </div>
+
+            <div className="current-hunt-container">
+              {currentHunt && (() => {
+                const isPhasesCollapsed = !!collapsedPhasesMap[currentHunt.id];
+                const hasPhasesOrFails = (currentHunt.phases?.length || 0) > 0;
+                const showPhasesPanel = hasPhasesOrFails && !isPhasesCollapsed;
+
+                return (
+                  <div key={currentHunt.id} className={`current-hunt-wrapper ${showPhasesPanel ? "has-phases-panel" : ""}`}>
+                    <div className="current-hunt-card-box">
+                      {renderDetailedHuntCard(currentHunt)}
+                    </div>
+
+                    {hasPhasesOrFails && (
+                      <div className={`current-hunt-phases-box ${showPhasesPanel ? "is-open" : "is-closed"}`}>
+                        <div className="hunt-phases-panel">
+                          <div className="hunt-phases-panel-header">
+                            <div className="flex items-center gap-2">
+                              <History size={17} className="text-[var(--accent)]" />
+                              <h3 className="hunt-phases-panel-title">FAILS & PHASES</h3>
+                            </div>
+                            <span className="hunt-phases-count-badge">
+                              {currentHunt.phases.length}
+                            </span>
+                          </div>
+
+                          <div className="hunt-phases-panel-list custom-scrollbar">
+                            {currentHunt.phases.map((phase, idx) => {
+                              const info = getPhaseEntryDisplayInfo(phase, currentHunt.phases);
+                              const displayChecks = getPhaseDisplayChecks(phase, currentHunt.phases);
+                              return (
+                                <div
+                                  key={phase.id || idx}
+                                  className={`hunt-phase-card-item ${info.isFail ? "is-failed" : "is-caught"}`}
+                                >
+                                  <div className="hunt-phase-item-sprite-well">
+                                    <img
+                                      src={getPokemonImage(phase.pokemon)}
+                                      alt=""
+                                      className={`hunt-phase-item-sprite ${!useHomeSprites ? "pixelated" : ""}`}
+                                      style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                                      onError={(e) => { e.currentTarget.src = "/fallback.png"; }}
+                                    />
+                                  </div>
+
+                                  <div className="hunt-phase-item-body">
+                                    <div className="hunt-phase-item-top">
+                                      <span className={`hunt-phase-item-label ${info.isFail ? "text-rose-400" : "text-[var(--accent)]"}`}>
+                                        {info.label}
+                                      </span>
+                                      <span className="hunt-phase-item-name">
+                                        {formatPokemonName(phase.pokemon?.name)}
+                                      </span>
+                                    </div>
+
+                                    <div className="hunt-phase-item-metrics">
+                                      <span>{displayChecks.intervalChecks.toLocaleString()} checks</span>
+                                      <span>•</span>
+                                      <span>Total: {displayChecks.totalChecks.toLocaleString()}</span>
+                                      {phase.elapsedMs > 0 && (
+                                        <>
+                                          <span>•</span>
+                                          <span className="font-mono">{formatDigitalTime(phase.elapsedMs)}</span>
+                                        </>
+                                      )}
+                                    </div>
+
+                                    {phase.notes && (
+                                      <p className="hunt-phase-item-notes">"{phase.notes}"</p>
+                                    )}
+                                  </div>
+
+                                  {phase.ball && (
+                                    <span className="hunt-phase-item-ball-badge" title={`Caught in ${phase.ball}`}>
+                                      {phase.ball}
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
                     )}
                   </div>
-                </div>
-
-                <div className="pokemon-grid">
-                  {filteredPokemon.map((pokemon, index) => (
-                    <button
-                      key={`pokemon-${pokemon?.id || 'unknown'}-${pokemon?.name || 'unknown'}-${pokemon?.formType || 'main'}-${index}`}
-                      type="button"
-                      className="pokemon-item"
-                      onClick={() => handlePokemonSelect(pokemon)}
-                    >
-                      <img
-                        src={getPokemonImage(pokemon, useHomeSprites)}
-                        alt={formatPokemonName(String(pokemon?.name || ''))}
-                        className="pokemon-img"
-                      />
-                      <div className="pokemon-text-container">
-                        <div className="pokemon-label">
-                          {pokemon?.name && pokemon.name === "unown"
-                            ? "Unown A" // Main Unown is Unown A
-                            : (pokemon?.name && pokemon.name === "unown-alpha")
-                              ? "Unown A" // Alpha Unown A
-                              : (pokemon?.formType && pokemon.formType !== "main" && pokemon.name && pokemon.name.includes('unown-'))
-                                ? `Unown ${pokemon.name.split('-')[1].toUpperCase()}` // Show "Unown B", "Unown C", etc.
-                                : (pokemon?.formType && pokemon.formType !== "main")
-                                  ? formatPokemonName(String(pokemon?.name || '').split('-')[0])
-                                  : formatPokemonName(String(pokemon?.name || ''))}
-                        </div>
-                        {pokemon?.formType && pokemon.formType !== "main" && (
-                          <div className="pokemon-form">
-                            {String(pokemon.formType) === "alpha" ? "Alpha" :
-                              String(pokemon.formType) === "alphaother" ? "Alpha Forms" :
-                                (pokemon.name && pokemon.name.toLowerCase().includes('-alpha')) ? "Alpha" :
-                                  String(pokemon.formType) === "hisuian" ? "Hisuian" :
-                                    String(pokemon.formType) === "galarian" ? "Galarian" :
-                                      String(pokemon.formType) === "alolan" ? "Alolan" :
-                                        String(pokemon.formType) === "paldean" ? "Paldean" :
-                                          String(pokemon.formType) === "gmax" ? "Gigantamax" :
-                                            String(pokemon.formType) === "gender" ? "Gender" :
-                                              String(pokemon.formType) === "unown" ? "Unown" :
-                                                String(pokemon.formType) === "other" ? "Other" :
-                                                  String(pokemon.formType) === "alcremie" ? "Alcremie" :
-                                                    String(pokemon.formType) === "vivillon" ? "Vivillon" :
-                                                      String(pokemon.formType)}
-                          </div>
-                        )}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pokemon-modal-footer">
-              </div>
+                );
+              })()}
             </div>
+          </section>
+
+          {/* OTHER HUNTS QUEUE */}
+          {otherHunts.length > 0 && (
+            <section className="other-hunts-section">
+              <div className="counters-section-header other-hunts-header">
+                <h2 className="counters-section-title">
+                  OTHER HUNTS <span className="counters-section-count">{otherHunts.length}</span>
+                </h2>
+              </div>
+
+              <div className="other-hunts-grid">
+                {otherHunts.map(hunt => renderCompactHuntCard(hunt))}
+              </div>
+            </section>
           )}
 
-          {/* Hunt Details Modal */}
-          {(showHuntModal || huntModalClosing) && selectedPokemon && (
-            <div
-              className={`hunt-modal ${huntModalClosing ? 'closing' : ''}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="hunt-modal-header">
-                <div className="hunt-pokemon-info">
-                  <div className="hunt-pokemon-image-container">
-                    <img
-                      src={getPokemonImage(selectedPokemon, useHomeSprites)}
-                      alt={formatPokemonName(selectedPokemon.name)}
-                      className="hunt-pokemon-image"
-                    />
-                  </div>
-                  <div className="hunt-pokemon-details">
-                    <h2 className="hunt-pokemon-name">{formatPokemonName(selectedPokemon.name)}</h2>
-                    <p className="hunt-pokemon-number">#{selectedPokemon.id ? selectedPokemon.id.toString().padStart(4, "0") : "????"}</p>
-                    {selectedPokemon?.formType && selectedPokemon.formType !== "main" && (
-                      <p className="hunt-pokemon-form">
-                        {String(selectedPokemon.formType) === "alpha" ? "Alpha" :
-                          String(selectedPokemon.formType) === "alphaother" ? "Alpha Forms" :
-                            (selectedPokemon.name && selectedPokemon.name.toLowerCase().includes('-alpha')) ? "Alpha" :
-                              String(selectedPokemon.formType) === "hisuian" ? "Hisuian" :
-                                String(selectedPokemon.formType) === "galarian" ? "Galarian" :
-                                  String(selectedPokemon.formType) === "alolan" ? "Alolan" :
-                                    String(selectedPokemon.formType) === "paldean" ? "Paldean" :
-                                      String(selectedPokemon.formType) === "gmax" ? "Gigantamax" :
-                                        String(selectedPokemon.formType) === "gender" ? "Gender" :
-                                          String(selectedPokemon.formType) === "partner-cap" ? "Partner Cap" :
-                                            String(selectedPokemon.formType) === "level-100" ? "Level 100" :
-                                              String(selectedPokemon.formType) === "therian" ? "Therian" :
-                                                String(selectedPokemon.formType) === "unown" ? "Unown" :
-                                                  String(selectedPokemon.formType)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    if (!huntModalClosing) {
-                      setHuntModalClosing(true);
-                      setBackdropClosing(true);
-                      setTimeout(() => {
-                        setShowHuntModal(false);
-                        setHuntModalClosing(false);
-                        setBackdropClosing(false);
-                      }, 300);
+          {/* ── PERMUTATION TABLE & GRAPH SECTION ───────────────────── */}
+          {currentHunt && (
+            <section className="w-full mt-4">
+              <div className="mmo-graph-section">
+                <PermutationTable
+                  chartData={currentHunt?.chartData || {}}
+                  chartConfig={{
+                    firstSpawn: currentHunt?.chartConfig?.firstSpawn ?? 8,
+                    secondSpawn: currentHunt?.chartConfig?.secondSpawn ?? 6,
+                    isAdvanced: currentHunt?.chartConfig?.isAdvanced ?? false,
+                    isSaveOrder: currentHunt?.chartConfig?.isSaveOrder ?? false,
+                    showSecondWave: currentHunt?.chartConfig?.showSecondWave ?? false,
+                    showGhostChecks: currentHunt?.chartConfig?.showGhostChecks ?? false,
+                    ...(currentHunt?.chartConfig || {})
+                  }}
+                  legendColors={legendColors}
+                  setLegendColors={setLegendColors}
+                  onChartUpdate={handleChartUpdate}
+                  onChartConfigUpdate={handleChartConfigUpdate}
+                  onChartCheck={(isChecked) => {
+                    if (currentHunt) {
+                      const spawnDelta = spawnCheckMode === "spawn"
+                        ? (currentHunt.chartConfig?.secondSpawn ?? 6)
+                        : 1;
+                      if (isChecked) {
+                        handleAddCheck(currentHunt.id, spawnDelta);
+                      } else {
+                        handleDecreaseCheck(currentHunt.id, spawnDelta);
+                      }
                     }
                   }}
-                  className="close-btn"
-                  aria-label="Close"
-                >
-                  <span className="sidebar-close-icon">
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="20" cy="20" r="18" fill="#fff" stroke="#232323" strokeWidth="2" />
-                      <path d="M2 20a18 18 0 0 1 36 0" fill="#e62829" stroke="#232323" strokeWidth="2" />
-                      <rect x="2" y="19" width="36" height="2" fill="#232323" />
-                      <circle cx="20" cy="20" r="7" fill="#ffffffff" stroke="#232323" strokeWidth="2" />
-                    </svg>
-                  </span>
-                </button>
+                />
               </div>
-
-              <div className="hunt-modal-content">
-                <div className="hunt-form">
-                  <div className="hunt-form-group">
-                    <label className="hunt-label">Game:</label>
-                    <SearchbarIconDropdown
-                      id="hunt-game-dropdown"
-                      options={allGames}
-                      value={huntDetails.game}
-                      onChange={val => setHuntDetails(prev => ({ ...prev, game: val, method: "" }))}
-                      placeholder="Select a game..."
-                      customBackground="var(--sidebar-edit-inputs)"
-                      customBorder="var(--border-color)"
-                    disabled={true}
-                    hideClearButton={true}
-                  />
-                  </div>
-
-                  <div className="hunt-form-group">
-                    <label className="hunt-label">Method:</label>
-                    <SearchbarIconDropdown
-                      id="hunt-method-dropdown"
-                      options={[
-                        { name: "None", value: "" },
-                        ...availableMethods.map(method => ({
-                          name: method.name,
-                          value: method.name
-                        })),
-                      ]}
-                      value={huntDetails.method}
-                      onChange={val => {
-                        setHuntDetails(prev => ({ ...prev, method: val }));
-                        // Clear modifiers when method changes
-                        if (val !== "Breeding") {
-                          setModifiers(prev => ({ ...prev, shinyParents: false }));
-                        }
-                        if (val !== "Catch Combo" && val !== "Random Encounters" && val !== "Soft Resets") {
-                          setModifiers(prev => ({ ...prev, lureActive: false }));
-                        }
-                        // For Sandwich method: automatically set Sparkling Lv 3
-                        if (val === "Sandwich" && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet")) {
-                          setModifiers(prev => ({
-                            ...prev,
-                            sparklingLv1: false,
-                            sparklingLv2: false,
-                            sparklingLv3: true
-                          }));
-                        }
-                      }}
-                      placeholder={huntDetails.game ? "Select a method..." : "Select a game first"}
-                      customBackground="var(--sidebar-edit-inputs)"
-                      customBorder="var(--border-color)"
-                      disabled={true}
-                      hideClearButton={true}
-                    />
-                  </div>
-
-                  {/* Modifiers Section */}
-                  {huntDetails.game && availableMethods.length > 0 && (
-                    (gameModifiers["Shiny Charm"] > 0 && !(huntDetails.method === "Fossil Revivals" && (huntDetails.game === "Let's Go Pikachu" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Fossil Revivals" && huntDetails.game === "Legends Z-A") && !(huntDetails.method === "Dynamax Raids" && (huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Gift Pokemon" && (huntDetails.game === "Sword" || huntDetails.game === "Shield" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Let's Go Pikachu")) && !(huntDetails.method === "Tera Raids" && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet")) && !((huntDetails.method === "Random Encounters" || huntDetails.method === "Poke Radar" || huntDetails.method === "Soft Resets" || huntDetails.method === "Fossil Revivals" || huntDetails.method === "Gift Pokemon" || huntDetails.method === "Underground Diglett Hunt") && (huntDetails.game === "Brilliant Diamond" || huntDetails.game === "Shining Pearl")) && !(huntDetails.method === "Poke Radar" && (huntDetails.game === "X" || huntDetails.game === "Y")) && !(huntDetails.method === "Ultra Wormholes" && (huntDetails.game === "Ultra Sun" || huntDetails.game === "Ultra Moon"))) ||
-                    (gameModifiers["Shiny Parents"] > 0 && huntDetails.method === "Breeding") ||
-                    (gameModifiers["Lure Active"] > 0 && (huntDetails.method === "Catch Combo" || huntDetails.method === "Random Encounters" || (huntDetails.method === "Soft Resets" && huntDetails.game !== "Let's Go Pikachu" && huntDetails.game !== "Let's Go Eevee"))) ||
-                    (gameModifiers["Research Lv 10"] > 0 && huntDetails.game === "Legends Arceus") ||
-                    (gameModifiers["Perfect Research"] > 0 && huntDetails.game === "Legends Arceus") ||
-                    (gameModifiers["Sparkling Lv 1"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces"))) ||
-                    (gameModifiers["Sparkling Lv 2"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces"))) ||
-                    (gameModifiers["Sparkling Lv 3"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces"))) ||
-                    (gameModifiers["Event Boosted"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && huntDetails.method === "Mass Outbreaks") ||
-                    (gameModifiers["Community Day"] > 0 && huntDetails.game === "GO" && (huntDetails.method === "Random Encounters" || huntDetails.method === "Daily Adventure Incense")) ||
-                    (gameModifiers["Raid Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Raid Battles") ||
-                    (gameModifiers["Research Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Field Research") ||
-                    (gameModifiers["Galar Birds"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Daily Adventure Incense") ||
-                    (gameModifiers["Hatch Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Breeding")
-                  ) && (
-                      <div className="hunt-form-group">
-                        <label className="hunt-label">Modifiers:</label>
-                        <div className="modifiers-section">
-                          {gameModifiers["Shiny Charm"] > 0 && !(huntDetails.method === "Fossil Revivals" && (huntDetails.game === "Let's Go Pikachu" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Fossil Revivals" && huntDetails.game === "Legends Z-A") && !(huntDetails.method === "Dynamax Raids" && (huntDetails.game === "Sword" || huntDetails.game === "Shield")) && !(huntDetails.method === "Gift Pokemon" && (huntDetails.game === "Sword" || huntDetails.game === "Shield" || huntDetails.game === "Let's Go Eevee" || huntDetails.game === "Let's Go Pikachu")) && !(huntDetails.method === "Tera Raids" && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet")) && !((huntDetails.method === "Random Encounters" || huntDetails.method === "Poke Radar" || huntDetails.method === "Soft Resets" || huntDetails.method === "Fossil Revivals" || huntDetails.method === "Gift Pokemon" || huntDetails.method === "Underground Diglett Hunt") && (huntDetails.game === "Brilliant Diamond" || huntDetails.game === "Shining Pearl")) && !(huntDetails.method === "Poke Radar" && (huntDetails.game === "X" || huntDetails.game === "Y")) && !(huntDetails.method === "Ultra Wormholes" && (huntDetails.game === "Ultra Sun" || huntDetails.game === "Ultra Moon")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.shinyCharm}
-                                onChange={(e) => {
-                                  const newShinyCharm = e.target.checked;
-                                  setModifiers(prev => {
-                                    const newModifiers = { ...prev, shinyCharm: newShinyCharm };
-                                    // Auto-check Research Lv 10 when Shiny Charm is checked in Legends Arceus
-                                    if (newShinyCharm && huntDetails.game === "Legends Arceus" && !prev.researchLv10) {
-                                      newModifiers.researchLv10 = true;
-                                    }
-                                    return newModifiers;
-                                  });
-                                }}
-                              />
-                              <span>Shiny Charm</span>
-                            </label>
-                          )}
-                          {gameModifiers["Shiny Parents"] > 0 && huntDetails.method === "Breeding" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.shinyParents}
-                                onChange={(e) => setModifiers(prev => ({ ...prev, shinyParents: e.target.checked }))}
-                              />
-                              <span>Shiny Parents</span>
-                            </label>
-                          )}
-                          {gameModifiers["Lure Active"] > 0 && (huntDetails.method === "Catch Combo" || huntDetails.method === "Random Encounters" || (huntDetails.method === "Soft Resets" && huntDetails.game !== "Let's Go Pikachu" && huntDetails.game !== "Let's Go Eevee")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.lureActive}
-                                onChange={(e) => setModifiers(prev => ({ ...prev, lureActive: e.target.checked }))}
-                              />
-                              <span>Lure Active</span>
-                            </label>
-                          )}
-                          {gameModifiers["Research Lv 10"] > 0 && huntDetails.game === "Legends Arceus" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.researchLv10}
-                                onChange={(e) => {
-                                  const newResearchLv10 = e.target.checked;
-                                  setModifiers(prev => {
-                                    const newModifiers = { ...prev, researchLv10: newResearchLv10 };
-                                    // Auto-uncheck Shiny Charm and Perfect Research when Research Lv 10 is unchecked in Legends Arceus
-                                    if (!newResearchLv10 && huntDetails.game === "Legends Arceus") {
-                                      if (prev.shinyCharm) {
-                                        newModifiers.shinyCharm = false;
-                                      }
-                                      if (prev.perfectResearch) {
-                                        newModifiers.perfectResearch = false;
-                                      }
-                                    }
-                                    return newModifiers;
-                                  });
-                                }}
-                              />
-                              <span>Research Lv 10</span>
-                            </label>
-                          )}
-                          {gameModifiers["Perfect Research"] > 0 && huntDetails.game === "Legends Arceus" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.perfectResearch}
-                                onChange={(e) => {
-                                  const newPerfectResearch = e.target.checked;
-                                  setModifiers(prev => {
-                                    const newModifiers = { ...prev, perfectResearch: newPerfectResearch };
-                                    // Auto-check Research Lv 10 when Perfect Research is checked in Legends Arceus
-                                    if (newPerfectResearch && huntDetails.game === "Legends Arceus" && !prev.researchLv10) {
-                                      newModifiers.researchLv10 = true;
-                                    }
-                                    return newModifiers;
-                                  });
-                                }}
-                              />
-                              <span>Perfect Research</span>
-                            </label>
-                          )}
-                          {gameModifiers["Sparkling Lv 1"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.sparklingLv1}
-                                onChange={(e) => {
-                                  const newSparklingLv1 = e.target.checked;
-                                  setModifiers(prev => {
-                                    const newModifiers = {
-                                      ...prev,
-                                      sparklingLv1: newSparklingLv1,
-                                      sparklingLv2: newSparklingLv1 ? false : prev.sparklingLv2,
-                                      sparklingLv3: newSparklingLv1 ? false : prev.sparklingLv3
-                                    };
-
-                                    // For Sandwich method: if turning off Lv 1 and no other sparkling is active, default to Lv 3
-                                    if (huntDetails.method === "Sandwich" && !newSparklingLv1 && !newModifiers.sparklingLv2 && !newModifiers.sparklingLv3) {
-                                      newModifiers.sparklingLv3 = true;
-                                    }
-
-                                    return newModifiers;
-                                  });
-                                }}
-                              />
-                              <span>Sparkling Lv 1</span>
-                            </label>
-                          )}
-                          {gameModifiers["Sparkling Lv 2"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.sparklingLv2}
-                                onChange={(e) => {
-                                  const newSparklingLv2 = e.target.checked;
-                                  setModifiers(prev => {
-                                    const newModifiers = {
-                                      ...prev,
-                                      sparklingLv2: newSparklingLv2,
-                                      sparklingLv1: newSparklingLv2 ? false : prev.sparklingLv1,
-                                      sparklingLv3: newSparklingLv2 ? false : prev.sparklingLv3
-                                    };
-
-                                    // For Sandwich method: if turning off Lv 2 and no other sparkling is active, default to Lv 3
-                                    if (huntDetails.method === "Sandwich" && !newSparklingLv2 && !newModifiers.sparklingLv1 && !newModifiers.sparklingLv3) {
-                                      newModifiers.sparklingLv3 = true;
-                                    }
-
-                                    return newModifiers;
-                                  });
-                                }}
-                              />
-                              <span>Sparkling Lv 2</span>
-                            </label>
-                          )}
-                          {gameModifiers["Sparkling Lv 3"] > 0 && ((huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && (huntDetails.method === "Random Encounters" || huntDetails.method === "Mass Outbreaks" || huntDetails.method === "Sandwich") || (huntDetails.game === "Legends Z-A" && huntDetails.method === "Hyperspaces")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.sparklingLv3}
-                                onChange={(e) => {
-                                  const newSparklingLv3 = e.target.checked;
-                                  setModifiers(prev => {
-                                    const newModifiers = {
-                                      ...prev,
-                                      sparklingLv3: newSparklingLv3,
-                                      sparklingLv1: newSparklingLv3 ? false : prev.sparklingLv1,
-                                      sparklingLv2: newSparklingLv3 ? false : prev.sparklingLv2
-                                    };
-
-                                    // For Sandwich method: if turning off Lv 3 and no other sparkling is active, default back to Lv 3
-                                    if (huntDetails.method === "Sandwich" && !newSparklingLv3 && !newModifiers.sparklingLv1 && !newModifiers.sparklingLv2) {
-                                      newModifiers.sparklingLv3 = true;
-                                    }
-
-                                    return newModifiers;
-                                  });
-                                }}
-                              />
-                              <span>Sparkling Lv 3</span>
-                            </label>
-                          )}
-                          {gameModifiers["Event Boosted"] > 0 && (huntDetails.game === "Scarlet" || huntDetails.game === "Violet") && huntDetails.method === "Mass Outbreaks" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.eventBoosted}
-                                onChange={(e) => setModifiers(prev => ({ ...prev, eventBoosted: e.target.checked }))}
-                              />
-                              <span>Event Boosted</span>
-                            </label>
-                          )}
-                          {gameModifiers["Community Day"] > 0 && huntDetails.game === "GO" && (huntDetails.method === "Random Encounters" || huntDetails.method === "Daily Adventure Incense") && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.communityDay}
-                                onChange={(e) => {
-                                  const newCommunityDay = e.target.checked;
-                                  setModifiers(prev => ({
-                                    ...prev,
-                                    communityDay: newCommunityDay,
-                                    raidDay: newCommunityDay ? false : prev.raidDay, // Uncheck Raid Day if Community Day is checked
-                                    researchDay: newCommunityDay ? false : prev.researchDay, // Uncheck Research Day if Community Day is checked
-                                    galarBirds: newCommunityDay ? false : prev.galarBirds, // Uncheck Galar Birds if Community Day is checked
-                                    hatchDay: newCommunityDay ? false : prev.hatchDay // Uncheck Hatch Day if Community Day is checked
-                                  }));
-                                }}
-                              />
-                              <span>Community Day</span>
-                            </label>
-                          )}
-                          {gameModifiers["Raid Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Raid Battles" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.raidDay}
-                                onChange={(e) => {
-                                  const newRaidDay = e.target.checked;
-                                  setModifiers(prev => ({
-                                    ...prev,
-                                    raidDay: newRaidDay,
-                                    communityDay: newRaidDay ? false : prev.communityDay, // Uncheck Community Day if Raid Day is checked
-                                    researchDay: newRaidDay ? false : prev.researchDay // Uncheck Research Day if Raid Day is checked
-                                  }));
-                                }}
-                              />
-                              <span>Raid Day</span>
-                            </label>
-                          )}
-                          {gameModifiers["Research Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Field Research" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.researchDay}
-                                onChange={(e) => {
-                                  const newResearchDay = e.target.checked;
-                                  setModifiers(prev => ({
-                                    ...prev,
-                                    researchDay: newResearchDay,
-                                    communityDay: newResearchDay ? false : prev.communityDay, // Uncheck Community Day if Research Day is checked
-                                    raidDay: newResearchDay ? false : prev.raidDay // Uncheck Raid Day if Research Day is checked
-                                  }));
-                                }}
-                              />
-                              <span>Research Day</span>
-                            </label>
-                          )}
-                          {gameModifiers["Galar Birds"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Daily Adventure Incense" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.galarBirds}
-                                onChange={(e) => {
-                                  const newGalarBirds = e.target.checked;
-                                  setModifiers(prev => ({
-                                    ...prev,
-                                    galarBirds: newGalarBirds,
-                                    communityDay: newGalarBirds ? false : prev.communityDay // Uncheck Community Day if Galar Birds is checked
-                                  }));
-                                }}
-                              />
-                              <span>Galar Birds</span>
-                            </label>
-                          )}
-                          {gameModifiers["Hatch Day"] > 0 && huntDetails.game === "GO" && huntDetails.method === "Breeding" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={modifiers.hatchDay}
-                                onChange={(e) => {
-                                  const newHatchDay = e.target.checked;
-                                  setModifiers(prev => ({
-                                    ...prev,
-                                    hatchDay: newHatchDay,
-                                    communityDay: newHatchDay ? false : prev.communityDay // Uncheck Community Day if Hatch Day is checked
-                                  }));
-                                }}
-                              />
-                              <span>Hatch Day</span>
-                            </label>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                  {/* Odds Display */}
-                  {((huntDetails.game && huntDetails.method && availableMethods.length > 0) || (!huntDetails.game || !huntDetails.method)) && (
-                    <div className="hunt-form-group">
-                      <label className="hunt-label">Current Odds:</label>
-                      <div className="odds-display">
-                        {currentOdds === "pokeradarXY" ? (
-                          // Special display for Poke Radar in X/Y - show table every 5 checks up to 40
-                          <div className="pokeradar-odds">
-                            <div className="pokeradar-odds-table">
-                              <div className="pokeradar-odds-table-header">
-                                <div className="pokeradar-odds-cell">Chain</div>
-                                <div className="pokeradar-odds-cell">Odds</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">0</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 0).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">5</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 5).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">10</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 10).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">15</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 15).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">20</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 20).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">25</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 25).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">30</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 30).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">35</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 35).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">40+</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 40).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "chainFishingXY" ? (
-                          // Special display for Chain Fishing in X/Y - show table every 5 checks up to 20
-                          <div className="chainfishing-odds">
-                            <div className="chainfishing-odds-table">
-                              <div className="chainfishing-odds-table-header">
-                                <div className="chainfishing-odds-cell">Chain</div>
-                                <div className="chainfishing-odds-cell">Odds</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">0</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 0).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">5</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 5).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">10</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 10).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">15</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 15).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">20+</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 20).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "chainFishingORAS" ? (
-                          // Special display for Chain Fishing in Omega Ruby/Alpha Sapphire - show table every 5 checks up to 20
-                          <div className="chainfishing-odds">
-                            <div className="chainfishing-odds-table">
-                              <div className="chainfishing-odds-table-header">
-                                <div className="chainfishing-odds-cell">Chain</div>
-                                <div className="chainfishing-odds-cell">Odds</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">0</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 0).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">5</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 5).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">10</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 10).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">15</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 15).toLocaleString()}</div>
-                              </div>
-                              <div className="chainfishing-odds-table-row">
-                                <div className="chainfishing-odds-cell">20+</div>
-                                <div className="chainfishing-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 20).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "dexNavORAS" ? (
-                          // Special display for DexNav in Omega Ruby/Alpha Sapphire - show chart with key milestones
-                          <div className="dexnav-odds">
-                            <div className="dexnav-odds-table">
-                              <div className="dexnav-odds-table-header">
-                                <div className="dexnav-odds-cell">Search Level</div>
-                                <div className="dexnav-odds-cell">Odds</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">0</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "1,366" : "4,096"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">1-16</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "969" : "2,906"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">17-33</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "751" : "2,252"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">34-50</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "613" : "1,838"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">84-100</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "395" : "1,185"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">101-150</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "353" : "1,059"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">201-300</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "291" : "874"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">401-500</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "248" : "744"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">701-800</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "203" : "608"}</div>
-                              </div>
-                              <div className="dexnav-odds-table-row">
-                                <div className="dexnav-odds-cell">901-999</div>
-                                <div className="dexnav-odds-cell">1/{modifiers.shinyCharm ? "181" : "542"}</div>
-                              </div>
-                            </div>
-                            <div className="dexnav-odds-note">
-                              <span className="dexnav-odds-note-text">Each encounter has a 4% chance for random shiny odds boost. Encounters at multiples of 50 and 100 have additional boosted odds (not dynamically tracked).</span>
-                            </div>
-                          </div>
-                        ) : currentOdds === "sosSMUSUM" ? (
-                          // Special display for SOS method in Sun/Moon and Ultra Sun/Ultra Moon - show chart with chain ranges
-                          <div className="sos-odds">
-                            <div className="sos-odds-table">
-                              <div className="sos-odds-table-header">
-                                <div className="sos-odds-cell">Chain</div>
-                                <div className="sos-odds-cell">Odds</div>
-                              </div>
-                              <div className="sos-odds-table-row">
-                                <div className="sos-odds-cell">0-10</div>
-                                <div className="sos-odds-cell">1/{modifiers.shinyCharm ? "1,366" : "4,096"}</div>
-                              </div>
-                              <div className="sos-odds-table-row">
-                                <div className="sos-odds-cell">11-20</div>
-                                <div className="sos-odds-cell">1/{modifiers.shinyCharm ? "586" : "820"}</div>
-                              </div>
-                              <div className="sos-odds-table-row">
-                                <div className="sos-odds-cell">21-30</div>
-                                <div className="sos-odds-cell">1/{modifiers.shinyCharm ? "373" : "456"}</div>
-                              </div>
-                              <div className="sos-odds-table-row">
-                                <div className="sos-odds-cell">31+</div>
-                                <div className="sos-odds-cell">1/{modifiers.shinyCharm ? "274" : "316"}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "ultraWormholes" ? (
-                          // Special display for Ultra Wormholes in Ultra Sun/Ultra Moon
-                          <div className="ultra-wormhole-odds">
-                            <div className="ultra-wormhole-main">
-                              <span className="ultra-wormhole-base">1%</span>
-                              <span className="ultra-wormhole-separator">→</span>
-                              <span className="ultra-wormhole-max">36%</span>
-                            </div>
-                            <div className="ultra-wormhole-note">
-                              <span className="ultra-wormhole-note-text">Odds increase with distance traveled</span>
-                            </div>
-                          </div>
-                        ) : currentOdds === "koMethod" ? (
-                          // Special display for KO Method in Sword/Shield - show full chart
-                          <div className="ko-method-odds">
-                            <div className="ko-odds-table">
-                              <div className="ko-odds-table-header">
-                                <div className="ko-odds-cell">KOs</div>
-                                <div className="ko-odds-cell">Odds</div>
-                              </div>
-                              <div className="ko-odds-table-row">
-                                <div className="ko-odds-cell">1</div>
-                                <div className="ko-odds-cell">{modifiers.shinyCharm ? "1/1,024" : "1/2,048"}</div>
-                              </div>
-                              <div className="ko-odds-table-row">
-                                <div className="ko-odds-cell">50</div>
-                                <div className="ko-odds-cell">{modifiers.shinyCharm ? "1/820" : "1/1,366"}</div>
-                              </div>
-                              <div className="ko-odds-table-row">
-                                <div className="ko-odds-cell">100</div>
-                                <div className="ko-odds-cell">{modifiers.shinyCharm ? "1/683" : "1/1,025"}</div>
-                              </div>
-                              <div className="ko-odds-table-row">
-                                <div className="ko-odds-cell">200</div>
-                                <div className="ko-odds-cell">{modifiers.shinyCharm ? "1/586" : "1/820"}</div>
-                              </div>
-                              <div className="ko-odds-table-row">
-                                <div className="ko-odds-cell">300</div>
-                                <div className="ko-odds-cell">{modifiers.shinyCharm ? "1/512" : "1/683"}</div>
-                              </div>
-                              <div className="ko-odds-table-row">
-                                <div className="ko-odds-cell">500+</div>
-                                <div className="ko-odds-cell">{modifiers.shinyCharm ? "1/456" : "1/586"}</div>
-                              </div>
-                            </div>
-                            <div className="ko-odds-note">
-                              <span className="ko-odds-note-text">Odds only apply to brilliant aura Pokemon</span>
-                            </div>
-                          </div>
-                        ) : currentOdds === "pokeradarDPP" ? (
-                          // Special display for Poke Radar in Diamond/Pearl/Platinum - show table every 5 checks up to 40
-                          <div className="pokeradar-odds">
-                            <div className="pokeradar-odds-table">
-                              <div className="pokeradar-odds-table-header">
-                                <div className="pokeradar-odds-cell">Chain</div>
-                                <div className="pokeradar-odds-cell">Odds</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">0</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 0).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">5</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 5).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">10</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 10).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">15</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 15).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">20</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 20).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">25</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 25).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">30</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 30).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">35</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 35).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">40+</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 40).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "pokeradarBDSP" ? (
-                          // Special display for Poke Radar in Brilliant Diamond/Shining Pearl - show table every 5 checks up to 40
-                          <div className="pokeradar-odds">
-                            <div className="pokeradar-odds-table">
-                              <div className="pokeradar-odds-table-header">
-                                <div className="pokeradar-odds-cell">Chain</div>
-                                <div className="pokeradar-odds-cell">Odds</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">0</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 0).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">5</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 5).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">10</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 10).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">15</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 15).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">20</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 20).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">25</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 25).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">30</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 30).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">35</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 35).toLocaleString()}</div>
-                              </div>
-                              <div className="pokeradar-odds-table-row">
-                                <div className="pokeradar-odds-cell">40+</div>
-                                <div className="pokeradar-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 40).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "catchComboLetsGo" ? (
-                          // Special display for Catch Combo in Let's Go games - show table with combo ranges
-                          <div className="catchcombo-odds">
-                            <div className="catchcombo-odds-table">
-                              <div className="catchcombo-odds-table-header">
-                                <div className="catchcombo-odds-cell">Combo</div>
-                                <div className="catchcombo-odds-cell">Odds</div>
-                              </div>
-                              <div className="catchcombo-odds-table-row">
-                                <div className="catchcombo-odds-cell">0-10</div>
-                                <div className="catchcombo-odds-cell">1/{modifiers.shinyCharm && modifiers.lureActive ? "1,024" : modifiers.shinyCharm ? "1,365" : modifiers.lureActive ? "2,048" : "4,096"}</div>
-                              </div>
-                              <div className="catchcombo-odds-table-row">
-                                <div className="catchcombo-odds-cell">11-20</div>
-                                <div className="catchcombo-odds-cell">1/{modifiers.shinyCharm && modifiers.lureActive ? "585" : modifiers.shinyCharm ? "683" : modifiers.lureActive ? "819" : "1,024"}</div>
-                              </div>
-                              <div className="catchcombo-odds-table-row">
-                                <div className="catchcombo-odds-cell">21-30</div>
-                                <div className="catchcombo-odds-cell">1/{modifiers.shinyCharm && modifiers.lureActive ? "372" : modifiers.shinyCharm ? "410" : modifiers.lureActive ? "455" : "512"}</div>
-                              </div>
-                              <div className="catchcombo-odds-table-row">
-                                <div className="catchcombo-odds-cell">31+</div>
-                                <div className="catchcombo-odds-cell">1/{modifiers.shinyCharm && modifiers.lureActive ? "273" : modifiers.shinyCharm ? "293" : modifiers.lureActive ? "315" : "341"}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "hordeEncounters" ? (
-                          // Special display for Horde Encounters - show odds with note
-                          <div className="horde-encounters-odds">
-                            <span className="odds-text">1 in {calculateOdds(huntDetails.game, huntDetails.method, modifiers).toLocaleString()}</span>
-                            <div className="horde-encounters-note">
-                              <span className="horde-encounters-note-text">Odds apply to each full horde encounter, not individual Pokemon</span>
-                            </div>
-                          </div>
-                        ) : currentOdds === "massOutbreaksSV" ? (
-                          // Special display for Mass Outbreaks in Scarlet/Violet - show table with sparkling power levels
-                          <div className="massoutbreak-odds">
-                            <div className="massoutbreak-odds-table">
-                              <div className="massoutbreak-odds-table-header">
-                                <div className="massoutbreak-odds-cell">Checks Cleared</div>
-                                <div className="massoutbreak-odds-cell">Odds</div>
-                              </div>
-                              <div className="massoutbreak-odds-table-row">
-                                <div className="massoutbreak-odds-cell">0-29</div>
-                                <div className="massoutbreak-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 15).toLocaleString()}</div>
-                              </div>
-                              <div className="massoutbreak-odds-table-row">
-                                <div className="massoutbreak-odds-cell">30-59</div>
-                                <div className="massoutbreak-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 45).toLocaleString()}</div>
-                              </div>
-                              <div className="massoutbreak-odds-table-row">
-                                <div className="massoutbreak-odds-cell">60+</div>
-                                <div className="massoutbreak-odds-cell">1/{getCurrentHuntOdds(huntDetails.game, huntDetails.method, modifiers, 75).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : currentOdds === "pokemonGoRandom" ? (
-                          // Special display for Pokemon Go Random Encounters and Daily Adventure Incense - show odds with note (hidden for Galar Birds)
-                          <div className="pokemon-go-random-odds">
-                            <span className="odds-text">1 in {calculateOdds(huntDetails.game, huntDetails.method, modifiers).toLocaleString()}</span>
-                            {!modifiers.galarBirds && (
-                              <div className="pokemon-go-random-note">
-                                <span className="pokemon-go-random-note-text">Pokemon Go shiny odds vary significantly between species and events. This represents the most common base rate, but actual odds may differ.</span>
-                              </div>
-                            )}
-                          </div>
-                        ) : currentOdds === "NA" ? (
-                          // Display NA when no game/method selected
-                          <span className="odds-text">NA</span>
-                        ) : (
-                          // Standard display for other methods
-                          <span className="odds-text">1 in {currentOdds.toLocaleString()}</span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* No Hunt Data Available Message */}
-                  {huntDetails.game && availableMethods.length === 0 && (
-                    <div className="hunt-form-group">
-                      <div className="no-hunt-data-message">
-                        <p>No hunt data available for {huntDetails.game} yet.</p>
-                        <p>Hunt methods and odds will be added as data is provided.</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="hunt-modal-footer">
-                <button
-                  onClick={handleStartHunt}
-                  className="hunt-start-btn"
-                >
-                  <Plus size={16} />
-                  Start Hunt
-                </button>
-              </div>
-            </div>
+            </section>
           )}
         </div>
       )}
 
-      {/* Reset Hunt Modal */}
-      {resetModal.show && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${resetModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${resetModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
+      {/* ============================================================
+          MODALS & DIALOGS (WITH UNIVERSAL MODAL SYSTEM)
+          ============================================================ */}
+
+      {/* 1. UNIFIED 5-STEP HUNT SETUP WIZARD */}
+      <Modal
+        isOpen={huntWizard.isOpen}
+        onClose={() => setHuntWizard(prev => ({ ...prev, isOpen: false }))}
+        title="Shiny Hunt Setup"
+        subtitle={`Step ${huntWizard.step + 1} of 5: ${
+          huntWizard.step === 0 ? "Game & Modifiers (Legends Arceus • Permutations)" :
+          huntWizard.step === 1 ? "Target Pokémon (Legends Arceus)" :
+          huntWizard.step === 2 ? "Possible Phases — Optional" :
+          huntWizard.step === 3 ? "Counter & Initial Settings" :
+          "Review Hunt & Live Odds"
+        }`}
+        icon={<Sparkles size={22} />}
+        size="md"
+        className="!max-w-[700px]"
+        closeOnBackdrop={false}
+        footer={({ close }) => (
+          <div className="flex items-center justify-between w-full">
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={close}
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                  <RotateCcw className="w-5 h-5 text-red-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--accent)]">Reset Hunt</h3>
-                  <p className="text-sm text-[var(--progressbar-info)]">This action cannot be undone</p>
-                </div>
-              </div>
-              <p className="text-gray-300 mb-6">
-                Are you sure you want to reset this hunt for <span className="font-semibold text-[var(--accent)]">{resetModal.hunt ? formatPokemonName(resetModal.hunt.pokemon.name) : ''}</span>?
-                This will reset the check count and timer.
-              </p>
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setResetModalClosing(true);
-                    setTimeout(() => {
-                      setResetModal({ show: false, hunt: null });
-                      setResetModalClosing(false);
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
+              Cancel
+            </Button>
+
+            <div className="flex items-center gap-2.5">
+              {huntWizard.step > 0 && (
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={() => setHuntWizard(prev => ({ ...prev, step: prev.step - 1 }))}
                 >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleResetConfirm}
-                  className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
-                >
-                  Reset Hunt
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* Delete Hunt Modal */}
-      {deleteModal.show && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${deleteModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${deleteModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                  <Trash2 className="w-5 h-5 text-red-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--accent)]">Delete Hunt</h3>
-                  <p className="text-sm text-[var(--progressbar-info)]">This action cannot be undone</p>
-                </div>
-              </div>
-              <p className="text-gray-300 mb-6">
-                Are you sure you want to delete this hunt for <span className="font-semibold text-[var(--accent)]">{deleteModal.hunt ? formatPokemonName(deleteModal.hunt.pokemon.name) : ''}</span>?
-                This will permanently delete all hunt data.
-              </p>
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setDeleteModalClosing(true);
-                    setTimeout(() => {
-                      setDeleteModal({ show: false, hunt: null });
-                      setDeleteModalClosing(false);
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDeleteConfirm}
-                  className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors font-semibold"
-                >
-                  Delete Hunt
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* Settings Hunt Modal */}
-      {settingsModal.show && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${settingsModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${settingsModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
-                  <Settings className="w-5 h-5 text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--accent)]">Hunt Settings</h3>
-                  <p className="text-sm text-[var(--progressbar-info)]">Manually adjust hunt values</p>
-                </div>
-              </div>
-
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Adjust Encounter Count
-                  </label>
-                  <div className="settings-number-input-wrapper">
-                    <input
-                      type="number"
-                      value={settingsForm.manualChecks}
-                      onChange={(e) => setSettingsForm(prev => ({ ...prev, manualChecks: e.target.value }))}
-                      className="settings-number-input"
-                      placeholder="Enter encounter count"
-                      min="0"
-                    />
-                    <div className="settings-number-buttons">
-                      <button
-                        type="button"
-                        className="settings-number-btn settings-number-btn-up"
-                        onClick={() => setSettingsForm(prev => ({ ...prev, manualChecks: String(Math.max(0, (parseInt(prev.manualChecks) || 0) + 1)) }))}
-                      >
-                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
-                          <path d="M5 0L10 6H0L5 0Z" />
-                        </svg>
-                      </button>
-                      <button
-                        type="button"
-                        className="settings-number-btn settings-number-btn-down"
-                        onClick={() => setSettingsForm(prev => ({ ...prev, manualChecks: String(Math.max(0, (parseInt(prev.manualChecks) || 0) - 1)) }))}
-                      >
-                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
-                          <path d="M5 6L0 0H10L5 6Z" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Adjust Timer (format: 1h 2m 3s)
-                  </label>
-                  <input
-                    type="text"
-                    value={settingsForm.manualTotalTime}
-                    onChange={(e) => setSettingsForm(prev => ({ ...prev, manualTotalTime: e.target.value }))}
-                    className="w-full px-3 py-2 bg-[var(--searchbar-bg)] border border-[var(--border-color)] rounded-lg text-white focus:outline-none focus:border-[var(--accent)]"
-                    placeholder="e.g., 1h 30m 45s"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setSettingsModalClosing(true);
-                    setTimeout(() => {
-                      setSettingsModal({ show: false, hunt: null });
-                      setSettingsModalClosing(false);
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSettingsConfirm}
-                  className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
-                >
-                  Apply Settings
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* Edit Hunt Modal */}
-      {editModal.show && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${editModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${editModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
-                  <Edit className="w-5 h-5 text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--accent)]">Edit Hunt</h3>
-                  <p className="text-sm text-[var(--progressbar-info)]">Change game, method, or Pokemon</p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {/* Pokemon Selection */}
-                <div className="hunt-form-group">
-                  <label className="hunt-label">Pokemon:</label>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 px-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--sidebar-edit-inputs)] text-[var(--text)]">
-                      {editForm.pokemon ? formatPokemonName(editForm.pokemon.name) : "Select Pokemon"}
-                    </div>
-                    <button
-                      onClick={() => {
-                        setIsEditingPokemon(true);
-                        setEditModalClosing(true);
-                        setTimeout(() => {
-                          setEditModal(prev => ({ ...prev, show: false }));
-                          setEditModalClosing(false);
-                          setShowPokemonModal(true);
-                        }, 300);
-                      }}
-                      className="px-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--sidebar-edit-inputs)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors flex items-center justify-center h-[42px]"
-                      title="Change Pokemon"
-                    >
-                      <Edit size={20} className="text-[var(--accent)]" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Game Selection */}
-                <div className="hunt-form-group">
-                  <label className="hunt-label">Game:</label>
-                  <SearchbarIconDropdown
-                    id="edit-game-dropdown"
-                    options={GAME_OPTIONS.filter(g => g.value !== "Home")}
-                    value={editForm.game}
-                    onChange={val => setEditForm(prev => ({ ...prev, game: val }))}
-                    placeholder="Select a game..."
-                    customBackground="var(--sidebar-edit-inputs)"
-                    customBorder="var(--border-color)"
-                    disabled={true}
-                    hideClearButton={true}
-                  />
-                </div>
-
-                {/* Method Selection */}
-                <div className="hunt-form-group">
-                  <label className="hunt-label">Method:</label>
-                  <SearchbarIconDropdown
-                    id="edit-method-dropdown"
-                    options={[
-                      { name: "None", value: "" },
-                      ...(editForm.game ? getMethodsForGame(editForm.game).map(method => ({
-                        name: method.name,
-                        value: method.name
-                      })) : [])
-                    ]}
-                    value={editForm.method}
-                    onChange={val => setEditForm(prev => ({ ...prev, method: val }))}
-                    placeholder={editForm.game ? "Select a method..." : "Select a game first"}
-                    customBackground="var(--sidebar-edit-inputs)"
-                    customBorder="var(--border-color)"
-                    disabled={true}
-                    hideClearButton={true}
-                  />
-                </div>
-
-                {/* Modifiers Section */}
-                {editForm.game && (() => {
-                  const editAvailableMethods = getMethodsForGame(editForm.game);
-                  const editGameModifiers = getModifiersForGame(editForm.game);
-
-                  return (
-                    (editGameModifiers["Shiny Charm"] > 0 && !(editForm.method === "Fossil Revivals" && (editForm.game === "Let's Go Pikachu" || editForm.game === "Let's Go Eevee" || editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Fossil Revivals" && editForm.game === "Legends Z-A") && !(editForm.method === "Dynamax Raids" && (editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Gift Pokemon" && (editForm.game === "Sword" || editForm.game === "Shield" || editForm.game === "Let's Go Eevee" || editForm.game === "Let's Go Pikachu")) && !(editForm.method === "Tera Raids" && (editForm.game === "Scarlet" || editForm.game === "Violet")) && !((editForm.method === "Random Encounters" || editForm.method === "Poke Radar" || editForm.method === "Soft Resets" || editForm.method === "Fossil Revivals" || editForm.method === "Gift Pokemon" || editForm.method === "Underground Diglett Hunt") && (editForm.game === "Brilliant Diamond" || editForm.game === "Shining Pearl")) && !(editForm.method === "Poke Radar" && (editForm.game === "X" || editForm.game === "Y")) && !(editForm.method === "Ultra Wormholes" && (editForm.game === "Ultra Sun" || editForm.game === "Ultra Moon"))) ||
-                    (editGameModifiers["Shiny Parents"] > 0 && editForm.method === "Breeding") ||
-                    (editGameModifiers["Lure Active"] > 0 && (editForm.method === "Catch Combo" || editForm.method === "Random Encounters" || (editForm.method === "Soft Resets" && editForm.game !== "Let's Go Pikachu" && editForm.game !== "Let's Go Eevee"))) ||
-                    (editGameModifiers["Research Lv 10"] > 0 && editForm.game === "Legends Arceus") ||
-                    (editGameModifiers["Perfect Research"] > 0 && editForm.game === "Legends Arceus") ||
-                    (editGameModifiers["Sparkling Lv 1"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces"))) ||
-                    (editGameModifiers["Sparkling Lv 2"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces"))) ||
-                    (editGameModifiers["Sparkling Lv 3"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces"))) ||
-                    (editGameModifiers["Event Boosted"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && editForm.method === "Mass Outbreaks") ||
-                    (editGameModifiers["Community Day"] > 0 && editForm.game === "GO" && (editForm.method === "Random Encounters" || editForm.method === "Daily Adventure Incense")) ||
-                    (editGameModifiers["Raid Day"] > 0 && editForm.game === "GO" && editForm.method === "Raid Battles") ||
-                    (editGameModifiers["Research Day"] > 0 && editForm.game === "GO" && editForm.method === "Field Research") ||
-                    (editGameModifiers["Galar Birds"] > 0 && editForm.game === "GO" && editForm.method === "Daily Adventure Incense") ||
-                    (editGameModifiers["Hatch Day"] > 0 && editForm.game === "GO" && editForm.method === "Breeding")
-                  ) && editAvailableMethods.length > 0 && (
-                      <div className="hunt-form-group">
-                        <label className="hunt-label">Modifiers:</label>
-                        <div className="modifiers-section">
-                          {editGameModifiers["Shiny Charm"] > 0 && !(editForm.method === "Fossil Revivals" && (editForm.game === "Let's Go Pikachu" || editForm.game === "Let's Go Eevee" || editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Fossil Revivals" && editForm.game === "Legends Z-A") && !(editForm.method === "Dynamax Raids" && (editForm.game === "Sword" || editForm.game === "Shield")) && !(editForm.method === "Gift Pokemon" && (editForm.game === "Sword" || editForm.game === "Shield" || editForm.game === "Let's Go Eevee" || editForm.game === "Let's Go Pikachu")) && !(editForm.method === "Tera Raids" && (editForm.game === "Scarlet" || editForm.game === "Violet")) && !((editForm.method === "Random Encounters" || editForm.method === "Poke Radar" || editForm.method === "Soft Resets" || editForm.method === "Fossil Revivals" || editForm.method === "Gift Pokemon" || editForm.method === "Underground Diglett Hunt") && (editForm.game === "Brilliant Diamond" || editForm.game === "Shining Pearl")) && !(editForm.method === "Poke Radar" && (editForm.game === "X" || editForm.game === "Y")) && !(editForm.method === "Ultra Wormholes" && (editForm.game === "Ultra Sun" || editForm.game === "Ultra Moon")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.shinyCharm}
-                                onChange={(e) => {
-                                  const newShinyCharm = e.target.checked;
-                                  setEditForm(prev => {
-                                    const newModifiers = { ...prev.modifiers, shinyCharm: newShinyCharm };
-                                    // Auto-check Research Lv 10 when Shiny Charm is checked in Legends Arceus
-                                    if (newShinyCharm && editForm.game === "Legends Arceus" && !prev.modifiers.researchLv10) {
-                                      newModifiers.researchLv10 = true;
-                                    }
-                                    return { ...prev, modifiers: newModifiers };
-                                  });
-                                }}
-                              />
-                              <span>Shiny Charm</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Shiny Parents"] > 0 && editForm.method === "Breeding" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.shinyParents}
-                                onChange={(e) => setEditForm(prev => ({ ...prev, modifiers: { ...prev.modifiers, shinyParents: e.target.checked } }))}
-                              />
-                              <span>Shiny Parents</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Lure Active"] > 0 && (editForm.method === "Catch Combo" || editForm.method === "Random Encounters" || (editForm.method === "Soft Resets" && editForm.game !== "Let's Go Pikachu" && editForm.game !== "Let's Go Eevee")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.lureActive}
-                                onChange={(e) => setEditForm(prev => ({ ...prev, modifiers: { ...prev.modifiers, lureActive: e.target.checked } }))}
-                              />
-                              <span>Lure Active</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Research Lv 10"] > 0 && editForm.game === "Legends Arceus" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.researchLv10}
-                                onChange={(e) => {
-                                  const newResearchLv10 = e.target.checked;
-                                  setEditForm(prev => {
-                                    const newModifiers = { ...prev.modifiers, researchLv10: newResearchLv10 };
-                                    // Auto-uncheck Shiny Charm and Perfect Research when Research Lv 10 is unchecked in Legends Arceus
-                                    if (!newResearchLv10 && editForm.game === "Legends Arceus") {
-                                      if (prev.modifiers.shinyCharm) {
-                                        newModifiers.shinyCharm = false;
-                                      }
-                                      if (prev.modifiers.perfectResearch) {
-                                        newModifiers.perfectResearch = false;
-                                      }
-                                    }
-                                    return { ...prev, modifiers: newModifiers };
-                                  });
-                                }}
-                              />
-                              <span>Research Lv 10</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Perfect Research"] > 0 && editForm.game === "Legends Arceus" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.perfectResearch}
-                                onChange={(e) => {
-                                  const newPerfectResearch = e.target.checked;
-                                  setEditForm(prev => {
-                                    const newModifiers = { ...prev.modifiers, perfectResearch: newPerfectResearch };
-                                    // Auto-check Research Lv 10 when Perfect Research is checked in Legends Arceus
-                                    if (newPerfectResearch && editForm.game === "Legends Arceus" && !prev.modifiers.researchLv10) {
-                                      newModifiers.researchLv10 = true;
-                                    }
-                                    return { ...prev, modifiers: newModifiers };
-                                  });
-                                }}
-                              />
-                              <span>Perfect Research</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Sparkling Lv 1"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.sparklingLv1}
-                                onChange={(e) => {
-                                  const newSparklingLv1 = e.target.checked;
-                                  setEditForm(prev => {
-                                    const newModifiers = {
-                                      ...prev.modifiers,
-                                      sparklingLv1: newSparklingLv1,
-                                      sparklingLv2: newSparklingLv1 ? false : prev.modifiers.sparklingLv2,
-                                      sparklingLv3: newSparklingLv1 ? false : prev.modifiers.sparklingLv3
-                                    };
-
-                                    // For Sandwich method: if turning off Lv 1 and no other sparkling is active, default to Lv 3
-                                    if (editForm.method === "Sandwich" && !newSparklingLv1 && !newModifiers.sparklingLv2 && !newModifiers.sparklingLv3) {
-                                      newModifiers.sparklingLv3 = true;
-                                    }
-
-                                    return { ...prev, modifiers: newModifiers };
-                                  });
-                                }}
-                              />
-                              <span>Sparkling Lv 1</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Sparkling Lv 2"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.sparklingLv2}
-                                onChange={(e) => {
-                                  const newSparklingLv2 = e.target.checked;
-                                  setEditForm(prev => {
-                                    const newModifiers = {
-                                      ...prev.modifiers,
-                                      sparklingLv2: newSparklingLv2,
-                                      sparklingLv1: newSparklingLv2 ? false : prev.modifiers.sparklingLv1,
-                                      sparklingLv3: newSparklingLv2 ? false : prev.modifiers.sparklingLv3
-                                    };
-
-                                    // For Sandwich method: if turning off Lv 2 and no other sparkling is active, default to Lv 3
-                                    if (editForm.method === "Sandwich" && !newSparklingLv2 && !newModifiers.sparklingLv1 && !newModifiers.sparklingLv3) {
-                                      newModifiers.sparklingLv3 = true;
-                                    }
-
-                                    return { ...prev, modifiers: newModifiers };
-                                  });
-                                }}
-                              />
-                              <span>Sparkling Lv 2</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Sparkling Lv 3"] > 0 && ((editForm.game === "Scarlet" || editForm.game === "Violet") && (editForm.method === "Random Encounters" || editForm.method === "Mass Outbreaks" || editForm.method === "Sandwich") || (editForm.game === "Legends Z-A" && editForm.method === "Hyperspaces")) && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.sparklingLv3}
-                                onChange={(e) => {
-                                  const newSparklingLv3 = e.target.checked;
-                                  setEditForm(prev => {
-                                    const newModifiers = {
-                                      ...prev.modifiers,
-                                      sparklingLv3: newSparklingLv3,
-                                      sparklingLv1: newSparklingLv3 ? false : prev.modifiers.sparklingLv1,
-                                      sparklingLv2: newSparklingLv3 ? false : prev.modifiers.sparklingLv2
-                                    };
-
-                                    // For Sandwich method: if turning off Lv 3 and no other sparkling is active, default back to Lv 3
-                                    if (editForm.method === "Sandwich" && !newSparklingLv3 && !newModifiers.sparklingLv1 && !newModifiers.sparklingLv2) {
-                                      newModifiers.sparklingLv3 = true;
-                                    }
-
-                                    return { ...prev, modifiers: newModifiers };
-                                  });
-                                }}
-                              />
-                              <span>Sparkling Lv 3</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Event Boosted"] > 0 && (editForm.game === "Scarlet" || editForm.game === "Violet") && editForm.method === "Mass Outbreaks" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.eventBoosted}
-                                onChange={(e) => setEditForm(prev => ({ ...prev, modifiers: { ...prev.modifiers, eventBoosted: e.target.checked } }))}
-                              />
-                              <span>Event Boosted</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Community Day"] > 0 && editForm.game === "GO" && (editForm.method === "Random Encounters" || editForm.method === "Daily Adventure Incense") && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.communityDay}
-                                onChange={(e) => {
-                                  const newCommunityDay = e.target.checked;
-                                  setEditForm(prev => ({
-                                    ...prev,
-                                    modifiers: {
-                                      ...prev.modifiers,
-                                      communityDay: newCommunityDay,
-                                      raidDay: newCommunityDay ? false : prev.modifiers.raidDay,
-                                      researchDay: newCommunityDay ? false : prev.modifiers.researchDay,
-                                      galarBirds: newCommunityDay ? false : prev.modifiers.galarBirds,
-                                      hatchDay: newCommunityDay ? false : prev.modifiers.hatchDay
-                                    }
-                                  }));
-                                }}
-                              />
-                              <span>Community Day</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Raid Day"] > 0 && editForm.game === "GO" && editForm.method === "Raid Battles" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.raidDay}
-                                onChange={(e) => {
-                                  const newRaidDay = e.target.checked;
-                                  setEditForm(prev => ({
-                                    ...prev,
-                                    modifiers: {
-                                      ...prev.modifiers,
-                                      raidDay: newRaidDay,
-                                      communityDay: newRaidDay ? false : prev.modifiers.communityDay,
-                                      researchDay: newRaidDay ? false : prev.modifiers.researchDay
-                                    }
-                                  }));
-                                }}
-                              />
-                              <span>Raid Day</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Research Day"] > 0 && editForm.game === "GO" && editForm.method === "Field Research" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.researchDay}
-                                onChange={(e) => {
-                                  const newResearchDay = e.target.checked;
-                                  setEditForm(prev => ({
-                                    ...prev,
-                                    modifiers: {
-                                      ...prev.modifiers,
-                                      researchDay: newResearchDay,
-                                      communityDay: newResearchDay ? false : prev.modifiers.communityDay,
-                                      raidDay: newResearchDay ? false : prev.modifiers.raidDay
-                                    }
-                                  }));
-                                }}
-                              />
-                              <span>Research Day</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Galar Birds"] > 0 && editForm.game === "GO" && editForm.method === "Daily Adventure Incense" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.galarBirds}
-                                onChange={(e) => {
-                                  const newGalarBirds = e.target.checked;
-                                  setEditForm(prev => ({
-                                    ...prev,
-                                    modifiers: {
-                                      ...prev.modifiers,
-                                      galarBirds: newGalarBirds,
-                                      communityDay: newGalarBirds ? false : prev.modifiers.communityDay
-                                    }
-                                  }));
-                                }}
-                              />
-                              <span>Galar Birds</span>
-                            </label>
-                          )}
-                          {editGameModifiers["Hatch Day"] > 0 && editForm.game === "GO" && editForm.method === "Breeding" && (
-                            <label className="modifier-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={editForm.modifiers.hatchDay}
-                                onChange={(e) => {
-                                  const newHatchDay = e.target.checked;
-                                  setEditForm(prev => ({
-                                    ...prev,
-                                    modifiers: {
-                                      ...prev.modifiers,
-                                      hatchDay: newHatchDay,
-                                      communityDay: newHatchDay ? false : prev.modifiers.communityDay
-                                    }
-                                  }));
-                                }}
-                              />
-                              <span>Hatch Day</span>
-                            </label>
-                          )}
-                        </div>
-                      </div>
-                    );
-                })()}
-              </div>
-
-              <div className="flex gap-3 justify-end mt-6">
-                <button
-                  onClick={() => {
-                    setEditModalClosing(true);
-                    setTimeout(() => {
-                      setEditModal({ show: false, hunt: null });
-                      setEditModalClosing(false);
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleEditConfirm}
-                  className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
-                >
-                  Update Hunt
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* Completion Hunt Modal */}
-      {completionModal.show && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${completionModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center">
-            <div
-              className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${completionModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--accent)]">Complete Hunt</h3>
-                  <p className="text-sm text-[var(--progressbar-info)]">Add final hunt details</p>
-                </div>
-              </div>
-
-              {/* Display existing hunt info */}
-              {completionModal.hunt && (
-                <div className="bg-[var(--searchbar-bg)] border border-[var(--border-color)] rounded-lg p-4 mb-4">
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <span className="text-gray-400">Pokemon:</span>
-                      <div className="font-medium text-white">{formatPokemonName(completionModal.hunt.pokemon.name)}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Form:</span>
-                      <div className="font-medium text-white">{getFormDisplayName(completionModal.hunt.pokemon) || "None"}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Method:</span>
-                      <div className="font-medium text-white">{completionModal.hunt.method}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Game:</span>
-                      <div className="font-medium text-white">{completionModal.hunt.game}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Date:</span>
-                      <div className="font-medium text-white">{new Date().toLocaleDateString()}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Final Check:</span>
-                      <div className="font-medium text-white">
-                        {completionModal.hunt.checks} in {formatTimeCompact(totalCheckTimes[completionModal.hunt.id] || 0)}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  Back
+                </Button>
               )}
+              <Button
+                variant="primary"
+                size="md"
+                onClick={huntWizard.step === 4 ? () => handleStartWizardHunt() : () => setHuntWizard(prev => ({ ...prev, step: prev.step + 1 }))}
+                disabled={
+                  (huntWizard.step === 1 && !huntWizard.selectedPokemon)
+                }
+                icon={huntWizard.step === 4 ? <Sparkles size={16} strokeWidth={2.5} /> : undefined}
+              >
+                {huntWizard.step === 4
+                  ? "Start Hunting"
+                  : huntWizard.step === 2 && huntWizard.possiblePhases.length === 0
+                  ? "Skip"
+                  : "Next"}
+              </Button>
+            </div>
+          </div>
+        )}
+      >
+        <div>
+          {/* Styled Progress Stepper Header */}
+          <div className="onboarding-progress-container hunt-wizard-progress-container">
+            <div className="onboarding-progress-track" />
+            <div
+              className="onboarding-progress-fill"
+              style={{ width: `calc(${(huntWizard.step / 4)} * (100% - 86px))` }}
+            />
 
-              <div className="space-y-4 mb-6">
-                <div className="sidebar-form-group">
-                  <label className="sidebar-label">Ball Used:</label>
-                  <SearchbarIconDropdown
-                    id="completion-ball-dropdown"
-                    options={getCompletionBallOptions()}
-                    value={completionForm.ball}
-                    onChange={val => setCompletionForm(prev => ({ ...prev, ball: val }))}
-                    placeholder="Select a ball..."
-                    customBackground="var(--sidebar-edit-inputs)"
-                    customBorder="var(--border-color)"
-                  />
-                </div>
+            {[
+              { id: "game", shortLabel: "GAME", title: "Game & Modifiers" },
+              { id: "hunt", shortLabel: "HUNT", title: "Target Pokémon" },
+              { id: "phases", shortLabel: "PHASES", title: "Phase Encounters" },
+              { id: "settings", shortLabel: "COUNTER", title: "Counter & Settings" },
+              { id: "preview", shortLabel: "PREVIEW", title: "Review Hunt & Live Odds" }
+            ].map((step, i) => {
+              const isActive = i === huntWizard.step;
+              const isCompleted = i < huntWizard.step;
+              const isDisabled = (i > 1 && !huntWizard.selectedPokemon);
 
-                {/* Only show mark field for games that support marks */}
-                {completionModal.hunt && ['Sword', 'Shield', 'Scarlet', 'Violet'].includes(completionModal.hunt.game) && (
-                  <div className="sidebar-form-group">
-                    <label className="sidebar-label">Mark:</label>
-                    <SearchbarIconDropdown
-                      id="completion-mark-dropdown"
-                      options={MARK_OPTIONS.filter(m => m.value !== "mightiest")}
-                      value={completionForm.mark}
-                      onChange={val => setCompletionForm(prev => ({ ...prev, mark: val }))}
-                      placeholder="Select a mark..."
-                      customBackground="var(--sidebar-edit-inputs)"
-                      customBorder="var(--border-color)"
-                  />
+              return (
+                <button
+                  key={step.id}
+                  type="button"
+                  className="onboarding-step-wrapper"
+                  disabled={isDisabled}
+                  onClick={() => {
+                    if (isDisabled) return;
+                    setHuntWizard(prev => ({ ...prev, step: i }));
+                  }}
+                  title={`Go to Step ${i + 1}: ${step.title}`}
+                >
+                  <div className={`onboarding-step-circle ${isActive ? 'active' : isCompleted ? 'completed' : 'upcoming'}`}>
+                    {isCompleted ? <Check size={14} strokeWidth={3} /> : i + 1}
+                  </div>
+                  <span className={`onboarding-step-label ${isActive ? 'active' : isCompleted ? 'completed' : 'upcoming'}`}>
+                    {step.shortLabel}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Dynamic Step Content */}
+          <div style={{ minHeight: '120px' }}>
+            {/* Step 1: Game, Method & Modifiers */}
+            {huntWizard.step === 0 && (
+              <div className="space-y-4">
+                {renderModifiersForm(
+                  huntWizard.game,
+                  huntWizard.method,
+                  huntWizard.modifiers,
+                  (callback) => {
+                    setHuntWizard(prev => ({
+                      ...prev,
+                      modifiers: typeof callback === "function" ? callback(prev.modifiers) : callback
+                    }));
+                  }
+                )}
+              </div>
+            )}
+
+            {/* Step 2: HUNT (Target Pokémon) */}
+            {huntWizard.step === 1 && (
+              <div className="space-y-3">
+                <SearchField
+                  value={huntWizard.searchTerm}
+                  onChange={(val) => setHuntWizard(prev => ({ ...prev, searchTerm: typeof val === "string" ? val : val?.target?.value || "" }))}
+                  placeholder="Search Pokémon in Legends Arceus by name or #dex..."
+                  fullWidth
+                  autoFocus
+                />
+
+                {availableFormTabs.length > 1 && (
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none custom-scrollbar">
+                    {availableFormTabs.map(tab => {
+                      const isActive = (huntWizard.formTab || "all") === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+                            isActive
+                              ? "bg-[var(--accent)] text-black shadow-sm"
+                              : "bg-white/[0.04] text-gray-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]"
+                          }`}
+                          onClick={() => setHuntWizard(prev => ({ ...prev, formTab: tab.id }))}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
 
-                <div className="sidebar-form-group">
-                  <label className="sidebar-label">Notes/extras:</label>
-                  <ContentFilterInput
-                    id="completion-notes-textarea"
-                    name="notes"
-                    type="textarea"
-                    value={completionForm.notes}
-                    onChange={(e) => setCompletionForm(prev => ({ ...prev, notes: e.target.value }))}
-                    placeholder="Add notes about this hunt..."
-                    configType="notes"
-                    showCharacterCount={true}
-                    showRealTimeValidation={true}
-                    className="sidebar-input"
-                    autoComplete="off"
-                  />
+                <div className="flex items-center justify-between text-xs text-gray-400 px-1">
+                  <span>Showing <strong>{wizardGamePokemon.length}</strong> obtainable in <strong>Legends Arceus</strong></span>
+                  {huntWizard.selectedPokemon && (
+                    <span className="text-[var(--accent)] font-bold flex items-center gap-1">
+                      Selected: {formatPokemonName(huntWizard.selectedPokemon.name)} ✓
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 max-h-[360px] overflow-y-auto custom-scrollbar pr-1 overscroll-contain">
+                  {wizardGamePokemon.map(pokemon => {
+                    const isSelected = (huntWizard.selectedPokemon?.stableId || huntWizard.selectedPokemon?.name) === (pokemon.stableId || pokemon.name);
+                    const formLabel = getFormDisplayName(pokemon);
+                    const dexNum = pokemon.id != null ? `#${String(pokemon.id).padStart(4, "0")}` : "";
+
+                    return (
+                      <button
+                        key={pokemon.stableId || `${pokemon.id}-${pokemon.name}`}
+                        type="button"
+                        className={`flex flex-col items-center pt-0 pb-2 px-1.5 rounded-xl border transition group text-left relative overflow-hidden ${
+                          isSelected
+                            ? "bg-[var(--accent)]/15 border-[var(--accent)]"
+                            : "bg-white/[0.03] border-white/[0.08] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10"
+                        }`}
+                        onClick={() => {
+                          setHuntWizard(prev => ({
+                            ...prev,
+                            selectedPokemon: pokemon
+                          }));
+                        }}
+                        onDoubleClick={() => {
+                          setHuntWizard(prev => ({
+                            ...prev,
+                            selectedPokemon: pokemon,
+                            step: 2
+                          }));
+                        }}
+                      >
+                        <img
+                          src={getPokemonImage(pokemon)}
+                          alt={pokemon.name}
+                          className={`w-14 h-14 object-contain group-hover:scale-110 transition-transform ${!useHomeSprites ? "pixelated" : ""}`}
+                          style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                        />
+                        <div className="flex flex-col items-center w-full -mt-2.5 relative z-10">
+                          <span className="text-xs font-bold text-white text-center line-clamp-1 max-w-[95%]">
+                            {formatPokemonName(pokemon.name)}
+                          </span>
+                          {dexNum && (
+                            <span className="text-[10px] font-mono text-gray-400 font-medium leading-tight mt-0.5">
+                              {dexNum}
+                            </span>
+                          )}
+                          {formLabel && (
+                            <span className="text-[10px] text-[var(--accent)] font-semibold truncate max-w-[95%] text-center leading-tight mt-0.5">
+                              {formLabel}
+                            </span>
+                          )}
+                        </div>
+                        {isSelected && (
+                          <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[var(--accent)] text-black flex items-center justify-center shrink-0 aspect-square shadow-sm pointer-events-none z-20">
+                            <Check size={11} strokeWidth={3.5} />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
+            )}
 
-              <div className="flex gap-3 justify-end">
+            {/* Step 3: PHASES (Possible Phase Encounters - Optional) */}
+            {huntWizard.step === 2 && (
+              <div className="space-y-3.5">
+                <SearchField
+                  value={huntWizard.phaseSearchTerm}
+                  onChange={(val) => setHuntWizard(prev => ({ ...prev, phaseSearchTerm: typeof val === "string" ? val : val?.target?.value || "" }))}
+                  placeholder="Search and add Pokémon in Legends Arceus..."
+                  fullWidth
+                />
+
+                {availablePhaseFormTabs.length > 1 && (
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none custom-scrollbar">
+                    {availablePhaseFormTabs.map(tab => {
+                      const isActive = (huntWizard.phaseFormTab || "all") === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+                            isActive
+                              ? "bg-[var(--accent)] text-black shadow-sm"
+                              : "bg-white/[0.04] text-gray-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]"
+                          }`}
+                          onClick={() => setHuntWizard(prev => ({ ...prev, phaseFormTab: tab.id }))}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-black text-white">
+                        Selected Phases
+                      </span>
+                      <span className="text-sm font-bold text-[var(--accent)]">
+                        {huntWizard.possiblePhases.length}/10
+                      </span>
+                    </div>
+                    {huntWizard.possiblePhases.length > 0 && (
+                      <button
+                        type="button"
+                        className="text-xs text-[var(--accent)] hover:underline font-bold transition cursor-pointer"
+                        onClick={() => setHuntWizard(prev => ({ ...prev, possiblePhases: [] }))}
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
+
+                  {huntWizard.possiblePhases.length > 0 && (
+                    <div className="flex flex-wrap gap-2 max-h-[80px] overflow-y-auto custom-scrollbar pr-1">
+                      {huntWizard.possiblePhases.map(pkm => (
+                        <div
+                          key={pkm.stableId || `${pkm.id}-${pkm.name}`}
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10 text-xs font-bold text-white shadow-sm hover:border-white/20 transition group"
+                        >
+                          <span>{formatPokemonName(pkm.name)}</span>
+                          <button
+                            type="button"
+                            className="text-gray-400 hover:text-rose-400 transition p-0.5 rounded cursor-pointer"
+                            title="Remove"
+                            onClick={() => {
+                              setHuntWizard(prev => ({
+                                ...prev,
+                                possiblePhases: prev.possiblePhases.filter(
+                                  p => (p.stableId || p.id) !== (pkm.stableId || pkm.id)
+                                )
+                              }));
+                            }}
+                          >
+                            <X size={13} strokeWidth={2.5} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1 overscroll-contain">
+                  {wizardGamePhasePokemon.map(pkm => {
+                    const isAdded = huntWizard.possiblePhases.some(
+                      p => (p.stableId || p.id) === (pkm.stableId || pkm.id)
+                    );
+                    const formLabel = getFormDisplayName(pkm);
+                    const dexNum = pkm.id != null ? `#${String(pkm.id).padStart(4, "0")}` : "";
+
+                    return (
+                      <button
+                        key={pkm.stableId || `${pkm.id}-${pkm.name}`}
+                        type="button"
+                        className={`flex flex-col items-center pt-0 pb-2 px-1.5 rounded-xl border transition group text-left relative overflow-hidden ${
+                          isAdded
+                            ? "bg-[var(--accent)]/15 border-[var(--accent)]"
+                            : "bg-white/[0.03] border-white/[0.08] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10"
+                        }`}
+                        onClick={() => {
+                          setHuntWizard(prev => ({
+                            ...prev,
+                            possiblePhases: isAdded
+                              ? prev.possiblePhases.filter(p => (p.stableId || p.id) !== (pkm.stableId || pkm.id))
+                              : prev.possiblePhases.length >= 10
+                              ? prev.possiblePhases
+                              : [...prev.possiblePhases, pkm]
+                          }));
+                        }}
+                      >
+                        <img
+                          src={getPokemonImage(pkm)}
+                          alt={pkm.name}
+                          className={`w-14 h-14 object-contain group-hover:scale-110 transition-transform ${!useHomeSprites ? "pixelated" : ""}`}
+                          style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                        />
+                        <div className="flex flex-col items-center w-full -mt-2.5 relative z-10">
+                          <span className="text-xs font-bold text-white text-center line-clamp-1 max-w-[95%]">
+                            {formatPokemonName(pkm.name)}
+                          </span>
+                          {dexNum && (
+                            <span className="text-[10px] font-mono text-gray-400 font-medium leading-tight mt-0.5">
+                              {dexNum}
+                            </span>
+                          )}
+                          {formLabel && (
+                            <span className="text-[10px] text-[var(--accent)] font-semibold truncate max-w-[95%] text-center leading-tight mt-0.5">
+                              {formLabel}
+                            </span>
+                          )}
+                        </div>
+                        {isAdded && (
+                          <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-[var(--accent)] text-black flex items-center justify-center shrink-0 aspect-square shadow-sm pointer-events-none z-20">
+                            <Check size={11} strokeWidth={3.5} />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
                 <button
-                  onClick={() => {
-                    setCompletionModalClosing(true);
-                    setTimeout(() => {
-                      setCompletionModal({ show: false, hunt: null });
-                      setCompletionModalClosing(false);
-                      setCompletionForm({ ball: '', mark: '', notes: '' });
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
+                  type="button"
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 transition text-left cursor-pointer group"
+                  onClick={() => setHuntWizard(prev => ({ ...prev, allowAnyPhase: prev.allowAnyPhase === false }))}
                 >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleCompletionConfirm}
-                  className="sidebar-button"
-                >
-                  Complete Hunt
+                  <div className="flex items-center gap-2 text-gray-300 font-medium text-xs">
+                    <span className="text-[var(--accent)] font-black text-sm leading-none">+</span>
+                    <span>Any obtainable Pokémon can phase at any time</span>
+                  </div>
+                  <div className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 shrink-0 ${
+                    huntWizard.allowAnyPhase !== false
+                      ? "bg-[var(--accent)]"
+                      : "bg-white/20"
+                  }`}>
+                    <div className={`w-4 h-4 rounded-full bg-black shadow-sm transition-transform ${
+                      huntWizard.allowAnyPhase !== false ? "translate-x-4" : "translate-x-0"
+                    }`} />
+                  </div>
                 </button>
               </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+            )}
 
+            {/* Step 4: COUNTER & INITIAL SETTINGS */}
+            {huntWizard.step === 3 && (
+              <div className="space-y-4">
+                <div className="hunt-modal-card space-y-3 p-4">
+                  <div className="text-xs font-extrabold uppercase tracking-wider text-white">
+                    Counter & Initial Settings
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="hunt-modal-label !text-white text-white font-bold">
+                        Starting Encounters
+                      </label>
+                      <p className="text-[11px] text-gray-400 mb-1.5">
+                        Already started hunting before tracking here? Enter your existing check count.
+                      </p>
+                      <div className="flex items-stretch rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden">
+                        <input
+                          type="number"
+                          min="0"
+                          className="w-full bg-transparent pl-3 pr-2 py-2 text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          value={huntWizard.startChecks}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            if (v === "") {
+                              setHuntWizard(prev => ({ ...prev, startChecks: "" }));
+                            } else {
+                              const n = parseInt(v, 10);
+                              setHuntWizard(prev => ({ ...prev, startChecks: isNaN(n) ? 0 : Math.max(0, n) }));
+                            }
+                          }}
+                          onBlur={() => setHuntWizard(prev => ({ ...prev, startChecks: Math.max(0, parseInt(prev.startChecks, 10) || 0) }))}
+                          placeholder="0"
+                        />
+                        <div className="flex flex-col border-l border-white/10 divide-y divide-white/10 shrink-0">
+                          <button
+                            type="button"
+                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            onClick={() => setHuntWizard(prev => ({ ...prev, startChecks: (parseInt(prev.startChecks, 10) || 0) + 1 }))}
+                            title="Increment"
+                          >
+                            <ChevronUp size={11} strokeWidth={3} />
+                          </button>
+                          <button
+                            type="button"
+                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            onClick={() => setHuntWizard(prev => ({ ...prev, startChecks: Math.max(0, (parseInt(prev.startChecks, 10) || 0) - 1) }))}
+                            title="Decrement"
+                          >
+                            <ChevronDown size={11} strokeWidth={3} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="hunt-modal-label !text-white text-white font-bold">
+                        Step Increment
+                      </label>
+                      <p className="text-[11px] text-gray-400 mb-1.5">
+                        How many encounters are added per count increment (default 1).
+                      </p>
+                      <div className="flex items-stretch rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden">
+                        <input
+                          type="number"
+                          min="1"
+                          className="w-full bg-transparent pl-3 pr-2 py-2 text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          value={huntWizard.huntIncrement}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            if (v === "") {
+                              setHuntWizard(prev => ({ ...prev, huntIncrement: "" }));
+                            } else {
+                              const n = parseInt(v, 10);
+                              setHuntWizard(prev => ({ ...prev, huntIncrement: isNaN(n) ? 1 : Math.max(1, n) }));
+                            }
+                          }}
+                          onBlur={() => setHuntWizard(prev => ({ ...prev, huntIncrement: Math.max(1, parseInt(prev.huntIncrement, 10) || 1) }))}
+                          placeholder="1"
+                        />
+                        <div className="flex flex-col border-l border-white/10 divide-y divide-white/10 shrink-0">
+                          <button
+                            type="button"
+                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            onClick={() => setHuntWizard(prev => ({ ...prev, huntIncrement: (parseInt(prev.huntIncrement, 10) || 1) + 1 }))}
+                            title="Increment"
+                          >
+                            <ChevronUp size={11} strokeWidth={3} />
+                          </button>
+                          <button
+                            type="button"
+                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            onClick={() => setHuntWizard(prev => ({ ...prev, huntIncrement: Math.max(1, (parseInt(prev.huntIncrement, 10) || 1) - 1) }))}
+                            title="Decrement"
+                          >
+                            <ChevronDown size={11} strokeWidth={3} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2 flex flex-col items-center text-center">
+                      <label className="hunt-modal-label !text-white text-white font-bold text-center">
+                        Starting Elapsed Time
+                      </label>
+                      <p className="text-[11px] text-gray-400 mb-1.5 text-center">
+                        Time already spent on this hunt (Hours, Minutes, Seconds).
+                      </p>
+                      <div className="grid grid-cols-3 gap-2 w-full max-w-sm">
+                        <div className="flex items-center rounded-xl bg-black/40 border border-white/10 px-2.5 py-1.5">
+                          <input
+                            type="number"
+                            min="0"
+                            className="w-full bg-transparent text-sm text-white font-bold focus:outline-none text-center"
+                            placeholder="0"
+                            value={huntWizard.startTime.hours || ""}
+                            onChange={(e) => setHuntWizard(prev => ({ ...prev, startTime: { ...prev.startTime, hours: e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value, 10) || 0) } }))}
+                          />
+                          <span className="text-xs text-gray-400 font-bold ml-1">h</span>
+                        </div>
+                        <div className="flex items-center rounded-xl bg-black/40 border border-white/10 px-2.5 py-1.5">
+                          <input
+                            type="number"
+                            min="0"
+                            max="59"
+                            className="w-full bg-transparent text-sm text-white font-bold focus:outline-none text-center"
+                            placeholder="0"
+                            value={huntWizard.startTime.minutes || ""}
+                            onChange={(e) => setHuntWizard(prev => ({ ...prev, startTime: { ...prev.startTime, minutes: e.target.value === "" ? "" : Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)) } }))}
+                          />
+                          <span className="text-xs text-gray-400 font-bold ml-1">m</span>
+                        </div>
+                        <div className="flex items-center rounded-xl bg-black/40 border border-white/10 px-2.5 py-1.5">
+                          <input
+                            type="number"
+                            min="0"
+                            max="59"
+                            className="w-full bg-transparent text-sm text-white font-bold focus:outline-none text-center"
+                            placeholder="0"
+                            value={huntWizard.startTime.seconds || ""}
+                            onChange={(e) => setHuntWizard(prev => ({ ...prev, startTime: { ...prev.startTime, seconds: e.target.value === "" ? "" : Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)) } }))}
+                          />
+                          <span className="text-xs text-gray-400 font-bold ml-1">s</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 5: PREVIEW */}
+            {huntWizard.step === 4 && (
+              <div className="space-y-4 max-h-[440px] overflow-y-auto custom-scrollbar pr-1 overscroll-contain">
+                {huntWizard.selectedPokemon && (
+                  <HuntIdentityOddsCard
+                    pokemon={huntWizard.selectedPokemon}
+                    game="Legends Arceus"
+                    method="Permutations"
+                    modifiers={huntWizard.modifiers}
+                    useHomeSprites={useHomeSprites}
+                  />
+                )}
+
+                <div className="hunt-modal-card space-y-2.5 p-3.5 bg-white/[0.03] border border-white/10 rounded-xl">
+                  <div className="flex items-center justify-between text-xs border-b border-white/[0.08] pb-2">
+                    <span className="font-extrabold text-white uppercase tracking-wider flex items-center gap-1.5">
+                      <Clock size={13} className="text-[var(--accent)]" /> Counter & Pacing Settings
+                    </span>
+                    <span className="text-gray-400 text-[11px]">Configured for hunt start</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-left">
+                    <div className="p-2.5 rounded-lg bg-black/30 border border-white/5 flex flex-col justify-between">
+                      <span className="text-[10px] uppercase font-bold text-gray-400 block">Starting Checks</span>
+                      <span className="text-sm font-extrabold text-white mt-1">
+                        {(parseInt(huntWizard.startChecks, 10) || 0).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-black/30 border border-white/5 flex flex-col justify-between">
+                      <span className="text-[10px] uppercase font-bold text-gray-400 block">Step Increment</span>
+                      <span className="text-sm font-extrabold text-[var(--accent)] mt-1">
+                        +{huntWizard.huntIncrement || 1}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-black/30 border border-white/5 flex flex-col justify-between">
+                      <span className="text-[10px] uppercase font-bold text-gray-400 block">Starting Elapsed</span>
+                      <span className="text-sm font-extrabold text-white mt-1">
+                        {(() => {
+                          const h = parseInt(huntWizard.startTime.hours, 10) || 0;
+                          const m = parseInt(huntWizard.startTime.minutes, 10) || 0;
+                          const s = parseInt(huntWizard.startTime.seconds, 10) || 0;
+                          const totalMs = ((h * 3600) + (m * 60) + s) * 1000;
+                          return totalMs > 0 ? formatDigitalTime(totalMs) : "00:00:00";
+                        })()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </Modal>
+
+      {/* Odds Breakdown Modal */}
+      <OddsBreakdownModal
+        isOpen={oddsModal.show}
+        onClose={() => setOddsModal(prev => ({ ...prev, show: false }))}
+        hunt={oddsModal.hunt}
+      />
+
+      {/* Adjust Values Modal */}
+      <AdjustHuntModal
+        isOpen={settingsModal.show}
+        onClose={() => setSettingsModal({ show: false, hunt: null })}
+        hunt={settingsModal.hunt}
+        huntIncrements={huntIncrements}
+        onSaveAdjustments={(huntId, payload) => {
+          handleSaveAdjustValues(settingsModal.hunt, payload);
+        }}
+      />
+
+      {/* Shiny Encounter Modal */}
+      <ShinyEncounterModal
+        isOpen={shinyEncounterModal.show}
+        onClose={() => setShinyEncounterModal(prev => ({ ...prev, show: false }))}
+        hunt={shinyEncounterModal.hunt}
+        allPokemon={allPokemon}
+        formsData={formsData}
+        useHomeSprites={useHomeSprites}
+        username={user?.username || null}
+        showMessage={showMessage}
+        onCompleteTargetHunt={handleCompleteTargetHunt}
+        onContinueAfterPhase={handleContinueAfterPhase}
+        onAddShinyToCollection={handleAddShinyToCollection}
+        onAddShinyFailToCollection={handleAddShinyFailToCollection}
+      />
+
+      {/* 4. EDIT OUTBREAK MODAL */}
+      <Modal
+        isOpen={editModal.show}
+        onClose={() => setEditModal(prev => ({ ...prev, show: false }))}
+        title="Edit Outbreak Settings"
+        subtitle="Update outbreak modifiers or target Pokémon"
+        icon={<Edit size={22} />}
+        size="sm"
+        footer={({ close }) => (
+          <>
+            <Button variant="secondary" onClick={close}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                const hunt = editModal.hunt;
+                if (!hunt || !editModal.pokemon) return;
+                const odds = calculateOdds(hunt.game, hunt.method, editModal.modifiers);
+                setAllActiveHunts(prev => {
+                  const next = prev.map(h => String(h.id) === String(hunt.id) ? {
+                    ...h,
+                    pokemon: editModal.pokemon,
+                    modifiers: editModal.modifiers,
+                    notes: editModal.notes,
+                    odds
+                  } : h);
+                  setCachedHuntsData({ activeHunts: next });
+                  debouncedSave(next);
+                  return next;
+                });
+                setEditModal({ show: false, hunt: null, pokemon: null, modifiers: {}, notes: "" });
+                showMessage("Outbreak settings updated!", "success");
+              }}
+            >
+              Save Changes
+            </Button>
           </>
+        )}
+      >
+        {editModal.hunt && (
+          <div className="space-y-4">
+            {renderModifiersForm(
+              editModal.hunt.game,
+              editModal.hunt.method,
+              editModal.modifiers,
+              (callback) => {
+                setEditModal(prev => ({
+                  ...prev,
+                  modifiers: typeof callback === "function" ? callback(prev.modifiers) : callback
+                }));
+              }
+            )}
+
+            <TextArea
+              label="Hunt Notes"
+              placeholder="Notes..."
+              value={editModal.notes}
+              onChange={(e) => setEditModal(prev => ({ ...prev, notes: e.target?.value !== undefined ? e.target.value : e }))}
+              maxLength={200}
+              fullWidth
+              rows={2}
+              resize="none"
+            />
+          </div>
+        )}
+      </Modal>
+
+      {/* 5. FAILS & PHASES HISTORY MODAL */}
+      <Modal
+        isOpen={phaseHistoryModal.show}
+        onClose={() => setPhaseHistoryModal(prev => ({ ...prev, show: false }))}
+        title="Fails & Phases History"
+        subtitle={`Timeline for Shiny ${formatPokemonName(phaseHistoryModal.hunt?.pokemon?.name)}`}
+        icon={<History size={22} />}
+        size="md"
+      >
+        {phaseHistoryModal.hunt && (
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto custom-scrollbar pr-1">
+            {(!phaseHistoryModal.hunt.phases || phaseHistoryModal.hunt.phases.length === 0) ? (
+              <div className="p-8 text-center text-gray-400 text-sm">
+                No phase or failed encounters recorded yet for this hunt.
+              </div>
+            ) : (
+              phaseHistoryModal.hunt.phases.map((phase, idx) => {
+                const info = getPhaseEntryDisplayInfo(phase, phaseHistoryModal.hunt.phases);
+                const displayChecks = getPhaseDisplayChecks(phase, phaseHistoryModal.hunt.phases);
+
+                return (
+                  <div
+                    key={phase.id || idx}
+                    className={`p-3 rounded-xl border flex items-center justify-between ${
+                      info.isFail
+                        ? "bg-rose-500/10 border-rose-500/20"
+                        : "bg-white/[0.03] border-white/[0.08]"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={getPokemonImage(phase.pokemon)}
+                        alt=""
+                        className={`w-12 h-12 object-contain ${!useHomeSprites ? "pixelated" : ""}`}
+                        style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                      />
+                      <div>
+                        <span className={`text-xs font-black uppercase ${info.isFail ? "text-rose-400" : "text-[var(--accent)]"}`}>
+                          {info.label}
+                        </span>
+                        <h4 className="text-sm font-extrabold text-white">
+                          {formatPokemonName(phase.pokemon?.name)}
+                        </h4>
+                        <span className="text-xs text-gray-400 font-semibold">
+                          {displayChecks.intervalChecks.toLocaleString()} checks (Total: {displayChecks.totalChecks.toLocaleString()})
+                          {phase.elapsedMs > 0 && ` • ${formatDigitalTime(phase.elapsedMs)}`}
+                        </span>
+                      </div>
+                    </div>
+
+                    {phase.ball && (
+                      <span className="text-xs font-bold text-gray-300 bg-white/[0.06] border border-white/10 px-2 py-1 rounded-md">
+                        {phase.ball}
+                      </span>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        )}
+      </Modal>
+
+      {/* 6. GLOBAL HUNT HISTORY MODAL */}
+      <HuntHistoryModal
+        isOpen={showHistoryModal}
+        onClose={() => setShowHistoryModal(false)}
+        huntHistory={huntHistory}
+        mode="mmo"
+        onDeleteEntry={handleDeleteHistoryEntry}
+        onClearAll={handleClearAllHistory}
+        onOpenWizard={handleOpenHuntWizard}
+        useHomeSprites={useHomeSprites}
+        formsData={formsData}
+      />
+
+      {/* 7. RESET OUTBREAK CONFIRM MODAL */}
+      <ConfirmModal
+        isOpen={resetModal.show}
+        onClose={() => setResetModal({ show: false, hunt: null })}
+        onConfirm={() => resetModal.hunt && handleConfirmResetTimer(resetModal.hunt.id)}
+        title="Reset Outbreak"
+        message={`Are you sure you want to reset this outbreak for "${resetModal.hunt ? formatPokemonName(resetModal.hunt.pokemon?.name) : ''}"? This will reset the check count and timer.`}
+        confirmText="Reset Outbreak"
+        variant="warning"
+      />
+
+      {/* 8. DELETE OUTBREAK CONFIRM MODAL */}
+      <ConfirmModal
+        isOpen={deleteModal.show}
+        onClose={() => setDeleteModal({ show: false, hunt: null })}
+        onConfirm={() => deleteModal.hunt && handleDeleteHunt(deleteModal.hunt.id)}
+        title="Delete Outbreak"
+        message={`Are you sure you want to delete this outbreak for "${deleteModal.hunt ? formatPokemonName(deleteModal.hunt.pokemon?.name) : ''}"? This will permanently remove this outbreak.`}
+        confirmText="Delete Outbreak"
+        variant="danger"
+      />
+    </div>
   );
 }

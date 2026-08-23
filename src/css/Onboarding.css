@@ -1,3 +1,7 @@
+/* ==========================================================================
+   ONBOARDING & INITIAL SETUP MODAL STYLES
+   ========================================================================== */
+
 /* Onboarding Modal Overlay / Backdrop */
 .onboarding-overlay,
 .onboarding-setup-backdrop {
@@ -26,16 +30,15 @@
 /* Modal container - dynamically bounded so it never exceeds screen */
 .onboarding-modal,
 .onboarding-setup-modal {
-  background-color: var(--profile-modal-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
+  background-color: var(--auth-boxes, var(--profile-modal-bg, #141416));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 20px;
   width: 100%;
-  max-width: 520px;
-  max-height: min(90dvh, 720px);
+  max-width: 530px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
   animation: onboardingSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -53,6 +56,8 @@
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
 }
 
 .onboarding-title {
@@ -70,9 +75,9 @@
   font-weight: 700;
   padding: 3px 10px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-color);
-  color: var(--text-muted);
+  background: color-mix(in srgb, var(--accent, #38bdf8) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #38bdf8) 35%, transparent);
+  color: var(--accent, #38bdf8);
   letter-spacing: 0.3px;
 }
 
@@ -127,8 +132,8 @@
 }
 
 .onboarding-step-wrapper:hover:not(:disabled) .onboarding-step-circle.upcoming {
-  border-color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.12);
+  border-color: color-mix(in srgb, var(--accent, #38bdf8) 50%, transparent);
+  background: color-mix(in srgb, var(--accent, #38bdf8) 12%, transparent);
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -136,7 +141,7 @@
 
 .onboarding-step-wrapper:hover:not(:disabled) .onboarding-step-circle.completed {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 4px 12px rgba(var(--accent-rgb, 234, 179, 8), 0.3);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent, #38bdf8) 35%, transparent);
 }
 
 /* Step Circles: Active, Completed, and Styled Next/Upcoming Steps */
@@ -154,13 +159,13 @@
   user-select: none;
 }
 
-/* Styled Next Steps: Sleek glassmorphic look with subtle border and gradient */
+/* Styled Next Steps */
 .onboarding-step-circle.upcoming {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  background: #18181b;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)), #18181b;
   border: 1.5px solid rgba(255, 255, 255, 0.16);
   color: rgba(255, 255, 255, 0.6);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(6px);
 }
 
 /* Active Step: Glowing accent styling */
@@ -176,10 +181,10 @@
 
 /* Completed Step: Accent colored with checkmark */
 .onboarding-step-circle.completed {
-  background: rgba(var(--accent-rgb, 234, 179, 8), 0.2);
+  background: color-mix(in srgb, var(--accent, #38bdf8) 28%, #141416);
   border: 1.5px solid var(--accent);
   color: var(--accent);
-  box-shadow: 0 0 8px rgba(var(--accent-rgb, 234, 179, 8), 0.25);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent, #38bdf8) 35%, transparent);
 }
 
 /* Step Labels under circles */
@@ -201,15 +206,21 @@
   color: var(--accent);
 }
 
-/* Modal Body - Scrollable content area */
+/* Modal Body - Scrollable content area without ugly scrollbars */
 .onboarding-setup-body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  overflow-x: hidden;
-  padding: 14px 20px 18px;
+  overflow-x: visible;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  padding: 16px 20px 18px;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+}
+
+.onboarding-setup-body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .onboarding-step-heading {
@@ -217,6 +228,10 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 6px;
+}
+
+.onboarding-step-heading svg {
+  color: var(--accent);
 }
 
 .onboarding-step-heading h3 {
@@ -239,6 +254,11 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   width: 100%;
+}
+
+.onboarding-setup-body .theme-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent, #38bdf8) 30%, transparent);
 }
 
 .onboarding-setup-body .theme-preview {
@@ -278,7 +298,7 @@
 
 .onboarding-setup-body .accent-circle.selected {
   transform: scale(1.12);
-  box-shadow: 0 0 0 2px #fff, 0 0 10px rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 2px #fff, 0 0 12px var(--accent);
 }
 
 .onboarding-sprite-card {
@@ -328,67 +348,44 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--profile-modal-bg);
+  background: var(--auth-boxes, var(--profile-modal-bg, #141416));
   position: relative;
   z-index: 2;
+  gap: 12px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
-.onboarding-btn-skip {
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 0.88rem;
-  border: none;
+.onboarding-setup-footer .onboarding-skip-btn {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--text-muted, #9ca3af) !important;
+  border-color: transparent !important;
+  padding: 8px 4px !important;
+  min-height: auto !important;
   text-decoration: underline;
-  cursor: pointer;
-  padding: 8px 4px;
-  transition: color 0.2s;
-}
-
-.onboarding-btn-skip:hover:not(:disabled) {
-  color: #fff;
-}
-
-.onboarding-btn-back {
-  padding: 8px 16px;
-  background: var(--searchbar-dropdown);
-  color: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 0.9rem;
+  text-underline-offset: 3px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
-.onboarding-btn-back:hover:not(:disabled) {
-  background: var(--dropdown-item-hover-bg);
-  border-color: rgba(255, 255, 255, 0.2);
+.onboarding-setup-footer .onboarding-skip-btn:hover:not(:disabled) {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--text, #ffffff) !important;
+  text-decoration: underline;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
-.onboarding-btn-next {
-  padding: 8px 20px;
-  background: var(--accent);
-  color: #000;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+/* Switch & Preferences */
+.onboarding-setup-body .switch-input:checked + .switch-slider {
+  background-color: var(--accent) !important;
 }
 
-.onboarding-btn-next:hover:not(:disabled) {
-  filter: brightness(1.12);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(var(--accent-rgb, 234, 179, 8), 0.35);
-}
-
-.onboarding-btn-back:disabled,
-.onboarding-btn-next:disabled,
-.onboarding-btn-skip:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.onboarding-setup-body .preference-item input[type="checkbox"]:checked {
+  accent-color: var(--accent);
 }
 
 /* Animations */
@@ -429,7 +426,7 @@
     box-shadow: 0 0 14px var(--accent), 0 0 0 3px rgba(255, 255, 255, 0.15);
   }
   50% {
-    box-shadow: 0 0 20px var(--accent), 0 0 0 5px rgba(var(--accent-rgb, 234, 179, 8), 0.35);
+    box-shadow: 0 0 20px var(--accent), 0 0 0 5px color-mix(in srgb, var(--accent, #38bdf8) 40%, transparent);
   }
 }
 
@@ -443,11 +440,13 @@
   .onboarding-modal,
   .onboarding-setup-modal {
     max-height: calc(100dvh - 20px);
-    border-radius: 14px;
+    border-radius: 16px;
   }
 
   .onboarding-setup-header {
     padding: 12px 14px 8px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
   }
 
   .onboarding-title {
@@ -532,12 +531,8 @@
 
   .onboarding-setup-footer {
     padding: 12px 14px;
-  }
-
-  .onboarding-btn-back,
-  .onboarding-btn-next {
-    padding: 8px 14px;
-    font-size: 0.85rem;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
   }
 }
 

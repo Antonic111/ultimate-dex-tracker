@@ -3,9 +3,9 @@
 export const HUNT_SYSTEM = {
   "Red": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 1
@@ -13,9 +13,9 @@ export const HUNT_SYSTEM = {
   },
   "Blue": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 1
@@ -23,9 +23,9 @@ export const HUNT_SYSTEM = {
   },
   "Green": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 1
@@ -33,9 +33,9 @@ export const HUNT_SYSTEM = {
   },
   "Yellow": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 1
@@ -43,9 +43,9 @@ export const HUNT_SYSTEM = {
   },
   "Gold": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 8192, description: "Egg hatching" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Breeding", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0, // Not available in Gen 2
@@ -54,9 +54,9 @@ export const HUNT_SYSTEM = {
   },
   "Silver": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 8192, description: "Egg hatching" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Breeding", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0, // Not available in Gen 2
@@ -65,10 +65,10 @@ export const HUNT_SYSTEM = {
   },
   "Crystal": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 8192, description: "Egg hatching" },
-      { name: "Odd Egg", baseOdds: 10, description: "Special egg from Day Care" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Breeding", baseOdds: 8192 },
+      { name: "Odd Egg", baseOdds: 10 }
     ],
     modifiers: {
       "Shiny Charm": 0, // Not available in Gen 2
@@ -77,9 +77,9 @@ export const HUNT_SYSTEM = {
   },
   "Ruby": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 3
@@ -87,9 +87,9 @@ export const HUNT_SYSTEM = {
   },
   "Sapphire": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 3
@@ -97,10 +97,10 @@ export const HUNT_SYSTEM = {
   },
   "Fire Red": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" },
-      { name: "Gift Pokemon", baseOdds: 8192, description: "Received as gifts from NPCs" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 },
+      { name: "Gift Pokemon", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 3
@@ -108,10 +108,10 @@ export const HUNT_SYSTEM = {
   },
   "Leaf Green": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" },
-      { name: "Gift Pokemon", baseOdds: 8192, description: "Received as gifts from NPCs" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 },
+      { name: "Gift Pokemon", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 3
@@ -119,10 +119,10 @@ export const HUNT_SYSTEM = {
   },
   "Emerald": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" },
-      { name: "Gift Pokemon", baseOdds: 8192, description: "Received as gifts from NPCs" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 },
+      { name: "Gift Pokemon", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 3
@@ -130,13 +130,13 @@ export const HUNT_SYSTEM = {
   },
   "Diamond": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 8192, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 1638, description: "Breeding with foreign Pokemon" },
-      { name: "Poke Radar", baseOdds: 8192, description: "Chain encounters with radar" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" },
-      { name: "Gift Pokemon", baseOdds: 8192, description: "Received as gifts from NPCs" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Breeding", baseOdds: 8192 },
+      { name: "Masuda Method", baseOdds: 1638 },
+      { name: "Poke Radar", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 },
+      { name: "Gift Pokemon", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 4
@@ -145,13 +145,13 @@ export const HUNT_SYSTEM = {
   },
   "Pearl": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 8192, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 1638, description: "Breeding with foreign Pokemon" },
-      { name: "Poke Radar", baseOdds: 8192, description: "Chain encounters with radar" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" },
-      { name: "Gift Pokemon", baseOdds: 8192, description: "Received as gifts from NPCs" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Breeding", baseOdds: 8192 },
+      { name: "Masuda Method", baseOdds: 1638 },
+      { name: "Poke Radar", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 },
+      { name: "Gift Pokemon", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 4
@@ -160,13 +160,13 @@ export const HUNT_SYSTEM = {
   },
   "Platinum": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 8192, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 1365, description: "Breeding with foreign Pokemon" },
-      { name: "Poke Radar", baseOdds: 8192, description: "Chain encounters with radar" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" },
-      { name: "Gift Pokemon", baseOdds: 8192, description: "Received as gifts from NPCs" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Breeding", baseOdds: 8192 },
+      { name: "Masuda Method", baseOdds: 1638 },
+      { name: "Poke Radar", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 },
+      { name: "Gift Pokemon", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 4
@@ -175,12 +175,12 @@ export const HUNT_SYSTEM = {
   },
   "Heart Gold": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Masuda Method", baseOdds: 1365, description: "Breeding with foreign Pokemon" },
-      { name: "Headbutt Encounters", baseOdds: 8192, description: "Shaking trees for encounters" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" },
-      { name: "Gift Pokemon", baseOdds: 8192, description: "Received as gifts from NPCs" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Masuda Method", baseOdds: 1638 },
+      { name: "Headbutt Encounters", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 },
+      { name: "Gift Pokemon", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 4
@@ -188,12 +188,12 @@ export const HUNT_SYSTEM = {
   },
   "Soul Silver": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Masuda Method", baseOdds: 1365, description: "Breeding with foreign Pokemon" },
-      { name: "Headbutt Encounters", baseOdds: 8192, description: "Shaking trees for encounters" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" },
-      { name: "Gift Pokemon", baseOdds: 8192, description: "Received as gifts from NPCs" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Masuda Method", baseOdds: 1638 },
+      { name: "Headbutt Encounters", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 },
+      { name: "Gift Pokemon", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 4
@@ -201,11 +201,11 @@ export const HUNT_SYSTEM = {
   },
   "Black": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Masuda Method", baseOdds: 1365, description: "Breeding with foreign Pokemon" },
-      { name: "Gift Pokemon", baseOdds: 8192, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Masuda Method", baseOdds: 1365 },
+      { name: "Gift Pokemon", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 5
@@ -213,11 +213,11 @@ export const HUNT_SYSTEM = {
   },
   "White": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Masuda Method", baseOdds: 1365, description: "Breeding with foreign Pokemon" },
-      { name: "Gift Pokemon", baseOdds: 8192, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Masuda Method", baseOdds: 1365 },
+      { name: "Gift Pokemon", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 0 // Not available in Gen 5
@@ -225,11 +225,11 @@ export const HUNT_SYSTEM = {
   },
   "Black 2": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Masuda Method", baseOdds: 1365, description: "Breeding with foreign Pokemon" },
-      { name: "Gift Pokemon", baseOdds: 8192, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Masuda Method", baseOdds: 1365 },
+      { name: "Gift Pokemon", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 5 sequels - improves odds to 1/2731 for most methods, 1/1024 for Masuda
@@ -237,11 +237,11 @@ export const HUNT_SYSTEM = {
   },
   "White 2": {
     methods: [
-      { name: "Random Encounters", baseOdds: 8192, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 8192, description: "Reset at legendary encounters" },
-      { name: "Masuda Method", baseOdds: 1365, description: "Breeding with foreign Pokemon" },
-      { name: "Gift Pokemon", baseOdds: 8192, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 8192, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 8192 },
+      { name: "Soft Resets", baseOdds: 8192 },
+      { name: "Masuda Method", baseOdds: 1365 },
+      { name: "Gift Pokemon", baseOdds: 8192 },
+      { name: "Fossil Revivals", baseOdds: 8192 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 5 sequels - improves odds to 1/2731 for most methods, 1/1024 for Masuda
@@ -249,16 +249,16 @@ export const HUNT_SYSTEM = {
   },
   "X": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "Poke Radar", baseOdds: 4096, description: "Chain encounters with radar" },
-      { name: "Chain Fishing", baseOdds: 4096, description: "Fishing chain encounters" },
-      { name: "Horde Encounters", baseOdds: 819, description: "Multiple Pokemon encounters" },
-      { name: "Friend Safari", baseOdds: 819, description: "Safari zone encounters" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "Poke Radar", baseOdds: 4096 },
+      { name: "Chain Fishing", baseOdds: 4096 },
+      { name: "Horde Encounters", baseOdds: 819 },
+      { name: "Friend Safari", baseOdds: 819 },
+      { name: "Gift Pokemon", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 6 - triples odds, Masuda becomes 1/512, Friend Safari becomes 1/585, Horde becomes 1/273
@@ -266,16 +266,16 @@ export const HUNT_SYSTEM = {
   },
   "Y": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "Poke Radar", baseOdds: 4096, description: "Chain encounters with radar" },
-      { name: "Chain Fishing", baseOdds: 4096, description: "Fishing chain encounters" },
-      { name: "Horde Encounters", baseOdds: 819, description: "Multiple Pokemon encounters" },
-      { name: "Friend Safari", baseOdds: 819, description: "Safari zone encounters" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "Poke Radar", baseOdds: 4096 },
+      { name: "Chain Fishing", baseOdds: 4096 },
+      { name: "Horde Encounters", baseOdds: 819 },
+      { name: "Friend Safari", baseOdds: 819 },
+      { name: "Gift Pokemon", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 6 - triples odds, Masuda becomes 1/512, Friend Safari becomes 1/585, Horde becomes 1/273
@@ -283,15 +283,15 @@ export const HUNT_SYSTEM = {
   },
   "Omega Ruby": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "DexNav", baseOdds: 4096, description: "Search encounters with DexNav" },
-      { name: "Chain Fishing", baseOdds: 4096, description: "Fishing chain encounters" },
-      { name: "Horde Encounters", baseOdds: 819, description: "Multiple Pokemon encounters" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "DexNav", baseOdds: 4096 },
+      { name: "Chain Fishing", baseOdds: 4096 },
+      { name: "Horde Encounters", baseOdds: 819 },
+      { name: "Gift Pokemon", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 6 - triples odds
@@ -299,15 +299,15 @@ export const HUNT_SYSTEM = {
   },
   "Alpha Sapphire": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "DexNav", baseOdds: 4096, description: "Search encounters with DexNav" },
-      { name: "Chain Fishing", baseOdds: 4096, description: "Fishing chain encounters" },
-      { name: "Horde Encounters", baseOdds: 819, description: "Multiple Pokemon encounters" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "DexNav", baseOdds: 4096 },
+      { name: "Chain Fishing", baseOdds: 4096 },
+      { name: "Horde Encounters", baseOdds: 819 },
+      { name: "Gift Pokemon", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 6 - triples odds
@@ -315,15 +315,15 @@ export const HUNT_SYSTEM = {
   },
   "Sun": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "SOS", baseOdds: 4096, description: "SOS chain encounters" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" },
-      { name: "Poke Pelago", baseOdds: 4096, description: "Island exploration encounters" },
-      { name: "Island Scan", baseOdds: 4096, description: "QR code scan encounters" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "SOS", baseOdds: 4096 },
+      { name: "Gift Pokemon", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 },
+      { name: "Poke Pelago", baseOdds: 4096 },
+      { name: "Island Scan", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 7 - triples odds
@@ -331,15 +331,15 @@ export const HUNT_SYSTEM = {
   },
   "Moon": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "SOS", baseOdds: 4096, description: "SOS chain encounters" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" },
-      { name: "Poke Pelago", baseOdds: 4096, description: "Island exploration encounters" },
-      { name: "Island Scan", baseOdds: 4096, description: "QR code scan encounters" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "SOS", baseOdds: 4096 },
+      { name: "Gift Pokemon", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 },
+      { name: "Poke Pelago", baseOdds: 4096 },
+      { name: "Island Scan", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 7 - triples odds
@@ -347,16 +347,16 @@ export const HUNT_SYSTEM = {
   },
   "Ultra Sun": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "SOS", baseOdds: 4096, description: "SOS chain encounters" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" },
-      { name: "Poke Pelago", baseOdds: 4096, description: "Island exploration encounters" },
-      { name: "Island Scan", baseOdds: 4096, description: "QR code scan encounters" },
-      { name: "Ultra Wormholes", baseOdds: 4096, description: "Ultra Space encounters" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "SOS", baseOdds: 4096 },
+      { name: "Gift Pokemon", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 },
+      { name: "Poke Pelago", baseOdds: 4096 },
+      { name: "Island Scan", baseOdds: 4096 },
+      { name: "Ultra Wormholes", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 7 - triples odds
@@ -364,16 +364,16 @@ export const HUNT_SYSTEM = {
   },
   "Ultra Moon": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "SOS", baseOdds: 4096, description: "SOS chain encounters" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" },
-      { name: "Poke Pelago", baseOdds: 4096, description: "Island exploration encounters" },
-      { name: "Island Scan", baseOdds: 4096, description: "QR code scan encounters" },
-      { name: "Ultra Wormholes", baseOdds: 4096, description: "Ultra Space encounters" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "SOS", baseOdds: 4096 },
+      { name: "Gift Pokemon", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 },
+      { name: "Poke Pelago", baseOdds: 4096 },
+      { name: "Island Scan", baseOdds: 4096 },
+      { name: "Ultra Wormholes", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 7 - triples odds
@@ -381,11 +381,11 @@ export const HUNT_SYSTEM = {
   },
   "Let's Go Pikachu": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
-      { name: "Catch Combo", baseOdds: 4096, description: "Chain catching encounters" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 },
+      { name: "Gift Pokemon", baseOdds: 4096 },
+      { name: "Catch Combo", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3, // Available in Let's Go - triples odds for most methods
@@ -394,11 +394,11 @@ export const HUNT_SYSTEM = {
   },
   "Let's Go Eevee": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
-      { name: "Catch Combo", baseOdds: 4096, description: "Chain catching encounters" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 },
+      { name: "Gift Pokemon", baseOdds: 4096 },
+      { name: "Catch Combo", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3, // Available in Let's Go - triples odds for most methods
@@ -407,15 +407,15 @@ export const HUNT_SYSTEM = {
   },
   "Sword": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "Dynamax Raids", baseOdds: 4096, description: "Max Raid Battles" },
-      { name: "Dynamax Adventures", baseOdds: 300, description: "Crown Tundra adventures" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" },
-      { name: "KO Method", baseOdds: 4096, description: "Knockout chain encounters" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "Dynamax Raids", baseOdds: 4096 },
+      { name: "Dynamax Adventures", baseOdds: 300 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Gift Pokemon", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 },
+      { name: "KO Method", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 8 - triples odds
@@ -423,15 +423,15 @@ export const HUNT_SYSTEM = {
   },
   "Shield": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "Dynamax Raids", baseOdds: 4096, description: "Max Raid Battles" },
-      { name: "Dynamax Adventures", baseOdds: 300, description: "Crown Tundra adventures" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" },
-      { name: "KO Method", baseOdds: 4096, description: "Knockout chain encounters" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "Dynamax Raids", baseOdds: 4096 },
+      { name: "Dynamax Adventures", baseOdds: 300 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Gift Pokemon", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 },
+      { name: "KO Method", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 8 - triples odds
@@ -439,14 +439,14 @@ export const HUNT_SYSTEM = {
   },
   "Brilliant Diamond": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "Underground Diglett Hunt", baseOdds: 2048, description: "Diglett hunting in Grand Underground" },
-      { name: "Poke Radar", baseOdds: 4096, description: "Chain encounters with Poke Radar" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "Underground Diglett Hunt", baseOdds: 2048 },
+      { name: "Poke Radar", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 },
+      { name: "Gift Pokemon", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 8 remakes - triples odds
@@ -454,14 +454,14 @@ export const HUNT_SYSTEM = {
   },
   "Shining Pearl": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "Underground Diglett Hunt", baseOdds: 2048, description: "Diglett hunting in Grand Underground" },
-      { name: "Poke Radar", baseOdds: 4096, description: "Chain encounters with Poke Radar" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils at museums" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "Underground Diglett Hunt", baseOdds: 2048 },
+      { name: "Poke Radar", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 },
+      { name: "Gift Pokemon", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3 // Available in Gen 8 remakes - triples odds
@@ -469,12 +469,11 @@ export const HUNT_SYSTEM = {
   },
   "Legends Arceus": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Mass Outbreaks", baseOdds: 158, description: "Mass outbreak encounters" },
-      { name: "Massive Mass Outbreaks", baseOdds: 316, description: "Massive mass outbreak encounters" },
-      { name: "Space-Time Distortions", baseOdds: 4096, description: "Space-time distortion encounters" },
-      { name: "Permutations", baseOdds: 4096, description: "Permutation encounters" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Mass Outbreaks", baseOdds: 158 },
+      { name: "Massive Mass Outbreaks", baseOdds: 316 },
+      { name: "Space-Time Distortions", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 1, // Special calculation for Legends Arceus
@@ -484,13 +483,13 @@ export const HUNT_SYSTEM = {
   },
   "Legends Z-A": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Soft Resets", baseOdds: 4096, description: "Reset at legendary encounters" },
-      { name: "Bench Resets", baseOdds: 4096, description: "Resetting at bench encounters" },
-      { name: "Fast Travels", baseOdds: 4096, description: "Fast travel encounters" },
-      { name: "Hyperspaces", baseOdds: 4096, description: "Hyperspace encounters" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" },
-      { name: "Fossil Revivals", baseOdds: 4096, description: "Reviving fossils" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Soft Resets", baseOdds: 4096 },
+      { name: "Bench Resets", baseOdds: 4096 },
+      { name: "Fast Travels", baseOdds: 4096 },
+      { name: "Hyperspaces", baseOdds: 4096 },
+      { name: "Gift Pokemon", baseOdds: 4096 },
+      { name: "Fossil Revivals", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3, // Available in Legends Z-A - triples odds (same as Scarlet/Violet)
@@ -501,14 +500,14 @@ export const HUNT_SYSTEM = {
   },
   "Scarlet": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "Tera Raids", baseOdds: 4103, description: "Tera Raid Battles" },
-      { name: "Mass Outbreaks", baseOdds: 4096, description: "Mass outbreak encounters" },
-      { name: "Picnic Resets", baseOdds: 4096, description: "Resetting at picnic encounters" },
-      { name: "Sandwich", baseOdds: 4096, description: "Sandwich encounter power" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "Tera Raids", baseOdds: 4103 },
+      { name: "Mass Outbreaks", baseOdds: 4096 },
+      { name: "Picnic Resets", baseOdds: 4096 },
+      { name: "Sandwich", baseOdds: 4096 },
+      { name: "Gift Pokemon", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3, // Available in Gen 9 - triples odds
@@ -520,14 +519,14 @@ export const HUNT_SYSTEM = {
   },
   "Violet": {
     methods: [
-      { name: "Random Encounters", baseOdds: 4096, description: "Random wild encounters" },
-      { name: "Breeding", baseOdds: 4096, description: "Egg hatching" },
-      { name: "Masuda Method", baseOdds: 683, description: "Breeding with foreign Pokemon" },
-      { name: "Tera Raids", baseOdds: 4103, description: "Tera Raid Battles" },
-      { name: "Mass Outbreaks", baseOdds: 4096, description: "Mass outbreak encounters" },
-      { name: "Picnic Resets", baseOdds: 4096, description: "Resetting at picnic encounters" },
-      { name: "Sandwich", baseOdds: 4096, description: "Sandwich encounter power" },
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as gifts from NPCs" }
+      { name: "Random Encounters", baseOdds: 4096 },
+      { name: "Breeding", baseOdds: 4096 },
+      { name: "Masuda Method", baseOdds: 683 },
+      { name: "Tera Raids", baseOdds: 4103 },
+      { name: "Mass Outbreaks", baseOdds: 4096 },
+      { name: "Picnic Resets", baseOdds: 4096 },
+      { name: "Sandwich", baseOdds: 4096 },
+      { name: "Gift Pokemon", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 3, // Available in Gen 9 - triples odds
@@ -539,11 +538,11 @@ export const HUNT_SYSTEM = {
   },
   "GO": {
     methods: [
-      { name: "Random Encounters", baseOdds: 512, description: "Wild Pokemon encounters" },
-      { name: "Raid Battles", baseOdds: 20, description: "Raid battle encounters" },
-      { name: "Field Research", baseOdds: 20, description: "Field research task rewards" },
-      { name: "Daily Adventure Incense", baseOdds: 512, description: "Daily Adventure Incense encounters" },
-      { name: "Breeding", baseOdds: 512, description: "Pokemon breeding encounters" }
+      { name: "Random Encounters", baseOdds: 512 },
+      { name: "Raid Battles", baseOdds: 20 },
+      { name: "Field Research", baseOdds: 20 },
+      { name: "Daily Adventure Incense", baseOdds: 512 },
+      { name: "Breeding", baseOdds: 512 }
     ],
     modifiers: {
       "Shiny Charm": 0, // Not available in Pokemon Go
@@ -556,7 +555,7 @@ export const HUNT_SYSTEM = {
   },
   "Home": {
     methods: [
-      { name: "Gift Pokemon", baseOdds: 4096, description: "Received as a gift in Home" }
+      { name: "Gift Pokemon", baseOdds: 4096 }
     ],
     modifiers: {
       "Shiny Charm": 0
@@ -585,8 +584,21 @@ export const calculateOdds = (gameName, methodName, modifiers = {}) => {
   const game = HUNT_SYSTEM[gameName];
   if (!game) return 4096;
 
-  const method = game.methods.find(m => m.name === methodName);
-  if (!method) return 4096;
+  // Determine the default base odds for this game (8192 for Gen 1-5, 4096 for Gen 6+, 512 for GO)
+  const defaultBaseOdds = game.methods.find(m => m.name === "Random Encounters")?.baseOdds || game.methods[0]?.baseOdds || 4096;
+
+  const method = game.methods.find(m => m.name === methodName) || (gameName === "Legends Arceus" && methodName === "Permutations" ? { name: "Permutations", baseOdds: 316 } : null);
+  if (methodName === "Evolved" || !method) {
+    let finalOdds = defaultBaseOdds;
+    if (modifiers.shinyCharm && game.modifiers && game.modifiers["Shiny Charm"] > 0) {
+      if (gameName === "Black 2" || gameName === "White 2") {
+        finalOdds = 2731;
+      } else {
+        finalOdds = Math.round(finalOdds / game.modifiers["Shiny Charm"]);
+      }
+    }
+    return finalOdds;
+  }
 
   let finalOdds = method.baseOdds;
 
@@ -643,8 +655,8 @@ export const calculateOdds = (gameName, methodName, modifiers = {}) => {
       finalOdds = Math.floor(finalOdds / game.modifiers["Shiny Parents"]);
     }
 
-  // Apply Lure Active modifier (for Catch Combo, Random Encounters, and Soft Resets in Let's Go)
-  if (modifiers.lureActive && game.modifiers["Lure Active"] > 0 && (methodName === "Catch Combo" || methodName === "Random Encounters" || methodName === "Soft Resets")) {
+  // Apply Lure Active modifier (for Catch Combo and Random Encounters in Let's Go)
+  if (modifiers.lureActive && game.modifiers["Lure Active"] > 0 && (methodName === "Catch Combo" || methodName === "Random Encounters")) {
     finalOdds = Math.floor(finalOdds / game.modifiers["Lure Active"]);
   }
 
@@ -810,20 +822,20 @@ export const calculatePokeRadarOdds = (chainLength) => {
 };
 
 // Function to calculate Poke Radar odds for X and Y
-export const calculatePokeRadarXYOdds = (chainLength) => {
+export const calculatePokeRadarXYOdds = (chainLength, hasShinyCharm = false) => {
   // Cap at chain length 40
   const cappedChainLength = Math.min(chainLength, 40);
   
-  // X and Y Poke Radar: starts at 1/4096, improves to 1/99 at chain 40+
-  // Linear interpolation between 4096 and 99
+  const startOdds = hasShinyCharm ? 1365 : 4096;
+  const endOdds = hasShinyCharm ? 99 : 200;
+
   if (cappedChainLength === 0) {
-    return 4096;
+    return startOdds;
   } else if (cappedChainLength >= 40) {
-    return 99;
+    return endOdds;
   } else {
-    // Linear interpolation: 4096 - (4096-99) * (chainLength/40)
-    const improvement = (4096 - 99) * (cappedChainLength / 40);
-    return Math.round(4096 - improvement);
+    const improvement = (startOdds - endOdds) * (cappedChainLength / 40);
+    return Math.round(startOdds - improvement);
   }
 };
 
@@ -1137,7 +1149,7 @@ export const getCurrentHuntOdds = (gameName, methodName, modifiers = {}, chainLe
   
   // For Poke Radar in X/Y, use dynamic calculation
   if (methodName === "Poke Radar" && (gameName === "X" || gameName === "Y")) {
-    return calculatePokeRadarXYOdds(chainLength);
+    return calculatePokeRadarXYOdds(chainLength, modifiers.shinyCharm);
   }
   
   // For Poke Radar in Brilliant Diamond/Shining Pearl, use dynamic calculation

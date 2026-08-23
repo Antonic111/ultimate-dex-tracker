@@ -63,8 +63,9 @@ export default function ProfileFavorites({ isOwner, isEditing, form, POKEMON_OPT
                     <div className="profile-rank-row mt-6">
                         {Array.from({ length: 5 }).map((_, index) => {
                             const poke = form.favoritePokemon[index];
-                            const data = POKEMON_OPTIONS.find(p => p.value === poke);
-                            const isEmpty = !data;
+                            const data = POKEMON_OPTIONS.find(p => p.value === poke || (p.stableId && p.stableId === poke) || p.name === poke || (p.baseName && p.baseName === poke));
+                            const isEmpty = !data || !poke;
+                            const isShiny = Boolean(form.favoritePokemonShiny?.[index]);
 
                             return (
                                 <div
@@ -91,8 +92,8 @@ export default function ProfileFavorites({ isOwner, isEditing, form, POKEMON_OPT
                                         <div className="profile-pokemon-box">
                                             <img
                                                 src={
-                                                    form.favoritePokemonShiny[index]
-                                                        ? data.shinyImage
+                                                    isShiny
+                                                        ? (data.shinyImage || data.image)
                                                         : data.image
                                                 }
                                                 alt={data.name}

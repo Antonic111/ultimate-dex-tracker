@@ -387,14 +387,21 @@
 }
 
 /* ===== SKELETON LOADING ===== */
-.skeleton {
+:root {
+  --skeleton-bg: #222222;
+  --skeleton-shimmer: rgba(255, 255, 255, 0.08);
+}
+
+.skeleton,
+.skeleton-box {
   background: linear-gradient(90deg,
-      var(--skeleton-bg) 25%,
-      rgba(255, 255, 255, 0.1) 37%,
-      var(--skeleton-bg) 63%);
+      var(--skeleton-bg, #222222) 25%,
+      var(--skeleton-shimmer, rgba(255, 255, 255, 0.08)) 37%,
+      var(--skeleton-bg, #222222) 63%);
   background-size: 400% 100%;
   animation: skeleton-loading 1.4s ease infinite;
-  border-radius: 4px;
+  border-radius: 6px;
+  pointer-events: none;
 }
 
 @keyframes skeleton-loading {
@@ -404,6 +411,22 @@
 
   100% {
     background-position: 0% 50%;
+  }
+}
+
+/* Smooth Progressive Content Fade-in */
+.fade-in-content {
+  animation: fadeInContent 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -419,13 +442,11 @@
 }
 
 /* ===== DARK/LIGHT THEME ADAPTATIONS ===== */
-[data-theme="light"] .loading-overlay {
-  background-color: rgba(255, 255, 255, 0.9);
+[data-theme="light"] {
+  --skeleton-bg: #e2e8f0;
+  --skeleton-shimmer: rgba(255, 255, 255, 0.7);
 }
 
-[data-theme="light"] .skeleton {
-  background: linear-gradient(90deg,
-      #f0f0f0 25%,
-      #e0e0e0 37%,
-      #f0f0f0 63%);
+[data-theme="light"] .loading-overlay {
+  background-color: rgba(255, 255, 255, 0.9);
 }

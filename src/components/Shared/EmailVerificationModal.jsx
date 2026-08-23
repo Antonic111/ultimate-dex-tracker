@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
+import React, { useState, useEffect } from "react";
+import { Mail, Check, ShieldCheck, KeyRound } from "lucide-react";
 import { useMessage } from "./MessageContext";
 import { userAPI } from "../../utils/api";
-import LoadingButton from "./LoadingButton";
-import "../../css/PasswordVerificationModal.css";
+import { Modal } from "./Modal";
+import { Button } from "./Button";
+import { TextField } from "./FormField";
 
 export default function EmailVerificationModal({ 
   isOpen, 
@@ -17,7 +18,6 @@ export default function EmailVerificationModal({
   const [code, setCode] = useState("");
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
-  const [closing, setClosing] = useState(false);
   const [emailCooldown, setEmailCooldown] = useState(0);
 
   const canVerify = code.trim().length === 6;
@@ -25,11 +25,7 @@ export default function EmailVerificationModal({
   const stepTitle = step === "current" 
     ? "Verify Current Email" 
     : "Verify New Email";
-  const stepDescription = step === "current"
-    ? `We'll email a 6-digit verification code to your current email address <b className="email-highlight">${currentEmail}</b> to confirm you own this account.`
-    : `We've sent a 6-digit verification code to your new email address <b className="email-highlight">${newEmail}</b>. Please enter it to complete the email change.`;
 
-  // Reset code when modal opens or step changes
   useEffect(() => {
     if (isOpen) {
       setCode("");
@@ -37,7 +33,6 @@ export default function EmailVerificationModal({
     }
   }, [isOpen, step]);
 
-  // Handle email cooldown countdown
   useEffect(() => {
     let interval;
     if (emailCooldown > 0) {
@@ -55,13 +50,6 @@ export default function EmailVerificationModal({
     };
   }, [emailCooldown]);
 
-  const handleClose = () => {
-    setClosing(true);
-    setTimeout(() => {
-      onClose();
-    }, 300);
-  };
-
   const sendCode = async () => {
     try {
       setSending(true);
@@ -71,7 +59,6 @@ export default function EmailVerificationModal({
         await userAPI.sendNewEmailVerificationCode();
       }
       showMessage("Verification code sent to your email.", "success");
-      // Start 30 second cooldown
       setEmailCooldown(30);
     } catch (e) {
       showMessage(e.message || "Couldn't send code", "error");
@@ -88,7 +75,6 @@ export default function EmailVerificationModal({
     }
     try {
       setVerifying(true);
-      // Verify the code
       let result = null;
       if (step === "current") {
         result = await userAPI.verifyCurrentEmailCode(code);
@@ -96,97 +82,85 @@ export default function EmailVerificationModal({
         result = await userAPI.verifyNewEmailCode(code);
       }
       showMessage("Verification successful!", "success");
-      // Call parent callback with result
       await onVerified?.(code, result);
       if (step === "new") {
-        handleClose();
+        onClose();
       }
     } catch (e) {
       showMessage(e.message, "error");
-      // Don't re-throw - modal handles error display
     } finally {
       setVerifying(false);
     }
   };
 
-  useEffect(() => {
-    const preventScroll = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    };
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={stepTitle}
+      subtitle={
+        step === "current"
+          ? "Verify account ownership before making changes"
+          : "Confirm your new email address to complete the update"
+      }
+      icon={<ShieldCheck size={22} />}
+      size="sm"
+    >
+      <form onSubmit={confirmVerification} className="space-y-4 text-sm" style={{ color: 'var(--text)' }}>
+        <p>
+          {step === "current" ? (
+            <>
+              We'll email a 6-digit verification code to your current email address <b style={{ color: 'var(--accent)' }}>{currentEmail}</b>.
+            </>
+          ) : (
+            <>
+              We've sent a 6-digit verification code to your new email address <b style={{ color: 'var(--accent)' }}>{newEmail}</b>.
+            </>
+          )}
+        </p>
 
-    if (isOpen) {
-      document.addEventListener('wheel', preventScroll, { passive: false });
-      document.addEventListener('touchmove', preventScroll, { passive: false });
-    } else {
-      document.removeEventListener('wheel', preventScroll);
-      document.removeEventListener('touchmove', preventScroll);
-    }
-    
-    return () => {
-      document.removeEventListener('wheel', preventScroll);
-      document.removeEventListener('touchmove', preventScroll);
-    };
-  }, [isOpen]);
-
-  return createPortal(
-    <div className={`modal-backdrop${closing ? " closing" : ""}`}>
-      <div className={`modal-card${closing ? " closing" : ""}`}>
-        <h3 className="modal-title">{stepTitle}</h3>
-        <p 
-          className="modal-desc"
-          dangerouslySetInnerHTML={{ __html: stepDescription }}
-        />
-
-        <div className="modal-row">
-          <LoadingButton 
-            variant="primary"
-            size="medium"
-            loading={sending}
-            loadingText="Sending..."
-            disabled={emailCooldown > 0}
+        <div>
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={sendCode}
+            loading={sending}
+            disabled={emailCooldown > 0}
+            icon={<Mail size={15} />}
           >
-            {emailCooldown > 0 ? `Resend in ${emailCooldown}s` : "Send code"}
-          </LoadingButton>
+            {emailCooldown > 0 ? `Resend code in ${emailCooldown}s` : "Send verification code"}
+          </Button>
         </div>
 
-        <form onSubmit={confirmVerification}>
-          <label className="modal-label">6-digit code</label>
-          <input
-            className="modal-input"
-            inputMode="numeric"
-            maxLength={6}
-            value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-            placeholder="Enter code"
-            autoFocus
-          />
+        <TextField
+          label="6-Digit Code"
+          id="verify-email-code"
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+          placeholder="000000"
+          startIcon={<KeyRound size={16} />}
+          maxLength={6}
+          fullWidth
+          required
+          autoFocus
+          autoComplete="one-time-code"
+        />
 
-          <div className="modal-row">
-            <LoadingButton 
-              type="submit" 
-              variant="primary"
-              size="medium"
-              loading={verifying}
-              loadingText="Verifying..."
-              disabled={!canVerify}
-            >
-              {step === "current" ? "Verify & Continue" : "Verify & Complete"}
-            </LoadingButton>
-            <LoadingButton 
-              type="button" 
-              variant="secondary"
-              size="medium"
-              onClick={handleClose}
-            >
-              Cancel
-            </LoadingButton>
-          </div>
-        </form>
-      </div>
-    </div>,
-    document.body
+        <div className="flex gap-2.5 justify-end pt-2">
+          <Button variant="secondary" onClick={onClose} disabled={verifying}>
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            loading={verifying}
+            disabled={!canVerify}
+            icon={<Check size={16} strokeWidth={2.5} />}
+          >
+            {step === "current" ? "Verify & Continue" : "Verify & Complete"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }

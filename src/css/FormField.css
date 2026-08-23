@@ -1,0 +1,840 @@
+/* ==========================================================================
+   UNIVERSAL FORM FIELD SYSTEM (FormField.css)
+   ========================================================================== */
+
+:root {
+  --udt-field-bg: var(--searchbar-inputs, #242428);
+  --udt-field-border: var(--border-color, rgba(255, 255, 255, 0.12));
+  --udt-field-border-hover: rgba(255, 255, 255, 0.25);
+  --udt-field-text: var(--text, #ffffff);
+  --udt-field-placeholder: var(--searchbar-placeholder-text, rgba(255, 255, 255, 0.45));
+  --udt-field-label: var(--text, #ffffff);
+  --udt-field-helper: var(--profile-labels, rgba(255, 255, 255, 0.55));
+  --udt-field-icon: var(--accent, #ffe76a);
+  --udt-field-focus-ring: color-mix(in srgb, var(--accent, #ffe76a) 22%, transparent);
+  --udt-field-error-ring: rgba(239, 68, 68, 0.22);
+}
+
+[data-theme="light"] {
+  --udt-field-placeholder: var(--searchbar-placeholder-text, rgba(0, 0, 0, 0.42));
+}
+
+/* ==========================================================================
+   1. FIELD WRAPPER & LAYOUT
+   ========================================================================== */
+
+.udt-form-field {
+  display: inline-flex;
+  flex-direction: column;
+  position: relative;
+  text-align: left;
+  box-sizing: border-box;
+  font-family: inherit;
+  width: auto;
+}
+
+.udt-form-field--full-width {
+  display: flex;
+  width: 100%;
+}
+
+/* ==========================================================================
+   2. LABELS & HEADER ROW
+   ========================================================================== */
+
+.udt-field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  line-height: 1.25;
+}
+
+.udt-field-label-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.udt-field-label {
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: var(--udt-field-label);
+  letter-spacing: 0.015em;
+  user-select: none;
+  cursor: pointer;
+}
+
+.udt-field-required-star {
+  color: #ef4444;
+  font-weight: 700;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.udt-field-optional-badge {
+  font-size: 0.725rem;
+  font-weight: 500;
+  color: var(--udt-field-helper);
+  opacity: 0.8;
+  margin-left: 2px;
+}
+
+.udt-field-sublabel {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--udt-field-helper);
+}
+
+.udt-field-header-extra {
+  font-size: 0.75rem;
+  color: var(--udt-field-helper);
+}
+
+/* ==========================================================================
+   3. FIELD CONTROL CONTAINER (Border, Background, Focus Glow)
+   ========================================================================== */
+
+.udt-field-control {
+  display: flex;
+  align-items: center;
+  position: relative;
+  background: var(--udt-field-bg);
+  border: 1px solid var(--udt-field-border);
+  border-radius: 10px;
+  color: var(--udt-field-text);
+  box-sizing: border-box;
+  transition: border-color 0.2s ease,
+              background-color 0.2s ease;
+  overflow: hidden;
+  width: 100%;
+}
+
+.udt-field-control:hover:not(.udt-field-control--disabled) {
+  border-color: var(--udt-field-border-hover);
+}
+
+.udt-field-control--focused {
+  border-color: var(--accent, #ffe76a) !important;
+}
+
+.udt-field-control--error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 2px var(--udt-field-error-ring) !important;
+}
+
+.udt-field-control--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.udt-field-control--disabled * {
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+.udt-field-control--readonly {
+  background: rgba(255, 255, 255, 0.03);
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   4. SIZES
+   ========================================================================== */
+
+/* Small (sm) */
+.udt-form-field--sm .udt-field-control:not(.udt-field-control--textarea) {
+  height: 36px;
+  min-height: 36px;
+  border-radius: 8px;
+}
+.udt-form-field--sm .udt-field-input,
+.udt-form-field--sm .udt-select-trigger,
+.udt-form-field--sm .udt-select-search-inline {
+  font-size: 0.8125rem;
+  padding: 6px 12px;
+  height: 100%;
+}
+.udt-form-field--sm .udt-field-icon-start {
+  padding-left: 10px;
+}
+.udt-form-field--sm .udt-field-icon-end {
+  padding-right: 10px;
+}
+
+/* Medium (md) — DEFAULT */
+.udt-form-field--md .udt-field-control:not(.udt-field-control--textarea) {
+  height: 42px;
+  min-height: 42px;
+  border-radius: 10px;
+}
+.udt-form-field--md .udt-field-input,
+.udt-form-field--md .udt-select-trigger,
+.udt-form-field--md .udt-select-search-inline {
+  font-size: 0.885rem;
+  padding: 9px 14px;
+  height: 100%;
+}
+.udt-form-field--md .udt-field-icon-start {
+  padding-left: 12px;
+}
+.udt-form-field--md .udt-field-icon-end {
+  padding-right: 8px;
+}
+
+/* Large (lg) */
+.udt-form-field--lg .udt-field-control:not(.udt-field-control--textarea) {
+  height: 48px;
+  min-height: 48px;
+  border-radius: 12px;
+}
+.udt-form-field--lg .udt-field-input,
+.udt-form-field--lg .udt-select-trigger,
+.udt-form-field--lg .udt-select-search-inline {
+  font-size: 0.95rem;
+  padding: 12px 16px;
+  height: 100%;
+}
+.udt-form-field--lg .udt-field-icon-start {
+  padding-left: 14px;
+}
+.udt-form-field--lg .udt-field-icon-end {
+  padding-right: 14px;
+}
+
+/* ==========================================================================
+   5. NATIVE INPUT & TEXTAREA STYLING
+   ========================================================================== */
+
+.udt-field-input {
+  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--udt-field-text);
+  font-family: inherit;
+  font-weight: 600; /* Semi-bold field text */
+  box-sizing: border-box;
+  line-height: 1.4;
+  margin: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.udt-field-input::placeholder {
+  color: var(--udt-field-placeholder) !important;
+  font-weight: 500;
+  opacity: 1;
+}
+
+/* Autofill Override: prevent browser yellow/blue/white backgrounds & maintain clean theme styling */
+.udt-field-input:-webkit-autofill,
+.udt-field-input:-webkit-autofill:hover,
+.udt-field-input:-webkit-autofill:focus,
+.udt-field-input:-webkit-autofill:active,
+.udt-field-control input:-webkit-autofill,
+.udt-field-control input:-webkit-autofill:hover,
+.udt-field-control input:-webkit-autofill:focus,
+.udt-field-control input:-webkit-autofill:active,
+.udt-field-control textarea:-webkit-autofill,
+.udt-field-control textarea:-webkit-autofill:hover,
+.udt-field-control textarea:-webkit-autofill:focus,
+.udt-field-control textarea:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--udt-field-bg, #242428) inset !important;
+  box-shadow: 0 0 0 1000px var(--udt-field-bg, #242428) inset !important;
+  -webkit-text-fill-color: var(--udt-field-text, var(--text, #ffffff)) !important;
+  color: var(--udt-field-text, var(--text, #ffffff)) !important;
+  caret-color: var(--udt-field-text, var(--text, #ffffff)) !important;
+  transition: background-color 5000000s ease-in-out 0s, color 5000000s ease-in-out 0s !important;
+  border-radius: inherit !important;
+}
+
+[data-theme="light"] .udt-field-input:-webkit-autofill,
+[data-theme="light"] .udt-field-input:-webkit-autofill:hover,
+[data-theme="light"] .udt-field-input:-webkit-autofill:focus,
+[data-theme="light"] .udt-field-input:-webkit-autofill:active,
+[data-theme="light"] .udt-field-control input:-webkit-autofill,
+[data-theme="light"] .udt-field-control textarea:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--udt-field-bg, #f8fafc) inset !important;
+  box-shadow: 0 0 0 1000px var(--udt-field-bg, #f8fafc) inset !important;
+  -webkit-text-fill-color: var(--udt-field-text, var(--text, #000000)) !important;
+  color: var(--udt-field-text, var(--text, #000000)) !important;
+  caret-color: var(--udt-field-text, var(--text, #000000)) !important;
+}
+
+.udt-field-input:autofill,
+.udt-field-input:autofill:hover,
+.udt-field-input:autofill:focus,
+.udt-field-input:autofill:active,
+.udt-field-control input:autofill,
+.udt-field-control textarea:autofill {
+  filter: none !important;
+  color: var(--udt-field-text, var(--text, #ffffff)) !important;
+  -webkit-text-fill-color: var(--udt-field-text, var(--text, #ffffff)) !important;
+  box-shadow: 0 0 0 1000px var(--udt-field-bg, #242428) inset !important;
+}
+
+/* Date field native styling */
+.udt-field-input--date::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+.udt-field-input--date::-webkit-datetime-edit {
+  color: var(--udt-field-text);
+  padding: 0;
+}
+
+.udt-field-input--date::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+.udt-field-input--date::-webkit-datetime-edit-text {
+  color: var(--udt-field-placeholder) !important;
+  padding: 0 1px;
+}
+
+.udt-field-input--date::-webkit-datetime-edit-month-field,
+.udt-field-input--date::-webkit-datetime-edit-day-field,
+.udt-field-input--date::-webkit-datetime-edit-year-field {
+  color: var(--udt-field-text);
+  font-weight: 600;
+  padding: 1px 2px;
+  border-radius: 3px;
+}
+
+/* When empty / unpopulated, format mm/dd/yyyy in uniform placeholder color */
+.udt-field-input--date-empty::-webkit-datetime-edit,
+.udt-field-input--date-empty::-webkit-datetime-edit-fields-wrapper,
+.udt-field-input--date-empty::-webkit-datetime-edit-text,
+.udt-field-input--date-empty::-webkit-datetime-edit-month-field,
+.udt-field-input--date-empty::-webkit-datetime-edit-day-field,
+.udt-field-input--date-empty::-webkit-datetime-edit-year-field {
+  color: var(--udt-field-placeholder) !important;
+  font-weight: 500;
+}
+
+.udt-field-input--date::-webkit-datetime-edit-month-field:focus,
+.udt-field-input--date::-webkit-datetime-edit-day-field:focus,
+.udt-field-input--date::-webkit-datetime-edit-year-field:focus {
+  background-color: var(--accent, #ffe76a);
+  color: #121216 !important;
+}
+
+/* Auto-padding when icons are present */
+.udt-field-control.has-start-icon .udt-field-input,
+.udt-field-control.has-start-icon .udt-select-trigger {
+  padding-left: 8px !important;
+}
+
+.udt-field-control.has-end-icon .udt-field-input,
+.udt-field-control.has-end-icon .udt-select-trigger {
+  padding-right: 8px !important;
+}
+
+/* ==========================================================================
+   6. ICON SLOTS & ACTIONS
+   ========================================================================== */
+
+.udt-field-icon-start,
+.udt-field-icon-end {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--accent, #ffe76a);
+  line-height: 0;
+  user-select: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.udt-field-icon-start svg:not([stroke="none"]):not(.udt-social-svg),
+.udt-field-icon-end svg:not([stroke="none"]):not(.udt-social-svg) {
+  color: var(--accent, #ffe76a);
+  stroke: currentColor;
+}
+
+.udt-field-icon-start svg[stroke="none"],
+.udt-field-icon-start svg.udt-social-svg,
+.udt-field-icon-end svg[stroke="none"],
+.udt-field-icon-end svg.udt-social-svg {
+  stroke: none !important;
+}
+
+.udt-field-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--accent, #ffe76a);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.15s ease, transform 0.15s ease;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.udt-field-icon-btn:hover {
+  color: var(--udt-field-text);
+  transform: scale(1.1);
+}
+
+/* Dedicated Clear Button: Red hover always */
+.udt-field-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--accent, #ffe76a);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.15s ease, transform 0.15s ease;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.udt-field-clear-btn:hover {
+  color: #ef4444 !important;
+  transform: scale(1.15);
+}
+
+.udt-field-icon-spacer {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   7. NUMBER FIELD STEPPERS
+   ========================================================================== */
+
+.udt-number-stepper-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0;
+  gap: 1px;
+}
+
+.udt-number-stepper-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--udt-field-placeholder);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 0;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.udt-number-stepper-btn:hover:not(:disabled) {
+  color: var(--udt-field-text);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.udt-number-stepper-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* Hide native number input arrows */
+input[type="number"].udt-field-input::-webkit-outer-spin-button,
+input[type="number"].udt-field-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"].udt-field-input {
+  -moz-appearance: textfield;
+}
+
+/* ==========================================================================
+   8. TEXTAREA
+   ========================================================================== */
+
+.udt-field-control--textarea {
+  align-items: flex-start;
+  min-height: auto !important;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.udt-field-textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.udt-field-textarea--no-resize {
+  resize: none;
+}
+
+/* ==========================================================================
+   9. FOOTER: HELPER, ERROR, CHAR COUNT
+   ========================================================================== */
+
+.udt-field-footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 5px;
+  font-size: 0.775rem;
+  line-height: 1.35;
+}
+
+.udt-field-message-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.udt-field-helper {
+  color: var(--udt-field-helper);
+  font-weight: 400;
+}
+
+.udt-field-error {
+  color: #ef4444;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.udt-field-error-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+}
+
+.udt-field-char-count {
+  color: var(--udt-field-helper);
+  font-size: 0.725rem;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-left: auto;
+  opacity: 0.75;
+}
+
+.udt-field-char-count--limit {
+  color: #ef4444;
+  font-weight: 700;
+  opacity: 1;
+}
+
+/* ==========================================================================
+   10. SELECT FIELD (Universal Dropdown)
+   ========================================================================== */
+
+.udt-select-container {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: auto;
+}
+
+.udt-select-container--open {
+  z-index: 10000 !important;
+}
+
+.udt-select-container--full-width {
+  display: flex;
+  width: 100%;
+}
+
+.udt-select-control-box {
+  cursor: pointer !important;
+  user-select: none;
+  width: 100%;
+}
+
+.udt-select-control-box * {
+  cursor: pointer;
+}
+
+.udt-select-control-box .udt-field-clear-btn {
+  cursor: pointer;
+}
+
+.udt-select-trigger {
+  width: 100%;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--udt-field-text);
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.udt-select-value-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.udt-select-value-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.udt-select-value-icon .fi,
+.udt-select-option-icon .fi,
+.udt-field-icon-start .fi {
+  display: inline-block;
+  width: 1.25em;
+  height: 0.95em;
+  border-radius: 2px;
+  background-size: cover;
+  background-position: center;
+  vertical-align: middle;
+}
+
+.udt-select-value-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.udt-select-placeholder {
+  color: var(--udt-field-placeholder) !important;
+  font-weight: 500;
+  font-size: inherit;
+  opacity: 1;
+}
+
+.udt-select-chevron {
+  color: var(--accent, #ffe76a);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 0;
+}
+
+.udt-select-chevron svg {
+  color: var(--accent, #ffe76a);
+  stroke: currentColor;
+}
+
+.udt-select-open .udt-select-chevron {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Menu Popup */
+.udt-select-dropdown {
+  /* position/coords are set via inline style when portaled */
+  z-index: 99999;
+  background: var(--dropdown-bg, #1c1c1c);
+  border: 1.5px solid var(--dropdown-border, #333333);
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 4px 12px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px);
+  overflow: hidden;
+  padding: 6px;
+  box-sizing: border-box;
+  transform-origin: top center;
+}
+
+/* placement-top handled via inline style (bottom instead of top) */
+.udt-select-dropdown--placement-top {
+  transform-origin: bottom center;
+}
+
+/* Inline Search Input for SelectField */
+.udt-select-search-inline {
+  width: 100%;
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-weight: 600;
+  cursor: text !important;
+}
+
+/* Dropdown Options List */
+.udt-select-options-list {
+  max-height: 240px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.udt-select-options-list::-webkit-scrollbar {
+  width: 6px;
+}
+.udt-select-options-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.udt-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: var(--udt-field-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  user-select: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.udt-select-option:hover:not(.udt-select-option--disabled),
+.udt-select-option--focused:not(.udt-select-option--disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent, #ffe76a);
+}
+
+.udt-select-option--selected {
+  background: color-mix(in srgb, var(--accent, #ffe76a) 15%, transparent) !important;
+  color: var(--accent, #ffe76a) !important;
+}
+
+.udt-select-option--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.udt-select-option-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.udt-select-option-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.udt-select-checkbox {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  border-radius: 4px;
+  accent-color: var(--accent, #ffe76a);
+  flex-shrink: 0;
+}
+
+.udt-select-option-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.udt-select-option-img--type {
+  border-radius: 50% !important;
+  transform: scale(1.15);
+  transform-origin: center;
+}
+
+.udt-select-option-text-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.udt-select-option-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.udt-select-option-desc {
+  font-size: 0.725rem;
+  font-weight: 400;
+  color: var(--udt-field-helper);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.udt-select-option-check {
+  color: var(--accent, #ffe76a);
+  flex-shrink: 0;
+  display: inline-flex;
+}
+
+.udt-select-empty {
+  padding: 12px 10px;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--udt-field-placeholder);
+}
+
+/* Group Headers */
+.udt-select-group-header {
+  padding: 6px 10px 4px 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--udt-field-helper);
+  opacity: 0.7;
+}

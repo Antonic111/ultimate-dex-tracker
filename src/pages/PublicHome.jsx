@@ -1,34 +1,481 @@
 import { Link } from "react-router-dom";
-import { Sparkles, Users, SquarePen, Star, ArrowRight, Globe, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
+import {
+  Sparkles,
+  Users,
+  SquarePen,
+  ArrowRight,
+  Globe,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  BarChart3,
+  Star,
+  Crosshair,
+  Layers,
+  Pause,
+  Plus,
+  Shield,
+  Clock,
+  Compass,
+  Zap,
+  Flame,
+  Search,
+  Settings,
+  ChevronDown,
+  ChevronUp,
+  Gamepad2,
+  Hash,
+  Award,
+  CirclePlus,
+  Crown,
+  Grid2x2Check,
+  Grid3x3,
+  ListChecks,
+  ListCollapse,
+  Ribbon,
+  CreditCard,
+  Download,
+  LayoutList
+} from "lucide-react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
+import genderForms from "../data/forms/gender.json";
+import alolanForms from "../data/forms/alolan.json";
+import galarianForms from "../data/forms/galarian.json";
+import hisuianForms from "../data/forms/hisuian.json";
+import paldeanForms from "../data/forms/paldean.json";
+import gmaxForms from "../data/forms/gmax.json";
+import unownForms from "../data/forms/unown.json";
+import otherForms from "../data/forms/other.json";
+import alcremieForms from "../data/forms/alcremie.json";
+import vivillonForms from "../data/forms/vivillon.json";
+import alphaForms from "../data/forms/alpha.json";
+
+import Footer from "../components/Shared/Footer";
+import { formatPokemonName } from "../utils";
 import { getSpriteUrl } from "../utils/spriteUtils";
+import { getCaughtKey } from "../caughtStorage";
 import { buildApiUrl } from "../config/api";
+import { Button } from "../components/Shared/Button";
+import { BullseyeIcon } from "../components/Shared/SearchBar";
 import "../css/PublicHome.css";
+
+// Animated sprite collections for Hero spots
+const TOP_RIGHT_SPRITES = [
+  "/landing_page/animated_sprites/top_right/celebi.gif",
+  "/landing_page/animated_sprites/top_right/darkrai.gif",
+  "/landing_page/animated_sprites/top_right/diancie.gif",
+  "/landing_page/animated_sprites/top_right/hoopa.gif",
+  "/landing_page/animated_sprites/top_right/jirachi.gif",
+  "/landing_page/animated_sprites/top_right/manaphy.gif",
+  "/landing_page/animated_sprites/top_right/meloetta.gif",
+  "/landing_page/animated_sprites/top_right/mew.gif"
+];
+
+const BOTTOM_LEFT_SPRITES = [
+  "/landing_page/animated_sprites/bottom_left/bulbasaur.gif",
+  "/landing_page/animated_sprites/bottom_left/charmander.gif",
+  "/landing_page/animated_sprites/bottom_left/chikorita.gif",
+  "/landing_page/animated_sprites/bottom_left/chimchar.gif",
+  "/landing_page/animated_sprites/bottom_left/cyndaquil.gif",
+  "/landing_page/animated_sprites/bottom_left/ditto.gif",
+  "/landing_page/animated_sprites/bottom_left/eevee.gif",
+  "/landing_page/animated_sprites/bottom_left/fennekin.gif",
+  "/landing_page/animated_sprites/bottom_left/froakie.gif",
+  "/landing_page/animated_sprites/bottom_left/grookey.gif",
+  "/landing_page/animated_sprites/bottom_left/litten.gif",
+  "/landing_page/animated_sprites/bottom_left/mudkip.gif",
+  "/landing_page/animated_sprites/bottom_left/oshawott.gif",
+  "/landing_page/animated_sprites/bottom_left/pikachu.gif",
+  "/landing_page/animated_sprites/bottom_left/piplup.gif",
+  "/landing_page/animated_sprites/bottom_left/popplio.gif",
+  "/landing_page/animated_sprites/bottom_left/rowlet.gif",
+  "/landing_page/animated_sprites/bottom_left/scorbunny.gif",
+  "/landing_page/animated_sprites/bottom_left/snivy.gif",
+  "/landing_page/animated_sprites/bottom_left/sobble.gif",
+  "/landing_page/animated_sprites/bottom_left/squirtle.gif",
+  "/landing_page/animated_sprites/bottom_left/tepig.gif",
+  "/landing_page/animated_sprites/bottom_left/torchic.gif",
+  "/landing_page/animated_sprites/bottom_left/totodile.gif",
+  "/landing_page/animated_sprites/bottom_left/treecko.gif",
+  "/landing_page/animated_sprites/bottom_left/turtwig.gif"
+];
+
+const BOTTOM_RIGHT_SPRITES = [
+  "/landing_page/animated_sprites/bottom_right/absol.gif",
+  "/landing_page/animated_sprites/bottom_right/aggron.gif",
+  "/landing_page/animated_sprites/bottom_right/altaria.gif",
+  "/landing_page/animated_sprites/bottom_right/arcanine.gif",
+  "/landing_page/animated_sprites/bottom_right/corviknight.gif",
+  "/landing_page/animated_sprites/bottom_right/donphan.gif",
+  "/landing_page/animated_sprites/bottom_right/dragapult.gif",
+  "/landing_page/animated_sprites/bottom_right/dragonite.gif",
+  "/landing_page/animated_sprites/bottom_right/electivire.gif",
+  "/landing_page/animated_sprites/bottom_right/flygon.gif",
+  "/landing_page/animated_sprites/bottom_right/garchomp.gif",
+  "/landing_page/animated_sprites/bottom_right/gardevoir.gif",
+  "/landing_page/animated_sprites/bottom_right/gengar.gif",
+  "/landing_page/animated_sprites/bottom_right/goodra.gif",
+  "/landing_page/animated_sprites/bottom_right/gyarados.gif",
+  "/landing_page/animated_sprites/bottom_right/hydreigon.gif",
+  "/landing_page/animated_sprites/bottom_right/kommoo.gif",
+  "/landing_page/animated_sprites/bottom_right/krookodile.gif",
+  "/landing_page/animated_sprites/bottom_right/lapras.gif",
+  "/landing_page/animated_sprites/bottom_right/lucario.gif",
+  "/landing_page/animated_sprites/bottom_right/luxray.gif",
+  "/landing_page/animated_sprites/bottom_right/metagross.gif",
+  "/landing_page/animated_sprites/bottom_right/nidoking.gif",
+  "/landing_page/animated_sprites/bottom_right/nidoqueen.gif",
+  "/landing_page/animated_sprites/bottom_right/ninetales.gif",
+  "/landing_page/animated_sprites/bottom_right/pangoro.gif",
+  "/landing_page/animated_sprites/bottom_right/salamence.gif",
+  "/landing_page/animated_sprites/bottom_right/scizor.gif",
+  "/landing_page/animated_sprites/bottom_right/snorlax.gif",
+  "/landing_page/animated_sprites/bottom_right/staraptor.gif",
+  "/landing_page/animated_sprites/bottom_right/toxtricity.gif",
+  "/landing_page/animated_sprites/bottom_right/trevenant.gif",
+  "/landing_page/animated_sprites/bottom_right/tyranitar.gif",
+  "/landing_page/animated_sprites/bottom_right/zoroark.gif"
+];
+
+const FINAL_EVO_STARTERS = [
+  { name: "Blastoise", src: "/landing_page/animated_sprites/final_evo_starters/blastoise.gif", fallback: 9 },
+  { name: "Blaziken", src: "/landing_page/animated_sprites/final_evo_starters/blaziken.gif", fallback: 257 },
+  { name: "Charizard", src: "/landing_page/animated_sprites/final_evo_starters/charizard.gif", fallback: 6 },
+  { name: "Emboar", src: "/landing_page/animated_sprites/final_evo_starters/emboar.gif", fallback: 500 },
+  { name: "Empoleon", src: "/landing_page/animated_sprites/final_evo_starters/empoleon.gif", fallback: 395 },
+  { name: "Feraligatr", src: "/landing_page/animated_sprites/final_evo_starters/feraligatr.gif", fallback: 160 },
+  { name: "Greninja", src: "/landing_page/animated_sprites/final_evo_starters/greninja.gif", fallback: 658 },
+  { name: "Incineroar", src: "/landing_page/animated_sprites/final_evo_starters/incineroar.gif", fallback: 727 },
+  { name: "Infernape", src: "/landing_page/animated_sprites/final_evo_starters/infernape.gif", fallback: 392 },
+  { name: "Meganium", src: "/landing_page/animated_sprites/final_evo_starters/meganium.gif", fallback: 154 },
+  { name: "Primarina", src: "/landing_page/animated_sprites/final_evo_starters/primarina.gif", fallback: 730 },
+  { name: "Samurott", src: "/landing_page/animated_sprites/final_evo_starters/samurott.gif", fallback: 503 },
+  { name: "Sceptile", src: "/landing_page/animated_sprites/final_evo_starters/sceptile.gif", fallback: 254 },
+  { name: "Serperior", src: "/landing_page/animated_sprites/final_evo_starters/serperior.gif", fallback: 497 },
+  { name: "Swampert", src: "/landing_page/animated_sprites/final_evo_starters/swampert.gif", fallback: 260 },
+  { name: "Torterra", src: "/landing_page/animated_sprites/final_evo_starters/torterra.gif", fallback: 389 },
+  { name: "Typhlosion", src: "/landing_page/animated_sprites/final_evo_starters/typhlosion.gif", fallback: 157 },
+  { name: "Venusaur", src: "/landing_page/animated_sprites/final_evo_starters/venusaur.gif", fallback: 3 }
+];
+
+// Poké Ball SVG Icon matching actual SearchBar
+function PokeballIcon({ style = {}, ...props }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="var(--accent)"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      width="1.2em"
+      height="1.2em"
+      style={{ display: "block", ...style }}
+      {...props}
+    >
+      <circle cx="12" cy="12" r="10" fill="none" />
+      <path d="M2 12h20" />
+      <circle cx="12" cy="12" r="3" fill="none" />
+      <circle cx="12" cy="12" r="1" fill="none" />
+    </svg>
+  );
+}
+
+// Category mappings with live data sources
+const CATEGORY_MAP = {
+  "Main Living Dex": {
+    title: "Main Living Dex",
+    data: pokemonData,
+    boxName: (idx) => (idx === 0 ? "0001 - 0030" : "0031 - 0060")
+  },
+  "Gender": {
+    title: "Gender Differences",
+    data: genderForms,
+    boxName: (idx) => `Gender Forms Box ${idx + 1}`
+  },
+  "Alola": {
+    title: "Alolan Forms",
+    data: alolanForms,
+    boxName: (idx) => `Alolan Forms Box ${idx + 1}`
+  },
+  "Galar": {
+    title: "Galarian Forms",
+    data: galarianForms,
+    boxName: (idx) => `Galarian Forms Box ${idx + 1}`
+  },
+  "Gmax": {
+    title: "Gigantamax Forms",
+    data: gmaxForms,
+    boxName: (idx) => `Gmax Forms Box ${idx + 1}`
+  },
+  "Hisui": {
+    title: "Hisuian Forms",
+    data: hisuianForms,
+    boxName: (idx) => `Hisuian Forms Box ${idx + 1}`
+  },
+  "Paldea": {
+    title: "Paldean Forms",
+    data: paldeanForms,
+    boxName: (idx) => `Paldean Forms Box ${idx + 1}`
+  },
+  "Unown": {
+    title: "Unown Forms",
+    data: unownForms,
+    boxName: (idx) => `Unown's Box ${idx + 1}`
+  },
+  "Other Forms": {
+    title: "Other Forms",
+    data: otherForms,
+    boxName: (idx) => `Other Forms Box ${idx + 1}`
+  },
+  "Alcremie": {
+    title: "Alcremie Forms",
+    data: alcremieForms,
+    boxName: (idx) => `Alcremie's Box ${idx + 1}`
+  },
+  "Vivillon": {
+    title: "Vivillon Forms",
+    data: vivillonForms,
+    boxName: (idx) => `Vivillon's Box ${idx + 1}`
+  },
+  "Alpha": {
+    title: "Alpha Forms",
+    data: alphaForms,
+    boxName: (idx) => `Alpha Forms Box ${idx + 1}`
+  }
+};
 
 export default function PublicHome() {
   const [totalCaught, setTotalCaught] = useState(null);
-  const [displayCount, setDisplayCount] = useState(0);
+  const [displayCount, setDisplayCount] = useState(22560);
+  const [activeSection, setActiveSection] = useState(0);
+  const [isHeroShiny, setIsHeroShiny] = useState(false);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [slideDirection, setSlideDirection] = useState("next"); // "next" | "prev"
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [sparkleKey, setSparkleKey] = useState(0);
+  const transitionTimeoutRef = useRef(null);
+  const touchStartXRef = useRef(null);
+  const [activeTab, setActiveTab] = useState("Main Living Dex");
+  const heroTiltRef = useRef(null);
+
+  // Randomize hero sprites on each page land
+  const [heroSprites] = useState(() => ({
+    topRight: TOP_RIGHT_SPRITES[Math.floor(Math.random() * TOP_RIGHT_SPRITES.length)],
+    bottomLeft: BOTTOM_LEFT_SPRITES[Math.floor(Math.random() * BOTTOM_LEFT_SPRITES.length)],
+    bottomRight: BOTTOM_RIGHT_SPRITES[Math.floor(Math.random() * BOTTOM_RIGHT_SPRITES.length)]
+  }));
+
+  // Randomize final evolution starter sprites for CTA banner
+  const [randomStarters] = useState(() => {
+    const idx1 = Math.floor(Math.random() * FINAL_EVO_STARTERS.length);
+    let idx2 = Math.floor(Math.random() * (FINAL_EVO_STARTERS.length - 1));
+    if (idx2 >= idx1) idx2++;
+    return {
+      left: FINAL_EVO_STARTERS[idx1],
+      right: FINAL_EVO_STARTERS[idx2]
+    };
+  });
+
+  // Global 3D Tilt effect: hooks onto mouse when interacting, and plays smooth floating animation when unhooked
+  useEffect(() => {
+    let rafId = null;
+    let isHooked = false;
+    let idleTimer = null;
+    let mouseOffsetX = 0;
+    let mouseOffsetY = 0;
+
+    const baseTiltX = 5.2;  // Tilted up
+    const baseTiltY = -5.0; // Tilted to the left
+    let currentX = baseTiltX;
+    let currentY = baseTiltY;
+    let currentTranslateY = 0;
+
+    const handleMouseMove = (e) => {
+      const width = window.innerWidth;
+      if (width <= 900) return;
+
+      const card = heroTiltRef.current;
+      if (!card) return;
+      const rect = card.getBoundingClientRect();
+      const cardCenterX = rect.left + rect.width / 2;
+      const cardCenterY = rect.top + rect.height / 2;
+
+      // Distance from mouse to card center
+      const dx = e.clientX - cardCenterX;
+      const dy = e.clientY - cardCenterY;
+
+      // Hook when mouse is over or near the hero section
+      const maxDistanceX = Math.max(window.innerWidth * 0.45, 450);
+      const maxDistanceY = Math.max(window.innerHeight * 0.55, 380);
+
+      if (Math.abs(dx) < maxDistanceX && Math.abs(dy) < maxDistanceY) {
+        isHooked = true;
+        const maxRotate = 4.8;
+        const normalizedY = Math.max(-1, Math.min(1, dy / (rect.height / 2)));
+        const normalizedX = Math.max(-1, Math.min(1, dx / (rect.width / 2)));
+
+        mouseOffsetY = -normalizedY * maxRotate;
+        mouseOffsetX = normalizedX * maxRotate;
+
+        if (idleTimer) clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => {
+          isHooked = false; // Unhook when idle
+        }, 1600);
+      } else {
+        isHooked = false; // Unhook when mouse leaves hero area
+      }
+    };
+
+    const handleMouseLeave = () => {
+      isHooked = false;
+      if (idleTimer) clearTimeout(idleTimer);
+    };
+
+    const animateTilt = (now) => {
+      if (window.innerWidth <= 900) {
+        if (heroTiltRef.current) {
+          heroTiltRef.current.style.transform = "none";
+        }
+        rafId = requestAnimationFrame(animateTilt);
+        return;
+      }
+
+      // Soft harmonic floating breathing that plays when unhooked
+      const time = (now || performance.now()) * 0.00075;
+      const idleTiltX = baseTiltX + Math.sin(time * 1.1) * 0.8;
+      const idleTiltY = baseTiltY + Math.cos(time * 0.9) * 0.9;
+      const idleFloatY = Math.sin(time * 1.1) * 4.0;
+
+      let targetX = baseTiltX;
+      let targetY = baseTiltY;
+      let targetTranslateY = 0;
+
+      if (isHooked) {
+        targetX = baseTiltX + mouseOffsetY;
+        targetY = baseTiltY + mouseOffsetX;
+        targetTranslateY = mouseOffsetY * 0.8;
+      } else {
+        // Play floating animation when unhooked
+        targetX = idleTiltX;
+        targetY = idleTiltY;
+        targetTranslateY = idleFloatY;
+      }
+
+      // Smooth liquid transition between hooked and unhooked states
+      currentX += (targetX - currentX) * 0.045;
+      currentY += (targetY - currentY) * 0.045;
+      currentTranslateY += (targetTranslateY - currentTranslateY) * 0.045;
+
+      if (heroTiltRef.current) {
+        heroTiltRef.current.style.transform = `perspective(1200px) translateY(${currentTranslateY.toFixed(2)}px) rotateX(${currentX.toFixed(2)}deg) rotateY(${currentY.toFixed(2)}deg)`;
+      }
+      rafId = requestAnimationFrame(animateTilt);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("mouseleave", handleMouseLeave, { passive: true });
+    rafId = requestAnimationFrame(animateTilt);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseleave", handleMouseLeave);
+      if (idleTimer) clearTimeout(idleTimer);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  // Interactive caught state across all categories (persisting by unique caught key)
+  // Start empty — the interactive demo should show 0 caught by default
+  const [caughtPokemonMap, setCaughtPokemonMap] = useState(() => new Set());
+
+  // Mobile search & filters collapse state (collapsed by default on mobile matching actual app)
+  const [mobileSearchCollapsed, setMobileSearchCollapsed] = useState(true);
+
+  const containerRef = useRef(null);
   const animFrameRef = useRef(null);
 
+  // Total dex forms calculation
+  // When shiny mode is on, exclude mighty forms (54 entries) as they cannot be shiny
+  const mightyFormsCount = useMemo(() => formsData.filter(f => f.formType === 'mighty').length, []);
+  const totalDexCount = useMemo(
+    () => isHeroShiny
+      ? pokemonData.length + formsData.length - mightyFormsCount
+      : pokemonData.length + formsData.length,
+    [isHeroShiny, mightyFormsCount]
+  );
+
+  // Active Category Data & Boxes
+  const currentCategory = CATEGORY_MAP[activeTab] || CATEGORY_MAP["Main Living Dex"];
+  const currentList = useMemo(() => currentCategory.data || [], [currentCategory]);
+
+  const box1List = useMemo(() => currentList.slice(0, 30), [currentList]);
+  const box2List = useMemo(() => currentList.slice(30, 60), [currentList]);
+
+  // Box Titles
+  const box1Title = useMemo(() => {
+    if (!box1List.length) return "Box 1";
+    if (activeTab === "Main Living Dex") {
+      return `${String(box1List[0]?.id || 1).padStart(4, "0")} - ${String(box1List[box1List.length - 1]?.id || 30).padStart(4, "0")}`;
+    }
+    return currentCategory.boxName(0);
+  }, [box1List, activeTab, currentCategory]);
+
+  const box2Title = useMemo(() => {
+    if (!box2List.length) return null;
+    if (activeTab === "Main Living Dex") {
+      return `${String(box2List[0]?.id || 31).padStart(4, "0")} - ${String(box2List[box2List.length - 1]?.id || 60).padStart(4, "0")}`;
+    }
+    return currentCategory.boxName(1);
+  }, [box2List, activeTab, currentCategory]);
+
+  // Total Caught Count for Progress Bar
+  const caughtCount = useMemo(() => caughtPokemonMap.size, [caughtPokemonMap]);
+
+  const togglePokemonCaught = (poke) => {
+    const key = getCaughtKey(poke, null, false);
+    setCaughtPokemonMap((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleBox = (pokemonList) => {
+    setCaughtPokemonMap((prev) => {
+      const next = new Set(prev);
+      const allCaught = pokemonList.every((p) => next.has(getCaughtKey(p, null, false)));
+      if (allCaught) {
+        pokemonList.forEach((p) => next.delete(getCaughtKey(p, null, false)));
+      } else {
+        pokemonList.forEach((p) => next.add(getCaughtKey(p, null, false)));
+      }
+      return next;
+    });
+  };
+
+  // Fetch live caught stats if available
   useEffect(() => {
     fetch(buildApiUrl('/profiles/stats/total-caught'))
       .then(r => r.json())
       .then(data => {
-        if (typeof data.total === 'number') {
+        if (typeof data.total === 'number' && data.total > 0) {
           setTotalCaught(data.total);
         }
       })
       .catch(() => {/* silently fail */});
   }, []);
 
-
-  // Animate count-up when totalCaught arrives
+  // Animated count-up for live caught stat
   useEffect(() => {
     if (totalCaught === null) return;
-    const duration = 1400;
+    const duration = 1500;
     const start = performance.now();
     const easeOut = (t) => 1 - Math.pow(1 - t, 3);
     const step = (now) => {
@@ -41,332 +488,995 @@ export default function PublicHome() {
     return () => cancelAnimationFrame(animFrameRef.current);
   }, [totalCaught]);
 
-  const features = [
-    {
-      title: "Track Every Detail",
-      description: "Log specific details for each Pokémon including date caught, Poké Ball, origin game, hunt method, marks, and ribbons.",
-      image: "/data/public_home_images/track_progress.png",
-    },
-    {
-      title: "Smart Filters",
-      description: "Filter by type, generation, game, ball type, forms, and caught status with advanced search.",
-      image: "/data/public_home_images/smart_filters.png",
-    },
-    {
-      title: "Share & Compare",
-      description: "Share your profile link and view other trainers' collections to compare progress worldwide.",
-      image: "/data/public_home_images/share_and_compare.png",
-    },
-    {
-      title: "Personalize",
-      description: "Customize themes, set favorites, and backup your data with your unique trainer identity.",
-      image: "/data/public_home_images/personalize.png",
-    },
-  ];
-
-  const [activeFeature, setActiveFeature] = useState(0);
-  const [featurePaused, setFeaturePaused] = useState(false);
-  const [featureTransitioning, setFeatureTransitioning] = useState(false);
-
-  const goToFeature = (index) => {
-    if (featureTransitioning) return;
-    setFeatureTransitioning(true);
-    setTimeout(() => {
-      setActiveFeature(typeof index === 'function' ? index(activeFeature) : index);
-      setFeatureTransitioning(false);
-    }, 250);
+  // Handle scroll snap tracking for indicator dots
+  const handleScroll = () => {
+    if (!containerRef.current) return;
+    const scrollTop = containerRef.current.scrollTop;
+    const height = containerRef.current.clientHeight;
+    const sectionIndex = Math.round(scrollTop / height);
+    if (sectionIndex !== activeSection) {
+      setActiveSection(sectionIndex);
+    }
   };
 
-  useEffect(() => {
-    if (featurePaused) return;
-    const id = setInterval(() => {
-      setFeatureTransitioning(true);
-      setTimeout(() => {
-        setActiveFeature(prev => (prev + 1) % features.length);
-        setFeatureTransitioning(false);
-      }, 250);
-    }, 7000);
-    return () => clearInterval(id);
-  }, [featurePaused]);
+  const scrollToSection = (index) => {
+    if (!containerRef.current) return;
+    const sections = containerRef.current.querySelectorAll(".snap-section");
+    if (sections[index]) {
+      sections[index].scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    } else {
+      const height = containerRef.current.clientHeight;
+      containerRef.current.scrollTo({
+        top: index * height,
+        behavior: "smooth"
+      });
+    }
+    setActiveSection(index);
+  };
 
-  const [lightboxSrc, setLightboxSrc] = useState(null);
-
-  useEffect(() => {
-    if (!lightboxSrc) return;
-    const handler = (e) => { if (e.key === 'Escape') setLightboxSrc(null); };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [lightboxSrc]);
-
-  // Pre-define card positions to prevent CLS - these are fixed and known at render time
-  const cardPositions = [
-    { top: 10, left: 20, size: 'large', rotation: -8 },
-    { top: 25, left: 70, size: 'medium', rotation: 12 },
-    { top: 45, left: 5, size: 'small', rotation: -15 },
-    { top: 60, left: 80, size: 'large', rotation: 6 },
-    { top: 85, left: 35, size: 'medium', rotation: -10 }
+  // Categories list matching site
+  const categories = [
+    "Main Living Dex",
+    "Gender",
+    "Alola",
+    "Galar",
+    "Gmax",
+    "Hisui",
+    "Paldea",
+    "Unown",
+    "Other Forms",
+    "Alcremie",
+    "Vivillon",
+    "Alpha"
   ];
 
-  // Initialize with placeholder cards to prevent CLS
-  const [randomCards, setRandomCards] = useState(() => {
-    return cardPositions.map((position, i) => ({
-      id: i,
-      pokemon: { name: 'loading' },
-      spriteUrl: '/Sprites/pikachu.png', // Default sprite that's likely cached
-      color: 'var(--accent)',
-      delay: i * 0.1,
-      position
-    }));
-  });
-
-  useEffect(() => {
-    // Scroll to top on page load
-    window.scrollTo(0, 0);
-
-    // Use the full Pokémon database
-    const allPokemon = pokemonData;
-
-    // Local special forms sprites
-    const localSprites = [
-      'flabebe-blue', 'flabebe-orange', 'flabebe-red', 'flabebe-white', 'flabebe-yellow',
-      'floette-blue', 'floette-orange', 'floette-red', 'floette-white', 'floette-yellow', 'floette-eternal',
-      'florges-blue', 'florges-orange', 'florges-red', 'florges-white', 'florges-yellow',
-      'furfrou-dandy', 'furfrou-debutante', 'furfrou-diamond', 'furfrou-heart', 'furfrou-kabuki', 'furfrou-lareine', 'furfrou-matron', 'furfrou-pharaoh', 'furfrou-star',
-      'gourgeist-average', 'gourgeist-large', 'gourgeist-small', 'gourgeist-super',
-      'lycanroc-dusk', 'lycanroc-midnight',
-      'maushold-family-of-three',
-      'minior-blue', 'minior-green', 'minior-indigo', 'minior-orange', 'minior-red', 'minior-violet', 'minior-yellow',
-      'oricorio-baile', 'oricorio-pau', 'oricorio-pom-pom', 'oricorio-sensu',
-      'partner-cap-pikachu',
-      'pumpkaboo-average', 'pumpkaboo-large', 'pumpkaboo-small', 'pumpkaboo-super',
-      'sqwuawkabilly-blue', 'sqwuawkabilly-green', 'sqwuawkabilly-white', 'sqwuawkabilly-yellow',
-      'tatsugiri-curly', 'tatsugiri-droopy', 'tatsugiri-stretchy',
-      'toxtricity-lowkey',
-      'vivillon-archipelago', 'vivillon-continental', 'vivillon-elegant', 'vivillon-fancy', 'vivillon-garden', 'vivillon-high-plains', 'vivillon-icy-snow', 'vivillon-jungle', 'vivillon-marine', 'vivillon-meadow', 'vivillon-modern', 'vivillon-monsoon', 'vivillon-ocean', 'vivillon-pokeball', 'vivillon-polar', 'vivillon-river', 'vivillon-sandstorm', 'vivillon-savanna', 'vivillon-sun', 'vivillon-tundra',
-      'zygarde-10'
-    ];
-    // Use site accent color for all cards
-    const accentColor = 'var(--accent)';
-
-    const cards = [];
-    for (let i = 0; i < cardPositions.length; i++) {
-      // 90% chance for database Pokémon, 10% chance for local special forms
-      const useLocalSprite = Math.random() < 0.1;
-      const isShiny = Math.random() < 0.5;
-
-      if (useLocalSprite) {
-        // Use local special form sprite
-        const localSprite = localSprites[Math.floor(Math.random() * localSprites.length)];
-        const spriteName = isShiny ? `${localSprite}-shiny` : localSprite;
-
-        cards.push({
-          id: i,
-          pokemon: { name: localSprite },
-          spriteUrl: `/Sprites/${spriteName}.png`,
-          color: accentColor,
-          delay: i * 0.1,
-          position: cardPositions[i]
-        });
-      } else {
-        // Use database Pokémon
-        const randomPokemon = allPokemon[Math.floor(Math.random() * allPokemon.length)];
-        const spriteUrl = getSpriteUrl(randomPokemon, isShiny, false);
-
-        cards.push({
-          id: i,
-          pokemon: randomPokemon,
-          spriteUrl: spriteUrl,
-          color: accentColor,
-          delay: i * 0.1,
-          position: cardPositions[i]
-        });
-      }
+  // Carousel Slides for Section 3
+  const showcaseSlides = [
+    {
+      id: "hunt-tracker",
+      badge: "TRACK EVERY HUNT",
+      title: "Powerful Hunt Tracker",
+      description: "Keep track of every shiny hunt with our advanced counter tools.",
+      image: "/landing_page/images/counter.png",
+      imageAlt: "Shiny Hunt Tracker Interface Preview",
+      bullets: [
+        "Encounter counter with hotkeys",
+        "Timer with pause & resume",
+        "Odds calculation in real-time",
+        "Phase tracking",
+        "Multiple hunts at once"
+      ],
+      ctaText: "Try Hunt Tracker",
+      ctaLink: "/counters"
+    },
+    {
+      id: "collection-statistics",
+      badge: "DETAILED STATISTICS",
+      title: "See Your Collection Like Never Before",
+      description: "Beautiful charts and statistics to visualize your progress.",
+      image: "/landing_page/images/stats.png",
+      imageAlt: "Collection Statistics Dashboard Preview",
+      bullets: [
+        "Collection breakdowns",
+        "Shiny progress tracking",
+        "Game & ball statistics",
+        "Mark & ribbon completion",
+        "Hunt history and analytics"
+      ],
+      ctaText: "Explore Stats",
+      ctaLink: "/trainers"
+    },
+    {
+      id: "connect-trainers",
+      badge: "SHARE & COMPARE",
+      title: "Connect With Trainers",
+      description: "Create your public profile and compare your collection with others.",
+      image: "/landing_page/images/share.png",
+      imageAlt: "Trainer Profile Sharing Preview",
+      bullets: [
+        "Public trainer profiles",
+        "Share your collections",
+        "Compare progress",
+        "Global leaderboards",
+        "Community driven"
+      ],
+      ctaText: "Explore Trainers",
+      ctaLink: "/trainers"
     }
-    setRandomCards(cards);
+  ];
+
+  const goToSlide = (newIndex, direction) => {
+    if (isTransitioning || newIndex === activeSlide) return;
+    setIsTransitioning(true);
+    setSlideDirection(direction);
+    setActiveSlide(newIndex);
+    setSparkleKey((prev) => prev + 1);
+
+    if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current);
+    transitionTimeoutRef.current = setTimeout(() => {
+      setIsTransitioning(false);
+    }, 460);
+  };
+
+  const handleNextSlide = () => {
+    const nextIndex = (activeSlide + 1) % showcaseSlides.length;
+    goToSlide(nextIndex, "next");
+  };
+
+  const handlePrevSlide = () => {
+    const prevIndex = (activeSlide - 1 + showcaseSlides.length) % showcaseSlides.length;
+    goToSlide(prevIndex, "prev");
+  };
+
+  const handleDotClick = (index) => {
+    if (index === activeSlide || isTransitioning) return;
+    goToSlide(index, index > activeSlide ? "next" : "prev");
+  };
+
+  const handleTouchStart = (e) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartXRef.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
+    if (Math.abs(deltaX) > 40) {
+      if (deltaX < 0) handleNextSlide();
+      else handlePrevSlide();
+    }
+    touchStartXRef.current = null;
+  };
+
+  // Add landing-page-active class to body while mounted to hide custom site scrollbars
+  useEffect(() => {
+    document.body.classList.add("landing-page-active");
+    return () => {
+      document.body.classList.remove("landing-page-active");
+      if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current);
+    };
+  }, []);
+
+  // Intercept scroll wheel on landing page — desktop only
+  // On mobile, the page is free-scrolling (no snap pages)
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Skip on mobile — let it scroll naturally
+    if (window.innerWidth <= 900) return;
+
+    let isWheeling = false;
+    let wheelTimer = null;
+
+    const handleWheel = (e) => {
+      const delta = e.deltaY;
+      if (Math.abs(delta) < 14) return;
+
+      e.preventDefault();
+
+      if (isWheeling) return;
+      isWheeling = true;
+
+      const sections = container.querySelectorAll(".snap-section");
+      if (!sections.length) return;
+
+      const scrollTop = container.scrollTop;
+      const height = container.clientHeight;
+      const currentIdx = Math.round(scrollTop / height);
+
+      let targetIdx = currentIdx;
+      if (delta > 0 && currentIdx < sections.length - 1) {
+        targetIdx = currentIdx + 1;
+      } else if (delta < 0 && currentIdx > 0) {
+        targetIdx = currentIdx - 1;
+      }
+
+      if (targetIdx !== currentIdx && sections[targetIdx]) {
+        sections[targetIdx].scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+        setActiveSection(targetIdx);
+      }
+
+      if (wheelTimer) clearTimeout(wheelTimer);
+      wheelTimer = setTimeout(() => {
+        isWheeling = false;
+      }, 650);
+    };
+
+    container.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener("wheel", handleWheel);
+      if (wheelTimer) clearTimeout(wheelTimer);
+    };
   }, []);
 
   return (
-    <div className="public-home page-container">
-      <div className="hero-section">
-        <div className="hero-content">
-          <div className="hero-badge">
-            <Sparkles className="sparkle-icon" />
-            <span>Ultimate Pokémon Collection Tracker</span>
-          </div>
-          <h1>Welcome to Ultimate Dex Tracker!</h1>
-          <p className="hero-subtitle">The ultimate tracker for Living Dexes, shiny hunting, marks, forms, Poké Balls, and collection completion.</p>
+    <div className="public-home-snap-container" ref={containerRef} onScroll={handleScroll}>
+      {/* Dynamic Animated Ambient Background Layer with Floating SVGs */}
+      <div className="landing-ambient-bg-layer" aria-hidden="true">
+        {/* Floating Pokéball 1 (Top Right) */}
+        <div className="ambient-float-item ambient-pokeball item-1" />
 
-          <p className="tracking-count">
-            Track {(pokemonData.length + formsData.length).toLocaleString()} Pokémon Forms &amp; Variants
-          </p>
+        {/* Floating Pikachu Silhouette (Bottom Left) */}
+        <div className="ambient-float-item ambient-pikachu item-2" />
 
-          {totalCaught !== null && (
-            <div className="live-caught-stat">
-              <div className="live-caught-inner">
-                <div className="live-dot-wrapper">
-                  <span className="live-dot" />
-                </div>
-                <Globe className="live-globe-icon" />
-                <span className="live-caught-number">{displayCount.toLocaleString()}</span>
-                <span className="live-caught-label">Pokémon tracked worldwide</span>
-              </div>
+        {/* Floating Sparkle 1 (Mid Right) */}
+        <div className="ambient-float-item ambient-sparkle1 item-3" />
+
+        {/* Floating Pokéball 3 (Top Left) */}
+        <div className="ambient-float-item ambient-pokeball item-4" />
+
+        {/* Floating Pokéball 2 (Lower Right) */}
+        <div className="ambient-float-item ambient-pokeball item-5" />
+
+        {/* Floating Sparkle 3 (Lower Center) */}
+        <div className="ambient-float-item ambient-sparkle3 item-6" />
+
+        {/* Floating Sparkle 2 (Mid Left) */}
+        <div className="ambient-float-item ambient-sparkle2 item-7" />
+
+        {/* Floating Sparkle 3 (Upper Center / Right) */}
+        <div className="ambient-float-item ambient-sparkle3 item-8" />
+      </div>
+
+      {/* Floating Side Section Indicator Dots */}
+      <nav className="section-nav-indicators" aria-label="Page Sections">
+        <button
+          className={`section-indicator-dot ${activeSection === 0 ? "active" : ""}`}
+          onClick={() => scrollToSection(0)}
+          aria-label="Go to Hero section"
+        >
+          <span className="indicator-tooltip">Welcome</span>
+        </button>
+        <button
+          className={`section-indicator-dot ${activeSection === 1 ? "active" : ""}`}
+          onClick={() => scrollToSection(1)}
+          aria-label="Go to Features section"
+        >
+          <span className="indicator-tooltip">Master Collection</span>
+        </button>
+        <button
+          className={`section-indicator-dot ${activeSection === 2 ? "active" : ""}`}
+          onClick={() => scrollToSection(2)}
+          aria-label="Go to Showcase section"
+        >
+          <span className="indicator-tooltip">Tools & Start</span>
+        </button>
+      </nav>
+
+      {/* =========================================================================
+          SECTION 1: HERO SECTION (Exact 100% Accurate Replica of Live Site Dex)
+          ========================================================================= */}
+      <section className="snap-section hero-snap-section">
+        {/* Subtle background glow */}
+        <div className="hero-bg-watermark" />
+
+        <div className="hero-snap-inner">
+          {/* Left Column */}
+          <div className="hero-snap-left">
+            <div className="hero-platform-badge">
+              <Sparkles size={14} className="sparkle-badge" />
+              <span>THE ULTIMATE POKÉMON COLLECTION PLATFORM</span>
             </div>
-          )}
 
-          {/* Creator Credit */}
-          <div className="creator-credit">
-            <span>
-              Created by Pokémon collector &amp; content creator{" "}
-              <a href="https://antonic.ca" target="_blank" rel="noopener noreferrer">
-                Antonic
-              </a>
-            </span>
-          </div>
+            <h1 className="hero-main-title">
+              Welcome to<br />
+              <span className="hero-gradient-text">Ultimate<br />Dex Tracker!</span>
+            </h1>
 
-          <div className="public-home-buttons">
-            <Link to="/register" className="home-signup-btn primary-btn">
-              <SquarePen className="btn-icon" />
-              Get Started Free
-            </Link>
-            <Link to="/login" className="home-login-btn secondary-btn">
-              <Users className="btn-icon" />
-              Login
-            </Link>
-            <Link to="/trainers" className="home-trainers-btn secondary-btn">
-              <ArrowRight className="btn-icon" />
-              Explore Trainers
-            </Link>
-          </div>
-        </div>
-        <div className="hero-visual">
-          <div className="random-cards-container">
-            {randomCards.map((card) => {
-              // Get image dimensions based on card size
-              const sizeMap = { large: 128, medium: 112, small: 96 };
-              const imgSize = sizeMap[card.position.size] || 96;
+            <p className="hero-main-desc">
+              The most powerful all-in-one tracker for your Pokémon collection and shiny hunting journey.
+            </p>
 
-              return (
-                <div
-                  key={card.id}
-                  className={`random-card ${card.position.size}`}
-                  style={{
-                    background: card.color,
-                    top: `${card.position.top}%`,
-                    left: `${card.position.left}%`,
-                    animationDelay: `${card.delay}s`,
-                    '--rotation': `${card.position.rotation}deg`
-                  }}
-                >
-                  <img
-                    src={card.spriteUrl}
-                    alt={card.pokemon.name}
-                    width={imgSize}
-                    height={imgSize}
-                    loading="eager"
-                    decoding="async"
-                    className="w-full h-full object-cover"
+            {/* Metric Stat Counters */}
+            <div className="hero-stats-row">
+              <div className="hero-stat-pill">
+                <div className="stat-pill-icon globe-icon-wrap"><Globe size={30} /></div>
+                <div className="stat-pill-text">
+                  <span className="stat-pill-num">{displayCount.toLocaleString()}+</span>
+                  <span className="stat-pill-desc">Pokémon tracked worldwide</span>
+                </div>
+              </div>
+
+              <div className="hero-stat-pill">
+                <div className="stat-pill-icon pikachu-icon-wrap">
+                  <span
+                    className="stat-pill-pikachu-img"
+                    aria-label="Pokémon Forms &amp; Variants"
                   />
                 </div>
-              );
-            })}
+                <div className="stat-pill-text">
+                  <span className="stat-pill-num">{((pokemonData.length + formsData.length) * 2).toLocaleString()}</span>
+                  <span className="stat-pill-desc">Pokémon Forms &amp; Variants</span>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="hero-action-buttons">
+              <Button
+                as={Link}
+                to="/register"
+                variant="primary"
+                size="lg"
+                icon={<SquarePen size={18} />}
+              >
+                Get Started Free
+              </Button>
+              <Button
+                as={Link}
+                to="/trainers"
+                variant="secondary"
+                size="lg"
+                icon={<Users size={18} />}
+              >
+                Explore Trainers
+              </Button>
+            </div>
+
+            <div className="hero-account-link">
+              <span>Already have an account? </span>
+              <Link to="/login" className="login-link">Log in</Link>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div className="features-section"
-        onMouseEnter={() => setFeaturePaused(true)}
-        onMouseLeave={() => setFeaturePaused(false)}
-      >
-        <div className="features-header">
-          <h2>Everything you need to master your collection</h2>
-          <p>Powerful tools designed for serious Pokémon trainers</p>
-        </div>
-
-        <div className="feature-carousel">
-          <button
-            className="feature-carousel-arrow left"
-            onClick={() => goToFeature((activeFeature - 1 + features.length) % features.length)}
-            aria-label="Previous feature"
-          >
-            <ChevronLeft size={22} />
-          </button>
-
-          <div className={`feature-slide ${featureTransitioning ? 'fading' : 'visible'}`}>
+          {/* Right Column: 100% Pixel-Accurate Interactive Living Dex Frame with 3D Mouse Tilt */}
+          <div className="hero-snap-right">
             <div
-              className="feature-slide-image"
-              onClick={() => setLightboxSrc(features[activeFeature].image)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setLightboxSrc(features[activeFeature].image)}
-              aria-label={`View ${features[activeFeature].title} full screen`}
+              ref={heroTiltRef}
+              className="hero-dex-interactive-port-wrapper"
             >
-              <img
-                src={features[activeFeature].image}
-                alt={features[activeFeature].title}
-                draggable={false}
-              />
-            </div>
-            <div className="feature-slide-text">
-              <h3>{features[activeFeature].title}</h3>
-              <p>{features[activeFeature].description}</p>
+              {/* Surrounding Floating Pokémon Sprites (Randomized per spot on page land) */}
+              <div className="floating-sprite sprite-mew sprite-top-right">
+                <img
+                  src={heroSprites.topRight}
+                  alt="Mythical Pokémon"
+                  className="floating-pokemon-img"
+                  onError={(e) => { e.target.src = "/landing_page/animated_sprites/top_right/mew.gif"; }}
+                />
+              </div>
+
+              <div className="floating-sprite sprite-gyarados sprite-bottom-right">
+                <img
+                  src={heroSprites.bottomRight}
+                  alt="Epic Pokémon"
+                  className="floating-pokemon-img"
+                  onError={(e) => { e.target.src = "/landing_page/animated_sprites/bottom_right/gyarados.gif"; }}
+                />
+              </div>
+
+              <div className="floating-sprite sprite-pikachu sprite-bottom-left">
+                <img
+                  src={heroSprites.bottomLeft}
+                  alt="Starter Pokémon"
+                  className="floating-pokemon-img"
+                  onError={(e) => { e.target.src = "/landing_page/animated_sprites/bottom_left/pikachu.gif"; }}
+                />
+              </div>
+
+              {/* Exact Live Website Dex Card Frame */}
+              <div className="real-site-dex-container">
+                {/* 1. Progress Bars Container */}
+                <div className="real-progress-box">
+                  <div className="real-progress-top-row">
+                    <span className="real-progress-heading">Progress Bars</span>
+                    <button className="real-progress-settings-btn" title="Progress Bar Settings">
+                      <Settings size={17} style={{ color: "var(--accent)" }} />
+                    </button>
+                  </div>
+
+                  <div className="real-progress-inner-card">
+                    <div className="real-progress-meta-line">
+                      <span className="real-meta-title">All Pokémon</span>
+                      <span className="real-meta-stats">
+                        {caughtCount} / {totalDexCount} • {((caughtCount / totalDexCount) * 100).toFixed(0)}% done! • {totalDexCount - caughtCount} to go!
+                      </span>
+                    </div>
+                    <div className="real-progress-track">
+                      <div
+                        className="real-progress-bar-fill"
+                        style={{ width: `${Math.max(0.5, (caughtCount / totalDexCount) * 100)}%`, opacity: caughtCount === 0 ? 0.25 : 1 }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. SearchBar and Dropdowns Container */}
+                <div className="real-searchbar-container">
+                  {/* Mobile-only Header — toggle button is display-only, no action on demo */}
+                  <div className="real-searchbar-mobile-header">
+                    <h3 className="real-searchbar-mobile-title">Search &amp; Filters</h3>
+                    <button
+                      type="button"
+                      className="real-searchbar-toggle-btn"
+                      aria-label="Expand search options"
+                    >
+                      <ListCollapse size={20} strokeWidth={3} style={{ color: "var(--accent)" }} />
+                    </button>
+                  </div>
+
+                  <div className="real-searchbar-grid">
+                    {/* Name/Dex Input (Always visible on PC and Mobile) */}
+                    <div className="real-search-field">
+                      <Search size={16} className="real-search-icon" style={{ color: "var(--accent)" }} />
+                      <input
+                        type="text"
+                        placeholder="Name or Dex #"
+                        className="real-search-input"
+                        readOnly
+                      />
+                    </div>
+
+                    {/* Filter Dropdown Options (Collapsible on mobile only, always visible on PC) */}
+                    <div className={`real-search-collapsible-group ${mobileSearchCollapsed ? "mobile-collapsed" : "mobile-expanded"}`}>
+                      {/* Filter Dropdown 1: Game Caught */}
+                      <div className="real-dropdown-field">
+                        <Gamepad2 size={16} style={{ color: "var(--accent)" }} />
+                        <span className="real-dropdown-label">Game Caught</span>
+                        <ChevronDown size={14} className="real-dropdown-caret" style={{ color: "var(--accent)" }} />
+                      </div>
+
+                      {/* Filter Dropdown 2: Game Obtainable In */}
+                      <div className="real-dropdown-field">
+                        <Gamepad2 size={16} style={{ color: "var(--accent)" }} />
+                        <span className="real-dropdown-label">Game Obtainable In</span>
+                        <ChevronDown size={14} className="real-dropdown-caret" style={{ color: "var(--accent)" }} />
+                      </div>
+
+                      {/* Filter Dropdown 3: Ball Caught */}
+                      <div className="real-dropdown-field">
+                        <PokeballIcon />
+                        <span className="real-dropdown-label">Ball Caught</span>
+                        <ChevronDown size={14} className="real-dropdown-caret" style={{ color: "var(--accent)" }} />
+                      </div>
+
+                      {/* Filter Dropdown 4: Type */}
+                      <div className="real-dropdown-field">
+                        <Flame size={16} style={{ color: "var(--accent)" }} />
+                        <span className="real-dropdown-label">Type</span>
+                        <ChevronDown size={14} className="real-dropdown-caret" style={{ color: "var(--accent)" }} />
+                      </div>
+
+                      {/* Filter Dropdown 5: Generation */}
+                      <div className="real-dropdown-field">
+                        <Hash size={16} style={{ color: "var(--accent)" }} />
+                        <span className="real-dropdown-label">Generation</span>
+                        <ChevronDown size={14} className="real-dropdown-caret" style={{ color: "var(--accent)" }} />
+                      </div>
+
+                      {/* Filter Dropdown 6: Mark/Ribbon */}
+                      <div className="real-dropdown-field">
+                        <Award size={16} style={{ color: "var(--accent)" }} />
+                        <span className="real-dropdown-label">Mark/Ribbon</span>
+                        <ChevronDown size={14} className="real-dropdown-caret" style={{ color: "var(--accent)" }} />
+                      </div>
+
+                      {/* Filter Dropdown 7: Hunt Method */}
+                      <div className="real-dropdown-field">
+                        <BullseyeIcon size={16} style={{ color: "var(--accent)" }} />
+                        <span className="real-dropdown-label">Hunt Method</span>
+                        <ChevronDown size={14} className="real-dropdown-caret" style={{ color: "var(--accent)" }} />
+                      </div>
+
+                      {/* Filter Dropdown 8: Category */}
+                      <div className="real-dropdown-field">
+                        <Crown size={16} style={{ color: "var(--accent)" }} />
+                        <span className="real-dropdown-label">Category</span>
+                        <ChevronDown size={14} className="real-dropdown-caret" style={{ color: "var(--accent)" }} />
+                      </div>
+
+                      {/* Filter Dropdown 9: Caught/Uncaught */}
+                      <div className="real-dropdown-field">
+                        <Star size={16} style={{ color: "var(--accent)" }} />
+                        <span className="real-dropdown-label">Caught/Uncaught</span>
+                        <ChevronDown size={14} className="real-dropdown-caret" style={{ color: "var(--accent)" }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Shiny Switch and Charm Bar */}
+                  <div className="real-searchbar-bottom-row">
+                    <button className="real-shiny-charm-btn" title="Manage Shiny Charm">
+                      <img
+                        src="/Charm.png"
+                        alt="Shiny Charm"
+                        className="real-shiny-charm-img"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    </button>
+
+                    <div className="dex-shiny-segmented-control" role="group" aria-label="Demo Pokemon sprite display mode">
+                      <button
+                        type="button"
+                        className={`dex-shiny-segmented-btn ${!isHeroShiny ? 'active is-regular' : ''}`}
+                        onClick={() => setIsHeroShiny(false)}
+                        title="Show regular Pokémon sprites"
+                      >
+                        <span className="dex-segmented-dot" />
+                        <span>Regular</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={`dex-shiny-segmented-btn ${isHeroShiny ? 'active is-shiny' : ''}`}
+                        onClick={() => setIsHeroShiny(true)}
+                        title="Show shiny Pokémon sprites"
+                      >
+                        <Sparkles size={16} className={`dex-segmented-sparkles ${isHeroShiny ? 'active' : ''}`} />
+                        <span>Shiny</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Category Tabs Bar */}
+                <div className="real-dex-tabs-bar">
+                  {categories.map((cat, idx) => (
+                    <div key={cat} className="real-tab-item-wrap">
+                      <button
+                        className={`real-dex-tab-btn ${activeTab === cat ? "active" : ""}`}
+                        onClick={() => setActiveTab(cat)}
+                      >
+                        {cat}
+                      </button>
+                      {idx < categories.length - 1 && <span className="real-tab-divider" />}
+                    </div>
+                  ))}
+                </div>
+
+                {/* 4. Section Title & Divider */}
+                <div className="real-dex-section-header">
+                  <h2 className="real-dex-title">{currentCategory.title}</h2>
+                  <div className="real-dex-subtitle">{`Showing ${currentList.length} Pokémon`}</div>
+                  <div className="real-dex-divider-glow" />
+                </div>
+
+                {/* 5. First 2 Boxes Grid for the Selected Category */}
+                <div className={`real-dex-boxes-row ${!box2List.length ? "single-box" : ""}`}>
+                  {/* Box 1 */}
+                  {box1List.length > 0 && (
+                    <div className="real-dex-box-container">
+                      <div className="real-box-header">
+                        <span className="real-box-title">{box1Title}</span>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => handleToggleBox(box1List)}
+                        >
+                          {box1List.every((p) => caughtPokemonMap.has(getCaughtKey(p, null, false))) ? "Unmark All" : "Mark All"}
+                        </Button>
+                      </div>
+
+                      <div className="real-pokemon-grid">
+                        {Array.from({ length: 30 }).map((_, pIdx) => {
+                          const poke = box1List[pIdx];
+                          if (!poke) {
+                            return (
+                              <div
+                                key={`b1_empty_${pIdx}`}
+                                className="real-pokemon-slot empty"
+                                style={{ visibility: "hidden", pointerEvents: "none" }}
+                                aria-hidden="true"
+                              />
+                            );
+                          }
+                          const key = getCaughtKey(poke, null, false);
+                          const isCaught = caughtPokemonMap.has(key);
+                          const sprite = getSpriteUrl(poke, isHeroShiny, false);
+                          const displayName = formatPokemonName(poke.name);
+                          const dexNum = poke.id ? `#${String(poke.id).padStart(4, "0")}` : "????";
+
+                          return (
+                            <div
+                              key={`${key}_${pIdx}`}
+                              className={`real-pokemon-slot ${isCaught ? "caught" : ""}`}
+                              onClick={() => togglePokemonCaught(poke)}
+                              title={`Click to toggle ${displayName} caught`}
+                            >
+                              <span className="real-slot-name">{displayName}</span>
+                              <img
+                                src={sprite}
+                                alt={displayName}
+                                className="real-slot-sprite"
+                                loading="eager"
+                                onError={(e) => {
+                                  e.target.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${poke.id || 1}.png`;
+                                }}
+                              />
+                              <span className="real-slot-num">{dexNum}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Box 2 (if available in this category) */}
+                  {box2List.length > 0 && (
+                    <div className="real-dex-box-container">
+                      <div className="real-box-header">
+                        <span className="real-box-title">{box2Title}</span>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => handleToggleBox(box2List)}
+                        >
+                          {box2List.every((p) => caughtPokemonMap.has(getCaughtKey(p, null, false))) ? "Unmark All" : "Mark All"}
+                        </Button>
+                      </div>
+
+                      <div className="real-pokemon-grid">
+                        {Array.from({ length: 30 }).map((_, pIdx) => {
+                          const poke = box2List[pIdx];
+                          if (!poke) {
+                            return (
+                              <div
+                                key={`b2_empty_${pIdx}`}
+                                className="real-pokemon-slot empty"
+                                style={{ visibility: "hidden", pointerEvents: "none" }}
+                                aria-hidden="true"
+                              />
+                            );
+                          }
+                          const key = getCaughtKey(poke, null, false);
+                          const isCaught = caughtPokemonMap.has(key);
+                          const sprite = getSpriteUrl(poke, isHeroShiny, false);
+                          const displayName = formatPokemonName(poke.name);
+                          const dexNum = poke.id ? `#${String(poke.id).padStart(4, "0")}` : "????";
+
+                          return (
+                            <div
+                              key={`${key}_${pIdx}`}
+                              className={`real-pokemon-slot ${isCaught ? "caught" : ""}`}
+                              onClick={() => togglePokemonCaught(poke)}
+                              title={`Click to toggle ${displayName} caught`}
+                            >
+                              <span className="real-slot-name">{displayName}</span>
+                              <img
+                                src={sprite}
+                                alt={displayName}
+                                className="real-slot-sprite"
+                                loading="eager"
+                                onError={(e) => {
+                                  e.target.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${poke.id || 1}.png`;
+                                }}
+                              />
+                              <span className="real-slot-num">{dexNum}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
-
-          <button
-            className="feature-carousel-arrow right"
-            onClick={() => goToFeature((activeFeature + 1) % features.length)}
-            aria-label="Next feature"
-          >
-            <ChevronRight size={22} />
-          </button>
         </div>
 
-        <div className="feature-dots">
-          {features.map((_, i) => (
-            <button
-              key={i}
-              className={`feature-dot ${i === activeFeature ? 'active' : ''}`}
-              onClick={() => goToFeature(i)}
-              aria-label={`Go to feature ${i + 1}`}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Lightbox */}
-      {lightboxSrc && createPortal(
-        <div
-          className="lightbox-overlay"
-          onClick={() => setLightboxSrc(null)}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Full screen image"
+        {/* Page Switch Arrow Button for Page 1 (Down to Page 2) */}
+        <button
+          className="scroll-hint-arrow scroll-hint-arrow-down"
+          onClick={() => scrollToSection(1)}
+          aria-label="Scroll down to master collection section"
         >
-          <button
-            className="lightbox-close"
-            onClick={() => setLightboxSrc(null)}
-            aria-label="Close"
-          >
-            ✕
-          </button>
-          <img
-            src={lightboxSrc}
-            alt="Feature screenshot"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>,
-        document.body
-      )}
+          <ChevronDown size={22} />
+        </button>
+      </section>
 
-      <div className="cta-section">
-        <div className="cta-content">
-          <h2>Ready to start tracking?</h2>
-          <Link to="/register" className="cta-button">
-            <SquarePen className="btn-icon" />
-            Register
-          </Link>
+      {/* =========================================================================
+          SECTION 2: MASTER YOUR COLLECTION (Image 2)
+          ========================================================================= */}
+      <section className="snap-section features-snap-section">
+        {/* Page Switch Arrow Button for Page 2 (Up to Page 1) */}
+        <button
+          className="scroll-hint-arrow scroll-hint-arrow-top"
+          onClick={() => scrollToSection(0)}
+          aria-label="Scroll up to welcome section"
+        >
+          <ChevronUp size={22} />
+        </button>
+
+        <div className="section-header-wrap">
+          <h2 className="section-title-large">Everything you need to master your collection</h2>
+          <p className="section-subtitle">Powerful tools designed for every type of Pokémon trainer.</p>
         </div>
-      </div>
+
+        <div className="master-features-grid">
+          {/* Card 1 */}
+          <div className="master-feature-card">
+            <div className="feature-icon-wrapper accent-glow">
+              <Grid2x2Check size={46} className="feature-lucide-icon accent" />
+            </div>
+            <h3 className="master-card-title">Living Dex Tracking</h3>
+            <p className="master-card-desc">
+              Track every Pokémon, form, variant, and regional difference.
+            </p>
+          </div>
+
+          {/* Card 2 */}
+          <div className="master-feature-card">
+            <div className="feature-icon-wrapper red-glow">
+              <Crosshair size={46} className="feature-lucide-icon red" />
+            </div>
+            <h3 className="master-card-title">Shiny Hunting Counters</h3>
+            <p className="master-card-desc">
+              Count encounters, track time, odds, and hunting methods.
+            </p>
+          </div>
+
+          {/* Card 3 */}
+          <div className="master-feature-card">
+            <div className="feature-icon-wrapper blue-glow">
+              <BarChart3 size={46} className="feature-lucide-icon blue" />
+            </div>
+            <h3 className="master-card-title">Detailed Statistics</h3>
+            <p className="master-card-desc">
+              In-depth stats for games, types, balls, marks and more.
+            </p>
+          </div>
+
+          {/* Card 4 */}
+          <div className="master-feature-card">
+            <div className="feature-icon-wrapper gold-glow">
+              <Ribbon size={46} className="feature-lucide-icon gold" />
+            </div>
+            <h3 className="master-card-title">Marks & Ribbons</h3>
+            <p className="master-card-desc">
+              Track every mark and ribbon in your collection.
+            </p>
+          </div>
+
+          {/* Card 5 */}
+          <div className="master-feature-card">
+            <div className="feature-icon-wrapper white-glow">
+              <div className="icon-pokeball-graphic" />
+            </div>
+            <h3 className="master-card-title">Poké Ball Vault</h3>
+            <p className="master-card-desc">
+              See all obtainable balls and track your collection.
+            </p>
+          </div>
+
+          {/* Card 6 */}
+          <div className="master-feature-card">
+            <div className="feature-icon-wrapper purple-glow">
+              <Users size={46} className="feature-lucide-icon purple" />
+            </div>
+            <h3 className="master-card-title">Trainer Profiles</h3>
+            <p className="master-card-desc">
+              Share your collection and compare with other trainers.
+            </p>
+          </div>
+
+          {/* Card 7: MMO Tool */}
+          <div className="master-feature-card">
+            <div className="feature-icon-wrapper orange-glow">
+              <ListChecks size={46} className="feature-lucide-icon orange" />
+            </div>
+            <h3 className="master-card-title">MMO Outbreak Tool</h3>
+            <p className="master-card-desc">
+              Find active massive mass outbreaks, locations, and spawn odds.
+            </p>
+          </div>
+
+          {/* Card 8: BINGO */}
+          <div className="master-feature-card">
+            <div className="feature-icon-wrapper emerald-glow">
+              <Grid3x3 size={46} className="feature-lucide-icon emerald" />
+            </div>
+            <h3 className="master-card-title">Shiny Bingo</h3>
+            <p className="master-card-desc">
+              Generate custom shiny bingo boards to hunt with friends or solo.
+            </p>
+          </div>
+        </div>
+
+        {/* Page Switch Arrow Button for Page 2 (Down to Page 3) */}
+        <button
+          className="scroll-hint-arrow scroll-hint-arrow-down"
+          onClick={() => scrollToSection(2)}
+          aria-label="Scroll down to tools and showcase section"
+        >
+          <ChevronDown size={22} />
+        </button>
+      </section>
+
+      {/* =========================================================================
+          SECTION 3: FEATURE DEEP-DIVES CAROUSEL, CTA BANNER & SITE FOOTER
+          ========================================================================= */}
+      <section className="snap-section showcase-snap-section">
+        {/* Page Switch Arrow Button for Page 3 (Up to Page 2) */}
+        <button
+          className="scroll-hint-arrow scroll-hint-arrow-top"
+          onClick={() => scrollToSection(1)}
+          aria-label="Scroll up to master collection section"
+        >
+          <ChevronUp size={22} />
+        </button>
+
+        <div className="showcase-snap-inner">
+          <div
+            className="showcase-carousel-wrapper"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {/* Left Arrow Button */}
+            <button
+              className="carousel-nav-arrow arrow-left"
+              onClick={handlePrevSlide}
+              disabled={isTransitioning}
+              aria-label="Previous showcase feature"
+            >
+              <ChevronLeft size={26} />
+            </button>
+
+            {/* Carousel Viewport & Sliding Track */}
+            <div className="showcase-carousel-viewport">
+              <div
+              className={`showcase-slides-track dir-${slideDirection}`}
+              style={{ transform: 'none' }}
+              >
+                {showcaseSlides.map((slide, idx) => {
+                  const isActive = idx === activeSlide;
+                  return (
+                    <div
+                      key={slide.id}
+                      className={`showcase-slide-card ${isActive ? "is-active" : "is-inactive"} dir-${slideDirection}`}
+                      aria-hidden={!isActive}
+                    >
+                      {/* Left Info Column */}
+                      <div className="showcase-info-column">
+                        <div className="showcase-badge">
+                          <span>{slide.badge}</span>
+                        </div>
+
+                        <h2 className="showcase-title">{slide.title}</h2>
+
+                        {/* Accent Divider Line with Traveling Sparkle Streak */}
+                        <div className="showcase-accent-line-wrap" aria-hidden="true">
+                          <div className="showcase-accent-line" />
+                          {isActive && (
+                            <div key={sparkleKey} className={`showcase-accent-sparkle ${slideDirection}`} />
+                          )}
+                        </div>
+
+                        <p className="showcase-desc">{slide.description}</p>
+
+                        <ul className="showcase-bullet-list">
+                          {slide.bullets.map((bullet, bIdx) => (
+                            <li key={bIdx} className="showcase-bullet-item">
+                              <div className="bullet-check-icon">
+                                <Check size={14} />
+                              </div>
+                              <span>{bullet}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Right Display Image Column */}
+                      <div className="showcase-mock-column">
+                        <div className="showcase-image-wrapper">
+                          <img
+                            src={slide.image}
+                            alt={slide.imageAlt}
+                            className="showcase-preview-img"
+                            loading={isActive ? "eager" : "lazy"}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Right Arrow Button */}
+            <button
+              className="carousel-nav-arrow arrow-right"
+              onClick={handleNextSlide}
+              disabled={isTransitioning}
+              aria-label="Next showcase feature"
+            >
+              <ChevronRight size={26} />
+            </button>
+          </div>
+
+          {/* Slide Indicator Dots */}
+          <div className="showcase-dots-row">
+            {showcaseSlides.map((slide, idx) => (
+              <button
+                key={slide.id}
+                className={`showcase-dot-btn ${idx === activeSlide ? "active" : ""}`}
+                onClick={() => handleDotClick(idx)}
+                disabled={isTransitioning}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+
+          {/* Bottom CTA Banner (Image 4) */}
+          <div className="bottom-cta-banner">
+            <div className="cta-banner-content">
+              {/* Left Pokemon (Random Starter) from landing_page/animated_sprites/final_evo_starters */}
+              <div className="banner-pokemon-left">
+                <img
+                  src={randomStarters.left.src}
+                  alt={randomStarters.left.name}
+                  className="banner-sprite"
+                  onError={(e) => { e.target.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${randomStarters.left.fallback}.png`; }}
+                />
+              </div>
+
+              {/* Center Copy & Button */}
+              <div className="banner-center-text">
+                <div className="banner-title-row">
+                  <span className="banner-sparkle-svg sparkle1" aria-hidden="true" />
+                  <h3 className="banner-title">Ready to start your journey?</h3>
+                  <span className="banner-sparkle-svg sparkle2" aria-hidden="true" />
+                </div>
+                <p className="banner-subtitle">
+                  Join thousands of trainers and start building your ultimate collection today!
+                </p>
+
+                <div className="banner-button-row">
+                  <Button
+                    as={Link}
+                    to="/register"
+                    variant="primary"
+                    size="lg"
+                    icon={<SquarePen size={18} />}
+                  >
+                    Get Started Free
+                  </Button>
+                </div>
+
+                {/* Trust Indicators */}
+                <div className="banner-perks-row">
+                  <span className="perk-item">
+                    <span className="perk-svg-icon free-icon" aria-hidden="true" />
+                    <span>100% Free</span>
+                  </span>
+                  <span className="perk-dot">•</span>
+                  <span className="perk-item">
+                    <CreditCard size={15} className="perk-icon" />
+                    <span>No Credit Card</span>
+                  </span>
+                  <span className="perk-dot">•</span>
+                  <span className="perk-item">
+                    <Download size={15} className="perk-icon" />
+                    <span>No Download Needed</span>
+                  </span>
+                  <span className="perk-dot">•</span>
+                  <span className="perk-item">
+                    <LayoutList size={15} className="perk-icon" />
+                    <span>Start Tracking Now</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Right Pokemon (Random Starter) from landing_page/animated_sprites/final_evo_starters */}
+              <div className="banner-pokemon-right">
+                <img
+                  src={randomStarters.right.src}
+                  alt={randomStarters.right.name}
+                  className="banner-sprite"
+                  onError={(e) => { e.target.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${randomStarters.right.fallback}.png`; }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Full-Width Site Footer */}
+        <Footer />
+      </section>
     </div>
   );
 }

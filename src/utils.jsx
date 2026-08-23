@@ -293,6 +293,11 @@ export function formatTrainerName(filename) {
 export function getFormDisplayName(pokemon) {
   const name = pokemon?.name;
 
+  // ✅ Origin Ball Dialga & Palkia
+  if (pokemon?.stableId === "origin-ball-dialga-483" || pokemon?.stableId === "origin-ball-palkia-484" || pokemon?.stableId?.startsWith("origin-ball-") || name?.startsWith("origin-ball-")) {
+    return "Origin Ball";
+  }
+
   // ✅ Alcremie: Gigantamax or Cream/Sweet
   if (name?.startsWith("alcremie")) {
     if (name === "alcremie-gmax") {
@@ -355,14 +360,15 @@ export function getFormDisplayName(pokemon) {
   }
 
   // ✅ Alpha variants for other forms (not Unown)
-  if (name.endsWith("-alpha") && pokemon.formType === "other") {
-    // Remove the -alpha suffix and format the base name
+  if (name && name.endsWith("-alpha") && pokemon.formType === "other") {
     const baseName = name.replace("-alpha", "");
-    const formattedName = formatPokemonName(baseName);
-    return `Alpha ${formattedName}`;
+    if (specialFormLabels[baseName]) {
+      return `Alpha ${specialFormLabels[baseName]}`;
+    }
+    return "Alpha";
   }
 
-  // ✅ Alpha pokemon with gender forms - show "Alpha Male" instead of "Alpha Pokémon"
+  // ✅ Alpha pokemon with gender forms - show "Alpha Male" instead of "Alpha"
   if (pokemon.formType === "alpha" && name) {
     const baseName = name.replace("-alpha", "");
     if (genderForms.includes(baseName)) {
@@ -371,8 +377,8 @@ export function getFormDisplayName(pokemon) {
   }
 
   // ✅ Generic Alpha Forms
-  if (pokemon.formType === "alpha" && name) {
-    return `Alpha ${formatPokemonName(name)}`;
+  if (pokemon.formType === "alpha") {
+    return "Alpha";
   }
 
   const formLabels = {
@@ -383,7 +389,7 @@ export function getFormDisplayName(pokemon) {
     paldean: "Paldean Form",
     other: "Alt Form",
     alcremie: "Alcremie Variant",
-    alpha: "Alpha Pokémon",
+    alpha: "Alpha",
     alphaother: "Alpha Female",
     mighty: "Mighty Mark"
   };

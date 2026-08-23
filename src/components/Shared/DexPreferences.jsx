@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { profileAPI } from "../../utils/api";
 import { useMessage } from "./MessageContext";
 import { Info } from "lucide-react";
+import Tooltip from "./Tooltip";
 
 export default function DexPreferences() {
     const defaultPreferences = {
@@ -305,10 +306,16 @@ export default function DexPreferences() {
                                 onChange={(e) => handleViewModeChange(e.target.value)}
                             />
                             <span className="preference-label">Categorized</span>
-                            <span className="preference-info-wrapper">
-                                <Info size={18} className="preference-info-icon" />
-                                <span className="preference-tooltip">Separate sections for Living Dex, Regional Forms, Alpha Forms, etc.</span>
-                            </span>
+                            <Tooltip
+                                content="Separate sections for Living Dex, Regional Forms, Alpha Forms, etc."
+                                position="top"
+                                align="center"
+                                maxWidth={240}
+                            >
+                                <span className="preference-info-icon-wrapper" style={{ display: 'inline-flex', alignItems: 'center', cursor: 'help' }}>
+                                    <Info size={18} className="preference-info-icon" />
+                                </span>
+                            </Tooltip>
                         </label>
                     </div>
 
@@ -322,10 +329,16 @@ export default function DexPreferences() {
                                 onChange={(e) => handleViewModeChange(e.target.value)}
                             />
                             <span className="preference-label">Unified</span>
-                            <span className="preference-info-wrapper">
-                                <Info size={18} className="preference-info-icon" />
-                                <span className="preference-tooltip">All Pokémon in one list, sorted by National Dex number.</span>
-                            </span>
+                            <Tooltip
+                                content="All Pokémon in one list, sorted by National Dex number."
+                                position="top"
+                                align="center"
+                                maxWidth={240}
+                            >
+                                <span className="preference-info-icon-wrapper" style={{ display: 'inline-flex', alignItems: 'center', cursor: 'help' }}>
+                                    <Info size={18} className="preference-info-icon" />
+                                </span>
+                            </Tooltip>
                         </label>
                     </div>
                 </div>

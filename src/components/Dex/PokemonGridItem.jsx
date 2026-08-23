@@ -10,6 +10,7 @@ function formatDexNumber(num) {
 function PokemonGridItem({
   poke,
   isCaught,
+  hasFail = false,
   isBlocked,
   sprite,
   readOnly,
@@ -23,15 +24,27 @@ function PokemonGridItem({
   handleTouchEnd,
   handleTouchCancel,
 }) {
+  const cardBackground = isCaught
+    ? "linear-gradient(to top, rgba(21, 128, 61, 0.4), rgba(34, 197, 94, 0.2))"
+    : (hasFail
+        ? "linear-gradient(to top, rgba(220, 38, 38, 0.35), rgba(239, 68, 68, 0.2))"
+        : "var(--searchbar-inputs)");
+
+  const cardBorder = poke?._isSearchMatch
+    ? "2px solid var(--accent)"
+    : (isCaught
+        ? "2px solid rgb(34, 197, 94)"
+        : (hasFail
+            ? "2px solid rgb(239, 68, 68)"
+            : "2px solid var(--border-color)"));
+
   return (
     <div
       data-tutorial-id="pokemon-card"
       className={`group relative flex flex-col items-center justify-center p-2 rounded-lg border transition-all duration-100 pokemon-slot-hover${readOnly ? " hover:bg-gray-700 dark:hover:bg-gray-600" : ""}${isBlocked ? " cursor-not-allowed" : " cursor-pointer"}${poke?._isSearchMatch ? " search-match-highlight" : ""}`}
       style={{
-        background: isCaught ? "linear-gradient(to top, rgba(21, 128, 61, 0.4), rgba(34, 197, 94, 0.2))" : "var(--searchbar-inputs)",
-        border: poke?._isSearchMatch
-          ? "2px solid var(--accent)"
-          : (isCaught ? "2px solid rgb(34, 197, 94)" : "2px solid var(--border-color)"),
+        background: cardBackground,
+        border: cardBorder,
         width: "clamp(60px, 15vw, 100px)",
         height: "clamp(60px, 15vw, 100px)",
         WebkitTouchCallout: "none",
@@ -43,6 +56,7 @@ function PokemonGridItem({
         zIndex: poke?._isSearchMatch ? 5 : 1,
       }}
       data-caught={isCaught}
+      data-fail={!isCaught && hasFail}
       data-readonly={readOnly}
       data-blocked={isBlocked}
       onContextMenu={(e) => e.preventDefault()}
@@ -146,6 +160,7 @@ export default memo(PokemonGridItem, (prev, next) => {
     prev.poke === next.poke &&
     prev.poke?._isSearchMatch === next.poke?._isSearchMatch &&
     prev.isCaught === next.isCaught &&
+    prev.hasFail === next.hasFail &&
     prev.isBlocked === next.isBlocked &&
     prev.sprite === next.sprite &&
     prev.readOnly === next.readOnly &&

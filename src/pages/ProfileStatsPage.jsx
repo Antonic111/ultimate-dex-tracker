@@ -16,15 +16,40 @@ import {
   Flame,
   Sparkles,
   Search,
-  Calendar
+  Calendar,
+  Clock,
+  Timer,
+  Zap,
+  Trophy,
+  XCircle,
+  CheckCheck,
+  Clover,
+  ArrowRight,
+  Info
 } from "lucide-react";
 import { useUser } from "../components/Shared/UserContext";
 import { useLoading } from "../components/Shared/LoadingContext";
-import { LoadingSpinner } from "../components/Shared";
+import { LoadingSpinner, SectionLoader, InlineLoader } from "../components/Shared";
+import { Button } from "../components/Shared/Button";
+import Modal from "../components/Shared/Modal";
 import { profileAPI, caughtAPI } from "../utils/api";
-import { calculateDetailedStats } from "../utils/detailedStatsUtils";
+import { calculateDetailedStats, calculateHuntStats } from "../utils/detailedStatsUtils";
+import { getSpriteUrl } from "../utils/spriteUtils";
+import { formatPokemonName } from "../utils";
+import pokemonData from "../data/pokemon.json";
+import formsData from "../utils/loadFormsData";
+import { calculateOdds } from "../utils/huntSystem";
+import { getUserAvatarUrl } from "../utils/profileUtils";
+import SelectField from "../components/Shared/FormField/SelectField";
+import SearchField from "../components/Shared/FormField/SearchField";
 import { BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "../css/ProfileStatsPage.css";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 function ProgressRing({ percentage = 0, size = 52, strokeWidth = 5, color = "var(--accent)" }) {
   const radius = (size - strokeWidth) / 2;
@@ -126,6 +151,26 @@ export default function ProfileStatsPage() {
   const [gamesPage, setGamesPage] = useState(1);
   const [methodsPage, setMethodsPage] = useState(1);
 
+  // Hunt Stats & History states
+  const [completedHunts, setCompletedHunts] = useState([]);
+  const [showcaseTab, setShowcaseTab] = useState("completed"); // "completed" | "fails"
+  const [huntSearch, setHuntSearch] = useState("");
+  const [huntSortType, setHuntSortType] = useState("date-desc");
+  const [huntPage, setHuntPage] = useState(1);
+  const [showHuntSortDropdown, setShowHuntSortDropdown] = useState(false);
+  const huntSortRef = useRef(null);
+
+  // Hunt Methods & Games Sort & Pagination states
+  const [huntMethodSort, setHuntMethodSort] = useState("most-hunts");
+  const [showHuntMethodSort, setShowHuntMethodSort] = useState(false);
+  const [huntMethodsPage, setHuntMethodsPage] = useState(1);
+  const huntMethodSortRef = useRef(null);
+
+  const [huntGameSort, setHuntGameSort] = useState("most-hunts");
+  const [showHuntGameSort, setShowHuntGameSort] = useState(false);
+  const [huntGamesPage, setHuntGamesPage] = useState(1);
+  const huntGameSortRef = useRef(null);
+
   // Category Sort states
   const [genSort, setGenSort] = useState("default");
   const [specialSort, setSpecialSort] = useState("default");
@@ -150,15 +195,24 @@ export default function ProfileStatsPage() {
       if (markSortRef.current && !markSortRef.current.contains(event.target)) {
         setShowMarkSortDropdown(false);
       }
+      if (huntSortRef.current && !huntSortRef.current.contains(event.target)) {
+        setShowHuntSortDropdown(false);
+      }
+      if (huntMethodSortRef.current && !huntMethodSortRef.current.contains(event.target)) {
+        setShowHuntMethodSort(false);
+      }
+      if (huntGameSortRef.current && !huntGameSortRef.current.contains(event.target)) {
+        setShowHuntGameSort(false);
+      }
     };
 
-    if (showBallSortDropdown || showMarkSortDropdown) {
+    if (showBallSortDropdown || showMarkSortDropdown || showHuntSortDropdown || showHuntMethodSort || showHuntGameSort) {
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showBallSortDropdown, showMarkSortDropdown]);
+  }, [showBallSortDropdown, showMarkSortDropdown, showHuntSortDropdown, showHuntMethodSort, showHuntGameSort]);
 
   useEffect(() => {
     if (!targetUsername && !userLoading) {
@@ -169,7 +223,7 @@ export default function ProfileStatsPage() {
 
     let mounted = true;
     setDataLoading(true);
-    setLoading(true);
+    setLoading('profile-stats-page', true);
 
     const fetchData = async () => {
       try {
@@ -179,11 +233,11 @@ export default function ProfileStatsPage() {
 
         if (!mounted) return;
 
-        if (prof?.isProfilePublic === false && !isOwner) {
+        if ((prof?.isProfilePublic === false || prof?.isStatsPublic === false) && !isOwner && !prof?.isPrivateAdminView) {
           setIsPrivate(true);
           setProfileData(prof);
           setDataLoading(false);
-          setLoading(false);
+          setLoading('profile-stats-page', false);
           return;
         }
 
@@ -205,10 +259,35 @@ export default function ProfileStatsPage() {
           map = response?.caughtPokemon || {};
         }
 
+        let hunts = [];
+        if (isOwner) {
+          try {
+            const raw = localStorage.getItem(`completedHunts:${currentUsername}`) || localStorage.getItem("completedHunts");
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) hunts = parsed;
+            }
+            const rawFails = localStorage.getItem(`completedFails:${currentUsername}`) || localStorage.getItem("completedFails");
+            if (rawFails) {
+              const parsedFails = JSON.parse(rawFails);
+              if (Array.isArray(parsedFails)) {
+                parsedFails.forEach(f => {
+                  if (!hunts.some(h => (h.entryId && h.entryId === f.entryId) || (h.id && h.id === f.id))) {
+                    hunts.push({ ...f, outcome: "failed", isFail: true });
+                  }
+                });
+              }
+            }
+          } catch {}
+        } else if (prof?.completedHunts && Array.isArray(prof.completedHunts)) {
+          hunts = prof.completedHunts;
+        }
+
         if (!mounted) return;
 
         setProfileData(prof);
         setCaughtData(map);
+        setCompletedHunts(hunts);
         setOwnerPreferences(prof?.dexPreferences || null);
         setIsPrivate(false);
       } catch (err) {
@@ -216,7 +295,7 @@ export default function ProfileStatsPage() {
       } finally {
         if (mounted) {
           setDataLoading(false);
-          setLoading(false);
+          setLoading('profile-stats-page', false);
         }
       }
     };
@@ -225,9 +304,9 @@ export default function ProfileStatsPage() {
 
     return () => {
       mounted = false;
-      setLoading(false);
+      setLoading('profile-stats-page', false);
     };
-  }, [targetUsername, isOwner, userLoading, currentUsername]);
+  }, [targetUsername, isOwner, userLoading, currentUsername, setLoading, navigate]);
 
   const [activePreferences, setActivePreferences] = useState(() => {
     try {
@@ -473,12 +552,311 @@ export default function ProfileStatsPage() {
     }
   };
 
+  const huntStats = useMemo(() => {
+    return calculateHuntStats(completedHunts, caughtData);
+  }, [completedHunts, caughtData]);
+
+  const currentSourceList = useMemo(() => {
+    if (!huntStats) return [];
+    return showcaseTab === "fails" ? (huntStats.failsList || []) : (huntStats.huntsList || []);
+  }, [huntStats, showcaseTab]);
+
+  const filteredHuntsList = useMemo(() => {
+    if (!currentSourceList) return [];
+    let list = [...currentSourceList];
+    const rawSearch = typeof huntSearch === "string" ? huntSearch : (huntSearch?.target?.value ?? "");
+    const q = rawSearch.trim().toLowerCase();
+    if (q) {
+      list = list.filter(h => 
+        (h.pokemonName && h.pokemonName.toLowerCase().includes(q)) ||
+        (h.nickname && h.nickname.toLowerCase().includes(q)) ||
+        (h.game && h.game.toLowerCase().includes(q)) ||
+        (h.method && h.method.toLowerCase().includes(q)) ||
+        (h.reason && h.reason.toLowerCase().includes(q)) ||
+        (h.notes && h.notes.toLowerCase().includes(q))
+      );
+    }
+    switch (huntSortType) {
+      case "date-desc":
+        return list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+      case "date-asc":
+        return list.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+      case "checks-desc":
+        return list.sort((a, b) => (Number(b.totalChecks || b.checks) || 0) - (Number(a.totalChecks || a.checks) || 0));
+      case "checks-asc":
+        return list.sort((a, b) => (Number(a.totalChecks || a.checks) || 0) - (Number(b.totalChecks || b.checks) || 0));
+      case "time-desc":
+        return list.sort((a, b) => (Number(b.elapsedMs || b.time) || 0) - (Number(a.elapsedMs || a.time) || 0));
+      case "time-asc":
+        return list.sort((a, b) => (Number(a.elapsedMs || a.time) || 0) - (Number(b.elapsedMs || b.time) || 0));
+      case "phases-desc":
+        return list.sort((a, b) => (Number(b.phaseCount || (b.phases?.length ? b.phases.length + 1 : 1)) || 1) - (Number(a.phaseCount || (a.phases?.length ? a.phases.length + 1 : 1)) || 1));
+      default:
+        return list;
+    }
+  }, [currentSourceList, huntSearch, huntSortType]);
+
+  const HUNTS_PER_PAGE = 6;
+  const totalHuntPages = Math.ceil(filteredHuntsList.length / HUNTS_PER_PAGE) || 1;
+  const paginatedHunts = filteredHuntsList.slice((huntPage - 1) * HUNTS_PER_PAGE, huntPage * HUNTS_PER_PAGE);
+
+  const currentTotalChecks = useMemo(() => {
+    return currentSourceList.reduce((acc, h) => acc + (Number(h.totalChecks || h.checks) || 0), 0);
+  }, [currentSourceList]);
+
+  const currentTotalTime = useMemo(() => {
+    return currentSourceList.reduce((acc, h) => acc + (Number(h.elapsedMs || h.time) || 0), 0);
+  }, [currentSourceList]);
+
+  const getOddsEvaluation = (checks, odds) => {
+    if (!checks || !odds || odds <= 0) return null;
+    const ratio = (checks / odds) * 100;
+    const formattedPct = ratio < 10 ? ratio.toFixed(1) : Math.round(ratio).toLocaleString();
+    
+    if (ratio <= 25) {
+      return {
+        pctText: `${formattedPct}% of odds`,
+        comment: "Extremely lucky!",
+        type: "super-lucky"
+      };
+    }
+    if (ratio <= 75) {
+      return {
+        pctText: `${formattedPct}% of odds`,
+        comment: "Lucky!",
+        type: "lucky"
+      };
+    }
+    if (ratio <= 100) {
+      return {
+        pctText: `${formattedPct}% of odds`,
+        comment: "Below odds! Nice hunt.",
+        type: "good"
+      };
+    }
+    if (ratio <= 150) {
+      return {
+        pctText: `${formattedPct}% of odds`,
+        comment: "Slightly over odds",
+        type: "slight-over"
+      };
+    }
+    if (ratio <= 300) {
+      return {
+        pctText: `${formattedPct}% of odds`,
+        comment: "Over odds... hang in there!",
+        type: "over"
+      };
+    }
+    return {
+      pctText: `${ratio.toLocaleString(undefined, { maximumFractionDigits: 0 })}% of odds`,
+      comment: "Brutal... way over odds",
+      type: "brutal"
+    };
+  };
+
+  const getHuntSortLabel = (type = huntSortType) => {
+    switch (type) {
+      case "date-desc": return "Date (Newest)";
+      case "date-asc": return "Date (Oldest)";
+      case "checks-desc": return "Most Checks";
+      case "checks-asc": return "Fewest Checks";
+      case "time-desc": return "Longest Time";
+      case "time-asc": return "Shortest Time";
+      case "phases-desc": return "Most Phases";
+      default: return "Date (Newest)";
+    }
+  };
+
+  // Sorted & Paginated Hunting Methods
+  const sortedHuntMethods = useMemo(() => {
+    if (!huntStats?.methodBreakdown) return [];
+    const list = [...huntStats.methodBreakdown];
+    switch (huntMethodSort) {
+      case "most-hunts":
+        return list.sort((a, b) => b.count - a.count || b.totalChecks - a.totalChecks);
+      case "least-hunts":
+        return list.sort((a, b) => a.count - b.count || a.totalChecks - b.totalChecks);
+      case "most-checks":
+        return list.sort((a, b) => b.totalChecks - a.totalChecks);
+      case "least-checks":
+        return list.sort((a, b) => a.totalChecks - b.totalChecks);
+      case "highest-avg":
+        return list.sort((a, b) => b.avgChecks - a.avgChecks);
+      case "lowest-avg":
+        return list.sort((a, b) => a.avgChecks - b.avgChecks);
+      case "alpha-asc":
+        return list.sort((a, b) => a.method.localeCompare(b.method));
+      case "alpha-desc":
+        return list.sort((a, b) => b.method.localeCompare(a.method));
+      default:
+        return list;
+    }
+  }, [huntStats?.methodBreakdown, huntMethodSort]);
+
+  const METHODS_PER_PAGE = 5;
+  const totalHuntMethodPages = Math.ceil(sortedHuntMethods.length / METHODS_PER_PAGE) || 1;
+  const paginatedHuntMethods = sortedHuntMethods.slice((huntMethodsPage - 1) * METHODS_PER_PAGE, huntMethodsPage * METHODS_PER_PAGE);
+
+  const getHuntMethodSortLabel = (type = huntMethodSort) => {
+    switch (type) {
+      case "most-hunts": return "Most Hunts";
+      case "least-hunts": return "Least Hunts";
+      case "most-checks": return "Most Checks";
+      case "least-checks": return "Fewest Checks";
+      case "highest-avg": return "Highest Avg Checks";
+      case "lowest-avg": return "Lowest Avg Checks";
+      case "alpha-asc": return "Name (A → Z)";
+      case "alpha-desc": return "Name (Z → A)";
+      default: return "Most Hunts";
+    }
+  };
+
+  // Sorted & Paginated Hunting Games
+  const sortedHuntGames = useMemo(() => {
+    if (!huntStats?.gameBreakdown) return [];
+    const list = [...huntStats.gameBreakdown];
+    switch (huntGameSort) {
+      case "most-hunts":
+        return list.sort((a, b) => b.count - a.count || b.totalChecks - a.totalChecks);
+      case "least-hunts":
+        return list.sort((a, b) => a.count - b.count || a.totalChecks - b.totalChecks);
+      case "most-checks":
+        return list.sort((a, b) => b.totalChecks - a.totalChecks);
+      case "least-checks":
+        return list.sort((a, b) => a.totalChecks - b.totalChecks);
+      case "highest-avg":
+        return list.sort((a, b) => b.avgChecks - a.avgChecks);
+      case "lowest-avg":
+        return list.sort((a, b) => a.avgChecks - b.avgChecks);
+      case "alpha-asc":
+        return list.sort((a, b) => a.game.localeCompare(b.game));
+      case "alpha-desc":
+        return list.sort((a, b) => b.game.localeCompare(a.game));
+      default:
+        return list;
+    }
+  }, [huntStats?.gameBreakdown, huntGameSort]);
+
+  const GAMES_PER_PAGE = 5;
+  const totalHuntGamePages = Math.ceil(sortedHuntGames.length / GAMES_PER_PAGE) || 1;
+  const paginatedHuntGames = sortedHuntGames.slice((huntGamesPage - 1) * GAMES_PER_PAGE, huntGamesPage * GAMES_PER_PAGE);
+
+  const getHuntGameSortLabel = (type = huntGameSort) => {
+    switch (type) {
+      case "most-hunts": return "Most Hunts";
+      case "least-hunts": return "Least Hunts";
+      case "most-checks": return "Most Checks";
+      case "least-checks": return "Fewest Checks";
+      case "highest-avg": return "Highest Avg Checks";
+      case "lowest-avg": return "Lowest Avg Checks";
+      case "alpha-asc": return "Name (A → Z)";
+      case "alpha-desc": return "Name (Z → A)";
+      default: return "Most Hunts";
+    }
+  };
+
+  function formatElapsed(ms) {
+    if (!ms || ms <= 0) return "0s";
+    const seconds = Math.floor((ms / 1000) % 60);
+    const minutes = Math.floor((ms / (1000 * 60)) % 60);
+    const hours = Math.floor(ms / (1000 * 60 * 60));
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ${seconds}s`;
+    }
+    if (minutes > 0) {
+      return `${minutes}m ${seconds}s`;
+    }
+    return `${seconds}s`;
+  }
+
+  function resolveHuntPokemon(hunt) {
+    if (!hunt) return null;
+    if (hunt.pokemon && (hunt.pokemon.sprites || hunt.pokemon.id)) {
+      return hunt.pokemon;
+    }
+    const rawName = (hunt.pokemonName || hunt.pokemon?.name || "").toLowerCase().trim();
+    if (!rawName) return null;
+
+    // 1. Exact match in pokemonData or formsData
+    let found = pokemonData.find(p => p.name?.toLowerCase() === rawName || p.cleanName?.toLowerCase() === rawName);
+    if (found) return found;
+
+    if (formsData && Array.isArray(formsData)) {
+      found = formsData.find(p => p.name?.toLowerCase() === rawName || p.cleanName?.toLowerCase() === rawName);
+      if (found) return found;
+    }
+
+    // 2. Prefix match (e.g. "zygarde" -> "zygarde-50", "deoxys" -> "deoxys-normal")
+    found = pokemonData.find(p => p.name?.toLowerCase().startsWith(rawName + "-"));
+    if (found) return found;
+
+    if (formsData && Array.isArray(formsData)) {
+      found = formsData.find(p => p.name?.toLowerCase().startsWith(rawName + "-"));
+      if (found) return found;
+    }
+
+    // 3. ID lookup if id is present
+    const id = Number(hunt.pokemon?.id || hunt.pokemonId);
+    if (!isNaN(id) && id > 0 && id < 2000) {
+      found = pokemonData.find(p => p.id === id);
+      if (found) return found;
+    }
+
+    return null;
+  }
+
+  function getHuntSprite(hunt, useHome) {
+    if (!hunt) return "";
+    const mon = resolveHuntPokemon(hunt);
+    if (mon) {
+      return getSpriteUrl(mon, true, useHome);
+    }
+    if (hunt.pokemon) {
+      return getSpriteUrl(hunt.pokemon, true, useHome);
+    }
+    return "";
+  }
+
+  const pageRef = useRef(null);
+
+  useEffect(() => {
+    if (dataLoading || userLoading || !stats || isPrivate) return;
+
+    let ctx = gsap.context(() => {
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (prefersReducedMotion) return;
+
+      // Smooth section-level scroll reveals with full style cleanup
+      const sections = gsap.utils.toArray(".stats-hero-card, .stats-overview-grid, .stats-section-block");
+
+      sections.forEach((sec) => {
+        gsap.fromTo(
+          sec,
+          { opacity: 0, y: 18 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.45,
+            ease: "power2.out",
+            clearProps: "all",
+            scrollTrigger: {
+              trigger: sec,
+              start: "top 92%",
+              once: true,
+            }
+          }
+        );
+      });
+    }, pageRef);
+
+    return () => {
+      ctx.revert();
+    };
+  }, [dataLoading, userLoading, stats, isPrivate]);
+
   if (dataLoading || userLoading) {
-    return (
-      <div className="stats-page-container">
-        <LoadingSpinner fullScreen text="Calculating detailed trainer stats..." />
-      </div>
-    );
+    return <SectionLoader minHeight="60vh" message="Calculating collection analytics..." />;
   }
 
   // Privacy locked screen
@@ -489,9 +867,16 @@ export default function ProfileStatsPage() {
           <Lock className="stats-private-icon" />
           <h2>This Profile is Private</h2>
           <p>{targetUsername}'s collection statistics are hidden by their privacy settings.</p>
-          <Link to="/trainers" className="stats-back-btn">
-            <ArrowLeft size={16} /> Back to Trainers
-          </Link>
+          <Button
+            as={Link}
+            to="/trainers"
+            variant="secondary"
+            size="sm"
+            className="stats-back-btn"
+            icon={<ArrowLeft size={16} />}
+          >
+            Back to Trainers
+          </Button>
         </div>
       </div>
     );
@@ -502,9 +887,16 @@ export default function ProfileStatsPage() {
       <div className="stats-page-container">
         <div className="stats-empty-box">
           <p>No statistics available for this trainer.</p>
-          <Link to={isOwner ? "/profile" : `/u/${targetUsername}`} className="stats-back-btn">
-            <ArrowLeft size={16} /> Return to Profile
-          </Link>
+          <Button
+            as={Link}
+            to={isOwner ? "/profile" : `/u/${targetUsername}`}
+            variant="secondary"
+            size="sm"
+            className="stats-back-btn"
+            icon={<ArrowLeft size={16} />}
+          >
+            Return to Profile
+          </Button>
         </div>
       </div>
     );
@@ -520,13 +912,13 @@ export default function ProfileStatsPage() {
   const paginatedMethods = allMethods.slice((methodsPage - 1) * ITEMS_PER_PAGE, methodsPage * ITEMS_PER_PAGE);
 
   const profileLink = isOwner ? "/profile" : `/u/${targetUsername}`;
-  const rawTrainer = (isOwner ? (user?.profileTrainer || profileData?.profileTrainer) : profileData?.profileTrainer) || "ash.png";
-  const trainerSprite = rawTrainer.endsWith('.png') ? rawTrainer : `${rawTrainer}.png`;
-  const avatarUrl = `/data/trainer_sprites/${trainerSprite}`;
+  const avatarUserObj = isOwner ? user : profileData;
+  const avatarUrl = getUserAvatarUrl(avatarUserObj);
+  const isCustomAvatar = Boolean(avatarUserObj?.avatar);
   const useHomeSprites = Boolean(effectivePreferences?.useHomeSprites);
 
   return (
-    <div className={`stats-page-container ${useHomeSprites ? "mode-home-sprites" : "mode-pixel-sprites"}`}>
+    <div ref={pageRef} className={`stats-page-container fade-in-content ${useHomeSprites ? "mode-home-sprites" : "mode-pixel-sprites"}`}>
       {/* Hero Trainer Banner */}
       <div className="stats-hero-card">
         <div className="stats-hero-profile">
@@ -534,8 +926,8 @@ export default function ProfileStatsPage() {
             <img 
               src={avatarUrl} 
               alt={targetUsername} 
-              className="stats-hero-avatar" 
-              onError={(e) => { e.currentTarget.src = "/data/trainer_sprites/ash.png"; }}
+              className="stats-hero-avatar"
+              onError={(e) => { e.currentTarget.src = "/avatar.png"; }}
             />
           </div>
           <div className="stats-hero-info">
@@ -581,9 +973,16 @@ export default function ProfileStatsPage() {
         </div>
 
         <div className="stats-hero-right">
-          <Link to={profileLink} className="stats-back-btn">
-            <ArrowLeft size={15} /> Back to Profile
-          </Link>
+          <Button
+            as={Link}
+            to={profileLink}
+            variant="secondary"
+            size="sm"
+            className="stats-back-btn"
+            icon={<ArrowLeft size={15} />}
+          >
+            Back to Profile
+          </Button>
         </div>
       </div>
 
@@ -702,6 +1101,899 @@ export default function ProfileStatsPage() {
           </div>
         </div>
       </div>
+
+      {/* SECTION: Counters & Shiny Hunting Analytics */}
+      {huntStats && (
+        <div className="stats-section-block hunt-stats-section">
+          <div className="stats-section-title">
+            <div className="stats-section-title-left">
+              <span>Counters & Shiny Hunting Analytics</span>
+            </div>
+            <div className="stats-section-title-right">
+              <span className="hunt-stats-badge">{huntStats.totalHunts} Completed {huntStats.totalHunts === 1 ? "Hunt" : "Hunts"}</span>
+            </div>
+          </div>
+
+          {/* KPI Metrics Grid */}
+          <div className="hunt-kpi-grid">
+            {/* Captures & Success Rate */}
+            <div className="hunt-kpi-card hunt-kpi-success">
+              <div className="hunt-kpi-icon"><Trophy size={18} /></div>
+              <div className="hunt-kpi-info">
+                <div className="hunt-kpi-val-row">
+                  <span className="hunt-kpi-value">{huntStats.totalHunts}</span>
+                  <span className="hunt-kpi-rate-badge success">{huntStats.successRate}% Success</span>
+                </div>
+                <span className="hunt-kpi-label">Captures</span>
+              </div>
+            </div>
+
+            {/* Failed & Fail Rate */}
+            <div className="hunt-kpi-card failure-kpi">
+              <div className="hunt-kpi-icon"><XCircle size={18} /></div>
+              <div className="hunt-kpi-info">
+                <div className="hunt-kpi-val-row">
+                  <span className="hunt-kpi-value">{huntStats.totalFails}</span>
+                  <span className="hunt-kpi-rate-badge failure">{huntStats.failRate}% Failed</span>
+                </div>
+                <span className="hunt-kpi-label">Total Fails</span>
+              </div>
+            </div>
+
+            {/* Total Checks */}
+            <div className="hunt-kpi-card">
+              <div className="hunt-kpi-icon"><Crosshair size={18} /></div>
+              <div className="hunt-kpi-info">
+                <span className="hunt-kpi-value">{huntStats.totalChecks.toLocaleString()}</span>
+                <span className="hunt-kpi-label">Total Checks</span>
+              </div>
+            </div>
+
+            {/* Total Time Hunted */}
+            <div className="hunt-kpi-card">
+              <div className="hunt-kpi-icon"><Clock size={18} /></div>
+              <div className="hunt-kpi-info">
+                <span className="hunt-kpi-value">{formatElapsed(huntStats.totalTimeMs)}</span>
+                <span className="hunt-kpi-label">Total Time Hunted</span>
+              </div>
+            </div>
+
+            {/* Avg Checks */}
+            <div className="hunt-kpi-card">
+              <div className="hunt-kpi-icon"><TrendingUp size={18} /></div>
+              <div className="hunt-kpi-info">
+                <span className="hunt-kpi-value">{huntStats.avgChecks.toLocaleString()}</span>
+                <span className="hunt-kpi-label">Avg Checks</span>
+              </div>
+            </div>
+
+            {/* Avg Time */}
+            <div className="hunt-kpi-card">
+              <div className="hunt-kpi-icon"><Timer size={18} /></div>
+              <div className="hunt-kpi-info">
+                <span className="hunt-kpi-value">{formatElapsed(huntStats.avgTimeMs)}</span>
+                <span className="hunt-kpi-label">Avg Time</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Trophy Hall of Records */}
+          <div className="hunt-records-header">
+            <h3>Hall of Records & Highlights</h3>
+          </div>
+          <div className="hunt-records-grid">
+            {/* Fastest Hunt (Fewest Checks) */}
+            {huntStats.records.fastestChecks && (() => {
+              const sprite = getHuntSprite(huntStats.records.fastestChecks, useHomeSprites);
+              return (
+                <div className="hunt-record-card trophy-gold">
+                  <div className="hunt-record-badge">
+                    <CheckCheck size={13} /> Fewest Checks
+                  </div>
+                  <div className="hunt-record-content">
+                    {sprite ? (
+                      <img 
+                        src={sprite} 
+                        alt="" 
+                        className={`hunt-record-sprite ${!useHomeSprites ? "pixelated" : ""}`}
+                        style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                        onError={(e) => { e.target.style.display = "none"; }}
+                      />
+                    ) : null}
+                    <div className="hunt-record-details">
+                      <span className="hunt-record-name">{formatPokemonName(huntStats.records.fastestChecks.pokemonName || huntStats.records.fastestChecks.pokemon?.name)}</span>
+                      <div className="hunt-record-main-stat">
+                        <strong>{(huntStats.records.fastestChecks.totalChecks || huntStats.records.fastestChecks.checks).toLocaleString()}</strong> checks
+                      </div>
+                      <div className="hunt-record-sub">
+                        <span>{huntStats.records.fastestChecks.game || "Unknown Game"}</span> • <span>{huntStats.records.fastestChecks.method || "Encounter"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Longest Hunt (Most Checks) */}
+            {huntStats.records.longestChecks && (() => {
+              const sprite = getHuntSprite(huntStats.records.longestChecks, useHomeSprites);
+              return (
+                <div className="hunt-record-card trophy-bronze">
+                  <div className="hunt-record-badge">
+                    <CheckCheck size={13} /> Most Checks
+                  </div>
+                  <div className="hunt-record-content">
+                    {sprite ? (
+                      <img 
+                        src={sprite} 
+                        alt="" 
+                        className={`hunt-record-sprite ${!useHomeSprites ? "pixelated" : ""}`}
+                        style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                        onError={(e) => { e.target.style.display = "none"; }}
+                      />
+                    ) : null}
+                    <div className="hunt-record-details">
+                      <span className="hunt-record-name">{formatPokemonName(huntStats.records.longestChecks.pokemonName || huntStats.records.longestChecks.pokemon?.name)}</span>
+                      <div className="hunt-record-main-stat">
+                        <strong>{(huntStats.records.longestChecks.totalChecks || huntStats.records.longestChecks.checks).toLocaleString()}</strong> checks
+                      </div>
+                      <div className="hunt-record-sub">
+                        <span>{huntStats.records.longestChecks.game || "Unknown Game"}</span> • <span>{huntStats.records.longestChecks.method || "Encounter"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Fastest Elapsed Time */}
+            {huntStats.records.fastestTime && (() => {
+              const sprite = getHuntSprite(huntStats.records.fastestTime, useHomeSprites);
+              return (
+                <div className="hunt-record-card trophy-silver">
+                  <div className="hunt-record-badge">
+                    <Timer size={13} /> Fastest Time
+                  </div>
+                  <div className="hunt-record-content">
+                    {sprite ? (
+                      <img 
+                        src={sprite} 
+                        alt="" 
+                        className={`hunt-record-sprite ${!useHomeSprites ? "pixelated" : ""}`}
+                        style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                        onError={(e) => { e.target.style.display = "none"; }}
+                      />
+                    ) : null}
+                    <div className="hunt-record-details">
+                      <span className="hunt-record-name">{formatPokemonName(huntStats.records.fastestTime.pokemonName || huntStats.records.fastestTime.pokemon?.name)}</span>
+                      <div className="hunt-record-main-stat">
+                        <strong>{formatElapsed(huntStats.records.fastestTime.elapsedMs || huntStats.records.fastestTime.time)}</strong>
+                      </div>
+                      <div className="hunt-record-sub">
+                        <span>{(huntStats.records.fastestTime.totalChecks || huntStats.records.fastestTime.checks).toLocaleString()} checks</span> • <span>{huntStats.records.fastestTime.game || "Game"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Longest Elapsed Time */}
+            {huntStats.records.longestTime && (() => {
+              const sprite = getHuntSprite(huntStats.records.longestTime, useHomeSprites);
+              return (
+                <div className="hunt-record-card trophy-marathon">
+                  <div className="hunt-record-badge">
+                    <Timer size={13} /> Longest Hunt Time
+                  </div>
+                  <div className="hunt-record-content">
+                    {sprite ? (
+                      <img 
+                        src={sprite} 
+                        alt="" 
+                        className={`hunt-record-sprite ${!useHomeSprites ? "pixelated" : ""}`}
+                        style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                        onError={(e) => { e.target.style.display = "none"; }}
+                      />
+                    ) : null}
+                    <div className="hunt-record-details">
+                      <span className="hunt-record-name">{formatPokemonName(huntStats.records.longestTime.pokemonName || huntStats.records.longestTime.pokemon?.name)}</span>
+                      <div className="hunt-record-main-stat">
+                        <strong>{formatElapsed(huntStats.records.longestTime.elapsedMs || huntStats.records.longestTime.time)}</strong>
+                      </div>
+                      <div className="hunt-record-sub">
+                        <span>{(huntStats.records.longestTime.totalChecks || huntStats.records.longestTime.checks).toLocaleString()} checks</span> • <span>{huntStats.records.longestTime.game || "Game"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Most Phases */}
+            {huntStats.records.mostPhases && (() => {
+              const sprite = getHuntSprite(huntStats.records.mostPhases, useHomeSprites);
+              return (
+                <div className="hunt-record-card trophy-phases">
+                  <div className="hunt-record-badge">
+                    <Layers size={13} /> Most Phases
+                  </div>
+                  <div className="hunt-record-content">
+                    {sprite ? (
+                      <img 
+                        src={sprite} 
+                        alt="" 
+                        className={`hunt-record-sprite ${!useHomeSprites ? "pixelated" : ""}`}
+                        style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                        onError={(e) => { e.target.style.display = "none"; }}
+                      />
+                    ) : null}
+                    <div className="hunt-record-details">
+                      <span className="hunt-record-name">{formatPokemonName(huntStats.records.mostPhases.pokemonName || huntStats.records.mostPhases.pokemon?.name)}</span>
+                      <div className="hunt-record-main-stat">
+                        <strong>{huntStats.records.mostPhases.phaseCount || (huntStats.records.mostPhases.phases?.length ? huntStats.records.mostPhases.phases.length + 1 : 1)}</strong> Phases
+                      </div>
+                      <div className="hunt-record-sub">
+                        <span>{(huntStats.records.mostPhases.totalChecks || huntStats.records.mostPhases.checks).toLocaleString()} total checks</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Luckiest Hunt */}
+            {huntStats.records.luckiest && (() => {
+              const sprite = getHuntSprite(huntStats.records.luckiest, useHomeSprites);
+              return (
+                <div className="hunt-record-card trophy-lucky">
+                  <div className="hunt-record-badge">
+                    <Clover size={13} /> Luckiest Hunt
+                  </div>
+                  <div className="hunt-record-content">
+                    {sprite ? (
+                      <img 
+                        src={sprite} 
+                        alt="" 
+                        className={`hunt-record-sprite ${!useHomeSprites ? "pixelated" : ""}`}
+                        style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                        onError={(e) => { e.target.style.display = "none"; }}
+                      />
+                    ) : null}
+                    <div className="hunt-record-details">
+                      <span className="hunt-record-name">{formatPokemonName(huntStats.records.luckiest.pokemonName || huntStats.records.luckiest.pokemon?.name)}</span>
+                      <div className="hunt-record-main-stat">
+                        <strong>{huntStats.records.luckiest.pctOfOdds}%</strong> of Odds
+                      </div>
+                      <div className="hunt-record-sub">
+                        <span>{(huntStats.records.luckiest.totalChecks || huntStats.records.luckiest.checks).toLocaleString()} / {huntStats.records.luckiest.odds?.toLocaleString()} base odds</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Methods & Games Breakdown side-by-side */}
+          {(huntStats.methodBreakdown.length > 0 || huntStats.gameBreakdown.length > 0) && (
+            <div className="hunt-breakdown-row">
+              {huntStats.methodBreakdown.length > 0 && (
+                <div className="hunt-breakdown-col">
+                  <div className="hunt-breakdown-col-header">
+                    <h4>Top Hunting Methods</h4>
+                    <div className={`stats-sort-button-wrap ${showHuntMethodSort ? 'open' : ''}`} ref={huntMethodSortRef}>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="stats-sort-button"
+                        onClick={() => setShowHuntMethodSort(!showHuntMethodSort)}
+                        aria-label="Sort Methods"
+                        icon={<ArrowUpDown size={13} />}
+                      >
+                        <span>{getHuntMethodSortLabel()}</span>
+                      </Button>
+
+                      {showHuntMethodSort && (
+                        <div className="stats-sort-dropdown">
+                          <div className="stats-sort-section">
+                            <div className="stats-sort-section-title">
+                              <Trophy size={12} />
+                              <span>Hunts</span>
+                            </div>
+                            <button
+                              className={`stats-sort-option ${huntMethodSort === "most-hunts" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntMethodSort("most-hunts");
+                                setHuntMethodsPage(1);
+                                setShowHuntMethodSort(false);
+                              }}
+                            >
+                              Most Hunts
+                            </button>
+                            <button
+                              className={`stats-sort-option ${huntMethodSort === "least-hunts" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntMethodSort("least-hunts");
+                                setHuntMethodsPage(1);
+                                setShowHuntMethodSort(false);
+                              }}
+                            >
+                              Least Hunts
+                            </button>
+                          </div>
+
+                          <div className="stats-sort-section">
+                            <div className="stats-sort-section-title">
+                              <Crosshair size={12} />
+                              <span>Checks</span>
+                            </div>
+                            <button
+                              className={`stats-sort-option ${huntMethodSort === "most-checks" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntMethodSort("most-checks");
+                                setHuntMethodsPage(1);
+                                setShowHuntMethodSort(false);
+                              }}
+                            >
+                              Most Checks
+                            </button>
+                            <button
+                              className={`stats-sort-option ${huntMethodSort === "least-checks" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntMethodSort("least-checks");
+                                setHuntMethodsPage(1);
+                                setShowHuntMethodSort(false);
+                              }}
+                            >
+                              Fewest Checks
+                            </button>
+                            <button
+                              className={`stats-sort-option ${huntMethodSort === "highest-avg" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntMethodSort("highest-avg");
+                                setHuntMethodsPage(1);
+                                setShowHuntMethodSort(false);
+                              }}
+                            >
+                              Highest Avg Checks
+                            </button>
+                            <button
+                              className={`stats-sort-option ${huntMethodSort === "lowest-avg" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntMethodSort("lowest-avg");
+                                setHuntMethodsPage(1);
+                                setShowHuntMethodSort(false);
+                              }}
+                            >
+                              Lowest Avg Checks
+                            </button>
+                          </div>
+
+                          <div className="stats-sort-section">
+                            <div className="stats-sort-section-title">
+                              <Search size={12} />
+                              <span>Name</span>
+                            </div>
+                            <button
+                              className={`stats-sort-option ${huntMethodSort === "alpha-asc" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntMethodSort("alpha-asc");
+                                setHuntMethodsPage(1);
+                                setShowHuntMethodSort(false);
+                              }}
+                            >
+                              Name (A → Z)
+                            </button>
+                            <button
+                              className={`stats-sort-option ${huntMethodSort === "alpha-desc" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntMethodSort("alpha-desc");
+                                setHuntMethodsPage(1);
+                                setShowHuntMethodSort(false);
+                              }}
+                            >
+                              Name (Z → A)
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="hunt-breakdown-list">
+                    {paginatedHuntMethods.map(m => (
+                      <div key={m.method} className="hunt-breakdown-item">
+                        <div className="hunt-breakdown-item-left">
+                          <span className="hunt-breakdown-name">{m.method}</span>
+                          <span className="hunt-breakdown-sub">{m.count} {m.count === 1 ? 'hunt' : 'hunts'} • avg {m.avgChecks.toLocaleString()} checks</span>
+                        </div>
+                        <div className="hunt-breakdown-item-right">
+                          <span className="hunt-breakdown-total">{m.totalChecks.toLocaleString()} checks</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {totalHuntMethodPages > 1 && (
+                    <div className="hunt-breakdown-pagination">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setHuntMethodsPage(p => Math.max(p - 1, 1))}
+                        disabled={huntMethodsPage === 1}
+                        aria-label="Previous Methods Page"
+                        icon={<ChevronLeft size={14} />}
+                      />
+                      <span className="hunt-breakdown-page-text">
+                        Page {huntMethodsPage} of {totalHuntMethodPages}
+                      </span>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setHuntMethodsPage(p => Math.min(p + 1, totalHuntMethodPages))}
+                        disabled={huntMethodsPage === totalHuntMethodPages}
+                        aria-label="Next Methods Page"
+                        icon={<ChevronRight size={14} />}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {huntStats.gameBreakdown.length > 0 && (
+                <div className="hunt-breakdown-col">
+                  <div className="hunt-breakdown-col-header">
+                    <h4>Top Hunting Games</h4>
+                    <div className={`stats-sort-button-wrap ${showHuntGameSort ? 'open' : ''}`} ref={huntGameSortRef}>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="stats-sort-button"
+                        onClick={() => setShowHuntGameSort(!showHuntGameSort)}
+                        aria-label="Sort Games"
+                        icon={<ArrowUpDown size={13} />}
+                      >
+                        <span>{getHuntGameSortLabel()}</span>
+                      </Button>
+
+                      {showHuntGameSort && (
+                        <div className="stats-sort-dropdown">
+                          <div className="stats-sort-section">
+                            <div className="stats-sort-section-title">
+                              <Trophy size={12} />
+                              <span>Hunts</span>
+                            </div>
+                            <button
+                              className={`stats-sort-option ${huntGameSort === "most-hunts" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntGameSort("most-hunts");
+                                setHuntGamesPage(1);
+                                setShowHuntGameSort(false);
+                              }}
+                            >
+                              Most Hunts
+                            </button>
+                            <button
+                              className={`stats-sort-option ${huntGameSort === "least-hunts" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntGameSort("least-hunts");
+                                setHuntGamesPage(1);
+                                setShowHuntGameSort(false);
+                              }}
+                            >
+                              Least Hunts
+                            </button>
+                          </div>
+
+                          <div className="stats-sort-section">
+                            <div className="stats-sort-section-title">
+                              <Crosshair size={12} />
+                              <span>Checks</span>
+                            </div>
+                            <button
+                              className={`stats-sort-option ${huntGameSort === "most-checks" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntGameSort("most-checks");
+                                setHuntGamesPage(1);
+                                setShowHuntGameSort(false);
+                              }}
+                            >
+                              Most Checks
+                            </button>
+                            <button
+                              className={`stats-sort-option ${huntGameSort === "least-checks" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntGameSort("least-checks");
+                                setHuntGamesPage(1);
+                                setShowHuntGameSort(false);
+                              }}
+                            >
+                              Fewest Checks
+                            </button>
+                            <button
+                              className={`stats-sort-option ${huntGameSort === "highest-avg" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntGameSort("highest-avg");
+                                setHuntGamesPage(1);
+                                setShowHuntGameSort(false);
+                              }}
+                            >
+                              Highest Avg Checks
+                            </button>
+                            <button
+                              className={`stats-sort-option ${huntGameSort === "lowest-avg" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntGameSort("lowest-avg");
+                                setHuntGamesPage(1);
+                                setShowHuntGameSort(false);
+                              }}
+                            >
+                              Lowest Avg Checks
+                            </button>
+                          </div>
+
+                          <div className="stats-sort-section">
+                            <div className="stats-sort-section-title">
+                              <Gamepad2 size={12} />
+                              <span>Name</span>
+                            </div>
+                            <button
+                              className={`stats-sort-option ${huntGameSort === "alpha-asc" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntGameSort("alpha-asc");
+                                setHuntGamesPage(1);
+                                setShowHuntGameSort(false);
+                              }}
+                            >
+                              Name (A → Z)
+                            </button>
+                            <button
+                              className={`stats-sort-option ${huntGameSort === "alpha-desc" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntGameSort("alpha-desc");
+                                setHuntGamesPage(1);
+                                setShowHuntGameSort(false);
+                              }}
+                            >
+                              Name (Z → A)
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="hunt-breakdown-list">
+                    {paginatedHuntGames.map(g => (
+                      <div key={g.game} className="hunt-breakdown-item">
+                        <div className="hunt-breakdown-item-left">
+                          <span className="hunt-breakdown-name">{g.game}</span>
+                          <span className="hunt-breakdown-sub">{g.count} {g.count === 1 ? 'hunt' : 'hunts'} • avg {g.avgChecks.toLocaleString()} checks</span>
+                        </div>
+                        <div className="hunt-breakdown-item-right">
+                          <span className="hunt-breakdown-total">{g.totalChecks.toLocaleString()} checks</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {totalHuntGamePages > 1 && (
+                    <div className="hunt-breakdown-pagination">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setHuntGamesPage(p => Math.max(p - 1, 1))}
+                        disabled={huntGamesPage === 1}
+                        aria-label="Previous Games Page"
+                        icon={<ChevronLeft size={14} />}
+                      />
+                      <span className="hunt-breakdown-page-text">
+                        Page {huntGamesPage} of {totalHuntGamePages}
+                      </span>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setHuntGamesPage(p => Math.min(p + 1, totalHuntGamePages))}
+                        disabled={huntGamesPage === totalHuntGamePages}
+                        aria-label="Next Games Page"
+                        icon={<ChevronRight size={14} />}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Interactive Completed Hunts & Fails Showcase */}
+          {(huntStats.totalHunts > 0 || huntStats.totalFails > 0) && (
+            <div className="hunt-log-section">
+              <div className="hunt-log-header">
+                <div className="hunt-log-header-left">
+                  <div className="hunt-tab-toggle-group">
+                    <button
+                      type="button"
+                      className={`hunt-tab-btn ${showcaseTab === "completed" ? "active" : ""}`}
+                      onClick={() => { setShowcaseTab("completed"); setHuntPage(1); }}
+                    >
+                      <Trophy size={15} />
+                      <span>Completed Hunts</span>
+                      <span className="hunt-tab-count">{huntStats.totalHunts}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`hunt-tab-btn ${showcaseTab === "fails" ? "active" : ""}`}
+                      onClick={() => { setShowcaseTab("fails"); setHuntPage(1); }}
+                    >
+                      <XCircle size={15} />
+                      <span>Logged Fails</span>
+                      <span className={`hunt-tab-count ${huntStats.totalFails > 0 ? "has-fails" : ""}`}>{huntStats.totalFails}</span>
+                    </button>
+                  </div>
+                </div>
+                <div className="hunt-log-controls">
+                  <div className="hunt-search-wrap">
+                    <SearchField
+                      id="hunt-showcase-search"
+                      placeholder={showcaseTab === "fails" ? "Search fails..." : "Search Pokémon, game, method..."}
+                      value={typeof huntSearch === "string" ? huntSearch : ""}
+                      onChange={(e) => {
+                        const val = typeof e === "string" ? e : (e?.target?.value ?? "");
+                        setHuntSearch(val);
+                        setHuntPage(1);
+                      }}
+                      onClear={() => { setHuntSearch(""); setHuntPage(1); }}
+                      size="md"
+                    />
+                  </div>
+
+                  <div className={`stats-sort-button-wrap ${showHuntSortDropdown ? 'open' : ''}`} ref={huntSortRef}>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="stats-sort-button"
+                      onClick={() => setShowHuntSortDropdown(!showHuntSortDropdown)}
+                      aria-label="Sort Hunts"
+                      icon={<ArrowUpDown size={15} />}
+                    >
+                      <span>{getHuntSortLabel()}</span>
+                    </Button>
+
+                    {showHuntSortDropdown && (
+                      <div className="stats-sort-dropdown">
+                        <div className="stats-sort-section">
+                          <div className="stats-sort-section-title">
+                            <Calendar size={12} />
+                            <span>Date</span>
+                          </div>
+                          <button
+                            className={`stats-sort-option ${huntSortType === "date-desc" ? "active" : ""}`}
+                            onClick={() => {
+                              setHuntSortType("date-desc");
+                              setShowHuntSortDropdown(false);
+                            }}
+                          >
+                            Date (Newest)
+                          </button>
+                          <button
+                            className={`stats-sort-option ${huntSortType === "date-asc" ? "active" : ""}`}
+                            onClick={() => {
+                              setHuntSortType("date-asc");
+                              setShowHuntSortDropdown(false);
+                            }}
+                          >
+                            Date (Oldest)
+                          </button>
+                        </div>
+
+                        <div className="stats-sort-section">
+                          <div className="stats-sort-section-title">
+                            <Crosshair size={12} />
+                            <span>Checks</span>
+                          </div>
+                          <button
+                            className={`stats-sort-option ${huntSortType === "checks-desc" ? "active" : ""}`}
+                            onClick={() => {
+                              setHuntSortType("checks-desc");
+                              setShowHuntSortDropdown(false);
+                            }}
+                          >
+                            Most Checks
+                          </button>
+                          <button
+                            className={`stats-sort-option ${huntSortType === "checks-asc" ? "active" : ""}`}
+                            onClick={() => {
+                              setHuntSortType("checks-asc");
+                              setShowHuntSortDropdown(false);
+                            }}
+                          >
+                            Fewest Checks
+                          </button>
+                        </div>
+
+                        <div className="stats-sort-section">
+                          <div className="stats-sort-section-title">
+                            <Clock size={12} />
+                            <span>Time</span>
+                          </div>
+                          <button
+                            className={`stats-sort-option ${huntSortType === "time-desc" ? "active" : ""}`}
+                            onClick={() => {
+                              setHuntSortType("time-desc");
+                              setShowHuntSortDropdown(false);
+                            }}
+                          >
+                            Longest Time
+                          </button>
+                          <button
+                            className={`stats-sort-option ${huntSortType === "time-asc" ? "active" : ""}`}
+                            onClick={() => {
+                              setHuntSortType("time-asc");
+                              setShowHuntSortDropdown(false);
+                            }}
+                          >
+                            Shortest Time
+                          </button>
+                        </div>
+
+                        {showcaseTab === "completed" && (
+                          <div className="stats-sort-section">
+                            <div className="stats-sort-section-title">
+                              <Layers size={12} />
+                              <span>Phases</span>
+                            </div>
+                            <button
+                              className={`stats-sort-option ${huntSortType === "phases-desc" ? "active" : ""}`}
+                              onClick={() => {
+                                setHuntSortType("phases-desc");
+                                setShowHuntSortDropdown(false);
+                              }}
+                            >
+                              Most Phases
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Hunts / Fails Grid */}
+              {paginatedHunts.length === 0 ? (
+                <div className="hunt-empty-state">
+                  <p>{showcaseTab === "fails" ? "No logged fails match your search." : "No completed hunts match your search."}</p>
+                </div>
+              ) : (
+                <>
+                  <div className="hunt-showcase-grid">
+                    {paginatedHunts.map((hunt, idx) => {
+                      const isFail = hunt.isFail || showcaseTab === "fails";
+                      const monObj = resolveHuntPokemon(hunt);
+                      const sprite = getHuntSprite(hunt, useHomeSprites);
+                      const displayName = formatPokemonName(hunt.pokemonName || hunt.pokemon?.name || monObj?.name || "Unknown");
+                      const checks = Number(hunt.totalChecks || hunt.checks) || 0;
+                      const timeMs = Number(hunt.elapsedMs || hunt.time) || 0;
+                      const phaseCount = Number(hunt.phaseCount) || (hunt.phases?.length ? hunt.phases.length + 1 : 1);
+                      const effectiveOdds = Number(hunt.odds) || calculateOdds(hunt.game, hunt.method, hunt.modifiers || {}) || 4096;
+                      const dateStr = (hunt.date || hunt.timestamp)
+                        ? new Date(hunt.date || hunt.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+                        : null;
+                      const oddsEval = getOddsEvaluation(checks, effectiveOdds);
+
+                      return (
+                        <div key={hunt.entryId || hunt.id || idx} className={`hunt-showcase-card ${isFail ? "fail-card" : ""}`}>
+                          {/* 1. Header: Sprite + Mon Info + Phase/Fail Tag */}
+                          <div className="hunt-showcase-card-top">
+                            <div className={`hunt-showcase-sprite-wrap ${isFail ? "fail-sprite-wrap" : ""}`}>
+                              {sprite ? (
+                                <img
+                                  src={sprite}
+                                  alt={displayName}
+                                  className={`hunt-showcase-sprite ${!useHomeSprites ? "pixelated" : ""}`}
+                                  style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                                  onError={(e) => {
+                                    e.target.style.display = "none";
+                                  }}
+                                />
+                              ) : (
+                                <Sparkles size={28} className="text-yellow-400 opacity-60" />
+                              )}
+                            </div>
+                            <div className="hunt-showcase-info">
+                              <div className="hunt-showcase-name-row">
+                                <span className="hunt-showcase-mon-name">{displayName}</span>
+                                {hunt.nickname && <span className="hunt-showcase-nickname">"{hunt.nickname}"</span>}
+                              </div>
+                              <div className="hunt-showcase-meta-pills">
+                                {hunt.game && <span className="hunt-showcase-pill pill-game">{hunt.game}</span>}
+                                {hunt.method && <span className="hunt-showcase-pill pill-method">{hunt.method}</span>}
+                                {isFail && hunt.reason && <span className="hunt-showcase-pill pill-reason">{hunt.reason}</span>}
+                              </div>
+                            </div>
+                            <div className="hunt-showcase-top-right">
+                              {isFail ? (
+                                <span className="hunt-fail-tag">FAIL</span>
+                              ) : phaseCount > 1 ? (
+                                <span className="hunt-phase-badge">{phaseCount} Phases</span>
+                              ) : null}
+                            </div>
+                          </div>
+
+                          {/* 2. Key Metrics Row (Checks, Time, Odds) */}
+                          <div className="hunt-showcase-stats-row">
+                            <div className="hunt-stat-box">
+                              <Crosshair size={13} className="hunt-stat-icon text-rose-400" />
+                              <span className="hunt-stat-val text-rose-400">{checks.toLocaleString()}</span>
+                              <span className="hunt-stat-lbl">CHECKS</span>
+                            </div>
+                            <div className="hunt-stat-box">
+                              <Clock size={13} className="hunt-stat-icon text-blue-400" />
+                              <span className="hunt-stat-val font-mono">{timeMs > 0 ? formatElapsed(timeMs) : "—"}</span>
+                              <span className="hunt-stat-lbl">TIME</span>
+                            </div>
+                            <div className="hunt-stat-box">
+                              <Sparkles size={13} className="hunt-stat-icon text-cyan-400" />
+                              <span className="hunt-stat-val text-cyan-300">{effectiveOdds > 0 ? `1/${effectiveOdds.toLocaleString()}` : "—"}</span>
+                              <span className="hunt-stat-lbl">ODDS</span>
+                            </div>
+                          </div>
+
+                          {/* 3. Odds Evaluation Banner & Date */}
+                          <div className={`hunt-showcase-odds-banner ${oddsEval?.type || "good"}`}>
+                            {oddsEval ? (
+                              <>
+                                <span className="hunt-odds-pct-pill">{oddsEval.pctText}</span>
+                                <span className="hunt-odds-comment">{oddsEval.comment}</span>
+                              </>
+                            ) : (
+                              <span className="hunt-odds-comment">{isFail ? "Phase Encounter" : "Hunt Completed"}</span>
+                            )}
+                            {dateStr && (
+                              <div className="hunt-odds-banner-date">
+                                <Calendar size={12} className="text-gray-400 shrink-0" />
+                                <span>{dateStr}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+
+              {/* Pagination Controls */}
+              {totalHuntPages > 1 && (
+                <div className="hunt-breakdown-pagination mt-3">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="stats-page-btn"
+                    disabled={huntPage === 1}
+                    onClick={() => setHuntPage(p => Math.max(1, p - 1))}
+                    aria-label="Previous Page"
+                    icon={<ChevronLeft size={16} />}
+                  />
+                  <span className="hunt-breakdown-page-text">
+                    Page {huntPage} of {totalHuntPages}
+                  </span>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="stats-page-btn"
+                    disabled={huntPage === totalHuntPages}
+                    onClick={() => setHuntPage(p => Math.min(totalHuntPages, p + 1))}
+                    aria-label="Next Page"
+                    icon={<ChevronRight size={16} />}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* SECTION 1: Generations Breakdown (Gen 1 - 9) */}
       <div className="stats-section-block">
@@ -1053,25 +2345,27 @@ export default function ProfileStatsPage() {
 
               {totalGamesPages > 1 ? (
                 <div className="stats-pagination">
-                  <button 
+                  <Button 
+                    variant="secondary"
+                    size="sm"
                     className="stats-page-btn" 
                     disabled={gamesPage === 1}
                     onClick={() => setGamesPage(p => Math.max(1, p - 1))}
                     aria-label="Previous Page"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
+                    icon={<ChevronLeft size={16} />}
+                  />
                   <span className="stats-page-indicator">
                     {gamesPage} / {totalGamesPages}
                   </span>
-                  <button 
+                  <Button 
+                    variant="secondary"
+                    size="sm"
                     className="stats-page-btn" 
                     disabled={gamesPage === totalGamesPages}
                     onClick={() => setGamesPage(p => Math.min(totalGamesPages, p + 1))}
                     aria-label="Next Page"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
+                    icon={<ChevronRight size={16} />}
+                  />
                 </div>
               ) : (
                 <div className="stats-pagination-spacer" />
@@ -1115,25 +2409,27 @@ export default function ProfileStatsPage() {
 
               {totalMethodsPages > 1 ? (
                 <div className="stats-pagination">
-                  <button 
+                  <Button 
+                    variant="secondary"
+                    size="sm"
                     className="stats-page-btn" 
                     disabled={methodsPage === 1}
                     onClick={() => setMethodsPage(p => Math.max(1, p - 1))}
                     aria-label="Previous Page"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
+                    icon={<ChevronLeft size={16} />}
+                  />
                   <span className="stats-page-indicator">
                     {methodsPage} / {totalMethodsPages}
                   </span>
-                  <button 
+                  <Button 
+                    variant="secondary"
+                    size="sm"
                     className="stats-page-btn" 
                     disabled={methodsPage === totalMethodsPages}
                     onClick={() => setMethodsPage(p => Math.min(totalMethodsPages, p + 1))}
                     aria-label="Next Page"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
+                    icon={<ChevronRight size={16} />}
+                  />
                 </div>
               ) : (
                 <div className="stats-pagination-spacer" />
@@ -1158,14 +2454,16 @@ export default function ProfileStatsPage() {
 
           <div className="stats-section-title-right">
             <div className={`stats-sort-button-wrap ${showBallSortDropdown ? 'open' : ''}`} ref={ballSortRef}>
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 className="stats-sort-button"
                 onClick={() => setShowBallSortDropdown(!showBallSortDropdown)}
                 aria-label="Sort Poké Balls"
+                icon={<ArrowUpDown size={15} />}
               >
-                <ArrowUpDown size={15} />
                 <span>{getBallSortLabel()}</span>
-              </button>
+              </Button>
 
               {showBallSortDropdown && (
                 <div className="stats-sort-dropdown">
@@ -1298,14 +2596,16 @@ export default function ProfileStatsPage() {
 
           <div className="stats-section-title-right">
             <div className={`stats-sort-button-wrap ${showMarkSortDropdown ? 'open' : ''}`} ref={markSortRef}>
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 className="stats-sort-button"
                 onClick={() => setShowMarkSortDropdown(!showMarkSortDropdown)}
                 aria-label="Sort Marks and Ribbons"
+                icon={<ArrowUpDown size={15} />}
               >
-                <ArrowUpDown size={15} />
                 <span>{getMarkSortLabel()}</span>
-              </button>
+              </Button>
 
               {showMarkSortDropdown && (
                 <div className="stats-sort-dropdown">

@@ -1,276 +1,313 @@
-/* ================================
-   EMAIL SENT PAGE STYLES - TAILWIND + MOBILE
-==================================*/
+/* ==========================================================================
+   EMAIL SENT / VERIFY EMAIL PAGE STYLES (Refined Modern Card Design)
+   ========================================================================== */
 
-/* Header logo sizing for auth pages */
-.auth-page header img {
-  @apply h-[40px] md:h-[90px] max-w-[280px] md:max-w-[380px] lg:max-w-[450px];
+.email-sent-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1 0 auto;
+  width: 100%;
+  padding: 24px 16px 36px;
+  box-sizing: border-box;
 }
 
-/* Main email sent form container */
-.email-sent-form {
-  @apply max-w-lg mx-auto mt-10 mb-8 px-8 pb-5 rounded-lg shadow-lg w-full border-2;
-  background-color: var(--auth-boxes);
-  border-color: var(--border-color);
+/* Card Container */
+.email-sent-card {
+  width: 100%;
+  max-width: 470px;
+  background: var(--auth-boxes, #141416);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 24px;
+  padding: 36px 32px 30px;
+  box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.6),
+              0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: emailSentFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   transition: background-color var(--transition-speed), border-color var(--transition-speed);
-  color: #fff;
-  font-family: 'Segoe UI', sans-serif;
-  animation: fadeInUp 0.5s ease-out forwards;
 }
 
-/* Email sent title */
-.email-sent-title {
-  @apply text-center text-4xl font-black py-9 m-0;
-  color: var(--accent);
-}
-
-/* Email sent message */
-.email-sent-message {
-  @apply text-center mb-6 text-base leading-relaxed;
-  color: #ccc;
-}
-
-.email-sent-message p {
-  @apply flex items-center justify-center gap-2 flex-wrap;
-}
-
-.email-sent-message .instruction {
-  @apply block mt-2;
-}
-
-.email-sent-message .auth-icon {
-  @apply mr-0 flex-shrink-0;
-}
-
-.email-sent-message strong {
-  @apply font-semibold;
-  color: #fff;
-}
-
-/* Form fields container */
-.email-sent-form-fields {
-  @apply flex flex-col gap-3;
-}
-
-/* Input wrapper with icon */
-.input-icon-wrapper {
-  @apply flex items-center rounded-md p-4;
-  background: var(--settings-input);
-  border: 1px solid var(--border-color);
-}
-
-/* Input fields */
-.email-sent-input {
-  @apply flex-1 bg-transparent border-0 outline-none text-base;
-  color: var(--text);
-}
-
-.email-sent-input::placeholder {
-  color: var(--searchbar-placeholder-text);
-}
-
-/* Auth icons */
-.auth-icon {
-  @apply w-5 h-5 mr-3;
-  stroke: var(--svg-icons);
-  transition: color var(--transition-speed);
-}
-
-/* Email sent button */
-.email-sent-button {
-  @apply py-3 rounded-lg font-bold cursor-pointer transition-all duration-200;
-  background-color: var(--accent);
-  color: #000;
-  border: none;
-}
-
-.email-sent-button:hover:not(:disabled) {
-  background-color: var(--accent-hover);
-  color: var(--text);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.email-sent-button:disabled {
-  @apply opacity-50 cursor-not-allowed;
-}
-
-/* Resend button */
-.resend-button {
-  @apply py-3 rounded-lg font-bold cursor-pointer transition-all duration-200 mt-2;
-  background-color: transparent;
-  color: var(--accent);
-  border: 2px solid var(--accent);
-}
-
-.resend-button:hover:not(:disabled) {
-  background-color: var(--accent);
-  color: #000;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.resend-button:disabled {
-  @apply opacity-50 cursor-not-allowed;
-}
-
-/* Verification info */
-.verification-info {
-  @apply mt-6 p-4 rounded-lg;
-  background: rgba(68, 68, 68, 0.1);
-  border: 1px solid rgba(68, 68, 68, 0.3);
-}
-
-.verification-info p {
-  @apply m-1 text-sm leading-relaxed flex items-center gap-2;
-  color: var(--text);
-}
-
-.verification-info p:first-child {
-  @apply mt-0;
-}
-
-.verification-info p:last-child {
-  @apply mb-0;
-}
-
-/* Mobile responsive styles */
-@media (max-width: 768px) {
-  .email-sent-form {
-    @apply max-w-sm mx-4 mt-24 mb-48 px-4 pb-4;
-    max-width: calc(100vw - 32px) !important;
-    width: calc(100vw - 32px) !important;
-  }
-  
-  .email-sent-title {
-    @apply text-2xl py-4;
-  }
-  
-  .input-icon-wrapper {
-    @apply p-3;
-  }
-  
-  .email-sent-input {
-    @apply text-sm;
-  }
-  
-  .auth-icon {
-    @apply w-4 h-4 mr-2;
-  }
-  
-  .email-sent-button,
-  .resend-button {
-    @apply py-2.5 text-sm;
-  }
-  
-  .email-sent-message {
-    @apply text-sm;
-  }
-}
-
-@media (max-width: 480px) {
-  .email-sent-form {
-    @apply mx-2 mt-16 mb-36 px-3 pb-3;
-    max-width: calc(100vw - 16px) !important;
-    width: calc(100vw - 16px) !important;
-  }
-  
-  .email-sent-title {
-    @apply text-xl py-3;
-  }
-  
-  .input-icon-wrapper {
-    @apply p-2;
-  }
-  
-  .email-sent-input {
-    @apply text-sm;
-  }
-  
-  .auth-icon {
-    @apply w-4 h-4 mr-2;
-  }
-  
-  .email-sent-button,
-  .resend-button {
-    @apply py-2 text-sm;
-  }
-  
-  .email-sent-message {
-    @apply text-xs;
-  }
-  
-  .verification-info {
-    @apply p-3;
-  }
-  
-  .verification-info p {
-    @apply text-xs;
-  }
-}
-
-/* Extra small mobile devices */
-@media (max-width: 360px) {
-  .email-sent-form {
-    @apply mx-1 mt-12 mb-24 px-2 pb-2;
-    max-width: calc(100vw - 8px) !important;
-    width: calc(100vw - 8px) !important;
-  }
-  
-  .email-sent-title {
-    @apply text-lg py-2;
-  }
-  
-  .input-icon-wrapper {
-    @apply p-1.5;
-  }
-  
-  .email-sent-input {
-    @apply text-xs;
-  }
-  
-  .auth-icon {
-    @apply w-3 h-3 mr-1.5;
-  }
-  
-  .email-sent-button,
-  .resend-button {
-    @apply py-1.5 text-xs;
-  }
-  
-  .email-sent-message {
-    @apply text-xs;
-  }
-  
-  .verification-info {
-    @apply p-2;
-  }
-  
-  .verification-info p {
-    @apply text-xs;
-  }
-}
-
-/* Animation keyframes */
-@keyframes fadeInUp {
+@keyframes emailSentFadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(14px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-/* Transparent autofill styling - maintains site theme */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-internal-autofill-selected {
-  background-color: transparent !important;
-  color: var(--text) !important;
-  transition: background-color 9999s ease-in-out 0s;
-  -webkit-text-fill-color: var(--text) !important;
-  box-shadow: none !important;
+/* --------------------------------------------------------------------------
+   HERO GRAPHIC (Glowing Mail / Check Badge)
+   -------------------------------------------------------------------------- */
+
+.email-sent-hero-graphic {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Centered Ambient Glow behind Mail Badge */
+.email-sent-hero-graphic::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent, #38bdf8) 42%, transparent) 0%,
+    color-mix(in srgb, var(--accent, #38bdf8) 16%, transparent) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+  filter: blur(14px);
+  z-index: 0;
+  transition: background 0.3s ease;
+}
+
+/* Mail Circle Badge */
+.email-sent-mail-badge {
+  position: relative;
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(20, 20, 24, 0.95) 100%);
+  border: 1.5px solid color-mix(in srgb, var(--accent, #38bdf8) 75%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5),
+              0 0 16px -2px color-mix(in srgb, var(--accent, #38bdf8) 35%, transparent);
+  z-index: 1;
+}
+
+.email-sent-mail-badge svg {
+  stroke-width: 1.75;
+}
+
+/* Check Sub-Badge Overlapping Bottom Right */
+.email-sent-check-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--auth-boxes, #141416);
+  border: 1.5px solid var(--accent, #38bdf8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent, #38bdf8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  z-index: 2;
+  transition: all var(--transition-speed);
+}
+
+/* --------------------------------------------------------------------------
+   HEADER & DESCRIPTION
+   -------------------------------------------------------------------------- */
+
+.email-sent-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--text, #ffffff);
+  margin: 0 0 10px 0;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.email-sent-title-accent {
+  color: var(--accent, #38bdf8);
+  transition: color var(--transition-speed);
+}
+
+.email-sent-description {
+  font-size: 0.88rem;
+  color: var(--text-muted, #9ca3af);
+  line-height: 1.5;
+  margin: 0 0 24px 0;
+  max-width: 360px;
+}
+
+.email-sent-description-accent {
+  color: var(--accent, #38bdf8);
+  font-weight: 600;
+  word-break: break-all;
+  transition: color var(--transition-speed);
+}
+
+/* --------------------------------------------------------------------------
+   FORM FIELDS & BUTTONS
+   -------------------------------------------------------------------------- */
+
+.email-sent-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.email-sent-input-wrapper input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.25em;
+  font-size: 1.15rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.email-sent-submit-btn {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 20px -2px color-mix(in srgb, var(--accent, #38bdf8) 40%, transparent);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color var(--transition-speed);
+}
+
+.email-sent-submit-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--accent, #38bdf8) 55%, transparent);
+}
+
+/* Resend Button */
+.email-sent-resend-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  border: 1.5px solid color-mix(in srgb, var(--accent, #38bdf8) 60%, transparent);
+  color: var(--accent, #38bdf8);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 11px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.email-sent-resend-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent, #38bdf8) 12%, transparent);
+  border-color: var(--accent, #38bdf8);
+  transform: translateY(-1px);
+}
+
+.email-sent-resend-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-muted, #8e8e93);
+}
+
+/* Divider */
+.email-sent-divider {
+  display: flex;
+  align-items: center;
+  margin: 2px 0;
+  color: var(--text-muted, #71717a);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.email-sent-divider::before,
+.email-sent-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-color, rgba(255, 255, 255, 0.1));
+}
+
+.email-sent-divider span {
+  padding: 0 12px;
+}
+
+/* Secondary Back to Login Button */
+.email-sent-back-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  color: var(--accent, #38bdf8);
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 12px 20px;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.email-sent-back-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent, #38bdf8);
+  transform: translateY(-1px);
+}
+
+/* Information Box */
+.email-sent-hints {
+  margin-top: 18px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.email-sent-hint-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted, #9ca3af);
+  line-height: 1.4;
+}
+
+.email-sent-hint-icon {
+  color: var(--accent, #38bdf8);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVENESS
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 520px) {
+  .email-sent-card {
+    padding: 28px 20px 24px;
+    border-radius: 20px;
+  }
+
+  .email-sent-title {
+    font-size: 1.5rem;
+  }
+
+  .email-sent-description {
+    font-size: 0.82rem;
+  }
 }

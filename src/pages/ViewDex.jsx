@@ -1,11 +1,13 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { Lock, ArrowLeft } from "lucide-react";
 import DexView from "../components/Dex/DexView";
 import Sidebar from "../components/Dex/PokemonSidebar";
+import { Button } from "../components/Shared/Button";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
 import { getCaughtKey, migrateOldCaughtData } from "../caughtStorage";
-import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
+import { LoadingSpinner, SectionLoader } from "../components/Shared";
 import { useLoading } from "../components/Shared/LoadingContext";
 import { profileAPI } from "../utils/api";
 import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isPseudoLegendaryEvo, isSubLegendary, isStarter, isStarterEvo, isFossil, isFossilEvo, isBaby, isBabyEvo, isParadox, getPokemonCategory } from "../utils/pokemonCategories";
@@ -50,9 +52,10 @@ export default function ViewDex() {
 
     const [selectedPokemon, setSelectedPokemon] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isPrivate, setIsPrivate] = useState(false);
 
     const setShowShiny = useCallback(val => {
-        if (val && selectedPokemon?.formType === "mighty") {
+        if (val && (selectedPokemon?.formType === "mighty" || selectedPokemon?.stableId === "origin-ball-dialga-483" || selectedPokemon?.stableId === "origin-ball-palkia-484" || selectedPokemon?.stableId?.startsWith("origin-ball-"))) {
             setSelectedPokemon(null);
             setSidebarOpen(false);
         }
@@ -99,9 +102,9 @@ export default function ViewDex() {
         };
     }, []);
 
-    // Auto-close sidebar on mighty pokemon if switched to shiny
+    // Auto-close sidebar on mighty or origin ball pokemon if switched to shiny
     useEffect(() => {
-        if (showShiny && selectedPokemon?.formType === "mighty") {
+        if (showShiny && (selectedPokemon?.formType === "mighty" || selectedPokemon?.stableId === "origin-ball-dialga-483" || selectedPokemon?.stableId === "origin-ball-palkia-484" || selectedPokemon?.stableId?.startsWith("origin-ball-"))) {
             setSelectedPokemon(null);
             setSidebarOpen(false);
         }
@@ -143,6 +146,10 @@ export default function ViewDex() {
         (async () => {
             try {
                 const user = await profileAPI.getPublicProfile(username);
+                if ((user?.isProfilePublic === false || user?.isPrivate) && !user?.isPrivateAdminView) {
+                    setIsPrivate(true);
+                    return;
+                }
                 const bars = Array.isArray(user.progressBars) ? user.progressBars : [];
                 // Update progress bars when they change
                 if (bars && bars.length > 0) {
@@ -376,8 +383,8 @@ export default function ViewDex() {
                 }
             }
 
-            // Mighty forms cannot be shiny
-            if (showShiny && pokemon.formType === "mighty") {
+            // Mighty forms and Origin Ball forms cannot be shiny
+            if (showShiny && (pokemon.formType === "mighty" || pokemon.stableId === "origin-ball-dialga-483" || pokemon.stableId === "origin-ball-palkia-484" || pokemon.stableId?.startsWith("origin-ball-"))) {
                 return { match: false, isSearchMatch: false };
             }
 
@@ -424,7 +431,7 @@ export default function ViewDex() {
             }
             // Game obtainable in (multi-select)
             if (filters.gameObtainable && filters.gameObtainable.length > 0) {
-                const availableGames = getAvailableGamesForPokemonSidebar(pokemon);
+                const availableGames = getAvailableGamesForPokemonSidebar(pokemon, showShiny);
                 const normalizedAvailable = new Set(availableGames.map(normalizeGameName));
                 const matchesGame = filters.gameObtainable.some(game =>
                     normalizedAvailable.has(normalizeGameName(game))
@@ -450,10 +457,24 @@ export default function ViewDex() {
                 if (!matchesMethod) return { match: false, isSearchMatch: false };
             }
 
-            // Type filter (multi-select)
+            // Type filter (multi-select - supports dual-type)
             if (filters.type && filters.type.length > 0) {
-                const matchesType = filters.type.some(type => pokemon.types?.includes(type));
-                if (!matchesType) return { match: false, isSearchMatch: false };
+                const isDualType = filters.type.includes("dual-type");
+                const pureTypes = filters.type.filter(t => t !== "dual-type");
+                const pokeTypes = pokemon.types || [];
+
+                if (isDualType) {
+                    if (pokeTypes.length < 2) return { match: false, isSearchMatch: false };
+                    if (pureTypes.length === 2) {
+                        const hasBoth = pureTypes.every(t => pokeTypes.includes(t));
+                        if (!hasBoth) return { match: false, isSearchMatch: false };
+                    } else if (pureTypes.length === 1) {
+                        if (!pokeTypes.includes(pureTypes[0])) return { match: false, isSearchMatch: false };
+                    }
+                } else {
+                    const matchesType = pureTypes.some(type => pokeTypes.includes(type));
+                    if (!matchesType) return { match: false, isSearchMatch: false };
+                }
             }
 
             // Generation filter (multi-select)
@@ -462,10 +483,12 @@ export default function ViewDex() {
                 if (!matchesGen) return { match: false, isSearchMatch: false };
             }
 
-            // Caught/uncaught filter
-            const isCaught = !!caughtInfo;
+            // Caught/uncaught/failed filter
+            const isCaught = !!(caughtInfo && caughtInfo.caught !== false && (caughtInfo.entries?.length > 0 || caughtInfo.caught === true));
+            const hasFail = Boolean(caughtInfo?.fails && caughtInfo.fails.length > 0);
             if (filters.caught === "caught" && !isCaught) return { match: false, isSearchMatch: false };
             if (filters.caught === "uncaught" && isCaught) return { match: false, isSearchMatch: false };
+            if (filters.caught === "failed" && !hasFail) return { match: false, isSearchMatch: false };
 
             // Category filtering
             if (filters.categories && filters.categories.length > 0) {
@@ -531,9 +554,31 @@ export default function ViewDex() {
         });
     }, [filters, profileOwnerPreferences, showShiny]);
 
+    if (isPrivate) {
+        return (
+            <div className="page-container fade-in-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '65vh' }}>
+                <div className="stats-private-card">
+                    <Lock className="stats-private-icon" />
+                    <h2>This Profile is Private</h2>
+                    <p>{username}'s Pokédex collection is hidden by their privacy settings.</p>
+                    <Button
+                        as={Link}
+                        to="/trainers"
+                        variant="secondary"
+                        size="sm"
+                        className="stats-back-btn"
+                        icon={<ArrowLeft size={16} />}
+                    >
+                        Back to Trainers
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <>
-            <div className="page-container">
+            <div className="page-container fade-in-content">
                 <DexView
                     viewingUsername={username}
                     allMons={allMons}
@@ -552,7 +597,6 @@ export default function ViewDex() {
                     setSidebarOpen={setSidebarOpen}
                     readOnly={true}
                     title={`${username}'s Living Dex`}
-                    caught={caughtInfoMap}
                     customFilterMons={customFilterMons}
                     externalLinkPreference={externalLinkPreference}
                     viewedUserShinyCharmGames={viewedUserShinyCharmGames}

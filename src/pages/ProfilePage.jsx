@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { createPortal } from "react-dom";
-import { useUser } from "../components/Shared/UserContext";
-import { useLoading } from "../components/Shared/LoadingContext";
-import { useMessage } from "../components/Shared/MessageContext";
-import { LoadingSpinner } from "../components/Shared";
+import { Lock, ArrowLeft, UserX } from "lucide-react";
+import { useUser, useLoading, useMessage, LoadingSpinner, SectionLoader, Button } from "../components/Shared";
 import { profileAPI, caughtAPI, creatorAPI } from "../utils/api";
 import { getFilteredFormsData } from "../utils/dexPreferences";
-import { calculateProfileStats } from "../utils/profileUtils";
+import { calculateProfileStats, extractYoutubeHandle, extractTwitchHandle } from "../utils/profileUtils";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
 import { getSpriteUrl } from "../utils/spriteUtils";
@@ -25,13 +23,14 @@ import "../css/ProfileRedesign.css";
 import "flag-icons/css/flag-icons.min.css";
 
 const FORM_TYPES_FOR_FAVORITES = [
-    "alolan", "galarian", "gmax", "hisuian", "paldean", "unown", "other", "alcremie", "vivillon"
+    "alpha", "alphaother", "alpha_other", "gender", "alolan", "galarian", "hisuian", "paldean", "gmax", "unown", "other", "alcremie", "vivillon", "mighty"
 ];
 
 export default function ProfilePage() {
     const { username: routeUsername } = useParams();
     const navigate = useNavigate();
-    const { username: currentUsername, email, createdAt: currentUserCreatedAt, loading: userLoading, setUser } = useUser();
+    const { username: currentUsername, email, createdAt: currentUserCreatedAt, loading: userLoading, setUser, isAdmin: currentUserIsAdmin, user: currentUserObj } = useUser();
+    const isViewerAdmin = Boolean(currentUserIsAdmin || currentUserObj?.isAdmin);
     const { setLoading, isLoading } = useLoading();
     const { showMessage } = useMessage();
 
@@ -56,6 +55,9 @@ export default function ProfilePage() {
         location: "",
         gender: "",
         profileTrainer: "",
+        avatar: null,
+        pendingAvatarFile: null,
+        pendingAvatarRemoved: false,
         favoriteGames: ["", "", "", "", ""],
         favoritePokemon: ["", "", "", "", ""],
         favoritePokemonShiny: [false, false, false, false, false],
@@ -101,6 +103,9 @@ export default function ProfilePage() {
 
     const POKEMON_OPTIONS = useMemo(() => {
         const base = pokemonData.map(p => ({
+            id: p.id,
+            gen: p.gen,
+            formType: null,
             name: formatPokemonName(p.name),
             value: p.name,
             image: getSpriteUrl(p, false, useHomeSprites),
@@ -112,8 +117,14 @@ export default function ProfilePage() {
                 const formLabel = getFormDisplayName(p);
                 const baseName = formatPokemonName(p.name);
                 return {
+                    id: p.id,
+                    gen: p.gen,
+                    formType: p.formType,
+                    formLabel: formLabel || p.formType,
                     name: formLabel ? `${baseName} (${formLabel})` : baseName,
-                    value: p.name,
+                    value: p.stableId || p.name,
+                    baseName: p.name,
+                    stableId: p.stableId,
                     image: getSpriteUrl(p, false, useHomeSprites),
                     shinyImage: getSpriteUrl(p, true, useHomeSprites),
                 };
@@ -185,7 +196,9 @@ export default function ProfilePage() {
         if (isOwner && userLoading) return;
 
         let ignore = false;
-        setLoading('profile-data', true);
+        if (!profileData) {
+            setLoading('profile-data', true);
+        }
 
         const fetchData = async () => {
             try {
@@ -199,13 +212,14 @@ export default function ProfilePage() {
                         location: data.location ?? prev.location,
                         gender: data.gender ?? prev.gender,
                         profileTrainer: data.profileTrainer ?? prev.profileTrainer,
+                        avatar: data.avatar ?? prev.avatar,
                         favoriteGames: Array.isArray(data.favoriteGames) ? [...data.favoriteGames] : prev.favoriteGames,
                         favoritePokemon: Array.isArray(data.favoritePokemon) ? [...data.favoritePokemon] : prev.favoritePokemon,
                         favoritePokemonShiny: Array.isArray(data.favoritePokemonShiny) ? [...data.favoritePokemonShiny] : prev.favoritePokemonShiny,
                         switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode,
                         goFriendCode: data.goFriendCode ?? prev.goFriendCode,
-                        youtubeUrl: data.youtubeUrl ?? prev.youtubeUrl,
-                        twitchUrl: data.twitchUrl ?? prev.twitchUrl
+                        youtubeUrl: extractYoutubeHandle(data.youtubeUrl) || "",
+                        twitchUrl: extractTwitchHandle(data.twitchUrl) || ""
                     }));
                     setIsAdmin(data.isAdmin ?? false);
                     setIsContentCreator(data.isContentCreator ?? false);
@@ -222,9 +236,12 @@ export default function ProfilePage() {
                     setForm(prev => ({
                         ...prev,
                         bio: data.bio, location: data.location, gender: data.gender, profileTrainer: data.profileTrainer,
+                        avatar: data.avatar || null,
                         favoriteGames: data.favoriteGames || [], favoritePokemon: data.favoritePokemon || [],
                         favoritePokemonShiny: data.favoritePokemonShiny || [], switchFriendCode: data.switchFriendCode,
-                        goFriendCode: data.goFriendCode, youtubeUrl: data.youtubeUrl, twitchUrl: data.twitchUrl
+                        goFriendCode: data.goFriendCode,
+                        youtubeUrl: extractYoutubeHandle(data.youtubeUrl) || "",
+                        twitchUrl: extractTwitchHandle(data.twitchUrl) || ""
                     }));
                     setIsAdmin(data.isAdmin ?? false);
                     setIsContentCreator(data.isContentCreator ?? false);
@@ -262,7 +279,9 @@ export default function ProfilePage() {
         if (!isOwner && !profileOwnerPreferences) return; // Wait for prefs to calculate correctly
         
         let ignore = false;
-        setLoading('profile-stats', true);
+        if (!statsData.stats) {
+            setLoading('profile-stats', true);
+        }
 
         const loadStats = async () => {
             try {
@@ -298,6 +317,10 @@ export default function ProfilePage() {
                 }
             } catch (err) {
                 console.error("Failed to load stats:", err);
+                if (!ignore) {
+                    const prefsToUse = isOwner ? dexPreferences : profileOwnerPreferences;
+                    setStatsData(calculateProfileStats({}, prefsToUse, []));
+                }
             } finally {
                 if (!ignore) setLoading('profile-stats', false);
             }
@@ -380,14 +403,58 @@ export default function ProfilePage() {
         };
     }, [isOwner]);
 
-    if ((isOwner && userLoading) || isLoading('profile-data')) {
-        return <div className="profile-wrapper"><LoadingSpinner fullScreen /></div>;
+    const isPrivate = !isOwner && !isViewerAdmin && !profileData?.isPrivateAdminView && (profileData?.isProfilePublic === false || profileData?.isPrivate);
+
+    const isProfileLoading = (isOwner && userLoading) || isLoading('profile-data') || (!isPrivate && (isLoading('profile-stats') || !statsData.stats));
+
+    if (isProfileLoading) {
+        return (
+            <div className="profile-page">
+                <SectionLoader minHeight="60vh" message="Loading trainer profile..." />
+            </div>
+        );
+    }
+
+    if (isPrivate) {
+        return (
+            <div className="profile-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '65vh' }}>
+                <div className="stats-private-card fade-in-up">
+                    <Lock className="stats-private-icon" />
+                    <h2>This Profile is Private</h2>
+                    <p>{targetUsername || "This trainer"}'s collection and profile are hidden by their privacy settings.</p>
+                    <Button
+                        as={Link}
+                        to="/trainers"
+                        variant="secondary"
+                        size="sm"
+                        className="stats-back-btn"
+                        icon={<ArrowLeft size={16} />}
+                    >
+                        Back to Trainers
+                    </Button>
+                </div>
+            </div>
+        );
     }
 
     if (!profileData && !isOwner) {
         return (
-            <div className="profile-wrapper page-container profile-page" style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <h2 style={{ color: 'var(--text)' }}>Profile not found</h2>
+            <div className="profile-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '65vh' }}>
+                <div className="stats-private-card fade-in-up">
+                    <UserX className="stats-private-icon" />
+                    <h2>Trainer Not Found</h2>
+                    <p>We couldn't find a trainer with the username "{targetUsername}".</p>
+                    <Button
+                        as={Link}
+                        to="/trainers"
+                        variant="secondary"
+                        size="sm"
+                        className="stats-back-btn"
+                        icon={<ArrowLeft size={16} />}
+                    >
+                        Back to Trainers
+                    </Button>
+                </div>
             </div>
         );
     }
@@ -395,7 +462,19 @@ export default function ProfilePage() {
     const createdAt = isOwner ? currentUserCreatedAt : profileData?.createdAt;
 
     return (
-        <div data-tutorial-id="profile-overview" className="profile-wrapper page-container profile-page">
+        <div data-tutorial-id="profile-overview" className="profile-page fade-in-content">
+            {(!isOwner && (isViewerAdmin || profileData?.isPrivateAdminView) && (profileData?.isProfilePublic === false || profileData?.isPrivate)) && (
+                <div className="admin-private-profile-notice flex items-center justify-between gap-3 px-4 py-2.5 mb-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold">
+                    <div className="flex items-center gap-2">
+                        <Lock size={15} className="text-amber-400 shrink-0" />
+                        <span><strong>Admin Preview:</strong> This profile is set to <strong>Private</strong>. Standard trainers cannot view this page.</span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 text-[10px] uppercase tracking-wider font-extrabold shrink-0">
+                        Admin Access
+                    </span>
+                </div>
+            )}
+
             <ProfileHero 
                 username={targetUsername}
                 createdAt={createdAt}
@@ -437,6 +516,8 @@ export default function ProfilePage() {
                         isEditing={isEditing}
                         form={form}
                         setForm={setForm}
+                        isContentCreator={isContentCreator}
+                        isAdmin={isAdmin}
                     />
                     <ProfileFavorites 
                         isOwner={isOwner}
@@ -454,6 +535,8 @@ export default function ProfilePage() {
                         recentAdded={statsData.recentAdded} 
                         useHomeSprites={useHomeSprites} 
                         targetUsername={targetUsername} 
+                        isStatsPublic={profileData?.isStatsPublic}
+                        isOwner={isOwner}
                     />
                 </div>
             </div>

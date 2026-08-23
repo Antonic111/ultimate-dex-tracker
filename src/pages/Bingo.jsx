@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { createPortal } from "react-dom";
-import { X, Search, Edit2, Check, RotateCcw, Link as LinkIcon, ArrowBigLeft } from "lucide-react";
+import { X, Search, Edit2, Check, RotateCcw, Link as LinkIcon, ArrowBigLeft, Lock, ArrowLeft } from "lucide-react";
 import { GAME_OPTIONS, genderForms } from "../Constants";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
@@ -17,6 +17,8 @@ import { useTheme } from '../components/Shared/ThemeContext';
 import { bingoAPI } from "../utils/api";
 import { useMessage } from "../components/Shared/MessageContext";
 import { useUser } from "../components/Shared/UserContext";
+import { Modal, ConfirmModal } from "../components/Shared/Modal";
+import { Button } from "../components/Shared/Button";
 
 const createEmptyGrid = () => Array.from({ length: 25 }, (_, i) => ({
     id: i,
@@ -86,6 +88,7 @@ const Bingo = () => {
     const [editingCellId, setEditingCellId] = useState(null);
     const [selectedGame, setSelectedGame] = useState("Red");
     const [searchTerm, setSearchTerm] = useState("");
+    const [isPrivate, setIsPrivate] = useState(false);
     const [showClearConfirm, setShowClearConfirm] = useState(false);
     const [clearConfirmClosing, setClearConfirmClosing] = useState(false);
     const [cycleIndex, setCycleIndex] = useState(0);
@@ -160,6 +163,9 @@ const Bingo = () => {
                 }
             } catch (error) {
                 console.error("Failed to load bingo data:", error);
+                if (readOnly && (error?.status === 403 || error?.userMessage?.toLowerCase().includes("private") || error?.message?.toLowerCase().includes("private") || error?.data?.error?.toLowerCase().includes("private"))) {
+                    setIsPrivate(true);
+                }
             } finally {
                 if (isMounted) {
                     isDataLoadedRef.current = true;
@@ -414,11 +420,33 @@ const Bingo = () => {
         return null;
     };
 
+    if (isPrivate) {
+        return (
+            <div className="bingo-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '65vh' }}>
+                <div className="stats-private-card">
+                    <Lock className="stats-private-icon" />
+                    <h2>This Profile is Private</h2>
+                    <p>{routeUsername}'s Bingo board is hidden by their privacy settings.</p>
+                    <Button
+                        as={Link}
+                        to="/trainers"
+                        variant="secondary"
+                        size="sm"
+                        className="stats-back-btn"
+                        icon={<ArrowLeft size={16} />}
+                    >
+                        Back to Trainers
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="bingo-page">
             <div className="bingo-container">
-                <div className="mt-12 mb-6" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
-                    <h1 className="bingo-page-title !m-0">
+                <div className="bingo-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
+                    <h1 className="bingo-page-title">
                         {readOnly ? `${routeUsername}'s ` : ''}2026 Shiny BINGO
                     </h1>
 
@@ -583,216 +611,130 @@ const Bingo = () => {
                     </div>
                 )}
             </div>
-
-            {/* Modal Portal - Using Counters.css classes */}
-            {
-                showModal && createPortal(
-                    <div className="pokemon-modal-backdrop">
-                        <div className="pokemon-modal bingo-custom-modal" onClick={e => e.stopPropagation()}>
-                            <div className="pokemon-modal-header">
-                                <h2>Select Game & Pokemon</h2>
-                                <button
-                                    onClick={closeModal}
-                                    className="close-btn"
-                                    aria-label="Close"
+            {/* Edit Slot Modal */}
+            <Modal
+                isOpen={showModal}
+                onClose={closeModal}
+                title="Select Game & Pokemon"
+                subtitle="Choose a game and Pokemon for this slot"
+                size="lg"
+                footer={
+                    editingCellId !== null && (
+                        <>
+                            {grid.find(c => c.id === editingCellId)?.pokemonList?.length > 0 && (
+                                <Button
+                                    variant="danger"
+                                    onClick={handleClearSlot}
+                                    icon={<X size={15} />}
                                 >
-                                    <span className="sidebar-close-icon">
-                                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <circle cx="20" cy="20" r="18" fill="#fff" stroke="#232323" strokeWidth="2" />
-                                            <path d="M2 20a18 18 0 0 1 36 0" fill="#e62829" stroke="#232323" strokeWidth="2" />
-                                            <rect x="2" y="19" width="36" height="2" fill="#232323" />
-                                            <circle cx="20" cy="20" r="7" fill="#ffffffff" stroke="#232323" strokeWidth="2" />
-                                            <circle cx="20" cy="20" r="3.5" fill="#fff" stroke="#232323" strokeWidth="1.5" />
-                                        </svg>
-                                    </span>
-                                </button>
+                                    Clear Slot
+                                </Button>
+                            )}
+                            <Button
+                                variant="primary"
+                                onClick={closeModal}
+                                icon={<Check size={16} strokeWidth={2.5} />}
+                            >
+                                Done
+                            </Button>
+                        </>
+                    )
+                }
+            >
+                <div className="space-y-4">
+                    {/* Game Selection */}
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-[var(--progressbar-info)]">Game:</label>
+                        <SearchbarIconDropdown
+                            id="bingo-game-dropdown"
+                            options={GAME_OPTIONS.filter(g => g.value)}
+                            value={selectedGame}
+                            onChange={(val) => setSelectedGame(val)}
+                            placeholder="Select a Game..."
+                            customBackground="var(--sidebar-edit-inputs)"
+                            customBorder="var(--sidebar-edit-inputs)"
+                            hideClearButton={true}
+                        />
+                    </div>
+
+                    {/* Search and Grid */}
+                    {selectedGame ? (
+                        <>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search Pokemon..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full px-3.5 py-2 text-sm rounded-xl bg-[var(--progressbar-input)] border border-[var(--border-color)] text-[var(--text)] focus:border-[var(--accent)] focus:outline-none"
+                                />
+                                {searchTerm && (
+                                    <button
+                                        type="button"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--progressbar-info)] hover:text-[var(--text)] transition-colors p-1"
+                                        onClick={() => setSearchTerm("")}
+                                        title="Clear search"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                )}
                             </div>
 
-                            <div className="pokemon-modal-content">
-                                {/* Game Selection - Added as first step */}
-                                <div className="pokemon-modal-search-row" style={{ marginBottom: '1rem', borderBottom: 'none', paddingBottom: 0 }}>
-                                    <div className="hunt-form-group" style={{ width: '100%' }}>
-                                        <label className="hunt-label">Game:</label>
-                                        <SearchbarIconDropdown
-                                            id="bingo-game-dropdown"
-                                            options={GAME_OPTIONS.filter(g => g.value)}
-                                            value={selectedGame}
-                                            onChange={(val) => setSelectedGame(val)}
-                                            placeholder="Select a Game..."
-                                            customBackground="var(--sidebar-edit-inputs)"
-                                            customBorder="var(--sidebar-edit-inputs)"
-                                            hideClearButton={true}
-                                        />
-                                    </div>
-                                </div>
-
-
-
-                                {/* Search and Grid - Only if game selected */}
-                                {selectedGame ? (
-                                    <>
-                                        <div className="pokemon-modal-search-row">
-                                            <div className="relative flex-1">
-                                                <input
-                                                    type="text"
-                                                    placeholder="Search Pokemon..."
-                                                    value={searchTerm}
-                                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                                    className="search-input"
-                                                />
-                                                {searchTerm && (
-                                                    <button
-                                                        type="button"
-                                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 transition-colors"
-                                                        style={{ color: 'var(--accent)' }}
-                                                        onClick={() => setSearchTerm("")}
-                                                        title="Clear search"
-                                                    >
-                                                        <X size={14} />
-                                                    </button>
+                            <div className="pokemon-grid">
+                                {filteredPokemon.map((pokemon, index) => {
+                                    const isSelected = grid.find(c => c.id === editingCellId)?.pokemonList?.some(p => p.id === pokemon.id && p.name === pokemon.name);
+                                    return (
+                                        <button
+                                            key={`pokemon-${pokemon?.id || 'unknown'}-${index}`}
+                                            type="button"
+                                            className={`pokemon-item ${isSelected ? 'selected ring-2 ring-[var(--accent)]' : ''}`}
+                                            onClick={() => handlePokemonSelect(pokemon)}
+                                            style={isSelected ? { backgroundColor: 'color-mix(in srgb, var(--accent) 20%, transparent)', borderColor: 'var(--accent)' } : {}}
+                                        >
+                                            <img
+                                                src={getPokemonImage(pokemon) || "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="}
+                                                alt={formatPokemonName(String(pokemon?.name || ''))}
+                                                className="pokemon-img"
+                                            />
+                                            <div className="pokemon-text-container">
+                                                <div className="pokemon-label">
+                                                    {formatPokemonName(String(pokemon?.name || ''))}
+                                                </div>
+                                                {pokemon?.formType && pokemon.formType !== "main" && (
+                                                    <div className="pokemon-form">
+                                                        {getFormDisplayName(pokemon)}
+                                                    </div>
                                                 )}
                                             </div>
-                                        </div>
-
-                                        <div className="pokemon-grid">
-                                            {filteredPokemon.map((pokemon, index) => {
-                                                const isSelected = grid.find(c => c.id === editingCellId)?.pokemonList?.some(p => p.id === pokemon.id && p.name === pokemon.name);
-                                                return (
-                                                <button
-                                                    key={`pokemon-${pokemon?.id || 'unknown'}-${index}`}
-                                                    type="button"
-                                                    className={`pokemon-item ${isSelected ? 'selected ring-2 ring-[var(--accent)]' : ''}`}
-                                                    onClick={() => handlePokemonSelect(pokemon)}
-                                                    style={isSelected ? { backgroundColor: 'color-mix(in srgb, var(--accent) 20%, transparent)', borderColor: 'var(--accent)' } : {}}
-                                                >
-                                                    <img
-                                                        src={getPokemonImage(pokemon) || "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="}
-                                                        alt={formatPokemonName(String(pokemon?.name || ''))}
-                                                        className="pokemon-img"
-                                                    />
-                                                    <div className="pokemon-text-container">
-                                                        <div className="pokemon-label">
-                                                            {formatPokemonName(String(pokemon?.name || ''))}
-                                                        </div>
-                                                        {pokemon?.formType && pokemon.formType !== "main" && (
-                                                            <div className="pokemon-form">
-                                                                {getFormDisplayName(pokemon)}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </button>
-                                            )})}
-                                            {filteredPokemon.length === 0 && (
-                                                <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                                                    No Pokemon found matching your search.
-                                                </div>
-                                            )}
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-                                        Please select a game to view available Pokemon.
-                                    </div>
-                                )}
-
-                                {/* Bottom Buttons of modal */}
-                                {editingCellId !== null && (
-                                    <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', gap: '1rem', paddingBottom: '0.5rem' }}>
-                                        {grid.find(c => c.id === editingCellId)?.pokemonList?.length > 0 && (
-                                            <button
-                                                type="button"
-                                                style={{
-                                                    padding: '0.5rem 1.5rem',
-                                                    border: 'none',
-                                                    backgroundColor: '#ef4444',
-                                                    color: 'white',
-                                                    borderRadius: '6px',
-                                                    cursor: 'pointer',
-                                                    fontWeight: '600',
-                                                    fontSize: '0.9rem',
-                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                                    transition: 'transform 0.1s'
-                                                }}
-                                                onClick={handleClearSlot}
-                                                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
-                                                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                                            >
-                                                Clear Slot
-                                            </button>
-                                        )}
-                                        <button
-                                            type="button"
-                                            style={{
-                                                padding: '0.5rem 1.5rem',
-                                                border: 'none',
-                                                backgroundColor: 'var(--accent)',
-                                                color: 'black',
-                                                borderRadius: '6px',
-                                                cursor: 'pointer',
-                                                fontWeight: '600',
-                                                fontSize: '0.9rem',
-                                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                                transition: 'transform 0.1s'
-                                            }}
-                                            onClick={closeModal}
-                                            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
-                                            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                                        >
-                                            Done
                                         </button>
+                                    );
+                                })}
+                                {filteredPokemon.length === 0 && (
+                                    <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                                        No Pokemon found matching your search.
                                     </div>
                                 )}
                             </div>
+                        </>
+                    ) : (
+                        <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+                            Please select a game to view available Pokemon.
                         </div>
-                    </div>,
-                    document.body
-                )
-            }
+                    )}
+                </div>
+            </Modal>
 
             {/* Clear Board Confirmation Modal */}
-            {
-                showClearConfirm && createPortal(
-                    <div
-                        className={`fixed inset-0 z-[20000] ${clearConfirmClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-                    >
-                        <div className="bg-black/80 w-full h-full flex items-center justify-center">
-                            <div
-                                className={`clear-confirm-modal bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${clearConfirmClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-                                onClick={e => e.stopPropagation()}
-                            >
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                                        <RotateCcw className="w-5 h-5 text-red-400" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-[var(--accent)]">Clear Board</h3>
-                                        <p className="text-sm text-[var(--progressbar-info)]">This action cannot be undone</p>
-                                    </div>
-                                </div>
-                                <p className="text-gray-300 mb-6">
-                                    Are you sure you want to clear the entire bingo board? This will delete all saved data.
-                                </p>
-                                <div className="flex gap-3 justify-end">
-                                    <button
-                                        onClick={closeClearConfirmModal}
-                                        className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={handleClearBoard}
-                                        className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
-                                    >
-                                        Clear Board
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>,
-                    document.body
-                )
-            }
-        </div >
+            <ConfirmModal
+                isOpen={showClearConfirm}
+                onClose={() => setShowClearConfirm(false)}
+                onConfirm={handleClearBoard}
+                title="Clear Board"
+                message="Are you sure you want to clear the entire bingo board? This will delete all saved data."
+                confirmText="Clear Board"
+                variant="danger"
+            />
+        </div>
     );
 };
 

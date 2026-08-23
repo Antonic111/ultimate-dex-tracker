@@ -1,0 +1,312 @@
+/* ==========================================================================
+   UNIVERSAL BUTTON SYSTEM (Button.css)
+   ========================================================================== */
+
+.udt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  gap: 8px;
+  font-family: inherit;
+  font-weight: 700; /* Bold, thick font across all buttons */
+  letter-spacing: 0.015em;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  line-height: 1.25;
+}
+
+.udt-btn:focus-visible {
+  outline: 2px solid var(--accent, #ffe76a);
+  outline-offset: 2px;
+}
+
+/* ================================
+   SVG / ICON SLOTS
+==================================*/
+
+.udt-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: inherit;
+  line-height: 0;
+  height: 1em;
+  transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.udt-btn-icon svg {
+  display: block;
+  stroke-width: 2.5;
+  width: 1.15em;
+  height: 1.15em;
+  color: inherit;
+  pointer-events: none;
+}
+
+.udt-btn-label {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+  font-weight: 700; /* Bold label */
+  line-height: 1.25;
+}
+
+/* ================================
+   BUTTON SIZES
+==================================*/
+
+.udt-btn--sm {
+  padding: 7px 15px;
+  font-size: 0.8125rem; /* ~13px */
+  border-radius: 8px;
+  gap: 6px;
+  min-height: 34px;
+}
+
+.udt-btn--sm .udt-btn-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.udt-btn--md {
+  padding: 10px 22px;
+  font-size: 0.885rem; /* ~14.2px */
+  border-radius: 10px;
+  gap: 8px;
+  min-height: 42px;
+}
+
+.udt-btn--md .udt-btn-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.udt-btn--lg {
+  padding: 14px 28px;
+  font-size: 1rem; /* 16px */
+  border-radius: 12px;
+  gap: 10px;
+  min-height: 50px;
+  border-width: 2px;
+}
+
+.udt-btn--lg .udt-btn-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* Full width option */
+.udt-btn--block {
+  width: 100%;
+}
+
+/* ================================
+   BUTTON VARIANTS
+==================================*/
+
+/* 1. Primary (Accent colored with black text -> on hover white text + darker accent) */
+.udt-btn--primary {
+  background-color: var(--accent, #ffe76a);
+  color: #000000;
+  border-color: var(--accent, #ffe76a);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.udt-btn--primary:hover:not(:disabled) {
+  background-color: var(--accent-hover, #d9be38);
+  border-color: var(--accent-hover, #d9be38);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.udt-btn--primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* 2. Secondary (Dark Glass / Outline for non-accent actions) */
+.udt-btn--secondary {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--text, #ffffff);
+  border-color: var(--border-color, #444444);
+}
+
+.udt-btn--secondary:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.udt-btn--secondary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* 3. Danger (Destructive Red) */
+.udt-btn--danger {
+  background-color: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+}
+
+.udt-btn--danger:hover:not(:disabled) {
+  background-color: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.45);
+}
+
+.udt-btn--danger:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* 4. Danger Soft / Outline (Subtle red that turns dark red on hover) */
+.udt-btn--danger-soft {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.udt-btn--danger-soft:hover:not(:disabled) {
+  background-color: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+}
+
+.udt-btn--danger-soft:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* 5. Success (Green / Affirmative) */
+.udt-btn--success {
+  background-color: #22c55e;
+  color: #000000;
+  border-color: #22c55e;
+  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.25);
+}
+
+.udt-btn--success:hover:not(:disabled) {
+  background-color: #16a34a;
+  border-color: #16a34a;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);
+}
+
+.udt-btn--success:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* 6. Ghost (Minimal transparent) */
+.udt-btn--ghost {
+  background: transparent;
+  color: var(--text, #ffffff);
+  border-color: transparent;
+}
+
+.udt-btn--ghost:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--accent, #ffe76a);
+  transform: translateY(-1px);
+}
+
+.udt-btn--ghost:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* 7. Icon Action Button (Square / Circular action pill) */
+.udt-btn--icon {
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  border-radius: 9px;
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-color, #3a3a3a);
+  color: var(--progress-icons, #b0b0b0);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.udt-btn--icon:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--accent, #ffe76a);
+  transform: translateY(-1px);
+}
+
+.udt-btn--icon.is-active {
+  background-color: color-mix(in srgb, var(--accent) 20%, transparent);
+  border-color: var(--accent, #ffe76a);
+  color: var(--accent, #ffe76a);
+}
+
+/* ================================
+   DISABLED & LOADING STATES
+==================================*/
+
+.udt-btn:disabled,
+.udt-btn.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.udt-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.udt-btn.is-loading {
+  cursor: wait;
+}
+
+/* Built-in Spinner */
+.udt-btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: udtBtnSpin 0.65s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+@keyframes udtBtnSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .udt-btn {
+    transition: none !important;
+    transform: none !important;
+  }
+  .udt-btn-spinner {
+    animation-duration: 1.5s;
+  }
+}

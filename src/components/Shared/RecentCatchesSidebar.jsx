@@ -4,6 +4,7 @@ import { useUser } from './UserContext';
 import { buildApiUrl } from '../../config/api';
 import { findPokemon, formatPokemonName } from '../../utils';
 import { transformSpriteUrlForViewer } from '../../utils/spriteUtils';
+import { getUserAvatarUrl } from '../../utils/profileUtils';
 import pokemonData from '../../data/pokemon.json';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 
@@ -188,7 +189,12 @@ const RecentCatchesSidebar = () => {
                 {/* Hover View (Avatar + Username + Time) */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-2 bg-[var(--pokemon-box-bg2)]/95 backdrop-blur-md z-10 opacity-0 translate-y-8 pointer-events-none transition-all duration-300 ease-out delay-0 group-hover:opacity-100 group-hover:translate-y-0 group-hover:delay-75">
                   <div className="w-[60%] max-w-[75px] aspect-square rounded-full border-2 border-[var(--trainer-avatar-border)] bg-[var(--trainer-avatar-bg)] overflow-hidden flex items-center justify-center mb-2 shadow-md">
-                    <img src={c.profileTrainer ? `/data/trainer_sprites/${c.profileTrainer}` : "/avatar.png"} alt={c.username} className="w-full h-auto object-contain" style={{ imageRendering: 'pixelated', transform: 'scale(1.20) translateY(15%)', transformOrigin: 'center bottom' }} onError={e => e.target.style.display = 'none'} />
+                    <img 
+                      src={getUserAvatarUrl(c)} 
+                      alt={c.username} 
+                      className="w-full h-full object-cover" 
+                      onError={e => e.target.style.display = 'none'} 
+                    />
                   </div>
                   <div className="font-bold text-[var(--accent)] text-[0.95rem] md:text-[1.05rem] leading-tight truncate w-full text-center">{c.username}</div>
                   <div className="text-[0.7rem] md:text-[0.75rem] text-white/75 leading-tight mt-1">{timeAgo(c.caughtAt)}</div>

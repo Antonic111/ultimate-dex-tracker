@@ -25,33 +25,46 @@ import { MessageProvider } from "./components/Shared/MessageContext";
 import { UserContext } from "./components/Shared/UserContext";
 import HeaderWithConditionalAuth from "./Header";
 import { ThemeProvider, useTheme } from "./components/Shared/ThemeContext";
+import { ConfirmModal } from "./components/Shared/Modal";
 import './css/theme.css';
 // import './css/pageAnimations.css'; // Moved to backup folder
 
 // Lazy load routes for code splitting
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
+const CompleteSignup = lazy(() => import("./pages/CompleteSignup"));
+const OAuthCallback = lazy(() => import("./pages/OAuthCallback"));
 const EmailSent = lazy(() => import("./pages/EmailSent"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const EnterResetCode = lazy(() => import("./pages/EnterResetCode"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const ProfileStatsPage = lazy(() => import("./pages/ProfileStatsPage"));
-const PublicHome = lazy(() => import("./pages/PublicHome"));
+import PublicHome from "./pages/PublicHome";
 const Settings = lazy(() => import("./pages/Settings"));
 const Backup = lazy(() => import("./pages/Backup"));
 const Trainers = lazy(() => import("./pages/Trainers"));
+const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 const Counters = lazy(() => import("./pages/Counters"));
 const ViewDex = lazy(() => import("./pages/ViewDex.jsx"));
 const Changelog = lazy(() => import("./pages/Changelog"));
 const Feedback = lazy(() => import("./pages/Feedback"));
+const PrivacyPolicy = lazy(() => import("./pages/LegalPrivacy.jsx"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 
 const Bingo = lazy(() => import("./pages/Bingo"));
 const Admin = lazy(() => import("./pages/Admin"));
 const HuntPopout = lazy(() => import("./pages/HuntPopout"));
 const MMOTool = lazy(() => import("./pages/MMOTool"));
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./config/queryClient";
 import { LoadingProvider, useLoading } from "./components/Shared/LoadingContext";
-import { LoadingSpinner } from "./components/Shared";
+import {
+  LoadingSpinner,
+  PageTransition,
+  SectionLoader,
+  BackgroundFetchIndicator
+} from "./components/Shared";
 import Footer from "./components/Shared/Footer";
 import CustomScrollbar from "./components/Shared/CustomScrollbar";
 import MaintenanceScreen from "./components/Shared/MaintenanceScreen";
@@ -61,7 +74,7 @@ import { buildApiUrl } from "./config/api.js";
 import { getFilteredFormsData, getDexPreferences } from "./utils/dexPreferences";
 import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "./data/blockedShinies";
 import { createPortal } from "react-dom";
-import { RotateCcw, TriangleAlert, Sparkles } from "lucide-react";
+import { RotateCcw, TriangleAlert, Sparkles, X } from "lucide-react";
 import { getAvailableGamesForPokemonSidebar, normalizeGameName } from "./utils/pokemonAvailability";
 
 // Mobile Keyboard Handler Hook
@@ -184,17 +197,36 @@ const LocationListener = ({ onNavigateToHome }) => {
   return null; // This component doesn't render anything
 };
 
-// Wrapper components to hide header/footer on popout window
+// Wrapper components to hide header/footer/extras on popout window and admin panel
 const HeaderWrapper = (props) => {
   const location = useLocation();
-  if (location.pathname === '/hunt-popout') return null;
+  if (location.pathname.startsWith('/hunt-popout') || location.pathname.startsWith('/admin')) return null;
   return <HeaderWithConditionalAuth {...props} />;
 };
 
-const FooterWrapper = () => {
+const FooterWrapper = ({ user }) => {
   const location = useLocation();
-  if (location.pathname === '/hunt-popout') return null;
+  if (location.pathname.startsWith('/hunt-popout') || location.pathname.startsWith('/admin')) return null;
+  if (location.pathname === '/' && !user?.username) return null;
   return <Footer />;
+};
+
+const SidebarWrapper = () => {
+  const location = useLocation();
+  if (location.pathname.startsWith('/hunt-popout') || location.pathname.startsWith('/admin')) return null;
+  return <RecentCatchesSidebar />;
+};
+
+const ScrollbarWrapper = () => {
+  const location = useLocation();
+  if (location.pathname.startsWith('/hunt-popout')) return null;
+  return <CustomScrollbar />;
+};
+
+const OnboardingWrapper = ({ user, onTutorialActiveChange }) => {
+  const location = useLocation();
+  if (location.pathname.startsWith('/hunt-popout') || !user?.username) return null;
+  return <OnboardingManager onTutorialActiveChange={onTutorialActiveChange} />;
 };
 
 
@@ -359,7 +391,13 @@ function RequireAuth({ loading, authReady, user, children }) {
   if (loading || !authReady) {
     return null; // Don't show anything, let the Profile component handle loading
   }
-  return user?.username ? children : <Navigate to="/login" replace />;
+  if (!user?.username) {
+    return <Navigate to="/login" replace />;
+  }
+  if (user?.needsProfileSetup) {
+    return <Navigate to="/complete-signup" replace />;
+  }
+  return children;
 }
 
 
@@ -423,20 +461,32 @@ export default function App() {
     email: null,
     createdAt: null,
     profileTrainer: null,
+    avatar: null,
     verified: false,
     progressBars: [],
     onboarding: null,
   });
   const [showMenu, setShowMenu] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return Boolean(localStorage.getItem('authToken') || sessionStorage.getItem('iosUserBackup'));
+    }
+    return false;
+  });
   const userMenuRef = useRef(null);
-  const [authReady, setAuthReady] = useState(false);
+  const [authReady, setAuthReady] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return !localStorage.getItem('authToken') && !sessionStorage.getItem('iosUserBackup');
+    }
+    return true;
+  });
   const [justLoggedIn, setJustLoggedIn] = useState(false); // Add flag to track recent login
   const [authTimeout, setAuthTimeout] = useState(false); // Timeout flag for bots/crawlers
   const [dexSections, setDexSections] = useState(() => createDexSections());
   const [currentDexPreferences, setCurrentDexPreferences] = useState(() => getDexPreferences());
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceStartTime, setMaintenanceStartTime] = useState(null);
+  const [dismissedMaintenanceBanner, setDismissedMaintenanceBanner] = useState(false);
 
   const [isTutorialActive, setIsTutorialActive] = useState(false);
   const [tutorialBulbasaurCaught, setTutorialBulbasaurCaught] = useState(false);
@@ -654,6 +704,7 @@ export default function App() {
           verified: newUserData.verified,
           createdAt: newUserData.createdAt,
           profileTrainer: newUserData.profileTrainer,
+          avatar: newUserData.avatar || null,
           progressBars: newUserData.progressBars || [],
           timestamp: Date.now(),
           isIOS: isIOS
@@ -684,6 +735,24 @@ export default function App() {
 
   // Initial auth check on page load
   useEffect(() => {
+    const hasToken = typeof window !== 'undefined' && Boolean(localStorage.getItem('authToken') || sessionStorage.getItem('iosUserBackup'));
+    if (!hasToken) {
+      setAuthReady(true);
+      setLoading(false);
+      setAuthTimeout(false);
+      // Silently fetch site settings without blocking page layout
+      fetch(buildApiUrl('/site-settings'))
+        .then(res => res.json())
+        .then(settings => {
+          if (settings) {
+            setMaintenanceMode(settings.maintenanceMode || false);
+            setMaintenanceStartTime(settings.maintenanceStartTime || null);
+          }
+        })
+        .catch(() => {});
+      return;
+    }
+
     setAuthReady(false);
     setAuthTimeout(false);
 
@@ -1035,6 +1104,18 @@ export default function App() {
     });
   }, [user?.username]);
 
+  // Listen for collection data reset event
+  useEffect(() => {
+    const handleDexDataReset = () => {
+      setCaught({});
+      setCaughtInfoMap({});
+      setSelectedPokemon(null);
+      setSidebarOpen(false);
+    };
+
+    window.addEventListener("dexDataReset", handleDexDataReset);
+    return () => window.removeEventListener("dexDataReset", handleDexDataReset);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -1074,7 +1155,7 @@ export default function App() {
     return {};
   }, [isTutorialActive, caughtInfoMap, tutorialBulbasaurCaught, tutorialBulbasaurInfo]);
 
-  // Load cached caught info immediately for seamless refreshes
+  // Load cached caught info immediately for seamless refreshes and clean up any ghost keys
   useEffect(() => {
     if (!user?.username) return;
     try {
@@ -1082,11 +1163,43 @@ export default function App() {
       if (raw) {
         const cached = JSON.parse(raw);
         if (cached && typeof cached === 'object') {
-          setCaughtInfoMap(prev => (Object.keys(prev).length ? prev : cached));
+          // Clean up ghost keys and remap legacy keys in client cache
+          const cleaned = {};
+          let needsCacheUpdate = false;
+          for (const key in cached) {
+            let targetKey = key;
+            if (key.includes("-main-")) {
+              targetKey = key.replace("-main-", "-");
+              needsCacheUpdate = true;
+            } else if (key === "hippopotas-gender-0450") {
+              targetKey = "hippopotas-gender-0449";
+              needsCacheUpdate = true;
+            } else if (key === "hippopotas-gender-0450_shiny") {
+              targetKey = "hippopotas-gender-0449_shiny";
+              needsCacheUpdate = true;
+            } else if (key === "zygarde-50" || key === "zygarde-0718") {
+              targetKey = "zygarde-50-718";
+              needsCacheUpdate = true;
+            } else if (key === "zygarde-50_shiny" || key === "zygarde-0718_shiny") {
+              targetKey = "zygarde-50-718_shiny";
+              needsCacheUpdate = true;
+            }
+            if (cleaned[targetKey] && Array.isArray(cleaned[targetKey].entries) && Array.isArray(cached[key]?.entries)) {
+              cleaned[targetKey].entries = [...cleaned[targetKey].entries, ...cached[key].entries];
+            } else {
+              cleaned[targetKey] = cached[key];
+            }
+          }
+
+          if (needsCacheUpdate) {
+            localStorage.setItem(`caughtInfoMap:${user.username}`, JSON.stringify(cleaned));
+          }
+
+          setCaughtInfoMap(prev => (Object.keys(prev).length ? prev : cleaned));
           // Derive caught booleans from cache for instant UI
           const caughtMap = {};
-          for (const key in cached) {
-            const info = cached[key];
+          for (const key in cleaned) {
+            const info = cleaned[key];
             if (info && typeof info === 'object') {
               if (info.entries && Array.isArray(info.entries) && info.entries.length > 0) {
                 caughtMap[key] = true;
@@ -1169,25 +1282,31 @@ export default function App() {
       // overwrite uncatch operations back to caught=true.
       if (event.detail?.source === 'app') return;
 
-      const { pokemon, caughtInfo, caughtKey } = event.detail;
+      const { pokemon, caughtInfo, caughtKey, isShiny } = event.detail;
+
+      if (isShiny) {
+        setShowShiny(true);
+      }
 
       // Update the caughtInfoMap with the new data
       setCaughtInfoMap(prev => {
         const updated = {
-          ...prev,
-          [caughtKey]: caughtInfo
+          ...prev
         };
+        if (caughtInfo == null) {
+          delete updated[caughtKey];
+        } else {
+          updated[caughtKey] = caughtInfo;
+        }
         return updated;
       });
 
       // Update the caught boolean map
-      setCaught(prev => {
-        const updated = {
-          ...prev,
-          [caughtKey]: true
-        };
-        return updated;
-      });
+      const isCaughtBool = Boolean(caughtInfo && caughtInfo.caught !== false && (caughtInfo.entries?.length > 0 || caughtInfo.caught === true));
+      setCaught(prev => ({
+        ...prev,
+        [caughtKey]: isCaughtBool
+      }));
     };
 
     window.addEventListener('caughtDataChanged', handleCaughtDataChanged);
@@ -1253,8 +1372,8 @@ export default function App() {
         return { match: false, poke, isSearchMatch: false };
       }
 
-      // Mighty Pokemon cannot be shiny
-      if (isShiny && poke.formType === "mighty") {
+      // Mighty Pokemon and Origin Ball Pokemon cannot be shiny
+      if (isShiny && (poke.formType === "mighty" || poke.stableId === "origin-ball-dialga-483" || poke.stableId === "origin-ball-palkia-484" || poke.stableId?.startsWith("origin-ball-"))) {
         return { match: false, poke, isSearchMatch: false };
       }
 
@@ -1344,7 +1463,7 @@ export default function App() {
       }
       // Game obtainable in (multi-select)
       if (filters.gameObtainable && filters.gameObtainable.length > 0) {
-        const availableGames = getAvailableGamesForPokemonSidebar(poke);
+        const availableGames = getAvailableGamesForPokemonSidebar(poke, showShiny);
         const normalizedAvailable = new Set(availableGames.map(normalizeGameName));
         const matchesGame = filters.gameObtainable.some(game =>
           normalizedAvailable.has(normalizeGameName(game))
@@ -1369,21 +1488,39 @@ export default function App() {
         const matchesMethod = filters.method.some(method => firstEntry.method === method);
         if (!matchesMethod) return { match: false, poke: poke2, isSearchMatch: false };
       }
-      // Type (multi-select - must match at least one)
+      // Type (multi-select - supports dual-type filtering)
       if (filters.type && filters.type.length > 0) {
-        const matchesType = filters.type.some(type => (poke.types || []).includes(type));
-        if (!matchesType) return { match: false, poke: poke2, isSearchMatch: false };
+        const isDualType = filters.type.includes("dual-type");
+        const pureTypes = filters.type.filter(t => t !== "dual-type");
+        const pokeTypes = poke.types || [];
+
+        if (isDualType) {
+          if (pokeTypes.length < 2) return { match: false, poke: poke2, isSearchMatch: false };
+          if (pureTypes.length === 2) {
+            const hasBoth = pureTypes.every(t => pokeTypes.includes(t));
+            if (!hasBoth) return { match: false, poke: poke2, isSearchMatch: false };
+          } else if (pureTypes.length === 1) {
+            if (!pokeTypes.includes(pureTypes[0])) return { match: false, poke: poke2, isSearchMatch: false };
+          }
+        } else {
+          const matchesType = pureTypes.some(type => pokeTypes.includes(type));
+          if (!matchesType) return { match: false, poke: poke2, isSearchMatch: false };
+        }
       }
       // Gen (multi-select)
       if (filters.gen && filters.gen.length > 0) {
         const matchesGen = filters.gen.some(gen => String(poke.gen) === String(gen));
         if (!matchesGen) return { match: false, poke: poke2, isSearchMatch: false };
       }
-      // Caught/uncaught - check the appropriate shiny status
+      // Caught/uncaught/failed - check the appropriate shiny status
       const caughtKey = getCaughtKey(poke, null, isShiny);
       const effectiveCaughtMap = isTutorialActive ? visualCaught : caught;
-      if (filters.caught === "caught" && !effectiveCaughtMap[caughtKey]) return { match: false, poke: poke2, isSearchMatch: false };
-      if (filters.caught === "uncaught" && effectiveCaughtMap[caughtKey]) return { match: false, poke: poke2, isSearchMatch: false };
+      const isMonCaught = !!effectiveCaughtMap[caughtKey];
+      const hasFail = Boolean((caughtInfoMap?.[caughtKey]?.fails || []).length > 0);
+
+      if (filters.caught === "caught" && !isMonCaught) return { match: false, poke: poke2, isSearchMatch: false };
+      if (filters.caught === "uncaught" && isMonCaught) return { match: false, poke: poke2, isSearchMatch: false };
+      if (filters.caught === "failed" && !hasFail) return { match: false, poke: poke2, isSearchMatch: false };
 
       // Category filtering
       if (filters.categories && filters.categories.length > 0) {
@@ -1515,6 +1652,7 @@ export default function App() {
     let freshInfo = null;
 
     if (!wasAlreadyCaught) {
+      const existingFails = currentInfoMap[key]?.fails || [];
       const newEntry = {
         nickname: "",
         date: "",
@@ -1529,27 +1667,50 @@ export default function App() {
       freshInfo = {
         caught: true,
         caughtAt: Date.now(),
-        entries: [newEntry]
+        entries: [newEntry],
+        ...(existingFails.length > 0 ? { fails: existingFails } : {})
       };
       setCaughtInfoMap(prevInfoMap => ({
         ...prevInfoMap,
         [key]: freshInfo
       }));
       if (user?.username) {
+        const isFeedPublic = user.isGlobalFeedPublic !== false;
         const pokeName = formatPokemonName(poke.name);
         const formName = getFormDisplayName(poke) || null;
         const sprite = getSpriteUrl(poke, isShiny, currentDexPreferences?.useHomeSprites);
-        const newCatchTrigger = { pokemonName: pokeName, formName: formName, sprite: sprite, username: user.username, profileTrainer: user.profileTrainer };
+        const newCatchTrigger = isFeedPublic ? { pokemonName: pokeName, formName: formName, sprite: sprite, username: user.username, profileTrainer: user.profileTrainer } : null;
         updateCaughtData(user.username, key, freshInfo, newCatchTrigger);
       }
     } else {
-      setCaughtInfoMap(prevInfoMap => {
-        const updated = { ...prevInfoMap };
-        delete updated[key];
-        return updated;
-      });
-      if (user?.username) {
-        updateCaughtData(user.username, key, null);
+      if (currentInfoMap[key]?.fails && currentInfoMap[key].fails.length > 0) {
+        freshInfo = {
+          caught: false,
+          entries: [],
+          fails: currentInfoMap[key].fails
+        };
+        setCaughtInfoMap(prevInfoMap => ({
+          ...prevInfoMap,
+          [key]: freshInfo
+        }));
+        if (user?.username) {
+          const pokeName = formatPokemonName(poke.name);
+          const formName = getFormDisplayName(poke) || null;
+          const removeTrigger = { pokemonName: pokeName, formName: formName, username: user.username };
+          updateCaughtData(user.username, key, freshInfo, null, removeTrigger);
+        }
+      } else {
+        setCaughtInfoMap(prevInfoMap => {
+          const updated = { ...prevInfoMap };
+          delete updated[key];
+          return updated;
+        });
+        if (user?.username) {
+          const pokeName = formatPokemonName(poke.name);
+          const formName = getFormDisplayName(poke) || null;
+          const removeTrigger = { pokemonName: pokeName, formName: formName, username: user.username };
+          updateCaughtData(user.username, key, null, null, removeTrigger);
+        }
       }
     }
 
@@ -1592,7 +1753,7 @@ export default function App() {
       detail: {
         pokemon: poke,
         caughtKey: key,
-        caughtInfo: wasAlreadyCaught ? null : freshInfo,
+        caughtInfo: wasAlreadyCaught ? (freshInfo || null) : freshInfo,
         wasCaught: wasAlreadyCaught,
         isShiny,
         source: 'app'
@@ -1602,21 +1763,21 @@ export default function App() {
 
   // Handle reset confirmation from grid click or bulk operations
   const handleResetConfirm = () => {
-    // Close modal with animation
-    setResetModalClosing(true);
-    setTimeout(() => {
-      setResetModal({
-        show: false,
-        pokemon: null,
-        pokemonName: '',
-        isShiny: false,
-        isBulkReset: false,
-        box: null
-      });
-      setResetModalClosing(false);
-    }, 300);
+    const isBulk = resetModal.isBulkReset;
+    const box = resetModal.box;
+    const isShiny = resetModal.isShiny;
+    const pokemon = resetModal.pokemon;
 
-    if (resetModal.isBulkReset && resetModal.box) {
+    setResetModal({
+      show: false,
+      pokemon: null,
+      pokemonName: '',
+      isShiny: false,
+      isBulkReset: false,
+      box: null
+    });
+
+    if (isBulk && box) {
       // Handle bulk reset (Unmark All)
       const newCaughtMap = { ...caught };
       const newInfoMap = { ...caughtInfoMap };
@@ -1625,8 +1786,14 @@ export default function App() {
       resetModal.box.forEach(p => {
         const key = getCaughtKey(p, null, resetModal.isShiny);
         newCaughtMap[key] = false;
-        newInfoMap[key] = null;
-        delta[key] = null;
+        if (newInfoMap[key]?.fails && newInfoMap[key].fails.length > 0) {
+          const failOnlyInfo = { caught: false, entries: [], fails: newInfoMap[key].fails };
+          newInfoMap[key] = failOnlyInfo;
+          delta[key] = failOnlyInfo;
+        } else {
+          delete newInfoMap[key];
+          delta[key] = null;
+        }
       });
 
       setCaught(newCaughtMap);
@@ -1652,11 +1819,23 @@ export default function App() {
       // Handle individual reset (grid click)
       const key = getCaughtKey(resetModal.pokemon, null, resetModal.isShiny);
 
+      const newInfo = (caughtInfoMap[key]?.fails && caughtInfoMap[key].fails.length > 0)
+        ? { caught: false, entries: [], fails: caughtInfoMap[key].fails }
+        : null;
+
       // Actually reset the Pokémon data
       setCaught(prev => ({ ...prev, [key]: false }));
-      setCaughtInfoMap(prev => ({ ...prev, [key]: null }));
+      setCaughtInfoMap(prev => {
+        const updated = { ...prev };
+        if (newInfo) updated[key] = newInfo;
+        else delete updated[key];
+        return updated;
+      });
       if (user?.username) {
-        updateCaughtData(user.username, key, null);
+        const pokeName = formatPokemonName(resetModal.pokemon.name);
+        const formName = getFormDisplayName(resetModal.pokemon) || null;
+        const removeTrigger = { pokemonName: pokeName, formName: formName, username: user.username };
+        updateCaughtData(user.username, key, newInfo, null, removeTrigger);
       }
 
       // Close sidebar if this Pokémon was selected
@@ -1672,7 +1851,7 @@ export default function App() {
   };
 
 
-  const updateCaughtInfo = useCallback((poke, info, isShiny = false, isNewEntryArg = false) => {
+  const updateCaughtInfo = useCallback((poke, info, isShiny = false, isNewEntryArg = false, isDeleteEntryArg = false) => {
     // Mighty Pokemon cannot be caught as shiny under any circumstances
     if (isShiny && poke?.formType === "mighty") {
       return;
@@ -1688,9 +1867,9 @@ export default function App() {
     const key = getCaughtKey(poke, null, isShiny);
     if (!key) return;
 
-    const wasAlreadyCaught = !!caught[key];
+    const wasAlreadyCaught = !!(caught[key] || (caughtInfoMap[key] && caughtInfoMap[key].caught !== false && (caughtInfoMap[key].entries?.length > 0 || caughtInfoMap[key].caught === true)));
+    const existingFails = caughtInfoMap[key]?.fails || [];
 
-    // Normalize data for backend schema (checks is Number or omitted)
     let cleanedInfo = null;
     if (info != null) {
       const checksStr = info.checks == null ? "" : String(info.checks).trim();
@@ -1702,12 +1881,31 @@ export default function App() {
       } else {
         delete cleanedInfo.checks;
       }
+      // If info didn't explicitly specify fails, preserve existing ones
+      if (cleanedInfo.fails === undefined && existingFails.length > 0) {
+        cleanedInfo.fails = existingFails;
+      }
+      const isCaughtVal = Boolean(cleanedInfo.caught !== false && (cleanedInfo.entries?.length > 0 || cleanedInfo.caught === true));
+      const hasFails = Array.isArray(cleanedInfo.fails) && cleanedInfo.fails.length > 0;
+      if (!isCaughtVal && !hasFails) {
+        cleanedInfo = null;
+      }
+    } else if (existingFails.length > 0) {
+      // If info is null (unmarked/reset), preserve recorded fails
+      cleanedInfo = {
+        caught: false,
+        entries: [],
+        fails: existingFails
+      };
     }
+
+    const isCaughtBool = Boolean(cleanedInfo && cleanedInfo.caught !== false && (cleanedInfo.entries?.length > 0 || cleanedInfo.caught === true));
+    const newEntriesCount = cleanedInfo?.entries?.length || (isCaughtBool ? 1 : 0);
 
     setCaughtInfoMap(prev => {
       const updated = { ...prev };
       if (cleanedInfo == null) {
-        updated[key] = null;
+        delete updated[key];
       } else {
         updated[key] = cleanedInfo;
       }
@@ -1716,29 +1914,40 @@ export default function App() {
 
     if (user?.username) {
       let newCatchTrigger = null;
-      if (isNewEntryArg) {
+      let removeCatchTrigger = null;
+
+      if (isNewEntryArg && user.isGlobalFeedPublic !== false && isCaughtBool) {
         const pokeName = formatPokemonName(poke.name);
         const formName = getFormDisplayName(poke) || null;
         const sprite = getSpriteUrl(poke, isShiny, currentDexPreferences?.useHomeSprites);
         newCatchTrigger = { pokemonName: pokeName, formName: formName, sprite: sprite, username: user.username, profileTrainer: user.profileTrainer };
+      } else if (!info || !cleanedInfo || !isCaughtBool || isDeleteEntryArg || (newEntriesCount < prevEntriesCount && prevEntriesCount > 0)) {
+        const pokeName = formatPokemonName(poke.name);
+        const formName = getFormDisplayName(poke) || null;
+        removeCatchTrigger = {
+          pokemonName: pokeName,
+          formName: formName,
+          username: user.username,
+          removeOne: newEntriesCount > 0
+        };
       }
-      updateCaughtData(user.username, key, cleanedInfo, newCatchTrigger);
+      updateCaughtData(user.username, key, cleanedInfo, newCatchTrigger, removeCatchTrigger);
     }
 
     // caught = true if we have info, false if we cleared it
-    setCaught(prev => ({ ...prev, [key]: !!info }));
+    setCaught(prev => ({ ...prev, [key]: isCaughtBool }));
 
     // Persist the most-recent-catch order to sessionStorage
     try {
       const existing = JSON.parse(sessionStorage.getItem('recentCatchOrder') || '[]');
       let updated;
-      if ((!wasAlreadyCaught || isNewEntryArg) && info != null) {
+      if ((!wasAlreadyCaught || isNewEntryArg) && isCaughtBool) {
         // Prepend the new catch, remove duplicates, keep top 5
         updated = [
           { stableId: poke.stableId, isShiny },
           ...existing.filter(c => !(c.stableId === poke.stableId && !!c.isShiny === !!isShiny))
         ].slice(0, 5);
-      } else if (info == null) {
+      } else if (!isCaughtBool) {
         // Remove the uncaught Pokémon from the order
         updated = existing.filter(c => !(c.stableId === poke.stableId && !!c.isShiny === !!isShiny));
       } else {
@@ -1970,12 +2179,15 @@ export default function App() {
   const shinySectionsNoFilters = useMemo(() => {
     return dexSections
       .filter(section => section.key !== "mighty")
-      .map(section => ({
-        section,
-        filteredMons: section.getList()
-      }))
+      .map(section => {
+        const filteredMons = filterMons(section.getList(), showForms, true);
+        return {
+          section,
+          filteredMons
+        };
+      })
       .filter(s => s.filteredMons.length > 0);
-  }, [dexSections]);
+  }, [dexSections, filterMons, showForms]);
 
   const regularSectionsWithFilters = useMemo(() => {
     return dexSections
@@ -1989,12 +2201,15 @@ export default function App() {
 
   const regularSectionsNoFilters = useMemo(() => {
     return dexSections
-      .map(section => ({
-        section,
-        filteredMons: section.getList()
-      }))
+      .map(section => {
+        const filteredMons = filterMons(section.getList(), showForms, false);
+        return {
+          section,
+          filteredMons
+        };
+      })
       .filter(s => s.filteredMons.length > 0);
-  }, [dexSections]);
+  }, [dexSections, filterMons, showForms]);
 
   const categorizedSections = useMemo(() => {
     return showShiny 
@@ -2078,204 +2293,202 @@ export default function App() {
   }
 
   return (
-    <ThemeProvider>
-      <LoadingProvider>
-        <UserContext.Provider value={{ ...user, setUser: handleUserUpdate, loading }}>
-          <MessageProvider>
-            <Router>
-              <div className="flex flex-col min-h-screen">
-                <RecentCatchesSidebar />
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <LoadingProvider>
+          <UserContext.Provider value={{ ...user, user, setUser: handleUserUpdate, loading }}>
+            <MessageProvider>
+              <Router>
+                <div className="flex flex-col min-h-screen">
+                  <BackgroundFetchIndicator />
+                  <SidebarWrapper />
 
-                <CloseSidebarOnRouteChange
-                  setSidebarOpen={setSidebarOpen}
-                  setSelectedPokemon={setSelectedPokemon}
-                  sidebarOpen={sidebarOpen}
-                  selectedPokemon={selectedPokemon}
-                />
+                  <CloseSidebarOnRouteChange
+                    setSidebarOpen={setSidebarOpen}
+                    setSelectedPokemon={setSelectedPokemon}
+                    sidebarOpen={sidebarOpen}
+                    selectedPokemon={selectedPokemon}
+                  />
 
-                {(isMaintenancePending || (maintenanceMode && isMaintenanceTime)) && (
-                  <div style={{
-                    backgroundColor: '#ef4444',
-                    color: 'white',
-                    padding: '8px 16px',
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                    position: 'fixed',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    zIndex: 1500,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    boxShadow: '0 -2px 10px rgba(0,0,0,0.5)'
-                  }}>
-                    <TriangleAlert className="w-5 h-5 flex-shrink-0" />
-                    {isMaintenancePending ? (
-                      <span>SCHEDULED MAINTENANCE: The site will go into maintenance mode in {maintenanceMinutesLeft} minute{maintenanceMinutesLeft !== 1 ? 's' : ''}. Please save your work immediately.</span>
-                    ) : (
-                      <span>ACTIVE MAINTENANCE MODE: Only admins can access the site right now.</span>
-                    )}
-                  </div>
-                )}
+                  {(isMaintenancePending || (maintenanceMode && isMaintenanceTime && (!user?.isAdmin || !dismissedMaintenanceBanner))) && !window.location.pathname.startsWith('/hunt-popout') && !window.location.pathname.startsWith('/admin') && (
+                    <div 
+                      onClick={() => {
+                        if (user?.isAdmin && !isMaintenancePending) {
+                          setDismissedMaintenanceBanner(true);
+                        }
+                      }}
+                      style={{
+                        backgroundColor: '#ef4444',
+                        color: 'white',
+                        padding: '8px 16px',
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                        position: 'fixed',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        zIndex: 1500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        boxShadow: '0 -2px 10px rgba(0,0,0,0.5)',
+                        cursor: (user?.isAdmin && !isMaintenancePending) ? 'pointer' : 'default',
+                        userSelect: 'none'
+                      }}
+                      title={user?.isAdmin && !isMaintenancePending ? "Click to dismiss banner until next page refresh" : undefined}
+                    >
+                      <TriangleAlert className="w-5 h-5 flex-shrink-0" />
+                      {isMaintenancePending ? (
+                        <span>SCHEDULED MAINTENANCE: The site will go into maintenance mode in {maintenanceMinutesLeft} minute{maintenanceMinutesLeft !== 1 ? 's' : ''}. Please save your work immediately.</span>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span>ACTIVE MAINTENANCE MODE: Only admins can access the site right now.</span>
+                          {user?.isAdmin && (
+                            <span className="text-xs font-normal opacity-85 underline ml-1 hidden sm:inline">
+                              (Click to dismiss)
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {user?.isAdmin && !isMaintenancePending && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDismissedMaintenanceBanner(true);
+                          }}
+                          className="ml-2 p-1 rounded hover:bg-black/20 text-white/90 hover:text-white transition-colors"
+                          title="Dismiss banner until next page refresh"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  )}
 
-                <HeaderWrapper
-                  user={user}
-                  setUser={handleUserUpdate}
-                  showMenu={showMenu}
-                  setShowMenu={setShowMenu}
-                  userMenuRef={userMenuRef}
-                />
+                  <HeaderWrapper
+                    user={user}
+                    setUser={handleUserUpdate}
+                    showMenu={showMenu}
+                    setShowMenu={setShowMenu}
+                    userMenuRef={userMenuRef}
+                  />
 
-                {/* Global Loading Indicator */}
-                <GlobalLoadingIndicator />
+                  {/* Global Loading Indicator */}
+                  <GlobalLoadingIndicator />
 
-                {/* Location Listener for detecting navigation to home page */}
-                <LocationListener onNavigateToHome={refreshDexPreferences} />
+                  {/* Location Listener for detecting navigation to home page */}
+                  <LocationListener onNavigateToHome={refreshDexPreferences} />
 
-                {user?.username && (
-                  <OnboardingManager onTutorialActiveChange={setIsTutorialActive} />
-                )}
+                  <OnboardingWrapper user={user} onTutorialActiveChange={setIsTutorialActive} />
 
-                <main className="flex-grow">
-                  <Routes>
-                    {/* Main App */}
-                    <Route
-                      path="/"
-                      element={
-                        // Only show loading spinner if we haven't timed out and auth isn't ready
-                        (!authTimeout && (loading || !authReady)) ? (
-                          <LoadingSpinner
-                            fullScreen
-                          />
-                        ) : user?.username ? (
+                  <main className="flex-grow flex flex-col">
+                    <Routes>
+                      {/* Main App */}
+                      <Route
+                        path="/"
+                        element={
+                          // Only show loading spinner if we haven't timed out and auth isn't ready
+                          (!authTimeout && (loading || !authReady)) ? (
+                            <LoadingSpinner fullScreen />
+                          ) : user?.needsProfileSetup ? (
+                            <Navigate to="/complete-signup" replace />
+                          ) : user?.username ? (
+                            <PageTransition>
+                              <div className="progress-manager-container page-animate-1">
+                                <ProgressManager
+                                  allMons={[...pokemonData, ...getFilteredFormsData(formsData, currentDexPreferences)]}
+                                  caughtInfoMap={visualCaughtInfoMap}
+                                  progressBarsOverride={user.progressBars}
+                                  showShiny={showShiny}
+                                  dexPreferences={currentDexPreferences}
+                                  showLockedCheckbox={true}
+                                />
+                              </div>
 
-                          <>
-                            <div className="progress-manager-container page-animate-1">
-                              <ProgressManager
-                                allMons={[...pokemonData, ...getFilteredFormsData(formsData, currentDexPreferences)]}
-                                caughtInfoMap={visualCaughtInfoMap}
-                                progressBarsOverride={user.progressBars}
-                                showShiny={showShiny}
-                                dexPreferences={currentDexPreferences}
-                                showLockedCheckbox={true}
-                              />
+                              <div className="search-bar-container page-animate-2" ref={searchBarRef}>
+                                <SearchBar
+                                  filters={filters}
+                                  setFilters={setFilters}
+                                  typeOptions={typeOptions}
+                                  genOptions={getGenOptions()}
+                                  showShiny={showShiny}
+                                  setShowShiny={setShowShiny}
+                                  caughtInfoMap={isTutorialActive ? visualCaughtInfoMap : caughtInfoMap}
+                                />
+                              </div>
 
-                            </div>
-
-                            <div className="search-bar-container page-animate-2" ref={searchBarRef}>
-                              <SearchBar
-                                filters={filters}
-                                setFilters={setFilters}
-                                typeOptions={typeOptions}
-                                genOptions={getGenOptions()}
-                                showShiny={showShiny}
-                                setShowShiny={setShowShiny}
-                              />
-                            </div>
-
-                            {/* Floating Shiny Toggle */}
-                            <div
-                              className="floating-shiny-toggle"
-                              style={{
-                                opacity: showFloatingShiny ? 1 : 0,
-                                visibility: showFloatingShiny ? 'visible' : 'hidden',
-                                transition: 'opacity 0.3s ease, visibility 0.3s ease',
-                                pointerEvents: showFloatingShiny ? 'auto' : 'none'
-                              }}
-                            >
-                              <label className="flex items-center gap-2 cursor-pointer" title="Toggle all shiny sprites" style={{ margin: 0 }}>
-                                <div className="switch" style={{ margin: 0 }}>
-                                  <input
-                                    type="checkbox"
-                                    className="switch-input"
-                                    checked={showShiny}
-                                    onChange={e => setShowShiny(e.target.checked)}
-                                  />
-                                  <div className="switch-slider" />
-                                </div>
-                                <span className="text-base font-medium flex items-center gap-2" style={{ color: 'var(--text)' }}>
-                                  <Sparkles
-                                    size={20}
-                                    style={{
-                                      color: showShiny ? '#fbbf24' : '#6b7280',
-                                      filter: showShiny ? 'none' : 'grayscale(100%)'
-                                    }}
-                                  />
-                                  Shiny
-                                </span>
-                              </label>
-                            </div>
-
-                            {/* Mobile tip below the entire search section, above categories/grid */}
-                            <div className="md:hidden w-full mt-3 mb-5 px-3 fade-in-up page-animate-3">
+                              {/* Floating Shiny Toggle */}
                               <div
-                                className="text-sm rounded-md px-3 py-2"
+                                className="floating-shiny-toggle"
                                 style={{
-                                  background: 'var(--searchbar-dropdown)',
-                                  border: '1px solid var(--border-color)',
-                                  color: 'var(--text)'
+                                  opacity: showFloatingShiny ? 1 : 0,
+                                  visibility: showFloatingShiny ? 'visible' : 'hidden',
+                                  transition: 'opacity 0.3s ease, visibility 0.3s ease',
+                                  pointerEvents: showFloatingShiny ? 'auto' : 'none'
                                 }}
                               >
-                                <ul className="list-disc pl-5 space-y-1">
-                                  <li>Tap a Pokémon to toggle caught.</li>
-                                  <li>Hold to open the sidebar.</li>
-                                </ul>
-                              </div>
-                            </div>
-
-                            <div className="main-bg page-container fade-in-up">
-                              {/* Dynamic Dex Grid based on showShiny toggle and dexViewMode */}
-                              {currentDexPreferences?.dexViewMode === 'unified' ? (
-                                // UNIFIED VIEW - All Pokemon in one list sorted by dex number
-                                <div className="dex-grid-section">
-                                  {!unifiedList.length ? null : (
-                                    <DexSection
-                                      readOnly={false}
-                                      caughtInfoMap={visualCaughtInfoMap}
-                                      updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, showShiny)}
-                                      key="unified"
-                                      sidebarOpen={sidebarOpen}
-                                      title={showShiny ? "Complete Shiny Dex" : "Complete Living Dex"}
-                                      pokemonList={unifiedList}
-                                      caught={visualCaught}
-                                      isCaught={(poke) => {
-                                        if (isTutorialActive) return poke.id === 1 ? tutorialBulbasaurCaught : false;
-                                        return caught[getCaughtKey(poke, null, showShiny)] || false;
-                                      }}
-                                      onMarkAll={(box) => handleMarkAll(box, showShiny)}
-                                      onToggleCaught={(poke) => handleToggleCaught(poke, showShiny)}
-                                      onSelect={handleSelectPokemon}
-                                      showShiny={showShiny}
-                                      showForms={showForms}
-                                      isTutorialActive={isTutorialActive}
-                                    />
-                                  )}
+                                <div className="dex-shiny-segmented-control" role="group" aria-label="Pokemon sprite display mode">
+                                  <button
+                                    type="button"
+                                    className={`dex-shiny-segmented-btn ${!showShiny ? 'active' : ''}`}
+                                    onClick={() => setShowShiny(false)}
+                                    title="Show regular Pokémon sprites"
+                                  >
+                                    <span>Regular</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className={`dex-shiny-segmented-btn ${showShiny ? 'active is-shiny' : ''}`}
+                                    onClick={() => setShowShiny(true)}
+                                    title="Show shiny Pokémon sprites"
+                                  >
+                                    <Sparkles size={16} className={`dex-segmented-sparkles ${showShiny ? 'active' : ''}`} />
+                                    <span>Shiny</span>
+                                  </button>
                                 </div>
-                              ) : (
-                                // CATEGORIZED VIEW - Show Tab Bar & Active Category Grid
-                                <div className="dex-grid-section" data-tutorial-id="all-categories">
-                                  <DexCategoryTabs
-                                    tabs={availableCategoryTabs}
-                                    activeTab={effectiveActiveCategoryTab}
-                                    onTabSelect={handleSelectCategoryTab}
-                                    isSearching={hasSearchFilters}
-                                  />
-                                  <div key={effectiveActiveCategoryTab} className="category-tab-content-animate">
-                                    {activeCategorySections.map(({ section, filteredMons }) => (
+                              </div>
+
+                              {/* Mobile tip below the entire search section, above categories/grid */}
+                              <div className="md:hidden w-full mt-3 mb-5 px-3 fade-in-up page-animate-3">
+                                <div
+                                  className="text-sm rounded-md px-3 py-2"
+                                  style={{
+                                    background: 'var(--searchbar-dropdown)',
+                                    border: '1px solid var(--border-color)',
+                                    color: 'var(--text)'
+                                  }}
+                                >
+                                  <ul className="list-disc pl-5 space-y-1">
+                                    <li>Tap a Pokémon to toggle caught.</li>
+                                    <li>Hold to open the sidebar.</li>
+                                  </ul>
+                                </div>
+                              </div>
+
+                              <div className="main-bg page-container page-animate-3">
+                                {/* Dynamic Dex Grid based on showShiny toggle and dexViewMode */}
+                                {currentDexPreferences?.dexViewMode === 'unified' ? (
+                                  // UNIFIED VIEW - All Pokemon in one list sorted by dex number
+                                  <div className="dex-grid-section">
+                                    {!unifiedList.length ? null : (
                                       <DexSection
                                         readOnly={false}
                                         caughtInfoMap={visualCaughtInfoMap}
                                         updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, showShiny)}
-                                        key={section.key}
+                                        key="unified"
                                         sidebarOpen={sidebarOpen}
-                                        title={section.title}
-                                        pokemonList={filteredMons}
+                                        title={showShiny ? "Complete Shiny Dex" : "Complete Living Dex"}
+                                        pokemonList={unifiedList}
                                         caught={visualCaught}
                                         isCaught={(poke) => {
                                           if (isTutorialActive) return poke.id === 1 ? tutorialBulbasaurCaught : false;
                                           return caught[getCaughtKey(poke, null, showShiny)] || false;
+                                        }}
+                                        hasFail={(poke) => {
+                                          const info = (caughtInfoMap || {})[getCaughtKey(poke, null, showShiny)];
+                                          return Boolean(info?.fails && info.fails.length > 0);
                                         }}
                                         onMarkAll={(box) => handleMarkAll(box, showShiny)}
                                         onToggleCaught={(poke) => handleToggleCaught(poke, showShiny)}
@@ -2283,349 +2496,475 @@ export default function App() {
                                         showShiny={showShiny}
                                         showForms={showForms}
                                         isTutorialActive={isTutorialActive}
-                                        allowCollapse={activeCategorySections.length > 1}
                                       />
-                                    ))}
+                                    )}
                                   </div>
-                                </div>
-                              )}
-                            </div>
+                                ) : (
+                                  // CATEGORIZED VIEW - Show Tab Bar & Active Category Grid
+                                  <div className="dex-grid-section" data-tutorial-id="all-categories">
+                                    <DexCategoryTabs
+                                      tabs={availableCategoryTabs}
+                                      activeTab={effectiveActiveCategoryTab}
+                                      onTabSelect={handleSelectCategoryTab}
+                                      isSearching={hasSearchFilters}
+                                    />
+                                    <div key={effectiveActiveCategoryTab} className="category-tab-content-animate">
+                                      {activeCategorySections.map(({ section, filteredMons }) => (
+                                        <DexSection
+                                          readOnly={false}
+                                          caughtInfoMap={visualCaughtInfoMap}
+                                          updateCaughtInfo={(poke, info) => updateCaughtInfo(poke, info, showShiny)}
+                                          key={section.key}
+                                          sidebarOpen={sidebarOpen}
+                                          title={section.title}
+                                          pokemonList={filteredMons}
+                                          caught={visualCaught}
+                                          isCaught={(poke) => {
+                                            if (isTutorialActive) return poke.id === 1 ? tutorialBulbasaurCaught : false;
+                                            return caught[getCaughtKey(poke, null, showShiny)] || false;
+                                          }}
+                                          hasFail={(poke) => {
+                                            const info = (caughtInfoMap || {})[getCaughtKey(poke, null, showShiny)];
+                                            return Boolean(info?.fails && info.fails.length > 0);
+                                          }}
+                                          onMarkAll={(box) => handleMarkAll(box, showShiny)}
+                                          onToggleCaught={(poke) => handleToggleCaught(poke, showShiny)}
+                                          onSelect={handleSelectPokemon}
+                                          showShiny={showShiny}
+                                          showForms={showForms}
+                                          isTutorialActive={isTutorialActive}
+                                          allowCollapse={activeCategorySections.length > 1}
+                                        />
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
 
-
-                            {showNoResults && hasActiveSearch && (
-                              <NoResults
-                                searchTerm={filters.searchTerm || "your search filters"}
-                                suggestion={suggestion}
-                                onSuggestionClick={(suggestion) => setFilters(f => ({ ...f, searchTerm: suggestion }))}
-                              />
-                            )}
-
-
-                            {selectedPokemon && (() => {
-                              const key = getCaughtKey(selectedPokemon, null, showShiny);
-                              const isTutorialTarget = isTutorialActive && selectedPokemon.id === 1;
-                              const caughtInfo = isTutorialActive ? (isTutorialTarget ? tutorialBulbasaurInfo : null) : caughtInfoMap[key];
-                              return (
-                                <Sidebar
-                                  open={!!selectedPokemon}
-                                  pokemon={selectedPokemon}
-                                  onClose={() => setSelectedPokemon(null)}
-                                  caughtInfo={caughtInfo}
-                                  caughtInfoMap={visualCaughtInfoMap}
-                                  updateCaughtInfo={updateCaughtInfo}
-                                  showShiny={showShiny}
-                                  onPokemonSelect={setSelectedPokemon}
-                                  externalLinkPreference={externalLinkPreference}
-                                  dexPreferences={currentDexPreferences}
-                                  isTutorialActive={isTutorialActive}
+                              {showNoResults && hasActiveSearch && (
+                                <NoResults
+                                  searchTerm={filters.searchTerm || "your search filters"}
+                                  suggestion={suggestion}
+                                  onSuggestionClick={(suggestion) => setFilters(f => ({ ...f, searchTerm: suggestion }))}
                                 />
-                              );
-                            })()}
-                          </>
-                        ) : (
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." />}>
-                            <PublicHome />
-                          </Suspense>
-                        )
-                      }
-                    />
+                              )}
 
-                    <Route
-                      path="/login"
-                      element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading login..." />}>
-                          {user?.username ? <Navigate to="/" /> : <Login onLogin={handleUserUpdate} />}
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/register"
-                      element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading registration..." />}>
-                          {user?.username ? <Navigate to="/" /> : <Register onRegister={handleUserUpdate} />}
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/email-sent"
-                      element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." />}>
-                          {!user?.username ? <EmailSent /> : <Navigate to="/" />}
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/forgot-password"
-                      element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." />}>
-                          {!user?.username ? <ForgotPassword /> : <Navigate to="/" />}
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/reset-password"
-                      element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." />}>
-                          {!user?.username ? <ResetPassword /> : <Navigate to="/" />}
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/enter-reset-code"
-                      element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." />}>
-                          {!user?.username ? <EnterResetCode /> : <Navigate to="/" />}
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/profile"
-                      element={
-                        <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading your profile..." />}>
-                            <ProfilePage />
-                          </Suspense>
-                        </RequireAuth>
-                      }
-                    />
+                              {selectedPokemon && (() => {
+                                const key = getCaughtKey(selectedPokemon, null, showShiny);
+                                const isTutorialTarget = isTutorialActive && selectedPokemon.id === 1;
+                                const caughtInfo = isTutorialActive ? (isTutorialTarget ? tutorialBulbasaurInfo : null) : caughtInfoMap[key];
+                                return (
+                                  <Sidebar
+                                    open={!!selectedPokemon}
+                                    pokemon={selectedPokemon}
+                                    onClose={() => setSelectedPokemon(null)}
+                                    caughtInfo={caughtInfo}
+                                    caughtInfoMap={visualCaughtInfoMap}
+                                    updateCaughtInfo={updateCaughtInfo}
+                                    showShiny={showShiny}
+                                    onPokemonSelect={setSelectedPokemon}
+                                    externalLinkPreference={externalLinkPreference}
+                                    dexPreferences={currentDexPreferences}
+                                    isTutorialActive={isTutorialActive}
+                                  />
+                                );
+                              })()}
+                            </PageTransition>
+                          ) : (
+                            <PageTransition>
+                              <PublicHome />
+                            </PageTransition>
+                          )
+                        }
+                      />
 
-                    <Route
-                      path="/trainers"
-                      element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading trainers..." />}>
-                          <Trainers />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/counters"
-                      element={
-                        <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading counters..." />}>
-                            <Counters />
+                      <Route
+                        path="/login"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            {user?.needsProfileSetup ? (
+                              <Navigate to="/complete-signup" replace />
+                            ) : user?.username ? (
+                              <Navigate to="/" replace />
+                            ) : (
+                              <PageTransition>
+                                <Login onLogin={handleUserUpdate} />
+                              </PageTransition>
+                            )}
                           </Suspense>
-                        </RequireAuth>
-                      }
-                    />
-                    <Route
-                      path="/bingo"
-                      element={
-                        <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading bingo..." />}>
-                            <Bingo />
+                        }
+                      />
+                      <Route
+                        path="/register"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            {user?.needsProfileSetup ? (
+                              <Navigate to="/complete-signup" replace />
+                            ) : user?.username ? (
+                              <Navigate to="/" replace />
+                            ) : (
+                              <PageTransition>
+                                <Register onRegister={handleUserUpdate} />
+                              </PageTransition>
+                            )}
                           </Suspense>
-                        </RequireAuth>
-                      }
-                    />
-                    <Route
-                      path="/changelog"
-                      element={
-                        <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading changelog..." />}>
-                            <Changelog />
+                        }
+                      />
+                      <Route
+                        path="/complete-signup"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            {user?.username ? (
+                              <PageTransition>
+                                <CompleteSignup onComplete={handleUserUpdate} />
+                              </PageTransition>
+                            ) : (
+                              <Navigate to="/login" />
+                            )}
                           </Suspense>
-                        </RequireAuth>
-                      }
-                    />
-                    <Route
-                      path="/feedback"
-                      element={
-                        <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading feedback..." />}>
-                            <Feedback />
+                        }
+                      />
+                      <Route
+                        path="/oauth/callback"
+                        element={
+                          <Suspense fallback={<LoadingSpinner fullScreen />}>
+                            <OAuthCallback onLogin={handleUserUpdate} />
                           </Suspense>
-                        </RequireAuth>
-                      }
-                    />
-                    <Route
-                      path="/mmo-tool"
-                      element={
-                        <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading MMO Tool..." />}>
-                            <MMOTool />
+                        }
+                      />
+                      <Route
+                        path="/email-sent"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            {!user?.username ? (
+                              <PageTransition>
+                                <EmailSent />
+                              </PageTransition>
+                            ) : (
+                              <Navigate to="/" />
+                            )}
                           </Suspense>
-                        </RequireAuth>
-                      }
-                    />
-                    <Route
-                      path="/admin"
-                      element={
-                        <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading admin panel..." />}>
-                            <Admin />
+                        }
+                      />
+                      <Route
+                        path="/forgot-password"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            {!user?.username ? (
+                              <PageTransition>
+                                <ForgotPassword />
+                              </PageTransition>
+                            ) : (
+                              <Navigate to="/" />
+                            )}
                           </Suspense>
-                        </RequireAuth>
-                      }
-                    />
-                    <Route
-                      path="/u/:username"
-                      element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading trainer profile..." />}>
-                          <ProfilePage />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/u/:username/dex"
-                      element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading Pokédex..." />}>
-                          <ViewDex />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/u/:username/bingo"
-                      element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading Bingo..." />}>
-                          <Bingo />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/u/:username/stats"
-                      element={
-                        <Suspense fallback={<LoadingSpinner fullScreen text="Loading trainer stats..." />}>
-                          <ProfileStatsPage />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/profile/stats"
-                      element={
-                        <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading your stats..." />}>
-                            <ProfileStatsPage />
+                        }
+                      />
+                      <Route
+                        path="/reset-password"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            {!user?.username ? (
+                              <PageTransition>
+                                <ResetPassword />
+                              </PageTransition>
+                            ) : (
+                              <Navigate to="/" />
+                            )}
                           </Suspense>
-                        </RequireAuth>
-                      }
-                    />
+                        }
+                      />
+                      <Route
+                        path="/enter-reset-code"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            {!user?.username ? (
+                              <PageTransition>
+                                <EnterResetCode />
+                              </PageTransition>
+                            ) : (
+                              <Navigate to="/" />
+                            )}
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/privacy"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <PrivacyPolicy />
+                            </PageTransition>
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/terms"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <TermsOfService />
+                            </PageTransition>
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/profile"
+                        element={
+                          <RequireAuth loading={loading} authReady={authReady} user={user}>
+                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                              <PageTransition>
+                                <ProfilePage />
+                              </PageTransition>
+                            </Suspense>
+                          </RequireAuth>
+                        }
+                      />
 
-                    <Route
-                      path="/settings"
-                      element={
-                        <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading settings..." />}>
-                            <Settings />
+                      <Route
+                        path="/trainers"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <Trainers />
+                            </PageTransition>
                           </Suspense>
-                        </RequireAuth>
-                      }
-                    />
-
-                    <Route
-                      path="/backup"
-                      element={
-                        <RequireAuth loading={loading} authReady={authReady} user={user}>
-                          <Suspense fallback={<LoadingSpinner fullScreen text="Loading backup..." />}>
-                            <Backup />
+                        }
+                      />
+                      <Route
+                        path="/leaderboard"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <Leaderboard />
+                            </PageTransition>
                           </Suspense>
-                        </RequireAuth>
-                      }
-                    />
+                        }
+                      />
+                      <Route
+                        path="/counters"
+                        element={
+                          <RequireAuth loading={loading} authReady={authReady} user={user}>
+                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                              <PageTransition>
+                                <Counters />
+                              </PageTransition>
+                            </Suspense>
+                          </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path="/bingo"
+                        element={
+                          <RequireAuth loading={loading} authReady={authReady} user={user}>
+                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                              <PageTransition>
+                                <Bingo />
+                              </PageTransition>
+                            </Suspense>
+                          </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path="/changelog"
+                        element={
+                          <RequireAuth loading={loading} authReady={authReady} user={user}>
+                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                              <PageTransition>
+                                <Changelog />
+                              </PageTransition>
+                            </Suspense>
+                          </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path="/feedback"
+                        element={
+                          <RequireAuth loading={loading} authReady={authReady} user={user}>
+                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                              <PageTransition>
+                                <Feedback />
+                              </PageTransition>
+                            </Suspense>
+                          </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path="/mmo-tool"
+                        element={
+                          <RequireAuth loading={loading} authReady={authReady} user={user}>
+                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                              <PageTransition>
+                                <MMOTool />
+                              </PageTransition>
+                            </Suspense>
+                          </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path="/admin"
+                        element={
+                          <RequireAuth loading={loading} authReady={authReady} user={user}>
+                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                              <PageTransition>
+                                <Admin />
+                              </PageTransition>
+                            </Suspense>
+                          </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path="/u/:username"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <ProfilePage />
+                            </PageTransition>
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/u/:username/dex"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <ViewDex />
+                            </PageTransition>
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/u/:username/bingo"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <Bingo />
+                            </PageTransition>
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/u/:username/stats"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <ProfileStatsPage />
+                            </PageTransition>
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/profile/stats"
+                        element={
+                          <RequireAuth loading={loading} authReady={authReady} user={user}>
+                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                              <PageTransition>
+                                <ProfileStatsPage />
+                              </PageTransition>
+                            </Suspense>
+                          </RequireAuth>
+                        }
+                      />
 
-                    {/* Hunt popout - standalone window, no auth wrapper */}
-                    <Route
-                      path="/hunt-popout"
-                      element={
-                        <Suspense fallback={<LoadingSpinner fullScreen />}>
-                          <HuntPopout />
-                        </Suspense>
-                      }
-                    />
+                      <Route
+                        path="/settings"
+                        element={
+                          <RequireAuth loading={loading} authReady={authReady} user={user}>
+                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                              <PageTransition>
+                                <Settings />
+                              </PageTransition>
+                            </Suspense>
+                          </RequireAuth>
+                        }
+                      />
 
-                    {/* Temporary route to preview loading screen - REMOVE BEFORE PRODUCTION */}
-                    <Route
-                      path="/loading"
-                      element={<LoadingSpinner fullScreen />}
-                    />
+                      <Route
+                        path="/backup"
+                        element={
+                          <RequireAuth loading={loading} authReady={authReady} user={user}>
+                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                              <PageTransition>
+                                <Backup />
+                              </PageTransition>
+                            </Suspense>
+                          </RequireAuth>
+                        }
+                      />
 
-                  </Routes>
-                </main>
+                      {/* Hunt popout - standalone window, no auth wrapper */}
+                      <Route
+                        path="/hunt-popout"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <HuntPopout />
+                            </PageTransition>
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/hunt-popout/:huntId"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <HuntPopout />
+                            </PageTransition>
+                          </Suspense>
+                        }
+                      />
 
-                <FooterWrapper />
+                      {/* Temporary route to preview loading screen */}
+                      <Route
+                        path="/loading"
+                        element={<LoadingSpinner fullScreen />}
+                      />
 
-                {/* Custom Scrollbar for Desktop */}
-                <CustomScrollbar />
-              </div>
-            </Router>
+                    </Routes>
+                  </main>
 
-            {/* Reset Modal for Grid Clicks */}
-            {resetModal.show && createPortal(
-              <div
-                className={`fixed inset-0 z-[20000] ${resetModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-                style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-              >
-                <div className="bg-black/80 w-full h-full flex items-center justify-center">
-                  <div
-                    className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${resetModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                        <RotateCcw className="w-5 h-5 text-red-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-[var(--accent)]">
-                          {resetModal.isBulkReset ? 'Unmark All Pokémon' : 'Reset Pokémon'}
-                        </h3>
-                        <p className="text-sm text-[var(--progressbar-info)]">This action cannot be undone</p>
-                      </div>
-                    </div>
-                    <p className="text-gray-300 mb-6">
-                      {resetModal.isBulkReset ? (
-                        <>
-                          Are you sure you want to unmark all Pokémon in this section? This will delete all saved data for <span className="font-semibold text-[var(--accent)]">{resetModal.pokemonName}</span>.
-                        </>
-                      ) : (
-                        <>
-                          Are you sure you want to reset <span className="font-semibold text-[var(--accent)]">{resetModal.pokemonName}</span>?
-                          This will delete all saved data.
-                        </>
-                      )}
-                    </p>
-                    <div className="flex gap-3 justify-end">
-                      <button
-                        onClick={() => {
-                          if (!resetModalReady) return; // Prevent ghost clicks
-                          setResetModalClosing(true);
-                          setTimeout(() => {
-                            setResetModal({
-                              show: false,
-                              pokemon: null,
-                              pokemonName: '',
-                              isShiny: false,
-                              isBulkReset: false,
-                              box: null
-                            });
-                            setResetModalClosing(false);
-                          }, 300);
-                        }}
-                        disabled={!resetModalReady}
-                        className={`px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold ${!resetModalReady ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        style={{ pointerEvents: resetModalReady ? 'auto' : 'none' }}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (!resetModalReady) return; // Prevent ghost clicks
-                          handleResetConfirm();
-                        }}
-                        disabled={!resetModalReady}
-                        className={`px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold ${!resetModalReady ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        style={{ pointerEvents: resetModalReady ? 'auto' : 'none' }}
-                      >
-                        {resetModal.isBulkReset ? 'Unmark All' : 'Reset Pokémon'}
-                      </button>
-                    </div>
-                  </div>
+                  <FooterWrapper user={user} />
+
+                  {/* Custom Scrollbar for Desktop */}
+                  <ScrollbarWrapper />
                 </div>
-              </div>,
-              document.body
-            )}
-            <AppThemeSync username={user?.username} />
-          </MessageProvider>
-        </UserContext.Provider>
-      </LoadingProvider>
-    </ThemeProvider>
+              </Router>
+
+              {/* Reset / Unmark All Modal */}
+              <ConfirmModal
+                isOpen={resetModal.show}
+                onClose={() => {
+                  setResetModal({
+                    show: false,
+                    pokemon: null,
+                    pokemonName: '',
+                    isShiny: false,
+                    isBulkReset: false,
+                    box: null
+                  });
+                }}
+                onConfirm={handleResetConfirm}
+                title={resetModal.isBulkReset ? 'Unmark All Pokémon' : 'Reset Pokémon'}
+                message={
+                  resetModal.isBulkReset ? (
+                    <>
+                      Are you sure you want to unmark all Pokémon in this section? This will delete all saved data for <span className="font-semibold text-[var(--accent)]">{resetModal.pokemonName}</span>.
+                    </>
+                  ) : (
+                    <>
+                      Are you sure you want to reset <span className="font-semibold text-[var(--accent)]">{resetModal.pokemonName}</span>? This will delete all saved data.
+                    </>
+                  )
+                }
+                confirmText={resetModal.isBulkReset ? 'Unmark All' : 'Reset Pokémon'}
+                cancelText="Cancel"
+                variant="danger"
+              />
+              <AppThemeSync username={user?.username} />
+            </MessageProvider>
+          </UserContext.Provider>
+        </LoadingProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }

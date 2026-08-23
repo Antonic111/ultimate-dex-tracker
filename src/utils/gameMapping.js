@@ -46,6 +46,8 @@ export const GAME_MAPPING = {
   "Ultra Moon": "Ultra Sun And Ultra Moon",
   
   // Gen 8
+  "Let's Go Pikachu": "Lets GO Eevee And Pikachu",
+  "Let's Go Eevee": "Lets GO Eevee And Pikachu",
   "Lets GO Pikachu": "Lets GO Eevee And Pikachu",
   "Lets GO Eevee": "Lets GO Eevee And Pikachu",
   "Sword": "Sword And Shield",
@@ -72,8 +74,8 @@ export const REVERSE_GAME_MAPPING = {
   "Blue Red Green And Yellow": ["Blue", "Red", "Green", "Yellow"],
   "Gold And Silver": ["Gold", "Silver"],
   "Crystal": ["Crystal"],
-          "Ruby And Sapphire": ["Ruby", "Sapphire"],
-          "Emerald": ["Emerald"],
+  "Ruby And Sapphire": ["Ruby", "Sapphire"],
+  "Emerald": ["Emerald"],
   "Fire Red And Leaf Green": ["Fire Red", "Leaf Green"],
   "Diamond And Pearl": ["Diamond", "Pearl"],
   "Platinum": ["Platinum"],
@@ -84,7 +86,7 @@ export const REVERSE_GAME_MAPPING = {
   "Omega Ruby And Alpha Sapphire": ["Omega Ruby", "Alpha Sapphire"],
   "Sun And Moon": ["Sun", "Moon"],
   "Ultra Sun And Ultra Moon": ["Ultra Sun", "Ultra Moon"],
-  "Lets GO Eevee And Pikachu": ["Lets GO Pikachu", "Lets GO Eevee"],
+  "Lets GO Eevee And Pikachu": ["Let's Go Pikachu", "Let's Go Eevee"],
   "Sword And Shield": ["Sword", "Shield"],
   "Brilliant Diamond And Shining Pearl": ["Brilliant Diamond", "Shining Pearl"],
   "Legends Arceus": ["Legends Arceus"],

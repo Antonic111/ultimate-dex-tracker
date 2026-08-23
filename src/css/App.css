@@ -393,16 +393,34 @@ body {
 
 /* Mobile-specific spacing for main container */
 @media (max-width: 768px) {
-  .main-bg {
-    max-width: calc(100% - 32px);
-    margin: 0 auto;
+  .main-bg,
+  .page-container {
+    max-width: calc(100% - 32px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .dex-grid-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }
 
 @media (max-width: 480px) {
-  .main-bg {
-    max-width: calc(100% - 24px);
-    margin: 0 auto;
+  .main-bg,
+  .page-container {
+    max-width: calc(100% - 24px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .dex-grid-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }
 
@@ -449,6 +467,8 @@ body {
   max-width: 1300px;
   width: 100%;
   margin: 0 auto;
+  position: relative;
+  z-index: 20;
 }
 
 @media (max-width: 768px) {
@@ -587,6 +607,16 @@ body {
     visibility: hidden;
   }
 
+  /* Hide scrollbar elements on landing page */
+  body.landing-page-active::before,
+  body.landing-page-active::after,
+  body.landing-page-active .custom-scrollbar-thumb {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    width: 0 !important;
+  }
+
   /* Custom scrollbar thumb - will be positioned by JavaScript (theme-aware) */
   .custom-scrollbar-thumb {
     position: fixed;
@@ -640,17 +670,24 @@ body {
   left: 50%;
   transform: translateX(-50%);
   z-index: 90;
-  background-color: var(--searchbar-bg, var(--bg-color));
-  padding: 8px 16px;
+  background-color: transparent;
+  padding: 0;
   border-radius: 999px;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: none;
+  box-shadow: none;
   display: flex;
   align-items: center;
-  gap: 12px;
   
   /* Desktop default */
   top: 150px;
+}
+
+.floating-shiny-toggle .dex-shiny-segmented-control {
+  background: var(--searchbar-bg, rgba(24, 24, 28, 0.92));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 1024px) {
@@ -663,5 +700,113 @@ body {
   .floating-shiny-toggle {
     /* Mobile header is shorter, so it doesn't need to be pushed down as much */
     top: 90px;
+  }
+}
+
+/* ============================================================
+   DEX SHINY / REGULAR CONNECTED HALF-PILL CONTROL
+   ============================================================ */
+.dex-shiny-segmented-control {
+  display: inline-flex;
+  align-items: stretch;
+  background: transparent;
+  border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  border-radius: 9999px;
+  padding: 0;
+  gap: 0;
+  user-select: none;
+  box-shadow: none;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.dex-shiny-segmented-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted, #888888);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+/* Left Half-Pill: Regular (rounded on outer left, connected with vertical seam on right) */
+.dex-shiny-segmented-btn:first-child {
+  border-radius: 9999px 0 0 9999px;
+  border-right: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+}
+
+/* Right Half-Pill: Shiny (connected on left, rounded on outer right) */
+.dex-shiny-segmented-btn:last-child {
+  border-radius: 0 9999px 9999px 0;
+}
+
+.dex-shiny-segmented-btn:hover:not(.active) {
+  color: var(--text, #ffffff);
+  background: transparent;
+  opacity: 0.85;
+}
+
+/* Regular Active State (No background) */
+.dex-shiny-segmented-btn.active.is-regular {
+  background: transparent;
+  color: var(--text, #ffffff);
+  font-weight: 700;
+}
+
+.dex-segmented-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted, #888888);
+  transition: all 0.2s ease;
+  display: inline-block;
+  opacity: 0.5;
+}
+
+.dex-shiny-segmented-btn.active.is-regular .dex-segmented-dot {
+  background: var(--accent, #38bdf8);
+  box-shadow: 0 0 6px var(--accent, #38bdf8);
+  opacity: 1;
+}
+
+/* Shiny Active State (No background) */
+.dex-shiny-segmented-btn.active.is-shiny {
+  background: transparent;
+  color: #fbbf24;
+  font-weight: 700;
+}
+
+.dex-segmented-sparkles {
+  color: var(--text-muted, #888888);
+  opacity: 0.5;
+  transition: transform 0.25s ease, color 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+}
+
+.dex-shiny-segmented-btn:hover .dex-segmented-sparkles {
+  color: #fbbf24;
+  opacity: 0.85;
+}
+
+.dex-shiny-segmented-btn.active.is-shiny .dex-segmented-sparkles {
+  color: #fbbf24;
+  opacity: 1;
+  filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.5));
+  transform: scale(1.15) rotate(12deg);
+}
+
+@media (max-width: 640px) {
+  .dex-shiny-segmented-btn {
+    padding: 5px 11px;
+    font-size: 0.82rem;
+    gap: 5px;
   }
 }

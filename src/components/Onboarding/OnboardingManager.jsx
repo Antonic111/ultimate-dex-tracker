@@ -18,7 +18,7 @@ export default function OnboardingManager({ onTutorialActiveChange }) {
   }, [phase, onTutorialActiveChange]);
 
   useEffect(() => {
-    if (user?.username && user.onboarding) {
+    if (user?.username && user.onboarding && !user.needsProfileSetup) {
       if (user.onboarding.isComplete === false) {
         const step = user.onboarding.tutorialStep || 0;
         if (step === 0) setPhase("settings");
@@ -31,7 +31,7 @@ export default function OnboardingManager({ onTutorialActiveChange }) {
     } else {
       setPhase(null);
     }
-  }, [user?.username, user?.onboarding?.isComplete, user?.onboarding?.tutorialStep]);
+  }, [user?.username, user?.onboarding?.isComplete, user?.onboarding?.tutorialStep, user?.needsProfileSetup]);
 
   const updateOnboarding = async (newState) => {
     // Optimistic UI update
@@ -50,7 +50,7 @@ export default function OnboardingManager({ onTutorialActiveChange }) {
     }
   };
 
-  if (!phase) return null;
+  if (!phase || user?.needsProfileSetup) return null;
 
   return (
     <>

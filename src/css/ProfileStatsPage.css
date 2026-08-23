@@ -8,10 +8,18 @@
 }
 
 .stats-page-container {
-  max-width: 1300px;
-  margin: 0 auto;
-  padding: 24px 16px 80px 16px;
+  max-width: 1300px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 28px 0 5rem 0;
   color: var(--text);
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .stats-page-container {
+    padding: 16px 16px 5rem 16px;
+  }
 }
 
 /* Hero Right Actions & Badges */
@@ -24,26 +32,7 @@
 }
 
 .stats-back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: var(--pokemon-box-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  color: var(--text);
-  font-size: 0.85rem;
-  font-weight: 700;
   text-decoration: none;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.stats-back-btn:hover {
-  background: var(--pokemon-box-bg2);
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: translateX(-2px);
 }
 
 /* Hero Section */
@@ -104,11 +93,8 @@
 
 .stats-hero-avatar {
   width: 100%;
-  height: auto;
-  object-fit: contain;
-  image-rendering: pixelated;
-  transform: scale(1.20) translateY(15%);
-  transform-origin: center bottom;
+  height: 100%;
+  object-fit: cover;
 }
 
 .stats-hero-info h1 {
@@ -444,7 +430,8 @@
 
 .stats-sort-pill-btn.active {
   background: var(--accent);
-  color: #fff;
+  color: #000;
+  font-weight: 700;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
 }
 
@@ -1111,28 +1098,10 @@
 }
 
 .stats-page-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background: var(--pokemon-box-bg);
-  color: var(--text);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.stats-page-btn:hover:not(:disabled) {
-  background: var(--pokemon-box-bg2);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.stats-page-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  min-height: 0 !important;
 }
 
 .stats-page-indicator {
@@ -1424,5 +1393,1007 @@
   .stat-overview-subtext {
     font-size: 0.72rem;
     margin-top: 2px;
+  }
+}
+
+/* ==========================================================================
+   COUNTERS & SHINY HUNTING ANALYTICS STYLES
+   ========================================================================== */
+
+.hunt-stats-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+/* KPI Metrics Grid */
+.hunt-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 640px) {
+  .hunt-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.hunt-kpi-card {
+  background: var(--profile-card-bg, #1a1a1f);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hunt-kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border-color));
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.hunt-kpi-card.hunt-kpi-success {
+  border-color: rgba(16, 185, 129, 0.25);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), var(--profile-card-bg, #1a1a1f));
+}
+
+.hunt-kpi-card.hunt-kpi-success .hunt-kpi-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.hunt-kpi-card.failure-kpi {
+  border-color: rgba(239, 68, 68, 0.25);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.06), var(--profile-card-bg, #1a1a1f));
+}
+
+.hunt-kpi-card.failure-kpi .hunt-kpi-icon {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.hunt-kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hunt-kpi-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.hunt-kpi-val-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hunt-kpi-value {
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: var(--text, #ffffff);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.hunt-kpi-rate-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
+.hunt-kpi-rate-badge.success {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.32);
+}
+
+.hunt-kpi-rate-badge.failure {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.32);
+}
+
+.hunt-kpi-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--profile-labels, #a1a1aa);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 3px;
+}
+
+/* Hall of Records / Highlights */
+.hunt-records-header {
+  margin: 20px 0 12px 0;
+}
+
+.hunt-records-header h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text, #ffffff);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.hunt-records-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+@media (max-width: 640px) {
+  .hunt-records-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+.hunt-record-card {
+  position: relative;
+  background: var(--profile-card-bg, #1a1a1f);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 12px;
+  padding: 8px 14px 8px 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hunt-record-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.hunt-record-badge {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.trophy-gold {
+  border-color: rgba(234, 179, 8, 0.35);
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.06), var(--profile-card-bg, #1a1a1f));
+}
+.trophy-gold .hunt-record-badge {
+  background: rgba(234, 179, 8, 0.2);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.4);
+}
+
+.trophy-silver {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.06), var(--profile-card-bg, #1a1a1f));
+}
+.trophy-silver .hunt-record-badge {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.trophy-bronze {
+  border-color: rgba(249, 115, 22, 0.35);
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.06), var(--profile-card-bg, #1a1a1f));
+}
+.trophy-bronze .hunt-record-badge {
+  background: rgba(249, 115, 22, 0.2);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.4);
+}
+
+.trophy-marathon {
+  border-color: rgba(168, 85, 247, 0.35);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.06), var(--profile-card-bg, #1a1a1f));
+}
+.trophy-marathon .hunt-record-badge {
+  background: rgba(168, 85, 247, 0.2);
+  color: #a855f7;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.trophy-phases {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.06), var(--profile-card-bg, #1a1a1f));
+}
+.trophy-phases .hunt-record-badge {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.trophy-lucky {
+  border-color: rgba(236, 72, 153, 0.35);
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.06), var(--profile-card-bg, #1a1a1f));
+}
+.trophy-lucky .hunt-record-badge {
+  background: rgba(236, 72, 153, 0.2);
+  color: #ec4899;
+  border: 1px solid rgba(236, 72, 153, 0.4);
+}
+
+.hunt-record-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.hunt-record-sprite {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+  flex-shrink: 0;
+  padding: 0;
+  margin: -4px 0 -4px 0;
+}
+
+.hunt-record-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-right: 90px;
+}
+
+.hunt-record-name {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--text, #ffffff);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hunt-record-main-stat {
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--text, #ffffff);
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+.hunt-record-main-stat strong {
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.hunt-record-sub {
+  font-size: 0.72rem;
+  color: var(--profile-labels, #a1a1aa);
+  margin-top: 3px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Methods & Games Breakdown */
+.hunt-breakdown-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.hunt-breakdown-col {
+  background: var(--profile-card-bg, #1a1a1f);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.hunt-breakdown-col-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.hunt-breakdown-col h4 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text, #ffffff);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hunt-breakdown-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hunt-breakdown-page-text {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--profile-labels, #a1a1aa);
+}
+
+.hunt-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hunt-breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.hunt-breakdown-item-left {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hunt-breakdown-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text, #ffffff);
+}
+
+.hunt-breakdown-sub {
+  font-size: 0.72rem;
+  color: var(--profile-labels, #a1a1aa);
+  margin-top: 1px;
+}
+
+.hunt-breakdown-total {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+/* Completed Hunts Showcase */
+.hunt-log-section {
+  background: var(--profile-card-bg, #1a1a1f);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.hunt-log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.hunt-log-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hunt-log-header h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text, #ffffff);
+  margin: 0;
+}
+
+.hunt-log-count-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--profile-labels, #a1a1aa);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.hunt-log-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hunt-search-wrap {
+  width: 250px;
+}
+
+.hunt-sort-wrap {
+  width: 200px;
+}
+
+/* Hunts Grid */
+.hunt-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+.hunt-showcase-card {
+  background: var(--profile-card-bg, #1a1a1f);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hunt-showcase-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.hunt-showcase-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hunt-showcase-sprite-wrap {
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  flex-shrink: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.hunt-showcase-sprite {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.4));
+  padding: 0;
+  margin: 0;
+}
+
+.hunt-showcase-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.hunt-showcase-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hunt-showcase-mon-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text, #ffffff);
+}
+
+.hunt-showcase-nickname {
+  font-size: 0.78rem;
+  color: var(--accent);
+  font-style: italic;
+}
+
+.hunt-showcase-meta-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 3px;
+}
+
+.hunt-showcase-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+  letter-spacing: 0.02em;
+}
+
+.hunt-phase-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #c084fc;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 6px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.hunt-tab-toggle-group {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.hunt-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--profile-labels, #a1a1aa);
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.hunt-tab-btn:hover {
+  color: var(--text, #ffffff);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.hunt-tab-btn.active {
+  background: var(--profile-card-bg, #242429);
+  color: var(--text, #ffffff);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hunt-tab-count {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--profile-labels, #a1a1aa);
+}
+
+.hunt-tab-btn.active .hunt-tab-count {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
+}
+
+.hunt-tab-count.has-fails {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #ef4444 !important;
+}
+
+.pill-game {
+  background: rgba(59, 130, 246, 0.14);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.28);
+}
+
+.pill-method {
+  background: rgba(234, 179, 8, 0.14);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.28);
+}
+
+.pill-reason {
+  background: rgba(249, 115, 22, 0.14);
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.28);
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hunt-showcase-card.fail-card {
+  border-color: rgba(239, 68, 68, 0.25);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), var(--profile-card-bg, #1a1a1f));
+}
+
+.hunt-showcase-card.fail-card:hover {
+  border-color: rgba(239, 68, 68, 0.55);
+  box-shadow: 0 4px 18px rgba(239, 68, 68, 0.18);
+}
+
+.fail-sprite-wrap {
+  border: none !important;
+  background: transparent !important;
+}
+
+.hunt-fail-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.hunt-empty-state {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--profile-labels, #a1a1aa);
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+/* 3-Column Key Metrics Box */
+.hunt-showcase-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 10px;
+  padding: 10px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  margin-top: 2px;
+}
+
+.hunt-stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hunt-stat-icon {
+  margin-bottom: 2px;
+  opacity: 0.85;
+}
+
+.hunt-stat-val {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--text, #ffffff);
+  line-height: 1.2;
+}
+
+.hunt-stat-lbl {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--profile-labels, #a1a1aa);
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+/* Odds Banner / Evaluation Bar */
+.hunt-showcase-odds-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.hunt-odds-pct-pill {
+  font-weight: 800;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hunt-odds-comment {
+  color: var(--profile-labels, #d4d4d8);
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  text-align: center;
+  padding: 0 4px;
+}
+
+.hunt-odds-banner-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--profile-labels, #a1a1aa);
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Odds Theme Variants */
+.hunt-showcase-odds-banner.super-lucky {
+  border-color: rgba(34, 197, 94, 0.3);
+  background: rgba(34, 197, 94, 0.06);
+}
+.hunt-showcase-odds-banner.super-lucky .hunt-odds-pct-pill {
+  color: #4ade80;
+}
+
+.hunt-showcase-odds-banner.lucky {
+  border-color: rgba(234, 179, 8, 0.3);
+  background: rgba(234, 179, 8, 0.06);
+}
+.hunt-showcase-odds-banner.lucky .hunt-odds-pct-pill {
+  color: #facc15;
+}
+
+.hunt-showcase-odds-banner.good {
+  border-color: rgba(20, 184, 166, 0.3);
+  background: rgba(20, 184, 166, 0.06);
+}
+.hunt-showcase-odds-banner.good .hunt-odds-pct-pill {
+  color: #2dd4bf;
+}
+
+.hunt-showcase-odds-banner.slight-over {
+  border-color: rgba(249, 115, 22, 0.3);
+  background: rgba(249, 115, 22, 0.06);
+}
+.hunt-showcase-odds-banner.slight-over .hunt-odds-pct-pill {
+  color: #fb923c;
+}
+
+.hunt-showcase-odds-banner.over {
+  border-color: rgba(244, 63, 94, 0.3);
+  background: rgba(244, 63, 94, 0.06);
+}
+.hunt-showcase-odds-banner.over .hunt-odds-pct-pill {
+  color: #fb7185;
+}
+
+.hunt-showcase-odds-banner.brutal {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+}
+.hunt-showcase-odds-banner.brutal .hunt-odds-pct-pill {
+  color: #f87171;
+}
+
+
+
+/* Responsive Mobile Adjustments */
+@media (max-width: 768px) {
+  .hunt-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .hunt-records-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hunt-breakdown-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Completed Hunts Section & Header */
+  .hunt-log-section {
+    padding: 14px 10px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .hunt-log-header {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .hunt-log-header-left {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .hunt-tab-toggle-group {
+    width: auto;
+    max-width: 100%;
+    margin: 0 auto;
+    display: inline-flex;
+    justify-content: center;
+    padding: 2px;
+    gap: 3px;
+  }
+
+  .hunt-tab-btn {
+    flex: initial;
+    padding: 5px 10px;
+    font-size: 0.76rem;
+    gap: 5px;
+    border-radius: 6px;
+  }
+
+  .hunt-tab-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .hunt-tab-count {
+    font-size: 0.68rem;
+    padding: 1px 5px;
+  }
+
+  /* Centered Search & Sort */
+  .hunt-log-controls {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .hunt-search-wrap {
+    width: 100%;
+  }
+
+  .hunt-log-controls .stats-sort-button-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .hunt-log-controls .stats-sort-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hunt-log-controls .stats-sort-dropdown {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+    width: 100%;
+    max-width: 280px;
+  }
+
+  /* Cards Mobile Fitting */
+  .hunt-showcase-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .hunt-showcase-card {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 12px 10px;
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  .hunt-showcase-card-top {
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .hunt-showcase-sprite-wrap {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+  }
+
+  .hunt-showcase-sprite {
+    width: 48px;
+    height: 48px;
+  }
+
+  .hunt-showcase-info {
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .hunt-showcase-mon-name {
+    font-size: 0.92rem;
+  }
+
+  .hunt-showcase-pill {
+    font-size: 0.65rem;
+    padding: 1px 6px;
+  }
+
+  .hunt-phase-badge,
+  .hunt-fail-tag {
+    font-size: 0.62rem;
+    padding: 1px 6px;
+  }
+
+  .hunt-showcase-stats-row {
+    padding: 8px 4px;
+    gap: 4px;
+    margin-top: 0;
+  }
+
+  .hunt-stat-val {
+    font-size: 0.86rem;
+  }
+
+  .hunt-stat-lbl {
+    font-size: 0.58rem;
+  }
+
+  .hunt-showcase-odds-banner {
+    padding: 6px 8px;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 0.68rem;
+  }
+
+  .hunt-odds-pct-pill {
+    font-size: 0.68rem;
+  }
+
+  .hunt-odds-comment {
+    font-size: 0.7rem;
+    padding: 0 2px;
+  }
+
+  .hunt-odds-banner-date {
+    font-size: 0.65rem;
   }
 }

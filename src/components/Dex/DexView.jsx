@@ -386,6 +386,7 @@ export default function DexView({
                     setShowShiny={setShowShiny}
                     viewingUsername={viewingUsername}
                     viewedUserShinyCharmGames={viewedUserShinyCharmGames || []}
+                    caughtInfoMap={caughtInfoMap}
                 />
             </div>
 
@@ -399,27 +400,26 @@ export default function DexView({
                     pointerEvents: showFloatingShiny ? 'auto' : 'none'
                 }}
             >
-                <label className="flex items-center gap-2 cursor-pointer" title="Toggle all shiny sprites" style={{ margin: 0 }}>
-                    <div className="switch" style={{ margin: 0 }}>
-                        <input
-                            type="checkbox"
-                            className="switch-input"
-                            checked={showShiny}
-                            onChange={e => setShowShiny(e.target.checked)}
-                        />
-                        <div className="switch-slider" />
-                    </div>
-                    <span className="text-base font-medium flex items-center gap-2" style={{ color: 'var(--text)' }}>
-                        <Sparkles
-                            size={20}
-                            style={{
-                                color: showShiny ? '#fbbf24' : '#6b7280',
-                                filter: showShiny ? 'none' : 'grayscale(100%)'
-                            }}
-                        />
-                        Shiny
-                    </span>
-                </label>
+                <div className="dex-shiny-segmented-control" role="group" aria-label="Pokemon sprite display mode">
+                    <button
+                        type="button"
+                        className={`dex-shiny-segmented-btn ${!showShiny ? 'active is-regular' : ''}`}
+                        onClick={() => setShowShiny(false)}
+                        title="Show regular Pokémon sprites"
+                    >
+                        <span className="dex-segmented-dot" />
+                        <span>Regular</span>
+                    </button>
+                    <button
+                        type="button"
+                        className={`dex-shiny-segmented-btn ${showShiny ? 'active is-shiny' : ''}`}
+                        onClick={() => setShowShiny(true)}
+                        title="Show shiny Pokémon sprites"
+                    >
+                        <Sparkles size={16} className={`dex-segmented-sparkles ${showShiny ? 'active' : ''}`} />
+                        <span>Shiny</span>
+                    </button>
+                </div>
             </div>
 
             {/* No Results Message - Show for both owner and viewer modes when there are no results */}
@@ -438,7 +438,7 @@ export default function DexView({
             )}
 
             {/* Main Dex Section */}
-            <div className="main-bg page-animate-2">
+            <div className="main-bg page-animate-3">
                 <DexCategoryTabs
                     tabs={availableTabs}
                     activeTab={effectiveActiveTab}
@@ -457,7 +457,14 @@ export default function DexView({
                             title={section.title}
                             pokemonList={filteredMons}
                             caught={caught || {}}
-                            isCaught={(poke) => (caught || {})[getCaughtKey(poke, null, showShiny)] || false}
+                            isCaught={(poke) => {
+                                const val = (caught || {})[getCaughtKey(poke, null, showShiny)];
+                                return typeof val === 'boolean' ? val : !!(val && val.caught !== false && (val.entries?.length > 0 || val.caught === true));
+                            }}
+                            hasFail={(poke) => {
+                                const info = (caughtInfoMap || {})[getCaughtKey(poke, null, showShiny)];
+                                return Boolean(info?.fails && info.fails.length > 0);
+                            }}
                             onMarkAll={onMarkAll || (() => { })}
                             onToggleCaught={onToggleCaught || (() => { })}
                             onSelect={onSelectPokemon || handlePokemonSelect}

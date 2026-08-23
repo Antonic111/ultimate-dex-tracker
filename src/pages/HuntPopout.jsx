@@ -1,463 +1,477 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useParams } from "react-router-dom";
 import { formatPokemonName } from "../utils";
 import { getSpriteUrl } from "../utils/spriteUtils";
 import { huntAPI, profileAPI } from "../utils/api";
-import { RotateCcw, Trash2, Settings, Info, Edit, X, Minus, Plus, Play, Pause, Check } from "lucide-react";
-import { getCurrentHuntOdds } from "../utils/huntSystem";
+import pokemonData from "../data/pokemon.json";
+import formsData from "../utils/loadFormsData";
+import DetailedHuntCard from "../components/Counters/DetailedHuntCard";
+import {
+  normalizeHunt,
+  updateHuntWithAction,
+  createHuntChannel,
+  getCachedHuntsData,
+  setCachedHuntsData
+} from "../utils/huntSync";
 import "../css/App.css";
 import "../css/Counters.css";
 
-function TimerDisplay({ lastCheckTime, isPaused }) {
-  const [secs, setSecs] = useState(0);
-  useEffect(() => {
-    setSecs(0);
-  }, [lastCheckTime]);
-  useEffect(() => {
-    if (isPaused) return;
-    const id = setInterval(() => setSecs(prev => prev + 1), 1000);
-    return () => clearInterval(id);
-  }, [isPaused]);
-
-  return <div className="current-timer">{isPaused ? "Paused" : `${secs}s`}</div>;
-}
-
-const formatTime = (milliseconds) => {
-  const seconds = Math.floor(milliseconds / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-
-  if (hours > 0) {
-    return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
-  } else if (minutes > 0) {
-    return `${minutes}m ${seconds % 60}s`;
-  } else {
-    return `${seconds}s`;
-  }
-};
-
 export default function HuntPopout() {
+  const { huntId: paramId } = useParams();
   const [hunt, setHunt] = useState(null);
-  const [checks, setChecks] = useState(0);
+  const [error, setError] = useState(null);
+  const [hotkey, setHotkey] = useState(() => {
+    try { return localStorage.getItem("huntHotkey") || " "; } catch { return " "; }
+  });
+  const [decrementHotkey, setDecrementHotkey] = useState(() => {
+    try { return localStorage.getItem("huntDecrementHotkey") || "-"; } catch { return "-"; }
+  });
+  const [, setTick] = useState(0);
 
-  const [useHomeSprites, setUseHomeSprites] = useState(() => {
+  const [metricMode, setMetricMode] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false;
+      return localStorage.getItem("dex_hunt_metric_mode") || "phase";
+    } catch {
+      return "phase";
+    }
+  });
+
+  const toggleMetricMode = useCallback(() => {
+    setMetricMode((prev) => {
+      const next = prev === "total" ? "phase" : "total";
+      try {
+        localStorage.setItem("dex_hunt_metric_mode", next);
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  const [useHomeSprites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("dexPreferences"))?.useHomeSprites || false;
     } catch {
       return false;
     }
   });
 
-  useEffect(() => {
-    const handlePrefsChange = () => {
-      try {
-        setUseHomeSprites(JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false);
-      } catch { }
-    };
-    window.addEventListener('dexPreferencesChanged', handlePrefsChange);
-    return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
-  }, []);
-  const [totalTime, setTotalTime] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [lastCheckTime, setLastCheckTime] = useState(Date.now());
-  const [error, setError] = useState(null);
-  const [expanded, setExpanded] = useState(false);
+  const resolvedHuntId = useMemo(() => {
+    if (paramId) return paramId;
+    const query = new URLSearchParams(window.location.search).get("huntId");
+    if (query) return query;
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    return parts.length > 1 ? parts[parts.length - 1] : null;
+  }, [paramId]);
+
+  const huntRef = useRef(hunt);
+  huntRef.current = hunt;
+
   const channelRef = useRef(null);
-  const huntIdRef = useRef(null);
-  const fullDataRef = useRef(null);
-  const [hotkey, setHotkey] = useState('a');
+  const saveTimeoutRef = useRef(null);
 
-  // Parse huntId from ?huntId=xxx
-  useEffect(() => {
-    profileAPI.getProfile().then(data => {
-      if (data?.dexPreferences?.hotkey) {
-        setHotkey(data.dexPreferences.hotkey);
+  // Debounced server save — NEVER resurrects deleted hunts
+  const debouncedServerSave = useCallback((updatedHunt) => {
+    if (!updatedHunt) return;
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(async () => {
+      try {
+        const cached = getCachedHuntsData() || {};
+        const existingList = cached.activeHunts || [];
+        const exists = existingList.some((h) => String(h.id) === String(updatedHunt.id));
+        if (!exists) {
+          // Hunt was removed or deleted, do NOT save/recreate it on server
+          return;
+        }
+
+        const nextList = existingList.map((h) => (String(h.id) === String(updatedHunt.id) ? updatedHunt : h));
+        setCachedHuntsData({ ...cached, activeHunts: nextList });
+        await huntAPI.updateHuntData({ activeHunts: nextList });
+      } catch (err) {
+        console.error("Failed to save popout hunt data:", err);
       }
-    }).catch(console.error);
-    
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("huntId");
-    if (!id) { setError("No hunt ID provided."); return; }
-    huntIdRef.current = Number(id);
-
-    document.title = "Hunt Popout";
-    document.body.style.backgroundColor = "var(--bg-black, #111)";
-    document.body.classList.add('popout-mode');
-
-    // Fetch current hunt data from API
-    huntAPI.getHuntData().then(data => {
-      fullDataRef.current = data;
-      const found = (data.activeHunts || []).find(h => h.id === Number(id));
-      if (!found) { setError("Hunt not found."); return; }
-
-      setHunt(found);
-      setChecks(found.checks || 0);
-      setTotalTime((data.totalCheckTimes || {})[id] || 0);
-
-      const paused = (data.pausedHunts || []).includes(Number(id));
-      setIsPaused(paused);
-      setLastCheckTime((data.lastCheckTimes || {})[id] || Date.now());
-
-      document.title = `${formatPokemonName(found.pokemon?.name || "")} — Hunt Popout`;
-    }).catch(err => {
-      console.error(err);
-      setError("Failed to load hunt data.");
-    });
-
-    const ch = new BroadcastChannel(`hunt-popout-${id}`);
-    channelRef.current = ch;
-
-    // Enforce minimum window size for popup
-    const minWidth = 470;
-    const minHeight = 400;
-    const enforceMinSize = () => {
-      let width = window.outerWidth;
-      let height = window.outerHeight;
-      let needsResize = false;
-
-      if (width > 0 && width < minWidth) {
-        width = minWidth;
-        needsResize = true;
-      }
-      if (height > 0 && height < minHeight) {
-        height = minHeight;
-        needsResize = true;
-      }
-
-      if (needsResize) {
-        window.resizeTo(width, height);
-      }
-    };
-
-    window.addEventListener('resize', enforceMinSize);
-
-    ch.onmessage = (e) => {
-      const { type, payload } = e.data;
-      if (type === "STATE_UPDATE") {
-        if (payload.checks !== undefined) setChecks(payload.checks);
-        if (payload.totalTime !== undefined) setTotalTime(payload.totalTime);
-        if (payload.isPaused !== undefined) setIsPaused(payload.isPaused);
-        if (payload.lastCheckTime !== undefined) setLastCheckTime(payload.lastCheckTime);
-        
-        // Sync our internal detached DB reference so hotkeys/clicks don't overwrite with stale data
-        huntAPI.getHuntData().then(data => {
-            fullDataRef.current = data;
-        }).catch(console.error);
-      }
-    };
-
-    return () => {
-      ch.close();
-      window.removeEventListener('resize', enforceMinSize);
-      document.body.classList.remove('popout-mode');
-    };
+    }, 450);
   }, []);
 
-  const postAction = useCallback((action) => {
-    channelRef.current?.postMessage({ type: "ACTION", action, huntId: huntIdRef.current });
-  }, []);
-
-  const handleAdd = useCallback(() => {
-    const data = fullDataRef.current;
-    if (!data) return;
-
-    const id = huntIdRef.current;
-    const now = Date.now();
-    let updatedTotalTime = totalTime;
-    
-    // Add logic
-    const incrementValue = data.huntIncrements?.[id] || 1;
-    const targetHunt = data.activeHunts.find(h => h.id === id);
-    if (targetHunt) {
-      targetHunt.checks += incrementValue;
-      setChecks(targetHunt.checks);
+  // Load initial hunt & user preferences
+  const loadData = useCallback(async () => {
+    const id = resolvedHuntId;
+    if (!id) {
+      setError("No hunt ID provided in popout.");
+      return;
     }
-    
-    // Timer rough approximation: add difference since lastCheckTime if not paused
-    if (!data.pausedHunts?.includes(id)) {
-      const elapsed = now - (data.lastCheckTimes?.[id] || now);
-      data.totalCheckTimes[id] = (data.totalCheckTimes[id] || 0) + elapsed;
-      updatedTotalTime = data.totalCheckTimes[id];
-      setTotalTime(updatedTotalTime);
+
+    // Check local cached data first for instant start
+    const cached = getCachedHuntsData();
+    if (cached?.activeHunts) {
+      const target = cached.activeHunts.find(
+        (h) => String(h.id) === String(id) || Number(h.id) === Number(id)
+      );
+      if (target) {
+        const normalized = normalizeHunt(target);
+        setHunt(normalized);
+        setError(null);
+        document.title = `${formatPokemonName(normalized.pokemon?.name || "Pokemon")} — Hunt Popout`;
+      }
     }
-    data.lastCheckTimes[id] = now;
-    setLastCheckTime(now);
 
-    postAction("ADD");
-    huntAPI.updateHuntData(data).catch(console.error);
-  }, [totalTime, isPaused, postAction]);
+    // Query backend for canonical state
+    try {
+      const data = await huntAPI.getHuntData();
+      if (data?.activeHunts) {
+        const target = data.activeHunts.find(
+          (h) => String(h.id) === String(id) || Number(h.id) === Number(id)
+        );
 
+        if (!target) {
+          setHunt(null);
+          setError("This hunt was deleted in the main window.");
+          return;
+        }
+
+        const normalized = normalizeHunt(
+          target,
+          Date.now(),
+          data.totalCheckTimes || {},
+          data.lastCheckTimes || {},
+          new Set(data.pausedHunts || [])
+        );
+
+        if (!huntRef.current || (normalized.version || 0) >= (huntRef.current.version || 0)) {
+          setHunt(normalized);
+          setError(null);
+          document.title = `${formatPokemonName(normalized.pokemon?.name || "Pokemon")} — Hunt Popout`;
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load popout hunt from API:", err);
+      if (!huntRef.current) {
+        setError("Failed to load hunt data.");
+      }
+    }
+  }, [resolvedHuntId]);
+
+  // Window setup, BroadcastChannel, and size clamping
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      // Don't trigger if the user is actively typing in an input
-      if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) || document.activeElement.contentEditable === 'true') {
+    document.body.style.backgroundColor = "#09090b";
+    document.documentElement.classList.add("popout-mode");
+    document.body.classList.add("popout-mode");
+
+    const MIN_W = 520;
+    const MIN_H = 500;
+
+    let resizeTimer = null;
+    const enforceMinBounds = () => {
+      try {
+        const curW = window.outerWidth || window.innerWidth;
+        const curH = window.outerHeight || window.innerHeight;
+        if (curW < MIN_W || curH < MIN_H) {
+          window.resizeTo(Math.max(curW, MIN_W), Math.max(curH, MIN_H));
+        }
+      } catch {}
+    };
+
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(enforceMinBounds, 30);
+    };
+
+    enforceMinBounds();
+    window.addEventListener("resize", handleResize);
+
+    profileAPI
+      .getProfile()
+      .then((data) => {
+        if (data?.dexPreferences?.hotkey) {
+          setHotkey(data.dexPreferences.hotkey);
+        }
+      })
+      .catch(() => {});
+
+    loadData();
+
+    // BroadcastChannel sync
+    const channel = createHuntChannel((msg) => {
+      if (!msg) return;
+
+      const targetId = String(resolvedHuntId);
+
+      // State Response from main window
+      if (msg.type === "RESPONSE_HUNT_STATE" && Array.isArray(msg.hunts)) {
+        const match = msg.hunts.find(
+          (h) => String(h.id) === targetId || String(h.huntId) === targetId
+        );
+        if (match) {
+          const normalized = normalizeHunt(match);
+          if (!huntRef.current || (normalized.version || 0) >= (huntRef.current.version || 0)) {
+            setHunt(normalized);
+            setError(null);
+          }
+        } else {
+          // Hunt was deleted or no longer active
+          setHunt(null);
+          setError("This hunt was deleted in the main window.");
+        }
         return;
       }
-      
-      if (e.key.toLowerCase() === hotkey.toLowerCase() && !isPaused) {
-        handleAdd();
+
+      // Actions from main window (including DELETE)
+      if (msg.type === "HUNT_ACTION" && String(msg.huntId) === targetId) {
+        if (msg.action?.type === "DELETE") {
+          setHunt(null);
+          setError("This hunt was deleted in the main window.");
+          return;
+        }
+        setHunt((prev) => {
+          if (!prev) return prev;
+          return updateHuntWithAction(prev, msg.action, msg.action.timestamp || Date.now());
+        });
+        return;
+      }
+
+      if (msg.type === "HUNT_UPDATED" && msg.hunt && String(msg.hunt.id) === targetId) {
+        setHunt((prev) => {
+          if (!prev || (msg.hunt.version || 0) >= (prev.version || 0)) {
+            return normalizeHunt(msg.hunt);
+          }
+          return prev;
+        });
+      }
+    });
+
+    channelRef.current = channel;
+
+    // Send state request to main window immediately
+    channel.broadcast({
+      type: "REQUEST_HUNT_STATE",
+      huntId: resolvedHuntId
+    });
+
+    return () => {
+      channel.close();
+      clearTimeout(resizeTimer);
+      window.removeEventListener("resize", handleResize);
+      document.documentElement.classList.remove("popout-mode");
+      document.body.classList.remove("popout-mode");
+    };
+  }, [loadData, resolvedHuntId]);
+
+  // Lightweight UI render tick (zero mutations, derived from Date.now())
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTick((t) => t + 1);
+    }, 500);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Canonical Actions
+  const huntIncrement = hunt?.increment || 1;
+
+  const handleAddCheck = useCallback(
+    (customDelta = null) => {
+      if (!huntRef.current) return;
+      const cached = getCachedHuntsData();
+      if (cached?.activeHunts && !cached.activeHunts.some(h => String(h.id) === String(huntRef.current.id))) {
+        setHunt(null);
+        setError("This hunt was deleted in the main window.");
+        return;
+      }
+
+      const currentHunt = huntRef.current;
+      const delta = customDelta !== null ? customDelta : currentHunt.increment || 1;
+      const now = Date.now();
+
+      const action = {
+        type: "INCREMENT",
+        huntId: currentHunt.id,
+        amount: delta,
+        timestamp: now
+      };
+
+      const nextHunt = updateHuntWithAction(currentHunt, action, now);
+      setHunt(nextHunt);
+
+      if (channelRef.current) {
+        channelRef.current.broadcast({
+          type: "HUNT_ACTION",
+          huntId: currentHunt.id,
+          action
+        });
+        channelRef.current.broadcast({
+          type: "HUNT_UPDATED",
+          hunt: nextHunt
+        });
+      }
+
+      debouncedServerSave(nextHunt);
+    },
+    [debouncedServerSave]
+  );
+
+  const handleDecreaseCheck = useCallback(() => {
+    if (!huntRef.current) return;
+    const cached = getCachedHuntsData();
+    if (cached?.activeHunts && !cached.activeHunts.some(h => String(h.id) === String(huntRef.current.id))) {
+      setHunt(null);
+      setError("This hunt was deleted in the main window.");
+      return;
+    }
+
+    const currentHunt = huntRef.current;
+    const delta = currentHunt.increment || 1;
+    const now = Date.now();
+
+    const action = {
+      type: "DECREMENT",
+      huntId: currentHunt.id,
+      amount: delta,
+      timestamp: now
+    };
+
+    const nextHunt = updateHuntWithAction(currentHunt, action, now);
+    setHunt(nextHunt);
+
+    if (channelRef.current) {
+      channelRef.current.broadcast({
+        type: "HUNT_ACTION",
+        huntId: currentHunt.id,
+        action
+      });
+      channelRef.current.broadcast({
+        type: "HUNT_UPDATED",
+        hunt: nextHunt
+      });
+    }
+
+    debouncedServerSave(nextHunt);
+  }, [debouncedServerSave]);
+
+  const handleTogglePause = useCallback(() => {
+    if (!huntRef.current) return;
+    const cached = getCachedHuntsData();
+    if (cached?.activeHunts && !cached.activeHunts.some(h => String(h.id) === String(huntRef.current.id))) {
+      setHunt(null);
+      setError("This hunt was deleted in the main window.");
+      return;
+    }
+
+    const currentHunt = huntRef.current;
+    const now = Date.now();
+
+    const action = {
+      type: "TOGGLE_PAUSE",
+      huntId: currentHunt.id,
+      timestamp: now
+    };
+
+    const nextHunt = updateHuntWithAction(currentHunt, action, now);
+    setHunt(nextHunt);
+
+    if (channelRef.current) {
+      channelRef.current.broadcast({
+        type: "HUNT_ACTION",
+        huntId: currentHunt.id,
+        action
+      });
+      channelRef.current.broadcast({
+        type: "HUNT_UPDATED",
+        hunt: nextHunt
+      });
+    }
+
+    debouncedServerSave(nextHunt);
+  }, [debouncedServerSave]);
+
+  // Helper for key matching
+  const isKeyMatch = useCallback((e, targetKey) => {
+    if (!targetKey) return false;
+    if (targetKey === " " && (e.code === "Space" || e.key === " " || e.key === "Spacebar")) return true;
+    if (targetKey === "+" && (e.key === "+" || e.key === "Add" || e.code === "NumpadAdd" || (e.key === "=" && e.shiftKey))) return true;
+    if (targetKey === "-" && (e.key === "-" || e.key === "Subtract" || e.code === "NumpadSubtract" || e.code === "Minus")) return true;
+    if (e.key.toLowerCase() === targetKey.toLowerCase()) return true;
+    if (e.code.toLowerCase() === targetKey.toLowerCase()) return true;
+    return false;
+  }, []);
+
+  // Hotkey listener
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (
+        document.activeElement?.tagName === "INPUT" ||
+        document.activeElement?.tagName === "TEXTAREA" ||
+        document.activeElement?.isContentEditable
+      ) {
+        return;
+      }
+
+      if (isKeyMatch(e, hotkey)) {
+        e.preventDefault();
+        handleAddCheck();
+        return;
+      }
+
+      if (isKeyMatch(e, decrementHotkey)) {
+        e.preventDefault();
+        handleDecreaseCheck();
+        return;
       }
     };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [hotkey, isPaused, handleAdd]);
 
-  const handleMinus = () => {
-    if (checks <= 0) return;
-    const data = fullDataRef.current;
-    if (!data) return;
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [hotkey, decrementHotkey, handleAddCheck, handleDecreaseCheck, isKeyMatch]);
 
-    const id = huntIdRef.current;
-    const incrementValue = data.huntIncrements?.[id] || 1;
-    const targetHunt = data.activeHunts.find(h => h.id === id);
-    if (targetHunt) {
-      targetHunt.checks = Math.max(0, targetHunt.checks - incrementValue);
-      setChecks(targetHunt.checks);
-    }
-    
-    postAction("MINUS");
-    huntAPI.updateHuntData(data).catch(console.error);
-  };
+  // Sprites
+  const allPokemon = useMemo(() => [...pokemonData, ...formsData], []);
+  const getPokemonImage = useCallback(
+    (pokemon) => {
+      if (!pokemon) return "/fallback.png";
+      const fresh = allPokemon.find(
+        (p) =>
+          (pokemon.stableId && p.stableId === pokemon.stableId) ||
+          (pokemon.name &&
+            p.name === pokemon.name &&
+            (p.formType || "main") === (pokemon.formType || "main")) ||
+          (p.id === pokemon.id && (!p.formType || p.formType === "main"))
+      );
+      const target = fresh || pokemon;
+      return getSpriteUrl(target, true, useHomeSprites);
+    },
+    [allPokemon, useHomeSprites]
+  );
 
-  const handlePause = () => {
-    const data = fullDataRef.current;
-    if (!data) return;
-
-    const id = huntIdRef.current;
-    const nextPaused = !isPaused;
-    setIsPaused(nextPaused);
-
-    const now = Date.now();
-    data.pausedHunts = data.pausedHunts || [];
-    
-    if (nextPaused) {
-      // It was unpaused, now pausable. We need to add the unpaused time segment to totalCheckTimes before we "park" it.
-      if (!data.pausedHunts.includes(id)) {
-        data.pausedHunts.push(id);
-        const elapsed = now - (data.lastCheckTimes?.[id] || now);
-        data.totalCheckTimes[id] = (data.totalCheckTimes[id] || 0) + elapsed;
-        setTotalTime(data.totalCheckTimes[id]);
-      }
-    } else {
-      // Unpausing
-      data.pausedHunts = data.pausedHunts.filter(p => p !== id);
-    }
-    
-    // Refresh the checktime to 'now' so timers start ticking from 0 again correctly.
-    data.lastCheckTimes[id] = now;
-    setLastCheckTime(now);
-
-    postAction(nextPaused ? "PAUSE" : "RESUME");
-    huntAPI.updateHuntData(data).catch(console.error);
-  };
-
-  if (error) {
+  if (error || !hunt) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column', color: 'white' }}>
-        <p style={{ color: "#ef4444", fontWeight: 700 }}>{error}</p>
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-[#09090b] text-white">
+        <p className="text-red-400 font-bold mb-4">{error || "Loading hunt…"}</p>
+        {error ? (
+          <button
+            type="button"
+            onClick={() => window.close()}
+            className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-semibold transition-colors"
+          >
+            Close Window
+          </button>
+        ) : null}
       </div>
     );
   }
 
-  if (!hunt) {
-    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'gray' }}>Loading hunt…</div>;
-  }
-
-  const getPokemonImage = (pokemon) => getSpriteUrl(pokemon, true, useHomeSprites);
-
-  const renderFormType = () => {
-    if (!hunt.pokemon.formType || hunt.pokemon.formType === "main") return null;
-    const map = {
-      alpha: "Alpha",
-      alphaother: "Alpha Forms",
-      gmax: "Gigantamax",
-      alolan: "Alolan",
-      galarian: "Galarian",
-      hisuian: "Hisuian",
-      paldean: "Paldean",
-      therian: "Therian",
-      "ash-cap": "Partner Cap",
-      "partner-cap": "Partner Cap"
-    };
-    return map[hunt.pokemon.formType] || hunt.pokemon.formType;
-  };
-
-  const calculateOddsDisplay = () => {
-    if (hunt.method === "Ultra Wormholes" && (hunt.game === "Ultra Sun" || hunt.game === "Ultra Moon")) {
-      return "1% - 36%";
-    }
-
-    const huntModifiers = hunt.modifiers || {
-      shinyCharm: false, shinyParents: false, lureActive: false,
-      researchLv10: false, perfectResearch: false, sparklingLv1: false,
-      sparklingLv2: false, sparklingLv3: false, eventBoosted: false,
-      communityDay: false, raidDay: false, researchDay: false,
-      galarBirds: false, hatchDay: false
-    };
-
-    const isComboMethod = (method, games) => hunt.method === method && games.includes(hunt.game);
-
-    if (
-      isComboMethod("Poke Radar", ["Diamond", "Pearl", "Platinum"]) ||
-      isComboMethod("Poke Radar", ["X", "Y"]) ||
-      isComboMethod("Poke Radar", ["Brilliant Diamond", "Shining Pearl"]) ||
-      isComboMethod("Chain Fishing", ["X", "Y", "Omega Ruby", "Alpha Sapphire"]) ||
-      isComboMethod("DexNav", ["Omega Ruby", "Alpha Sapphire"]) ||
-      isComboMethod("SOS", ["Sun", "Moon", "Ultra Sun", "Ultra Moon"]) ||
-      isComboMethod("KO Method", ["Sword", "Shield"]) ||
-      isComboMethod("Catch Combo", ["Let's Go Pikachu", "Let's Go Eevee"]) ||
-      isComboMethod("Mass Outbreaks", ["Scarlet", "Violet"])
-    ) {
-      return `1/${getCurrentHuntOdds(hunt.game, hunt.method, huntModifiers, checks)}`;
-    }
-
-    if (hunt.odds === null) return "NA";
-    return `1/${hunt.odds || 4096}`;
-  };
-
   return (
-    <div id="hunt-popout-wrapper" className="container page-container counters-page" style={{ margin: 0, padding: '20px', maxWidth: '100vw', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-      <style>{`
-        /* FOOLPROOF DESKTOP LOCK OVERRIDES */
-        #hunt-popout-wrapper .decrease-check-btn {
-            box-sizing: border-box !important;
-        }
-        #hunt-popout-wrapper .checks-display .decrease-check-btn {
-            display: flex !important;
-            position: absolute !important;
-            bottom: -8px !important;
-            left: -8px !important;
-            width: 24px !important;
-            height: 24px !important;
-            padding: 0.25rem !important;
-            border-radius: 50% !important;
-            min-width: 0 !important;
-            min-height: 0 !important;
-        }
-        #hunt-popout-wrapper .checks-buttons .decrease-check-btn {
-            display: none !important;
-        }
-        #hunt-popout-wrapper .hunt-header {
-            flex-direction: row !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            gap: 1.5rem !important;
-            padding: 0 1rem !important;
-            flex-wrap: nowrap !important;
-        }
-        #hunt-popout-wrapper .hunt-pokemon {
-            flex: 1 !important;
-            min-width: auto !important;
-            max-width: none !important;
-        }
-        #hunt-popout-wrapper .hunt-pokemon-image {
-            width: 90px !important;
-            height: 90px !important;
-        }
-        #hunt-popout-wrapper .hunt-pokemon-info h3 {
-            font-size: 1.1rem !important;
-            line-height: normal !important;
-            word-break: normal !important;
-            white-space: normal !important;
-            text-overflow: clip !important;
-            overflow: visible !important;
-        }
-        #hunt-popout-wrapper .hunt-complete {
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            gap: 1rem !important;
-        }
-        #hunt-popout-wrapper .hunt-odds-display {
-            width: 100% !important;
-            flex: 1 1 auto !important;
-            justify-content: center !important;
-        }
-        #hunt-popout-wrapper .complete-hunt-btn {
-            width: auto !important;
-            flex: 1 1 auto !important;
-        }
-        #hunt-popout-wrapper .hunt-actions {
-            transform: none !important;
-            display: flex !important;
-            justify-content: flex-end !important;
-            gap: 0.5rem !important;
-        }
-        #hunt-popout-wrapper .hunt-checks {
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            padding: 1.25rem !important;
-            gap: 0.25rem !important;
-        }
-        #hunt-popout-wrapper .checks-display { width: auto !important; order: 0 !important; flex-shrink: 0 !important; }
-        #hunt-popout-wrapper .timer-display { width: auto !important; margin-left: auto !important; order: 0 !important; flex-shrink: 0 !important; align-items: flex-start !important; text-align: left !important; }
-        #hunt-popout-wrapper .checks-buttons { min-width: auto !important; order: 0 !important; flex-shrink: 0 !important; gap: 0.5rem !important; }
-        #hunt-popout-wrapper .checks-count { font-size: 1.8rem !important; width: auto !important; min-width: 4rem !important; padding: 0.25rem 1rem !important; }
-        #hunt-popout-wrapper .pause-btn, #hunt-popout-wrapper .add-check-btn { padding: 0.75rem 1.25rem !important; font-size: 1rem !important; }
-        #hunt-popout-wrapper .hunt-delete-btn, #hunt-popout-wrapper .hunt-reset-btn, #hunt-popout-wrapper .hunt-settings-btn, #hunt-popout-wrapper .hunt-info-btn, #hunt-popout-wrapper .hunt-edit-btn { padding: 8px !important; width: auto !important; height: auto !important; min-width: 0 !important; min-height: 0 !important; }
-        #hunt-popout-wrapper .hunt-delete-btn svg, #hunt-popout-wrapper .hunt-reset-btn svg, #hunt-popout-wrapper .hunt-settings-btn svg, #hunt-popout-wrapper .hunt-info-btn svg, #hunt-popout-wrapper .hunt-edit-btn svg { width: 16px !important; height: 16px !important; }
-      `}</style>
-      <div className="active-hunts-section" style={{ margin: 0, width: '100%', maxWidth: '400px' }}>
-        <div className="hunts-grid" style={{ display: 'block' }}>
-
-          <div className="hunt-card">
-            <div className="hunt-header">
-              {!expanded ? (
-                <>
-                  <div className="hunt-pokemon">
-                    <img src={getPokemonImage(hunt.pokemon)} alt={formatPokemonName(hunt.pokemon.name)} className="hunt-pokemon-image" />
-                    <div className="hunt-pokemon-info">
-                      <h3>{formatPokemonName(hunt.pokemon.name)}</h3>
-                      {renderFormType() && (
-                        <div className="hunt-pokemon-form">{renderFormType()}</div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="hunt-actions">
-                    <button className="hunt-info-btn" title="Show hunt details" onClick={() => setExpanded(true)}><Info size={16} /></button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="hunt-details">
-                    <div className="hunt-detail-item">Game: {hunt.game || "NA"}</div>
-                    <div className="hunt-detail-item">Method: {hunt.method || "NA"}</div>
-                  </div>
-                  <div className="hunt-actions expanded-view">
-                    <button className="hunt-info-btn" title="Hide hunt details" onClick={() => setExpanded(false)}><X size={16} /></button>
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div className="hunt-checks">
-              <div className="checks-display">
-                <span className="checks-count">{checks}</span>
-                <button onClick={handleMinus} className="decrease-check-btn" title="Decrease check" disabled={checks <= 0}><Minus size={12} /></button>
-              </div>
-              <div className="timer-display">
-                <div className="total-time">{formatTime(totalTime)}</div>
-                <div className="last-check-time">
-                  <TimerDisplay lastCheckTime={lastCheckTime} isPaused={isPaused} />
-                </div>
-              </div>
-              <div className="checks-buttons">
-                <button onClick={handlePause} className="pause-btn" title={isPaused ? "Resume hunt" : "Pause hunt"}>
-                  {isPaused ? <Play size={16} /> : <Pause size={16} />}
-                </button>
-                <button onClick={handleMinus} className="decrease-check-btn" title="Decrease check" disabled={checks <= 0}><Minus size={16} /></button>
-                <button onClick={handleAdd} className="add-check-btn" title="Add check"><Plus size={16} /></button>
-              </div>
-            </div>
-
-            <div className="hunt-complete">
-              <div className="hunt-odds-display" style={{ flex: '1 1 auto', width: '100%', justifyContent: 'center' }}>
-                <span className="odds-label">Odds:</span>
-                <span className="odds-value">{calculateOddsDisplay()}</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
+    <div className={`hunt-popout-page min-h-screen w-full bg-[#09090b] flex flex-col items-center justify-center p-3 text-white select-none ${!useHomeSprites ? "using-gen5-sprites" : ""}`}>
+      <div className="hunt-popout-card-container w-full max-w-[480px]">
+        <DetailedHuntCard
+          hunt={hunt}
+          isPopout={true}
+          getPokemonImage={getPokemonImage}
+          useHomeSprites={useHomeSprites}
+          hotkey={hotkey}
+          decrementHotkey={decrementHotkey}
+          huntIncrement={huntIncrement}
+          metricMode={metricMode}
+          onToggleMetricMode={toggleMetricMode}
+          onAddCheck={() => handleAddCheck()}
+          onDecreaseCheck={handleDecreaseCheck}
+          onTogglePause={handleTogglePause}
+        />
       </div>
     </div>
   );

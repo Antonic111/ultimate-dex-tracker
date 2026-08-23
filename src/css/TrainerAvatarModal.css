@@ -1,0 +1,431 @@
+/* ==========================================================================
+   TRAINER AVATAR SELECTION MODAL WITH LIVE PREVIEW SCREEN
+   ========================================================================== */
+
+/* Shorter vertical height and locked outer modal body */
+.trainer-avatar-modal-panel .udt-modal-body {
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+  height: 440px;
+  max-height: calc(75vh - 80px);
+  padding: 14px 18px;
+  box-sizing: border-box;
+}
+
+.trainer-modal-body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.trainer-modal-layout {
+  display: grid;
+  grid-template-columns: 1fr 290px;
+  gap: 14px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  align-items: stretch;
+}
+
+/* ==========================================================================
+   LEFT COLUMN: Search & Scrollable Grid
+   ========================================================================== */
+.trainer-modal-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.trainer-modal-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.trainer-search-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.trainer-count-badge {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text, #f1f5f9);
+  background: var(--profile-modal-boxes, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  height: 42px;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 0 16px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  user-select: none;
+  flex-shrink: 0;
+  letter-spacing: 0.2px;
+}
+
+/* Scrollable Grid - THE ONLY SCROLLABLE ELEMENT */
+.trainer-avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 7px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2px 4px 8px 2px;
+  align-content: start;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Individual Trainer Card in Avatar Modal */
+.trainer-avatar-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--profile-modal-boxes, rgba(255, 255, 255, 0.04));
+  border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  padding: 5px 3px 5px;
+  height: 96px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  min-width: 0;
+}
+
+.trainer-avatar-card:hover {
+  background: var(--profile-modal-boxes-hover, rgba(255, 255, 255, 0.08));
+  border-color: var(--border-color-hover, rgba(255, 255, 255, 0.25));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.trainer-avatar-card.selected {
+  border-color: var(--accent, #a855f7);
+  background: color-mix(in srgb, var(--accent, #a855f7) 15%, rgba(255, 255, 255, 0.04));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent, #a855f7) 35%, transparent);
+}
+
+.trainer-avatar-card.previewing:not(.selected) {
+  border-color: color-mix(in srgb, var(--accent, #a855f7) 60%, rgba(255, 255, 255, 0.2));
+}
+
+.trainer-avatar-card-selected-badge {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--accent, #a855f7);
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+.trainer-avatar-card-image-wrap {
+  width: 100%;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trainer-avatar-card-img {
+  height: 50px;
+  max-width: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transition: transform 0.2s ease;
+}
+
+.trainer-avatar-card:hover .trainer-avatar-card-img {
+  transform: scale(1.1);
+}
+
+.trainer-avatar-card-name {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text, #f1f5f9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  line-height: 1.15;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   RIGHT COLUMN: Dedicated Live Preview Panel (Bigger Preview, Stacked Layout)
+   ========================================================================== */
+.trainer-preview-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--profile-modal-boxes, rgba(255, 255, 255, 0.03));
+  border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 14px;
+  padding: 12px 14px;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden; /* NON-SCROLLABLE */
+  flex-shrink: 0;
+  height: 100%;
+  box-sizing: border-box;
+  justify-content: space-between;
+}
+
+/* Background glow effect behind preview */
+.trainer-preview-glow {
+  position: absolute;
+  top: 30px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent, #a855f7) 25%, transparent) 0%, transparent 70%);
+  filter: blur(24px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.trainer-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  z-index: 1;
+}
+
+.trainer-preview-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary, #888888);
+}
+
+.trainer-preview-status-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1.5px 7px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.trainer-preview-status-pill.active {
+  background: color-mix(in srgb, var(--accent, #a855f7) 25%, transparent);
+  color: var(--accent, #a855f7);
+  border: 1px solid color-mix(in srgb, var(--accent, #a855f7) 50%, transparent);
+}
+
+.trainer-preview-status-pill.preview {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary, #888888);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Live Circle Avatar Preview - Big & Prominent */
+.trainer-hero-avatar-preview-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.trainer-hero-avatar-circle {
+  width: 172px;
+  height: 172px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--pokemon-box-bg, #0f172a);
+  border: 3.5px solid var(--accent, #a855f7);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--accent, #a855f7) 35%, transparent), 0 8px 24px rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.trainer-hero-avatar-circle:hover {
+  transform: scale(1.03);
+}
+
+.trainer-hero-avatar-circle-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transform: scale(1.45) translateY(24%);
+  transform-origin: center bottom;
+  transition: transform 0.2s ease;
+}
+
+/* Trainer Info Details Under Preview */
+.trainer-preview-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  z-index: 1;
+}
+
+.trainer-preview-name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text, #f8fafc);
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Action buttons in preview panel - stacked vertically */
+.trainer-preview-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   MODAL FOOTER
+   ========================================================================== */
+.trainer-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  gap: 12px;
+}
+
+.trainer-footer-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   RESPONSIVENESS (Mobile Layout)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .trainer-avatar-modal-panel .udt-modal-body {
+    height: auto;
+    max-height: 70vh;
+    padding: 10px 12px;
+  }
+
+  .trainer-modal-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 60vh;
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  .trainer-preview-panel {
+    flex-direction: row;
+    padding: 8px 12px;
+    gap: 10px;
+    align-items: center;
+    text-align: left;
+    height: auto;
+    flex-shrink: 0; /* Pinned at top, never scrolls */
+    overflow: hidden;
+  }
+
+  .trainer-preview-glow {
+    display: none;
+  }
+
+  .trainer-hero-avatar-circle {
+    width: 68px;
+    height: 68px;
+    border-width: 2.5px;
+    flex-shrink: 0;
+  }
+
+  .trainer-preview-header {
+    display: none;
+  }
+
+  .trainer-preview-info {
+    text-align: left;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .trainer-preview-name {
+    font-size: 0.95rem;
+  }
+
+  .trainer-preview-actions {
+    display: none;
+  }
+
+  .trainer-modal-main {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .trainer-avatar-grid {
+    grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+    gap: 5px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .trainer-avatar-card {
+    height: 88px;
+  }
+
+  .trainer-avatar-card-image-wrap {
+    height: 48px;
+  }
+
+  .trainer-avatar-card-img {
+    height: 44px;
+  }
+
+  .trainer-modal-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .trainer-footer-btns {
+    justify-content: flex-end;
+  }
+}

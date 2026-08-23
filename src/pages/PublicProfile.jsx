@@ -1,18 +1,19 @@
 import { useEffect, useState, useContext, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import "../css/Profile.css";
-import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight, Video, Youtube, Twitch } from "lucide-react";
+import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight, Video } from "lucide-react";
+import { YoutubeIcon, TwitchIcon } from "../components/Shared/SocialIcons";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
 import { formatPokemonName } from "../utils";
 import { getCaughtKey } from "../caughtStorage";
 import { COUNTRY_OPTIONS } from "../data/countries";
-import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
-import { useMessage } from "../components/Shared";
+import { LoadingSpinner, SectionLoader, useMessage } from "../components/Shared";
 import { profileAPI } from "../utils/api";
 import { UserContext } from "../components/Shared/UserContext";
 import { getSpriteUrl } from "../utils/spriteUtils";
+import { getUserAvatarUrl } from "../utils/profileUtils";
 
 
 // Move createPokemonLookup and POKEMON_OPTIONS inside the component
@@ -98,6 +99,17 @@ const fromOptionsOrTitle = (opts, key, suffixIfMissing = "") => {
 const countAll = (list, key) => {
     const counts = {};
     for (const it of list) {
+        if (key === "mark") {
+            const markList = (Array.isArray(it?.marks) && it.marks.length > 0)
+                ? it.marks
+                : (it?.mark && it.mark !== "none" && it.mark !== "Unknown" && it.mark !== "unknown" ? [it.mark] : []);
+            for (const rawMark of markList) {
+                const v = String(rawMark ?? "").trim().toLowerCase();
+                if (!v || v === "none" || v === "unknown") continue;
+                counts[v] = (counts[v] || 0) + 1;
+            }
+            continue;
+        }
         const v = String(it?.[key] ?? "").trim().toLowerCase();
         if (!v || v === "none" || v === "unknown") continue;
         counts[v] = (counts[v] || 0) + 1;
@@ -414,11 +426,11 @@ export default function PublicProfile() {
                     if (info.entries && Array.isArray(info.entries)) {
                         // New format: extract entries
                         info.entries.forEach(entry => {
-                            if (entry && (entry.ball || entry.mark || entry.game || entry.method)) {
+                            if (entry && (entry.ball || entry.mark || (Array.isArray(entry.marks) && entry.marks.length > 0) || entry.game || entry.method)) {
                                 allEntries.push(entry);
                             }
                         });
-                    } else if (info.ball || info.mark || info.game || info.method) {
+                    } else if (info.ball || info.mark || (Array.isArray(info.marks) && info.marks.length > 0) || info.game || info.method) {
                         // Old format: use the info directly
                         allEntries.push(info);
                     }
@@ -621,39 +633,8 @@ export default function PublicProfile() {
 
 
     if (loading) return (
-        <div className="profile-wrapper">
-            <div className="profile-header-bar">
-                <div className="profile-header-left">
-                    <SkeletonLoader type="text" width="200px" height="2em" />
-                    <SkeletonLoader type="text" width="300px" height="1.2em" />
-                </div>
-                <div className="profile-header-right">
-                    <SkeletonLoader type="button" width="100px" height="40px" />
-                </div>
-            </div>
-            <div className="profile-two-column">
-                <div className="profile-left">
-                    <div className="profile-header-row">
-                        <SkeletonLoader type="avatar" width="120px" height="120px" />
-                        <div className="profile-bio-block">
-                            <SkeletonLoader type="text" lines={2} height="60px" />
-                        </div>
-                    </div>
-                    <div className="profile-row-split">
-                        <SkeletonLoader type="text" width="150px" height="1.5em" />
-                        <SkeletonLoader type="text" width="150px" height="1.5em" />
-                    </div>
-                    <SkeletonLoader type="text" width="100%" height="1.5em" />
-                </div>
-                <div className="profile-divider" />
-                <div className="profile-right">
-                    <div className="profile-stats-grid">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                            <SkeletonLoader key={i} type="text" width="100%" height="2em" />
-                        ))}
-                    </div>
-                </div>
-            </div>
+        <div className="profile-wrapper page-container profile-page">
+            <SectionLoader minHeight="60vh" message="Loading trainer profile..." />
         </div>
     );
     if (!data) {
@@ -688,8 +669,8 @@ export default function PublicProfile() {
                 <div className="profile-header-left">
                     <div className="profile-top-line">
                         <h1 className="profile-username">
-                            <span>
-                                {data.username}
+                            <span className="inline-flex items-center gap-2.5">
+                                <span>{data.username}</span>
                                 {data.isAdmin && (
                                     <span className="crown-wrapper">
                                         <Crown
@@ -704,7 +685,7 @@ export default function PublicProfile() {
                                     </span>
                                 )}
                                 {data.isContentCreator && (
-                                    <span className="crown-wrapper" style={{ marginLeft: '-2px' }}>
+                                    <span className="crown-wrapper">
                                         <Video
                                             size={26}
                                             strokeWidth={2.5}
@@ -765,13 +746,13 @@ export default function PublicProfile() {
                     <div className="profile-actions">
                         {data.isContentCreator && data.youtubeUrl && (
                             <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" className="profile-social-btn youtube-btn" aria-label="YouTube Channel">
-                                <Youtube size={18} />
+                                <YoutubeIcon size={18} color="#ef4444" />
                                 <span className="hidden sm:inline">YouTube</span>
                             </a>
                         )}
                         {data.isContentCreator && data.twitchUrl && (
                             <a href={data.twitchUrl} target="_blank" rel="noopener noreferrer" className="profile-social-btn twitch-btn" aria-label="Twitch Channel">
-                                <Twitch size={18} />
+                                <TwitchIcon size={18} color="#a855f7" />
                                 <span className="hidden sm:inline">Twitch</span>
                             </a>
                         )}
@@ -790,8 +771,8 @@ export default function PublicProfile() {
                         <div className="profile-avatar-block">
                             <div className="profile-avatar" style={{ cursor: "default" }}>
                                 <img
-                                    src={`/data/trainer_sprites/${data.profileTrainer || "ash.png"}`}
-                                    alt="Trainer"
+                                    src={getUserAvatarUrl(data)}
+                                    alt="Avatar"
                                     className="profile-avatar-img"
                                 />
                             </div>

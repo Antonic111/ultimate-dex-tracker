@@ -2,8 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useUser } from "../components/Shared/UserContext";
 import "../css/Profile.css";
-import { NotebookPen, Trophy, Mars, Venus, VenusAndMars, PencilLine, SquareX, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight, Video, Clock, Youtube, Twitch } from "lucide-react";
-import { IconDropdown } from "../components/Shared/IconDropdown";
+import { NotebookPen, Trophy, Mars, Venus, VenusAndMars, Globe, PencilLine, SquareX, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight, Video, Clock, Youtube, Twitch } from "lucide-react";
 import FavoriteSelectionModal from "../components/Shared/FavoriteSelectionModal";
 import CreatorRequestModal from "../components/Shared/CreatorRequestModal";
 import "flag-icons/css/flag-icons.min.css";
@@ -19,11 +18,11 @@ import formsData from "../utils/loadFormsData";
 import { getCaughtKey } from "../caughtStorage";
 import { useLoading } from "../components/Shared/LoadingContext";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
-import ContentFilterInput from "../components/Shared/ContentFilterInput";
 import { validateContent } from "../../shared/contentFilter";
 import { profileAPI, caughtAPI, creatorAPI } from "../utils/api";
 import { getFilteredFormsData } from "../utils/dexPreferences";
-import { SearchbarIconDropdown } from "../components/Shared/SearchBar";
+import { normalizeYoutubeUrl, normalizeTwitchUrl } from "../utils/profileUtils";
+import { InputField, SelectField, TextAreaField } from "../components/Shared/FormField";
 
 const FORM_TYPES_FOR_FAVORITES = [
     "alolan",
@@ -150,6 +149,8 @@ export default function Profile() {
 
     const BASE_POKEMON_OPTIONS = useMemo(() => {
         return pokemonData.map((p) => ({
+            id: p.id,
+            gen: p.gen,
             name: formatPokemonName(p.name),
             value: p.name,
             image: getSpriteUrl(p, false, useHomeSprites),
@@ -166,6 +167,10 @@ export default function Profile() {
                 const baseName = formatPokemonName(p.name);
                 const name = formLabel ? `${baseName} (${formLabel})` : baseName;
                 return {
+                    id: p.id,
+                    gen: p.gen,
+                    formType: p.formType,
+                    formLabel: formLabel || p.formType,
                     name,
                     value: p.name,
                     image: getSpriteUrl(p, false, useHomeSprites),
@@ -350,7 +355,9 @@ export default function Profile() {
 
     useEffect(() => {
         let ignore = false;
-        setLoading('profile-stats', true);
+        if (!statsData.stats) {
+            setLoading('profile-stats', true);
+        }
 
         async function loadStats() {
             try {
@@ -405,11 +412,11 @@ export default function Profile() {
                     if (info.entries && Array.isArray(info.entries)) {
                         // New format: extract entries
                         info.entries.forEach(entry => {
-                            if (entry && (entry.ball || entry.mark || entry.game || entry.method)) {
+                            if (entry && (entry.ball || entry.mark || (Array.isArray(entry.marks) && entry.marks.length > 0) || entry.game || entry.method)) {
                                 allEntries.push(entry);
                             }
                         });
-                    } else if (info.ball || info.mark || info.game || info.method) {
+                    } else if (info.ball || info.mark || (Array.isArray(info.marks) && info.marks.length > 0) || info.game || info.method) {
                         // Old format: use the info directly
                         allEntries.push(info);
                     }
@@ -450,6 +457,17 @@ export default function Profile() {
                 const countAll = (list, key) => {
                     const counts = {};
                     for (const it of list) {
+                        if (key === "mark") {
+                            const markList = (Array.isArray(it?.marks) && it.marks.length > 0)
+                                ? it.marks
+                                : (it?.mark && it.mark !== "none" && it.mark !== "Unknown" && it.mark !== "unknown" ? [it.mark] : []);
+                            for (const rawMark of markList) {
+                                const v = String(rawMark ?? "").trim().toLowerCase();
+                                if (!v || v === "none" || v === "unknown") continue;
+                                counts[v] = (counts[v] || 0) + 1;
+                            }
+                            continue;
+                        }
                         const v = String(it?.[key] ?? "").trim().toLowerCase();
                         if (!v || v === "none" || v === "unknown") continue;
                         counts[v] = (counts[v] || 0) + 1;
@@ -754,35 +772,21 @@ export default function Profile() {
     };
 
     const updatePokemonAtIndex = (value, isShiny) => {
-        const updatedPokemon = [...form.favoritePokemon];
-        const updatedShiny = [...form.favoritePokemonShiny];
-
-        while (updatedPokemon.length < 5) updatedPokemon.push("");
-        while (updatedShiny.length < 5) updatedShiny.push(false);
-
-        updatedPokemon[pokemonSlotIndex] = value;
-        updatedShiny[pokemonSlotIndex] = isShiny;
-
-        setForm({
-            ...form,
-            favoritePokemon: updatedPokemon,
-            favoritePokemonShiny: updatedShiny,
-        });
-
-        setShowPokemonModal(false);
-    };
-
-    const openGameModal = (index) => {
-        setGameSlotIndex(index);
-        setShowGameModal(true);
-    };
-
-    const updateGameAtIndex = (value) => {
-        const updated = [...form.favoriteGames];
-        while (updated.length < 5) updated.push("");
-        updated[gameSlotIndex] = value;
-        setForm({ ...form, favoriteGames: updated });
+    const handleSaveGames = (newGames) => {
+        const updated = Array.from({ length: 5 }, (_, i) => newGames[i] || "");
+        setForm(prev => ({ ...prev, favoriteGames: updated }));
         setShowGameModal(false);
+    };
+
+    const handleSavePokemon = (newPokemon, newShiny) => {
+        const updatedPoke = Array.from({ length: 5 }, (_, i) => newPokemon[i] || "");
+        const updatedShiny = Array.from({ length: 5 }, (_, i) => Boolean(newShiny?.[i]));
+        setForm(prev => ({
+            ...prev,
+            favoritePokemon: updatedPoke,
+            favoritePokemonShiny: updatedShiny
+        }));
+        setShowPokemonModal(false);
     };
 
     const refreshRecentPokemon = () => {
@@ -870,8 +874,8 @@ export default function Profile() {
                 <div className="profile-header-left">
                     <div className="profile-top-line">
                         <h1 className="profile-username">
-                            <span>
-                                {username}
+                            <span className="inline-flex items-center gap-2.5">
+                                <span>{username}</span>
                                 {isAdmin && (
                                     <span className="crown-wrapper">
                                         <Crown
@@ -886,7 +890,7 @@ export default function Profile() {
                                     </span>
                                 )}
                                 {isContentCreator && (
-                                    <span className="crown-wrapper" style={{ marginLeft: '-2px' }}>
+                                    <span className="crown-wrapper">
                                         <Video
                                             size={26}
                                             strokeWidth={2.5}
@@ -986,23 +990,8 @@ export default function Profile() {
                                         return;
                                     }
 
-                                    let finalYoutube = (form.youtubeUrl || "").trim();
-                                    if (finalYoutube) {
-                                        if (!/^https?:\/\//i.test(finalYoutube)) finalYoutube = 'https://' + finalYoutube;
-                                        if (!/^(https?:\/\/)?(www\.)?(youtube\.com\/(channel\/|@|c\/)|youtu\.be\/)/i.test(finalYoutube)) {
-                                            showMessage("Invalid YouTube URL. Example: youtube.com/@YourChannel", "error");
-                                            return;
-                                        }
-                                    }
-
-                                    let finalTwitch = (form.twitchUrl || "").trim();
-                                    if (finalTwitch) {
-                                        if (!/^https?:\/\//i.test(finalTwitch)) finalTwitch = 'https://' + finalTwitch;
-                                        if (!/^(https?:\/\/)?(www\.)?twitch\.tv\/[a-zA-Z0-9_]+/i.test(finalTwitch)) {
-                                            showMessage("Invalid Twitch URL. Example: twitch.tv/yourchannel", "error");
-                                            return;
-                                        }
-                                    }
+                                    let finalYoutube = normalizeYoutubeUrl(form.youtubeUrl);
+                                    let finalTwitch = normalizeTwitchUrl(form.twitchUrl);
 
                                     const reorderedGames = reorderGames(form.favoriteGames);
                                     const reorderedPokemon = reorderToFront(form.favoritePokemon, "");
@@ -1121,15 +1110,16 @@ export default function Profile() {
                                 {isLoading('profile-data') ? (
                                     <SkeletonLoader type="text" lines={2} height="60px" />
                                 ) : isEditing ? (
-                                    <ContentFilterInput
-                                        type="textarea"
-                                        value={form.bio}
+                                    <TextAreaField
+                                        id="profile-bio"
+                                        value={form.bio || ""}
                                         onChange={(e) => setForm({ ...form, bio: e.target.value })}
-                                        configType="bio"
-                                        showCharacterCount={true}
-                                        showRealTimeValidation={true}
                                         placeholder="Tell us about yourself..."
                                         maxLength={250}
+                                        showCount
+                                        resize="none"
+                                        rows={4}
+                                        fullWidth
                                     />
                                 ) : (
                                     <div className="field-display">
@@ -1144,16 +1134,30 @@ export default function Profile() {
                         <div className="profile-field">
                             <label>Location</label>
                             {isEditing ? (
-                                <SearchbarIconDropdown
+                                <SelectField
+                                    id="profile-location"
                                     options={COUNTRY_OPTIONS.map(country => ({
-                                        name: country.name,
-                                        value: country.value,
+                                        label: country.name,
+                                        value: country.name,
                                         icon: <span className={`fi fi-${country.code.toLowerCase()}`} />
                                     }))}
-                                    value={form.location}
+                                    value={form.location || ""}
                                     onChange={(value) => setForm({ ...form, location: value })}
                                     placeholder="Select location"
-                                    hideClearButton
+                                    searchable
+                                    searchPlaceholder="Search country..."
+                                    clearable
+                                    size="md"
+                                    fullWidth
+                                    startIcon={
+                                        (() => {
+                                            const selected = COUNTRY_OPTIONS.find(c => c.name === form.location);
+                                            if (selected) {
+                                                return <span className={`fi fi-${selected.code.toLowerCase()}`} />;
+                                            }
+                                            return <Globe size={16} />;
+                                        })()
+                                    }
                                 />
                             ) : (
                                 <div className="field-display">
@@ -1175,23 +1179,34 @@ export default function Profile() {
                         <div className="profile-field">
                             <label>Gender</label>
                             {isEditing ? (
-                                <SearchbarIconDropdown
+                                <SelectField
+                                    id="profile-gender"
                                     options={[
-                                        { name: "Male", value: "Male", icon: <Mars size={18} color="#4aaaff" /> },
-                                        { name: "Female", value: "Female", icon: <Venus size={18} color="#ff6ec7" /> },
-                                        { name: "Other", value: "Other", icon: <VenusAndMars size={18} color="#ffffff" /> },
+                                        { label: "Male", value: "Male", icon: <Mars size={18} color="#4aaaff" /> },
+                                        { label: "Female", value: "Female", icon: <Venus size={18} color="#ff6ec7" /> },
+                                        { label: "Other", value: "Other", icon: <VenusAndMars size={18} color="#ffffff" /> },
                                     ]}
-                                    value={form.gender}
+                                    value={form.gender || ""}
                                     onChange={(value) => setForm({ ...form, gender: value })}
                                     placeholder="Select gender"
-                                    hideClearButton
+                                    clearable
+                                    size="md"
+                                    fullWidth
+                                    startIcon={
+                                        (() => {
+                                            if (form.gender === "Male") return <Mars size={16} color="#4aaaff" />;
+                                            if (form.gender === "Female") return <Venus size={16} color="#ff6ec7" />;
+                                            if (form.gender === "Other") return <VenusAndMars size={16} color="#ffffff" />;
+                                            return <VenusAndMars size={16} />;
+                                        })()
+                                    }
                                 />
                             ) : (
                                 <div className="field-display">
                                     {form.gender === "Male" && <Mars size={16} color="#4aaaff" style={{ marginRight: "6px" }} />}
                                     {form.gender === "Female" && <Venus size={16} color="#ff6ec7" style={{ marginRight: "6px" }} />}
                                     {form.gender === "Other" && <VenusAndMars size={16} color="#ffffff" style={{ marginRight: "6px" }} />}
-                                    {form.gender === "Other" ? "Female" : (form.gender || "N/A")}
+                                    {form.gender || "N/A"}
                                 </div>
                             )}
                         </div>
@@ -1202,28 +1217,27 @@ export default function Profile() {
                         <div className="profile-field">
                             <label>Nintendo Switch Friend Code</label>
                             {isEditing ? (
-                                <input
+                                <InputField
+                                    id="profile-switch-fc"
                                     type="text"
                                     placeholder="SW-1234-5678-9012"
-                                    value={form.switchFriendCode}
+                                    value={form.switchFriendCode || ""}
                                     onChange={(e) => setForm({ ...form, switchFriendCode: formatSwitchFCInput(e.target.value) })}
                                     onPaste={(e) => {
                                         e.preventDefault();
                                         const text = (e.clipboardData || window.clipboardData).getData("text");
                                         setForm({ ...form, switchFriendCode: formatSwitchFCInput(text) });
                                     }}
+                                    startIcon={<img src="/data/friend_code_icons/switch.png" alt="Switch" className="w-5 h-5 object-contain" />}
                                     inputMode="numeric"
                                     autoComplete="off"
                                     maxLength={17}
                                     pattern="^SW-\d{4}-\d{4}-\d{4}$"
                                     title="Format: SW-1234-5678-9012"
-                                    style={{
-                                        backgroundImage: 'url(/data/friend_code_icons/switch.png)',
-                                        backgroundPosition: '12px center',
-                                        backgroundSize: '20px 20px',
-                                        backgroundRepeat: 'no-repeat',
-                                        paddingLeft: '40px'
-                                    }}
+                                    clearable
+                                    onClear={() => setForm({ ...form, switchFriendCode: "" })}
+                                    size="md"
+                                    fullWidth
                                 />
                             ) : (
                                 <div className="field-display">
@@ -1238,28 +1252,27 @@ export default function Profile() {
                             <div className="profile-field">
                                 <label>Pokémon GO Friend Code</label>
                                 {isEditing ? (
-                                    <input
+                                    <InputField
+                                        id="profile-go-fc"
                                         type="text"
                                         placeholder="0000 0000 0000"
-                                        value={form.goFriendCode}
+                                        value={form.goFriendCode || ""}
                                         onChange={(e) => setForm({ ...form, goFriendCode: formatGoFCInput(e.target.value) })}
                                         onPaste={(e) => {
                                             e.preventDefault();
                                             const text = (e.clipboardData || window.clipboardData).getData("text");
                                             setForm({ ...form, goFriendCode: formatGoFCInput(text) });
                                         }}
+                                        startIcon={<img src="/data/friend_code_icons/go.png" alt="Pokémon GO" className="w-5 h-5 object-contain" />}
                                         inputMode="numeric"
                                         autoComplete="off"
                                         maxLength={14}
                                         pattern="^\d{4} \d{4} \d{4}$"
                                         title="Format: 0000 0000 0000"
-                                        style={{
-                                            backgroundImage: 'url(/data/friend_code_icons/go.png)',
-                                            backgroundPosition: '12px center',
-                                            backgroundSize: '20px 20px',
-                                            backgroundRepeat: 'no-repeat',
-                                            paddingLeft: '40px'
-                                        }}
+                                        clearable
+                                        onClear={() => setForm({ ...form, goFriendCode: "" })}
+                                        size="md"
+                                        fullWidth
                                     />
                                 ) : (
                                     <div className="field-display">
@@ -1274,20 +1287,32 @@ export default function Profile() {
                             <>
                                 <div className="profile-field">
                                     <label><Youtube size={16} color="#ef4444" /> YouTube URL</label>
-                                    <input
+                                    <InputField
+                                        id="profile-youtube"
                                         type="url"
                                         placeholder="https://youtube.com/@YourChannel"
-                                        value={form.youtubeUrl}
+                                        value={form.youtubeUrl || ""}
                                         onChange={(e) => setForm({ ...form, youtubeUrl: e.target.value })}
+                                        startIcon={<Youtube size={16} color="#ef4444" />}
+                                        clearable
+                                        onClear={() => setForm({ ...form, youtubeUrl: "" })}
+                                        size="md"
+                                        fullWidth
                                     />
                                 </div>
                                 <div className="profile-field">
                                     <label><Twitch size={16} color="#a855f7" /> Twitch URL</label>
-                                    <input
+                                    <InputField
+                                        id="profile-twitch"
                                         type="url"
                                         placeholder="https://twitch.tv/yourchannel"
-                                        value={form.twitchUrl}
+                                        value={form.twitchUrl || ""}
                                         onChange={(e) => setForm({ ...form, twitchUrl: e.target.value })}
+                                        startIcon={<Twitch size={16} color="#a855f7" />}
+                                        clearable
+                                        onClear={() => setForm({ ...form, twitchUrl: "" })}
+                                        size="md"
+                                        fullWidth
                                     />
                                 </div>
                             </>
@@ -1562,20 +1587,21 @@ export default function Profile() {
             <FavoriteSelectionModal
                 isOpen={showGameModal}
                 onClose={() => setShowGameModal(false)}
-                title="Select a Favorite Game"
+                title="Select Favorite Games"
                 options={GAME_OPTIONS_TWO}
-                selected={form.favoriteGames[gameSlotIndex] ? [form.favoriteGames[gameSlotIndex]] : []}
-                onChange={(val) => updateGameAtIndex(val[0])}
-                max={1}
+                selected={form.favoriteGames || []}
+                onChange={handleSaveGames}
+                max={5}
             />
             <FavoriteSelectionModal
                 isOpen={showPokemonModal}
                 onClose={() => setShowPokemonModal(false)}
-                title="Select a Favorite Pokémon"
+                title="Select Favorite Pokémon"
                 options={POKEMON_OPTIONS}
-                selected={form.favoritePokemon[pokemonSlotIndex] ? [form.favoritePokemon[pokemonSlotIndex]] : []}
-                onChange={(val) => updatePokemonAtIndex(val.value, val.isShiny)}
-                max={1}
+                selected={form.favoritePokemon || []}
+                selectedShiny={form.favoritePokemonShiny || []}
+                onChange={handleSavePokemon}
+                max={5}
             />
             <CreatorRequestModal
                 isOpen={showCreatorModal}

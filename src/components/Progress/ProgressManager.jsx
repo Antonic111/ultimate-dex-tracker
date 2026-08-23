@@ -1,20 +1,19 @@
-// This is a replacement for ProgressManager.jsx — copy and paste fully
-
-// Removed @dnd-kit imports - using arrow key controls instead
-import { Eye, EyeOff, ListCollapse, Pencil, Plus, Settings, Trash2, ChevronUp, ChevronDown } from "lucide-react";
+import { Eye, EyeOff, ListCollapse, Pencil, Plus, Settings, Trash2, ChevronUp, ChevronDown, RotateCcw, Check, SlidersHorizontal, Sparkles, Flame, Hash, Shapes, Crown } from "lucide-react";
 import { useEffect, useState, useContext, useRef, useMemo } from "react";
-import { createPortal } from "react-dom";
 import { getCaughtKey } from "../../caughtStorage";
 
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS } from "../../Constants";
 import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "../../data/blockedShinies";
-import MultiSelectChips from "../Shared/MultiSelectChips";
+import { isLegendary, isSubLegendary, isMythical, isUltraBeast, isPseudoLegendary, isPseudoLegendaryEvo, isParadox, isStarter, isStarterEvo, isFossil, isFossilEvo, isBaby, isBabyEvo, getPokemonCategories } from "../../utils/pokemonCategories";
+import SelectField from "../Shared/FormField/SelectField";
 import ProgressBar from "./ProgressBar";
 // Removed SortableItem import - using arrow controls instead
 import { UserContext, useUser } from "../Shared/UserContext";
 import { useMessage } from "../Shared/MessageContext";
 import { validateContent } from "../../../shared/contentFilter";
 import { progressAPI } from '../../utils/api';
+import { Modal, ConfirmModal } from "../Shared/Modal";
+import { Button } from "../Shared/Button";
 
 const DEFAULT_BARS = [
     {
@@ -50,6 +49,50 @@ const TEMPLATE_PRESETS = [
 ];
 
 const MAX_CUSTOM_BARS = 8;
+
+const FORM_TYPE_OPTIONS = [
+    { label: "Main", value: "main" },
+    { label: "Forms", value: "forms" },
+    { label: "Gender", value: "gender" },
+    { label: "Alolan", value: "alolan" },
+    { label: "Galarian", value: "galarian" },
+    { label: "Gmax", value: "gmax" },
+    { label: "Hisuian", value: "hisuian" },
+    { label: "Paldean", value: "paldean" },
+    { label: "Unown", value: "unown" },
+    { label: "Other", value: "other" },
+    { label: "Alcremie", value: "alcremie" },
+    { label: "Alpha", value: "alpha" },
+    { label: "Alpha Genders & Other's", value: "alphaother" },
+];
+
+const GEN_OPTIONS = [
+    { label: "Gen 1", value: "1" },
+    { label: "Gen 2", value: "2" },
+    { label: "Gen 3", value: "3" },
+    { label: "Gen 4", value: "4" },
+    { label: "Gen 5", value: "5" },
+    { label: "Gen 6", value: "6" },
+    { label: "Gen 7", value: "7" },
+    { label: "Gen 8", value: "8" },
+    { label: "Gen 9", value: "9" },
+];
+
+const TYPE_OPTIONS = [
+    "normal", "fire", "water", "grass", "electric", "ice",
+    "fighting", "poison", "ground", "flying", "psychic", "bug",
+    "rock", "ghost", "dragon", "dark", "steel", "fairy"
+].map(t => ({
+    label: t.charAt(0).toUpperCase() + t.slice(1),
+    value: t,
+    image: `/type-icons/${t.toLowerCase()}.png`,
+    isType: true
+}));
+
+const CATEGORY_OPTIONS = getPokemonCategories().map(c => ({
+    label: c.name || c.label,
+    value: c.value,
+}));
 
 function loadFullCaughtMap() {
     const caughtMap = {};
@@ -109,6 +152,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
     const [bars, setBars] = useState(getInitialBars());
     const [editingBars, setEditingBars] = useState([]); // New state for editing
     const [deleteModal, setDeleteModal] = useState({ show: false, index: null, barName: '' });
+    const [showResetModal, setShowResetModal] = useState(false);
     const [deleteModalClosing, setDeleteModalClosing] = useState(false);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false); // Track changes
     // Removed drag state - using arrow controls instead
@@ -255,54 +299,20 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
 
     const [showSettings, setShowSettings] = useState(false);
-    const [closing, setClosing] = useState(false);
     const [collapsed, setCollapsed] = useState(true);
-
-    // Removed drag-related modifiers and sensors - using arrow controls instead
-
-
-    useEffect(() => {
-        if (showSettings) {
-            const preventScroll = (e) => {
-                if (e.target.closest('.progress-manager-modal') || e.target.closest('[role="dialog"]') || e.target.closest('.custom-scrollbar')) return;
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            };
-
-            const preventKeyScroll = (e) => {
-                if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) {
-                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && !e.target.closest('[role="dialog"]')) {
-                        e.preventDefault();
-                    }
-                }
-            };
-
-            document.addEventListener('wheel', preventScroll, { passive: false });
-            document.addEventListener('touchmove', preventScroll, { passive: false });
-            document.addEventListener('keydown', preventKeyScroll, { passive: false });
-
-            return () => {
-                document.removeEventListener('wheel', preventScroll);
-                document.removeEventListener('touchmove', preventScroll);
-                document.removeEventListener('keydown', preventKeyScroll);
-            };
-        }
-    }, [showSettings]);
 
     // New functions for save/cancel system
     function openEditModal() {
         // Collapse all open filters and set editing state
-        const collapsed = bars.map(bar => ({
+        const collapsedBars = bars.map(bar => ({
             ...bar,
             __showFilters: false,
             // Ensure __locked property is preserved for template bars
             __locked: bar.__locked || false,
         }));
-        setEditingBars(collapsed);
+        setEditingBars(collapsedBars);
         setHasUnsavedChanges(false);
         setShowSettings(true);
-        setClosing(false);
     }
 
     function saveChanges() {
@@ -327,22 +337,18 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
         setBars(editingBars);
         saveBarsToProfile(editingBars);
         showMessage('Progress bars updated successfully!', 'success');
-        handleCloseModal();
+        setShowSettings(false);
     }
 
     function cancelChanges() {
         setEditingBars([]);
         setHasUnsavedChanges(false);
-        handleCloseModal();
+        setShowSettings(false);
         showMessage('Changes discarded', 'info');
     }
 
     function handleCloseModal() {
-        setClosing(true);
-        setTimeout(() => {
-            setShowSettings(false);
-            setClosing(false);
-        }, 300);
+        setShowSettings(false);
     }
 
     function handleEditChange(index, field, value) {
@@ -379,9 +385,9 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                 if (data && data.entries && Array.isArray(data.entries)) {
                     // New format: extract from entries array
                     data.entries.forEach(entry => {
-                        const mList = Array.isArray(entry?.marks)
+                        const mList = (Array.isArray(entry?.marks) && entry.marks.length > 0)
                             ? entry.marks
-                            : (entry?.mark ? [entry.mark] : []);
+                            : (entry?.mark && entry.mark !== "none" && entry.mark !== "Unknown" ? [entry.mark] : []);
                         mList.forEach(m => {
                             if (m && allMarkValues.has(m)) {
                                 foundMarks.add(m);
@@ -389,9 +395,9 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                         });
                     });
                 } else if (data) {
-                    const mList = Array.isArray(data.marks)
+                    const mList = (Array.isArray(data.marks) && data.marks.length > 0)
                         ? data.marks
-                        : (data.mark ? [data.mark] : []);
+                        : (data.mark && data.mark !== "none" && data.mark !== "Unknown" ? [data.mark] : []);
                     mList.forEach(m => {
                         if (m && allMarkValues.has(m)) {
                             foundMarks.add(m);
@@ -459,8 +465,8 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
         const filtered = visibleMons.filter((mon) => {
             const formType = mon.formType || "main";
 
-            // Mighty Pokemon cannot be shiny
-            if (isShinyMode && formType === "mighty") {
+            // Mighty Pokemon and Origin Ball Pokemon cannot be shiny
+            if (isShinyMode && (formType === "mighty" || mon.stableId === "origin-ball-dialga-483" || mon.stableId === "origin-ball-palkia-484" || mon.stableId?.startsWith("origin-ball-"))) {
                 return false;
             }
 
@@ -479,6 +485,34 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
             if (bar.filters?.type?.length > 0) {
                 const types = mon.types || [];
                 if (!types.some((t) => bar.filters.type.includes(t))) return false;
+            }
+
+            if (bar.filters?.categories?.length > 0) {
+                const matchesAnyCategory = bar.filters.categories.some(category => {
+                    switch (category) {
+                        case "legendary":
+                            return isLegendary(mon);
+                        case "mythical":
+                            return isMythical(mon);
+                        case "ultra-beast":
+                            return isUltraBeast(mon);
+                        case "pseudo-legendary":
+                            return isPseudoLegendary(mon) || isPseudoLegendaryEvo(mon);
+                        case "sub-legendary":
+                            return isSubLegendary(mon);
+                        case "paradox":
+                            return isParadox(mon);
+                        case "starter":
+                            return isStarter(mon) || isStarterEvo(mon);
+                        case "fossil":
+                            return isFossil(mon) || isFossilEvo(mon);
+                        case "baby":
+                            return isBaby(mon) || isBabyEvo(mon);
+                        default:
+                            return false;
+                    }
+                });
+                if (!matchesAnyCategory) return false;
             }
 
             // Exclude locked Pokemon if the option is enabled
@@ -508,19 +542,24 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
         // prioritize showing shiny progress. If showShiny is false, prioritize regular progress.
         const shouldShowShinyProgress = showShiny && !isShinyBar;
 
+        const isMonCaught = (k) => {
+            const entry = caughtMap[k];
+            return Boolean(entry && entry.caught !== false && (entry.entries?.length > 0 || entry.caught === true));
+        };
+
         const caught = filtered.filter((mon) => {
             const regularKey = getCaughtKey(mon, null, false);
             const shinyKey = getCaughtKey(mon, null, true);
 
             if (isShinyBar) {
                 // This bar tracks shiny Pokémon specifically
-                return !!caughtMap[shinyKey];
+                return isMonCaught(shinyKey);
             } else if (shouldShowShinyProgress) {
                 // We're showing shiny grid, so prioritize shiny progress for general bars
-                return !!caughtMap[shinyKey];
+                return isMonCaught(shinyKey);
             } else {
                 // We're showing regular grid, so show regular progress for general bars
-                return !!caughtMap[regularKey];
+                return isMonCaught(regularKey);
             }
         }).length;
 
@@ -579,371 +618,344 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
 
 
 
-            {!readOnly && showSettings && (
-                createPortal(
-                    <div
-                        className={`progress-modal-overlay${closing ? " closing" : ""}`}
-                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-                    >
-                        <div
-                            className={`progress-modal-panel${closing ? " closing" : ""}`}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="modal-header">
-                                <h3>Edit Progress Bars</h3>
-                                <div className="modal-actions">
-                                    <button
-                                        className="modal-cancel-btn"
-                                        onClick={() => {
-                                            // Revert to default progress bars
-                                            setEditingBars(DEFAULT_BARS.map(bar => ({
-                                                ...bar,
-                                                __locked: false // Default bars are not locked
-                                            })));
-                                            setHasUnsavedChanges(true);
-                                        }}
-                                    >
-                                        Revert to Default
-                                    </button>
-                                    <button
-                                        className="modal-save-btn"
-                                        onClick={saveChanges}
-                                        disabled={!hasUnsavedChanges}
-                                    >
-                                        Save Changes
-                                    </button>
-                                    <button className="modal-close-btn" onClick={handleCloseModal} aria-label="Cancel">
-                                        <span className="sidebar-close-icon">
-                                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <circle cx="20" cy="20" r="18" fill="#fff" stroke="#232323" strokeWidth="2" />
-                                                <path d="M2 20a18 18 0 0 1 36 0" fill="#e62829" stroke="#232323" strokeWidth="2" />
-                                                <rect x="2" y="19" width="36" height="2" fill="#232323" />
-                                                <circle cx="20" cy="20" r="7" fill="#ffffffff" stroke="#232323" strokeWidth="2" />
-                                                <circle cx="20" cy="20" r="3.5" fill="#fff" stroke="#232323" strokeWidth="1.5" />
-                                            </svg>
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
+            {!readOnly && (
+                <Modal
+                    isOpen={showSettings}
+                    onClose={handleCloseModal}
+                    title="Progress Bars"
+                    subtitle="Customize and reorder your collection progress bars"
+                    icon={<SlidersHorizontal size={22} />}
+                    size="lg"
+                    actions={
+                        <>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => setShowResetModal(true)}
+                                icon={<RotateCcw size={15} />}
+                                title="Reset to default progress bar"
+                            >
+                                Reset Default
+                            </Button>
+                            <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={saveChanges}
+                                disabled={!hasUnsavedChanges}
+                                icon={<Check size={15} strokeWidth={2.5} />}
+                                title={hasUnsavedChanges ? "Save changes to progress bars" : "No changes to save"}
+                            >
+                                Save Changes
+                            </Button>
+                        </>
+                    }
+                >
+                    <div className="drag-container custom-scrollbar">
+                        {editingBars.map((bar, index) => {
+                            const visibleCount = editingBars.filter(b => b.visible).length;
+                            const isLastVisible = visibleCount <= 1 && bar.visible;
 
-                            <div className="modal-body">
-                                <div className="drag-container">
-                                    {editingBars.map((bar, index) => {
-                                        const visibleCount = editingBars.filter(b => b.visible).length;
-                                        const isLastVisible = visibleCount <= 1 && bar.visible;
+                            return (
+                                <div key={bar.id} className={`bar-settings-group ${bar.__showFilters ? "filters-open" : ""}`}>
+                                    <div className="bar-settings-row">
+                                        <div className="arrow-controls">
+                                            <button
+                                                className="arrow-btn"
+                                                onClick={() => moveBarUp(index)}
+                                                disabled={index === 0}
+                                                title="Move up"
+                                            >
+                                                <ChevronUp size={16} />
+                                            </button>
+                                            <button
+                                                className="arrow-btn"
+                                                onClick={() => moveBarDown(index)}
+                                                disabled={index === editingBars.length - 1}
+                                                title="Move down"
+                                            >
+                                                <ChevronDown size={16} />
+                                            </button>
+                                        </div>
 
-                                        return (
-                                            <div key={bar.id} className="bar-settings-group">
-                                                <div className="bar-settings-row">
-                                                    <div className="arrow-controls">
-                                                        <button
-                                                            className="arrow-btn"
-                                                            onClick={() => moveBarUp(index)}
-                                                            disabled={index === 0}
-                                                            title="Move up"
-                                                        >
-                                                            <ChevronUp size={16} />
-                                                        </button>
-                                                        <button
-                                                            className="arrow-btn"
-                                                            onClick={() => moveBarDown(index)}
-                                                            disabled={index === editingBars.length - 1}
-                                                            title="Move down"
-                                                        >
-                                                            <ChevronDown size={16} />
-                                                        </button>
-                                                    </div>
-
-                                                    {bar.__locked ? (
-                                                        <div className="bar-template-layout">
-                                                            <span className="bar-name-label">{bar.name}</span>
-                                                            <div className="bar-controls">
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        <input
-                                                            type="text"
-                                                            value={bar.name}
-                                                            onChange={(e) => {
-                                                                handleEditChange(index, 'name', e.target.value);
-                                                            }}
-                                                            className="bar-name-input"
-                                                        />
-                                                    )}
-
-                                                    <div className="bar-controls">
-                                                        {!bar.__locked && (
-                                                            <>
-                                                                <button
-                                                                    className="eye-toggle-btn"
-                                                                    onClick={() => {
-                                                                        if (isLastVisible) return;
-                                                                        handleEditChange(index, 'visible', !bar.visible);
-                                                                    }}
-                                                                    disabled={isLastVisible}
-                                                                    title={isLastVisible ? "You must keep at least 1 visible bar" : (bar.visible ? "Hide" : "Show")}
-                                                                    style={{
-                                                                        opacity: isLastVisible ? 0.5 : 1,
-                                                                        cursor: isLastVisible ? "not-allowed" : "pointer"
-                                                                    }}
-                                                                >
-                                                                    {bar.visible ? <Eye size={20} /> : <EyeOff size={20} />}
-                                                                </button>
-
-                                                                <button
-                                                                    className={`filter-toggle-btn${bar.__showFilters ? " active" : ""}`}
-                                                                    onClick={() => {
-                                                                        const updated = [...editingBars];
-                                                                        updated[index].__showFilters = !updated[index].__showFilters;
-                                                                        setEditingBars(updated);
-                                                                    }}
-                                                                    title="Configure filters"
-                                                                >
-                                                                    <Pencil size={18} />
-                                                                </button>
-                                                            </>
-                                                        )}
-
-                                                        <button
-                                                            onClick={() => {
-                                                                if (editingBars.length <= 1) return;
-                                                                setDeleteModalClosing(false);
-                                                                setDeleteModal({
-                                                                    show: true,
-                                                                    index: index,
-                                                                    barName: bar.name
-                                                                });
-                                                            }}
-                                                            disabled={editingBars.length <= 1}
-                                                            title={editingBars.length <= 1 ? "You must keep at least 1 progress bar" : "Delete"}
-                                                            style={{
-                                                                opacity: editingBars.length <= 1 ? 0.5 : 1,
-                                                                cursor: editingBars.length <= 1 ? "not-allowed" : "pointer"
-                                                            }}
-                                                        >
-                                                            <Trash2 />
-                                                        </button>
-                                                    </div>
+                                        {bar.__locked ? (
+                                            <div className="bar-template-layout">
+                                                <div className="bar-name-wrap">
+                                                    <span className="bar-preset-pill">PRESET</span>
+                                                    <span className="bar-name-label">{bar.name}</span>
                                                 </div>
+                                            </div>
+                                        ) : (
+                                            <div className="bar-input-wrap">
+                                                <input
+                                                    type="text"
+                                                    value={bar.name}
+                                                    onChange={(e) => {
+                                                        handleEditChange(index, 'name', e.target.value);
+                                                    }}
+                                                    placeholder="Progress Bar Name"
+                                                    className="bar-name-input"
+                                                />
+                                            </div>
+                                        )}
 
-                                                {bar.__showFilters && !bar.__locked && (
-                                                    <div className="bar-settings-filters">
-                                                        <div className="bar-filter-editor">
-                                                            <MultiSelectChips
-                                                                label="Form Types"
-                                                                value={bar.filters.formType || []}
-                                                                options={[
-                                                                    { label: "Main", value: "main" },
-                                                                    { label: "Forms", value: "forms" },
-                                                                    { label: "Gender", value: "gender" },
-                                                                    { label: "Alolan", value: "alolan" },
-                                                                    { label: "Galarian", value: "galarian" },
-                                                                    { label: "Gmax", value: "gmax" },
-                                                                    { label: "Hisuian", value: "hisuian" },
-                                                                    { label: "Paldean", value: "paldean" },
-                                                                    { label: "Unown", value: "unown" },
-                                                                    { label: "Other", value: "other" },
-                                                                    { label: "Alcremie", value: "alcremie" },
-                                                                    { label: "Alpha", value: "alpha" },
-                                                                    { label: "Alpha Genders & Other's", value: "alphaother" },
-                                                                ]}
-                                                                onChange={(val) => {
-                                                                    handleEditChange(index, 'filters', { formType: val });
+                                        <div className="bar-controls">
+                                            {!bar.__locked && (
+                                                <>
+                                                    <button
+                                                        className={`eye-toggle-btn ${!bar.visible ? "hidden-bar" : ""}`}
+                                                        onClick={() => {
+                                                            if (isLastVisible) return;
+                                                            handleEditChange(index, 'visible', !bar.visible);
+                                                        }}
+                                                        disabled={isLastVisible}
+                                                        title={isLastVisible ? "You must keep at least 1 visible bar" : (bar.visible ? "Hide progress bar" : "Show progress bar")}
+                                                    >
+                                                        {bar.visible ? <Eye size={18} /> : <EyeOff size={18} />}
+                                                    </button>
+
+                                                    <button
+                                                        className={`filter-toggle-btn ${bar.__showFilters ? "active" : ""}`}
+                                                        onClick={() => {
+                                                            const updated = [...editingBars];
+                                                            updated[index].__showFilters = !updated[index].__showFilters;
+                                                            setEditingBars(updated);
+                                                        }}
+                                                        title="Configure filters"
+                                                    >
+                                                        <Pencil size={17} />
+                                                    </button>
+                                                </>
+                                            )}
+
+                                            <button
+                                                className="delete-bar-btn"
+                                                onClick={() => {
+                                                    if (editingBars.length <= 1) return;
+                                                    setDeleteModal({
+                                                        show: true,
+                                                        index: index,
+                                                        barName: bar.name
+                                                    });
+                                                }}
+                                                disabled={editingBars.length <= 1}
+                                                title={editingBars.length <= 1 ? "You must keep at least 1 progress bar" : "Delete progress bar"}
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {bar.__showFilters && !bar.__locked && (
+                                        <div className="bar-settings-filters">
+                                            <div className="filters-header-tag">
+                                                <SlidersHorizontal size={14} style={{ color: "var(--accent)" }} />
+                                                <span>Filter Pokémon Included in this Bar</span>
+                                            </div>
+                                            <div className="bar-filter-editor">
+                                                <SelectField
+                                                    id={`progress-bar-${bar.id || index}-form-type`}
+                                                    label="Form Types"
+                                                    options={FORM_TYPE_OPTIONS}
+                                                    value={bar.filters?.formType || []}
+                                                    onChange={(val) => {
+                                                        handleEditChange(index, 'filters', { formType: val });
+                                                    }}
+                                                    placeholder="Select Form Types"
+                                                    multiple
+                                                    searchable
+                                                    searchPlaceholder="Filter forms..."
+                                                    clearable
+                                                    startIcon={<Shapes size={16} />}
+                                                    size="md"
+                                                    fullWidth
+                                                />
+
+                                                <SelectField
+                                                    id={`progress-bar-${bar.id || index}-gen`}
+                                                    label="Generations"
+                                                    options={GEN_OPTIONS}
+                                                    value={bar.filters?.gen || []}
+                                                    onChange={(val) => {
+                                                        handleEditChange(index, 'filters', { gen: val });
+                                                    }}
+                                                    placeholder="Select Generations"
+                                                    multiple
+                                                    searchable
+                                                    searchPlaceholder="Filter generations..."
+                                                    clearable
+                                                    startIcon={<Hash size={16} />}
+                                                    size="md"
+                                                    fullWidth
+                                                />
+
+                                                <SelectField
+                                                    id={`progress-bar-${bar.id || index}-type`}
+                                                    label="Types"
+                                                    options={TYPE_OPTIONS}
+                                                    value={bar.filters?.type || []}
+                                                    onChange={(val) => {
+                                                        handleEditChange(index, 'filters', { type: val });
+                                                    }}
+                                                    placeholder="Select Types"
+                                                    multiple
+                                                    searchable
+                                                    searchPlaceholder="Filter types..."
+                                                    clearable
+                                                    startIcon={<Flame size={16} />}
+                                                    size="md"
+                                                    fullWidth
+                                                />
+
+                                                <SelectField
+                                                    id={`progress-bar-${bar.id || index}-categories`}
+                                                    label="Categories"
+                                                    options={CATEGORY_OPTIONS}
+                                                    value={bar.filters?.categories || []}
+                                                    onChange={(val) => {
+                                                        handleEditChange(index, 'filters', { categories: val });
+                                                    }}
+                                                    placeholder="Select Categories"
+                                                    multiple
+                                                    searchable
+                                                    searchPlaceholder="Filter categories..."
+                                                    clearable
+                                                    startIcon={<Crown size={16} />}
+                                                    size="md"
+                                                    fullWidth
+                                                />
+
+                                                {showLockedCheckbox && (
+                                                    <div className="chip-filter-group" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                                                        <label className="filter-checkbox-card">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={!!bar.filters?.excludeLocked}
+                                                                onChange={(e) => {
+                                                                    handleEditChange(index, 'filters', { excludeLocked: e.target.checked });
                                                                 }}
+                                                                className="w-4 h-4 cursor-pointer"
+                                                                style={{ accentColor: 'var(--accent)' }}
                                                             />
-
-                                                            <MultiSelectChips
-                                                                label="Generations"
-                                                                value={bar.filters.gen || []}
-                                                                options={["1", "2", "3", "4", "5", "6", "7", "8", "9"]}
-                                                                onChange={(val) => {
-                                                                    handleEditChange(index, 'filters', { gen: val });
-                                                                }}
-                                                            />
-
-                                                            <MultiSelectChips
-                                                                label="Types"
-                                                                value={bar.filters.type || []}
-                                                                options={[
-                                                                    "normal", "fire", "water", "grass", "electric", "ice",
-                                                                    "fighting", "poison", "ground", "flying", "psychic", "bug",
-                                                                    "rock", "ghost", "dragon", "dark", "steel", "fairy"
-                                                                ]}
-                                                                onChange={(val) => {
-                                                                    handleEditChange(index, 'filters', { type: val });
-                                                                }}
-                                                            />
-
-                                                            {showLockedCheckbox && (
-                                                                <div className="chip-filter-group">
-                                                                    <label className="chip-filter-label" style={{ color: 'var(--text)' }}>Options</label>
-                                                                    <label className="flex items-center gap-2 cursor-pointer" style={{ padding: '8px 12px', backgroundColor: 'var(--progressbar-input)', borderRadius: '6px', border: '2px solid #444', transition: 'all 0.2s' }}>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            checked={!!bar.filters?.excludeLocked}
-                                                                            onChange={(e) => {
-                                                                                handleEditChange(index, 'filters', { excludeLocked: e.target.checked });
-                                                                            }}
-                                                                            className="w-4 h-4"
-                                                                            style={{ accentColor: 'var(--accent)' }}
-                                                                        />
-                                                                        <span style={{ color: 'var(--text)', fontSize: '0.9rem' }}>Exclude Locked Pokemon</span>
-                                                                    </label>
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                            <span className="filter-checkbox-text">Exclude Locked</span>
+                                                        </label>
                                                     </div>
                                                 )}
                                             </div>
-                                        );
-                                    })}
+                                        </div>
+                                    )}
                                 </div>
+                            );
+                        })}
+                    </div>
 
-                                <div className="add-bar-row">
-                                    <button
-                                        onClick={() => {
-                                            if (editingBars.filter(b => !b.__locked).length >= MAX_CUSTOM_BARS) {
-                                                return;
-                                            }
+                    <div className="modal-footer-section">
+                        <div className="add-bar-row">
+                            <Button
+                                variant="secondary"
+                                block
+                                size="md"
+                                onClick={() => {
+                                    if (editingBars.filter(b => !b.__locked).length >= MAX_CUSTOM_BARS) {
+                                        return;
+                                    }
 
-                                            const newBar = {
-                                                id: `custom_${Date.now()}`,
-                                                name: "New Progress Bar",
-                                                filters: {},
-                                                visible: true,
-                                            };
-                                            const updated = [...editingBars, newBar];
-                                            setEditingBars(updated);
-                                            setHasUnsavedChanges(true);
-                                        }}
-                                        disabled={editingBars.filter(b => !b.__locked).length >= MAX_CUSTOM_BARS}
+                                    const newBar = {
+                                        id: `custom_${Date.now()}`,
+                                        name: "New Progress Bar",
+                                        filters: {},
+                                        visible: true,
+                                    };
+                                    const updated = [...editingBars, newBar];
+                                    setEditingBars(updated);
+                                    setHasUnsavedChanges(true);
+                                }}
+                                disabled={editingBars.filter(b => !b.__locked).length >= MAX_CUSTOM_BARS}
+                                icon={<Plus size={18} strokeWidth={2.5} />}
+                            >
+                                Add Custom Progress Bar ({editingBars.filter(b => !b.__locked).length}/{MAX_CUSTOM_BARS})
+                            </Button>
+                        </div>
 
-                                        style={{
-                                            opacity: editingBars.length >= MAX_CUSTOM_BARS ? 0.4 : 1,
-                                            cursor: editingBars.length >= MAX_CUSTOM_BARS ? "not-allowed" : "pointer",
-                                        }}
-                                    >
-                                        <Plus size={22} strokeWidth={3} />
-                                        Add Progress Bar
-                                    </button>
-                                </div>
+                        <div className="template-presets-container">
+                            <div className="presets-label">
+                                <Sparkles size={14} style={{ color: "var(--accent)" }} />
+                                <span>Quick Presets</span>
+                            </div>
+                            <div className="template-bar-buttons">
+                                {TEMPLATE_PRESETS.map((template) => {
+                                    const alreadyExists = editingBars.some(
+                                        (bar) => bar.filters?.tally === template.filters.tally
+                                    );
 
-                                <div className="template-bar-buttons">
-                                    {TEMPLATE_PRESETS.map((template) => {
-                                        const alreadyExists = editingBars.some(
-                                            (bar) => bar.filters?.tally === template.filters.tally
-                                        );
+                                    return (
+                                        <Button
+                                            key={template.id}
+                                            variant="secondary"
+                                            size="sm"
+                                            onClick={() => {
+                                                if (alreadyExists) return;
 
-                                        return (
-                                            <button
-                                                key={template.id}
-                                                onClick={() => {
-                                                    if (alreadyExists) return;
+                                                const totalBars = editingBars.length;
+                                                if (totalBars >= MAX_CUSTOM_BARS) return;
 
-                                                    const totalBars = editingBars.length;
-                                                    if (totalBars >= MAX_CUSTOM_BARS) return;
-
-                                                    const newBar = {
-                                                        ...template,
-                                                        id: `custom_${template.id}_${Date.now()}`,
-                                                        __locked: true, // Ensure template bars are locked
-                                                    };
-                                                    const updated = [...editingBars, newBar];
-                                                    setEditingBars(updated);
-                                                    setHasUnsavedChanges(true);
-                                                }}
-
-                                                disabled={alreadyExists || editingBars.length >= MAX_CUSTOM_BARS}
-                                                title={alreadyExists ? "Already added" : ""}
-                                                style={{
-                                                    opacity: alreadyExists || editingBars.length >= MAX_CUSTOM_BARS ? 0.4 : 1,
-                                                    cursor: alreadyExists || editingBars.length >= MAX_CUSTOM_BARS ? "not-allowed" : "pointer"
-                                                }}
-                                            >
-                                                <Plus size={18} strokeWidth={2.5} />
-                                                {template.name}
-                                            </button>
-                                        );
-                                    })}
-
-                                </div>
+                                                const newBar = {
+                                                    ...template,
+                                                    id: `custom_${template.id}_${Date.now()}`,
+                                                    __locked: true, // Ensure template bars are locked
+                                                };
+                                                const updated = [...editingBars, newBar];
+                                                setEditingBars(updated);
+                                                setHasUnsavedChanges(true);
+                                            }}
+                                            disabled={alreadyExists || editingBars.length >= MAX_CUSTOM_BARS}
+                                            icon={alreadyExists ? <Check size={14} strokeWidth={2.5} /> : <Plus size={14} strokeWidth={2.5} />}
+                                            title={alreadyExists ? "Already added" : `Add ${template.name}`}
+                                        >
+                                            {template.name}
+                                        </Button>
+                                    );
+                                })}
                             </div>
                         </div>
-                    </div>,
-                    document.body)
+                    </div>
+                </Modal>
             )}
 
             {/* Delete Confirmation Modal */}
-            {deleteModal.show && createPortal(
-                <div className={`fixed inset-0 z-[20000] flex items-center justify-center ${deleteModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
-                    {/* Backdrop */}
-                    <div
-                        className={`absolute inset-0 bg-black/80 ${deleteModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-                        onClick={() => {
-                            setDeleteModalClosing(true);
-                            setTimeout(() => {
-                                setDeleteModal({ show: false, index: null, barName: '' });
-                                setDeleteModalClosing(false);
-                            }, 300);
-                        }}
-                    />
+            <ConfirmModal
+                isOpen={deleteModal.show}
+                onClose={() => setDeleteModal({ show: false, index: null, barName: '' })}
+                onConfirm={() => {
+                    if (deleteModal.index !== null) {
+                        const updated = editingBars.filter((_, i) => i !== deleteModal.index);
+                        setEditingBars(updated);
+                        setHasUnsavedChanges(true);
+                    }
+                    setDeleteModal({ show: false, index: null, barName: '' });
+                }}
+                title="Delete Progress Bar"
+                message={`Are you sure you want to delete "${deleteModal.barName}"? This action cannot be undone.`}
+                confirmText="Delete"
+                variant="danger"
+            />
 
-                    {/* Modal */}
-                    <div className={`relative bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${deleteModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}>
-                        {/* Header */}
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                                <Trash2 className="w-5 h-5 text-red-400" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-[var(--accent)]">Delete Progress Bar</h3>
-                                <p className="text-sm text-[var(--progressbar-info)]">This action cannot be undone</p>
-                            </div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="mb-6">
-                            <p className="text-[var(--text)]">
-                                Are you sure you want to delete <span className="font-semibold text-[var(--accent)]">"{deleteModal.barName}"</span>?
-                            </p>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex gap-3 justify-end">
-                            <button
-                                onClick={() => {
-                                    setDeleteModalClosing(true);
-                                    setTimeout(() => {
-                                        setDeleteModal({ show: false, index: null, barName: '' });
-                                        setDeleteModalClosing(false);
-                                    }, 300);
-                                }}
-                                className="px-4 py-2 text-[var(--text)] hover:text-[var(--modal-buttons-hover-text)] transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() => {
-                                    if (deleteModal.index !== null) {
-                                        const updated = editingBars.filter((_, i) => i !== deleteModal.index);
-                                        setEditingBars(updated);
-                                        setHasUnsavedChanges(true);
-                                    }
-                                    setDeleteModalClosing(true);
-                                    setTimeout(() => {
-                                        setDeleteModal({ show: false, index: null, barName: '' });
-                                        setDeleteModalClosing(false);
-                                    }, 300);
-                                }}
-                                className="px-4 py-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-[var(--text)] rounded-lg transition-colors font-medium"
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>,
-                document.body
-            )}
+            {/* Reset to Default Confirmation Modal */}
+            <ConfirmModal
+                isOpen={showResetModal}
+                onClose={() => setShowResetModal(false)}
+                onConfirm={() => {
+                    setEditingBars(DEFAULT_BARS.map(bar => ({
+                        ...bar,
+                        __locked: false
+                    })));
+                    setHasUnsavedChanges(true);
+                    setShowResetModal(false);
+                }}
+                title="Reset Progress Bars"
+                message="Are you sure you want to reset all progress bars back to default? Any custom progress bars and configurations will be replaced."
+                confirmText="Reset to Default"
+                variant="danger"
+            />
         </div>
     );
 }

@@ -1,0 +1,208 @@
+/* ==========================================================================
+   UNIVERSAL TOOLTIP SYSTEM (Tooltip.css)
+   Matches the sleek dark tooltip styling used throughout the app & sidebar
+   ========================================================================== */
+
+.udt-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.udt-tooltip {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.95);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  padding: 0.45rem 0.75rem;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  text-transform: none;
+  text-shadow: none;
+  white-space: nowrap;
+  width: max-content;
+  max-width: 420px;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+}
+
+.udt-tooltip.udt-tooltip--wrap {
+  white-space: normal;
+  text-align: center;
+  word-break: normal;
+}
+
+/* Arrow Base */
+.udt-tooltip::after {
+  content: '';
+  position: absolute;
+  border: 6px solid transparent;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   POSITION: TOP (Default)
+   ========================================================================== */
+
+.udt-tooltip--top {
+  bottom: calc(100% + 8px);
+}
+
+.udt-tooltip--top::after {
+  top: 100%;
+  border-top-color: rgba(0, 0, 0, 0.95);
+}
+
+/* Top Alignments */
+.udt-tooltip--top.udt-tooltip--center {
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+}
+
+.udt-tooltip--top.udt-tooltip--center::after {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.udt-tooltip--top.udt-tooltip--start {
+  left: 0;
+  transform: translateY(4px);
+}
+
+.udt-tooltip--top.udt-tooltip--start::after {
+  left: 6px;
+}
+
+.udt-tooltip--top.udt-tooltip--end {
+  right: 0;
+  left: auto;
+  transform: translateY(4px);
+}
+
+.udt-tooltip--top.udt-tooltip--end::after {
+  right: 6px;
+  left: auto;
+}
+
+/* ==========================================================================
+   POSITION: BOTTOM
+   ========================================================================== */
+
+.udt-tooltip--bottom {
+  top: calc(100% + 8px);
+}
+
+.udt-tooltip--bottom::after {
+  bottom: 100%;
+  border-bottom-color: rgba(0, 0, 0, 0.95);
+}
+
+.udt-tooltip--bottom.udt-tooltip--center {
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.udt-tooltip--bottom.udt-tooltip--center::after {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.udt-tooltip--bottom.udt-tooltip--start {
+  left: 0;
+  transform: translateY(-4px);
+}
+
+.udt-tooltip--bottom.udt-tooltip--start::after {
+  left: 6px;
+}
+
+.udt-tooltip--bottom.udt-tooltip--end {
+  right: 0;
+  left: auto;
+  transform: translateY(-4px);
+}
+
+.udt-tooltip--bottom.udt-tooltip--end::after {
+  right: 6px;
+  left: auto;
+}
+
+/* ==========================================================================
+   POSITION: LEFT & RIGHT
+   ========================================================================== */
+
+.udt-tooltip--left {
+  right: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%) translateX(4px);
+}
+
+.udt-tooltip--left::after {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left-color: rgba(0, 0, 0, 0.95);
+}
+
+.udt-tooltip--right {
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+}
+
+.udt-tooltip--right::after {
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-right-color: rgba(0, 0, 0, 0.95);
+}
+
+/* ==========================================================================
+   HOVER / ACTIVE VISIBILITY TRIGGER
+   ========================================================================== */
+
+.udt-tooltip-wrapper:hover .udt-tooltip,
+.udt-tooltip-wrapper:focus-within .udt-tooltip,
+.udt-tooltip.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.udt-tooltip-wrapper:hover .udt-tooltip--top.udt-tooltip--center,
+.udt-tooltip.is-visible.udt-tooltip--top.udt-tooltip--center {
+  transform: translateX(-50%) translateY(0);
+}
+
+.udt-tooltip-wrapper:hover .udt-tooltip--top.udt-tooltip--start,
+.udt-tooltip-wrapper:hover .udt-tooltip--top.udt-tooltip--end,
+.udt-tooltip.is-visible.udt-tooltip--top.udt-tooltip--start,
+.udt-tooltip.is-visible.udt-tooltip--top.udt-tooltip--end {
+  transform: translateY(0);
+}
+
+.udt-tooltip-wrapper:hover .udt-tooltip--bottom.udt-tooltip--center,
+.udt-tooltip.is-visible.udt-tooltip--bottom.udt-tooltip--center {
+  transform: translateX(-50%) translateY(0);
+}
+
+.udt-tooltip-wrapper:hover .udt-tooltip--bottom.udt-tooltip--start,
+.udt-tooltip-wrapper:hover .udt-tooltip--bottom.udt-tooltip--end,
+.udt-tooltip.is-visible.udt-tooltip--bottom.udt-tooltip--start,
+.udt-tooltip.is-visible.udt-tooltip--bottom.udt-tooltip--end {
+  transform: translateY(0);
+}
+
+.udt-tooltip-wrapper:hover .udt-tooltip--left,
+.udt-tooltip-wrapper:hover .udt-tooltip--right,
+.udt-tooltip.is-visible.udt-tooltip--left,
+.udt-tooltip.is-visible.udt-tooltip--right {
+  transform: translateY(-50%) translateX(0);
+}

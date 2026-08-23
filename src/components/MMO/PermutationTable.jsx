@@ -1,7 +1,8 @@
-import { useState, useMemo, useEffect } from "react";
-import { createPortal } from "react-dom";
+import { useState, useMemo } from "react";
 import { RotateCcw } from "lucide-react";
 import { PERMUTATION_DATA, ADVANCED_PERMUTATION_DATA, GHOST_PERMUTATION_DATA } from "../../data/permutations";
+import { ConfirmModal } from "../Shared/Modal";
+import { Button } from "../Shared/Button";
 import "../../css/PermutationTable.css";
 
 /* ─── colour mapping ──────────────────────────────────────────────────────── */
@@ -63,23 +64,7 @@ function PermutationGrid({
   onChartUpdate,
   legendColors
 }) {
-
   const [showResetModal, setShowResetModal] = useState(false);
-  const [resetModalClosing, setResetModalClosing] = useState(false);
-
-  useEffect(() => {
-    if (showResetModal) {
-      document.documentElement.style.overflow = 'hidden';
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-    }
-    return () => { 
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = ''; 
-    };
-  }, [showResetModal]);
 
   const rows = useMemo(() => {
     const activeDataObj = (supportsAdvanced && isAdvanced && advancedDataObj) ? advancedDataObj : dataObj;
@@ -124,6 +109,21 @@ function PermutationGrid({
   }, [rows, globalChartData, maxCols, isSaveOrder, title]);
 
   const spawnNumbers = Array.from({ length: maxCols }, (_, i) => i + 1);
+
+  const handleResetConfirm = () => {
+    if (onChartUpdate) {
+      const newChartData = { ...globalChartData };
+      let hasChanges = false;
+      for (const key of Object.keys(newChartData)) {
+        if (key.startsWith(`${title}-`)) {
+          delete newChartData[key];
+          hasChanges = true;
+        }
+      }
+      if (hasChanges) onChartUpdate(newChartData);
+    }
+    setShowResetModal(false);
+  };
 
   return (
     <div className="perm-table-outer" style={{ marginBottom: '2rem' }}>
@@ -203,75 +203,30 @@ function PermutationGrid({
       </div>
 
       <div className="perm-reset-wrap">
-        {!readOnly && <button 
-          className="perm-reset-btn" 
-          onClick={() => setShowResetModal(true)}
-          title="Uncheck all rows in this chart"
-          style={{ backgroundColor: 'var(--accent)', color: 'white', border: 'none' }}
-        >
-          <RotateCcw className="w-4 h-4" />
-          Reset Chart
-        </button>}
+        {!readOnly && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setShowResetModal(true)}
+            icon={<RotateCcw size={15} />}
+          >
+            Reset Chart
+          </Button>
+        )}
       </div>
 
-      {showResetModal && createPortal(
-        <div className={`fixed inset-0 z-[20000] ${resetModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}>
-          <div className="bg-black/80 w-full h-full flex items-center justify-center">
-            <div className={`bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl ${resetModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                  <RotateCcw className="w-5 h-5 text-red-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--accent)]">Reset Chart</h3>
-                  <p className="text-sm text-[var(--progressbar-info)]">This action cannot be undone</p>
-                </div>
-              </div>
-              <p className="text-gray-300 mb-6">
-                Are you sure you want to reset all permutations for <span className="font-semibold text-[var(--accent)]">{title}</span>?
-              </p>
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setResetModalClosing(true);
-                    setTimeout(() => {
-                      setShowResetModal(false);
-                      setResetModalClosing(false);
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    if (onChartUpdate) {
-                      const newChartData = { ...globalChartData };
-                      let hasChanges = false;
-                      for (const key of Object.keys(newChartData)) {
-                        if (key.startsWith(`${title}-`)) {
-                          delete newChartData[key];
-                          hasChanges = true;
-                        }
-                      }
-                      if (hasChanges) onChartUpdate(newChartData);
-                    }
-                    setResetModalClosing(true);
-                    setTimeout(() => {
-                      setShowResetModal(false);
-                      setResetModalClosing(false);
-                    }, 300);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors font-semibold"
-                >
-                  Reset Chart
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      <ConfirmModal
+        isOpen={showResetModal}
+        onClose={() => setShowResetModal(false)}
+        onConfirm={handleResetConfirm}
+        title="Reset Permutation Chart"
+        subtitle="This action cannot be undone"
+        message={`Are you sure you want to reset all completed rows for ${title}? This will clear your checked progress on this chart.`}
+        confirmText="Reset Chart"
+        cancelText="Cancel"
+        variant="danger"
+        confirmDelayMs={500}
+      />
     </div>
   );
 }
@@ -291,8 +246,8 @@ export default function PermutationTable({
   const secondSpawn = chartConfig.secondSpawn ?? 6;
   const isAdvanced = chartConfig.isAdvanced ?? false;
   const isSaveOrder = chartConfig.isSaveOrder ?? false;
-  const showSecondWave = chartConfig.showSecondWave ?? true;
-  const showGhostChecks = chartConfig.showGhostChecks ?? true;
+  const showSecondWave = chartConfig.showSecondWave ?? false;
+  const showGhostChecks = chartConfig.showGhostChecks ?? false;
 
   const setConfig = (key, val) => {
     if (onChartConfigUpdate) {
@@ -339,13 +294,13 @@ export default function PermutationTable({
         {!readOnly && (
           <div className="perm-legend-item" style={{ marginLeft: 'auto', paddingLeft: '1rem' }}>
             <button 
-              className="perm-reset-colors-btn hover:text-[var(--text)] transition-colors" 
+              type="button"
+              className="flex items-center gap-1.5 px-2 py-1 text-xs font-semibold text-gray-400 hover:text-[var(--accent)] bg-transparent hover:bg-transparent border-0 shadow-none outline-none transition-colors cursor-pointer" 
               onClick={() => setLegendColors && setLegendColors({})}
               title="Reset Colors to Default"
-              style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'none', border: '1px solid var(--border-color)', color: 'inherit', padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
             >
-              <RotateCcw className="w-3 h-3" />
-              Reset Colors
+              <RotateCcw size={13} />
+              <span>Reset Colors</span>
             </button>
           </div>
         )}
@@ -363,95 +318,93 @@ export default function PermutationTable({
       )}
 
       {/* ── Unified Config Bar ─────────────────────────────────────────── */}
-      {!readOnly && <div className="perm-config-bar" style={{ marginBottom: '2rem' }}>
-        <div className="perm-config-left">
-          
-          <div style={{ display: 'flex', gap: '3rem', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
+      {!readOnly && (
+        <div className="perm-config-bar" style={{ marginBottom: '2rem' }}>
+          <div className="perm-config-left">
             
-            {/* First Wave Config */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
-              <span className="perm-config-title">First Wave Configuration</span>
-              <span className="perm-config-sub">Select the Number of Spawns</span>
-              <div className="perm-spawn-btns">
-                {[8, 9, 10].map(n => (
-                  <button
-                    key={n}
-                    className={`perm-spawn-btn${firstSpawn === n ? " active" : ""}`}
-                    onClick={() => setConfig('firstSpawn', n)}
-                  >
-                    {n}
-                  </button>
-                ))}
+            <div style={{ display: 'flex', gap: '3rem', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
+              
+              {/* First Wave Config */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
+                <span className="perm-config-title">First Wave Configuration</span>
+                <span className="perm-config-sub">Select the Number of Spawns</span>
+                <div className="flex items-center gap-2">
+                  {[8, 9, 10].map(n => (
+                    <Button
+                      key={n}
+                      variant={firstSpawn === n ? "primary" : "secondary"}
+                      size="sm"
+                      className="min-w-[44px] h-[36px] font-bold"
+                      onClick={() => setConfig('firstSpawn', n)}
+                    >
+                      {n}
+                    </Button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Second Wave Config */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
-              <span className="perm-config-title">Second Wave Configuration</span>
-              <span className="perm-config-sub">Select the Number of Spawns</span>
-              <div className="perm-spawn-btns">
-                {[6, 7].map(n => (
-                  <button
-                    key={n}
-                    className={`perm-spawn-btn${secondSpawn === n ? " active" : ""}`}
-                    onClick={() => setConfig('secondSpawn', n)}
-                  >
-                    {n}
-                  </button>
-                ))}
+              {/* Second Wave Config */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
+                <span className="perm-config-title">Second Wave Configuration</span>
+                <span className="perm-config-sub">Select the Number of Spawns</span>
+                <div className="flex items-center gap-2">
+                  {[6, 7].map(n => (
+                    <Button
+                      key={n}
+                      variant={secondSpawn === n ? "primary" : "secondary"}
+                      size="sm"
+                      className="min-w-[44px] h-[36px] font-bold"
+                      onClick={() => setConfig('secondSpawn', n)}
+                    >
+                      {n}
+                    </Button>
+                  ))}
+                </div>
               </div>
+
+            </div>
+            
+            <div style={{ display: 'flex', gap: '2rem', marginTop: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <button
+                type="button"
+                className="perm-switch-wrap bg-transparent border-0 cursor-pointer p-0 select-none text-left"
+                onClick={() => setConfig('isAdvanced', !isAdvanced)}
+              >
+                <span className={`perm-switch ${isAdvanced ? 'active' : ''}`} />
+                <span>Advanced Mode</span>
+              </button>
+
+              <button
+                type="button"
+                className="perm-switch-wrap bg-transparent border-0 cursor-pointer p-0 select-none text-left"
+                onClick={() => setConfig('isSaveOrder', !isSaveOrder)}
+              >
+                <span className={`perm-switch ${isSaveOrder ? 'active' : ''}`} />
+                <span>Save Order</span>
+              </button>
+
+              <button
+                type="button"
+                className="perm-switch-wrap bg-transparent border-0 cursor-pointer p-0 select-none text-left"
+                onClick={() => setConfig('showSecondWave', !showSecondWave)}
+              >
+                <span className={`perm-switch ${showSecondWave ? 'active' : ''}`} />
+                <span>Second Wave</span>
+              </button>
+
+              <button
+                type="button"
+                className="perm-switch-wrap bg-transparent border-0 cursor-pointer p-0 select-none text-left"
+                onClick={() => setConfig('showGhostChecks', !showGhostChecks)}
+              >
+                <span className={`perm-switch ${showGhostChecks ? 'active' : ''}`} />
+                <span>Ghost Checks</span>
+              </button>
             </div>
 
           </div>
-          
-          <div style={{ display: 'flex', gap: '2rem', marginTop: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <label className="perm-switch-wrap">
-              <input 
-                type="checkbox" 
-                style={{ display: 'none' }}
-                checked={isAdvanced}
-                onChange={(e) => setConfig('isAdvanced', e.target.checked)}
-              />
-              <span className={`perm-switch ${isAdvanced ? 'active' : ''}`} />
-              Advanced Mode
-            </label>
-
-            <label className="perm-switch-wrap">
-              <input 
-                type="checkbox" 
-                style={{ display: 'none' }}
-                checked={isSaveOrder}
-                onChange={(e) => setConfig('isSaveOrder', e.target.checked)}
-              />
-              <span className={`perm-switch ${isSaveOrder ? 'active' : ''}`} />
-              Save Order
-            </label>
-
-            <label className="perm-switch-wrap">
-              <input 
-                type="checkbox" 
-                style={{ display: 'none' }}
-                checked={showSecondWave}
-                onChange={(e) => setConfig('showSecondWave', e.target.checked)}
-              />
-              <span className={`perm-switch ${showSecondWave ? 'active' : ''}`} />
-              Second Wave
-            </label>
-
-            <label className="perm-switch-wrap">
-              <input 
-                type="checkbox" 
-                style={{ display: 'none' }}
-                checked={showGhostChecks}
-                onChange={(e) => setConfig('showGhostChecks', e.target.checked)}
-              />
-              <span className={`perm-switch ${showGhostChecks ? 'active' : ''}`} />
-              Ghost Checks
-            </label>
-          </div>
-
         </div>
-      </div>}
+      )}
 
       {/* ── Grids ───────────────────────────────────────────────────────── */}
       <PermutationGrid 
@@ -482,7 +435,7 @@ export default function PermutationTable({
           onChartUpdate={onChartUpdate}
           onChartCheck={onChartCheck}
           legendColors={legendColors}
-        readOnly={readOnly}
+          readOnly={readOnly}
         />
       )}
 
@@ -498,7 +451,7 @@ export default function PermutationTable({
           onChartUpdate={onChartUpdate}
           onChartCheck={onChartCheck}
           legendColors={legendColors}
-        readOnly={readOnly}
+          readOnly={readOnly}
         />
       )}
 

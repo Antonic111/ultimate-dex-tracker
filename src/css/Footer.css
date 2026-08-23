@@ -1,266 +1,432 @@
-/* Footer Styles - Traditional CSS with Tailwind integration */
+/* ==========================================================================
+   SITE FOOTER (Centered & Compact Layout)
+   ========================================================================== */
 
 .site-footer {
   background-color: var(--header);
   border-top: 8px solid var(--accent);
-  padding: 40px 0 20px 0;
+  padding: 20px 0 0 0;
   color: var(--text);
   transition: background-color var(--transition-speed);
+  position: relative;
+  overflow: hidden;
   margin-top: auto;
+  width: 100%;
+}
+
+/* Background Watermark Faded Pokéball (pokeball2.svg) */
+.footer-bg-pokeball {
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 440px;
+  height: 360px;
+  background: url('/landing_page/pokeball2.svg') no-repeat right center / contain;
+  opacity: 0.09;
+  -webkit-mask-image: radial-gradient(ellipse 90% 90% at 75% 50%, rgba(0, 0, 0, 1) 10%, rgba(0, 0, 0, 0.35) 55%, transparent 85%);
+  mask-image: radial-gradient(ellipse 90% 90% at 75% 50%, rgba(0, 0, 0, 1) 10%, rgba(0, 0, 0, 0.35) 55%, transparent 85%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .footer-content {
   max-width: 1300px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 40px;
-  padding: 0 16px;
+  grid-template-columns: 1.6fr 1.15fr 0.8fr 1fr;
+  gap: 28px;
+  padding: 0 16px 16px 16px;
+  position: relative;
+  z-index: 1;
 }
 
-@media (max-width: 768px) {
-  .footer-content {
-    max-width: 100%;
-    margin: 0 8px;
-    padding: 0 12px;
-    gap: 20px;
-    grid-template-columns: 1fr;
-  }
-}
-
-.footer-section {
+/* Generic Centered Column */
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
 }
 
-.footer-section h3 {
-  color: var(--accent);
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin: 0 0 16px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+/* Column 1: Brand */
+.footer-brand-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
-.footer-section ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.footer-section ul li {
-  margin-bottom: 8px;
-}
-
-.footer-section ul li a {
-  color: var(--text);
-  text-decoration: none;
-  transition: color var(--transition-speed);
-  font-size: 0.9rem;
-}
-
-.footer-section ul li a:hover {
-  color: var(--accent);
-}
-
-/* Quick Links Grid Layout */
-.quick-links-grid {
-  display: grid;
-  grid-template-columns: repeat(3, max-content);
-  justify-content: center;
-  gap: 8px 16px;
-}
-
-.quick-link {
-  color: var(--text);
-  text-decoration: none;
-  transition: color var(--transition-speed);
-  padding: 4px 0;
+.footer-brand-layout {
   display: flex;
   align-items: center;
-  gap: 8px;
-  white-space: nowrap;
+  gap: 16px;
+  text-align: left;
 }
 
-.quick-link:hover {
-  color: var(--accent);
+.footer-brand-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
-.quick-link svg {
+.footer-logo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.footer-logo-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
   flex-shrink: 0;
 }
 
-/* Mobile 2-column layout for Quick Links */
-@media (max-width: 768px) {
-  .quick-links-grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, auto) !important;
-    grid-auto-rows: auto !important;
-    gap: 8px 20px !important;
-    width: fit-content !important;
-    margin: 0 auto !important;
-  }
-
-  .quick-link {
-    justify-content: flex-start;
-    width: auto !important;
-    max-width: none !important;
-  }
+.footer-logo-img {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
 }
 
-.credit-link {
-  color: var(--accent);
-  text-decoration: none;
+.footer-logo-layer2 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.footer-logo-layer3 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-mask: url('/Logo_Layer3.png') no-repeat center / contain;
+  mask: url('/Logo_Layer3.png') no-repeat center / contain;
+  background-color: var(--accent, #ffe76a);
+  transition: background-color var(--transition-speed);
+  pointer-events: none;
+}
+
+.footer-brand-desc {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #999999;
+  margin: 0 0 0.45rem 0;
+  max-width: 270px;
+  text-align: center;
+}
+
+.footer-support-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.76rem;
   font-weight: 600;
-  transition: color var(--transition-speed);
-}
-
-.credit-link:hover {
-  color: var(--text);
-  text-decoration: underline;
-}
-
-.footer-section p {
-  margin: 0;
-  line-height: 1.6;
-  font-size: 0.9rem;
-  color: var(--text);
-}
-
-.social-links {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 16px;
-}
-
-.social-link {
-  color: var(--accent);
   text-decoration: none;
-  transition: color var(--transition-speed);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 0.45rem;
+}
+
+.footer-support-btn:hover {
+  border-color: var(--accent, #ffe76a);
+  color: var(--accent, #ffe76a);
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+.footer-social-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px;
-  border-radius: 8px;
-  transition: all var(--transition-speed);
+  gap: 8px;
 }
 
-.social-link:hover {
-  color: var(--text);
+.footer-social-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cccccc;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
 
-.youtube-link {
-  color: var(--accent);
+.footer-social-btn svg {
+  width: 13px;
+  height: 13px;
 }
 
-.twitch-link {
-  color: var(--accent);
+.footer-social-btn:hover {
+  border-color: var(--accent, #ffe76a);
+  color: var(--accent, #ffe76a);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
 }
 
-.discord-link {
-  color: var(--accent);
+/* Column Header Titles */
+.footer-column-title {
+  color: var(--accent, #ffe76a);
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  text-align: center;
 }
 
-.discord-icon {
-  fill: currentColor;
-  opacity: 0.8;
-  transition: opacity var(--transition-speed);
+/* Quick Links 2-Column Grid */
+.footer-quick-links-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  width: fit-content;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  column-gap: 20px;
+  row-gap: 4px;
 }
 
-.discord-link:hover .discord-icon {
-  opacity: 1;
+.footer-quick-links-grid li {
+  display: flex;
+  justify-content: flex-start;
 }
 
-.instagram-link {
-  color: var(--accent);
+/* Nav Links Lists */
+.footer-links-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
 }
 
-.instagram-icon {
-  fill: currentColor;
-  opacity: 0.8;
-  transition: opacity var(--transition-speed);
+.footer-links-list li {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
 }
 
-.instagram-link:hover .instagram-icon {
-  opacity: 1;
+.footer-nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  color: #b0b0b0;
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.tiktok-link {
-  color: var(--accent);
+.footer-nav-link:hover {
+  color: var(--accent, #ffe76a);
+  transform: translateX(3px);
 }
 
-.tiktok-icon {
-  fill: currentColor;
-  opacity: 0.8;
-  transition: opacity var(--transition-speed);
+.footer-nav-link svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  color: #888888;
+  display: inline-block;
+  transition: color 0.2s ease;
 }
 
-.tiktok-link:hover .tiktok-icon {
-  opacity: 1;
+.footer-nav-link:hover svg {
+  color: var(--accent, #ffe76a);
 }
 
-.footer-bottom {
+/* Legal Column */
+.footer-legal-column {
+  align-items: center;
+  text-align: center;
+}
+
+.footer-legal-body {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #888888;
+  text-align: center;
+  max-width: 260px;
+}
+
+.footer-legal-body p {
+  margin: 0 0 0.4rem 0;
+}
+
+/* ==========================================================================
+   BOTTOM BAR (Far Left: Copyright, Center: Ball Tagline, Far Right: Made By)
+   ========================================================================== */
+
+.footer-bottom-bar {
   max-width: 1300px;
   margin: 0 auto;
-  text-align: center;
-  padding: 20px 16px 0 16px;
-  border-top: 1px solid var(--accent);
-  margin-top: 30px;
-  overflow: hidden;
+  padding: 0 16px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
-.footer-bottom p {
-  margin: 0;
-  color: var(--text);
-  font-size: 0.9rem;
-  opacity: 0.8;
+.footer-bottom-inner {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.65rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.footer-bottom-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #888888;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-/* Inline poké ball icons for the footer tagline */
+.footer-bottom-center {
+  flex: 1;
+  text-align: center;
+}
+
+.footer-tagline {
+  margin: 0;
+  color: #999999;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.footer-bottom-right {
+  font-size: 0.78rem;
+  color: #888888;
+  white-space: nowrap;
+}
+
+.footer-heart-icon {
+  color: var(--accent, #ffe76a);
+  vertical-align: -2px;
+  margin: 0 2px;
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+}
+
+.footer-author-link {
+  color: var(--accent, #ffe76a);
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.footer-author-link:hover {
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
+/* Inline Poké Ball Tagline Icons */
 .inline-ball {
-  width: 18px;
-  height: 18px;
-  vertical-align: -3px;
-  margin: 0 4px;
+  width: 15px;
+  height: 15px;
+  vertical-align: -2.5px;
+  margin: 0 2px;
   image-rendering: -webkit-optimize-contrast;
   display: inline-block;
   flex-shrink: 0;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* ==========================================================================
+   RESPONSIVE FOOTER STYLES
+   ========================================================================== */
+
+@media (max-width: 1024px) {
   .footer-content {
-    grid-template-columns: 1fr;
-    gap: 30px;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    padding: 0 24px 24px 24px;
   }
 
-  .footer-section {
+  .footer-bottom-inner {
+    flex-direction: column;
     text-align: center;
+    gap: 10px;
+    padding: 0 20px;
   }
 
-  .site-footer {
-    padding: 30px 0 15px 0;
-  }
-
-  /* Allow footer tagline to wrap on mobile */
-  .footer-bottom p {
+  .footer-tagline {
     white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    line-height: 1.4;
   }
 }
 
-@media (max-width: 480px) {
-  .footer-content {
-    padding: 0 12px;
+@media (max-width: 640px) {
+  .site-footer {
+    padding: 24px 0 0 0;
   }
 
-  .footer-bottom {
-    padding: 20px 12px 0 12px;
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 0 16px 20px 16px;
+  }
+
+  .footer-brand-layout {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .footer-brand-info {
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-brand-desc {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .footer-social-row {
+    justify-content: center;
+  }
+
+  .footer-bottom-inner {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 900px) {
+  .footer-bg-pokeball {
+    opacity: 0.16;
+    right: 50%;
+    transform: translate(50%, -50%);
+    -webkit-mask-image: none;
+    mask-image: none;
+    width: 600px;
+    height: 600px;
   }
 }

@@ -39,7 +39,9 @@ export const UNOBTAINABLE_SHINY_DEX_NUMBERS = [
 // Pokemon form names that have unobtainable shinies (for forms that share the same ID)
 export const UNOBTAINABLE_SHINY_FORM_NAMES = [
     "vivillon-pokeball",
-    "floette-eternal"
+    "floette-eternal",
+    "origin-ball-dialga-483",
+    "origin-ball-palkia-484"
 ];
 
 // Pokemon dex numbers that are GO exclusive shinies (only obtainable through Pokemon GO)

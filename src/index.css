@@ -7,9 +7,106 @@
   box-sizing: border-box;
 }
 
+/* Prevent accidental native browser drag on all SVGs, SVG children, and images */
+*, *::before, *::after {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+svg, svg *, img {
+  -webkit-user-drag: none !important;
+  user-drag: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  pointer-events: none;
+}
+
+/* Allow explicit opt-in for interactive SVGs / images if ever needed */
+svg[data-interactive="true"],
+svg.interactive,
+img[data-interactive="true"],
+img.interactive {
+  pointer-events: auto;
+}
+
+/* Ensure buttons and links receive pointer events smoothly */
+button,
+a,
+input,
+select,
+textarea,
+[role="button"],
+.btn {
+  pointer-events: auto;
+}
+
+/* Universal Autofill Overrides (prevent browser default bright blue/yellow/white backgrounds) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--searchbar-inputs, #242424) inset !important;
+  box-shadow: 0 0 0 1000px var(--searchbar-inputs, #242424) inset !important;
+  -webkit-text-fill-color: var(--text, #ffffff) !important;
+  color: var(--text, #ffffff) !important;
+  caret-color: var(--text, #ffffff) !important;
+  transition: background-color 5000000s ease-in-out 0s, color 5000000s ease-in-out 0s !important;
+}
+
+[data-theme="light"] input:-webkit-autofill,
+[data-theme="light"] input:-webkit-autofill:hover,
+[data-theme="light"] input:-webkit-autofill:focus,
+[data-theme="light"] input:-webkit-autofill:active,
+[data-theme="light"] textarea:-webkit-autofill,
+[data-theme="light"] textarea:-webkit-autofill:hover,
+[data-theme="light"] textarea:-webkit-autofill:focus,
+[data-theme="light"] textarea:-webkit-autofill:active,
+[data-theme="light"] select:-webkit-autofill,
+[data-theme="light"] select:-webkit-autofill:hover,
+[data-theme="light"] select:-webkit-autofill:focus,
+[data-theme="light"] select:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--searchbar-inputs, #f8fafc) inset !important;
+  box-shadow: 0 0 0 1000px var(--searchbar-inputs, #f8fafc) inset !important;
+  -webkit-text-fill-color: var(--text, #000000) !important;
+  color: var(--text, #000000) !important;
+  caret-color: var(--text, #000000) !important;
+}
+
+input:autofill,
+input:autofill:hover,
+input:autofill:focus,
+input:autofill:active,
+textarea:autofill,
+textarea:autofill:hover,
+textarea:autofill:focus,
+textarea:autofill:active,
+select:autofill,
+select:autofill:hover,
+select:autofill:focus,
+select:autofill:active {
+  filter: none !important;
+  color: var(--text, #ffffff) !important;
+  -webkit-text-fill-color: var(--text, #ffffff) !important;
+  box-shadow: 0 0 0 1000px var(--searchbar-inputs, #242424) inset !important;
+}
+
 /* Default site background (dark theme) */
 :root {
   --site-background: linear-gradient(to right, #0a0a0a 0%, #0d0d0d 5%, #0f0f0f 10%, #111 15%, #111 85%, #0f0f0f 90%, #0d0d0d 95%, #0a0a0a 100%);
+}
+
+html {
+  scrollbar-gutter: stable;
 }
 
 html,
@@ -101,4 +198,216 @@ img[src*="/other/home/"] {
     box-shadow: 0 0 18px var(--accent), 0 0 6px var(--accent);
   }
 }
+
+/* ==========================================================================
+   GLOBAL 1300PX PAGE CONTAINER STANDARD
+   ========================================================================== */
+.container,
+.page-container,
+.main-container {
+  max-width: 1300px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .container,
+  .page-container,
+  .main-container {
+    max-width: calc(100% - 32px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .container,
+  .page-container,
+  .main-container {
+    max-width: calc(100% - 24px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* ==========================================================================
+   UNIVERSAL PAGE HEADER & TITLE STANDARD
+   ========================================================================== */
+.page-title,
+.counters-page-title,
+.trainers-main-heading,
+.trainers-page-title,
+.leaderboard-main-title,
+.settings-title,
+.changelog-page h1,
+.bug-report-section h1,
+.bingo-page-title,
+.backup-header h1,
+.mmo-page-title,
+.admin-page .page-title,
+.admin-header h1 {
+  font-size: 2.5rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.15 !important;
+  color: var(--text-color, #ffffff) !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .page-title,
+  .counters-page-title,
+  .trainers-main-heading,
+  .trainers-page-title,
+  .leaderboard-main-title,
+  .settings-title,
+  .changelog-page h1,
+  .bug-report-section h1,
+  .bingo-page-title,
+  .backup-header h1,
+  .mmo-page-title,
+  .admin-page .page-title,
+  .admin-header h1 {
+    font-size: 1.85rem !important;
+    letter-spacing: -0.02em !important;
+  }
+}
+
+/* Universal Gap between Page Header and Divider */
+.counters-header-row,
+.trainers-hero-section,
+.trainers-title-wrap,
+.leaderboard-title-row,
+.settings-header,
+.mmo-header-row,
+.mmo-header,
+.backup-header,
+.changelog-container > h1,
+.bingo-header-row,
+.admin-header,
+.admin-container > .page-title {
+  margin-bottom: 0.75rem !important;
+}
+
+@media (max-width: 768px) {
+  .counters-header-row,
+  .trainers-hero-section,
+  .trainers-title-wrap,
+  .leaderboard-title-row,
+  .settings-header,
+  .mmo-header-row,
+  .mmo-header,
+  .backup-header,
+  .changelog-container > h1,
+  .bingo-header-row,
+  .admin-header,
+  .admin-container > .page-title {
+    margin-bottom: 0.5rem !important;
+  }
+}
+
+/* ==========================================================================
+   UNIVERSAL APP DIVIDER STANDARD
+   ========================================================================== */
+.app-divider,
+.counters-divider,
+.header-divider,
+.settings-divider {
+  height: 2px;
+  width: 100%;
+  margin: 0 0 1.5rem 0 !important;
+  border-radius: 1px;
+  background: linear-gradient(90deg, var(--accent, #38bdf8) 0%, rgba(255, 255, 255, 0.08) 60%, transparent 100%);
+  border: none;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .app-divider,
+  .counters-divider,
+  .header-divider,
+  .settings-divider {
+    margin: 0 0 1rem 0 !important;
+  }
+}
+
+/* ==========================================================================
+   UNIVERSAL PAGE LOAD ENTRANCE ANIMATION STANDARD
+   ========================================================================== */
+@keyframes universalPageFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  99.9% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    /* Clear transform so no lingering containing blocks break fixed position elements */
+    transform: none;
+  }
+}
+
+.page-enter,
+.page-fade-in,
+.fade-in-up,
+.fade-in-content,
+.slide-up,
+.page-animate-1,
+.page-animate-2,
+.page-animate-3,
+.counters-page,
+.trainers-page,
+.leaderboard-page,
+.profile-page,
+.profile-wrapper,
+.stats-page-container,
+.mmo-page,
+.bingo-page,
+.changelog-page,
+.backup-page,
+.settings-page,
+.admin-page,
+.login-page-container,
+.register-page-container,
+.forgot-page-container,
+.reset-code-page-container,
+.reset-password-page-container,
+.complete-signup-page-container,
+.email-sent-page-container,
+.legal-page-container {
+  animation: universalPageFadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+  will-change: opacity, transform;
+}
+
+/* Prevent animation transform stacking contexts when modals are open */
+html.modal-open .page-enter,
+html.modal-open .fade-in-up,
+html.modal-open .fade-in-content,
+html.modal-open .slide-up,
+html.modal-open .page-animate-1,
+html.modal-open .page-animate-2,
+html.modal-open .page-animate-3,
+html.modal-open .counters-page,
+html.modal-open .trainers-page,
+html.modal-open .leaderboard-page,
+html.modal-open .settings-page {
+  animation-play-state: paused !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+/* Page Transition Wrapper - ensure full vertical height stretch between header and footer */
+.page-transition-wrap {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+}
+
 

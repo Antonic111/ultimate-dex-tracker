@@ -55,6 +55,113 @@ export const guessISOFromLocation = (loc) => {
     return m ? m[1] : null;
 };
 
+/**
+ * Normalizes YouTube input into a valid URL:
+ * - full url: https://youtube.com/@name or https://youtube.com/name -> https://youtube.com/@name
+ * - handle with @: @name -> https://youtube.com/@name
+ * - raw name: name -> https://youtube.com/@name
+ * - channel/c/short urls: https://youtube.com/channel/... or https://youtu.be/... -> https://...
+ */
+export function normalizeYoutubeUrl(input) {
+    if (!input) return "";
+    let str = String(input).trim();
+    if (!str) return "";
+
+    // Keep direct channel, custom /c/, or youtu.be links
+    if (/^(https?:\/\/)?(www\.)?youtu\.be\//i.test(str)) {
+        return str.startsWith("http") ? str : `https://${str}`;
+    }
+    if (/^(https?:\/\/)?(www\.)?youtube\.com\/(channel\/|c\/)/i.test(str)) {
+        return str.startsWith("http") ? str : `https://${str}`;
+    }
+
+    // Match full youtube.com url with handle or path
+    const ytMatch = str.match(/^(?:https?:\/\/)?(?:www\.)?youtube\.com\/@?([a-zA-Z0-9_.\-]+)/i);
+    if (ytMatch && ytMatch[1]) {
+        return `https://youtube.com/@${ytMatch[1]}`;
+    }
+
+    // Handle @handle or raw username
+    const handle = str.replace(/^@/, "").replace(/^\/+/, "").trim();
+    if (handle) {
+        return `https://youtube.com/@${handle}`;
+    }
+    return "";
+}
+
+/**
+ * Normalizes Twitch input into a valid URL:
+ * - full url: https://twitch.tv/name or twitch.tv/name -> https://twitch.tv/name
+ * - handle with @: @name -> https://twitch.tv/name
+ * - raw name: name -> https://twitch.tv/name
+ */
+export function normalizeTwitchUrl(input) {
+    if (!input) return "";
+    let str = String(input).trim();
+    if (!str) return "";
+
+    const twMatch = str.match(/^(?:https?:\/\/)?(?:www\.)?twitch\.tv\/@?([a-zA-Z0-9_]+)/i);
+    if (twMatch && twMatch[1]) {
+        return `https://twitch.tv/${twMatch[1]}`;
+    }
+
+    const handle = str.replace(/^@/, "").replace(/^\/+/, "").trim();
+    if (handle) {
+        return `https://twitch.tv/${handle}`;
+    }
+    return "";
+}
+
+/**
+ * Extracts a clean channel name or handle for display/editing:
+ * - https://youtube.com/@ChannelName -> @ChannelName
+ * - https://youtube.com/c/ChannelName -> @ChannelName
+ * - https://youtube.com/channel/UC12345 -> UC12345
+ * - https://youtu.be/ChannelName -> ChannelName
+ * - @ChannelName -> @ChannelName
+ * - ChannelName -> @ChannelName
+ */
+export function extractYoutubeHandle(input) {
+    if (!input) return "";
+    let str = String(input).trim();
+    if (!str) return "";
+
+    const atMatch = str.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/@([a-zA-Z0-9_.\-]+)/i);
+    if (atMatch && atMatch[1]) return `@${atMatch[1]}`;
+
+    const cMatch = str.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:c\/|user\/)?([a-zA-Z0-9_.\-]+)/i);
+    if (cMatch && cMatch[1] && !['watch', 'results', 'feed', 'channel'].includes(cMatch[1].toLowerCase())) {
+        return cMatch[1].startsWith('@') ? cMatch[1] : `@${cMatch[1]}`;
+    }
+
+    const channelMatch = str.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/channel\/([a-zA-Z0-9_.\-]+)/i);
+    if (channelMatch && channelMatch[1]) return channelMatch[1];
+
+    const shortMatch = str.match(/(?:https?:\/\/)?(?:www\.)?youtu\.be\/([a-zA-Z0-9_.\-]+)/i);
+    if (shortMatch && shortMatch[1]) return shortMatch[1];
+
+    if (str.startsWith('@')) return str;
+    return `@${str}`;
+}
+
+/**
+ * Extracts a clean Twitch username for display/editing:
+ * - https://twitch.tv/channelname -> channelname
+ * - https://www.twitch.tv/channelname -> channelname
+ * - @channelname -> channelname
+ * - channelname -> channelname
+ */
+export function extractTwitchHandle(input) {
+    if (!input) return "";
+    let str = String(input).trim();
+    if (!str) return "";
+
+    const twMatch = str.match(/(?:https?:\/\/)?(?:www\.)?twitch\.tv\/@?([a-zA-Z0-9_]+)/i);
+    if (twMatch && twMatch[1]) return twMatch[1];
+
+    return str.replace(/^@/, "").replace(/^\/+/, "").trim();
+}
+
 const toTitle = (s) => String(s || "").replace(/[-_]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
 
 const fromOptionsOrTitle = (opts, key, suffixIfMissing = "") => {
@@ -73,9 +180,9 @@ const countAll = (list, key) => {
     const counts = {};
     for (const it of list) {
         if (key === "mark") {
-            const markList = Array.isArray(it?.marks)
+            const markList = (Array.isArray(it?.marks) && it.marks.length > 0)
                 ? it.marks
-                : (it?.mark ? [it.mark] : []);
+                : (it?.mark && it.mark !== "none" && it.mark !== "Unknown" && it.mark !== "unknown" ? [it.mark] : []);
             for (const rawMark of markList) {
                 const v = String(rawMark ?? "").trim().toLowerCase();
                 if (!v || v === "none" || v === "unknown") continue;
@@ -158,8 +265,9 @@ export function calculateProfileStats(map, dexPreferences, optimisticOrder = nul
     const totalShiny = shinyKeys.length;
 
     // Filter caught entries (checking both regular and shiny suffixes)
-    const regularEntries = Object.entries(map).filter(([key, info]) => info && !key.includes('_shiny'));
-    const shinyEntries = Object.entries(map).filter(([key, info]) => info && key.includes('_shiny'));
+    const isEntryCaught = (info) => Boolean(info && info.caught !== false && (info.entries?.length > 0 || info.caught === true));
+    const regularEntries = Object.entries(map).filter(([key, info]) => isEntryCaught(info) && !key.includes('_shiny'));
+    const shinyEntries = Object.entries(map).filter(([key, info]) => isEntryCaught(info) && key.includes('_shiny'));
 
     const regularCaught = regularEntries.length;
     const shinyCaught = shinyEntries.length;
@@ -173,11 +281,11 @@ export function calculateProfileStats(map, dexPreferences, optimisticOrder = nul
     allCaughtInfos.forEach(info => {
         if (info.entries && Array.isArray(info.entries)) {
             info.entries.forEach(entry => {
-                if (entry && (entry.ball || entry.mark || entry.game || entry.method)) {
+                if (entry && (entry.ball || entry.mark || (Array.isArray(entry.marks) && entry.marks.length > 0) || entry.game || entry.method)) {
                     allEntries.push(entry);
                 }
             });
-        } else if (info.ball || info.mark || info.game || info.method) {
+        } else if (info.ball || info.mark || (Array.isArray(info.marks) && info.marks.length > 0) || info.game || info.method) {
             allEntries.push(info);
         }
     });
@@ -229,7 +337,7 @@ export function calculateProfileStats(map, dexPreferences, optimisticOrder = nul
     const withoutTimestamps = [];
 
     Object.entries(map).forEach(([key, info]) => {
-        if (!info) return;
+        if (!info || !isEntryCaught(info)) return;
 
         const isShiny = key.includes('_shiny');
         const mon = keyToMon.get(key) || keyToMon.get(key.replace('_shiny', '')); // Handle both exact match or base match
@@ -307,3 +415,82 @@ export function calculateProfileStats(map, dexPreferences, optimisticOrder = nul
 
     return { stats, recentAdded: recentList };
 }
+
+export const DEFAULT_PROFILE_PICTURES = [
+    "/data/default_profile_pictures/butterfree.png",
+    "/data/default_profile_pictures/celebi.png",
+    "/data/default_profile_pictures/charizard.png",
+    "/data/default_profile_pictures/ditto.png",
+    "/data/default_profile_pictures/gardevoir.png",
+    "/data/default_profile_pictures/gengar.png",
+    "/data/default_profile_pictures/guzzlord.png",
+    "/data/default_profile_pictures/gyarados.png",
+    "/data/default_profile_pictures/lucario.png",
+    "/data/default_profile_pictures/metagross.png",
+    "/data/default_profile_pictures/mew.png",
+    "/data/default_profile_pictures/mewtwo.png",
+    "/data/default_profile_pictures/noctowl.png",
+    "/data/default_profile_pictures/pikachu.png",
+    "/data/default_profile_pictures/psyduck.png",
+    "/data/default_profile_pictures/rayquaza.png",
+    "/data/default_profile_pictures/shaymin.png"
+];
+
+/**
+ * Deterministically returns one of the 7 default avatars based on a string seed (e.g. username or id).
+ */
+export function getDefaultAvatarUrl(seed = "") {
+    if (!seed) return DEFAULT_PROFILE_PICTURES[0];
+    let hash = 0;
+    const str = String(seed);
+    for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash |= 0;
+    }
+    const index = Math.abs(hash) % DEFAULT_PROFILE_PICTURES.length;
+    return DEFAULT_PROFILE_PICTURES[index];
+}
+
+/**
+ * Resolves avatar image URL for a user or profile object.
+ * Priority:
+ * 1. user.avatar (custom uploaded image or assigned default profile picture)
+ * 2. Deterministic default profile picture
+ */
+export function getUserAvatarUrl(userOrAvatar) {
+    if (!userOrAvatar) return DEFAULT_PROFILE_PICTURES[0];
+    if (typeof userOrAvatar === "string") {
+        if (
+            userOrAvatar.startsWith("/uploads/") ||
+            userOrAvatar.startsWith("http://") ||
+            userOrAvatar.startsWith("https://") ||
+            userOrAvatar.startsWith("data:") ||
+            userOrAvatar.startsWith("blob:") ||
+            userOrAvatar.startsWith("/data/default_profile_pictures/")
+        ) {
+            // Map legacy default[1-7].png paths to new named paths
+            if (userOrAvatar.includes("/default1.png")) return "/data/default_profile_pictures/charizard.png";
+            if (userOrAvatar.includes("/default2.png")) return "/data/default_profile_pictures/gengar.png";
+            if (userOrAvatar.includes("/default3.png")) return "/data/default_profile_pictures/lucario.png";
+            if (userOrAvatar.includes("/default4.png")) return "/data/default_profile_pictures/mew.png";
+            if (userOrAvatar.includes("/default5.png")) return "/data/default_profile_pictures/mewtwo.png";
+            if (userOrAvatar.includes("/default6.png")) return "/data/default_profile_pictures/pikachu.png";
+            if (userOrAvatar.includes("/default7.png")) return "/data/default_profile_pictures/rayquaza.png";
+            return userOrAvatar;
+        }
+        return getDefaultAvatarUrl(userOrAvatar);
+    }
+    if (userOrAvatar.avatar) {
+        if (userOrAvatar.avatar.includes("/default1.png")) return "/data/default_profile_pictures/charizard.png";
+        if (userOrAvatar.avatar.includes("/default2.png")) return "/data/default_profile_pictures/gengar.png";
+        if (userOrAvatar.avatar.includes("/default3.png")) return "/data/default_profile_pictures/lucario.png";
+        if (userOrAvatar.avatar.includes("/default4.png")) return "/data/default_profile_pictures/mew.png";
+        if (userOrAvatar.avatar.includes("/default5.png")) return "/data/default_profile_pictures/mewtwo.png";
+        if (userOrAvatar.avatar.includes("/default6.png")) return "/data/default_profile_pictures/pikachu.png";
+        if (userOrAvatar.avatar.includes("/default7.png")) return "/data/default_profile_pictures/rayquaza.png";
+        return userOrAvatar.avatar;
+    }
+    const seed = userOrAvatar.username || userOrAvatar._id || userOrAvatar.id || userOrAvatar.email || "";
+    return getDefaultAvatarUrl(seed);
+}
+

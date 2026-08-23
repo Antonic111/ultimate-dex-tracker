@@ -6,6 +6,7 @@ const recentCatchSchema = new mongoose.Schema({
   sprite: { type: String, required: true },
   username: { type: String, required: true },
   profileTrainer: { type: String, default: null },
+  avatar: { type: String, default: null },
   caughtAt: { type: Date, default: Date.now }
 });
 

@@ -1,12 +1,14 @@
 import React from 'react';
-import { LinkIcon, Heart, Crown, Video, Youtube, Twitch, Clock, NotebookPen, SquareX, ArrowLeft } from "lucide-react";
+import { LinkIcon, Heart, Crown, Video, Clock, Camera, NotebookPen, SquareX, ArrowLeft } from "lucide-react";
+import { YoutubeIcon, TwitchIcon } from "../Shared/SocialIcons";
 import { profileAPI } from "../../utils/api";
 import { useMessage } from "../Shared/MessageContext";
 import { useLoading } from "../Shared/LoadingContext";
 import { validateContent } from "../../../shared/contentFilter";
-import { getTimeAgo } from "../../utils/profileUtils";
+import { getTimeAgo, normalizeYoutubeUrl, normalizeTwitchUrl, extractYoutubeHandle, extractTwitchHandle, getUserAvatarUrl } from "../../utils/profileUtils";
 import { useNavigate } from 'react-router-dom';
-import ContentFilterInput from "../Shared/ContentFilterInput";
+import { Button } from "../Shared/Button";
+import { TextAreaField } from "../Shared/FormField";
 
 const SWITCH_FC_RE = /^SW-\d{4}-\d{4}-\d{4}$/;
 const GO_FC_RE = /^\d{4} \d{4} \d{4}$/;
@@ -77,6 +79,11 @@ export default function ProfileHero({
     const handleSave = async () => {
         if (!isEditing) {
             formBeforeEditRef.current = JSON.parse(JSON.stringify(form));
+            setForm((prev) => ({
+                ...prev,
+                youtubeUrl: extractYoutubeHandle(prev.youtubeUrl),
+                twitchUrl: extractTwitchHandle(prev.twitchUrl),
+            }));
             setIsEditing(true);
             return;
         }
@@ -93,35 +100,22 @@ export default function ProfileHero({
             return;
         }
 
-        let finalYoutube = (form.youtubeUrl || "").trim();
-        if (finalYoutube) {
-            if (!/^https?:\/\//i.test(finalYoutube)) finalYoutube = 'https://' + finalYoutube;
-            if (!/^(https?:\/\/)?(www\.)?(youtube\.com\/(channel\/|@|c\/)|youtu\.be\/)/i.test(finalYoutube)) {
-                showMessage("Invalid YouTube URL. Example: youtube.com/@YourChannel", "error");
-                return;
-            }
-        }
-
-        let finalTwitch = (form.twitchUrl || "").trim();
-        if (finalTwitch) {
-            if (!/^https?:\/\//i.test(finalTwitch)) finalTwitch = 'https://' + finalTwitch;
-            if (!/^(https?:\/\/)?(www\.)?twitch\.tv\/[a-zA-Z0-9_]+/i.test(finalTwitch)) {
-                showMessage("Invalid Twitch URL. Example: twitch.tv/yourchannel", "error");
-                return;
-            }
-        }
+        let finalYoutube = normalizeYoutubeUrl(form.youtubeUrl);
+        let finalTwitch = normalizeTwitchUrl(form.twitchUrl);
 
         const reorderToFront = (arr, fill) => {
-            const cleaned = arr.filter((v) => v !== null && v !== undefined && v !== "");
+            const cleaned = (arr || []).filter((v) => v !== null && v !== undefined && v !== "");
             return [...cleaned, ...Array(5 - cleaned.length).fill(fill)].slice(0, 5);
         };
         const reorderedGames = reorderToFront(form.favoriteGames, "");
-        const reorderedPokemon = reorderToFront(form.favoritePokemon, "");
-        
-        const reorderShiny = (arr) => {
-             const cleaned = arr.filter((v) => v !== null && v !== undefined);
-             return [...cleaned, ...Array(5 - cleaned.length).fill(false)].slice(0, 5);
-        };
+
+        const pairedPokemon = (form.favoritePokemon || [])
+            .map((poke, idx) => ({ poke: poke || "", shiny: Boolean(form.favoritePokemonShiny?.[idx]) }))
+            .filter(item => item.poke.trim() !== "");
+        while (pairedPokemon.length < 5) pairedPokemon.push({ poke: "", shiny: false });
+
+        const reorderedPokemon = pairedPokemon.map(p => p.poke).slice(0, 5);
+        const reorderedShiny = pairedPokemon.map(p => p.shiny).slice(0, 5);
 
         try {
             const bioValidation = validateContent(String(form.bio || ''), 'bio');
@@ -130,21 +124,50 @@ export default function ProfileHero({
                 return;
             }
             setLoading('save-profile', true);
+
+            // Handle pending avatar upload or removal
+            let finalAvatar = form.avatar;
+            if (form.pendingAvatarFile) {
+                const uploadRes = await profileAPI.uploadAvatar(form.pendingAvatarFile);
+                finalAvatar = uploadRes.avatar;
+                if (setUser) {
+                    setUser((prev) => ({ ...prev, avatar: finalAvatar }));
+                }
+            } else if (form.pendingAvatarRemoved) {
+                await profileAPI.removeAvatar();
+                finalAvatar = null;
+                if (setUser) {
+                    setUser((prev) => ({ ...prev, avatar: null }));
+                }
+            }
+
             await profileAPI.updateProfile({
                 bio: form.bio, location: form.location, gender: form.gender, profileTrainer: form.profileTrainer,
-                favoriteGames: reorderedGames, favoritePokemon: reorderedPokemon, favoritePokemonShiny: reorderShiny(form.favoritePokemonShiny),
+                avatar: finalAvatar,
+                favoriteGames: reorderedGames, favoritePokemon: reorderedPokemon, favoritePokemonShiny: reorderedShiny,
                 switchFriendCode: fc, goFriendCode: goFc, youtubeUrl: finalYoutube, twitchUrl: finalTwitch,
             });
 
             showMessage("Profile changes saved", "success");
             setForm((prev) => ({
-                ...prev, favoriteGames: reorderedGames, favoritePokemon: reorderedPokemon, favoritePokemonShiny: reorderShiny(form.favoritePokemonShiny),
-                switchFriendCode: fc, goFriendCode: goFc, youtubeUrl: finalYoutube, twitchUrl: finalTwitch,
+                ...prev,
+                avatar: finalAvatar,
+                pendingAvatarFile: null,
+                pendingAvatarRemoved: false,
+                favoriteGames: reorderedGames,
+                favoritePokemon: reorderedPokemon,
+                favoritePokemonShiny: reorderedShiny,
+                switchFriendCode: fc,
+                goFriendCode: goFc,
+                youtubeUrl: extractYoutubeHandle(finalYoutube),
+                twitchUrl: extractTwitchHandle(finalTwitch),
             }));
-            setUser((prev) => ({ ...prev, profileTrainer: form.profileTrainer || prev.profileTrainer }));
+            setUser((prev) => ({ ...prev, profileTrainer: form.profileTrainer || prev.profileTrainer, avatar: finalAvatar !== undefined ? finalAvatar : prev.avatar }));
             setIsEditing(false);
         } catch (err) {
-            showMessage("Failed to update profile", "error");
+            console.error("Failed to update profile:", err);
+            const msg = err.userMessage || err.message || "Failed to update profile";
+            showMessage(msg, "error");
         } finally {
             setLoading('save-profile', false);
         }
@@ -156,13 +179,16 @@ export default function ProfileHero({
 
             {/* Mobile-only: Back button pinned to top-right corner of the card */}
             {!isEditing && (
-                <button
+                <Button
+                    variant="secondary"
+                    size="sm"
                     className="hero-back-btn hero-back-btn-mobile"
                     onClick={() => navigate(-1)}
+                    icon={<ArrowLeft size={16} />}
                     aria-label="Go back"
                 >
-                    <ArrowLeft size={16} /> Back
-                </button>
+                    Back
+                </Button>
             )}
             
             <div className="profile-hero-content">
@@ -174,13 +200,13 @@ export default function ProfileHero({
                         style={{ cursor: (isOwner && isEditing) ? "pointer" : "default" }}
                     >
                         <img
-                            src={`/data/trainer_sprites/${form.profileTrainer || "ash.png"}`}
-                            alt="Trainer"
+                            src={getUserAvatarUrl(form.avatar ? { avatar: form.avatar } : form)}
+                            alt="Avatar"
                             className="profile-hero-avatar-img"
                         />
                         {isOwner && isEditing && (
                             <div className="profile-avatar-edit-overlay">
-                                <NotebookPen size={32} strokeWidth={2} />
+                                <Camera size={30} strokeWidth={2} />
                             </div>
                         )}
                     </div>
@@ -191,30 +217,32 @@ export default function ProfileHero({
                     <div className="profile-hero-top-row">
                         <div className="profile-hero-identity">
                             <h1 className="profile-hero-username">
-                                {username}
-                                {isAdmin && (
-                                    <span className="crown-wrapper">
-                                        <Crown size={28} strokeWidth={2.5} style={{ color: "#fbbf24", flexShrink: 0, cursor: "default" }} />
-                                        <span className="crown-tooltip">Admin</span>
-                                    </span>
-                                )}
-                                {isContentCreator && (
-                                    <span className="crown-wrapper" style={{ marginLeft: '-2px' }}>
-                                        <Video size={28} strokeWidth={2.5} style={{ color: "#fbbf24", flexShrink: 0, cursor: "default" }} />
-                                        <span className="crown-tooltip">Content Creator</span>
-                                    </span>
-                                )}
+                                <span className="inline-flex items-center gap-2.5">
+                                    <span>{username}</span>
+                                    {isAdmin && (
+                                        <span className="crown-wrapper">
+                                            <Crown size={26} strokeWidth={2.5} style={{ color: "#fbbf24", flexShrink: 0, cursor: "default" }} />
+                                            <span className="crown-tooltip">Admin</span>
+                                        </span>
+                                    )}
+                                    {isContentCreator && (
+                                        <span className="crown-wrapper">
+                                            <Video size={26} strokeWidth={2.5} style={{ color: "#fbbf24", flexShrink: 0, cursor: "default" }} />
+                                            <span className="crown-tooltip">Content Creator</span>
+                                        </span>
+                                    )}
+                                </span>
                             </h1>
                             
                             <div className="profile-hero-socials">
                                 {form.twitchUrl && (
-                                    <a href={form.twitchUrl} target="_blank" rel="noopener noreferrer" className="hero-social-link twitch" aria-label="Twitch Channel">
-                                        <Twitch size={16} />
+                                    <a href={normalizeTwitchUrl(form.twitchUrl)} target="_blank" rel="noopener noreferrer" className="hero-social-link twitch" aria-label="Twitch Channel">
+                                        <TwitchIcon size={16} />
                                     </a>
                                 )}
                                 {form.youtubeUrl && (
-                                    <a href={form.youtubeUrl} target="_blank" rel="noopener noreferrer" className="hero-social-link youtube" aria-label="YouTube Channel">
-                                        <Youtube size={16} />
+                                    <a href={normalizeYoutubeUrl(form.youtubeUrl)} target="_blank" rel="noopener noreferrer" className="hero-social-link youtube" aria-label="YouTube Channel">
+                                        <YoutubeIcon size={16} />
                                     </a>
                                 )}
                                 
@@ -259,46 +287,58 @@ export default function ProfileHero({
 
                         <div className="profile-hero-actions">
                             {!isEditing && (
-                                <button className="hero-back-btn" onClick={() => navigate(-1)}>
-                                    <ArrowLeft size={16} /> Back
-                                </button>
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    className="hero-back-btn"
+                                    onClick={() => navigate(-1)}
+                                    icon={<ArrowLeft size={16} />}
+                                >
+                                    Back
+                                </Button>
                             )}
 
                             {isOwner && (
                                 <>
                                     {!isContentCreator && !isEditing && (
-                                        <button
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
                                             className="hero-creator-btn"
                                             onClick={() => setShowCreatorModal(true)}
                                             disabled={creatorStatus === 'pending'}
                                             title={creatorStatus === 'pending' ? "Request Pending" : "Request Creator"}
+                                            icon={creatorStatus === 'pending' ? <Clock size={16} /> : <Video size={16} />}
                                         >
-                                            {creatorStatus === 'pending' ? <Clock size={16} /> : <Video size={16} />}
                                             <span className="hidden md:inline">{creatorStatus === 'pending' ? "CC Pending" : "Request Creator"}</span>
-                                        </button>
+                                        </Button>
                                     )}
 
-                                    <button
+                                    <Button
+                                        variant={isEditing ? "primary" : "secondary"}
+                                        size="sm"
                                         className={`hero-edit-btn ${isEditing ? "active" : ""}`}
-                                        disabled={isLoading('save-profile')}
+                                        loading={isLoading('save-profile')}
                                         onClick={handleSave}
+                                        icon={<NotebookPen size={16} />}
                                     >
-                                        <NotebookPen size={16} />
                                         <span>{isEditing ? "Save" : "Edit"}</span>
-                                    </button>
+                                    </Button>
 
                                     {isEditing && (
-                                        <button
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
                                             className="hero-cancel-btn"
                                             onClick={() => {
                                                 if (formBeforeEditRef.current) setForm(formBeforeEditRef.current);
                                                 setIsEditing(false);
                                                 showMessage("Changes discarded", "info");
                                             }}
+                                            icon={<SquareX size={16} />}
                                         >
-                                            <SquareX size={16} />
                                             Cancel
-                                        </button>
+                                        </Button>
                                     )}
                                 </>
                             )}
@@ -309,18 +349,23 @@ export default function ProfileHero({
                         <div className="bio-label">
                             <span className="quote-mark">“</span> BIO
                         </div>
+                        {isOwner && isEditing && (
+                            <div className="bio-char-limit">
+                                {(form.bio || "").length} / 250
+                            </div>
+                        )}
                         <div className="bio-content">
                             {isOwner && isEditing ? (
-                                <ContentFilterInput
-                                    type="textarea"
-                                    value={form.bio}
+                                <TextAreaField
+                                    id="profile-hero-bio"
+                                    value={form.bio || ""}
                                     onChange={(e) => setForm({ ...form, bio: e.target.value })}
-                                    configType="bio"
-                                    showCharacterCount={true}
-                                    showRealTimeValidation={true}
                                     placeholder="Tell us about yourself..."
                                     maxLength={250}
-                                    className="bio-textarea"
+                                    resize="none"
+                                    rows={3}
+                                    size="sm"
+                                    fullWidth
                                 />
                             ) : (
                                 <p>{form.bio && form.bio.length > 150 ? `${form.bio.slice(0, 150)}…` : (form.bio || "No bio provided.")}</p>

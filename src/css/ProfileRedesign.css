@@ -2,6 +2,23 @@
    REDESIGN CSS (Overrides for new 3-tier layout)
    ========================================================================== */
 
+.profile-page {
+  max-width: 1300px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 28px 0 64px 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .profile-page {
+    padding: 16px 16px 64px 16px;
+  }
+}
+
 /* 1. Hero Section */
 .profile-hero-section {
   @apply relative w-full max-w-[1300px] flex rounded-xl p-8 mb-6;
@@ -28,10 +45,7 @@
 }
 
 .profile-hero-avatar-img {
-  @apply w-full h-auto object-contain;
-  image-rendering: pixelated;
-  transform: scale(1.20) translateY(15%);
-  transform-origin: center bottom;
+  @apply w-full h-full object-cover;
 }
 
 .profile-avatar-edit-overlay {
@@ -226,43 +240,41 @@
   top: 1px;
 }
 
+.bio-char-limit {
+  @apply absolute -top-[11px] right-4 px-2 py-0.5 rounded text-[10px] font-bold text-gray-400 uppercase tracking-wider;
+  background: #0f0f0f;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
 .bio-content p {
   @apply text-sm text-gray-300 m-0 leading-relaxed;
 }
 
-.bio-textarea {
-  @apply w-full bg-transparent text-white border-none resize-none text-sm outline-none min-h-[60px];
+/* Seamless textarea within bio card (no double box) */
+.profile-hero-bio .udt-form-field {
+  width: 100%;
+  margin: 0;
+}
+
+.profile-hero-bio .udt-field-control {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  min-height: auto !important;
+}
+
+.profile-hero-bio .udt-field-textarea {
+  background: transparent !important;
+  padding: 0 !important;
+  font-size: 0.875rem !important;
+  line-height: 1.625 !important;
+  color: #e5e7eb !important;
+  min-height: 60px;
 }
 
 .profile-hero-actions {
   @apply flex items-center gap-2;
-}
-
-.hero-back-btn,
-.hero-edit-btn,
-.hero-cancel-btn,
-.hero-creator-btn {
-  @apply flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition text-sm cursor-pointer border-none;
-}
-
-.hero-back-btn {
-  @apply bg-white/10 text-white hover:bg-white/20;
-}
-
-.hero-edit-btn {
-  @apply bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)];
-}
-
-.hero-cancel-btn {
-  @apply bg-white/10 text-white hover:bg-white/20;
-}
-
-.hero-creator-btn {
-  @apply bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)];
-}
-
-.hero-creator-btn:disabled {
-  @apply opacity-60 cursor-not-allowed hover:bg-[var(--accent)];
 }
 
 /* 2. Top Stats */
@@ -423,11 +435,12 @@
 }
 
 .info-edit-wrapper {
-  @apply w-[250px];
+  @apply w-[260px] max-w-full;
 }
 
-.profile-inline-input {
-  @apply w-full bg-[rgba(255,255,255,0.05)] border border-white/10 rounded-md px-3 py-1.5 text-sm text-white text-right focus:text-left transition-all;
+.info-edit-wrapper .udt-form-field {
+  width: 100%;
+  margin: 0;
 }
 
 /* Profile Favorites Section Background */

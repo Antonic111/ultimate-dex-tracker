@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { Sparkles, Check, Info } from 'lucide-react';
 import { profileAPI } from '../../utils/api';
 import { GAME_OPTIONS } from '../../Constants';
 import { useMessage } from './MessageContext';
-import '../../css/ProgressBar.css';
+import { Modal } from './Modal';
+import { Button } from './Button';
 
 // Games from Black 2 onwards that have Shiny Charm
 const SHINY_CHARM_GAMES = [
@@ -33,55 +34,21 @@ export default function ShinyCharmModal({ isOpen, onClose, readOnly = false, vie
   const [selectedGames, setSelectedGames] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [closing, setClosing] = useState(false);
   const { showMessage } = useMessage();
 
   // Load user's shiny charm preferences when modal opens
   useEffect(() => {
     if (isOpen) {
       if (readOnly) {
-        // In read-only mode, use the viewed user's games
         if (Array.isArray(viewedUserShinyCharmGames)) {
           setSelectedGames(viewedUserShinyCharmGames);
           setLoading(false);
         }
       } else {
-        // In edit mode, load current user's games
         loadShinyCharmGames();
       }
-      setClosing(false);
     }
   }, [isOpen, readOnly, viewedUserShinyCharmGames]);
-
-  // Prevent body scrolling when modal is open without breaking sticky header
-  useEffect(() => {
-    if (isOpen) {
-      const preventScroll = (e) => {
-        if (e.target.closest('[role="dialog"]') || e.target.closest('.custom-scrollbar')) return;
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      };
-
-      const preventKeyScroll = (e) => {
-        if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) {
-          if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && !e.target.closest('[role="dialog"]')) {
-            e.preventDefault();
-          }
-        }
-      };
-
-      document.addEventListener('wheel', preventScroll, { passive: false });
-      document.addEventListener('touchmove', preventScroll, { passive: false });
-      document.addEventListener('keydown', preventKeyScroll, { passive: false });
-
-      return () => {
-        document.removeEventListener('wheel', preventScroll);
-        document.removeEventListener('touchmove', preventScroll);
-        document.removeEventListener('keydown', preventKeyScroll);
-      };
-    }
-  }, [isOpen]);
 
   const loadShinyCharmGames = async () => {
     setLoading(true);
@@ -97,6 +64,7 @@ export default function ShinyCharmModal({ isOpen, onClose, readOnly = false, vie
   };
 
   const handleToggleGame = (gameName) => {
+    if (readOnly) return;
     setSelectedGames(prev => {
       if (prev.includes(gameName)) {
         return prev.filter(g => g !== gameName);
@@ -106,26 +74,17 @@ export default function ShinyCharmModal({ isOpen, onClose, readOnly = false, vie
     });
   };
 
-  const handleClose = () => {
-    setClosing(true);
-    setTimeout(() => {
-      onClose();
-      setClosing(false);
-    }, 300);
-  };
-
   const handleSave = async () => {
     setSaving(true);
     try {
       await profileAPI.updateProfile({ shinyCharmGames: selectedGames });
       showMessage('Shiny Charm preferences saved!', 'success');
 
-      // Dispatch event to notify other components of the update
       window.dispatchEvent(new CustomEvent('shinyCharmGamesUpdated', {
         detail: { shinyCharmGames: selectedGames }
       }));
 
-      handleClose();
+      onClose();
     } catch (error) {
       console.error('Error saving shiny charm games:', error);
       showMessage('Failed to save shiny charm preferences', 'error');
@@ -134,104 +93,112 @@ export default function ShinyCharmModal({ isOpen, onClose, readOnly = false, vie
     }
   };
 
-  if (!isOpen && !closing) return null;
-
-  return createPortal(
-    <div
-      className={`progress-modal-overlay${closing ? " closing" : ""}`}
-      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Shiny Charm Games"
+      subtitle={
+        readOnly && viewedUsername ? (
+          <>
+            <span style={{ color: 'var(--accent)' }}>{viewedUsername}</span>
+            {' has the Shiny Charm in these games:'}
+          </>
+        ) : (
+          'Select which games you have acquired the Shiny Charm in'
+        )
+      }
+      icon={<Sparkles size={22} />}
+      size="md"
+      actions={
+        !readOnly && (
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleSave}
+            loading={loading || saving}
+            icon={<Check size={16} strokeWidth={2.5} />}
+          >
+            Save
+          </Button>
+        )
+      }
     >
-      <div
-        className={`progress-modal-panel${closing ? " closing" : ""}`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="modal-header" style={{ paddingBottom: 0, marginBottom: 0 }}>
-          <h3>Shiny Charm Games</h3>
-          <div className="modal-actions">
-            {!readOnly && (
-              <button
-                className="modal-save-btn"
-                onClick={handleSave}
-                disabled={saving}
+      <div className="grid grid-cols-2 gap-2.5 py-1">
+        {SHINY_CHARM_GAMES.map((gameName) => {
+          const gameOption = GAME_OPTIONS.find(g => g.name === gameName);
+          const isSelected = selectedGames.includes(gameName);
+
+          return (
+            <div
+              key={gameName}
+              className={`flex items-center gap-2 md:gap-3 p-3 rounded-xl transition-all ${readOnly ? '' : 'cursor-pointer'} select-none`}
+              style={{
+                backgroundColor: isSelected ? 'var(--accent)' : 'rgba(255, 255, 255, 0.05)',
+                border: `1.5px solid ${isSelected ? 'var(--accent)' : 'var(--border-color, #444444)'}`,
+                boxShadow: isSelected
+                  ? '0 4px 14px rgba(0, 0, 0, 0.35)'
+                  : '0 2px 6px rgba(0, 0, 0, 0.2)',
+                cursor: readOnly ? 'default' : 'pointer',
+                opacity: readOnly && !isSelected ? 0.45 : (loading ? 0.75 : 1),
+                transform: isSelected ? 'translateY(-1px)' : 'none'
+              }}
+              onClick={() => handleToggleGame(gameName)}
+            >
+              {gameOption?.image && (
+                <img
+                  src={gameOption.image}
+                  alt=""
+                  className="w-7 h-7 rounded-lg object-contain flex-shrink-0"
+                  onError={(e) => (e.target.style.display = 'none')}
+                />
+              )}
+              <span
+                className="text-xs md:text-sm truncate"
+                style={{
+                  color: isSelected ? '#000000' : 'var(--text, #ffffff)',
+                  fontWeight: '700'
+                }}
               >
-                {saving ? 'Saving...' : 'Save'}
-              </button>
-            )}
-            <button className="modal-close-btn" onClick={handleClose} aria-label="Close">
-              <span className="sidebar-close-icon">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="20" cy="20" r="18" fill="#fff" stroke="#232323" strokeWidth="2" />
-                  <path d="M2 20a18 18 0 0 1 36 0" fill="#e62829" stroke="#232323" strokeWidth="2" />
-                  <rect x="2" y="19" width="36" height="2" fill="#232323" />
-                  <circle cx="20" cy="20" r="7" fill="#ffffffff" stroke="#232323" strokeWidth="2" />
-                  <circle cx="20" cy="20" r="3.5" fill="#fff" stroke="#232323" strokeWidth="1.5" />
-                </svg>
+                {gameName}
               </span>
-            </button>
-          </div>
-        </div>
-
-        <div className="modal-body" style={{ padding: '0 24px 32px 24px', marginTop: 0 }}>
-          {loading ? (
-            <div className="text-center py-8" style={{ color: 'var(--text)' }}>
-              Loading...
             </div>
-          ) : (
-            <>
-              <p className="mb-4 text-sm" style={{ color: 'var(--text)' }}>
-                {readOnly && viewedUsername
-                  ? (
-                    <>
-                      <span style={{ color: 'var(--accent)' }}>{viewedUsername}</span>
-                      {' has the Shiny Charm in these games:'}
-                    </>
-                  )
-                  : 'Select which games you have the Shiny Charm in:'
-                }
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
-                {SHINY_CHARM_GAMES.map((gameName) => {
-                  const gameOption = GAME_OPTIONS.find(g => g.name === gameName);
-                  const isSelected = selectedGames.includes(gameName);
+          );
+        })}
+      </div>
 
-                  return (
-                    <div
-                      key={gameName}
-                      className={`flex items-center gap-2 md:gap-3 p-2 md:p-3 rounded-lg transition-colors ${readOnly ? '' : 'cursor-pointer'} game-option-item`}
-                      style={{
-                        backgroundColor: isSelected ? 'var(--accent)' : 'var(--pokemon-box-bg2)',
-                        border: `1px solid ${isSelected ? 'var(--accent)' : 'var(--border-color)'}`,
-                        boxShadow: isSelected
-                          ? '0 3px 5px rgba(0, 0, 0, 0.8)'
-                          : '0 3px 5px rgba(0, 0, 0, 0.6)',
-                        cursor: readOnly ? 'default' : 'pointer',
-                        opacity: readOnly && !isSelected ? 0.6 : 1,
-                      }}
-                      onClick={() => !readOnly && handleToggleGame(gameName)}
-                    >
-                      {gameOption?.image && (
-                        <img
-                          src={gameOption.image}
-                          alt=""
-                          className="w-6 h-6 md:w-8 md:h-8 rounded"
-                          onError={(e) => (e.target.style.display = 'none')}
-                        />
-                      )}
-                      <span className="text-sm md:text-base" style={{
-                        color: 'var(--text)',
-                        fontWeight: isSelected ? 'bold' : 'normal'
-                      }}>
-                        {gameName}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </>
-          )}
+      {/* Auto-Modifier Notice Banner */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '10px',
+          marginTop: '14px',
+          padding: '10px 14px',
+          borderRadius: '10px',
+          backgroundColor: 'var(--profile-modal-boxes, rgba(255, 255, 255, 0.04))',
+          border: '1px solid var(--border-color, rgba(255, 255, 255, 0.1))',
+          color: 'var(--profile-labels, #a1a1aa)',
+          fontSize: '0.8125rem',
+          lineHeight: '1.45',
+        }}
+      >
+        <Info
+          size={18}
+          style={{
+            color: 'var(--accent)',
+            flexShrink: 0,
+            marginTop: '2px',
+          }}
+        />
+        <div>
+          <strong style={{ color: 'var(--text, #ffffff)', fontWeight: '700' }}>
+            Automatic Modifier:
+          </strong>{' '}
+          When logging or editing catch details for a shiny Pokémon from any selected game, the{' '}
+          <span style={{ color: 'var(--text, #ffffff)', fontWeight: '600' }}>Shiny Charm</span> modifier will automatically be enabled.
         </div>
       </div>
-    </div>,
-    document.body
+    </Modal>
   );
 }

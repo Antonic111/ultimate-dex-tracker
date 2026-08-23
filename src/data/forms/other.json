@@ -577,6 +577,60 @@
     }
   },
   {
+    "id": 483,
+    "name": "dialga",
+    "formType": "other",
+    "stableId": "origin-ball-dialga-483",
+    "types": [
+      "steel",
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/483.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/483.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/483.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/483.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": null,
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Origin Ball"
+      ],
+      "shiny": []
+    }
+  },
+  {
+    "id": 484,
+    "name": "palkia",
+    "formType": "other",
+    "stableId": "origin-ball-palkia-484",
+    "types": [
+      "water",
+      "dragon"
+    ],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/484.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/484.png",
+      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/484.png",
+      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/484.png"
+    },
+    "gen": 4,
+    "evolution": {
+      "pre": null,
+      "next": []
+    },
+    "recommended_balls": {
+      "default": [
+        "Origin Ball"
+      ],
+      "shiny": []
+    }
+  },
+  {
     "id": 492,
     "name": "shaymin-sky",
     "formType": "other",

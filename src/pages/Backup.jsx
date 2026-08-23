@@ -4,7 +4,7 @@ import { caughtAPI, profileAPI } from '../utils/api';
 import { useTheme } from '../components/Shared/ThemeContext';
 import { UserContext } from '../components/Shared/UserContext';
 import { useMessage } from '../components/Shared/MessageContext';
-import { LoadingSpinner } from '../components/Shared';
+import { LoadingSpinner, SectionLoader } from '../components/Shared';
 import { fetchCaughtData } from '../api/caught';
 import ImportConfirmModal from '../components/Shared/ImportConfirmModal';
 import RestoreBackupModal from '../components/Shared/RestoreBackupModal';
@@ -510,16 +510,20 @@ export default function Backup() {
 
   if (loading) {
     return (
-      <div className="backup-page">
+      <div className="backup-page page-container fade-in-content">
         <div className="backup-container">
-          <LoadingSpinner />
+          <div className="backup-header">
+            <h1>Backup & Import/Export</h1>
+            <div className="header-divider"></div>
+          </div>
+          <SectionLoader minHeight="250px" message="Loading backups..." />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="backup-page page-container slide-up">
+    <div className="backup-page page-container slide-up fade-in-content">
       <div className="backup-container">
         <div className="backup-header">
           <h1>Backup & Import/Export</h1>

@@ -4,6 +4,7 @@ import { getCaughtKey } from "../caughtStorage";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import { getFilteredFormsDataForProfile } from "./profileUtils";
 import { getSpriteUrl } from "./spriteUtils";
+import { calculateOdds } from "./huntSystem";
 import {
   isLegendary,
   isSubLegendary,
@@ -101,6 +102,8 @@ export function calculateDetailedStats(caughtMap, dexPreferences) {
 
   Object.entries(caughtMap).forEach(([key, info]) => {
     if (!info) return;
+    const isEntryCaught = Boolean(info.caught !== false && (info.entries?.length > 0 || info.caught === true));
+    if (!isEntryCaught) return;
     if (key.includes("_shiny")) {
       shinyEntriesMap[key] = info;
     } else {
@@ -116,7 +119,7 @@ export function calculateDetailedStats(caughtMap, dexPreferences) {
       info.entries.forEach(sub => {
         if (sub) allSubEntries.push({ ...sub, isShiny });
       });
-    } else if (info.ball || info.mark || info.game || info.method || info.gender) {
+    } else if (info.ball || info.mark || (Array.isArray(info.marks) && info.marks.length > 0) || info.game || info.method || info.gender) {
       allSubEntries.push({ ...info, isShiny });
     }
   };
@@ -339,12 +342,12 @@ export function calculateDetailedStats(caughtMap, dexPreferences) {
   // 7. MARKS & RIBBONS RANKED BREAKDOWN
   const markCounts = {};
   allSubEntries.forEach(entry => {
-    const markList = Array.isArray(entry.marks)
+    const markList = (Array.isArray(entry.marks) && entry.marks.length > 0)
       ? entry.marks
-      : (entry.mark ? [entry.mark] : []);
+      : (entry.mark && entry.mark !== "none" && entry.mark !== "Unknown" && entry.mark !== "unknown" ? [entry.mark] : []);
     markList.forEach(rawMark => {
       const mark = String(rawMark || "").trim();
-      if (!mark || mark === "none" || mark === "Unknown") return;
+      if (!mark || mark === "none" || mark === "Unknown" || mark === "unknown") return;
       if (!markCounts[mark]) {
         markCounts[mark] = { count: 0, regular: 0, shiny: 0 };
       }
@@ -481,5 +484,272 @@ export function calculateDetailedStats(caughtMap, dexPreferences) {
       genderless: genderlessCount,
       total: maleCount + femaleCount + genderlessCount
     }
+  };
+}
+
+export function calculateHuntStats(completedHunts = [], caughtMap = {}) {
+  const hunts = Array.isArray(completedHunts) ? [...completedHunts] : [];
+
+  // Harvest any hunt entries from caughtMap that might not be in completedHunts
+  if (caughtMap && typeof caughtMap === "object") {
+    Object.entries(caughtMap).forEach(([caughtKey, info]) => {
+      if (info && Array.isArray(info.entries)) {
+        info.entries.forEach(entry => {
+          if (entry.isHuntTracker) {
+            const entryId = entry.entryId || entry.id;
+            const alreadyExists = hunts.some(h => 
+              (entryId && (h.entryId === entryId || h.id === entryId)) ||
+              (h.caughtKey === caughtKey && h.date === entry.date && (h.totalChecks === entry.totalChecks || h.checks === entry.checks))
+            );
+            if (!alreadyExists) {
+              hunts.push({
+                ...entry,
+                caughtKey,
+                pokemonName: entry.pokemonName || caughtKey.split("-")[0],
+                pokemon: entry.pokemon || null,
+                timestamp: entry.timestamp || (entry.date ? new Date(entry.date).getTime() : 0),
+                addedToLivingDex: true
+              });
+            }
+          }
+        });
+      }
+    });
+  }
+
+  // Collect all fails from caughtMap and hunt entries
+  const failsList = [];
+
+  const addFailItem = (f, defaultMonName, defaultMon) => {
+    if (!f) return;
+
+    const monName = f.pokemonName || f.pokemon?.name || defaultMonName || "";
+    const pObj = f.pokemon || defaultMon || null;
+    const checks = Number(f.totalChecks || f.checks || f.phaseChecks) || 0;
+    const timeMs = Number(f.elapsedMs || f.time) || 0;
+    const timestamp = f.timestamp || (f.date ? new Date(f.date).getTime() : 0);
+    const dateStr = f.date || (timestamp ? new Date(timestamp).toISOString().split("T")[0] : "");
+    const entryId = f.entryId || f.id || null;
+
+    // Check if already in failsList
+    const isDuplicate = failsList.some(existing => {
+      // 1. Match by entryId or id
+      if (entryId && existing.entryId && entryId === existing.entryId) return true;
+      if (f.id && existing.id && f.id === existing.id) return true;
+
+      // 2. Semantic matching: same pokemon + same game + same checks
+      const sameMon = monName.toLowerCase() === (existing.pokemonName || "").toLowerCase();
+      const sameGame = (f.game || "").toLowerCase() === (existing.game || "").toLowerCase();
+      const sameChecks = checks === (Number(existing.totalChecks || existing.checks) || 0);
+
+      if (sameMon && sameGame && sameChecks) {
+        // Date match or within same day
+        const existingDate = (existing.date || "").split("T")[0];
+        const newDate = dateStr.split("T")[0];
+        if (existingDate && newDate && existingDate === newDate) return true;
+
+        const timeDiff = Math.abs((timestamp || 0) - (existing.timestamp || 0));
+        if (timestamp > 0 && existing.timestamp > 0 && timeDiff < 1000 * 60 * 60 * 24) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+    if (isDuplicate) return;
+
+    failsList.push({
+      ...f,
+      id: entryId || `${dateStr}-${checks}-${f.game || ''}`,
+      entryId: entryId || `${dateStr}-${checks}-${f.game || ''}`,
+      pokemonName: monName,
+      pokemon: pObj,
+      checks,
+      totalChecks: checks,
+      time: timeMs,
+      elapsedMs: timeMs,
+      timestamp,
+      date: dateStr,
+      reason: f.reason || f.notes || "Failed Encounter",
+      isFail: true
+    });
+  };
+
+  if (caughtMap && typeof caughtMap === "object") {
+    Object.entries(caughtMap).forEach(([caughtKey, info]) => {
+      if (info && Array.isArray(info.fails)) {
+        const cleanKey = caughtKey.replace(/:shiny$|-shiny$/, "");
+        info.fails.forEach(f => addFailItem(f, f.pokemonName || f.pokemon?.name || cleanKey, f.pokemon || null));
+      }
+    });
+  }
+
+  hunts.forEach(h => {
+    if (h.outcome === "failed" || h.isFail) {
+      addFailItem(h, h.pokemonName, h.pokemon);
+      return;
+    }
+    if (Array.isArray(h.fails)) {
+      h.fails.forEach(f => addFailItem(f, h.pokemonName, h.pokemon));
+    }
+    if (Array.isArray(h.phases)) {
+      h.phases.forEach(p => {
+        if (p.outcome === "failed" || p.isFail) {
+          addFailItem(p, p.pokemonName || h.pokemonName, p.pokemon || h.pokemon);
+        }
+      });
+    }
+  });
+
+  const successfulHunts = hunts.filter(h => h.outcome !== "failed" && !h.isFail);
+  const totalFails = failsList.length;
+
+  if (successfulHunts.length === 0 && totalFails === 0) {
+    return null;
+  }
+
+  let totalChecks = 0;
+  let totalTimeMs = 0;
+  let totalPhases = 0;
+  let fastestChecksHunt = null;
+  let longestChecksHunt = null;
+  let fastestTimeHunt = null;
+  let longestTimeHunt = null;
+  let mostPhasesHunt = null;
+  let luckiestHunt = null;
+  let toughestHunt = null;
+
+  const methodMap = {};
+  const gameMap = {};
+
+  successfulHunts.forEach(h => {
+    const checks = Number(h.totalChecks || h.checks) || 0;
+    const timeMs = Number(h.elapsedMs || h.time) || 0;
+    const phaseList = Array.isArray(h.phases) ? h.phases : [];
+    const phaseCount = Number(h.phaseCount) || (phaseList.length + 1) || 1;
+    const odds = Number(h.odds) || calculateOdds(h.game, h.method, h.modifiers || {}) || 4096;
+    h.odds = odds;
+
+    totalChecks += checks;
+    totalTimeMs += timeMs;
+    totalPhases += (phaseCount - 1); // count of extra phase shinies
+
+    // Fastest Hunt (Fewest checks)
+    if (checks > 0) {
+      const fastChecks = Number(fastestChecksHunt?.totalChecks || fastestChecksHunt?.checks) || Infinity;
+      if (!fastestChecksHunt || checks < fastChecks) {
+        fastestChecksHunt = h;
+      }
+      // Longest Hunt (Most checks)
+      const longChecks = Number(longestChecksHunt?.totalChecks || longestChecksHunt?.checks) || 0;
+      if (!longestChecksHunt || checks > longChecks) {
+        longestChecksHunt = h;
+      }
+    }
+
+    // Fastest Time (lowest elapsed time > 0)
+    if (timeMs > 0) {
+      const fastestTime = Number(fastestTimeHunt?.elapsedMs || fastestTimeHunt?.time) || Infinity;
+      if (!fastestTimeHunt || timeMs < fastestTime) {
+        fastestTimeHunt = h;
+      }
+      // Longest Time (highest elapsed time)
+      const longestTime = Number(longestTimeHunt?.elapsedMs || longestTimeHunt?.time) || 0;
+      if (!longestTimeHunt || timeMs > longestTime) {
+        longestTimeHunt = h;
+      }
+    }
+
+    // Most Phases Record
+    const curPhases = phaseCount;
+    const recordPhases = Number(mostPhasesHunt?.phaseCount) || (mostPhasesHunt?.phases?.length ? mostPhasesHunt.phases.length + 1 : 1);
+    if (!mostPhasesHunt || curPhases > recordPhases) {
+      if (curPhases > 1) {
+        mostPhasesHunt = h;
+      }
+    }
+
+    // Luckiest Hunt (Lowest % of odds or ratio of checks/odds)
+    if (odds > 0 && checks > 0) {
+      const ratio = checks / odds;
+      const luckyRatio = luckiestHunt ? ((Number(luckiestHunt.totalChecks || luckiestHunt.checks) || 0) / (Number(luckiestHunt.odds) || 1)) : Infinity;
+      if (ratio < luckyRatio) {
+        luckiestHunt = { ...h, oddsRatio: ratio, pctOfOdds: Math.round(ratio * 100) };
+      }
+
+      // Toughest Hunt (Highest multiple of odds)
+      const toughRatio = toughestHunt ? ((Number(toughestHunt.totalChecks || toughestHunt.checks) || 0) / (Number(toughestHunt.odds) || 1)) : 0;
+      if (ratio > toughRatio && ratio >= 1) {
+        toughestHunt = { ...h, oddsRatio: ratio, multipleOfOdds: (checks / odds).toFixed(1) };
+      }
+    }
+
+    // Method breakdown
+    const method = h.method || "Standard Encounter";
+    if (!methodMap[method]) {
+      methodMap[method] = { method, count: 0, totalChecks: 0, totalTimeMs: 0 };
+    }
+    methodMap[method].count += 1;
+    methodMap[method].totalChecks += checks;
+    methodMap[method].totalTimeMs += timeMs;
+
+    // Game breakdown
+    const game = h.game || "Unknown Game";
+    if (!gameMap[game]) {
+      gameMap[game] = { game, count: 0, totalChecks: 0, totalTimeMs: 0 };
+    }
+    gameMap[game].count += 1;
+    gameMap[game].totalChecks += checks;
+    gameMap[game].totalTimeMs += timeMs;
+  });
+
+  const totalHunts = successfulHunts.length;
+  const avgChecks = totalHunts > 0 ? Math.round(totalChecks / totalHunts) : 0;
+  const avgTimeMs = totalHunts > 0 ? Math.round(totalTimeMs / totalHunts) : 0;
+
+  const totalEncounters = totalHunts + totalFails;
+  const successRate = totalEncounters > 0 ? Number(((totalHunts / totalEncounters) * 100).toFixed(1)) : 100;
+  const failRate = totalEncounters > 0 ? Number(((totalFails / totalEncounters) * 100).toFixed(1)) : 0;
+
+  const methodBreakdown = Object.values(methodMap)
+    .map(m => ({
+      ...m,
+      avgChecks: Math.round(m.totalChecks / m.count),
+      avgTimeMs: Math.round(m.totalTimeMs / m.count),
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  const gameBreakdown = Object.values(gameMap)
+    .map(g => ({
+      ...g,
+      avgChecks: Math.round(g.totalChecks / g.count),
+      avgTimeMs: Math.round(g.totalTimeMs / g.count),
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  return {
+    totalHunts,
+    totalChecks,
+    totalTimeMs,
+    avgChecks,
+    avgTimeMs,
+    totalPhases,
+    totalFails,
+    totalEncounters,
+    successRate,
+    failRate,
+    records: {
+      fastestChecks: fastestChecksHunt,
+      longestChecks: longestChecksHunt,
+      fastestTime: fastestTimeHunt,
+      longestTime: longestTimeHunt,
+      mostPhases: mostPhasesHunt,
+      luckiest: luckiestHunt,
+      toughest: toughestHunt,
+    },
+    methodBreakdown,
+    gameBreakdown,
+    huntsList: successfulHunts.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)),
+    failsList: failsList.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
   };
 }

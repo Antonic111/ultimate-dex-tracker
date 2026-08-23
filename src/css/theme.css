@@ -9,6 +9,10 @@
   --z-modal-panel: 10051;
   --z-modal-dropdown: 10052;
   --z-loading: 10053;
+
+  /* Neutral Text Tones */
+  --text-muted: #888888;
+  --text-secondary: #888888;
 }
 
 [data-theme="dark"] {
@@ -20,6 +24,8 @@
   --main-bg: #111;
   --main-bg2: #0a0a0a;
   --text: #ffffff;
+  --text-muted: #888888;
+  --text-secondary: #888888;
   --header-hello: #aaa;
 
   /* APP.CSS */
@@ -90,7 +96,7 @@
   --searchbar-inputs: #242424;
   --searchbar-dropdown: #181818;
   --searchbar-dropdown-selected: #3f3f3f;
-  --searchbar-placeholder-text: #aaa;
+  --searchbar-placeholder-text: rgba(255, 255, 255, 0.45);
 
   /* PROGRESSBARS.CSS */
   --progressbar-info: #aaa;
@@ -151,6 +157,10 @@
   /* gray-100 */
   --text: #1f2937;
   /* gray-800 - better contrast than gray-900 */
+  --text-muted: #6b7280;
+  /* gray-500 */
+  --text-secondary: #6b7280;
+  /* gray-500 */
   --header-hello: #4b5563;
   /* gray-600 - softer */
 
@@ -530,6 +540,51 @@ textarea:focus {
   background-size: 200% 100% !important;
   animation: rainbowFlow 3s linear infinite !important;
   will-change: filter, background-position;
+}
+
+/* ==========================================================================
+   INTERACTIVE CARD MICRO-INTERACTIONS
+   ========================================================================== */
+.udt-interactive-card,
+.trainer-card,
+.hunt-record-card,
+.stat-pill-card,
+.top-trainer-spotlight-box,
+.podium-card {
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.18s ease,
+              background-color 0.18s ease,
+              box-shadow 0.18s ease;
+}
+
+.udt-interactive-card:hover,
+.trainer-card:hover,
+.hunt-record-card:hover,
+.top-trainer-spotlight-box:hover,
+.podium-card:hover {
+  transform: translateY(-1px);
+}
+
+.udt-interactive-card:active,
+.trainer-card:active,
+.hunt-record-card:active,
+.top-trainer-spotlight-box:active,
+.podium-card:active {
+  transform: scale(0.99);
+}
+
+/* ==========================================================================
+   ACCESSIBILITY: PREFERS-REDUCED-MOTION
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 

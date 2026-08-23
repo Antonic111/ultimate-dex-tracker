@@ -419,10 +419,13 @@ export const caughtAPI = {
   },
 
   // Atomically update a single entry
-  async updateCaughtEntry(key, info, newCatchTrigger = null) {
+  async updateCaughtEntry(key, info, newCatchTrigger = null, removeCatchTrigger = null) {
     const payload = { info };
     if (newCatchTrigger) {
       payload.newCatchTrigger = newCatchTrigger;
+    }
+    if (removeCatchTrigger) {
+      payload.removeCatchTrigger = removeCatchTrigger;
     }
     return api.put(`/caught/${encodeURIComponent(key)}`, payload);
   },
@@ -485,18 +488,60 @@ export const profileAPI = {
     return api.put('/profile', profileData);
   },
 
+  // Upload custom profile avatar with Sightengine moderation
+  async uploadAvatar(file) {
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    const url = buildApiUrl('/users/avatar');
+    const token = localStorage.getItem('authToken');
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const errorData = await response.json();
+        const error = new Error(errorData.error || 'Failed to upload avatar');
+        error.userMessage = errorData.error || 'Failed to upload avatar';
+        throw error;
+      }
+      const errorText = await response.text();
+      const error = new Error(errorText || 'Failed to upload avatar');
+      error.userMessage = errorText || 'Failed to upload avatar';
+      throw error;
+    }
+
+    return response.json();
+  },
+
+  // Remove custom avatar
+  async removeAvatar() {
+    return api.delete('/users/avatar');
+  },
+
   // Update dex preferences
   async updateDexPreferences(dexPreferences) {
     return api.put('/profile', { dexPreferences });
   },
 
-  // Get public users for trainers page
-  async getPublicUsers(query = '', page = 1, pageSize = 24, random = false) {
+  // Get public users for trainers or leaderboard page
+  async getPublicUsers(query = '', page = 1, pageSize = 24, random = false, scope = '') {
     const params = new URLSearchParams();
     if (query) params.append('query', query);
     if (page) params.append('page', page.toString());
     if (pageSize) params.append('pageSize', pageSize.toString());
     if (random) params.append('random', '1');
+    if (scope) params.append('scope', scope);
 
     const queryString = params.toString();
     const endpoint = queryString ? `/users/public?${queryString}` : '/users/public';
@@ -585,6 +630,16 @@ export const userAPI = {
     return api.post('/verify-password-code', { code });
   },
 
+  // Send reset collection code
+  async sendResetCollectionCode() {
+    return api.post('/account/reset-collection/send');
+  },
+
+  // Confirm reset collection
+  async confirmResetCollection(code, username) {
+    return api.post('/account/reset-collection/confirm', { code, confirm: username });
+  },
+
   // Send delete account code
   async sendDeleteCode() {
     return api.post('/account/delete/send');
@@ -638,3 +693,60 @@ export const creatorAPI = {
     return api.patch(`/admin/creator-requests/${id}`, data);
   },
 };
+
+// ─── OAuth API ─────────────────────────────────────────────────────────────────
+export const oauthAPI = {
+  // Get all linked OAuth providers for the logged-in user
+  async getProviders() {
+    return api.get('/oauth/providers');
+  },
+
+  // Unlink a specific OAuth provider ('google' | 'discord')
+  async unlinkProvider(provider) {
+    return api.delete(`/oauth/unlink/${encodeURIComponent(provider)}`);
+  },
+
+  // Complete profile setup for new OAuth users (username and optional password)
+  async completeOAuthSetup(data) {
+    return api.post('/complete-oauth-setup', data);
+  },
+};
+
+// ─── Notifications & Announcements API ───────────────────────────────────────
+export const notificationsAPI = {
+  // Get notifications for current user
+  async getNotifications() {
+    return api.get('/notifications');
+  },
+
+  // Mark single notification as read/unread
+  async markAsRead(id, read = true) {
+    return api.patch(`/notifications/${encodeURIComponent(id)}/read`, { read });
+  },
+
+  // Mark all notifications as read
+  async markAllAsRead() {
+    return api.post('/notifications/read-all');
+  },
+
+  // Delete/hide single notification for user
+  async deleteNotification(id) {
+    return api.delete(`/notifications/${encodeURIComponent(id)}`);
+  },
+
+  // Delete/hide all notifications for user
+  async deleteAllNotifications() {
+    return api.post('/notifications/delete-all');
+  },
+
+  // Admin: Broadcast a new announcement
+  async sendAnnouncement(data) {
+    return api.post('/notifications/announcement', data);
+  },
+
+  // Admin: Permanently delete an announcement
+  async deleteAnnouncementAdmin(id) {
+    return api.delete(`/notifications/admin/${encodeURIComponent(id)}`);
+  }
+};
+

@@ -19,11 +19,11 @@ export function getSpriteUrl(pokemon, isShiny = false, useHomeSprites = false) {
         return isShiny && pokemon.sprites.front_shiny ? pokemon.sprites.front_shiny : (pokemon.sprites.front_default || '/fallback.png');
     }
 
-    // User prefers HOME sprites - STRICT NO FALLBACK
+    // User prefers HOME sprites - fall back to front sprites if home sprite is unavailable
     if (isShiny) {
-        return pokemon.sprites.home_shiny || '';
+        return pokemon.sprites.home_shiny || pokemon.sprites.front_shiny || pokemon.sprites.front_default || '/fallback.png';
     } else {
-        return pokemon.sprites.home_default || '';
+        return pokemon.sprites.home_default || pokemon.sprites.front_default || '/fallback.png';
     }
 }
 

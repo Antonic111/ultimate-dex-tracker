@@ -59,7 +59,27 @@ export function generateEmailHtml({ username, subject, code, action }) {
   let didNotRequestTitle = "Didn't request this code?";
   let didNotRequestText = 'You can safely ignore this email — your account will remain secure.';
 
-  if (normAction.includes('register') || (normAction.includes('verification') && !normAction.includes('email change') && !normAction.includes('new email') && !normAction.includes('password change'))) {
+  if (normAction.includes('reset collection') || normAction.includes('collection reset')) {
+    theme = 'red';
+    accentHex = '#ef4444';
+    badgeBg = 'rgba(239, 68, 68, 0.12)';
+    badgeBorder = 'rgba(239, 68, 68, 0.4)';
+    badgeText = 'COLLECTION RESET';
+    headlineText = 'Reset all collection data';
+    actionDescription = 'Enter this code to permanently reset all caught Pokémon, shiny hunts, progress bars, and bingo cards for your account. Your account and login credentials will remain active.';
+    didNotRequestTitle = "Didn't request a collection reset?";
+    didNotRequestText = 'Warning: This action is permanent and cannot be undone. If you did not request this, you can safely ignore this email and your collection will remain safe.';
+  } else if (normAction.includes('deletion') || normAction.includes('delete')) {
+    theme = 'red';
+    accentHex = '#ef4444';
+    badgeBg = 'rgba(239, 68, 68, 0.12)';
+    badgeBorder = 'rgba(239, 68, 68, 0.4)';
+    badgeText = 'ACCOUNT DELETION';
+    headlineText = 'Confirm account deletion';
+    actionDescription = 'Enter this code to permanently delete your Ultimate Dex Tracker account and all saved Pokémon data.';
+    didNotRequestTitle = "Didn't request account deletion?";
+    didNotRequestText = 'Warning: This action is permanent. If you did not request this, ignore this email and your account will remain safe.';
+  } else if (normAction.includes('register') || (normAction.includes('verification') && !normAction.includes('email change') && !normAction.includes('new email') && !normAction.includes('password change'))) {
     theme = 'yellow';
     accentHex = '#ffe76a';
     badgeBg = 'rgba(255, 231, 106, 0.12)';
@@ -69,7 +89,7 @@ export function generateEmailHtml({ username, subject, code, action }) {
     actionDescription = 'Enter this code to complete your registration and begin tracking your collection across every game.';
     didNotRequestTitle = "Didn't create an account?";
     didNotRequestText = 'You can safely ignore this email. No account will be activated without this code.';
-  } else if (normAction.includes('password reset') || normAction.includes('reset')) {
+  } else if (normAction.includes('password reset') || normAction.includes('reset password') || normAction === 'reset') {
     theme = 'orange';
     accentHex = '#f97316';
     badgeBg = 'rgba(249, 115, 22, 0.12)';
@@ -109,22 +129,12 @@ export function generateEmailHtml({ username, subject, code, action }) {
     actionDescription = 'Enter this code to confirm your new password for your Ultimate Dex Tracker account.';
     didNotRequestTitle = "Didn't request this change?";
     didNotRequestText = 'If you did not make this change, please sign in and secure your account immediately.';
-  } else if (normAction.includes('deletion') || normAction.includes('delete')) {
-    theme = 'red';
-    accentHex = '#ef4444';
-    badgeBg = 'rgba(239, 68, 68, 0.12)';
-    badgeBorder = 'rgba(239, 68, 68, 0.4)';
-    badgeText = 'ACCOUNT DELETION';
-    headlineText = 'Confirm account deletion';
-    actionDescription = 'Enter this code to permanently delete your Ultimate Dex Tracker account and all saved Pokémon data.';
-    didNotRequestTitle = "Didn't request account deletion?";
-    didNotRequestText = 'Warning: This action is permanent. If you did not request this, ignore this email and your account will remain safe.';
   }
 
   const assets = EMAIL_ASSETS[theme] || EMAIL_ASSETS['yellow'];
 
-  // Format code with spaces for crisp display
-  const formattedCode = String(code || '').split('').join(' ');
+  // Keep code contiguous so users can cleanly copy and paste without space artifacts
+  const formattedCode = String(code || '').trim();
 
   return `
 <!DOCTYPE html>

@@ -1,0 +1,293 @@
+/* ==========================================================================
+   COMPLETE SIGNUP PAGE STYLES (Refined Modern Card Design)
+   ========================================================================== */
+
+.complete-signup-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1 0 auto;
+  width: 100%;
+  padding: 24px 16px 36px;
+  box-sizing: border-box;
+}
+
+/* Card Container */
+.complete-signup-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--auth-boxes, #141416);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 24px;
+  padding: 36px 32px 30px;
+  box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.6),
+              0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: completeSignupFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+@keyframes completeSignupFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   HERO GRAPHIC (Glowing User Badge)
+   -------------------------------------------------------------------------- */
+
+.complete-signup-hero-graphic {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Centered Ambient Glow behind User Badge */
+.complete-signup-hero-graphic::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent, #38bdf8) 42%, transparent) 0%,
+    color-mix(in srgb, var(--accent, #38bdf8) 16%, transparent) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+  filter: blur(14px);
+  z-index: 0;
+  transition: background 0.3s ease;
+}
+
+/* User Circle Badge */
+.complete-signup-user-badge {
+  position: relative;
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(20, 20, 24, 0.95) 100%);
+  border: 1.5px solid color-mix(in srgb, var(--accent, #38bdf8) 75%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent, #38bdf8);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5),
+              0 0 16px -2px color-mix(in srgb, var(--accent, #38bdf8) 35%, transparent);
+  z-index: 1;
+  transition: color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.complete-signup-user-badge svg {
+  stroke-width: 2;
+}
+
+/* --------------------------------------------------------------------------
+   HEADER & DESCRIPTION
+   -------------------------------------------------------------------------- */
+
+.complete-signup-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--text, #ffffff);
+  margin: 0 0 10px 0;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.complete-signup-title-accent {
+  color: var(--accent, #38bdf8);
+  transition: color var(--transition-speed);
+}
+
+.complete-signup-description {
+  font-size: 0.88rem;
+  color: var(--text-muted, #9ca3af);
+  line-height: 1.5;
+  margin: 0 0 24px 0;
+  max-width: 380px;
+}
+
+/* --------------------------------------------------------------------------
+   FORM FIELDS & BUTTONS
+   -------------------------------------------------------------------------- */
+
+.complete-signup-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Password Strength Section */
+.password-strength-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  margin-top: -6px;
+  margin-bottom: 2px;
+}
+
+.password-strength-bars {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.password-strength-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: background-color 0.25s ease;
+}
+
+.password-strength-label {
+  font-size: 0.78rem;
+  color: var(--text-muted, #9ca3af);
+  font-weight: 500;
+}
+
+.password-strength-value {
+  font-weight: 700;
+  margin-left: 4px;
+  transition: color 0.2s ease;
+}
+
+/* Username status indicator inside input field */
+.username-status-badge {
+  display: flex;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.username-status-badge .spinning {
+  animation: spin 1s linear infinite;
+  color: var(--text-muted, #9ca3af);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Submit Button */
+.complete-signup-submit-btn {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  margin-top: 4px;
+  box-shadow: 0 4px 20px -2px color-mix(in srgb, var(--accent, #38bdf8) 40%, transparent);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color var(--transition-speed);
+}
+
+.complete-signup-submit-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--accent, #38bdf8) 55%, transparent);
+}
+
+/* Divider */
+.complete-signup-divider {
+  display: flex;
+  align-items: center;
+  margin: 2px 0;
+  color: var(--text-muted, #71717a);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.complete-signup-divider::before,
+.complete-signup-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-color, rgba(255, 255, 255, 0.1));
+}
+
+.complete-signup-divider span {
+  padding: 0 12px;
+}
+
+/* Skip Button */
+.complete-signup-skip-btn {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  color: var(--text-muted, #9ca3af);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 12px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.complete-signup-skip-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text, #ffffff);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Legal Footer */
+.complete-signup-legal {
+  font-size: 0.76rem;
+  color: var(--text-muted, #71717a);
+  line-height: 1.45;
+  margin-top: 18px;
+  text-align: center;
+}
+
+.complete-signup-legal a {
+  color: var(--accent, #38bdf8);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--transition-speed);
+}
+
+.complete-signup-legal a:hover {
+  filter: brightness(1.2);
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVENESS
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 520px) {
+  .complete-signup-card {
+    padding: 28px 20px 24px;
+    border-radius: 20px;
+  }
+
+  .complete-signup-title {
+    font-size: 1.5rem;
+  }
+
+  .complete-signup-description {
+    font-size: 0.82rem;
+  }
+}

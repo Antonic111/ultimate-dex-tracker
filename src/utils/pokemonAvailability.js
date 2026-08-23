@@ -52,9 +52,59 @@ export const GAME_COUNTERPARTS = {
 export const normalizeGameName = (name) =>
   String(name || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
+export const PLA_SHINY_LOCKED_IDS = new Set([
+  480, // Uxie
+  481, // Mesprit
+  482, // Azelf
+  483, // Dialga
+  484, // Palkia
+  485, // Heatran
+  486, // Regigigas
+  487, // Giratina
+  488, // Cresselia
+  489, // Phione
+  490, // Manaphy
+  491, // Darkrai
+  492, // Shaymin
+  493, // Arceus
+  641, // Tornadus
+  642, // Thundurus
+  645, // Landorus
+  905  // Enamorus
+]);
+
+export const PLA_SHINY_LOCKED_NAMES = [
+  "enamorus",
+  "landorus",
+  "thundurus",
+  "tornadus",
+  "arceus",
+  "shaymin",
+  "darkrai",
+  "manaphy",
+  "phione",
+  "cresselia",
+  "giratina",
+  "regigigas",
+  "heatran",
+  "palkia",
+  "dialga",
+  "azelf",
+  "mesprit",
+  "uxie"
+];
+
+export const isPLAShinyLocked = (pokemon) => {
+  if (!pokemon) return false;
+  const idNum = Number(pokemon.id);
+  if (PLA_SHINY_LOCKED_IDS.has(idNum)) return true;
+  const name = String(pokemon.name || "").toLowerCase().replace(/[^a-z]/g, "");
+  return PLA_SHINY_LOCKED_NAMES.some(locked => name.includes(locked));
+};
+
 // Get games where a Pokemon can be caught, ordered by release date.
 // This mirrors the sidebar "Obtainable In" logic for 1:1 matching.
-export const getAvailableGamesForPokemonSidebar = (pokemon) => {
+export const getAvailableGamesForPokemonSidebar = (pokemon, isShiny = true) => {
   if (!pokemon || !pokemon.id) return [];
 
   const pokemonName = pokemon.name?.toLowerCase() || "";
@@ -62,11 +112,24 @@ export const getAvailableGamesForPokemonSidebar = (pokemon) => {
   let availableGames = [];
 
   // 1. Determine base availability (Hardcoded Forms vs Default)
+  if (pokemon.stableId === "origin-ball-dialga-483" || pokemon.stableId === "origin-ball-palkia-484" || pokemon.stableId?.startsWith("origin-ball-") || pokemonName.startsWith("origin-ball-")) {
+    return isShiny ? [] : ["Legends Arceus"];
+  }
+
   if (formType === "mighty" && Number(pokemon.id) !== 151 && pokemonName !== "mew") {
     return ["Scarlet", "Violet"];
   }
 
-  if (formType === "alpha" || formType === "alphaother") {
+  const isAlpha =
+    formType === "alpha" ||
+    formType === "alphaother" ||
+    pokemonName.includes("alpha") ||
+    pokemon.form === "alpha" ||
+    String(pokemon.form || "").toLowerCase().includes("alpha") ||
+    pokemon.stableId?.includes("-alpha-") ||
+    pokemon.stableId?.endsWith("-alpha");
+
+  if (isAlpha) {
     if (pokemonName.includes("alolan") || pokemonName.includes("galarian") || pokemonName.includes("paldean") || pokemonName.includes("gmax") || pokemonName.includes("mega")) {
       availableGames = [];
     } else {
@@ -84,7 +147,7 @@ export const getAvailableGamesForPokemonSidebar = (pokemon) => {
     }
   }
   else if (pokemonName.includes("therian") || pokemonName.includes("therian-") || pokemonName.includes("-therian")) {
-    availableGames = ["Legends Arceus", "GO"];
+    availableGames = (isShiny && isPLAShinyLocked(pokemon)) ? ["GO"] : ["Legends Arceus", "GO"];
   }
   else if (pokemonName.includes("magikarp") && (pokemonName.includes("level-100") || pokemonName.includes("level 100") || pokemonName.includes("lvl-100") || pokemonName.includes("lvl 100"))) {
     availableGames = ["Diamond", "Pearl", "Platinum", "Scarlet", "Violet"];
@@ -175,6 +238,20 @@ export const getAvailableGamesForPokemonSidebar = (pokemon) => {
     availableGames = getAvailableGamesForPokemon(pokemon.id, gamePokemonData);
   }
 
+  const isGenderForm =
+    formType === "gender" ||
+    pokemon.form === "gender" ||
+    pokemonName.includes("-gender") ||
+    pokemonName.endsWith(" gender") ||
+    pokemon.stableId?.includes("-gender-");
+
+  if (isGenderForm) {
+    // Gender difference forms cannot be caught in Gen 1 (Red, Green, Blue, Yellow)
+    availableGames = availableGames.filter(
+      game => !["Red", "Green", "Blue", "Yellow"].includes(game)
+    );
+  }
+
   // Filter out exclusives based on versionExclusives.json
   // If a pokemon is in likely exclusive to the counterpart game, remove the current game from availability
   availableGames = availableGames.filter(game => {
@@ -204,6 +281,11 @@ export const getAvailableGamesForPokemonSidebar = (pokemon) => {
     }
     return true;
   });
+
+  // Filter out Legends Arceus for shiny-locked Pokémon when calculating shiny availability
+  if (isShiny && isPLAShinyLocked(pokemon)) {
+    availableGames = availableGames.filter(g => g !== "Legends Arceus");
+  }
 
   return availableGames.sort((a, b) => GAME_RELEASE_ORDER.indexOf(a) - GAME_RELEASE_ORDER.indexOf(b));
 };

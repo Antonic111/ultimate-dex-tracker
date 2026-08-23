@@ -47,7 +47,9 @@ export const LoadingProvider = ({ children }) => {
     });
   }, []);
 
-  const value = {
+  const isLoading = useCallback((key) => Boolean(loadingStates[key]), [loadingStates]);
+
+  const value = React.useMemo(() => ({
     loadingStates,
     globalLoading,
     setLoading,
@@ -55,8 +57,8 @@ export const LoadingProvider = ({ children }) => {
     isAnyLoading,
     clearAllLoading,
     clearLoading,
-    isLoading: (key) => loadingStates[key] || false
-  };
+    isLoading
+  }), [loadingStates, globalLoading, setLoading, setGlobalLoadingState, isAnyLoading, clearAllLoading, clearLoading, isLoading]);
 
   return (
     <LoadingContext.Provider value={value}>

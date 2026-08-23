@@ -1,8 +1,10 @@
-import { useEffect, useState, useRef, useContext } from 'react';
+import { useEffect, useState, useRef, useContext, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useLoading } from './LoadingContext';
 import { UserContext } from './UserContext';
 
 export default function CustomScrollbar() {
+  const location = useLocation();
   const [scrollPosition, setScrollPosition] = useState(0);
   const [scrollHeight, setScrollHeight] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
@@ -10,72 +12,106 @@ export default function CustomScrollbar() {
   const [dragStartY, setDragStartY] = useState(0);
   const [dragStartScroll, setDragStartScroll] = useState(0);
   const thumbRef = useRef(null);
-  const { isAnyLoading } = useLoading();
+  const trackRef = useRef(null);
   const userContext = useContext(UserContext);
 
+  const username = userContext?.username || userContext?.user?.username;
+  const isLandingPage = location.pathname === '/' && !userContext?.loading && !username;
+
+  const updateScrollbar = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    if (window.innerWidth < 769 || isLandingPage) return;
+
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    const rootEl = document.getElementById('root');
+    const totalHeight = Math.max(
+      document.documentElement.scrollHeight || 0,
+      document.body.scrollHeight || 0,
+      rootEl?.scrollHeight || 0
+    );
+    const clientHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+
+    setScrollPosition(prev => Math.abs(prev - scrollTop) > 0.5 ? scrollTop : prev);
+    setScrollHeight(prev => Math.abs(prev - totalHeight) > 1 ? totalHeight : prev);
+    setViewportHeight(prev => Math.abs(prev - clientHeight) > 1 ? clientHeight : prev);
+  }, [isLandingPage]);
+
+  // Continuous frame check & event listeners for 100% accurate real-time tracking
   useEffect(() => {
-    // Only run on desktop
-    if (window.innerWidth < 769) return;
+    if (typeof window === 'undefined') return;
+    if (window.innerWidth < 769 || isLandingPage) {
+      document.body.classList.remove('no-scrollbar');
+      return;
+    }
 
-    const updateScrollbar = () => {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-      const totalHeight = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
-      const clientHeight = document.documentElement.clientHeight || window.innerHeight || 0;
-
-
-      setScrollPosition(scrollTop);
-      setScrollHeight(totalHeight);
-      setViewportHeight(clientHeight);
-    };
-
-    const handleResize = () => {
-      updateScrollbar();
-    };
-
-    // Initial setup
+    // Immediate calculation
     updateScrollbar();
 
-    // Add scroll and resize listeners
+    // Event listeners
     window.addEventListener('scroll', updateScrollbar, { passive: true });
     document.addEventListener('scroll', updateScrollbar, { passive: true });
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', updateScrollbar, { passive: true });
 
-    // Use ResizeObserver to detect content changes
-    const resizeObserver = new ResizeObserver(() => {
-      // Small delay to ensure DOM has updated
-      setTimeout(updateScrollbar, 10);
+    // Live animation frame loop for instantaneous updates when cards/filters/images load
+    let animationFrameId;
+    const loop = () => {
+      updateScrollbar();
+      animationFrameId = requestAnimationFrame(loop);
+    };
+    animationFrameId = requestAnimationFrame(loop);
+
+    // MutationObserver to detect DOM mutations (filtering, accordions, tabs)
+    const rootEl = document.getElementById('root');
+    const mutationObserver = new MutationObserver(() => {
+      updateScrollbar();
     });
 
-    // Observe the document body for content changes
-    resizeObserver.observe(document.body);
-    resizeObserver.observe(document.documentElement);
-
-    // Also observe the main content area if it exists
-    const mainContent = document.querySelector('main');
-    if (mainContent) {
-      resizeObserver.observe(mainContent);
+    if (rootEl) {
+      mutationObserver.observe(rootEl, { childList: true, subtree: true, attributes: true });
     }
 
     return () => {
       window.removeEventListener('scroll', updateScrollbar);
       document.removeEventListener('scroll', updateScrollbar);
-      window.removeEventListener('resize', handleResize);
-      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateScrollbar);
+      cancelAnimationFrame(animationFrameId);
+      mutationObserver.disconnect();
     };
-  }, []);
+  }, [location.pathname, isLandingPage, updateScrollbar]);
 
   // Calculate thumb position and size
-  const scrollableHeight = Math.max(1, scrollHeight - viewportHeight); // Ensure minimum of 1 to avoid division by zero
+  const scrollableHeight = Math.max(1, scrollHeight - viewportHeight);
   const thumbHeight = scrollHeight > 0 ? Math.max(60, Math.min(200, (viewportHeight / scrollHeight) * viewportHeight)) : 60;
-  const maxThumbTop = viewportHeight > 0 ? viewportHeight - thumbHeight - 16 : 0; // Account for top and bottom margins
+  const maxThumbTop = viewportHeight > 0 ? Math.max(0, viewportHeight - thumbHeight - 16) : 0;
   const thumbTop = scrollableHeight > 0 && maxThumbTop > 0 ? Math.min(maxThumbTop, (scrollPosition / scrollableHeight) * maxThumbTop) : 0;
 
   // Handle mouse down on thumb
   const handleMouseDown = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(true);
     setDragStartY(e.clientY);
     setDragStartScroll(scrollPosition);
+  };
+
+  // Handle click on track to jump scroll position
+  const handleTrackClick = (e) => {
+    if (isDragging) return;
+    if (e.target === thumbRef.current) return;
+
+    const trackRect = trackRef.current?.getBoundingClientRect();
+    if (!trackRect) return;
+
+    const clickY = e.clientY - trackRect.top;
+    const currentScrollableHeight = Math.max(1, scrollHeight - viewportHeight);
+    const availableTrackHeight = Math.max(1, viewportHeight - thumbHeight - 16);
+    const targetScroll = ((clickY - thumbHeight / 2) / availableTrackHeight) * currentScrollableHeight;
+    const clampedScroll = Math.max(0, Math.min(currentScrollableHeight, targetScroll));
+
+    window.scrollTo({
+      top: clampedScroll,
+      behavior: 'smooth'
+    });
   };
 
   // Handle mouse move for dragging
@@ -84,10 +120,10 @@ export default function CustomScrollbar() {
 
     const handleMouseMove = (e) => {
       const deltaY = e.clientY - dragStartY;
-      const scrollableHeight = scrollHeight - viewportHeight;
-      const trackHeight = viewportHeight - thumbHeight - 16;
+      const currentScrollableHeight = Math.max(1, scrollHeight - viewportHeight);
+      const trackHeight = Math.max(1, viewportHeight - thumbHeight - 16);
       const scrollRatio = deltaY / trackHeight;
-      const newScrollPosition = Math.max(0, Math.min(scrollableHeight, dragStartScroll + (scrollRatio * scrollableHeight)));
+      const newScrollPosition = Math.max(0, Math.min(currentScrollableHeight, dragStartScroll + (scrollRatio * currentScrollableHeight)));
 
       window.scrollTo(0, newScrollPosition);
     };
@@ -115,45 +151,18 @@ export default function CustomScrollbar() {
       document.body.classList.remove('scrollbar-loading');
     }
 
-    // Cleanup on unmount
     return () => {
       document.body.classList.remove('scrollbar-loading');
     };
   }, [userContext?.loading]);
 
-  // Update scrollbar periodically to catch any missed content changes
-  // This is a safety net for cases where ResizeObserver might not fire
-  useEffect(() => {
-    if (window.innerWidth < 769) return;
-
-    const updateScrollbar = () => {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-      const totalHeight = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
-      const clientHeight = document.documentElement.clientHeight || window.innerHeight || 0;
-
-      // Only update if values have actually changed to avoid unnecessary re-renders
-      setScrollPosition(prev => prev !== scrollTop ? scrollTop : prev);
-      setScrollHeight(prev => prev !== totalHeight ? totalHeight : prev);
-      setViewportHeight(prev => prev !== clientHeight ? clientHeight : prev);
-    };
-
-    // Use requestAnimationFrame to ensure DOM is ready
-    const rafId = requestAnimationFrame(() => {
-      updateScrollbar();
-    });
-    
-    // Also update after a delay to catch delayed content changes
-    const timeoutId = setTimeout(updateScrollbar, 100);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      clearTimeout(timeoutId);
-    };
-  }); // Run on mount and when component re-renders (no dependencies to avoid circular updates)
-
   // Toggle no-scrollbar class based on whether scrolling is needed
   useEffect(() => {
-    const needsScrolling = scrollHeight > viewportHeight;
+    if (isLandingPage) {
+      document.body.classList.remove('no-scrollbar');
+      return;
+    }
+    const needsScrolling = scrollHeight > viewportHeight + 10;
 
     if (needsScrolling) {
       document.body.classList.remove('no-scrollbar');
@@ -161,38 +170,51 @@ export default function CustomScrollbar() {
       document.body.classList.add('no-scrollbar');
     }
 
-    // Cleanup on unmount
     return () => {
       document.body.classList.remove('no-scrollbar');
     };
-  }, [scrollHeight, viewportHeight]);
+  }, [scrollHeight, viewportHeight, isLandingPage]);
 
-  // Don't render on mobile
-  if (typeof window !== 'undefined' && window.innerWidth < 769) {
+  // Don't render on mobile or on public landing page
+  if ((typeof window !== 'undefined' && window.innerWidth < 769) || isLandingPage) {
     return null;
   }
 
-  // Only hide during main app loading, not component-specific loading
-  const userLoading = userContext?.loading || false;
-
-  if (userLoading) {
+  // Only hide during initial user loading
+  if (userContext?.loading) {
     return null;
   }
 
   // Don't show scrollbar if content doesn't require scrolling
-  const needsScrolling = scrollHeight > viewportHeight;
+  const needsScrolling = scrollHeight > viewportHeight + 10;
 
   return (
     <div
-      ref={thumbRef}
-      className="custom-scrollbar-thumb"
+      ref={trackRef}
+      className="custom-scrollbar-click-track"
+      onClick={handleTrackClick}
       style={{
-        top: `${thumbTop + 8}px`,
-        height: `${thumbHeight}px`,
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        width: '20px',
+        height: '100vh',
+        zIndex: 9999,
+        cursor: 'pointer',
+        pointerEvents: needsScrolling ? 'auto' : 'none',
         display: (scrollHeight > 0 && viewportHeight > 0 && needsScrolling) ? 'block' : 'none',
-        cursor: isDragging ? 'grabbing' : 'grab'
       }}
-      onMouseDown={handleMouseDown}
-    />
+    >
+      <div
+        ref={thumbRef}
+        className="custom-scrollbar-thumb"
+        style={{
+          top: `${thumbTop + 8}px`,
+          height: `${thumbHeight}px`,
+          cursor: isDragging ? 'grabbing' : 'grab'
+        }}
+        onMouseDown={handleMouseDown}
+      />
+    </div>
   );
 }

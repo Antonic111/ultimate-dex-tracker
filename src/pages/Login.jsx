@@ -1,47 +1,49 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import "../css/Login.css";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { User, Lock, LogIn, ArrowRight } from "lucide-react";
 import { useMessage } from "../components/Shared/MessageContext";
-import { Eye, EyeOff, User, Lock } from "lucide-react";
-import { authAPI } from "../utils/api.js";
-import { progressAPI } from "../utils/api.js";
-import { profileAPI } from "../utils/api.js";
+import { authAPI, progressAPI, profileAPI } from "../utils/api.js";
+import TextField from "../components/Shared/FormField/TextField.jsx";
+import Button from "../components/Shared/Button.jsx";
+import OAuthButtons from "../components/Shared/OAuthButtons.jsx";
+import "../css/Login.css";
 
 export default function Login({ onLogin }) {
-  const [form, setForm] = useState({ usernameOrEmail: "", password: "" });
+  const [form, setForm] = useState({ usernameOrEmail: "", password: "", rememberMe: false });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { showMessage } = useMessage();
-  const clickedRef = React.useRef(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const clickedRef = useRef(false);
 
   const showVerifiedMessage = searchParams.get("verified") === "1";
 
   useEffect(() => {
     if (showVerifiedMessage) {
-              showMessage("Email verified! You can now log in.", "success");
+      showMessage("Email verified! You can now log in.", "success");
     }
-  }, []);
+  }, [showVerifiedMessage, showMessage]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (clickedRef.current || loading) return; // 🛑 block spam clicks
+    if (clickedRef.current || loading) return;
     clickedRef.current = true;
-
-    // Ensure password field type is "password" on submit so Chrome detects it
-    setShowPassword(false);
     setLoading(true);
 
     try {
       const loginData = await authAPI.login({
-        ...form,
-        rememberMe: form.rememberMe || false,
+        usernameOrEmail: form.usernameOrEmail,
+        password: form.password,
+        rememberMe: form.rememberMe,
       });
 
       // Check if the user is verified from the login response
@@ -51,44 +53,36 @@ export default function Login({ onLogin }) {
         return;
       }
 
-      // Use the user data from the login response
-      
-      
-      // Since the login response doesn't include progress bars, we need to fetch them separately
       let progressBars = [];
       try {
         const progressResponse = await progressAPI.getProgressBars();
         progressBars = progressResponse || [];
-      } catch (error) {
-        // removed console.warn to reduce console noise
-        
-        // Fallback: try to get from profile endpoint
+      } catch (_) {
         try {
           const profileResponse = await profileAPI.getProfile();
-          if (profileResponse && profileResponse.progressBars) {
-            progressBars = profileResponse.progressBars;
-          } else {
-            progressBars = [];
-          }
-        } catch (profileError) {
-          // removed console.warn to reduce console noise
+          progressBars = profileResponse?.progressBars || [];
+        } catch (__) {
           progressBars = [];
         }
       }
-      
 
-      
       onLogin({
+        ...loginData.user,
         username: loginData.user.username,
         email: loginData.user.email,
         createdAt: loginData.user.createdAt,
         profileTrainer: loginData.user.profileTrainer,
+        avatar: loginData.user.avatar || null,
         verified: loginData.user.verified,
         isAdmin: loginData.user.isAdmin || false,
-        progressBars: progressBars,
+        isContentCreator: loginData.user.isContentCreator || false,
+        youtubeUrl: loginData.user.youtubeUrl || null,
+        twitchUrl: loginData.user.twitchUrl || null,
+        onboarding: loginData.user.onboarding,
+        progressBars,
       });
 
-      // Tell Chrome/browser password manager to offer saving the credential
+      // Chrome/browser credential helper
       if (window.PasswordCredential) {
         try {
           const cred = new window.PasswordCredential({
@@ -97,24 +91,19 @@ export default function Login({ onLogin }) {
             name: loginData.user.username,
           });
           await navigator.credentials.store(cred);
-        } catch (_) {
-          // Silently ignore — credential storage is optional
-        }
+        } catch (_) {}
       }
 
       navigate("/");
     } catch (err) {
-      // Handle specific verification error
-      if (err.message.includes('Account not verified')) {
-        // Check if the backend provided the email in the error response
+      if (err.message && err.message.includes("Account not verified")) {
         if (err.data && err.data.email) {
           showMessage("Account not verified. Redirecting to verification page...", "info");
           setTimeout(() => {
             navigate(`/email-sent?email=${encodeURIComponent(err.data.email)}`);
           }, 1500);
         } else {
-          // Fallback: try to extract email from the input field
-          const email = form.usernameOrEmail.includes('@') ? form.usernameOrEmail : '';
+          const email = form.usernameOrEmail.includes("@") ? form.usernameOrEmail : "";
           if (email) {
             showMessage("Account not verified. Redirecting to verification page...", "info");
             setTimeout(() => {
@@ -125,90 +114,113 @@ export default function Login({ onLogin }) {
           }
         }
       } else {
-        showMessage(`${err.message}`, "error");
+        showMessage(err.message || "Failed to log in", "error");
       }
     } finally {
       setLoading(false);
       setTimeout(() => {
         clickedRef.current = false;
-      }, 750); // allow retry after delay
+      }, 750);
     }
   };
 
-
   return (
-    <div className={`login-form page-container auth-page ${loading ? "loading" : ""}`}>
-      <h2 className="login-title">LOGIN</h2>
-      
-      <form onSubmit={handleSubmit} className="login-form-fields">
-        <div className="input-icon-wrapper">
-          <User className="auth-icon" size={20} />
-          <input
+    <div className={`login-page-container ${loading ? "is-submitting" : ""}`}>
+      <div className="login-card">
+        {/* Header Title and Subtitle */}
+        <div className="login-header">
+          <h1 className="login-title">
+            WELCOME <span className="login-title-accent">BACK</span>
+          </h1>
+          <p className="login-subtitle">
+            <span>Log in to continue your Pokémon journey</span>
+            <span className="login-sparkle-icon" aria-hidden="true" />
+          </p>
+        </div>
+
+        {/* Form Fields */}
+        <form onSubmit={handleSubmit} className="login-form-fields">
+          <TextField
             id="username"
             name="usernameOrEmail"
             type="text"
             placeholder="Username or Email"
             value={form.usernameOrEmail}
             onChange={handleChange}
-            className="login-input"
+            startIcon={<User size={18} className="auth-field-icon" />}
+            size="lg"
+            fullWidth
             required
             autoComplete="username"
           />
-        </div>
 
-        <div className="input-icon-wrapper password-wrapper">
-          <Lock className="auth-icon" size={20} />
-          <input
+          <TextField
             id="password"
             name="password"
-            type={showPassword ? "text" : "password"}
+            type="password"
             placeholder="Password"
             value={form.password}
             onChange={handleChange}
-            className="login-input"
+            startIcon={<Lock size={18} className="auth-field-icon" />}
+            size="lg"
+            fullWidth
             required
             autoComplete="current-password"
+            showPasswordToggle
           />
-          <button
-            type="button"
-            className="show-password-toggle"
-            onClick={() => setShowPassword(prev => !prev)}
-            aria-label="Toggle password visibility"
-            tabIndex={-1}
-          >
-            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </button>
-        </div>
 
-        <label className="remember-me-checkbox">
-          <input
-            type="checkbox"
-            name="rememberMe"
-            checked={form.rememberMe || false}
-            onChange={(e) => setForm({ ...form, rememberMe: e.target.checked })}
-          />
-          <span className="checkbox-svg">
-            <svg viewBox="0 0 24 24" className="checkbox-check">
-              <path
-                fill="none"
-                strokeWidth="3"
-                d="M4 12l5 5L20 7"
+          {/* Options Row: Remember Me + Forgot Password */}
+          <div className="login-options-row">
+            <label className="remember-me-checkbox">
+              <input
+                type="checkbox"
+                name="rememberMe"
+                checked={form.rememberMe}
+                onChange={handleChange}
               />
-            </svg>
-          </span>
-          Remember me
-        </label>
+              <span className="checkbox-svg">
+                <svg viewBox="0 0 24 24" className="checkbox-check">
+                  <path fill="none" strokeWidth="3" d="M4 12l5 5L20 7" />
+                </svg>
+              </span>
+              <span>Remember me</span>
+            </label>
 
-        <button type="submit" className="login-button" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
-        </button>
+            <Link to="/forgot-password" className="forgot-password-link">
+              Forgot password?
+            </Link>
+          </div>
 
-        <div className="auth-redirect double">
-          <a href="/register">Don't have an account?</a>
-          <span className="auth-divider" />
-          <a href="/forgot-password">Forgot password?</a>
-        </div>
-      </form>
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            block
+            loading={loading}
+            icon={<LogIn size={18} />}
+            className="auth-main-btn"
+          >
+            Log In
+          </Button>
+
+          {/* Social OAuth Buttons with Divider */}
+          <OAuthButtons
+            layout="grid"
+            dividerText="OR CONTINUE WITH"
+            dividerPosition="top"
+          />
+
+          {/* Footer Link */}
+          <div className="auth-footer-link">
+            <span>Don't have an account?</span>{" "}
+            <Link to="/register" className="auth-action-link">
+              <span>Sign up</span>
+              <ArrowRight size={15} />
+            </Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

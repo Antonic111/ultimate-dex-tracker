@@ -3,6 +3,7 @@ import { formatPokemonName } from "../../utils";
 import { getSpriteUrl } from "../../utils/spriteUtils";
 import { Plus, Minus } from "lucide-react";
 import PokemonGridItem from "./PokemonGridItem";
+import { Button } from "../Shared/Button";
 
 
 
@@ -10,6 +11,7 @@ export default function DexSection({
   title,
   pokemonList,
   isCaught = () => false,
+  hasFail = () => false,
   onToggleCaught,
   onSelect,
   onMarkAll,
@@ -79,6 +81,13 @@ export default function DexSection({
     }
     return false;
   }, [isCaught]);
+
+  const safeHasFail = useCallback((poke) => {
+    if (typeof hasFail === 'function') {
+      return hasFail(poke);
+    }
+    return false;
+  }, [hasFail]);
 
   const getDisplayName = useCallback((name) => {
     const cache = nameCacheRef.current;
@@ -328,9 +337,7 @@ export default function DexSection({
         </div>
 
         {/* Divider below header */}
-        <div className={`w-full h-1 rounded-full ${collapsed ? "mb-2" : "mb-6"}`} style={{
-          background: `linear-gradient(to right, var(--border-color) 35%, var(--accent))`
-        }}></div>
+        <div className={`app-divider ${collapsed ? "!mb-2 !mt-0" : "!mb-6 !mt-2"}`} />
 
 
         <div
@@ -426,26 +433,14 @@ export default function DexSection({
 
                       {/* hide mark-all in read-only */}
                       {!readOnly && onMarkAll && (
-                        <button
-                          className="px-4 py-0.5 rounded-full text-base font-medium transition-all duration-100 self-center md:hover:scale-105 md:hover:shadow-lg"
-                          style={{ backgroundColor: 'var(--accent)', color: '#000000' }}
-                          onMouseEnter={(e) => {
-                            if (window.innerWidth >= 768) { // PC only
-                              e.target.style.backgroundColor = 'var(--accent-hover)';
-                              e.target.style.color = '#ffffff';
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (window.innerWidth >= 768) { // PC only
-                              e.target.style.backgroundColor = 'var(--accent)';
-                              e.target.style.color = '#000000';
-                            }
-                          }}
+                        <Button
+                          variant="primary"
+                          size="sm"
                           onClick={() => onMarkAll(box)}
                         >
                           {/* Only check unlocked Pokemon when determining button text */}
                           {box.filter(p => !p._isBlocked).every((p) => safeIsCaught(p)) ? "Unmark All" : "Mark All"}
-                        </button>
+                        </Button>
                       )}
                     </div>
                   </div>
@@ -457,6 +452,7 @@ export default function DexSection({
                         const sprite = getSpriteUrl(poke, showShiny, useHomeSprites);
                         const isBlocked = poke._isBlocked === true;
                         const isCaught = safeIsCaught(poke);
+                        const hasFail = safeHasFail(poke);
                         const displayName = getDisplayName(poke.name);
                         const absoluteIndex = i * 30 + idx;
 
@@ -465,6 +461,7 @@ export default function DexSection({
                             key={key}
                             poke={poke}
                             isCaught={isCaught}
+                            hasFail={hasFail}
                             isBlocked={isBlocked}
                             sprite={sprite}
                             readOnly={readOnly}
