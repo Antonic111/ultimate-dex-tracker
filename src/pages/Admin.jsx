@@ -29,6 +29,9 @@ const Admin = () => {
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(null);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [maintenanceStartTime, setMaintenanceStartTime] = useState(null);
+  const [scheduledTime, setScheduledTime] = useState(''); // local datetime-local input value
+  const [maintenanceCountdown, setMaintenanceCountdown] = useState('');
   const [systemStats, setSystemStats] = useState({
     uptimePercent: '99.98%',
     apiLatency: '24ms',
@@ -225,6 +228,7 @@ const Admin = () => {
       if (settingsRes.ok) {
         const settingsData = await settingsRes.json();
         setMaintenanceMode(settingsData.maintenanceMode || false);
+        setMaintenanceStartTime(settingsData.maintenanceStartTime || null);
       }
 
       if (creatorReqsData && creatorReqsData.requests) {
@@ -338,7 +342,7 @@ const Admin = () => {
 
   const handleToggleMaintenance = async (mode) => {
     try {
-      const payload = { maintenanceMode: mode };
+      const payload = { maintenanceMode: mode, maintenanceStartTime: null };
       const response = await fetch(buildApiUrl('/admin/site-settings'), {
         method: 'PUT',
         headers: {
@@ -352,6 +356,9 @@ const Admin = () => {
       if (response.ok) {
         const result = await response.json();
         setMaintenanceMode(result.settings.maintenanceMode);
+        setMaintenanceStartTime(null);
+        setScheduledTime('');
+        setMaintenanceCountdown('');
         showMessage(`Maintenance mode ${result.settings.maintenanceMode ? 'enabled' : 'disabled'}`, 'success');
       } else {
         const error = await response.json();
@@ -361,6 +368,90 @@ const Admin = () => {
       showMessage('Failed to update maintenance mode', 'error');
     }
   };
+
+  const handleScheduleMaintenance = async () => {
+    if (!scheduledTime) {
+      showMessage('Please pick a date and time first', 'error');
+      return;
+    }
+    const isoTime = new Date(scheduledTime).toISOString();
+    if (new Date(isoTime) <= new Date()) {
+      showMessage('Scheduled time must be in the future', 'error');
+      return;
+    }
+    try {
+      const response = await fetch(buildApiUrl('/admin/site-settings'), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {})
+        },
+        body: JSON.stringify({ maintenanceStartTime: isoTime }),
+        credentials: 'include'
+      });
+      if (response.ok) {
+        const result = await response.json();
+        setMaintenanceStartTime(result.settings.maintenanceStartTime);
+        setMaintenanceMode(result.settings.maintenanceMode);
+        showMessage('Maintenance scheduled! Users will see a countdown banner.', 'success');
+      } else {
+        const error = await response.json();
+        showMessage(error.error || 'Failed to schedule maintenance', 'error');
+      }
+    } catch (err) {
+      showMessage('Failed to schedule maintenance', 'error');
+    }
+  };
+
+  const handleCancelSchedule = async () => {
+    try {
+      const response = await fetch(buildApiUrl('/admin/site-settings'), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {})
+        },
+        body: JSON.stringify({ maintenanceStartTime: null, maintenanceMode: false }),
+        credentials: 'include'
+      });
+      if (response.ok) {
+        setMaintenanceStartTime(null);
+        setMaintenanceMode(false);
+        setScheduledTime('');
+        setMaintenanceCountdown('');
+        showMessage('Maintenance schedule cancelled', 'success');
+      } else {
+        const error = await response.json();
+        showMessage(error.error || 'Failed to cancel schedule', 'error');
+      }
+    } catch (err) {
+      showMessage('Failed to cancel schedule', 'error');
+    }
+  };
+
+  // Live countdown ticker for scheduled maintenance
+  useEffect(() => {
+    if (!maintenanceStartTime) {
+      setMaintenanceCountdown('');
+      return;
+    }
+    const tick = () => {
+      const diff = new Date(maintenanceStartTime) - Date.now();
+      if (diff <= 0) {
+        setMaintenanceCountdown('Starting now...');
+        return;
+      }
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setMaintenanceCountdown(
+        `${h > 0 ? `${h}h ` : ''}${m}m ${s}s`
+      );
+    };
+    tick();
+    const timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  }, [maintenanceStartTime]);
 
   const handleOpenEditUser = (user) => {
     setSelectedUser(user);
@@ -1454,19 +1545,84 @@ const Admin = () => {
               </div>
 
               <div className="flex flex-col gap-4 mt-3 max-w-xl">
+
+                {/* --- Immediate toggle --- */}
                 <div className="p-4 rounded-xl bg-black/25 border border-white/[0.08] flex items-center justify-between">
                   <div className="flex flex-col">
                     <span className="font-bold text-white text-sm">Maintenance Mode</span>
-                    <span className="text-[11px] text-gray-400">Lock the application for all non-admin visitors.</span>
+                    <span className="text-[11px] text-gray-400">Lock the application immediately for all non-admin visitors.</span>
+                    {maintenanceMode && !maintenanceStartTime && (
+                      <span className="text-[11px] text-red-400 mt-0.5 font-semibold">⚠ Currently active</span>
+                    )}
                   </div>
                   <Button
-                    variant={maintenanceMode ? "danger" : "secondary"}
+                    variant={maintenanceMode && !maintenanceStartTime ? 'danger' : 'secondary'}
                     size="md"
                     onClick={() => handleToggleMaintenance(!maintenanceMode)}
                   >
-                    {maintenanceMode ? 'Active (Disable)' : 'Enable'}
+                    {maintenanceMode && !maintenanceStartTime ? 'Active — Disable' : 'Enable Now'}
                   </Button>
                 </div>
+
+                {/* --- Scheduled maintenance --- */}
+                <div className="p-4 rounded-xl bg-black/25 border border-white/[0.08] flex flex-col gap-3">
+                  <div>
+                    <span className="font-bold text-white text-sm">Schedule Maintenance</span>
+                    <p className="text-[11px] text-gray-400 mt-0.5">Set a future time — users will see a live countdown banner so they can save their work before maintenance begins.</p>
+                  </div>
+
+                  {maintenanceStartTime ? (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                        <Clock size={15} className="text-amber-400 shrink-0" />
+                        <div className="flex-1">
+                          <p className="text-[11px] text-amber-300 font-semibold">Scheduled for {new Date(maintenanceStartTime).toLocaleString()}</p>
+                          {maintenanceCountdown && (
+                            <p className="text-[13px] text-white font-bold tabular-nums">{maintenanceCountdown} remaining</p>
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={handleCancelSchedule}
+                      >
+                        Cancel Schedule
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <input
+                        id="maintenance-datetime"
+                        type="datetime-local"
+                        value={scheduledTime}
+                        onChange={e => setScheduledTime(e.target.value)}
+                        min={new Date(Date.now() + 60000).toISOString().slice(0, 16)}
+                        style={{
+                          background: 'rgba(255,255,255,0.04)',
+                          border: '1px solid rgba(255,255,255,0.12)',
+                          borderRadius: '8px',
+                          padding: '8px 10px',
+                          color: '#fff',
+                          fontSize: '13px',
+                          outline: 'none',
+                          colorScheme: 'dark',
+                          width: '100%',
+                        }}
+                      />
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleScheduleMaintenance}
+                        disabled={!scheduledTime}
+                      >
+                        <Clock size={13} />
+                        Schedule Maintenance
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
               </div>
             </div>
           )}
