@@ -25,10 +25,8 @@ import { moderateImage } from "../utils/sightengine.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const avatarUploadDir = path.join(__dirname, "../uploads/avatars");
-if (!fs.existsSync(avatarUploadDir)) {
-  fs.mkdirSync(avatarUploadDir, { recursive: true });
-}
+// NOTE: Vercel serverless has a read-only filesystem.
+// Avatars are stored as base64 data URIs in MongoDB instead of on disk.
 
 // Multer memory storage for in-memory moderation before writing to disk
 const avatarUpload = multer({
@@ -908,30 +906,18 @@ router.post("/users/avatar", authenticateUser, (req, res, next) => {
       });
     }
 
-    // Save avatar to disk
-    const ext = path.extname(req.file.originalname) || ".jpg";
-    const cleanExt = [".jpg", ".jpeg", ".png", ".webp", ".gif"].includes(ext.toLowerCase()) ? ext.toLowerCase() : ".jpg";
-    const fileName = `avatar-${user._id}-${Date.now()}${cleanExt}`;
-    const filePath = path.join(avatarUploadDir, fileName);
+    // Store avatar as a base64 data URI directly in MongoDB.
+    // This avoids needing a writable filesystem (Vercel serverless is read-only).
+    const mimeType = req.file.mimetype || "image/jpeg";
+    const base64Data = req.file.buffer.toString("base64");
+    const dataUri = `data:${mimeType};base64,${base64Data}`;
 
-    await fs.promises.writeFile(filePath, req.file.buffer);
-
-    // If old custom avatar existed, safely delete it
-    if (user.avatar && user.avatar.startsWith("/uploads/avatars/")) {
-      const oldFileName = path.basename(user.avatar);
-      const oldFilePath = path.join(avatarUploadDir, oldFileName);
-      if (fs.existsSync(oldFilePath)) {
-        fs.promises.unlink(oldFilePath).catch(() => {});
-      }
-    }
-
-    const publicUrl = `/uploads/avatars/${fileName}`;
-    user.avatar = publicUrl;
+    user.avatar = dataUri;
     await user.save();
 
     res.json({
       message: "Profile picture uploaded successfully!",
-      avatar: publicUrl,
+      avatar: dataUri,
     });
   } catch (err) {
     console.error("🔥 Error uploading avatar:", err);
@@ -945,13 +931,7 @@ router.delete("/users/avatar", authenticateUser, async (req, res) => {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: "User not found." });
 
-    if (user.avatar && user.avatar.startsWith("/uploads/avatars/")) {
-      const oldFileName = path.basename(user.avatar);
-      const oldFilePath = path.join(avatarUploadDir, oldFileName);
-      if (fs.existsSync(oldFilePath)) {
-        fs.promises.unlink(oldFilePath).catch(() => {});
-      }
-    }
+    // No disk file to delete — avatar is stored as base64 in MongoDB.
 
     const defaults = [
       "/data/default_profile_pictures/butterfree.png",
