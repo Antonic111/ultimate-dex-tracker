@@ -65,11 +65,13 @@ export const SANITIZATION_RULES = {
     normalize: true,
   },
   avatar: {
-    maxLength: 300,
+    // Avatars are either default paths (/data/...) or base64 data URIs set by
+    // the moderated upload endpoint. Passthrough-safe; not user-editable text.
+    maxLength: 10_000_000,
     minLength: 0,
-    allowedChars: /^[a-zA-Z0-9._\-\/:]+$/,
-    trim: true,
-    normalize: true,
+    allowedChars: null, // no char restriction — validated at upload time
+    trim: false,
+    normalize: false,
   },
   huntHotkey: {
     maxLength: 20,
@@ -252,7 +254,12 @@ export function sanitizeProfileData(profileData) {
       else if (fieldName === 'switchFriendCode') fieldType = 'switchFriendCode';
       else if (fieldName === 'goFriendCode') fieldType = 'goFriendCode';
       else if (fieldName === 'profileTrainer') fieldType = 'profileTrainer';
-      else if (fieldName === 'avatar') fieldType = 'avatar';
+      else if (fieldName === 'avatar') {
+        // Avatar is set only by the moderated upload endpoint — skip sanitization,
+        // just pass it through to avoid rejecting base64 data URIs or long paths.
+        sanitized[fieldName] = value;
+        continue;
+      }
       else if (fieldName === 'huntHotkey') fieldType = 'huntHotkey';
       
       const result = sanitizeInput(value, fieldType);
