@@ -21,8 +21,15 @@ const router = express.Router();
 
 // ─── Dynamic Config helpers ──────────────────────────────────────────────────
 
+function ensureProtocol(url) {
+  if (!url) return url;
+  // If the URL doesn't start with http:// or https://, add https://
+  if (!/^https?:\/\//i.test(url)) return `https://${url}`;
+  return url;
+}
+
 function getBackendUrl(req) {
-  if (process.env.BACKEND_URL) return process.env.BACKEND_URL.replace(/\/$/, "");
+  if (process.env.BACKEND_URL) return ensureProtocol(process.env.BACKEND_URL).replace(/\/$/, "");
   // In development, backend default is port 5000
   const proto = req.headers["x-forwarded-proto"] || req.protocol || "http";
   const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost:5000";
@@ -30,7 +37,7 @@ function getBackendUrl(req) {
 }
 
 function getFrontendUrl() {
-  return (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
+  return ensureProtocol(process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
 }
 
 function getGoogleConfig(req) {
