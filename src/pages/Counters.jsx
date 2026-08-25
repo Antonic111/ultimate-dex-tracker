@@ -69,7 +69,7 @@ import { SearchbarIconDropdown } from "../components/Shared/SearchBar";
 import ContentFilterInput from "../components/Shared/ContentFilterInput";
 import { validateContent } from "../../shared/contentFilter";
 import { useTheme } from "../components/Shared/ThemeContext";
-import { getSpriteUrl } from "../utils/spriteUtils";
+import { getSpriteUrl, resolvePokemon, cleanPokemonNameOrKey } from "../utils/spriteUtils";
 import { UserContext } from "../components/Shared/UserContext";
 import { useMessage } from "../components/Shared/MessageContext";
 import { huntAPI, profileAPI } from "../utils/api";
@@ -1322,6 +1322,17 @@ export default function Counters() {
         return false;
       };
 
+      const isActualHuntItem = (h) => {
+        if (!h) return false;
+        if (h.isHuntTracker || h.isCounter || h.isHunt || h.source === "completedHunts" || h.source === "completedFails") return true;
+        if (h.outcome === "failed" || h.isFail) return true;
+        if (Array.isArray(h.phases) && h.phases.length > 0) return true;
+        if (Array.isArray(h.fails) && h.fails.length > 0) return true;
+        if ((Number(h.totalChecks || h.checks || 0) > 0 || Number(h.elapsedMs || h.time || 0) > 0) && (h.method || h.game)) return true;
+        if (h.caughtKey && !h.isHuntTracker) return false;
+        return false;
+      };
+
       // 1. Load from local completed hunts storage
       const storageKeys = [
         username ? `completedHunts:${username}` : null,
@@ -1335,10 +1346,14 @@ export default function Counters() {
             const parsed = JSON.parse(raw);
             if (Array.isArray(parsed)) {
               parsed.forEach(h => {
-                if (!isItemDeleted(h) && !historyList.some(e => (e.entryId && e.entryId === h.entryId) || (e.id && e.id === h.id))) {
+                if (isActualHuntItem(h) && !isItemDeleted(h) && !historyList.some(e => (e.entryId && e.entryId === h.entryId) || (e.id && e.id === h.id))) {
+                  const resolvedMon = resolvePokemon(h);
+                  const cleanName = resolvedMon?.name || cleanPokemonNameOrKey(h.pokemonName || h.pokemon?.name);
                   historyList.push({
                     ...h,
                     source: "completedHunts",
+                    pokemon: resolvedMon || h.pokemon,
+                    pokemonName: cleanName || h.pokemonName || "Unknown",
                     timestamp: h.timestamp || (h.date ? new Date(h.date).getTime() : 0)
                   });
                 }
@@ -1361,12 +1376,16 @@ export default function Counters() {
             const parsed = JSON.parse(raw);
             if (Array.isArray(parsed)) {
               parsed.forEach(f => {
-                if (!isItemDeleted(f) && !historyList.some(e => (e.entryId && e.entryId === f.entryId) || (e.id && e.id === f.id))) {
+                if (isActualHuntItem(f) && !isItemDeleted(f) && !historyList.some(e => (e.entryId && e.entryId === f.entryId) || (e.id && e.id === f.id))) {
+                  const resolvedMon = resolvePokemon(f);
+                  const cleanName = resolvedMon?.name || cleanPokemonNameOrKey(f.pokemonName || f.pokemon?.name);
                   historyList.push({
                     ...f,
                     source: "completedFails",
                     outcome: "failed",
                     isFail: true,
+                    pokemon: resolvedMon || f.pokemon,
+                    pokemonName: cleanName || f.pokemonName || "Unknown",
                     timestamp: f.timestamp || (f.date ? new Date(f.date).getTime() : 0)
                   });
                 }
@@ -1376,7 +1395,7 @@ export default function Counters() {
         } catch {}
       });
 
-      // 3. Load from Living Dex caught data
+      // 3. Load from Living Dex caught data (only genuine hunt-tracker entries)
       let caughtData = null;
       if (username) {
         try {
@@ -1398,14 +1417,13 @@ export default function Counters() {
         Object.entries(caughtData).forEach(([caughtKey, info]) => {
           if (info && Array.isArray(info.entries)) {
             info.entries.forEach(entry => {
-              const isHuntEntry = entry.isHuntTracker ||
+              const isHuntEntry = Boolean(
+                entry.isHuntTracker ||
                 entry.isCounter ||
                 entry.isHunt ||
-                Number(entry.totalChecks || entry.checks || 0) > 0 ||
-                Number(entry.elapsedMs || entry.time || 0) > 0 ||
-                !!entry.method ||
-                Number(entry.phaseCount || 0) > 1 ||
-                (Array.isArray(entry.phases) && entry.phases.length > 0);
+                entry.source === "completedHunts" ||
+                entry.source === "completedFails"
+              );
 
               if (isHuntEntry && !isItemDeleted(entry)) {
                 const entryId = entry.entryId || entry.id;
@@ -1414,8 +1432,8 @@ export default function Counters() {
                   (h.caughtKey === caughtKey && h.date === entry.date && (h.totalChecks === entry.totalChecks || h.checks === entry.checks))
                 );
 
-                const cleanKey = caughtKey.replace(/:shiny$|-shiny$/, "");
-                const monName = entry.pokemonName || entry.pokemon?.name || cleanKey;
+                const resolvedMon = resolvePokemon(entry) || resolvePokemon(caughtKey);
+                const monName = resolvedMon?.name || cleanPokemonNameOrKey(entry.pokemonName || entry.pokemon?.name || caughtKey);
                 const checks = Number(entry.totalChecks ?? entry.checks ?? 0);
                 const rawTime = entry.elapsedMs ?? entry.time ?? 0;
                 const timeMs = Number(rawTime > 0 && rawTime < 100000 && !entry.elapsedMs ? rawTime * 1000 : rawTime);
@@ -1429,8 +1447,8 @@ export default function Counters() {
                     id: entry.id || entryId,
                     entryId: entryId || entry.id,
                     caughtKey,
-                    pokemonName: monName,
-                    pokemon: entry.pokemon || (monName ? { name: monName } : null),
+                    pokemonName: monName || "Unknown",
+                    pokemon: resolvedMon || (monName ? { name: monName } : null),
                     checks,
                     totalChecks: checks,
                     time: timeMs,

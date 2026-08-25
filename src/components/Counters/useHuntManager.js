@@ -16,11 +16,7 @@ import {
   setCachedHuntsData,
   createHuntChannel
 } from "../../utils/huntSync";
-import {
-  calculateOdds,
-  getCurrentHuntOdds
-} from "../../utils/huntSystem";
-import { getSpriteUrl } from "../../utils/spriteUtils";
+import { getSpriteUrl, resolvePokemon, cleanPokemonNameOrKey } from "../../utils/spriteUtils";
 import { validateContent } from "../../../shared/contentFilter";
 
 export function useHuntManager({
@@ -1291,6 +1287,17 @@ export function useHuntManager({
         return false;
       };
 
+      const isActualHuntItem = (h) => {
+        if (!h) return false;
+        if (h.isHuntTracker || h.isCounter || h.isHunt || h.source === "completedHunts" || h.source === "completedFails") return true;
+        if (h.outcome === "failed" || h.isFail) return true;
+        if (Array.isArray(h.phases) && h.phases.length > 0) return true;
+        if (Array.isArray(h.fails) && h.fails.length > 0) return true;
+        if ((Number(h.totalChecks || h.checks || 0) > 0 || Number(h.elapsedMs || h.time || 0) > 0) && (h.method || h.game)) return true;
+        if (h.caughtKey && !h.isHuntTracker) return false;
+        return false;
+      };
+
       const storageKeys = [
         username ? `completedHunts:${username}` : null,
         "completedHunts",
@@ -1305,9 +1312,10 @@ export function useHuntManager({
             if (Array.isArray(parsed)) {
               parsed.forEach(h => {
                 const eid = h.entryId || (h.id ? String(h.id) : null) || `${h.date}-${h.timestamp}`;
-                if (!seenEntryIds.has(eid) && !isItemDeleted(h)) {
+                if (isActualHuntItem(h) && !seenEntryIds.has(eid) && !isItemDeleted(h)) {
                   seenEntryIds.add(eid);
-                  const monName = h.pokemonName || h.pokemon?.name || (typeof h.pokemon === "string" ? h.pokemon : "") || (h.caughtKey ? h.caughtKey.split("-")[0] : "");
+                  const resolvedMon = resolvePokemon(h);
+                  const monName = resolvedMon?.name || cleanPokemonNameOrKey(h.pokemonName || h.pokemon?.name);
                   const checks = Number(h.totalChecks ?? h.checks ?? 0);
                   const rawTime = h.elapsedMs ?? h.time ?? 0;
                   const timeMs = Number(rawTime > 0 && rawTime < 100000 && !h.elapsedMs ? rawTime * 1000 : rawTime);
@@ -1315,8 +1323,9 @@ export function useHuntManager({
                     ...h,
                     id: h.id || eid,
                     entryId: eid,
-                    pokemonName: monName,
-                    pokemon: h.pokemon || (monName ? { name: monName } : null),
+                    source: "completedHunts",
+                    pokemonName: monName || "Unknown",
+                    pokemon: resolvedMon || (monName ? { name: monName } : null),
                     checks,
                     totalChecks: checks,
                     time: timeMs,
@@ -1345,9 +1354,10 @@ export function useHuntManager({
             if (Array.isArray(parsed)) {
               parsed.forEach(f => {
                 const eid = f.entryId || (f.id ? String(f.id) : null) || `${f.date}-${f.timestamp}`;
-                if (!seenEntryIds.has(eid) && !isItemDeleted(f)) {
+                if (isActualHuntItem(f) && !seenEntryIds.has(eid) && !isItemDeleted(f)) {
                   seenEntryIds.add(eid);
-                  const monName = f.pokemonName || f.pokemon?.name || (typeof f.pokemon === "string" ? f.pokemon : "") || (f.caughtKey ? f.caughtKey.split("-")[0] : "");
+                  const resolvedMon = resolvePokemon(f);
+                  const monName = resolvedMon?.name || cleanPokemonNameOrKey(f.pokemonName || f.pokemon?.name);
                   const checks = Number(f.totalChecks ?? f.checks ?? 0);
                   const rawTime = f.elapsedMs ?? f.time ?? 0;
                   const timeMs = Number(rawTime > 0 && rawTime < 100000 && !f.elapsedMs ? rawTime * 1000 : rawTime);
@@ -1355,8 +1365,9 @@ export function useHuntManager({
                     ...f,
                     id: f.id || eid,
                     entryId: eid,
-                    pokemonName: monName,
-                    pokemon: f.pokemon || (monName ? { name: monName } : null),
+                    source: "completedFails",
+                    pokemonName: monName || "Unknown",
+                    pokemon: resolvedMon || (monName ? { name: monName } : null),
                     checks,
                     totalChecks: checks,
                     time: timeMs,
@@ -1372,7 +1383,7 @@ export function useHuntManager({
         }
       });
 
-      // Load from Living Dex caught data
+      // Load from Living Dex caught data (only genuine hunt tracker entries)
       let caughtData = null;
       if (username) {
         try {
@@ -1394,14 +1405,13 @@ export function useHuntManager({
         Object.entries(caughtData).forEach(([caughtKey, info]) => {
           if (info && Array.isArray(info.entries)) {
             info.entries.forEach(entry => {
-              const isHuntEntry = entry.isHuntTracker ||
+              const isHuntEntry = Boolean(
+                entry.isHuntTracker ||
                 entry.isCounter ||
                 entry.isHunt ||
-                Number(entry.totalChecks || entry.checks || 0) > 0 ||
-                Number(entry.elapsedMs || entry.time || 0) > 0 ||
-                !!entry.method ||
-                Number(entry.phaseCount || 0) > 1 ||
-                (Array.isArray(entry.phases) && entry.phases.length > 0);
+                entry.source === "completedHunts" ||
+                entry.source === "completedFails"
+              );
 
               if (isHuntEntry && !isItemDeleted(entry)) {
                 const entryId = entry.entryId || entry.id;
@@ -1410,8 +1420,8 @@ export function useHuntManager({
                   (h.caughtKey === caughtKey && h.date === entry.date && (h.totalChecks === entry.totalChecks || h.checks === entry.checks))
                 );
 
-                const cleanKey = caughtKey.replace(/:shiny$|-shiny$/, "");
-                const monName = entry.pokemonName || entry.pokemon?.name || cleanKey;
+                const resolvedMon = resolvePokemon(entry) || resolvePokemon(caughtKey);
+                const monName = resolvedMon?.name || cleanPokemonNameOrKey(entry.pokemonName || entry.pokemon?.name || caughtKey);
                 const checks = Number(entry.totalChecks ?? entry.checks ?? 0);
                 const rawTime = entry.elapsedMs ?? entry.time ?? 0;
                 const timeMs = Number(rawTime > 0 && rawTime < 100000 && !entry.elapsedMs ? rawTime * 1000 : rawTime);
@@ -1425,8 +1435,8 @@ export function useHuntManager({
                     id: entry.id || entryId,
                     entryId: entryId || entry.id,
                     caughtKey,
-                    pokemonName: monName,
-                    pokemon: entry.pokemon || (monName ? { name: monName } : null),
+                    pokemonName: monName || "Unknown",
+                    pokemon: resolvedMon || (monName ? { name: monName } : null),
                     checks,
                     totalChecks: checks,
                     time: timeMs,

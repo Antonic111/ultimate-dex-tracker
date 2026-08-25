@@ -2,6 +2,101 @@ import pokemonData from "../data/pokemon.json";
 import formsDataDefault from "./loadFormsData";
 
 /**
+ * Cleans a raw Pokemon name, caughtKey, or hunt identifier (e.g. "Komala 775_shiny", "775_shiny", "775:shiny", "deoxys-attack:shiny")
+ * into a clean, canonical Pokemon name.
+ * 
+ * @param {string} raw - The raw Pokemon name or key.
+ * @returns {string} The cleaned Pokemon name.
+ */
+export function cleanPokemonNameOrKey(raw = "") {
+    if (!raw || typeof raw !== "string") return "";
+    let clean = raw.trim();
+
+    // Strip out standard suffix tags like :shiny, _shiny, -shiny, (shiny)
+    clean = clean.replace(/[:_ -]?shiny$/i, "").replace(/\(shiny\)$/i, "").trim();
+
+    // Check if it's in format "Name 123" or "Name_123" or "Name-123"
+    const matchNameWithId = clean.match(/^([a-zA-Z\s.-]+?)[\s_-]+(\d+)$/);
+    if (matchNameWithId) {
+        const namePart = matchNameWithId[1].trim();
+        const idPart = Number(matchNameWithId[2]);
+        const match = pokemonData.find(p => p.id === idPart || p.name?.toLowerCase() === namePart.toLowerCase());
+        if (match) return match.name;
+        return namePart;
+    }
+
+    // Check if it's pure numeric ID like "775"
+    if (/^\d+$/.test(clean)) {
+        const match = pokemonData.find(p => p.id === Number(clean));
+        if (match) return match.name;
+    }
+
+    return clean;
+}
+
+/**
+ * Resolves a full Pokémon object (with ID and sprites) from any entry, string, or partial object.
+ * 
+ * @param {Object|string} entryOrPokemon - The hunt entry or Pokémon object/name.
+ * @returns {Object|null} Full Pokémon object or fallback object.
+ */
+export function resolvePokemon(entryOrPokemon) {
+    if (!entryOrPokemon) return null;
+
+    // If it already has full sprites or image, return as-is or enhance
+    if (typeof entryOrPokemon === "object" && entryOrPokemon.sprites && entryOrPokemon.id) {
+        return entryOrPokemon;
+    }
+
+    const rawName = typeof entryOrPokemon === "string"
+        ? entryOrPokemon
+        : (entryOrPokemon.pokemonName || entryOrPokemon.targetPokemon || entryOrPokemon.target || entryOrPokemon.name || entryOrPokemon.pokemon?.name || entryOrPokemon.caughtKey || "");
+    
+    const id = typeof entryOrPokemon === "object"
+        ? (entryOrPokemon.pokemon?.id || entryOrPokemon.id || entryOrPokemon.speciesId || entryOrPokemon.pokemonId || null)
+        : null;
+
+    const stableId = typeof entryOrPokemon === "object"
+        ? (entryOrPokemon.pokemon?.stableId || entryOrPokemon.stableId || null)
+        : null;
+
+    // 1. Try stableId against forms
+    if (stableId) {
+        const formMatch = formsDataDefault?.find(f => f.stableId === stableId);
+        if (formMatch) return formMatch;
+    }
+
+    // 2. Clean the raw name
+    const cleanName = cleanPokemonNameOrKey(rawName);
+
+    if (cleanName) {
+        const lower = cleanName.toLowerCase();
+        // Check forms
+        const formMatch = formsDataDefault?.find(f => 
+            (f.stableId && f.stableId.toLowerCase() === lower) || 
+            (f.name && f.name.toLowerCase() === lower)
+        );
+        if (formMatch) return formMatch;
+
+        // Check base pokemonData
+        const baseMatch = pokemonData.find(p => p.name && p.name.toLowerCase() === lower);
+        if (baseMatch) return baseMatch;
+    }
+
+    // 3. Try numeric ID
+    if (id && !isNaN(Number(id))) {
+        const baseMatch = pokemonData.find(p => p.id === Number(id));
+        if (baseMatch) return baseMatch;
+    }
+
+    // Fallback object with clean name
+    return {
+        name: cleanName || rawName || "Unknown",
+        id: Number(id) || 1
+    };
+}
+
+/**
  * Gets the appropriate sprite URL for a Pokémon, considering shiny status and HOME sprite preference.
  * Reliably resolves sprites even for legacy hunt records or partial Pokémon objects.
  * 
@@ -15,33 +110,7 @@ export function getSpriteUrl(pokemon, isShiny = false, useHomeSprites = false) {
         return '/fallback.png';
     }
 
-    let resolved = pokemon;
-
-    // If pokemon object does not have full sprites, resolve it from pokemonData / formsData
-    if (!pokemon.sprites) {
-        const name = typeof pokemon === 'string' ? pokemon : (pokemon.name || pokemon.pokemonName || pokemon.targetPokemon || '');
-        const id = typeof pokemon === 'object' ? (pokemon.id || pokemon.speciesId) : null;
-        const stableId = typeof pokemon === 'object' ? pokemon.stableId : null;
-
-        if (stableId) {
-            const formMatch = formsDataDefault?.find(f => f.stableId === stableId);
-            if (formMatch && formMatch.sprites) resolved = formMatch;
-        }
-        if (!resolved.sprites && id) {
-            const baseMatch = pokemonData.find(p => p.id === Number(id));
-            if (baseMatch && baseMatch.sprites) resolved = baseMatch;
-        }
-        if (!resolved.sprites && name) {
-            const cleanName = name.trim().toLowerCase();
-            const formMatch = formsDataDefault?.find(f => (f.stableId && f.stableId.toLowerCase() === cleanName) || (f.name && f.name.toLowerCase() === cleanName));
-            if (formMatch && formMatch.sprites) {
-                resolved = formMatch;
-            } else {
-                const baseMatch = pokemonData.find(p => p.name && p.name.toLowerCase() === cleanName);
-                if (baseMatch && baseMatch.sprites) resolved = baseMatch;
-            }
-        }
-    }
+    const resolved = resolvePokemon(pokemon) || pokemon;
 
     if (resolved && resolved.sprites) {
         if (!useHomeSprites) {

@@ -262,16 +262,27 @@ export default function ProfileStatsPage() {
         let hunts = [];
         if (isOwner) {
           try {
+            const isActualHuntItem = (h) => {
+              if (!h) return false;
+              if (h.isHuntTracker || h.isCounter || h.isHunt || h.source === "completedHunts" || h.source === "completedFails") return true;
+              if (h.outcome === "failed" || h.isFail) return true;
+              if (Array.isArray(h.phases) && h.phases.length > 0) return true;
+              if (Array.isArray(h.fails) && h.fails.length > 0) return true;
+              if ((Number(h.totalChecks || h.checks || 0) > 0 || Number(h.elapsedMs || h.time || 0) > 0) && (h.method || h.game)) return true;
+              if (h.caughtKey && !h.isHuntTracker) return false;
+              return false;
+            };
+
             const raw = localStorage.getItem(`completedHunts:${currentUsername}`) || localStorage.getItem("completedHunts") || localStorage.getItem("huntHistory");
             if (raw) {
               const parsed = JSON.parse(raw);
-              if (Array.isArray(parsed)) hunts = parsed;
+              if (Array.isArray(parsed)) hunts = parsed.filter(isActualHuntItem);
             }
             const rawFails = localStorage.getItem(`completedFails:${currentUsername}`) || localStorage.getItem("completedFails");
             if (rawFails) {
               const parsedFails = JSON.parse(rawFails);
               if (Array.isArray(parsedFails)) {
-                parsedFails.forEach(f => {
+                parsedFails.filter(isActualHuntItem).forEach(f => {
                   if (!hunts.some(h => (h.entryId && (h.entryId === f.entryId || h.entryId === f.id)) || (h.id && (h.id === f.id || h.id === f.entryId)))) {
                     hunts.push({ ...f, outcome: "failed", isFail: true });
                   }

@@ -3,7 +3,7 @@ import formsData from "./loadFormsData";
 import { getCaughtKey } from "../caughtStorage";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import { getFilteredFormsDataForProfile } from "./profileUtils";
-import { getSpriteUrl } from "./spriteUtils";
+import { getSpriteUrl, resolvePokemon, cleanPokemonNameOrKey } from "./spriteUtils";
 import { calculateOdds } from "./huntSystem";
 import {
   isLegendary,
@@ -494,15 +494,8 @@ export function calculateHuntStats(completedHunts = [], caughtMap = {}) {
   // Helper to normalize any hunt entry into uniform schema
   const normalizeHuntEntry = (h, fallbackKey = "") => {
     if (!h) return null;
-    const cleanKey = fallbackKey ? fallbackKey.replace(/:shiny$|-shiny$/, "") : "";
-    let mon = h.pokemon;
-    if (typeof mon === "string") {
-      mon = { name: mon };
-    } else if (!mon || typeof mon !== "object") {
-      const name = h.pokemonName || h.targetPokemon || h.target || h.name || cleanKey || "";
-      mon = name ? { name } : null;
-    }
-    const pokemonName = h.pokemonName || mon?.name || h.targetPokemon || h.target || cleanKey || "Unknown";
+    const mon = resolvePokemon(h) || (typeof h.pokemon === "object" ? h.pokemon : null);
+    const pokemonName = mon?.name || cleanPokemonNameOrKey(h.pokemonName || h.targetPokemon || h.target || h.name || fallbackKey) || "Unknown";
     const checks = Number(h.totalChecks ?? h.checks ?? h.phaseChecks ?? h.count ?? h.rolls ?? 0) || 0;
     const rawTime = h.elapsedMs ?? h.time ?? h.totalTime ?? 0;
     const timeMs = Number(rawTime > 0 && rawTime < 100000 && !h.elapsedMs ? rawTime * 1000 : rawTime) || 0;
@@ -551,9 +544,25 @@ export function calculateHuntStats(completedHunts = [], caughtMap = {}) {
     };
   };
 
+  // Filter out corrupted/unrelated non-hunt entries that may have been stored in legacy caches
+  const isActualHunt = (h) => {
+    if (!h) return false;
+    if (h.isHuntTracker || h.isCounter || h.isHunt || h.source === "completedHunts" || h.source === "completedFails") return true;
+    if (h.outcome === "failed" || h.isFail) return true;
+    if (Array.isArray(h.phases) && h.phases.length > 0) return true;
+    if (Array.isArray(h.fails) && h.fails.length > 0) return true;
+    // If it has actual count or time with a method/game
+    if ((Number(h.totalChecks || h.checks || 0) > 0 || Number(h.elapsedMs || h.time || 0) > 0) && (h.method || h.game)) return true;
+    // If it's a caughtMap harvested item without isHuntTracker, ignore it
+    if (h.caughtKey && !h.isHuntTracker) return false;
+    return false;
+  };
+
   rawHunts.forEach(h => {
-    const normalized = normalizeHuntEntry(h);
-    if (normalized) hunts.push(normalized);
+    if (isActualHunt(h)) {
+      const normalized = normalizeHuntEntry(h);
+      if (normalized) hunts.push(normalized);
+    }
   });
 
   // Harvest any hunt entries from caughtMap that might not be in completedHunts
@@ -561,14 +570,13 @@ export function calculateHuntStats(completedHunts = [], caughtMap = {}) {
     Object.entries(caughtMap).forEach(([caughtKey, info]) => {
       if (info && Array.isArray(info.entries)) {
         info.entries.forEach(entry => {
-          const isHuntEntry = entry.isHuntTracker ||
+          const isHuntEntry = Boolean(
+            entry.isHuntTracker ||
             entry.isCounter ||
             entry.isHunt ||
-            Number(entry.totalChecks || entry.checks || 0) > 0 ||
-            Number(entry.elapsedMs || entry.time || 0) > 0 ||
-            !!entry.method ||
-            Number(entry.phaseCount || 0) > 1 ||
-            (Array.isArray(entry.phases) && entry.phases.length > 0);
+            entry.source === "completedHunts" ||
+            entry.source === "completedFails"
+          );
 
           if (isHuntEntry) {
             const entryId = entry.entryId || entry.id;
@@ -577,7 +585,7 @@ export function calculateHuntStats(completedHunts = [], caughtMap = {}) {
               (h.caughtKey === caughtKey && h.date === entry.date && (h.totalChecks === entry.totalChecks || h.checks === entry.checks))
             );
             if (!alreadyExists) {
-              const normalized = normalizeHuntEntry({ ...entry, caughtKey, addedToLivingDex: true }, caughtKey);
+              const normalized = normalizeHuntEntry({ ...entry, caughtKey, isHuntTracker: true, addedToLivingDex: true }, caughtKey);
               if (normalized) hunts.push(normalized);
             }
           }

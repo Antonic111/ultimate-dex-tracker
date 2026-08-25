@@ -15,7 +15,7 @@ import {
   Calendar
 } from "lucide-react";
 import { GAME_OPTIONS } from "../../Constants";
-import { getSpriteUrl } from "../../utils/spriteUtils";
+import { getSpriteUrl, resolvePokemon, cleanPokemonNameOrKey } from "../../utils/spriteUtils";
 import { formatDigitalTime } from "../../utils/huntSync";
 import pokemonData from "../../data/pokemon.json";
 import formsDataDefault from "../../utils/loadFormsData";
@@ -30,7 +30,8 @@ const getGameImage = (gameName) => {
 
 const formatPokemonName = (name) => {
   if (!name) return "";
-  return name.charAt(0).toUpperCase() + name.slice(1);
+  const clean = cleanPokemonNameOrKey(name);
+  return clean.charAt(0).toUpperCase() + clean.slice(1);
 };
 
 export default function HuntHistoryModal({
@@ -80,13 +81,7 @@ export default function HuntHistoryModal({
   }, [scopedHistory]);
 
   const getHistoryPokemon = (entry) => {
-    if (entry.pokemon && (entry.pokemon.image || entry.pokemon.sprites || entry.pokemon.id)) {
-      return entry.pokemon;
-    }
-    const cleanName = (entry.pokemonName || (entry.caughtKey ? entry.caughtKey.split("-")[0] : "") || "").trim();
-    const base = pokemonData.find(p => p.name?.toLowerCase() === cleanName.toLowerCase());
-    const form = formsData?.find(f => (f.stableId && f.stableId === cleanName) || f.name?.toLowerCase() === cleanName.toLowerCase());
-    return form || base || { name: cleanName, id: 1 };
+    return resolvePokemon(entry) || { name: cleanPokemonNameOrKey(entry?.pokemonName) || "Unknown", id: 1 };
   };
 
   const filteredEntries = useMemo(() => {
