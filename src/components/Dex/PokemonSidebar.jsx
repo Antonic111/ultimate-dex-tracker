@@ -576,24 +576,26 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
           const parsed = JSON.parse(rawHistory);
           if (Array.isArray(parsed)) {
             parsed.forEach(h => {
-              if ((h.outcome === "failed" || h.isFail) && (h.addedToLivingDex || h.addedToCollection)) {
+              if (h.outcome === "failed" || h.isFail) {
                 const pMon = h.pokemon || (h.pokemonName ? { name: h.pokemonName } : null);
                 if (
                   (pMon?.stableId && pMon.stableId === pokeStableId) ||
                   (pMon?.id && pMon.id === pokeId) ||
-                  (pMon?.name && pMon.name.toLowerCase() === pokeName)
+                  (pMon?.name && pMon.name.toLowerCase() === pokeName) ||
+                  (h.pokemonName && h.pokemonName.toLowerCase() === pokeName)
                 ) {
                   addFail(h);
                 }
               }
               if (Array.isArray(h.phases)) {
                 h.phases.forEach(p => {
-                  if (p.outcome === "failed" && (p.addedToLivingDex || p.addedToCollection)) {
-                    const pMon = p.pokemon || h.pokemon;
+                  if (p.outcome === "failed" || p.isFail) {
+                    const pMon = p.pokemon || h.pokemon || (p.pokemonName ? { name: p.pokemonName } : null);
                     if (
                       (pMon?.stableId && pMon.stableId === pokeStableId) ||
                       (pMon?.id && pMon.id === pokeId) ||
-                      (pMon?.name && pMon.name.toLowerCase() === pokeName)
+                      (pMon?.name && pMon.name.toLowerCase() === pokeName) ||
+                      (p.pokemonName && p.pokemonName.toLowerCase() === pokeName)
                     ) {
                       addFail(p);
                     }

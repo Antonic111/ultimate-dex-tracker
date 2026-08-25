@@ -2,6 +2,23 @@
    ULTIMATE DEX TRACKER - ADMIN CONSOLE (SITE GREY PALETTE)
    ========================================================================== */
 
+/* Hide Ko-Fi tip widget on Admin page */
+body.admin-page div[id^="kofi-widget-overlay"],
+body.admin-page iframe[src*="ko-fi"],
+body.admin-page .floatingchat-container-wrap,
+body.admin-page .floatingchat-container-wrap-mobi,
+body.admin-page .floating-chat-kofi-popup-iframe,
+body:has(.admin-fullscreen-window) div[id^="kofi-widget-overlay"],
+body:has(.admin-fullscreen-window) iframe[src*="ko-fi"],
+body:has(.admin-fullscreen-window) .floatingchat-container-wrap,
+body:has(.admin-fullscreen-window) .floatingchat-container-wrap-mobi,
+body:has(.admin-fullscreen-window) .floating-chat-kofi-popup-iframe {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
 .admin-fullscreen-window {
   position: fixed;
   inset: 0;
@@ -1158,4 +1175,43 @@
   color: var(--text-muted, #888888);
   font-size: 13px;
   z-index: 1000;
+}
+
+/* --------------------------------------------------------------------------
+   Empty States (Centered Layout)
+   -------------------------------------------------------------------------- */
+.empty-state-box {
+  flex: 1;
+  width: 100%;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  margin: auto;
+}
+
+.empty-state-icon-bubble {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.admin-empty-table {
+  text-align: center;
+  vertical-align: middle;
+  padding: 32px 16px !important;
+}
+
+.admin-empty-table .empty-state-box {
+  min-height: 200px;
+  padding: 24px 0;
 }

@@ -713,6 +713,8 @@ router.put("/profile", authenticateUser, async (req, res) => {
     if (req.body.favoriteGames !== undefined) user.favoriteGames = sanitizedData.favoriteGames;
     if (req.body.favoritePokemon !== undefined) user.favoritePokemon = sanitizedData.favoritePokemon;
     if (req.body.favoritePokemonShiny !== undefined) user.favoritePokemonShiny = req.body.favoritePokemonShiny;
+    if (req.body.favoriteBalls !== undefined) user.favoriteBalls = sanitizedData.favoriteBalls;
+    if (req.body.favoriteTrainers !== undefined) user.favoriteTrainers = sanitizedData.favoriteTrainers;
     if (req.body.switchFriendCode !== undefined) user.switchFriendCode = sanitizedData.switchFriendCode;
     if (req.body.goFriendCode !== undefined) user.goFriendCode = sanitizedData.goFriendCode;
     if (req.body.profileTrainer !== undefined) user.profileTrainer = sanitizedData.profileTrainer;
@@ -851,6 +853,8 @@ router.put("/profile", authenticateUser, async (req, res) => {
         favoriteGames: user.favoriteGames,
         favoritePokemon: user.favoritePokemon,
         favoritePokemonShiny: user.favoritePokemonShiny,
+        favoriteBalls: user.favoriteBalls,
+        favoriteTrainers: user.favoriteTrainers,
         profileTrainer: user.profileTrainer,
         avatar: user.avatar || null,
         switchFriendCode: user.switchFriendCode,
@@ -972,7 +976,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer avatar switchFriendCode goFriendCode isProfilePublic isGlobalFeedPublic isLeaderboardPublic isFriendCodesPublic isStatsPublic likes dexPreferences externalLinkPreference shinyCharmGames huntHotkey isAdmin accentColor siteTheme isContentCreator youtubeUrl twitchUrl lastActiveAt");
+    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny favoriteBalls favoriteTrainers profileTrainer avatar switchFriendCode goFriendCode isProfilePublic isGlobalFeedPublic isLeaderboardPublic isFriendCodesPublic isStatsPublic likes dexPreferences externalLinkPreference shinyCharmGames huntHotkey isAdmin accentColor siteTheme isContentCreator youtubeUrl twitchUrl lastActiveAt");
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -983,6 +987,8 @@ router.get("/profile", authenticateUser, async (req, res) => {
       favoriteGames: user.favoriteGames,
       favoritePokemon: user.favoritePokemon,
       favoritePokemonShiny: user.favoritePokemonShiny,
+      favoriteBalls: user.favoriteBalls,
+      favoriteTrainers: user.favoriteTrainers,
       profileTrainer: user.profileTrainer,
       avatar: user.avatar || null,
       switchFriendCode: user.switchFriendCode,
@@ -1883,7 +1889,7 @@ router.get("/users/:username/public", async (req, res) => {
     const u = await User.findOne({
       username: req.params.username
     })
-      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny profileTrainer avatar createdAt switchFriendCode goFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin bingoGrid isContentCreator youtubeUrl twitchUrl lastActiveAt isProfilePublic isGlobalFeedPublic isLeaderboardPublic isStatsPublic")
+      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny favoriteBalls favoriteTrainers profileTrainer avatar createdAt switchFriendCode goFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin bingoGrid isContentCreator youtubeUrl twitchUrl lastActiveAt isProfilePublic isGlobalFeedPublic isLeaderboardPublic isStatsPublic")
       .lean();
 
     if (!u) return res.status(404).json({ error: "User not found" });
@@ -2285,7 +2291,7 @@ router.post("/assign-admin", authenticateUser, requireAdmin, async (req, res) =>
 // GET /api/admin/users - Get all users (admin only)
 router.get("/admin/users", authenticateUser, requireAdmin, async (req, res) => {
   try {
-    const rawUsers = await User.find({}, 'username email isAdmin verified createdAt bio isContentCreator avatar profileTrainer lastActiveAt isSuspended suspendedReason location favoriteGames favoritePokemon')
+    const rawUsers = await User.find({}, 'username email isAdmin verified createdAt bio isContentCreator avatar profileTrainer lastActiveAt isSuspended suspendedReason location favoriteGames favoritePokemon favoriteBalls favoriteTrainers')
       .sort({ createdAt: -1 })
       .lean();
 

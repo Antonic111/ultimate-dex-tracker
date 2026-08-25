@@ -488,28 +488,97 @@ export function calculateDetailedStats(caughtMap, dexPreferences) {
 }
 
 export function calculateHuntStats(completedHunts = [], caughtMap = {}) {
-  const hunts = Array.isArray(completedHunts) ? [...completedHunts] : [];
+  const rawHunts = Array.isArray(completedHunts) ? [...completedHunts] : [];
+  const hunts = [];
+
+  // Helper to normalize any hunt entry into uniform schema
+  const normalizeHuntEntry = (h, fallbackKey = "") => {
+    if (!h) return null;
+    const cleanKey = fallbackKey ? fallbackKey.replace(/:shiny$|-shiny$/, "") : "";
+    let mon = h.pokemon;
+    if (typeof mon === "string") {
+      mon = { name: mon };
+    } else if (!mon || typeof mon !== "object") {
+      const name = h.pokemonName || h.targetPokemon || h.target || h.name || cleanKey || "";
+      mon = name ? { name } : null;
+    }
+    const pokemonName = h.pokemonName || mon?.name || h.targetPokemon || h.target || cleanKey || "Unknown";
+    const checks = Number(h.totalChecks ?? h.checks ?? h.phaseChecks ?? h.count ?? h.rolls ?? 0) || 0;
+    const rawTime = h.elapsedMs ?? h.time ?? h.totalTime ?? 0;
+    const timeMs = Number(rawTime > 0 && rawTime < 100000 && !h.elapsedMs ? rawTime * 1000 : rawTime) || 0;
+    const timestamp = Number(h.timestamp) || (h.date ? new Date(h.date).getTime() : 0);
+    const dateStr = h.date || (timestamp ? new Date(timestamp).toISOString().split("T")[0] : "");
+
+    let game = h.game || "";
+    if (game === "PLA" || game === "Legends: Arceus" || game === "Pokemon Legends Arceus") game = "Legends Arceus";
+    if (game === "SV" || game === "Scarlet & Violet" || game === "Scarlet/Violet") game = "Scarlet";
+    if (game === "SwSh" || game === "Sword & Shield" || game === "Sword/Shield") game = "Sword";
+    if (game === "BDSP" || game === "Brilliant Diamond & Shining Pearl") game = "Brilliant Diamond";
+
+    let method = h.method || "";
+    if (method === "MMO" || method === "Massive Mass Outbreak" || method === "Massive Mass Outbreaks") {
+      method = game === "Legends Arceus" && h.isPermutation ? "Permutations" : "Massive Mass Outbreaks";
+    }
+    if (method === "Encounters") method = "Random Encounters";
+    if (method === "Masuda") method = "Masuda Method";
+    if (method === "Egg Hatching") method = "Breeding";
+
+    const odds = Number(h.odds) || (game && method ? calculateOdds(game, method, h.modifiers || {}) : 4096) || 4096;
+    const phaseList = Array.isArray(h.phases) ? h.phases : [];
+    const phaseCount = Number(h.phaseCount) || (phaseList.length ? phaseList.length + 1 : 1);
+    const isFail = h.outcome === "failed" || !!h.isFail;
+
+    return {
+      ...h,
+      id: h.id || h.entryId || `${dateStr}-${checks}-${game}`,
+      entryId: h.entryId || h.id || `${dateStr}-${checks}-${game}`,
+      pokemon: mon,
+      pokemonName,
+      checks,
+      totalChecks: checks,
+      time: timeMs,
+      elapsedMs: timeMs,
+      odds,
+      game,
+      method,
+      phaseCount,
+      phases: phaseList,
+      fails: Array.isArray(h.fails) ? h.fails : [],
+      outcome: isFail ? "failed" : "caught",
+      isFail,
+      timestamp,
+      date: dateStr
+    };
+  };
+
+  rawHunts.forEach(h => {
+    const normalized = normalizeHuntEntry(h);
+    if (normalized) hunts.push(normalized);
+  });
 
   // Harvest any hunt entries from caughtMap that might not be in completedHunts
   if (caughtMap && typeof caughtMap === "object") {
     Object.entries(caughtMap).forEach(([caughtKey, info]) => {
       if (info && Array.isArray(info.entries)) {
         info.entries.forEach(entry => {
-          if (entry.isHuntTracker) {
+          const isHuntEntry = entry.isHuntTracker ||
+            entry.isCounter ||
+            entry.isHunt ||
+            Number(entry.totalChecks || entry.checks || 0) > 0 ||
+            Number(entry.elapsedMs || entry.time || 0) > 0 ||
+            !!entry.method ||
+            Number(entry.phaseCount || 0) > 1 ||
+            (Array.isArray(entry.phases) && entry.phases.length > 0);
+
+          if (isHuntEntry) {
             const entryId = entry.entryId || entry.id;
-            const alreadyExists = hunts.some(h => 
+            const alreadyExists = hunts.some(h =>
               (entryId && (h.entryId === entryId || h.id === entryId)) ||
               (h.caughtKey === caughtKey && h.date === entry.date && (h.totalChecks === entry.totalChecks || h.checks === entry.checks))
             );
             if (!alreadyExists) {
-              hunts.push({
-                ...entry,
-                caughtKey,
-                pokemonName: entry.pokemonName || caughtKey.split("-")[0],
-                pokemon: entry.pokemon || null,
-                timestamp: entry.timestamp || (entry.date ? new Date(entry.date).getTime() : 0),
-                addedToLivingDex: true
-              });
+              const normalized = normalizeHuntEntry({ ...entry, caughtKey, addedToLivingDex: true }, caughtKey);
+              if (normalized) hunts.push(normalized);
             }
           }
         });
@@ -523,13 +592,28 @@ export function calculateHuntStats(completedHunts = [], caughtMap = {}) {
   const addFailItem = (f, defaultMonName, defaultMon) => {
     if (!f) return;
 
-    const monName = f.pokemonName || f.pokemon?.name || defaultMonName || "";
-    const pObj = f.pokemon || defaultMon || null;
-    const checks = Number(f.totalChecks || f.checks || f.phaseChecks) || 0;
-    const timeMs = Number(f.elapsedMs || f.time) || 0;
-    const timestamp = f.timestamp || (f.date ? new Date(f.date).getTime() : 0);
+    const cleanMonName = f.pokemonName || f.pokemon?.name || (typeof f.pokemon === "string" ? f.pokemon : "") || defaultMonName || "";
+    const pObj = f.pokemon || defaultMon || (cleanMonName ? { name: cleanMonName } : null);
+    const checks = Number(f.totalChecks ?? f.checks ?? f.phaseChecks ?? 0) || 0;
+    const rawTime = f.elapsedMs ?? f.time ?? 0;
+    const timeMs = Number(rawTime > 0 && rawTime < 100000 && !f.elapsedMs ? rawTime * 1000 : rawTime) || 0;
+    const timestamp = Number(f.timestamp) || (f.date ? new Date(f.date).getTime() : 0);
     const dateStr = f.date || (timestamp ? new Date(timestamp).toISOString().split("T")[0] : "");
     const entryId = f.entryId || f.id || null;
+
+    let game = f.game || "";
+    if (game === "PLA" || game === "Legends: Arceus" || game === "Pokemon Legends Arceus") game = "Legends Arceus";
+    if (game === "SV" || game === "Scarlet & Violet" || game === "Scarlet/Violet") game = "Scarlet";
+    if (game === "SwSh" || game === "Sword & Shield" || game === "Sword/Shield") game = "Sword";
+    if (game === "BDSP" || game === "Brilliant Diamond & Shining Pearl") game = "Brilliant Diamond";
+
+    let method = f.method || "";
+    if (method === "MMO" || method === "Massive Mass Outbreak" || method === "Massive Mass Outbreaks") {
+      method = game === "Legends Arceus" && f.isPermutation ? "Permutations" : "Massive Mass Outbreaks";
+    }
+    if (method === "Encounters") method = "Random Encounters";
+    if (method === "Masuda") method = "Masuda Method";
+    if (method === "Egg Hatching") method = "Breeding";
 
     // Check if already in failsList
     const isDuplicate = failsList.some(existing => {
@@ -538,12 +622,11 @@ export function calculateHuntStats(completedHunts = [], caughtMap = {}) {
       if (f.id && existing.id && f.id === existing.id) return true;
 
       // 2. Semantic matching: same pokemon + same game + same checks
-      const sameMon = monName.toLowerCase() === (existing.pokemonName || "").toLowerCase();
-      const sameGame = (f.game || "").toLowerCase() === (existing.game || "").toLowerCase();
+      const sameMon = cleanMonName.toLowerCase() === (existing.pokemonName || "").toLowerCase();
+      const sameGame = game.toLowerCase() === (existing.game || "").toLowerCase();
       const sameChecks = checks === (Number(existing.totalChecks || existing.checks) || 0);
 
       if (sameMon && sameGame && sameChecks) {
-        // Date match or within same day
         const existingDate = (existing.date || "").split("T")[0];
         const newDate = dateStr.split("T")[0];
         if (existingDate && newDate && existingDate === newDate) return true;
@@ -560,17 +643,20 @@ export function calculateHuntStats(completedHunts = [], caughtMap = {}) {
 
     failsList.push({
       ...f,
-      id: entryId || `${dateStr}-${checks}-${f.game || ''}`,
-      entryId: entryId || `${dateStr}-${checks}-${f.game || ''}`,
-      pokemonName: monName,
+      id: entryId || `${dateStr}-${checks}-${game}`,
+      entryId: entryId || `${dateStr}-${checks}-${game}`,
+      pokemonName: cleanMonName,
       pokemon: pObj,
       checks,
       totalChecks: checks,
       time: timeMs,
       elapsedMs: timeMs,
+      game,
+      method,
       timestamp,
       date: dateStr,
       reason: f.reason || f.notes || "Failed Encounter",
+      outcome: "failed",
       isFail: true
     });
   };
@@ -595,7 +681,7 @@ export function calculateHuntStats(completedHunts = [], caughtMap = {}) {
     if (Array.isArray(h.phases)) {
       h.phases.forEach(p => {
         if (p.outcome === "failed" || p.isFail) {
-          addFailItem(p, p.pokemonName || h.pokemonName, p.pokemon || h.pokemon);
+          addFailItem(p, p.pokemonName || p.pokemon?.name || h.pokemonName || h.pokemon?.name, p.pokemon || h.pokemon);
         }
       });
     }

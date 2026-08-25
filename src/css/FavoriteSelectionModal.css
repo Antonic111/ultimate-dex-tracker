@@ -324,6 +324,11 @@
   gap: 8px;
 }
 
+.fav-grid--ball {
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+}
+
 .fav-grid--trainer {
   grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
   gap: 8px;
@@ -451,6 +456,28 @@
 
 .fav-card--game:hover .fav-card-img {
   transform: scale(1.05);
+}
+
+/* Ball Card specific */
+.fav-card--ball {
+  height: 106px;
+  padding: 5px 4px 6px;
+}
+
+.fav-card--ball .fav-card-image-wrap {
+  height: 62px;
+}
+
+.fav-card--ball .fav-card-img {
+  height: 52px;
+  max-width: 100%;
+  object-fit: contain;
+  image-rendering: auto !important;
+  transition: transform 0.2s ease;
+}
+
+.fav-card--ball:hover .fav-card-img {
+  transform: scale(1.1);
 }
 
 /* Trainer Card specific */

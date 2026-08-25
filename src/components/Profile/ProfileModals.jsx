@@ -6,7 +6,7 @@ import CreatorRequestModal from "../Shared/CreatorRequestModal";
 import AvatarUploadModal from "./AvatarUploadModal";
 import { Modal } from "../Shared/Modal";
 import { Button } from "../Shared/Button";
-import { GAME_OPTIONS_TWO } from "../../Constants";
+import { FAVORITE_GAME_OPTIONS, BALL_OPTIONS_TWO, TRAINER_OPTIONS } from "../../Constants";
 
 export default function ProfileModals({
     isOwner, isEditing, form, setForm,
@@ -14,6 +14,8 @@ export default function ProfileModals({
     showTrainerModal, setShowTrainerModal,
     showGameModal, setShowGameModal, gameSlotIndex,
     showPokemonModal, setShowPokemonModal, pokemonSlotIndex,
+    showBallModal, setShowBallModal,
+    showFavoriteTrainerModal, setShowFavoriteTrainerModal,
     POKEMON_OPTIONS, pendingNavigation, setPendingNavigation, setIsEditing
 }) {
     const navigate = useNavigate();
@@ -35,13 +37,25 @@ export default function ProfileModals({
         setShowPokemonModal(false);
     };
 
+    const handleSaveBalls = (newBalls) => {
+        const updated = Array.from({ length: 5 }, (_, i) => newBalls[i] || "");
+        setForm(prev => ({ ...prev, favoriteBalls: updated }));
+        setShowBallModal(false);
+    };
+
+    const handleSaveTrainers = (newTrainers) => {
+        const updated = Array.from({ length: 5 }, (_, i) => newTrainers[i] || "");
+        setForm(prev => ({ ...prev, favoriteTrainers: updated }));
+        setShowFavoriteTrainerModal(false);
+    };
+
     return (
         <>
             <FavoriteSelectionModal
                 isOpen={showGameModal}
                 onClose={() => setShowGameModal(false)}
                 title="Select Favorite Games"
-                options={GAME_OPTIONS_TWO}
+                options={FAVORITE_GAME_OPTIONS}
                 selected={form.favoriteGames || []}
                 onChange={handleSaveGames}
                 max={5}
@@ -55,6 +69,26 @@ export default function ProfileModals({
                 selected={form.favoritePokemon || []}
                 selectedShiny={form.favoritePokemonShiny || []}
                 onChange={handleSavePokemon}
+                max={5}
+            />
+
+            <FavoriteSelectionModal
+                isOpen={showBallModal}
+                onClose={() => setShowBallModal(false)}
+                title="Select Favorite Pokéballs"
+                options={BALL_OPTIONS_TWO}
+                selected={form.favoriteBalls || []}
+                onChange={handleSaveBalls}
+                max={5}
+            />
+
+            <FavoriteSelectionModal
+                isOpen={showFavoriteTrainerModal}
+                onClose={() => setShowFavoriteTrainerModal(false)}
+                title="Select Favorite Trainers"
+                options={TRAINER_OPTIONS}
+                selected={form.favoriteTrainers || []}
+                onChange={handleSaveTrainers}
                 max={5}
             />
             

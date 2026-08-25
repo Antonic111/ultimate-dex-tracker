@@ -217,9 +217,9 @@ export function useHuntManager({
   // ── Filtered Lists for Mode Scoping ───────────────────────────────────────
   const activeHunts = useMemo(() => {
     if (mode === "mmo") {
-      return allActiveHunts.filter(h => (h.game === "Legends Arceus" && h.method === "Permutations") || h.method === "Permutations");
+      return allActiveHunts.filter(h => (h.game === "Legends Arceus" && (h.method === "Permutations" || h.method === "Massive Mass Outbreak" || h.method === "Massive Mass Outbreaks")) || h.method === "Permutations" || h.isMMO);
     }
-    return allActiveHunts.filter(h => !(h.game === "Legends Arceus" && h.method === "Permutations") && h.method !== "Permutations");
+    return allActiveHunts.filter(h => !((h.game === "Legends Arceus" && (h.method === "Permutations" || h.method === "Massive Mass Outbreak" || h.method === "Massive Mass Outbreaks")) || h.method === "Permutations" || h.isMMO));
   }, [allActiveHunts, mode]);
 
   const currentHunt = useMemo(() => {
@@ -238,9 +238,9 @@ export function useHuntManager({
 
   const historyBadgeCount = useMemo(() => {
     if (mode === "mmo") {
-      return (huntHistory || []).filter(h => (h.game === "Legends Arceus" && h.method === "Permutations") || h.method === "Permutations").length;
+      return (huntHistory || []).filter(h => (h.game === "Legends Arceus" && (h.method === "Permutations" || h.method === "Massive Mass Outbreak" || h.method === "Massive Mass Outbreaks")) || h.method === "Permutations" || h.isMMO).length;
     }
-    return (huntHistory || []).filter(h => !(h.game === "Legends Arceus" && h.method === "Permutations") && h.method !== "Permutations").length;
+    return (huntHistory || []).filter(h => !((h.game === "Legends Arceus" && (h.method === "Permutations" || h.method === "Massive Mass Outbreak" || h.method === "Massive Mass Outbreaks")) || h.method === "Permutations" || h.isMMO)).length;
   }, [huntHistory, mode]);
 
   // ── Debounced Backend & Local Persistence ─────────────────────────────────
@@ -715,6 +715,8 @@ export function useHuntManager({
 
     const caughtEntry = {
       date: phaseRecord.date ? phaseRecord.date.split("T")[0] : new Date().toISOString().split("T")[0],
+      pokemon: workingPokemon,
+      pokemonName: workingPokemon?.name || "Unknown",
       game: hunt.game,
       method: hunt.method,
       nickname: (phaseRecord.nickname || shinyEncounterModal.nickname || "").trim(),
@@ -818,6 +820,8 @@ export function useHuntManager({
 
     const failEntry = {
       date: phaseRecord.date ? phaseRecord.date.split("T")[0] : new Date().toISOString().split("T")[0],
+      pokemon: workingPokemon,
+      pokemonName: workingPokemon?.name || "Unknown",
       game: hunt.game,
       method: hunt.method,
       checks: phaseRecord.phaseChecks || 0,
@@ -907,12 +911,15 @@ export function useHuntManager({
     setAllActiveHunts(updatedHunts);
     setCachedHuntsData({ activeHunts: updatedHunts });
 
+    const phasePokemon = phaseRecord.pokemon || hunt.pokemon;
+    const phasePokemonName = phasePokemon?.name || phaseRecord.pokemonName || "Unknown";
+
     if (phaseRecord.outcome === "failed") {
       const failEntry = {
         id: phaseRecord.id || now,
         entryId: phaseRecord.entryId || Math.random().toString(36).substr(2, 9),
-        pokemon: shinyEncounterModal.selectedPokemon || hunt.pokemon,
-        pokemonName: (shinyEncounterModal.selectedPokemon || hunt.pokemon)?.name || "Unknown",
+        pokemon: phasePokemon,
+        pokemonName: phasePokemonName,
         game: hunt.game,
         method: hunt.method,
         checks: phaseRecord.phaseChecks || 0,
@@ -920,14 +927,14 @@ export function useHuntManager({
         elapsedMs: phaseRecord.elapsedMs || 0,
         time: phaseRecord.elapsedMs || 0,
         odds: phaseRecord.odds || hunt.odds || null,
-        reason: phaseRecord.reason || (shinyEncounterModal.notes || "").trim() || "Failed Encounter",
-        notes: phaseRecord.notes || (shinyEncounterModal.notes || "").trim() || "",
+        reason: phaseRecord.reason || (phaseRecord.notes || "").trim() || "Failed Encounter",
+        notes: phaseRecord.notes || (phaseRecord.notes || "").trim() || "",
         date: phaseRecord.date || new Date().toISOString(),
         timestamp: now,
         outcome: "failed",
         isFail: true,
         isHuntTracker: true,
-        addedToLivingDex: Boolean(shinyEncounterModal.addedToCollection)
+        addedToLivingDex: Boolean(phaseRecord.addedToCollection)
       };
 
       try {
@@ -937,6 +944,43 @@ export function useHuntManager({
         localStorage.setItem(storageKey, JSON.stringify(updated));
         if (username) localStorage.setItem("completedFails", JSON.stringify(updated));
         setHuntHistory(prev => [failEntry, ...prev.filter(e => e.entryId !== failEntry.entryId)]);
+      } catch {}
+    } else {
+      // Non-target / target phase caught and continuing hunt
+      const completedPhaseEntry = {
+        id: phaseRecord.id || now,
+        entryId: phaseRecord.entryId || Math.random().toString(36).substr(2, 9),
+        pokemon: phasePokemon,
+        pokemonName: phasePokemonName,
+        game: hunt.game,
+        method: hunt.method,
+        checks: phaseRecord.phaseChecks || 0,
+        totalChecks: phaseRecord.totalChecks || hunt.checks || 0,
+        elapsedMs: phaseRecord.elapsedMs || 0,
+        time: phaseRecord.elapsedMs || 0,
+        odds: phaseRecord.odds || hunt.odds || null,
+        modifiers: hunt.modifiers || {},
+        nickname: phaseRecord.nickname || "",
+        ball: phaseRecord.ball || "",
+        mark: phaseRecord.mark || "",
+        notes: phaseRecord.notes || "",
+        date: phaseRecord.date || new Date().toISOString(),
+        timestamp: now,
+        outcome: "caught",
+        isFail: false,
+        isPhase: true,
+        targetPokemon: hunt.pokemon,
+        isHuntTracker: true,
+        addedToLivingDex: Boolean(phaseRecord.addedToCollection)
+      };
+
+      try {
+        const storageKey = username ? `completedHunts:${username}` : "completedHunts";
+        const existing = JSON.parse(localStorage.getItem(storageKey) || "[]");
+        const updated = [completedPhaseEntry, ...existing.filter(e => e.entryId !== completedPhaseEntry.entryId)];
+        localStorage.setItem(storageKey, JSON.stringify(updated));
+        if (username) localStorage.setItem("completedHunts", JSON.stringify(updated));
+        setHuntHistory(prev => [completedPhaseEntry, ...prev.filter(e => e.entryId !== completedPhaseEntry.entryId)]);
       } catch {}
     }
 
@@ -1161,6 +1205,7 @@ export function useHuntManager({
       startTime: startedAt,
       pausedAt: now,
       totalPausedMs: 0,
+      elapsedMs: manualElapsedMs,
       status: "paused",
       isPaused: true,
       increment: huntIncrement,
@@ -1259,14 +1304,26 @@ export function useHuntManager({
             const parsed = JSON.parse(raw);
             if (Array.isArray(parsed)) {
               parsed.forEach(h => {
-                const eid = h.entryId || `${h.id}-${h.timestamp}`;
+                const eid = h.entryId || (h.id ? String(h.id) : null) || `${h.date}-${h.timestamp}`;
                 if (!seenEntryIds.has(eid) && !isItemDeleted(h)) {
                   seenEntryIds.add(eid);
+                  const monName = h.pokemonName || h.pokemon?.name || (typeof h.pokemon === "string" ? h.pokemon : "") || (h.caughtKey ? h.caughtKey.split("-")[0] : "");
+                  const checks = Number(h.totalChecks ?? h.checks ?? 0);
+                  const rawTime = h.elapsedMs ?? h.time ?? 0;
+                  const timeMs = Number(rawTime > 0 && rawTime < 100000 && !h.elapsedMs ? rawTime * 1000 : rawTime);
                   historyList.push({
                     ...h,
+                    id: h.id || eid,
                     entryId: eid,
+                    pokemonName: monName,
+                    pokemon: h.pokemon || (monName ? { name: monName } : null),
+                    checks,
+                    totalChecks: checks,
+                    time: timeMs,
+                    elapsedMs: timeMs,
                     outcome: h.outcome || (h.isFail ? "failed" : "caught"),
-                    isFail: h.outcome === "failed" || Boolean(h.isFail)
+                    isFail: h.outcome === "failed" || Boolean(h.isFail),
+                    timestamp: Number(h.timestamp) || (h.date ? new Date(h.date).getTime() : 0)
                   });
                 }
               });
@@ -1287,14 +1344,26 @@ export function useHuntManager({
             const parsed = JSON.parse(raw);
             if (Array.isArray(parsed)) {
               parsed.forEach(f => {
-                const eid = f.entryId || `${f.id}-${f.timestamp}`;
+                const eid = f.entryId || (f.id ? String(f.id) : null) || `${f.date}-${f.timestamp}`;
                 if (!seenEntryIds.has(eid) && !isItemDeleted(f)) {
                   seenEntryIds.add(eid);
+                  const monName = f.pokemonName || f.pokemon?.name || (typeof f.pokemon === "string" ? f.pokemon : "") || (f.caughtKey ? f.caughtKey.split("-")[0] : "");
+                  const checks = Number(f.totalChecks ?? f.checks ?? 0);
+                  const rawTime = f.elapsedMs ?? f.time ?? 0;
+                  const timeMs = Number(rawTime > 0 && rawTime < 100000 && !f.elapsedMs ? rawTime * 1000 : rawTime);
                   historyList.push({
                     ...f,
+                    id: f.id || eid,
                     entryId: eid,
+                    pokemonName: monName,
+                    pokemon: f.pokemon || (monName ? { name: monName } : null),
+                    checks,
+                    totalChecks: checks,
+                    time: timeMs,
+                    elapsedMs: timeMs,
                     outcome: "failed",
-                    isFail: true
+                    isFail: true,
+                    timestamp: Number(f.timestamp) || (f.date ? new Date(f.date).getTime() : 0)
                   });
                 }
               });
@@ -1303,7 +1372,143 @@ export function useHuntManager({
         }
       });
 
-      historyList.sort((a, b) => (b.timestamp || new Date(b.date).getTime() || 0) - (a.timestamp || new Date(a.date).getTime() || 0));
+      // Load from Living Dex caught data
+      let caughtData = null;
+      if (username) {
+        try {
+          const { fetchCaughtData } = await import("../../api/caught");
+          caughtData = await fetchCaughtData(username);
+        } catch {}
+        if (!caughtData) {
+          try {
+            caughtData = JSON.parse(localStorage.getItem(`caughtInfoMap:${username}`) || "{}");
+          } catch {}
+        }
+      } else {
+        try {
+          caughtData = JSON.parse(localStorage.getItem("caughtInfoMap") || "{}");
+        } catch {}
+      }
+
+      if (caughtData && typeof caughtData === "object") {
+        Object.entries(caughtData).forEach(([caughtKey, info]) => {
+          if (info && Array.isArray(info.entries)) {
+            info.entries.forEach(entry => {
+              const isHuntEntry = entry.isHuntTracker ||
+                entry.isCounter ||
+                entry.isHunt ||
+                Number(entry.totalChecks || entry.checks || 0) > 0 ||
+                Number(entry.elapsedMs || entry.time || 0) > 0 ||
+                !!entry.method ||
+                Number(entry.phaseCount || 0) > 1 ||
+                (Array.isArray(entry.phases) && entry.phases.length > 0);
+
+              if (isHuntEntry && !isItemDeleted(entry)) {
+                const entryId = entry.entryId || entry.id;
+                const matchIndex = historyList.findIndex(h =>
+                  (entryId && (h.entryId === entryId || h.id === entryId)) ||
+                  (h.caughtKey === caughtKey && h.date === entry.date && (h.totalChecks === entry.totalChecks || h.checks === entry.checks))
+                );
+
+                const cleanKey = caughtKey.replace(/:shiny$|-shiny$/, "");
+                const monName = entry.pokemonName || entry.pokemon?.name || cleanKey;
+                const checks = Number(entry.totalChecks ?? entry.checks ?? 0);
+                const rawTime = entry.elapsedMs ?? entry.time ?? 0;
+                const timeMs = Number(rawTime > 0 && rawTime < 100000 && !entry.elapsedMs ? rawTime * 1000 : rawTime);
+
+                if (matchIndex >= 0) {
+                  historyList[matchIndex].addedToLivingDex = true;
+                  historyList[matchIndex].caughtKey = caughtKey;
+                } else {
+                  historyList.push({
+                    ...entry,
+                    id: entry.id || entryId,
+                    entryId: entryId || entry.id,
+                    caughtKey,
+                    pokemonName: monName,
+                    pokemon: entry.pokemon || (monName ? { name: monName } : null),
+                    checks,
+                    totalChecks: checks,
+                    time: timeMs,
+                    elapsedMs: timeMs,
+                    timestamp: Number(entry.timestamp) || (entry.date ? new Date(entry.date).getTime() : 0),
+                    addedToLivingDex: true
+                  });
+                }
+              }
+            });
+          }
+
+          if (info && Array.isArray(info.fails)) {
+            info.fails.forEach(failEntry => {
+              if (!isItemDeleted(failEntry)) {
+                const entryId = failEntry.entryId || failEntry.id;
+                const matchIndex = historyList.findIndex(h =>
+                  (entryId && (h.entryId === entryId || h.id === entryId)) ||
+                  (h.caughtKey === caughtKey && h.date === failEntry.date && (h.totalChecks === failEntry.totalChecks || h.checks === failEntry.checks))
+                );
+
+                const cleanKey = caughtKey.replace(/:shiny$|-shiny$/, "");
+                const monName = failEntry.pokemonName || failEntry.pokemon?.name || cleanKey;
+                const checks = Number(failEntry.totalChecks ?? failEntry.checks ?? 0);
+                const rawTime = failEntry.elapsedMs ?? failEntry.time ?? 0;
+                const timeMs = Number(rawTime > 0 && rawTime < 100000 && !failEntry.elapsedMs ? rawTime * 1000 : rawTime);
+
+                if (matchIndex >= 0) {
+                  historyList[matchIndex].addedToLivingDex = true;
+                  historyList[matchIndex].caughtKey = caughtKey;
+                  historyList[matchIndex].isFail = true;
+                  historyList[matchIndex].outcome = "failed";
+                } else {
+                  historyList.push({
+                    ...failEntry,
+                    id: failEntry.id || entryId,
+                    entryId: entryId || failEntry.id,
+                    caughtKey,
+                    pokemonName: monName,
+                    pokemon: failEntry.pokemon || (monName ? { name: monName } : null),
+                    checks,
+                    totalChecks: checks,
+                    time: timeMs,
+                    elapsedMs: timeMs,
+                    timestamp: Number(failEntry.timestamp) || (failEntry.date ? new Date(failEntry.date).getTime() : 0),
+                    addedToLivingDex: true,
+                    outcome: "failed",
+                    isFail: true
+                  });
+                }
+              }
+            });
+          }
+        });
+      }
+
+      // Also scan allActiveHunts phases for any fails or phases not yet in history
+      if (Array.isArray(allActiveHuntsRef.current)) {
+        allActiveHuntsRef.current.forEach(h => {
+          if (Array.isArray(h.phases)) {
+            h.phases.forEach(p => {
+              const pPokemon = p.pokemon || h.pokemon;
+              const pPokemonName = p.pokemonName || p.pokemon?.name || h.pokemon?.name;
+              const isFail = p.outcome === "failed" || p.isFail;
+              if (!isItemDeleted(p) && !historyList.some(e => (e.entryId && e.entryId === p.entryId) || (e.id && e.id === p.id))) {
+                historyList.push({
+                  ...p,
+                  pokemonName: pPokemonName,
+                  pokemon: pPokemon,
+                  game: p.game || h.game,
+                  method: p.method || h.method,
+                  outcome: isFail ? "failed" : "caught",
+                  isFail,
+                  timestamp: Number(p.timestamp) || (p.date ? new Date(p.date).getTime() : 0)
+                });
+              }
+            });
+          }
+        });
+      }
+
+      historyList.sort((a, b) => (b.timestamp || (b.date ? new Date(b.date).getTime() : 0)) - (a.timestamp || (a.date ? new Date(a.date).getTime() : 0)));
       setHuntHistory(historyList);
     } catch (e) {
       console.error("Failed to load hunt history:", e);

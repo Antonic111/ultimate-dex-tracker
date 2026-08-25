@@ -95,16 +95,15 @@ export const MessageProvider = ({ children }) => {
   return (
     <MessageContext.Provider value={{ showMessage }}>
       {children}
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[99999] flex flex-col gap-2.5 pointer-events-none max-w-[90vw]">
-        <AnimatePresence mode="popLayout">
+      <div className="fixed bottom-4 inset-x-0 mx-auto z-[99999] flex flex-col items-center gap-2.5 pointer-events-none w-max max-w-[90vw]">
+        <AnimatePresence>
           {messages.map((msg) => (
             <motion.div
               key={msg.id}
-              layout
-              initial={{ opacity: 0, y: 20, scale: 0.94 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.94 }}
-              transition={{ type: "spring", stiffness: 450, damping: 30 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
               className={`
                 pointer-events-auto cursor-pointer px-4 py-2.5 md:px-5 md:py-3 rounded-lg text-white text-sm md:text-base font-medium shadow-xl
                 w-full max-w-[90vw] md:w-auto md:max-w-md

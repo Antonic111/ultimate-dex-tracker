@@ -4,13 +4,15 @@ import {
   History,
   Trophy,
   XCircle,
+  CheckCircle2,
   Sparkles,
   Clock,
   Search,
   X,
   Plus,
   Trash2,
-  Flag
+  Flag,
+  Calendar
 } from "lucide-react";
 import { GAME_OPTIONS } from "../../Constants";
 import { getSpriteUrl } from "../../utils/spriteUtils";
@@ -222,7 +224,7 @@ export default function HuntHistoryModal({
                     type="button"
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                       historyTab === "completed"
-                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-sm"
+                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm"
                         : "text-gray-400 hover:text-white"
                     }`}
                     onClick={() => setHistoryTab("completed")}
@@ -326,131 +328,161 @@ export default function HuntHistoryModal({
                   : "Recorded";
                 const totalChecks = entry.totalChecks || entry.checks || 0;
                 const elapsedMs = entry.elapsedMs || entry.time || 0;
+                const calculatedOdds = entry.odds || 4096;
+                const phaseVal = isFail
+                  ? `Phase ${entry.phaseNumber || 1}`
+                  : (entry.phaseCount || (entry.phases ? entry.phases.length + 1 : 1));
 
                 return (
                   <div
                     key={entry.entryId || entry.id || entry.timestamp}
-                    className={`history-entry-card group ${
-                      isFail
-                        ? "!border-rose-500/30 !bg-rose-500/[0.04] hover:!border-rose-500/50 hover:!bg-rose-500/[0.07]"
-                        : "!border-emerald-500/30 !bg-emerald-500/[0.04] hover:!border-emerald-500/50 hover:!bg-emerald-500/[0.07]"
-                    }`}
+                    className={`history-entry-card ${isFail ? "is-failed" : "is-caught"}`}
                   >
-                    <div className="history-entry-left">
-                      <div className={`history-entry-sprite-wrap ${
-                        isFail
-                          ? "!border-rose-500/30 !bg-rose-500/10"
-                          : "!border-emerald-500/30 !bg-emerald-500/10"
-                      }`}>
-                        <img
-                          src={getSpriteUrl(fullPokemon, true, useHomeSprites)}
-                          alt=""
-                          className={`history-entry-sprite ${!useHomeSprites ? "pixelated" : ""}`}
-                          style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
-                          onError={(e) => { e.currentTarget.src = "/fallback.png"; }}
-                        />
-                      </div>
+                    {/* Left: Sprite Box */}
+                    <div className="history-entry-sprite-box">
+                      <Sparkles
+                        size={14}
+                        className={`history-entry-corner-sparkle ${isFail ? "text-rose-400" : "text-emerald-400"}`}
+                      />
+                      <img
+                        src={getSpriteUrl(fullPokemon, true, useHomeSprites)}
+                        alt=""
+                        className={`history-entry-sprite ${!useHomeSprites ? "pixelated" : ""}`}
+                        style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
+                        onError={(e) => { e.currentTarget.src = "/fallback.png"; }}
+                      />
+                    </div>
 
-                      <div className="history-entry-info">
-                        <div className="history-entry-title-row">
-                          <span className="history-entry-title">
-                            Shiny {formatPokemonName(fullPokemon?.name || entry.pokemonName)}
-                          </span>
+                    {/* Right: Main Content Area */}
+                    <div className="history-entry-main">
+                      {/* Top Header Row */}
+                      <div className="history-entry-header">
+                        <div className="history-entry-title-group">
+                          <h4 className="history-entry-pokemon-name">
+                            {formatPokemonName(fullPokemon?.name || entry.pokemonName)}
+                          </h4>
+                          <Sparkles
+                            size={14}
+                            className={`shrink-0 ${isFail ? "text-rose-400" : "text-emerald-400"}`}
+                          />
                           {fullPokemon?.id != null && (
-                            <span className="text-[11px] font-mono text-gray-400 font-semibold">
+                            <span className="history-entry-dex-num">
                               #{String(fullPokemon.id).padStart(4, "0")}
                             </span>
                           )}
-                          {isFail ? (
-                            <span className="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/40">
-                              FAIL
-                            </span>
-                          ) : (
-                            <span className="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                              CAUGHT
-                            </span>
-                          )}
                           {entry.nickname && (
-                            <span className="text-[11px] text-amber-300 font-bold px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
+                            <span className="history-entry-nickname">
                               "{entry.nickname}"
                             </span>
                           )}
                         </div>
 
-                        <div className="history-entry-badge-row">
-                          {entry.game && (
-                            <span className="history-entry-pill">
-                              {getGameImage(entry.game) && (
-                                <img src={getGameImage(entry.game)} alt="" className="w-3.5 h-3.5 object-contain" />
-                              )}
-                              <span>{entry.game}</span>
+                        <div className="history-entry-status-actions">
+                          {isFail ? (
+                            <span className="history-status-badge failed">
+                              <XCircle size={13} strokeWidth={2.5} />
+                              <span>FAILED</span>
+                            </span>
+                          ) : (
+                            <span className="history-status-badge caught">
+                              <CheckCircle2 size={13} strokeWidth={2.5} />
+                              <span>CAUGHT</span>
                             </span>
                           )}
-                          {entry.method && (
-                            <span className="history-entry-pill text-[var(--accent)] border-[var(--accent)]/20 bg-[var(--accent)]/10">
-                              {entry.method}
-                            </span>
-                          )}
-                          {isFail && entry.reason && (
-                            <span className="history-entry-pill text-amber-300 border-amber-500/30 bg-amber-500/10">
-                              {entry.reason}
-                            </span>
-                          )}
-                          <span className="text-gray-400 text-[11px] font-medium">
-                            • {entryDateStr}
-                          </span>
+                          <button
+                            type="button"
+                            className="history-action-btn"
+                            onClick={() => setDeleteEntryModal({ show: true, entry })}
+                            title={isFail ? "Remove fail from history" : "Remove hunt from history"}
+                            aria-label={isFail ? "Remove fail from history" : "Remove hunt from history"}
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         </div>
+                      </div>
 
-                        <div className="flex items-center flex-wrap gap-2 text-xs mt-0.5">
-                          <span className={`font-extrabold ${isFail ? "text-rose-400" : "text-emerald-400"}`}>
-                            {totalChecks.toLocaleString()} checks {isFail ? "(at fail)" : ""}
+                      {/* Middle Badges Row */}
+                      <div className="history-entry-meta-row">
+                        {entry.game && (
+                          <span className="history-meta-pill">
+                            {getGameImage(entry.game) ? (
+                              <img src={getGameImage(entry.game)} alt="" className="w-3.5 h-3.5 object-contain" />
+                            ) : (
+                              <span>🎮</span>
+                            )}
+                            <span>{entry.game}</span>
                           </span>
-                          {elapsedMs > 0 && (
-                            <span className="font-mono text-gray-400 text-[11px]">
-                              • {formatDigitalTime(elapsedMs)}
-                            </span>
-                          )}
-                          {entry.odds && (
-                            <span className="text-gray-400 text-[11px]">
-                              • 1/{entry.odds.toLocaleString()}
-                            </span>
-                          )}
-                          {!isFail && entry.phaseCount > 1 && (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-300 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
-                              <Flag size={10} className="text-amber-400" />
-                              <span>Phase {entry.phaseCount}</span>
-                            </span>
-                          )}
-                        </div>
-
-                        {entry.notes && (
-                          <p className="text-[11px] text-gray-400 italic line-clamp-1 mt-0.5">
-                            "{entry.notes}"
-                          </p>
+                        )}
+                        {entry.method && (
+                          <span className="history-meta-pill">
+                            <span className="text-[var(--accent)]">✦</span>
+                            <span>{entry.method}</span>
+                          </span>
+                        )}
+                        <span className="history-meta-pill text-gray-400">
+                          <Calendar size={12} className="text-gray-500" />
+                          <span>{entryDateStr}</span>
+                        </span>
+                        {entry.ball && (
+                          <span className="history-meta-pill text-gray-300">
+                            <span>{entry.ball}</span>
+                          </span>
+                        )}
+                        {entry.addedToLivingDex && (
+                          <span className="history-meta-pill !bg-emerald-500/10 !border-emerald-500/25 !text-emerald-300 font-bold">
+                            <span>Living Dex ✓</span>
+                          </span>
                         )}
                       </div>
-                    </div>
 
-                    <div className="history-entry-right">
-                      {entry.ball && (
-                        <span className="history-entry-pill text-gray-300">
-                          {entry.ball}
-                        </span>
+                      {/* Bottom 4-Column Stats Grid */}
+                      <div className="history-entry-stats-grid">
+                        <div className="history-entry-stat-col">
+                          <span className="history-entry-stat-label">
+                            {isFail ? "FAILED AT" : "CHECKS"}
+                          </span>
+                          <span className={`history-entry-stat-val ${isFail ? "!text-rose-400" : "!text-emerald-400"}`}>
+                            {totalChecks.toLocaleString()} {isFail ? "checks" : ""}
+                          </span>
+                          {isFail && (
+                            <span className="history-entry-stat-sub" title={entry.reason || "Failed Encounter"}>
+                              {entry.reason || "Failed Encounter"}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="history-entry-stat-col">
+                          <span className="history-entry-stat-label">TIME</span>
+                          <span className="history-entry-stat-val">
+                            <Clock size={13} className="text-gray-400 shrink-0" />
+                            <span>{elapsedMs > 0 ? formatDigitalTime(elapsedMs) : "00:00"}</span>
+                          </span>
+                        </div>
+
+                        <div className="history-entry-stat-col">
+                          <span className="history-entry-stat-label">ODDS</span>
+                          <span className="history-entry-stat-val">
+                            <Sparkles size={13} className="text-amber-400 shrink-0" />
+                            <span>1 / {calculatedOdds.toLocaleString()}</span>
+                          </span>
+                        </div>
+
+                        <div className="history-entry-stat-col">
+                          <span className="history-entry-stat-label">
+                            {!isFail && (entry.phaseCount > 1 || (entry.phases && entry.phases.length > 0)) ? "PHASES" : "PHASE"}
+                          </span>
+                          <span className="history-entry-stat-val">
+                            <Flag size={13} className="text-gray-400 shrink-0" />
+                            <span>{phaseVal}</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {entry.notes && (
+                        <p className="text-[11px] text-gray-400 italic line-clamp-1 border-t border-white/[0.04] pt-1">
+                          "{entry.notes}"
+                        </p>
                       )}
-                      {entry.addedToLivingDex && (
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                          Living Dex ✓
-                        </span>
-                      )}
-                      <button
-                        type="button"
-                        className="history-delete-btn"
-                        onClick={() => setDeleteEntryModal({ show: true, entry })}
-                        title={isFail ? "Remove fail from history" : "Remove hunt from history"}
-                        aria-label={isFail ? "Remove fail from history" : "Remove hunt from history"}
-                      >
-                        <Trash2 size={15} />
-                      </button>
                     </div>
                   </div>
                 );

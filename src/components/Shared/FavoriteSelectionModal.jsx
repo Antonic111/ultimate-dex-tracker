@@ -32,6 +32,7 @@ export default function FavoriteSelectionModal({
     onChange,
     max = 1,
     showHoverPreview = false,
+    size,
 }) {
     const [tempSelection, setTempSelection] = useState([]);
     const [tempShiny, setTempShiny] = useState([]);
@@ -45,6 +46,7 @@ export default function FavoriteSelectionModal({
     const isPokemonModal = title.toLowerCase().includes("pokémon") || title.toLowerCase().includes("pokemon");
     const isGameModal = title.toLowerCase().includes("game");
     const isTrainerModal = title.toLowerCase().includes("trainer");
+    const isBallModal = title.toLowerCase().includes("ball") || title.toLowerCase().includes("pokéball");
 
     // Initialize state on open
     useEffect(() => {
@@ -257,7 +259,7 @@ export default function FavoriteSelectionModal({
             title={title}
             subtitle={subtitleText}
             icon={modalIcon}
-            size={isPokemonModal ? "xl" : isGameModal ? "lg" : "md"}
+            size={size || (isPokemonModal ? "xl" : "lg")}
             footer={({ close }) => (
                 <div className="fav-modal-footer">
                     {chosenCount > 0 && (
@@ -429,7 +431,13 @@ export default function FavoriteSelectionModal({
                     ref={gridRef}
                     onScroll={handleScroll}
                     className={`fav-grid custom-scrollbar ${
-                        isPokemonModal ? "fav-grid--pokemon" : isGameModal ? "fav-grid--game" : "fav-grid--trainer"
+                        isPokemonModal
+                            ? "fav-grid--pokemon"
+                            : isGameModal
+                            ? "fav-grid--game"
+                            : isBallModal
+                            ? "fav-grid--ball"
+                            : "fav-grid--trainer"
                     }`}
                 >
                     {displayedOptions.length === 0 ? (
@@ -466,7 +474,7 @@ export default function FavoriteSelectionModal({
                                     key={item.value}
                                     type="button"
                                     className={`fav-card ${
-                                        isPokemonModal ? "fav-card--pokemon" : isGameModal ? "fav-card--game" : "fav-card--trainer"
+                                        isPokemonModal ? "fav-card--pokemon" : isGameModal ? "fav-card--game" : isBallModal ? "fav-card--ball" : "fav-card--trainer"
                                     } ${isSelected ? "selected" : ""}`}
                                     onClick={() => toggleSelect(item.value)}
                                     onMouseEnter={() => (showHoverPreview ? setHovered(item) : null)}

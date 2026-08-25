@@ -45,12 +45,17 @@ export const formatIntervalTime = (seconds = 0) => {
  */
 export const getHuntElapsedTime = (hunt, now = Date.now()) => {
   if (!hunt) return 0;
-  const startedAt = hunt.startedAt || hunt.startTime || (typeof hunt.id === "number" ? hunt.id : now);
-  const totalPausedMs = hunt.totalPausedMs || 0;
   const isPaused = hunt.status === "paused" || hunt.isPaused;
+  const totalPausedMs = Number(hunt.totalPausedMs) || 0;
+  let startedAt = Number(hunt.startedAt || hunt.startTime) || 0;
+
+  if (!startedAt) {
+    const rawTime = Number(hunt.elapsedMs ?? hunt.time ?? 0);
+    return rawTime > 0 && rawTime < 100000 && !hunt.elapsedMs ? rawTime * 1000 : rawTime;
+  }
 
   if (isPaused) {
-    const pausedAt = hunt.pausedAt || hunt.updatedAt || now;
+    const pausedAt = Number(hunt.pausedAt || hunt.updatedAt || now);
     return Math.max(0, pausedAt - startedAt - totalPausedMs);
   }
   return Math.max(0, now - startedAt - totalPausedMs);
@@ -67,37 +72,167 @@ export const normalizeHunt = (hunt, now = Date.now(), legacyTotals = {}, legacyL
   const isLegacyPaused = legacyPaused.has(huntId) || legacyPaused.has(String(huntId)) || legacyPaused.has(Number(huntId));
   const isPaused = hunt.status ? hunt.status === "paused" : (hunt.isPaused ?? isLegacyPaused);
 
+  // Normalize Pokémon info
+  let pokemon = hunt.pokemon;
+  if (typeof pokemon === "string") {
+    pokemon = { name: pokemon };
+  } else if (!pokemon || typeof pokemon !== "object") {
+    const pName = hunt.pokemonName || hunt.targetPokemon || hunt.target || hunt.name || "";
+    pokemon = pName ? { name: pName } : null;
+  }
+  const pokemonName = hunt.pokemonName || pokemon?.name || hunt.targetPokemon || hunt.target || "";
+
+  // Normalize startedAt and timestamps
   let startedAt = hunt.startedAt || hunt.startTime;
-  let totalPausedMs = hunt.totalPausedMs;
-
-  // Handle migration from legacy totalCheckTimes if startedAt / totalPausedMs aren't explicit
-  if (!startedAt) {
-    const accumulatedTime = legacyTotals[huntId] ?? legacyTotals[String(huntId)] ?? 0;
-    startedAt = now - accumulatedTime;
-    totalPausedMs = 0;
-  }
-  if (totalPausedMs === undefined || totalPausedMs === null) {
-    totalPausedMs = 0;
+  if (typeof startedAt === "string") {
+    const parsed = new Date(startedAt).getTime();
+    if (!isNaN(parsed)) startedAt = parsed;
+    else startedAt = null;
   }
 
-  const pausedAt = isPaused ? (hunt.pausedAt || legacyLasts[huntId] || now) : null;
+  let totalPausedMs = Number(hunt.totalPausedMs) || 0;
+
+  // Handle migration from legacy totalCheckTimes / elapsedMs / time if startedAt isn't explicit
+  const rawLegacyTime = legacyTotals[huntId] ?? legacyTotals[String(huntId)] ?? hunt.elapsedMs ?? hunt.time ?? hunt.totalTime ?? 0;
+  const accumulatedTime = Number(rawLegacyTime) || 0;
+  const accumulatedMs = accumulatedTime > 0 && accumulatedTime < 100000 && !hunt.elapsedMs ? accumulatedTime * 1000 : accumulatedTime;
+
+  // Prevent ancient calendar creation dates (e.g. from months/years ago in startDate) from blowing up the timer
+  const isSuspiciousStartTime = startedAt && (now - startedAt > 86400000) && (!hunt.totalPausedMs || hunt.totalPausedMs === 0) && (accumulatedMs < (now - startedAt - 3600000));
+
+  if (!startedAt || isSuspiciousStartTime) {
+    if (accumulatedMs > 0) {
+      startedAt = now - accumulatedMs;
+      totalPausedMs = 0;
+    } else {
+      startedAt = now;
+      totalPausedMs = 0;
+    }
+  }
+
+  let pausedAt = hunt.pausedAt;
+  if (typeof pausedAt === "string") {
+    const parsed = new Date(pausedAt).getTime();
+    pausedAt = !isNaN(parsed) ? parsed : null;
+  }
+  if (isPaused && !pausedAt) {
+    pausedAt = legacyLasts[huntId] || now;
+  }
+
+  // Normalize checks
+  const checks = Number(hunt.checks ?? hunt.currentChecks ?? hunt.rolls ?? hunt.count ?? hunt.totalChecks ?? 0) || 0;
+
+  // Normalize game & method
+  let game = hunt.game || "";
+  if (game === "PLA" || game === "Legends: Arceus" || game === "Pokemon Legends Arceus") game = "Legends Arceus";
+  if (game === "SV" || game === "Scarlet & Violet" || game === "Scarlet/Violet") game = "Scarlet";
+  if (game === "SwSh" || game === "Sword & Shield" || game === "Sword/Shield") game = "Sword";
+  if (game === "BDSP" || game === "Brilliant Diamond & Shining Pearl") game = "Brilliant Diamond";
+
+  let method = hunt.method || "";
+  if (method === "MMO" || method === "Massive Mass Outbreak" || method === "Massive Mass Outbreaks") {
+    method = game === "Legends Arceus" && hunt.isPermutation ? "Permutations" : "Massive Mass Outbreaks";
+  }
+  if (method === "Encounters") method = "Random Encounters";
+  if (method === "Masuda") method = "Masuda Method";
+  if (method === "Egg Hatching") method = "Breeding";
+
+  // Normalize phases
+  const rawPhases = Array.isArray(hunt.phases) ? hunt.phases : [];
+  const phases = rawPhases.map((p, idx) => {
+    if (!p || typeof p !== "object") {
+      return {
+        id: `${huntId}-phase-${idx + 1}`,
+        phaseNumber: idx + 1,
+        pokemon: { name: String(p || "Unknown") },
+        pokemonName: String(p || "Unknown"),
+        outcome: "caught",
+        checks: 0,
+        totalChecks: checks,
+        date: new Date().toISOString()
+      };
+    }
+    let phaseMon = p.pokemon;
+    if (typeof phaseMon === "string") {
+      phaseMon = { name: phaseMon };
+    } else if (!phaseMon || typeof phaseMon !== "object") {
+      const name = p.pokemonName || p.name || "Unknown";
+      phaseMon = { name };
+    }
+    const phaseMonName = p.pokemonName || phaseMon?.name || "Unknown";
+    const phaseChecks = Number(p.phaseChecks ?? p.checks ?? p.count ?? 0) || 0;
+    const phaseTotal = Number(p.totalChecks ?? p.total ?? checks) || checks;
+    const isFail = p.outcome === "failed" || p.isFail;
+
+    return {
+      ...p,
+      id: p.id || p.entryId || `${huntId}-phase-${idx + 1}`,
+      phaseNumber: p.phaseNumber || (idx + 1),
+      pokemon: phaseMon,
+      pokemonName: phaseMonName,
+      outcome: isFail ? "failed" : (p.outcome || "caught"),
+      isFail: !!isFail,
+      phaseChecks,
+      checks: phaseChecks,
+      totalChecks: phaseTotal,
+      elapsedMs: Number(p.elapsedMs || p.time || 0),
+      date: p.date || new Date().toISOString()
+    };
+  });
+
+  // Normalize fails
+  const rawFails = Array.isArray(hunt.fails) ? hunt.fails : [];
+  const fails = rawFails.map((f, idx) => {
+    if (typeof f === "number") {
+      return {
+        id: `${huntId}-fail-${idx + 1}`,
+        checks: f,
+        totalChecks: f,
+        date: new Date().toISOString(),
+        reason: "Failed Encounter",
+        outcome: "failed",
+        isFail: true,
+        pokemon,
+        pokemonName
+      };
+    }
+    const failChecks = Number(f.checks ?? f.totalChecks ?? f.count ?? 0) || 0;
+    return {
+      ...f,
+      id: f.id || f.entryId || `${huntId}-fail-${idx + 1}`,
+      checks: failChecks,
+      totalChecks: Number(f.totalChecks ?? failChecks) || failChecks,
+      outcome: "failed",
+      isFail: true,
+      pokemon: f.pokemon || pokemon,
+      pokemonName: f.pokemonName || f.pokemon?.name || pokemonName
+    };
+  });
+
+  const currentElapsedMs = Math.max(0, (isPaused ? (pausedAt || now) : now) - startedAt - totalPausedMs);
 
   return {
     ...hunt,
     id: huntId,
     huntId,
     version: hunt.version || 1,
-    checks: Math.max(0, hunt.checks || 0),
+    pokemon,
+    pokemonName,
+    game,
+    method,
+    checks,
     status: isPaused ? "paused" : "running",
     isPaused,
     startedAt,
     startTime: startedAt,
     pausedAt,
     totalPausedMs: Math.max(0, totalPausedMs),
+    elapsedMs: currentElapsedMs,
     lastCheckAt: hunt.lastCheckAt || legacyLasts[huntId] || now,
     updatedAt: hunt.updatedAt || now,
-    phases: hunt.phases || [],
-    fails: hunt.fails || [],
+    phases,
+    fails,
+    odds: hunt.odds || null,
     isPhasesCollapsed: !!hunt.isPhasesCollapsed,
     modifiers: hunt.modifiers || {},
     stats: hunt.stats || {}

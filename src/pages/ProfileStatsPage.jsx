@@ -262,7 +262,7 @@ export default function ProfileStatsPage() {
         let hunts = [];
         if (isOwner) {
           try {
-            const raw = localStorage.getItem(`completedHunts:${currentUsername}`) || localStorage.getItem("completedHunts");
+            const raw = localStorage.getItem(`completedHunts:${currentUsername}`) || localStorage.getItem("completedHunts") || localStorage.getItem("huntHistory");
             if (raw) {
               const parsed = JSON.parse(raw);
               if (Array.isArray(parsed)) hunts = parsed;
@@ -272,8 +272,33 @@ export default function ProfileStatsPage() {
               const parsedFails = JSON.parse(rawFails);
               if (Array.isArray(parsedFails)) {
                 parsedFails.forEach(f => {
-                  if (!hunts.some(h => (h.entryId && h.entryId === f.entryId) || (h.id && h.id === f.id))) {
+                  if (!hunts.some(h => (h.entryId && (h.entryId === f.entryId || h.entryId === f.id)) || (h.id && (h.id === f.id || h.id === f.entryId)))) {
                     hunts.push({ ...f, outcome: "failed", isFail: true });
+                  }
+                });
+              }
+            }
+
+            // Also harvest any active hunt phases and fails
+            const rawActive = localStorage.getItem("activeHunts");
+            if (rawActive) {
+              const parsedActive = JSON.parse(rawActive);
+              if (Array.isArray(parsedActive)) {
+                parsedActive.forEach(ah => {
+                  if (Array.isArray(ah.phases)) {
+                    ah.phases.forEach(p => {
+                      if (!hunts.some(h => (h.entryId && (h.entryId === p.entryId || h.entryId === p.id)) || (h.id && (h.id === p.id || h.id === p.entryId)))) {
+                        hunts.push({
+                          ...p,
+                          pokemonName: p.pokemonName || p.pokemon?.name || ah.pokemonName || ah.pokemon?.name,
+                          pokemon: p.pokemon || ah.pokemon,
+                          game: p.game || ah.game,
+                          method: p.method || ah.method,
+                          outcome: p.outcome || "caught",
+                          isFail: p.outcome === "failed" || !!p.isFail
+                        });
+                      }
+                    });
                   }
                 });
               }

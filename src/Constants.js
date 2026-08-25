@@ -1,3 +1,5 @@
+import trainerData from "./trainers.json";
+
 // BALLS
 export const BALL_OPTIONS = [
   { name: "None", value: "" },
@@ -40,7 +42,17 @@ export const BALL_OPTIONS = [
   { name: "Strange Ball", value: "Strange Ball", image: "/data/balls/strange-ball.png" }
 ];
 
-// GAMES
+export const BALL_OPTIONS_TWO = BALL_OPTIONS.filter(b => b.value !== "");
+
+export const TRAINER_OPTIONS = Array.isArray(trainerData)
+  ? trainerData.map(t => ({
+      name: t.name,
+      value: t.filename,
+      image: `/data/trainer_sprites/${t.filename}`
+    }))
+  : [];
+
+// GAMES (Standard box art for site-wide counters, sidebar, bingo, search, etc.)
 export const GAME_OPTIONS = [
   { name: "None", value: "" },
 
@@ -172,6 +184,83 @@ export const GAME_OPTIONS_TWO = [
   // Other
   { name: "GO", value: "GO", image: "/data/games/go.png" },
   { name: "Home", value: "Home", image: "/data/games/home.png" }
+];
+
+// FAVORITE GAME OPTIONS (High-res text logos used exclusively in Profile Favorites)
+export const FAVORITE_GAME_OPTIONS = [
+
+  // Gen 1 (1996–1999)
+  { name: "Red", value: "Red", image: "/data/games_text_logos/red.png" },
+  { name: "Blue", value: "Blue", image: "/data/games_text_logos/blue.png" },
+  { name: "Green", value: "Green", image: "/data/games_text_logos/green.png" },
+  { name: "Yellow", value: "Yellow", image: "/data/games_text_logos/yellow.png" },
+
+  // Gen 2 (1999–2001)
+  { name: "Gold", value: "Gold", image: "/data/games_text_logos/gold.png" },
+  { name: "Silver", value: "Silver", image: "/data/games_text_logos/silver.png" },
+  { name: "Crystal", value: "Crystal", image: "/data/games_text_logos/crystal.png" },
+
+  // Gen 3 (2002–2006)
+  { name: "Ruby", value: "Ruby", image: "/data/games_text_logos/ruby.png" },
+  { name: "Sapphire", value: "Sapphire", image: "/data/games_text_logos/sapphire.png" },
+  { name: "Emerald", value: "Emerald", image: "/data/games_text_logos/emerald.png" },
+  { name: "Fire Red", value: "Fire Red", image: "/data/games_text_logos/firered.png" },
+  { name: "Leaf Green", value: "Leaf Green", image: "/data/games_text_logos/leafgreen.png" },
+
+  // Gen 4 (2006–2009)
+  { name: "Diamond", value: "Diamond", image: "/data/games_text_logos/diamond.png" },
+  { name: "Pearl", value: "Pearl", image: "/data/games_text_logos/pearl.png" },
+  { name: "Platinum", value: "Platinum", image: "/data/games_text_logos/platinum.png" },
+  { name: "Heart Gold", value: "Heart Gold", image: "/data/games_text_logos/heartgold.png" },
+  { name: "Soul Silver", value: "Soul Silver", image: "/data/games_text_logos/soulsilver.png" },
+
+  // Gen 5 (2010–2012)
+  { name: "Black", value: "Black", image: "/data/games_text_logos/black.png" },
+  { name: "White", value: "White", image: "/data/games_text_logos/white.png" },
+  { name: "Black 2", value: "Black 2", image: "/data/games_text_logos/black2.png" },
+  { name: "White 2", value: "White 2", image: "/data/games_text_logos/white2.png" },
+
+  // Gen 6 (2013–2014)
+  { name: "X", value: "X", image: "/data/games_text_logos/x.png" },
+  { name: "Y", value: "Y", image: "/data/games_text_logos/y.png" },
+  { name: "Omega Ruby", value: "Omega Ruby", image: "/data/games_text_logos/omegaruby.png" },
+  { name: "Alpha Sapphire", value: "Alpha Sapphire", image: "/data/games_text_logos/alphasapphire.png" },
+
+  // Gen 7 (2016–2018)
+  { name: "Sun", value: "Sun", image: "/data/games_text_logos/sun.png" },
+  { name: "Moon", value: "Moon", image: "/data/games_text_logos/moon.png" },
+  { name: "Ultra Sun", value: "Ultra Sun", image: "/data/games_text_logos/ultrasun.png" },
+  { name: "Ultra Moon", value: "Ultra Moon", image: "/data/games_text_logos/ultramoon.png" },
+  { name: "Let's Go Pikachu", value: "Let's Go Pikachu", image: "/data/games_text_logos/letsgopikachu.png" },
+  { name: "Let's Go Eevee", value: "Let's Go Eevee", image: "/data/games_text_logos/letsgoeevee.png" },
+
+  // Gen 8 (2019–2021)
+  { name: "Sword", value: "Sword", image: "/data/games_text_logos/sword.png" },
+  { name: "Shield", value: "Shield", image: "/data/games_text_logos/shield.png" },
+  { name: "Brilliant Diamond", value: "Brilliant Diamond", image: "/data/games_text_logos/brilliantdiamond.png" },
+  { name: "Shining Pearl", value: "Shining Pearl", image: "/data/games_text_logos/shiningpearl.png" },
+  { name: "Legends Arceus", value: "Legends Arceus", image: "/data/games_text_logos/arceus.png" },
+
+  // Gen 9 (2022–2023)
+  { name: "Scarlet", value: "Scarlet", image: "/data/games_text_logos/scarlet.png" },
+  { name: "Violet", value: "Violet", image: "/data/games_text_logos/violet.png" },
+
+  // Gen 9.5 (2025)
+  { name: "Legends Z-A", value: "Legends Z-A", image: "/data/games_text_logos/za.png" },
+
+  // Spin-offs & Other
+  { name: "Colosseum", value: "Colosseum", image: "/data/games_text_logos/colosseum.png" },
+  { name: "XD Gale of Darkness", value: "XD Gale of Darkness", image: "/data/games_text_logos/xdgaleofdarkness.png" },
+  { name: "Battle Revolution", value: "Battle Revolution", image: "/data/games_text_logos/battlerevolution.png" },
+  { name: "Mystery Dungeon DX", value: "Mystery Dungeon DX", image: "/data/games_text_logos/mysterydungeondx.png" },
+  { name: "Rumble", value: "Rumble", image: "/data/games_text_logos/rumble.png" },
+  { name: "Quest", value: "Quest", image: "/data/games_text_logos/quest.png" },
+  { name: "Masters EX", value: "Masters EX", image: "/data/games_text_logos/masters.png" },
+  { name: "Café ReMix", value: "Café ReMix", image: "/data/games_text_logos/remix.png" },
+  { name: "Sleep", value: "Sleep", image: "/data/games_text_logos/sleep.png" },
+  { name: "Champions", value: "Champions", image: "/data/games_text_logos/champions.png" },
+  { name: "GO", value: "GO", image: "/data/games_text_logos/go.png" },
+  { name: "Home", value: "Home", image: "/data/games_text_logos/home.png" }
 ];
 
 // MARKS

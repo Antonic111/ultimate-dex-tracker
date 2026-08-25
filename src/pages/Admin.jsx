@@ -4,7 +4,7 @@ import {
   XCircle, AlertCircle, Calendar, Mail, UserCheck, Filter, Trash2, Check, 
   ChevronLeft, ChevronRight, ArrowUp, ArrowDown, Video, Youtube, Twitch, 
   Clock, MessageSquare, Crown, UserX, Edit3, MoreHorizontal,
-  ExternalLink, Ban, Sparkles, RefreshCw, Send, Radio, AlertTriangle, X, Bell, Home,
+  ExternalLink, Ban, RefreshCw, Send, Radio, AlertTriangle, X, Bell, Home,
   LogOut, ArrowLeft
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -128,6 +128,10 @@ const Admin = () => {
 
   useEffect(() => {
     checkAdminStatus();
+    document.body.classList.add('admin-page');
+    return () => {
+      document.body.classList.remove('admin-page');
+    };
   }, []);
 
   // Global click outside listener
@@ -1080,9 +1084,16 @@ const Admin = () => {
                     {paginatedUsers.length === 0 ? (
                       <tr>
                         <td colSpan={6} className="admin-empty-table">
-                          <div className="empty-state-box py-6">
-                            <Users size={28} className="text-gray-500 mb-1" />
-                            <span className="font-bold text-gray-300 text-xs">No users found</span>
+                          <div className="empty-state-box">
+                            <div className="empty-state-icon-bubble">
+                              <Users size={30} className="text-gray-500" />
+                            </div>
+                            <span className="font-bold text-gray-200 text-sm mt-3">
+                              {userSearch || roleFilter !== 'all' || statusFilter !== 'all' ? 'No users matching your filters' : 'No users found'}
+                            </span>
+                            <span className="text-xs text-gray-500 mt-1 max-w-xs">
+                              {userSearch || roleFilter !== 'all' || statusFilter !== 'all' ? 'Try adjusting your search query or clearing active filters.' : 'There are currently no registered users in the database.'}
+                            </span>
                           </div>
                         </td>
                       </tr>
@@ -1355,49 +1366,62 @@ const Admin = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2.5 mt-2">
-                {bugReports.length === 0 ? (
-                  <div className="empty-state-box py-10">
-                    <Bug size={32} className="text-gray-500 mb-2" />
-                    <span className="font-bold text-gray-300 text-sm">No bug reports filed</span>
-                  </div>
-                ) : (
-                  bugReports
-                    .filter(r => !bugReportSearch || (r.title && r.title.toLowerCase().includes(bugReportSearch.toLowerCase())) || (r.description && r.description.toLowerCase().includes(bugReportSearch.toLowerCase())))
-                    .map((report) => (
-                      <div key={report._id} className="p-3.5 rounded-xl bg-black/25 border border-white/[0.08] flex items-center justify-between gap-3">
-                        <div className="flex flex-col gap-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-white text-sm truncate">{report.title || 'Untitled Report'}</span>
-                            <span className={`status-pill ${report.status === 'resolved' ? 'active' : 'suspended'} text-[10px]`}>
-                              {report.status === 'resolved' ? 'Resolved' : 'Open'}
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-300 line-clamp-1">{report.description}</p>
-                          <span className="text-[10px] text-gray-500">Reported by @{report.username || 'Anonymous'} • {getTimeAgo(report.createdAt)}</span>
+              <div className="flex flex-col flex-1 min-h-0">
+                {(() => {
+                  const filteredBugs = bugReports.filter(r => !bugReportSearch || (r.title && r.title.toLowerCase().includes(bugReportSearch.toLowerCase())) || (r.description && r.description.toLowerCase().includes(bugReportSearch.toLowerCase())));
+                  if (filteredBugs.length === 0) {
+                    return (
+                      <div className="empty-state-box">
+                        <div className="empty-state-icon-bubble">
+                          <Bug size={30} className="text-gray-500" />
                         </div>
-
-                        <div className="flex items-center gap-2 shrink-0">
-                          {report.status !== 'resolved' && (
-                            <Button
-                              variant="success"
-                              size="sm"
-                              onClick={() => confirmResolveReport(report, 'Bug Report')}
-                            >
-                              Resolve
-                            </Button>
-                          )}
-                          <Button
-                            variant="danger-soft"
-                            size="sm"
-                            icon={<Trash2 size={13} />}
-                            onClick={() => { setSelectedReport({ ...report, reportType: 'Bug Report' }); setShowDeleteReportModal(true); }}
-                            aria-label="Delete bug report"
-                          />
-                        </div>
+                        <span className="font-bold text-gray-200 text-sm mt-3">
+                          {bugReportSearch ? 'No matching bug reports found' : 'No bug reports filed'}
+                        </span>
+                        <span className="text-xs text-gray-500 mt-1 max-w-xs">
+                          {bugReportSearch ? 'Try adjusting your search query.' : 'All clear! There are currently no bug reports in the system.'}
+                        </span>
                       </div>
-                    ))
-                )}
+                    );
+                  }
+                  return (
+                    <div className="flex flex-col gap-2.5 mt-2">
+                      {filteredBugs.map((report) => (
+                        <div key={report._id} className="p-3.5 rounded-xl bg-black/25 border border-white/[0.08] flex items-center justify-between gap-3">
+                          <div className="flex flex-col gap-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-white text-sm truncate">{report.title || 'Untitled Report'}</span>
+                              <span className={`status-pill ${report.status === 'resolved' ? 'active' : 'suspended'} text-[10px]`}>
+                                {report.status === 'resolved' ? 'Resolved' : 'Open'}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-300 line-clamp-1">{report.description}</p>
+                            <span className="text-[10px] text-gray-500">Reported by @{report.username || 'Anonymous'} • {getTimeAgo(report.createdAt)}</span>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            {report.status !== 'resolved' && (
+                              <Button
+                                variant="success"
+                                size="sm"
+                                onClick={() => confirmResolveReport(report, 'Bug Report')}
+                              >
+                                Resolve
+                              </Button>
+                            )}
+                            <Button
+                              variant="danger-soft"
+                              size="sm"
+                              icon={<Trash2 size={13} />}
+                              onClick={() => { setSelectedReport({ ...report, reportType: 'Bug Report' }); setShowDeleteReportModal(true); }}
+                              aria-label="Delete bug report"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           )}
@@ -1422,49 +1446,62 @@ const Admin = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2.5 mt-2">
-                {featureRequests.length === 0 ? (
-                  <div className="empty-state-box py-10">
-                    <MessageSquare size={32} className="text-gray-500 mb-2" />
-                    <span className="font-bold text-gray-300 text-sm">No feature requests filed</span>
-                  </div>
-                ) : (
-                  featureRequests
-                    .filter(r => !featureRequestSearch || (r.title && r.title.toLowerCase().includes(featureRequestSearch.toLowerCase())) || (r.description && r.description.toLowerCase().includes(featureRequestSearch.toLowerCase())))
-                    .map((req) => (
-                      <div key={req._id} className="p-3.5 rounded-xl bg-black/25 border border-white/[0.08] flex items-center justify-between gap-3">
-                        <div className="flex flex-col gap-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-white text-sm truncate">{req.title || 'Untitled Request'}</span>
-                            <span className={`status-pill ${req.status === 'resolved' ? 'active' : 'suspended'} text-[10px]`}>
-                              {req.status === 'resolved' ? 'Completed' : 'Open'}
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-300 line-clamp-1">{req.description}</p>
-                          <span className="text-[10px] text-gray-500">Requested by @{req.username || 'Anonymous'} • {getTimeAgo(req.createdAt)}</span>
+              <div className="flex flex-col flex-1 min-h-0">
+                {(() => {
+                  const filteredRequests = featureRequests.filter(r => !featureRequestSearch || (r.title && r.title.toLowerCase().includes(featureRequestSearch.toLowerCase())) || (r.description && r.description.toLowerCase().includes(featureRequestSearch.toLowerCase())));
+                  if (filteredRequests.length === 0) {
+                    return (
+                      <div className="empty-state-box">
+                        <div className="empty-state-icon-bubble">
+                          <MessageSquare size={30} className="text-gray-500" />
                         </div>
-
-                        <div className="flex items-center gap-2 shrink-0">
-                          {req.status !== 'resolved' && (
-                            <Button
-                              variant="success"
-                              size="sm"
-                              onClick={() => confirmResolveReport(req, 'Feature Request')}
-                            >
-                              Complete
-                            </Button>
-                          )}
-                          <Button
-                            variant="danger-soft"
-                            size="sm"
-                            icon={<Trash2 size={13} />}
-                            onClick={() => { setSelectedReport({ ...req, reportType: 'Feature Request' }); setShowDeleteReportModal(true); }}
-                            aria-label="Delete feature request"
-                          />
-                        </div>
+                        <span className="font-bold text-gray-200 text-sm mt-3">
+                          {featureRequestSearch ? 'No matching feature requests found' : 'No feature requests filed'}
+                        </span>
+                        <span className="text-xs text-gray-500 mt-1 max-w-xs">
+                          {featureRequestSearch ? 'Try adjusting your search query.' : 'All clear! There are currently no pending feature requests in the system.'}
+                        </span>
                       </div>
-                    ))
-                )}
+                    );
+                  }
+                  return (
+                    <div className="flex flex-col gap-2.5 mt-2">
+                      {filteredRequests.map((req) => (
+                        <div key={req._id} className="p-3.5 rounded-xl bg-black/25 border border-white/[0.08] flex items-center justify-between gap-3">
+                          <div className="flex flex-col gap-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-white text-sm truncate">{req.title || 'Untitled Request'}</span>
+                              <span className={`status-pill ${req.status === 'resolved' ? 'active' : 'suspended'} text-[10px]`}>
+                                {req.status === 'resolved' ? 'Completed' : 'Open'}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-300 line-clamp-1">{req.description}</p>
+                            <span className="text-[10px] text-gray-500">Requested by @{req.username || 'Anonymous'} • {getTimeAgo(req.createdAt)}</span>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            {req.status !== 'resolved' && (
+                              <Button
+                                variant="success"
+                                size="sm"
+                                onClick={() => confirmResolveReport(req, 'Feature Request')}
+                              >
+                                Complete
+                              </Button>
+                            )}
+                            <Button
+                              variant="danger-soft"
+                              size="sm"
+                              icon={<Trash2 size={13} />}
+                              onClick={() => { setSelectedReport({ ...req, reportType: 'Feature Request' }); setShowDeleteReportModal(true); }}
+                              aria-label="Delete feature request"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           )}
@@ -1479,56 +1516,63 @@ const Admin = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2.5 mt-2">
+              <div className="flex flex-col flex-1 min-h-0">
                 {creatorRequests.length === 0 ? (
-                  <div className="empty-state-box py-10">
-                    <Video size={32} className="text-gray-500 mb-2" />
-                    <span className="font-bold text-gray-300 text-sm">No creator applications pending</span>
+                  <div className="empty-state-box">
+                    <div className="empty-state-icon-bubble">
+                      <Video size={30} className="text-gray-500" />
+                    </div>
+                    <span className="font-bold text-gray-200 text-sm mt-3">No creator applications pending</span>
+                    <span className="text-xs text-gray-500 mt-1 max-w-xs">
+                      There are currently no creator applications awaiting review.
+                    </span>
                   </div>
                 ) : (
-                  creatorRequests.map((req) => (
-                    <div key={req._id} className="p-3.5 rounded-xl bg-black/25 border border-white/[0.08] flex items-center justify-between gap-3">
-                      <div className="flex flex-col gap-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-white text-sm">@{req.username}</span>
-                          <span className={`status-pill ${req.status === 'approved' ? 'active' : req.status === 'rejected' ? 'suspended' : 'neutral'} text-[10px]`}>
-                            {req.status}
-                          </span>
+                  <div className="flex flex-col gap-2.5 mt-2">
+                    {creatorRequests.map((req) => (
+                      <div key={req._id} className="p-3.5 rounded-xl bg-black/25 border border-white/[0.08] flex items-center justify-between gap-3">
+                        <div className="flex flex-col gap-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-white text-sm">@{req.username}</span>
+                            <span className={`status-pill ${req.status === 'approved' ? 'active' : req.status === 'rejected' ? 'suspended' : 'neutral'} text-[10px]`}>
+                              {req.status}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3 text-xs">
+                            {req.youtubeUrl && (
+                              <a href={req.youtubeUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-rose-400 hover:underline">
+                                <Youtube size={13} /> YouTube
+                              </a>
+                            )}
+                            {req.twitchUrl && (
+                              <a href={req.twitchUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-purple-400 hover:underline">
+                                <Twitch size={13} /> Twitch
+                              </a>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-3 text-xs">
-                          {req.youtubeUrl && (
-                            <a href={req.youtubeUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-rose-400 hover:underline">
-                              <Youtube size={13} /> YouTube
-                            </a>
-                          )}
-                          {req.twitchUrl && (
-                            <a href={req.twitchUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-purple-400 hover:underline">
-                              <Twitch size={13} /> Twitch
-                            </a>
-                          )}
-                        </div>
-                      </div>
 
-                      {req.status === 'pending' && (
-                        <div className="flex items-center gap-2 shrink-0">
-                          <Button
-                            variant="success"
-                            size="sm"
-                            onClick={() => handleUpdateCreatorRequest(req._id, 'approved')}
-                          >
-                            Approve
-                          </Button>
-                          <Button
-                            variant="danger-soft"
-                            size="sm"
-                            onClick={() => handleUpdateCreatorRequest(req._id, 'rejected')}
-                          >
-                            Reject
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  ))
+                        {req.status === 'pending' && (
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Button
+                              variant="success"
+                              size="sm"
+                              onClick={() => handleUpdateCreatorRequest(req._id, 'approved')}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              variant="danger-soft"
+                              size="sm"
+                              onClick={() => handleUpdateCreatorRequest(req._id, 'rejected')}
+                            >
+                              Reject
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>

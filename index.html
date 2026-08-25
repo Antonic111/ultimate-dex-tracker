@@ -219,7 +219,17 @@
     body.popout-mode iframe[src*="ko-fi"],
     body.popout-mode .floatingchat-container-wrap,
     body.popout-mode .floatingchat-container-wrap-mobi,
-    body.popout-mode .floating-chat-kofi-popup-iframe {
+    body.popout-mode .floating-chat-kofi-popup-iframe,
+    body.admin-page div[id^="kofi-widget-overlay"],
+    body.admin-page iframe[src*="ko-fi"],
+    body.admin-page .floatingchat-container-wrap,
+    body.admin-page .floatingchat-container-wrap-mobi,
+    body.admin-page .floating-chat-kofi-popup-iframe,
+    body:has(.admin-fullscreen-window) div[id^="kofi-widget-overlay"],
+    body:has(.admin-fullscreen-window) iframe[src*="ko-fi"],
+    body:has(.admin-fullscreen-window) .floatingchat-container-wrap,
+    body:has(.admin-fullscreen-window) .floatingchat-container-wrap-mobi,
+    body:has(.admin-fullscreen-window) .floating-chat-kofi-popup-iframe {
       display: none !important;
       visibility: hidden !important;
       pointer-events: none !important;

@@ -1,6 +1,21 @@
 [
   {
-    "date": "2026-08-18",
+    "date": "2026-08-25",
+    "version": "v1.2.1",
+    "type": "feature",
+    "title": "",
+    "description": "",
+    "features": [
+      "Revamped the Favorites section on profile pages, adding support for favorite Trainers and Poké Balls, along with additional games that can now be selected as favorites even if they aren’t tracked by the site."
+    ],
+    "fixes": [
+      "Updated the Counters page history to properly display phases and fails instead of incorrectly showing the hunt target.",
+      "Updated the phase list on the Counters page to show the correct overall count for all phases and fails, instead of counting each one individually.",
+      "Attempted to improve legacy hunt compatibility on the Counters page to more accurately work with the new revamped system."
+    ]
+  },
+  {
+    "date": "2026-08-23",
     "version": "v1.2.0",
     "type": "feature",
     "title": "",

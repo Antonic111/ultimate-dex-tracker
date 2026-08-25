@@ -85,6 +85,8 @@ const userSchema = new mongoose.Schema({
   favoriteGames: [String],
   favoritePokemon: [String],
   favoritePokemonShiny: [Boolean],
+  favoriteBalls: [String],
+  favoriteTrainers: [String],
   switchFriendCode: String,
   goFriendCode: String,
   profileTrainer: String,

@@ -195,7 +195,9 @@ export default function ShinyEncounterModal({
       hunt.modifiers || {},
       intervalChecks || currentChecks
     );
-    const phaseNumber = phases.length + 1;
+    const nonTargetCount = (phases.filter(p => !p.isTarget)?.length || 0) + (!isTarget ? 1 : 0);
+    const targetFailCount = (phases.filter(p => p.isTarget && p.outcome === "failed")?.length || 0) + (isTarget && chosenOutcome === "failed" ? 1 : 0);
+    const phaseNumber = !isTarget ? nonTargetCount : targetFailCount;
 
     if (chosenOutcome === "caught") {
       const rawNickname = (nickname || "").trim();
@@ -224,6 +226,7 @@ export default function ShinyEncounterModal({
       entryId: uniquePhaseEntryId,
       phaseNumber,
       pokemon: selectedPokemon,
+      pokemonName: selectedPokemon?.name || "Unknown",
       isTarget,
       outcome: chosenOutcome, // "caught" | "failed"
       phaseChecks: Math.max(0, intervalChecks),

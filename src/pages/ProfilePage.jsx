@@ -61,6 +61,8 @@ export default function ProfilePage() {
         favoriteGames: ["", "", "", "", ""],
         favoritePokemon: ["", "", "", "", ""],
         favoritePokemonShiny: [false, false, false, false, false],
+        favoriteBalls: ["", "", "", "", ""],
+        favoriteTrainers: ["", "", "", "", ""],
         switchFriendCode: "",
         goFriendCode: "",
         youtubeUrl: "",
@@ -80,6 +82,8 @@ export default function ProfilePage() {
     const [gameSlotIndex, setGameSlotIndex] = useState(null);
     const [showPokemonModal, setShowPokemonModal] = useState(false);
     const [pokemonSlotIndex, setPokemonSlotIndex] = useState(null);
+    const [showBallModal, setShowBallModal] = useState(false);
+    const [showFavoriteTrainerModal, setShowFavoriteTrainerModal] = useState(false);
 
     // Preferences
     const [dexPreferences, setDexPreferences] = useState(() => {
@@ -216,6 +220,8 @@ export default function ProfilePage() {
                         favoriteGames: Array.isArray(data.favoriteGames) ? [...data.favoriteGames] : prev.favoriteGames,
                         favoritePokemon: Array.isArray(data.favoritePokemon) ? [...data.favoritePokemon] : prev.favoritePokemon,
                         favoritePokemonShiny: Array.isArray(data.favoritePokemonShiny) ? [...data.favoritePokemonShiny] : prev.favoritePokemonShiny,
+                        favoriteBalls: Array.isArray(data.favoriteBalls) ? [...data.favoriteBalls] : (prev.favoriteBalls || ["", "", "", "", ""]),
+                        favoriteTrainers: Array.isArray(data.favoriteTrainers) ? [...data.favoriteTrainers] : (prev.favoriteTrainers || ["", "", "", "", ""]),
                         switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode,
                         goFriendCode: data.goFriendCode ?? prev.goFriendCode,
                         youtubeUrl: extractYoutubeHandle(data.youtubeUrl) || "",
@@ -238,7 +244,10 @@ export default function ProfilePage() {
                         bio: data.bio, location: data.location, gender: data.gender, profileTrainer: data.profileTrainer,
                         avatar: data.avatar || null,
                         favoriteGames: data.favoriteGames || [], favoritePokemon: data.favoritePokemon || [],
-                        favoritePokemonShiny: data.favoritePokemonShiny || [], switchFriendCode: data.switchFriendCode,
+                        favoritePokemonShiny: data.favoritePokemonShiny || [],
+                        favoriteBalls: data.favoriteBalls || [],
+                        favoriteTrainers: data.favoriteTrainers || [],
+                        switchFriendCode: data.switchFriendCode,
                         goFriendCode: data.goFriendCode,
                         youtubeUrl: extractYoutubeHandle(data.youtubeUrl) || "",
                         twitchUrl: extractTwitchHandle(data.twitchUrl) || ""
@@ -523,9 +532,12 @@ export default function ProfilePage() {
                         isOwner={isOwner}
                         isEditing={isEditing}
                         form={form}
+                        useHomeSprites={useHomeSprites}
                         POKEMON_OPTIONS={POKEMON_OPTIONS}
                         openGameModal={(i) => { setGameSlotIndex(i); setShowGameModal(true); }}
                         openPokemonModal={(i) => { setPokemonSlotIndex(i); setShowPokemonModal(true); }}
+                        openBallModal={() => setShowBallModal(true)}
+                        openTrainerModal={() => setShowFavoriteTrainerModal(true)}
                     />
                 </div>
 
@@ -557,6 +569,10 @@ export default function ProfilePage() {
                 showPokemonModal={showPokemonModal}
                 setShowPokemonModal={setShowPokemonModal}
                 pokemonSlotIndex={pokemonSlotIndex}
+                showBallModal={showBallModal}
+                setShowBallModal={setShowBallModal}
+                showFavoriteTrainerModal={showFavoriteTrainerModal}
+                setShowFavoriteTrainerModal={setShowFavoriteTrainerModal}
                 POKEMON_OPTIONS={POKEMON_OPTIONS}
                 pendingNavigation={pendingNavigation}
                 setPendingNavigation={setPendingNavigation}

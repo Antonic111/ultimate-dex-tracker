@@ -69,41 +69,44 @@ export const getPhaseEntryDisplayInfo = (phase, allPhases = []) => {
   const isFailed = phase.outcome === "failed";
 
   if (isTarget && isFailed) {
-    const count = preceding.filter(p => p.isTarget && p.outcome === "failed").length || 1;
+    const targetFailCount = preceding.filter(p => p.isTarget && p.outcome === "failed").length || 1;
+    const countLabel = targetFailCount > 1 ? `Target Failed ${targetFailCount}:` : "Target Failed:";
+    const countTitle = targetFailCount > 1 ? `Target Failed ${targetFailCount}` : "Target Failed";
     return {
       type: "target_failed",
-      label: `Target Failed ${count}:`,
-      title: `Target Failed ${count}: ${formatPokemonName(phase.pokemon?.name)}`,
-      badgeText: "Target Failed",
+      label: countLabel,
+      title: `${countTitle}: ${formatPokemonName(phase.pokemon?.name)}`,
+      badgeText: targetFailCount > 1 ? `Target Failed ${targetFailCount}` : "Target Failed",
       isFail: true,
       isTarget: true,
-      count
+      count: targetFailCount
     };
   }
 
+  // Non-target count across all non-targets (both caught and failed)
+  const nonTargetCount = preceding.filter(p => !p.isTarget).length || phase.phaseNumber || (phaseIdx + 1);
+
   if (isFailed) {
-    const count = preceding.filter(p => !p.isTarget && p.outcome === "failed").length || 1;
     return {
       type: "phase_failed",
-      label: `Phase ${phase.phaseNumber || (phaseIdx + 1)} Failed:`,
-      title: `Phase ${phase.phaseNumber || (phaseIdx + 1)} Failed: ${formatPokemonName(phase.pokemon?.name)}`,
-      badgeText: "Failed",
+      label: `Phase ${nonTargetCount} Failed:`,
+      title: `Phase ${nonTargetCount} Failed: ${formatPokemonName(phase.pokemon?.name)}`,
+      badgeText: "Phase Failed",
       isFail: true,
       isTarget: false,
-      count
+      count: nonTargetCount
     };
   }
 
   if (!isTarget) {
-    const count = preceding.filter(p => !p.isTarget && p.outcome === "caught").length || 1;
     return {
       type: "phase_caught",
-      label: `Phase ${phase.phaseNumber || (phaseIdx + 1)}:`,
-      title: `Phase ${phase.phaseNumber || (phaseIdx + 1)}: ${formatPokemonName(phase.pokemon?.name)}`,
-      badgeText: "Phase Caught",
+      label: `Phase ${nonTargetCount}:`,
+      title: `Phase ${nonTargetCount}: ${formatPokemonName(phase.pokemon?.name)}`,
+      badgeText: "✓ Caught",
       isFail: false,
       isTarget: false,
-      count
+      count: nonTargetCount
     };
   }
 
@@ -111,7 +114,7 @@ export const getPhaseEntryDisplayInfo = (phase, allPhases = []) => {
     type: "target_caught",
     label: "Target Caught:",
     title: `Target Caught: ${formatPokemonName(phase.pokemon?.name)}`,
-    badgeText: "Caught",
+    badgeText: "✓ Caught",
     isFail: false,
     isTarget: true,
     count: 1
@@ -672,11 +675,6 @@ export default function MMOTool({ useHomeSprites = false }) {
             icon={<History size={16} />}
           >
             <span>History</span>
-            {historyBadgeCount > 0 && (
-              <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-black bg-white/15 text-white border border-white/10 leading-none">
-                {historyBadgeCount}
-              </span>
-            )}
           </Button>
 
           <Button

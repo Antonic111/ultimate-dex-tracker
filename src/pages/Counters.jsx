@@ -130,40 +130,56 @@ export const getPhaseEntryDisplayInfo = (phase, allPhases = []) => {
   const isFailed = phase.outcome === "failed";
 
   if (isTarget && isFailed) {
-    const count = preceding.filter(p => p.isTarget && p.outcome === "failed").length || 1;
+    const targetFailCount = preceding.filter(p => p.isTarget && p.outcome === "failed").length || 1;
+    const countLabel = targetFailCount > 1 ? `Target Failed ${targetFailCount}:` : "Target Failed:";
+    const countTitle = targetFailCount > 1 ? `Target Failed ${targetFailCount}` : "Target Failed";
     return {
       type: "target_failed",
-      label: `Target Failed ${count}:`,
-      title: `Target Failed ${count}: ${formatPokemonName(phase.pokemon?.name)}`,
-      badgeText: "Target Failed",
+      label: countLabel,
+      title: `${countTitle}: ${formatPokemonName(phase.pokemon?.name)}`,
+      badgeText: targetFailCount > 1 ? `Target Failed ${targetFailCount}` : "Target Failed",
       isFail: true,
       isTarget: true,
-      count
+      count: targetFailCount
     };
-  } else if (!isTarget && isFailed) {
-    const count = preceding.filter(p => !p.isTarget && p.outcome === "failed").length || 1;
+  }
+
+  // Non-target count across all non-targets (both caught and failed)
+  const nonTargetCount = preceding.filter(p => !p.isTarget).length || phase.phaseNumber || (phaseIdx + 1);
+
+  if (isFailed) {
     return {
       type: "phase_failed",
-      label: `Phase Failed ${count}:`,
-      title: `Phase Failed ${count}: ${formatPokemonName(phase.pokemon?.name)}`,
+      label: `Phase ${nonTargetCount} Failed:`,
+      title: `Phase ${nonTargetCount} Failed: ${formatPokemonName(phase.pokemon?.name)}`,
       badgeText: "Phase Failed",
       isFail: true,
       isTarget: false,
-      count
+      count: nonTargetCount
     };
-  } else {
-    // Non-target phase caught
-    const count = preceding.filter(p => !p.isTarget && p.outcome === "caught").length || phase.phaseNumber || (phaseIdx + 1);
+  }
+
+  if (!isTarget) {
     return {
       type: "phase_caught",
-      label: `Phase ${count}:`,
-      title: `Phase ${count}: ${formatPokemonName(phase.pokemon?.name)}`,
+      label: `Phase ${nonTargetCount}:`,
+      title: `Phase ${nonTargetCount}: ${formatPokemonName(phase.pokemon?.name)}`,
       badgeText: "✓ Caught",
       isFail: false,
       isTarget: false,
-      count
+      count: nonTargetCount
     };
   }
+
+  return {
+    type: "target_caught",
+    label: "Target Caught:",
+    title: `Target Caught: ${formatPokemonName(phase.pokemon?.name)}`,
+    badgeText: "✓ Caught",
+    isFail: false,
+    isTarget: true,
+    count: 1
+  };
 };
 
 export const getPhaseDisplayChecks = (phase, allPhases = []) => {
@@ -674,12 +690,22 @@ export default function Counters() {
   // ── Global Raw Active Hunts (shared with MMO Tool) ────────────────────────
   const [allActiveHunts, setAllActiveHunts] = useState(() => {
     const cached = getCachedHuntsData();
-    return cached.activeHunts ? cached.activeHunts.map(normalizeHunt) : [];
+    if (cached?.activeHunts && Array.isArray(cached.activeHunts)) {
+      return cached.activeHunts.map(h => normalizeHunt(h));
+    }
+    try {
+      const saved = localStorage.getItem("activeHunts");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed.map(h => normalizeHunt(h));
+      }
+    } catch {}
+    return [];
   });
 
-  // Filter out Legends Arceus Permutations hunts (handled exclusively in MMO Tool)
+  // Filter out Legends Arceus MMO / Permutation hunts (handled exclusively in MMO Tool)
   const activeHunts = useMemo(() => {
-    return (allActiveHunts || []).filter(h => !(h.game === "Legends Arceus" && h.method === "Permutations"));
+    return (allActiveHunts || []).filter(h => !((h.game === "Legends Arceus" && (h.method === "Permutations" || h.method === "Massive Mass Outbreak" || h.method === "Massive Mass Outbreaks")) || h.method === "Permutations" || h.isMMO));
   }, [allActiveHunts]);
 
   const [currentHuntId, setCurrentHuntId] = useState(() => {
@@ -1372,12 +1398,27 @@ export default function Counters() {
         Object.entries(caughtData).forEach(([caughtKey, info]) => {
           if (info && Array.isArray(info.entries)) {
             info.entries.forEach(entry => {
-              if (entry.isHuntTracker && !isItemDeleted(entry)) {
-                const entryId = entry.entryId;
+              const isHuntEntry = entry.isHuntTracker ||
+                entry.isCounter ||
+                entry.isHunt ||
+                Number(entry.totalChecks || entry.checks || 0) > 0 ||
+                Number(entry.elapsedMs || entry.time || 0) > 0 ||
+                !!entry.method ||
+                Number(entry.phaseCount || 0) > 1 ||
+                (Array.isArray(entry.phases) && entry.phases.length > 0);
+
+              if (isHuntEntry && !isItemDeleted(entry)) {
+                const entryId = entry.entryId || entry.id;
                 const matchIndex = historyList.findIndex(h =>
-                  (entryId && h.entryId === entryId) ||
+                  (entryId && (h.entryId === entryId || h.id === entryId)) ||
                   (h.caughtKey === caughtKey && h.date === entry.date && (h.totalChecks === entry.totalChecks || h.checks === entry.checks))
                 );
+
+                const cleanKey = caughtKey.replace(/:shiny$|-shiny$/, "");
+                const monName = entry.pokemonName || entry.pokemon?.name || cleanKey;
+                const checks = Number(entry.totalChecks ?? entry.checks ?? 0);
+                const rawTime = entry.elapsedMs ?? entry.time ?? 0;
+                const timeMs = Number(rawTime > 0 && rawTime < 100000 && !entry.elapsedMs ? rawTime * 1000 : rawTime);
 
                 if (matchIndex >= 0) {
                   historyList[matchIndex].addedToLivingDex = true;
@@ -1385,9 +1426,15 @@ export default function Counters() {
                 } else {
                   historyList.push({
                     ...entry,
+                    id: entry.id || entryId,
+                    entryId: entryId || entry.id,
                     caughtKey,
-                    pokemonName: entry.pokemonName || caughtKey.split("-")[0],
-                    pokemon: entry.pokemon || null,
+                    pokemonName: monName,
+                    pokemon: entry.pokemon || (monName ? { name: monName } : null),
+                    checks,
+                    totalChecks: checks,
+                    time: timeMs,
+                    elapsedMs: timeMs,
                     timestamp: entry.timestamp || (entry.date ? new Date(entry.date).getTime() : 0),
                     addedToLivingDex: true
                   });
@@ -1399,11 +1446,17 @@ export default function Counters() {
           if (info && Array.isArray(info.fails)) {
             info.fails.forEach(failEntry => {
               if (!isItemDeleted(failEntry)) {
-                const entryId = failEntry.entryId;
+                const entryId = failEntry.entryId || failEntry.id;
                 const matchIndex = historyList.findIndex(h =>
-                  (entryId && h.entryId === entryId) ||
+                  (entryId && (h.entryId === entryId || h.id === entryId)) ||
                   (h.caughtKey === caughtKey && h.date === failEntry.date && (h.totalChecks === failEntry.totalChecks || h.checks === failEntry.checks))
                 );
+
+                const cleanKey = caughtKey.replace(/:shiny$|-shiny$/, "");
+                const monName = failEntry.pokemonName || failEntry.pokemon?.name || cleanKey;
+                const checks = Number(failEntry.totalChecks ?? failEntry.checks ?? 0);
+                const rawTime = failEntry.elapsedMs ?? failEntry.time ?? 0;
+                const timeMs = Number(rawTime > 0 && rawTime < 100000 && !failEntry.elapsedMs ? rawTime * 1000 : rawTime);
 
                 if (matchIndex >= 0) {
                   historyList[matchIndex].addedToLivingDex = true;
@@ -1413,9 +1466,15 @@ export default function Counters() {
                 } else {
                   historyList.push({
                     ...failEntry,
+                    id: failEntry.id || entryId,
+                    entryId: entryId || failEntry.id,
                     caughtKey,
-                    pokemonName: failEntry.pokemonName || caughtKey.split("-")[0],
-                    pokemon: failEntry.pokemon || null,
+                    pokemonName: monName,
+                    pokemon: failEntry.pokemon || (monName ? { name: monName } : null),
+                    checks,
+                    totalChecks: checks,
+                    time: timeMs,
+                    elapsedMs: timeMs,
                     timestamp: failEntry.timestamp || (failEntry.date ? new Date(failEntry.date).getTime() : 0),
                     addedToLivingDex: true,
                     outcome: "failed",
@@ -1428,20 +1487,23 @@ export default function Counters() {
         });
       }
 
-      // 4. Also scan activeHunts phases for any fails
+      // 4. Also scan activeHunts phases for any fails or phases not yet in history
       if (Array.isArray(activeHunts)) {
         activeHunts.forEach(h => {
           if (Array.isArray(h.phases)) {
             h.phases.forEach(p => {
-              if ((p.outcome === "failed" || p.isFail) && !isItemDeleted(p) && !historyList.some(e => (e.entryId && e.entryId === p.entryId) || (e.id && e.id === p.id))) {
+              const pPokemon = p.pokemon || h.pokemon;
+              const pPokemonName = p.pokemonName || p.pokemon?.name || h.pokemon?.name;
+              const isFail = p.outcome === "failed" || p.isFail;
+              if (!isItemDeleted(p) && !historyList.some(e => (e.entryId && e.entryId === p.entryId) || (e.id && e.id === p.id))) {
                 historyList.push({
                   ...p,
-                  pokemonName: p.pokemonName || h.pokemon?.name,
-                  pokemon: p.pokemon || h.pokemon,
+                  pokemonName: pPokemonName,
+                  pokemon: pPokemon,
                   game: p.game || h.game,
                   method: p.method || h.method,
-                  outcome: "failed",
-                  isFail: true,
+                  outcome: isFail ? "failed" : "caught",
+                  isFail,
                   timestamp: p.timestamp || (p.date ? new Date(p.date).getTime() : 0)
                 });
               }
@@ -2070,6 +2132,7 @@ export default function Counters() {
       startTime: startedAt,
       pausedAt: now,
       totalPausedMs: 0,
+      elapsedMs: startElapsedMs,
       status: "paused",
       isPaused: true,
       increment: huntIncrement,
@@ -2215,7 +2278,9 @@ export default function Counters() {
     }
 
     const dynamicOddsNum = getCurrentHuntOdds(hunt.game, hunt.method, hunt.modifiers || {}, intervalChecks || currentChecks);
-    const phaseNumber = phases.length + 1;
+    const nonTargetCount = (phases.filter(p => !p.isTarget)?.length || 0) + (!isTarget ? 1 : 0);
+    const targetFailCount = (phases.filter(p => p.isTarget && p.outcome === "failed")?.length || 0) + (isTarget && outcome === "failed" ? 1 : 0);
+    const phaseNumber = !isTarget ? nonTargetCount : targetFailCount;
 
     if (outcome === "caught") {
       const rawNickname = (shinyEncounterModal.nickname || "").trim();
@@ -2244,6 +2309,7 @@ export default function Counters() {
       entryId: uniquePhaseEntryId,
       phaseNumber,
       pokemon: selectedPokemon,
+      pokemonName: selectedPokemon?.name || "Unknown",
       isTarget,
       outcome, // "caught" | "failed"
       phaseChecks: Math.max(0, intervalChecks),
@@ -2294,6 +2360,8 @@ export default function Counters() {
 
     const caughtEntry = {
       date: new Date().toISOString().split("T")[0],
+      pokemon: workingPokemon,
+      pokemonName: workingPokemon?.name || "Unknown",
       nickname: phaseRecord.nickname || (shinyEncounterModal.nickname || "").trim(),
       ball: phaseRecord.ball || shinyEncounterModal.ball || "",
       mark: phaseRecord.mark || shinyEncounterModal.mark || "",
@@ -2431,6 +2499,8 @@ export default function Counters() {
 
     const failEntry = {
       date: phaseRecord.date ? phaseRecord.date.split("T")[0] : new Date().toISOString().split("T")[0],
+      pokemon: workingPokemon,
+      pokemonName: workingPokemon?.name || "Unknown",
       game: hunt.game,
       method: hunt.method,
       checks: phaseRecord.phaseChecks || 0,
@@ -2527,6 +2597,9 @@ export default function Counters() {
     if (!hunt || !phaseRecord) return;
     const now = Date.now();
 
+    const phasePokemon = phaseRecord.pokemon || hunt.pokemon;
+    const phasePokemonName = phasePokemon?.name || phaseRecord.pokemonName || "Unknown";
+
     const action = {
       type: "LOG_SHINY_PHASE",
       huntId: hunt.id,
@@ -2542,8 +2615,8 @@ export default function Counters() {
       const failEntry = {
         id: phaseRecord.id || now,
         entryId: phaseRecord.entryId || phaseRecord.id || Math.random().toString(36).substr(2, 9),
-        pokemon: shinyEncounterModal.selectedPokemon || hunt.pokemon,
-        pokemonName: (shinyEncounterModal.selectedPokemon || hunt.pokemon)?.name || "Unknown",
+        pokemon: phasePokemon,
+        pokemonName: phasePokemonName,
         game: hunt.game,
         method: hunt.method,
         checks: phaseRecord.phaseChecks || 0,
@@ -2551,14 +2624,14 @@ export default function Counters() {
         elapsedMs: phaseRecord.elapsedMs || 0,
         time: phaseRecord.elapsedMs || 0,
         odds: phaseRecord.odds || hunt.odds || null,
-        reason: phaseRecord.reason || (shinyEncounterModal.notes || "").trim() || "Failed Encounter",
-        notes: phaseRecord.notes || (shinyEncounterModal.notes || "").trim() || "",
+        reason: phaseRecord.reason || (phaseRecord.notes || "").trim() || "Failed Encounter",
+        notes: phaseRecord.notes || (phaseRecord.notes || "").trim() || "",
         date: phaseRecord.date || new Date().toISOString(),
         timestamp: now,
         outcome: "failed",
         isFail: true,
         isHuntTracker: true,
-        addedToLivingDex: Boolean(shinyEncounterModal.addedToCollection)
+        addedToLivingDex: Boolean(phaseRecord.addedToCollection)
       };
 
       try {
@@ -2570,6 +2643,45 @@ export default function Counters() {
           localStorage.setItem("completedFails", JSON.stringify(updated));
         }
         setHuntHistory(prev => [failEntry, ...prev.filter(e => e.entryId !== failEntry.entryId)]);
+      } catch {}
+    } else {
+      // Non-target / target phase caught and continuing hunt
+      const completedPhaseEntry = {
+        id: phaseRecord.id || now,
+        entryId: phaseRecord.entryId || Math.random().toString(36).substr(2, 9),
+        pokemon: phasePokemon,
+        pokemonName: phasePokemonName,
+        game: hunt.game,
+        method: hunt.method,
+        checks: phaseRecord.phaseChecks || 0,
+        totalChecks: phaseRecord.totalChecks || hunt.checks || 0,
+        elapsedMs: phaseRecord.elapsedMs || 0,
+        time: phaseRecord.elapsedMs || 0,
+        odds: phaseRecord.odds || hunt.odds || null,
+        modifiers: hunt.modifiers || {},
+        nickname: phaseRecord.nickname || "",
+        ball: phaseRecord.ball || "",
+        mark: phaseRecord.mark || "",
+        notes: phaseRecord.notes || "",
+        date: phaseRecord.date || new Date().toISOString(),
+        timestamp: now,
+        outcome: "caught",
+        isFail: false,
+        isPhase: true,
+        targetPokemon: hunt.pokemon,
+        isHuntTracker: true,
+        addedToLivingDex: Boolean(phaseRecord.addedToCollection)
+      };
+
+      try {
+        const storageKey = username ? `completedHunts:${username}` : "completedHunts";
+        const existing = JSON.parse(localStorage.getItem(storageKey) || "[]");
+        const updated = [completedPhaseEntry, ...existing.filter(e => e.entryId !== completedPhaseEntry.entryId)];
+        localStorage.setItem(storageKey, JSON.stringify(updated));
+        if (username) {
+          localStorage.setItem("completedHunts", JSON.stringify(updated));
+        }
+        setHuntHistory(prev => [completedPhaseEntry, ...prev.filter(e => e.entryId !== completedPhaseEntry.entryId)]);
       } catch {}
     }
 
@@ -2613,7 +2725,7 @@ export default function Counters() {
 
   const handleCompleteTargetHunt = async (hunt, phaseRecord) => {
     if (!hunt || !phaseRecord) return;
-    const workingPokemon = hunt.pokemon;
+    const workingPokemon = phaseRecord?.pokemon || hunt.pokemon;
     const huntId = hunt.id;
 
     const calculatedOdds = phaseRecord.odds || hunt.odds || calculateOdds(hunt.game, hunt.method, hunt.modifiers || {}) || 4096;
@@ -2625,7 +2737,7 @@ export default function Counters() {
       id: Date.now(),
       entryId: phaseRecord.entryId || Math.random().toString(36).substr(2, 9),
       pokemon: workingPokemon,
-      pokemonName: workingPokemon.name,
+      pokemonName: workingPokemon?.name || "Unknown",
       game: hunt.game,
       method: hunt.method,
       checks: phaseRecord.phaseChecks || 0,
@@ -3218,11 +3330,6 @@ export default function Counters() {
             icon={<History size={16} />}
           >
             <span>History</span>
-            {countersHistoryCount > 0 && (
-              <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-black bg-white/15 text-white border border-white/10 leading-none">
-                {countersHistoryCount}
-              </span>
-            )}
           </Button>
 
           <Button

@@ -108,6 +108,8 @@ export default function ProfileHero({
             return [...cleaned, ...Array(5 - cleaned.length).fill(fill)].slice(0, 5);
         };
         const reorderedGames = reorderToFront(form.favoriteGames, "");
+        const reorderedBalls = reorderToFront(form.favoriteBalls, "");
+        const reorderedTrainers = reorderToFront(form.favoriteTrainers, "");
 
         const pairedPokemon = (form.favoritePokemon || [])
             .map((poke, idx) => ({ poke: poke || "", shiny: Boolean(form.favoritePokemonShiny?.[idx]) }))
@@ -145,6 +147,7 @@ export default function ProfileHero({
                 bio: form.bio, location: form.location, gender: form.gender, profileTrainer: form.profileTrainer,
                 avatar: finalAvatar,
                 favoriteGames: reorderedGames, favoritePokemon: reorderedPokemon, favoritePokemonShiny: reorderedShiny,
+                favoriteBalls: reorderedBalls, favoriteTrainers: reorderedTrainers,
                 switchFriendCode: fc, goFriendCode: goFc, youtubeUrl: finalYoutube, twitchUrl: finalTwitch,
             });
 
@@ -157,6 +160,8 @@ export default function ProfileHero({
                 favoriteGames: reorderedGames,
                 favoritePokemon: reorderedPokemon,
                 favoritePokemonShiny: reorderedShiny,
+                favoriteBalls: reorderedBalls,
+                favoriteTrainers: reorderedTrainers,
                 switchFriendCode: fc,
                 goFriendCode: goFc,
                 youtubeUrl: extractYoutubeHandle(finalYoutube),
