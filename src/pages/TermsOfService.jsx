@@ -300,17 +300,16 @@ export default function TermsOfService() {
         {/* Section 17 */}
         <section id="contact" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">17</span> Contact Information
+            <span className="section-number">17</span> Contact & Inquiries
           </h2>
           <p className="legal-paragraph">
-            If you have questions, feedback, or legal inquiries regarding these Terms of Service, please contact us through our official channels:
+            If you have questions regarding these Terms of Service or billing, please use the appropriate channel:
           </p>
           <ul className="legal-list">
+            <li><strong>Billing, Receipts & Refunds:</strong> Handled by Merchant of Record at <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
             <li><strong>Developer & Creator:</strong> Antonic (Solo Developer)</li>
             <li><strong>Developer Portfolio:</strong> <a href="https://antonic.ca" target="_blank" rel="noopener noreferrer">antonic.ca</a></li>
             <li><strong>Website:</strong> <a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a></li>
-            <li><strong>Community Discord:</strong> <a href="https://discord.com/invite/YE9uCuQcrW" target="_blank" rel="noopener noreferrer">discord.com/invite/YE9uCuQcrW</a></li>
-            <li><strong>In-App Feedback:</strong> Accessible via the <Link to="/feedback">Feedback</Link> link in the footer</li>
             <li><strong>Governing Jurisdiction:</strong> Province of Ontario, Canada</li>
           </ul>
         </section>

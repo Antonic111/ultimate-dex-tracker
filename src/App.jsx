@@ -215,6 +215,29 @@ const isStandaloneRoute = (pathname) => {
   );
 };
 
+// Public compliance, legal, and pricing routes that must remain accessible to crawlers and users during maintenance
+export const isPublicExemptMaintenanceRoute = (pathname) => {
+  const cleanPath = (pathname || '').split('?')[0].split('#')[0].replace(/\/+$/, '') || '/';
+  return (
+    cleanPath === '/privacy' ||
+    cleanPath === '/terms' ||
+    cleanPath === '/refund-policy' ||
+    cleanPath === '/refunds' ||
+    cleanPath === '/membership' ||
+    cleanPath === '/membership/checkout' ||
+    cleanPath.startsWith('/overlay/hunt') ||
+    cleanPath.startsWith('/admin')
+  );
+};
+
+const MaintenanceRouteGuard = ({ isMaintenanceActive, children }) => {
+  const location = useLocation();
+  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(location.pathname)) {
+    return <MaintenanceScreen />;
+  }
+  return children;
+};
+
 const HeaderWrapper = (props) => {
   const location = useLocation();
   if (isStandaloneRoute(location.pathname)) return null;
@@ -228,9 +251,9 @@ const FooterWrapper = ({ user }) => {
   return <Footer />;
 };
 
-const SidebarWrapper = () => {
+const SidebarWrapper = ({ isMaintenanceActive }) => {
   const location = useLocation();
-  if (isStandaloneRoute(location.pathname)) return null;
+  if (isStandaloneRoute(location.pathname) || isMaintenanceActive) return null;
   return <RecentCatchesSidebar />;
 };
 
@@ -2327,8 +2350,11 @@ export default function App() {
 
   const isMaintenanceTime = !maintenanceStartTime || new Date(maintenanceStartTime).getTime() <= currentTime;
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const isMaintenanceActive = Boolean(
+    maintenanceMode && (!user || !user.isAdmin) && !isLocalhost && isMaintenanceTime
+  );
   
-  if (maintenanceMode && (!user || !user.isAdmin) && !isLocalhost && isMaintenanceTime) {
+  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(window.location.pathname)) {
     return <MaintenanceScreen />;
   }
 
@@ -2349,7 +2375,7 @@ export default function App() {
               <Router>
                 <div className="flex flex-col min-h-screen">
                   <BackgroundFetchIndicator />
-                  <SidebarWrapper />
+                  <SidebarWrapper isMaintenanceActive={isMaintenanceActive} />
 
                   <CloseSidebarOnRouteChange
                     setSidebarOpen={setSidebarOpen}
@@ -2432,7 +2458,8 @@ export default function App() {
                   <OnboardingWrapper user={user} onTutorialActiveChange={setIsTutorialActive} />
 
                   <main className="flex-grow flex flex-col">
-                    <Routes>
+                    <MaintenanceRouteGuard isMaintenanceActive={isMaintenanceActive}>
+                      <Routes>
                       {/* Main App */}
                       <Route
                         path="/"
@@ -3054,7 +3081,8 @@ export default function App() {
                       />
 
                     </Routes>
-                  </main>
+                  </MaintenanceRouteGuard>
+                </main>
 
                   <FooterWrapper user={user} />
 

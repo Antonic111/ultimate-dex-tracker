@@ -112,7 +112,7 @@ export default function RefundPolicy() {
             <span className="section-number">4</span> How to Request a Refund
           </h2>
           <p className="legal-paragraph">
-            Requesting a refund is quick and straightforward. You may use either of the following methods:
+            All billing, transactions, and refund disbursements are processed exclusively by our authorized Merchant of Record, <strong>Paddle</strong>. To ensure the fastest possible resolution, all refund requests should be submitted directly to Paddle:
           </p>
           <div className="legal-table-wrapper">
             <table className="legal-table">
@@ -125,14 +125,14 @@ export default function RefundPolicy() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Paddle Buyer Support (Direct)</strong></td>
-                  <td>Click the <em>"Manage Subscription"</em> or <em>"Contact Support"</em> link in your email receipt from Paddle, or visit <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a> with your order number.</td>
+                  <td><strong>Paddle Buyer Support (Recommended)</strong></td>
+                  <td>Visit <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a> and enter your email address or transaction Order ID to look up your purchase and submit a refund request directly.</td>
                   <td>Within 24 hours</td>
                 </tr>
                 <tr>
-                  <td><strong>In-App Support & Feedback</strong></td>
-                  <td>Submit a refund request via our in-app <Link to="/feedback">Feedback Form</Link> or contact us on our official <a href="https://discord.com/invite/YE9uCuQcrW" target="_blank" rel="noopener noreferrer">Community Discord</a> with your account username and transaction email.</td>
-                  <td>Within 24–48 hours</td>
+                  <td><strong>Email Receipt Link</strong></td>
+                  <td>Click the <em>"Manage Subscription"</em>, <em>"View Invoice"</em>, or <em>"Contact Support"</em> link located at the bottom of any email receipt received from Paddle after purchase.</td>
+                  <td>Instant lookup & fast processing</td>
                 </tr>
               </tbody>
             </table>
@@ -145,7 +145,7 @@ export default function RefundPolicy() {
             <span className="section-number">5</span> Refund Processing Times & Method
           </h2>
           <ul className="legal-list">
-            <li><strong>Original Payment Method:</strong> All approved refunds are credited back directly to the original payment method used during checkout (Credit/Debit Card, PayPal, Apple Pay, or Google Pay). We cannot issue refunds to alternate accounts or third parties.</li>
+            <li><strong>Original Payment Method:</strong> All approved refunds are credited back directly to the original payment method used during checkout (Credit/Debit Card, PayPal, Apple Pay, or Google Pay). Paddle cannot issue refunds to alternate accounts or third parties.</li>
             <li><strong>Bank Processing Times:</strong> Once Paddle processes the refund, it typically reflects in your bank or card statement within <strong>3 to 5 business days</strong> (depending on your financial institution).</li>
           </ul>
         </section>
@@ -156,7 +156,7 @@ export default function RefundPolicy() {
             <span className="section-number">6</span> Chargebacks & Friendly Fraud
           </h2>
           <p className="legal-paragraph">
-            If you do not recognize a charge or have a question about your bill, we strongly encourage you to contact us or Paddle Buyer Support (<a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a>) before initiating a bank dispute or chargeback. We are always happy to help and resolve billing questions immediately.
+            If you do not recognize a charge or have a question about your bill, please look up your transaction with Paddle Buyer Support (<a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a>) before initiating a bank dispute or chargeback. Paddle can quickly look up receipts, cancel subscriptions, and issue eligible refunds directly.
           </p>
         </section>
 
@@ -166,12 +166,11 @@ export default function RefundPolicy() {
             <span className="section-number">7</span> Contact & Support
           </h2>
           <p className="legal-paragraph">
-            For any questions regarding billing, cancellations, or refunds, please reach out to us:
+            For all questions regarding transactions, receipts, cancellations, or refunds:
           </p>
           <ul className="legal-list">
-            <li><strong>Paddle Merchant Support:</strong> <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
-            <li><strong>Community Discord:</strong> <a href="https://discord.com/invite/YE9uCuQcrW" target="_blank" rel="noopener noreferrer">discord.com/invite/YE9uCuQcrW</a></li>
-            <li><strong>In-App Feedback:</strong> <Link to="/feedback">Submit Feedback</Link></li>
+            <li><strong>Paddle Buyer Support (Direct Refunds):</strong> <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
+            <li><strong>Paddle Help Center:</strong> <a href="https://paddle.com/help" target="_blank" rel="noopener noreferrer">paddle.com/help</a></li>
             <li><strong>Website:</strong> <a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a></li>
           </ul>
         </section>

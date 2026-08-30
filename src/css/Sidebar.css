@@ -83,27 +83,25 @@
   position: relative;
   width: 92px;
   height: 92px;
-  border-radius: 50%;
-  border: 3px solid var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--sidebar-pokemon-bg);
+  background: transparent;
   flex-shrink: 0;
-  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
 .sidebar-header-avatar-img {
-  width: 82px;
-  height: 82px;
+  width: 88px;
+  height: 88px;
   object-fit: contain;
   image-rendering: pixelated;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
 }
 
 .shiny-sparkles-overlay {
   position: absolute;
-  top: -4px;
-  right: -6px;
+  top: 0px;
+  right: 0px;
   background: #000000;
   border-radius: 50%;
   width: 24px;

@@ -13,7 +13,7 @@ import {
   Coffee,
   Globe,
   Code2,
-  MessageSquare,
+  HelpCircle,
   Shield,
   RefreshCw
 } from 'lucide-react';
@@ -224,10 +224,16 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="/feedback" className="footer-nav-link">
-                <MessageSquare size={15} />
-                <span>Feedback</span>
-              </Link>
+              <a
+                href="https://paddle.net"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-nav-link"
+                title="Paddle Buyer Support & Invoice Lookup"
+              >
+                <HelpCircle size={15} />
+                <span>Buyer Help</span>
+              </a>
             </li>
             <li>
               <Link to="/refund-policy" className="footer-nav-link">

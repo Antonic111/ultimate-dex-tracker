@@ -465,6 +465,26 @@ body:has(.obs-overlay-viewport)::after {
   background: transparent !important;
 }
 
+/* ─── Global Premium Username Animated Gradient & Aura ─── */
+.animated-gradient-username-wrapper {
+  display: inline-flex;
+  align-items: center;
+  overflow: visible;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  filter: drop-shadow(-1px -1px 6px color-mix(in srgb, var(--grad-c1, #ec4899) 35%, transparent))
+          drop-shadow(1px 1px 7px color-mix(in srgb, var(--grad-c2, #8b5cf6) 35%, transparent));
+}
+
+.animated-gradient-username {
+  background: linear-gradient(135deg, var(--grad-c1, #ec4899), var(--grad-c2, #8b5cf6)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+  display: inline-block !important;
+}
+
 
 
 

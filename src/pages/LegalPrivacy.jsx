@@ -87,9 +87,8 @@ export default function LegalPrivacy() {
             <li><strong>Social Media Links (Optional):</strong> YouTube channel or Twitch channel URLs submitted for content creator badges or public profiles.</li>
           </ul>
 
-          <h3 className="legal-subsection-title">B. User Submissions & Creator Applications</h3>
+          <h3 className="legal-subsection-title">B. Creator Applications</h3>
           <ul className="legal-list">
-            <li><strong>Bug Reports & Feedback:</strong> Titles, descriptions, and categories submitted through our in-app feedback modal. Users may submit reports anonymously or linked to their account.</li>
             <li><strong>Creator Requests:</strong> Channel URLs, follower/subscriber counts, and content category descriptions submitted when applying for a verified Content Creator badge.</li>
           </ul>
         </section>
@@ -381,17 +380,16 @@ export default function LegalPrivacy() {
         {/* Section 15 */}
         <section id="contact" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">15</span> Contact & Governance
+            <span className="section-number">15</span> Contact & Inquiries
           </h2>
           <p className="legal-paragraph">
-            If you have questions, feedback, or privacy inquiries regarding this Privacy Policy, please contact us via our official channels:
+            If you have questions regarding this Privacy Policy or billing data, please use the appropriate channel:
           </p>
           <ul className="legal-list">
+            <li><strong>Billing & Payment Privacy:</strong> Handled by Merchant of Record at <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
             <li><strong>Developer & Creator:</strong> Antonic (Solo Developer)</li>
             <li><strong>Developer Portfolio:</strong> <a href="https://antonic.ca" target="_blank" rel="noopener noreferrer">antonic.ca</a></li>
             <li><strong>Website:</strong> <a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a></li>
-            <li><strong>Community Discord:</strong> <a href="https://discord.com/invite/YE9uCuQcrW" target="_blank" rel="noopener noreferrer">discord.com/invite/YE9uCuQcrW</a></li>
-            <li><strong>In-App Feedback:</strong> Accessible via the <Link to="/feedback">Feedback</Link> link in the footer</li>
             <li><strong>Governing Jurisdiction:</strong> Province of Ontario, Canada</li>
           </ul>
         </section>

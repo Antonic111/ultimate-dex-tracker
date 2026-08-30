@@ -120,9 +120,13 @@ export default function MembershipCheckout() {
         checkoutData?.data?.subscription_id ||
         checkoutData?.data?.items?.[0]?.subscription_id;
 
-      const res = await fetch(buildApiUrl("/api/monetization/sync"), {
+      const token = localStorage.getItem("authToken");
+      const headers = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch(buildApiUrl("/monetization/sync"), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         credentials: "include",
         body: JSON.stringify({ subscriptionId, transactionId }),
       });

@@ -14,5 +14,12 @@ Allow: /
 User-agent: Mediapartners-Google
 Allow: /
 
+# Specifically allow Paddle verification crawlers
+User-agent: PaddleBot
+Allow: /
+
+User-agent: Paddle
+Allow: /
+
 # Sitemap location
 Sitemap: https://www.ultimatedextracker.com/sitemap.xml

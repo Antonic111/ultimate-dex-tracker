@@ -1,6 +1,6 @@
 [
   {
-    "date": "2026-08-29",
+    "date": "2026-08-30",
     "version": "v1.2.1",
     "type": "feature",
     "title": "",
@@ -26,7 +26,8 @@
       "Fixed an issue where locked Pokémon on your own account could incorrectly remain hidden when viewing another user's public profile with no lock settings enabled.",
       "Fixed an issue where viewing another user's profile with HOME sprites could display inconsistent sprites if you had Gen 5 sprites enabled. Sprites will now correctly follow your account settings.",
       "Added more visuals and improved existing images in the third section of the landing page for a more polished and engaging presentation.",
-      "Changed the role SVGs to more detailed versions."
+      "Changed the role SVGs to more detailed versions.",
+      "Removed the stroked background behind the sprites in the sidebar."
     ]
   },
   {

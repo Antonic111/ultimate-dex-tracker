@@ -3,17 +3,23 @@
    ========================================================================== */
 
 .legal-page-container {
-  width: 100%;
-  max-width: 1300px;
-  margin: 0 auto;
-  padding: 28px 20px 80px;
+  width: 100% !important;
+  max-width: 1300px !important;
+  margin: 0 auto !important;
+  padding: 28px 0 80px 0;
   color: var(--text, #ffffff);
   box-sizing: border-box;
 }
 
+@media (max-width: 1340px) {
+  .legal-page-container {
+    padding: 28px 16px 80px 16px;
+  }
+}
+
 @media (max-width: 768px) {
   .legal-page-container {
-    padding: 16px 16px 80px;
+    padding: 16px 16px 80px 16px;
   }
 }
 
@@ -258,7 +264,7 @@
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .legal-page-container {
-    padding: 24px 14px 60px;
+    padding: 16px 16px 80px 16px;
   }
 
   .legal-card {

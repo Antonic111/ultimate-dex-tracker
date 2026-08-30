@@ -34,8 +34,13 @@ export function EntitlementProvider({ children }) {
         setLoading(true);
       }
 
-      const res = await fetch(buildApiUrl("/api/monetization/status"), {
+      const token = localStorage.getItem("authToken");
+      const headers = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch(buildApiUrl("/monetization/status"), {
         credentials: "include",
+        headers,
       });
 
       if (res.ok) {

@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import "../../css/EvolutionChain.css";
-import { Dna } from "lucide-react";
+import { Dna, Check } from "lucide-react";
 import { findPokemon, getRelatedForms } from "../../utils";
 import { getSpriteUrl } from "../../utils/spriteUtils";
 
@@ -104,8 +104,8 @@ function EvoSprite({ mon, size = 44, showShiny = false, onPokemonSelect = null, 
         loading="lazy"
       />
       {isSelected && (
-        <div className="evo-sprite-selection-indicator">
-          <div className="evo-sprite-selection-ring"></div>
+        <div className="evo-sprite-selected-badge" title="Currently Selected">
+          <Check size={10} strokeWidth={3.5} />
         </div>
       )}
     </div>
