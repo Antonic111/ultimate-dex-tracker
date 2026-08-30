@@ -383,9 +383,10 @@ export default function LegalPrivacy() {
             <span className="section-number">15</span> Contact & Inquiries
           </h2>
           <p className="legal-paragraph">
-            If you have questions regarding this Privacy Policy or billing data, please use the appropriate channel:
+            If you have questions regarding this Privacy Policy, your personal data, or billing inquiries, please use the appropriate channel:
           </p>
           <ul className="legal-list">
+            <li><strong>Privacy & Data Inquiries:</strong> <a href="mailto:support@ultimatedextracker.com">support@ultimatedextracker.com</a></li>
             <li><strong>Billing & Payment Privacy:</strong> Handled by Merchant of Record at <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
             <li><strong>Developer & Creator:</strong> Antonic (Solo Developer)</li>
             <li><strong>Developer Portfolio:</strong> <a href="https://antonic.ca" target="_blank" rel="noopener noreferrer">antonic.ca</a></li>

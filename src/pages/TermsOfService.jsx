@@ -303,9 +303,10 @@ export default function TermsOfService() {
             <span className="section-number">17</span> Contact & Inquiries
           </h2>
           <p className="legal-paragraph">
-            If you have questions regarding these Terms of Service or billing, please use the appropriate channel:
+            If you have questions regarding these Terms of Service, customer support, or billing, please use the appropriate channel:
           </p>
           <ul className="legal-list">
+            <li><strong>Customer & Technical Support:</strong> <a href="mailto:support@ultimatedextracker.com">support@ultimatedextracker.com</a></li>
             <li><strong>Billing, Receipts & Refunds:</strong> Handled by Merchant of Record at <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
             <li><strong>Developer & Creator:</strong> Antonic (Solo Developer)</li>
             <li><strong>Developer Portfolio:</strong> <a href="https://antonic.ca" target="_blank" rel="noopener noreferrer">antonic.ca</a></li>

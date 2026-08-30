@@ -55,6 +55,7 @@ const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
 
 const Bingo = lazy(() => import("./pages/Bingo"));
 const Admin = lazy(() => import("./pages/Admin"));
+const Achievements = lazy(() => import("./pages/Achievements"));
 const HuntPopout = lazy(() => import("./pages/HuntPopout"));
 const MMOTool = lazy(() => import("./pages/MMOTool"));
 const StreamerTools = lazy(() => import("./pages/StreamerTools"));
@@ -451,6 +452,19 @@ function RequireAuth({ loading, authReady, user, children }) {
   }
   if (user?.needsProfileSetup) {
     return <Navigate to="/complete-signup" replace />;
+  }
+  return children;
+}
+
+function RequireAdmin({ loading, authReady, user, children }) {
+  if (loading || !authReady) {
+    return null;
+  }
+  if (!user?.username) {
+    return <Navigate to="/login" replace />;
+  }
+  if (!user?.isAdmin) {
+    return <Navigate to="/" replace />;
   }
   return children;
 }
@@ -2942,6 +2956,18 @@ export default function App() {
                               </PageTransition>
                             </Suspense>
                           </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path="/achievements"
+                        element={
+                          <RequireAdmin loading={loading} authReady={authReady} user={user}>
+                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                              <PageTransition>
+                                <Achievements />
+                              </PageTransition>
+                            </Suspense>
+                          </RequireAdmin>
                         }
                       />
                       <Route

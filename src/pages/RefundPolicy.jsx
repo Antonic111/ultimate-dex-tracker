@@ -166,9 +166,10 @@ export default function RefundPolicy() {
             <span className="section-number">7</span> Contact & Support
           </h2>
           <p className="legal-paragraph">
-            For all questions regarding transactions, receipts, cancellations, or refunds:
+            For all questions regarding memberships, transactions, receipts, cancellations, or refunds:
           </p>
           <ul className="legal-list">
+            <li><strong>Customer & Billing Support:</strong> <a href="mailto:support@ultimatedextracker.com">support@ultimatedextracker.com</a></li>
             <li><strong>Paddle Buyer Support (Direct Refunds):</strong> <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
             <li><strong>Paddle Help Center:</strong> <a href="https://paddle.com/help" target="_blank" rel="noopener noreferrer">paddle.com/help</a></li>
             <li><strong>Website:</strong> <a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a></li>

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, User, Settings, Users, Database, Tally5, FileText, Shield, ShieldUser, Crown, Menu, X, Grid3x3, MessageCircleWarning, ListChecks, Heart, ChevronDown, ChevronRight, Sparkles, Tv, ShoppingBag, ArrowRight } from "lucide-react";
+import { LogOut, User, Settings, Users, Database, Tally5, FileText, Shield, ShieldUser, Crown, Menu, X, Grid3x3, MessageCircleWarning, ListChecks, Heart, ChevronDown, ChevronRight, Sparkles, Tv, ShoppingBag, ArrowRight, Award } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { authAPI } from './utils/api';
 import { useTheme } from "./components/Shared/ThemeContext";
@@ -70,6 +70,16 @@ const NAV_DROPDOWNS = [
         color: "text-yellow-400",
         bgColor: "bg-yellow-500/10",
         borderColor: "border-yellow-500/20",
+      },
+      {
+        to: "/achievements",
+        label: "Achievements",
+        description: "Trainer badges & milestones",
+        icon: Award,
+        color: "text-amber-400",
+        bgColor: "bg-amber-500/10",
+        borderColor: "border-amber-500/20",
+        adminOnly: true,
       },
     ],
   },
@@ -366,7 +376,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
 
   const isDropdownActive = (dropdown) => {
     return dropdown.items.some(
-      (item) => location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to + '/'))
+      (item) => (!item.adminOnly || user?.isAdmin) && (location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to + '/')))
     );
   };
 
@@ -537,7 +547,9 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                           onMouseEnter={() => handleNavMouseEnter(dropdown.id)}
                           onMouseLeave={handleNavMouseLeave}
                         >
-                          {dropdown.items.map((item) => {
+                          {dropdown.items
+                            .filter(item => !item.adminOnly || user?.isAdmin)
+                            .map((item) => {
                             const ItemIcon = item.icon;
                             const isItemActive = location.pathname === item.to;
 
@@ -613,7 +625,9 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                       {category.label}
                     </div>
                     <div className="flex flex-col gap-0.5">
-                      {category.items.map((item) => {
+                      {category.items
+                        .filter(item => !item.adminOnly || user?.isAdmin)
+                        .map((item) => {
                         const ItemIcon = item.icon;
                         const isItemActive = location.pathname === item.to;
 

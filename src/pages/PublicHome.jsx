@@ -1476,7 +1476,7 @@ export default function PublicHome() {
                   Join thousands of trainers and start building your ultimate collection today!
                 </p>
 
-                <div className="banner-button-row">
+                <div className="banner-button-row" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
                   <Button
                     as={Link}
                     to="/register"
@@ -1485,6 +1485,15 @@ export default function PublicHome() {
                     icon={<SquarePen size={18} />}
                   >
                     Get Started Free
+                  </Button>
+                  <Button
+                    as={Link}
+                    to="/membership"
+                    variant="secondary"
+                    size="lg"
+                    icon={<Crown size={18} />}
+                  >
+                    View Pricing & Perks
                   </Button>
                 </div>
 

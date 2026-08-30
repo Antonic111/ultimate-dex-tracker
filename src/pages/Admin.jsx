@@ -5,7 +5,7 @@ import {
   ChevronLeft, ChevronRight, ArrowUp, ArrowDown, Video, Youtube, Twitch, 
   Clock, MessageSquare, Crown, UserX, Edit3, MoreHorizontal,
   ExternalLink, Ban, RefreshCw, Send, Radio, AlertTriangle, X, Bell, Home,
-  LogOut, ArrowLeft, Sparkles, Activity, Cpu, Zap, BarChart2, Gauge, Server, TrendingUp, Database
+  LogOut, ArrowLeft, Sparkles, Activity, Cpu, Zap, BarChart2, Gauge, Server, TrendingUp, Database, Award
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -987,6 +987,17 @@ const Admin = () => {
                   <span>Site Settings</span>
                 </div>
               </button>
+
+              <Link
+                to="/achievements"
+                className="admin-nav-item"
+                onClick={() => setMobileSidebarOpen(false)}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Award size={17} className="admin-nav-icon" />
+                  <span>Badges & Achievements</span>
+                </div>
+              </Link>
 
               <button
                 type="button"

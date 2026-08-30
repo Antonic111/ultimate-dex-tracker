@@ -15,7 +15,8 @@ import {
   Code2,
   HelpCircle,
   Shield,
-  RefreshCw
+  RefreshCw,
+  Crown
 } from 'lucide-react';
 import { useTheme } from './ThemeContext';
 import { YoutubeIcon, TwitchIcon } from './SocialIcons';
@@ -177,9 +178,9 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="/changelog" className="footer-nav-link">
-                <FileText size={15} />
-                <span>Changelog</span>
+              <Link to="/membership" className="footer-nav-link">
+                <Crown size={15} />
+                <span>Pricing</span>
               </Link>
             </li>
           </ul>
@@ -190,37 +191,15 @@ export default function Footer() {
           <h3 className="footer-column-title">RESOURCES & LEGAL</h3>
           <ul className="footer-quick-links-grid">
             <li>
-              <a
-                href="https://pokeapi.co/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="footer-nav-link"
-              >
-                <Globe size={15} />
-                <span>PokéAPI</span>
-              </a>
+              <Link to="/membership" className="footer-nav-link">
+                <Crown size={15} />
+                <span>Membership</span>
+              </Link>
             </li>
             <li>
               <Link to="/privacy" className="footer-nav-link">
                 <Shield size={15} />
                 <span>Privacy</span>
-              </Link>
-            </li>
-            <li>
-              <a
-                href="https://lucide.dev/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="footer-nav-link"
-              >
-                <Code2 size={15} />
-                <span>Lucide</span>
-              </a>
-            </li>
-            <li>
-              <Link to="/terms" className="footer-nav-link">
-                <FileText size={15} />
-                <span>Terms</span>
               </Link>
             </li>
             <li>
@@ -233,6 +212,23 @@ export default function Footer() {
               >
                 <HelpCircle size={15} />
                 <span>Buyer Help</span>
+              </a>
+            </li>
+            <li>
+              <Link to="/terms" className="footer-nav-link">
+                <FileText size={15} />
+                <span>Terms</span>
+              </Link>
+            </li>
+            <li>
+              <a
+                href="https://pokeapi.co/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-nav-link"
+              >
+                <Globe size={15} />
+                <span>PokéAPI</span>
               </a>
             </li>
             <li>
