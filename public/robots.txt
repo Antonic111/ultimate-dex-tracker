@@ -1,24 +1,7 @@
 # robots.txt for Ultimate Dex Tracker
-# Allow all search engines and bots to crawl the site
+# Allow all search engines and legitimate crawlers to access public pages
 
 User-agent: *
-Allow: /
-
-# Specifically allow Google crawlers
-User-agent: Googlebot
-Allow: /
-
-User-agent: AdsBot-Google
-Allow: /
-
-User-agent: Mediapartners-Google
-Allow: /
-
-# Specifically allow Paddle verification crawlers
-User-agent: PaddleBot
-Allow: /
-
-User-agent: Paddle
 Allow: /
 
 # Sitemap location

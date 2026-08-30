@@ -215,9 +215,15 @@ const isStandaloneRoute = (pathname) => {
   );
 };
 
-// Public compliance, legal, and pricing routes that must remain accessible to crawlers and users during maintenance
-export const isPublicExemptMaintenanceRoute = (pathname) => {
+// Public compliance, legal, marketing, and pricing routes that must remain accessible to crawlers and reviewers during maintenance
+export const isPublicExemptMaintenanceRoute = (pathname, user) => {
   const cleanPath = (pathname || '').split('?')[0].split('#')[0].replace(/\/+$/, '') || '/';
+  
+  // Public landing page is read-only and must be visible to crawlers and reviewers so site doesn't appear "Offline/Under Construction"
+  if (cleanPath === '/' && (!user || !user.username)) {
+    return true;
+  }
+
   return (
     cleanPath === '/privacy' ||
     cleanPath === '/terms' ||
@@ -230,9 +236,9 @@ export const isPublicExemptMaintenanceRoute = (pathname) => {
   );
 };
 
-const MaintenanceRouteGuard = ({ isMaintenanceActive, children }) => {
+const MaintenanceRouteGuard = ({ isMaintenanceActive, user, children }) => {
   const location = useLocation();
-  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(location.pathname)) {
+  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(location.pathname, user)) {
     return <MaintenanceScreen />;
   }
   return children;
@@ -2354,7 +2360,7 @@ export default function App() {
     maintenanceMode && (!user || !user.isAdmin) && !isLocalhost && isMaintenanceTime
   );
   
-  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(window.location.pathname)) {
+  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(window.location.pathname, user)) {
     return <MaintenanceScreen />;
   }
 
@@ -2458,7 +2464,7 @@ export default function App() {
                   <OnboardingWrapper user={user} onTutorialActiveChange={setIsTutorialActive} />
 
                   <main className="flex-grow flex flex-col">
-                    <MaintenanceRouteGuard isMaintenanceActive={isMaintenanceActive}>
+                    <MaintenanceRouteGuard isMaintenanceActive={isMaintenanceActive} user={user}>
                       <Routes>
                       {/* Main App */}
                       <Route
