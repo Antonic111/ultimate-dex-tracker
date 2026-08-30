@@ -130,65 +130,65 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Column 2: QUICK LINKS (2-column layout) */}
-        <div className="footer-column footer-quick-links-column">
-          <h3 className="footer-column-title">QUICK LINKS</h3>
+        {/* Column 2: NAVIGATION (2-column layout) */}
+        <div className="footer-column footer-nav-column">
+          <h3 className="footer-column-title">NAVIGATION</h3>
           <ul className="footer-quick-links-grid">
             <li>
               <Link to="/" className="footer-nav-link">
-                <Home size={16} />
+                <Home size={15} />
                 <span>Home</span>
               </Link>
             </li>
             <li>
-              <Link to="/profile" className="footer-nav-link">
-                <User size={16} />
-                <span>Profile</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/trainers" className="footer-nav-link">
-                <Users size={16} />
-                <span>Trainers</span>
-              </Link>
-            </li>
-            <li>
               <Link to="/counters" className="footer-nav-link">
-                <Tally5 size={16} />
+                <Tally5 size={15} />
                 <span>Counters</span>
               </Link>
             </li>
             <li>
+              <Link to="/profile" className="footer-nav-link">
+                <User size={15} />
+                <span>Profile</span>
+              </Link>
+            </li>
+            <li>
               <Link to="/mmo-tool" className="footer-nav-link">
-                <ListChecks size={16} />
+                <ListChecks size={15} />
                 <span>MMO Tool</span>
               </Link>
             </li>
             <li>
+              <Link to="/trainers" className="footer-nav-link">
+                <Users size={15} />
+                <span>Trainers</span>
+              </Link>
+            </li>
+            <li>
               <Link to="/bingo" className="footer-nav-link">
-                <Grid3x3 size={16} />
+                <Grid3x3 size={15} />
                 <span>Bingo</span>
               </Link>
             </li>
             <li>
-              <Link to="/changelog" className="footer-nav-link">
-                <FileText size={16} />
-                <span>Changelog</span>
+              <Link to="/settings" className="footer-nav-link">
+                <Settings size={15} />
+                <span>Settings</span>
               </Link>
             </li>
             <li>
-              <Link to="/settings" className="footer-nav-link">
-                <Settings size={16} />
-                <span>Settings</span>
+              <Link to="/changelog" className="footer-nav-link">
+                <FileText size={15} />
+                <span>Changelog</span>
               </Link>
             </li>
           </ul>
         </div>
 
-        {/* Column 3: RESOURCES */}
+        {/* Column 3: RESOURCES & LEGAL (2-column balanced layout) */}
         <div className="footer-column footer-resources-column">
-          <h3 className="footer-column-title">RESOURCES</h3>
-          <ul className="footer-links-list">
+          <h3 className="footer-column-title">RESOURCES & LEGAL</h3>
+          <ul className="footer-quick-links-grid">
             <li>
               <a
                 href="https://pokeapi.co/"
@@ -196,9 +196,15 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="footer-nav-link"
               >
-                <Globe size={16} />
+                <Globe size={15} />
                 <span>PokéAPI</span>
               </a>
+            </li>
+            <li>
+              <Link to="/privacy" className="footer-nav-link">
+                <Shield size={15} />
+                <span>Privacy</span>
+              </Link>
             </li>
             <li>
               <a
@@ -207,52 +213,29 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="footer-nav-link"
               >
-                <Code2 size={16} />
-                <span>Lucide Icons</span>
+                <Code2 size={15} />
+                <span>Lucide</span>
               </a>
             </li>
             <li>
-              <Link to="/changelog" className="footer-nav-link">
-                <FileText size={16} />
-                <span>Changelog</span>
+              <Link to="/terms" className="footer-nav-link">
+                <FileText size={15} />
+                <span>Terms</span>
               </Link>
             </li>
             <li>
               <Link to="/feedback" className="footer-nav-link">
-                <MessageSquare size={16} />
-                <span>Feedback & Contact</span>
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Column 4: LEGAL */}
-        <div className="footer-column footer-legal-column">
-          <h3 className="footer-column-title">LEGAL</h3>
-          <ul className="footer-links-list" style={{ marginBottom: "10px" }}>
-            <li>
-              <Link to="/privacy" className="footer-nav-link">
-                <Shield size={16} />
-                <span>Privacy Policy</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/terms" className="footer-nav-link">
-                <FileText size={16} />
-                <span>Terms of Service</span>
+                <MessageSquare size={15} />
+                <span>Feedback</span>
               </Link>
             </li>
             <li>
               <Link to="/refund-policy" className="footer-nav-link">
-                <RefreshCw size={16} />
-                <span>Refund Policy</span>
+                <RefreshCw size={15} />
+                <span>Refunds</span>
               </Link>
             </li>
           </ul>
-          <div className="footer-legal-body">
-            <p>Not affiliated with Nintendo, Game Freak, or The Pokémon Company.</p>
-            <p>Pokémon is a trademark of Nintendo.</p>
-          </div>
         </div>
       </div>
 
@@ -310,6 +293,11 @@ export default function Footer() {
               </a>
             </span>
           </div>
+        </div>
+
+        {/* Disclaimer Bar */}
+        <div className="footer-disclaimer-bar">
+          <p>Ultimate Dex Tracker is an unofficial fan project and is not affiliated with, endorsed by, or sponsored by Nintendo, GAME FREAK, or The Pokémon Company. Pokémon is a registered trademark of Nintendo.</p>
         </div>
       </div>
     </footer>
