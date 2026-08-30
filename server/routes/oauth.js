@@ -10,6 +10,7 @@ import LinkedProvider from "../models/LinkedProvider.js";
 import { generateOAuthState, verifyOAuthState } from "../middleware/oauthState.js";
 import { oauthLimiter } from "../middleware/rateLimit.js";
 import { authenticateUser } from "../middleware/authenticateUser.js";
+import { getMembershipBadgeInfo } from "../utils/entitlementService.js";
 
 // Ensure env vars are loaded
 dotenv.config();
@@ -511,6 +512,7 @@ router.post("/complete-oauth-setup", authenticateUser, async (req, res) => {
     if (skip) {
       user.needsProfileSetup = false;
       await user.save();
+      const membershipInfo = await getMembershipBadgeInfo(user._id);
       return res.json({
         success: true,
         user: {
@@ -519,9 +521,15 @@ router.post("/complete-oauth-setup", authenticateUser, async (req, res) => {
           email: user.email,
           hasPassword: Boolean(user.password),
           profileTrainer: user.profileTrainer,
+          nameColor1: user.nameColor1 || user.nameGradientColor1 || null,
+          nameColor2: user.nameColor2 || user.nameGradientColor2 || null,
+          avatar: user.avatar || null,
           needsProfileSetup: false,
           verified: user.verified,
           isAdmin: user.isAdmin,
+          isPremium: Boolean(membershipInfo.isPremium),
+          premiumMonths: membershipInfo.premiumMonths || 0,
+          premiumSince: membershipInfo.premiumSince || null,
           onboarding: user.onboarding,
         },
       });
@@ -564,6 +572,8 @@ router.post("/complete-oauth-setup", authenticateUser, async (req, res) => {
     user.needsProfileSetup = false;
     await user.save();
 
+    const membershipInfo = await getMembershipBadgeInfo(user._id);
+
     res.json({
       success: true,
       message: "Profile setup completed successfully",
@@ -573,9 +583,15 @@ router.post("/complete-oauth-setup", authenticateUser, async (req, res) => {
         email: user.email,
         hasPassword: Boolean(user.password),
         profileTrainer: user.profileTrainer,
+        nameColor1: user.nameColor1 || user.nameGradientColor1 || null,
+        nameColor2: user.nameColor2 || user.nameGradientColor2 || null,
+        avatar: user.avatar || null,
         needsProfileSetup: false,
         verified: user.verified,
         isAdmin: user.isAdmin,
+        isPremium: Boolean(membershipInfo.isPremium),
+        premiumMonths: membershipInfo.premiumMonths || 0,
+        premiumSince: membershipInfo.premiumSince || null,
         onboarding: user.onboarding,
       },
     });
