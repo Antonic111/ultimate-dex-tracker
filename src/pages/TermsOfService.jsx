@@ -142,9 +142,9 @@ export default function TermsOfService() {
             <li>At the end of your billing cycle, your subscription will not renew, and your account will automatically revert to a standard free account.</li>
           </ul>
 
-          <h3 className="legal-subsection-title">D. Refund Policy</h3>
+          <h3 className="legal-subsection-title">D. Refund & Cancellation Policy</h3>
           <p className="legal-paragraph">
-            Because digital membership perks (animated avatars, watermark removal, custom gradient styling, and expanded profile slots) are made available immediately upon purchase, subscription payments are generally non-refundable except as required by mandatory consumer protection laws in your jurisdiction (such as statutory EU/UK withdrawal rights within the initial 14-day period where digital content has not been fully delivered, or where billing errors occurred). For refund inquiries, you may contact Paddle support or reach out to us via our official contact channels.
+            Because digital membership perks (animated avatars, custom gradient styling, streamer overlays, and expanded profile slots) are made available immediately upon purchase, subscription payments are subject to our dedicated <Link to="/refund-policy" style={{ fontWeight: 700, color: "var(--accent-color)" }}>Refund & Cancellation Policy</Link>, which includes statutory consumer protection rights (such as EU/UK 14-day cooling-off withdrawal rights), handling of billing errors, and straightforward self-serve cancellation.
           </p>
 
           <h3 className="legal-subsection-title">E. Modification of Perks & Pricing</h3>

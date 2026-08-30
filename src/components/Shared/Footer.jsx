@@ -14,7 +14,8 @@ import {
   Globe,
   Code2,
   MessageSquare,
-  Shield
+  Shield,
+  RefreshCw
 } from 'lucide-react';
 import { useTheme } from './ThemeContext';
 import { YoutubeIcon, TwitchIcon } from './SocialIcons';
@@ -232,6 +233,12 @@ export default function Footer() {
               <Link to="/terms" className="footer-nav-link">
                 <FileText size={16} />
                 <span>Terms</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/refund-policy" className="footer-nav-link">
+                <RefreshCw size={16} />
+                <span>Refunds</span>
               </Link>
             </li>
           </ul>

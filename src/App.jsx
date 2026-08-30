@@ -51,6 +51,7 @@ const Changelog = lazy(() => import("./pages/Changelog"));
 const Feedback = lazy(() => import("./pages/Feedback"));
 const PrivacyPolicy = lazy(() => import("./pages/LegalPrivacy.jsx"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
 
 const Bingo = lazy(() => import("./pages/Bingo"));
 const Admin = lazy(() => import("./pages/Admin"));
@@ -2732,6 +2733,26 @@ export default function App() {
                           <Suspense fallback={<SectionLoader minHeight="60vh" />}>
                             <PageTransition>
                               <TermsOfService />
+                            </PageTransition>
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/refund-policy"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <RefundPolicy />
+                            </PageTransition>
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/refunds"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <RefundPolicy />
                             </PageTransition>
                           </Suspense>
                         }
