@@ -185,10 +185,10 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Column 3: RESOURCES (2-column layout) */}
+        {/* Column 3: RESOURCES */}
         <div className="footer-column footer-resources-column">
           <h3 className="footer-column-title">RESOURCES</h3>
-          <ul className="footer-quick-links-grid">
+          <ul className="footer-links-list">
             <li>
               <a
                 href="https://pokeapi.co/"
@@ -208,7 +208,7 @@ export default function Footer() {
                 className="footer-nav-link"
               >
                 <Code2 size={16} />
-                <span>Lucide</span>
+                <span>Lucide Icons</span>
               </a>
             </li>
             <li>
@@ -220,25 +220,7 @@ export default function Footer() {
             <li>
               <Link to="/feedback" className="footer-nav-link">
                 <MessageSquare size={16} />
-                <span>Feedback</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/privacy" className="footer-nav-link">
-                <Shield size={16} />
-                <span>Privacy</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/terms" className="footer-nav-link">
-                <FileText size={16} />
-                <span>Terms</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/refund-policy" className="footer-nav-link">
-                <RefreshCw size={16} />
-                <span>Refunds</span>
+                <span>Feedback & Contact</span>
               </Link>
             </li>
           </ul>
@@ -247,6 +229,26 @@ export default function Footer() {
         {/* Column 4: LEGAL */}
         <div className="footer-column footer-legal-column">
           <h3 className="footer-column-title">LEGAL</h3>
+          <ul className="footer-links-list" style={{ marginBottom: "10px" }}>
+            <li>
+              <Link to="/privacy" className="footer-nav-link">
+                <Shield size={16} />
+                <span>Privacy Policy</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/terms" className="footer-nav-link">
+                <FileText size={16} />
+                <span>Terms of Service</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/refund-policy" className="footer-nav-link">
+                <RefreshCw size={16} />
+                <span>Refund Policy</span>
+              </Link>
+            </li>
+          </ul>
           <div className="footer-legal-body">
             <p>Not affiliated with Nintendo, Game Freak, or The Pokémon Company.</p>
             <p>Pokémon is a trademark of Nintendo.</p>
