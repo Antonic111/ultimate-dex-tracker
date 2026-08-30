@@ -672,7 +672,7 @@ export default function PublicProfile() {
                     <div className="profile-top-line">
                         <h1 className="profile-username">
                             <span className="inline-flex items-center gap-2.5">
-                                {data.nameColor1 && data.nameColor2 ? (
+                                {data.nameColor1 && data.nameColor2 && (data.isPremium || data.isAdmin) ? (
                                     <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": data.nameColor1, "--grad-c2": data.nameColor2 }}>
                                         <span className="animated-gradient-username">
                                             {data.username}

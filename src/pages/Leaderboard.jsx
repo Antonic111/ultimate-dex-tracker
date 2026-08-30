@@ -378,7 +378,7 @@ export default function Leaderboard() {
                   </div>
 
                   <h3 className="podium-username">
-                    {topThree[1].nameColor1 && topThree[1].nameColor2 ? (
+                    {topThree[1].nameColor1 && topThree[1].nameColor2 && (topThree[1].isPremium || topThree[1].isAdmin) ? (
                       <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": topThree[1].nameColor1, "--grad-c2": topThree[1].nameColor2 }}>
                         <span className="animated-gradient-username">{topThree[1].username}</span>
                       </span>
@@ -474,7 +474,7 @@ export default function Leaderboard() {
                   </div>
 
                   <h3 className="podium-username">
-                    {topThree[0].nameColor1 && topThree[0].nameColor2 ? (
+                    {topThree[0].nameColor1 && topThree[0].nameColor2 && (topThree[0].isPremium || topThree[0].isAdmin) ? (
                       <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": topThree[0].nameColor1, "--grad-c2": topThree[0].nameColor2 }}>
                         <span className="animated-gradient-username">{topThree[0].username}</span>
                       </span>
@@ -568,7 +568,7 @@ export default function Leaderboard() {
                   </div>
 
                   <h3 className="podium-username">
-                    {topThree[2].nameColor1 && topThree[2].nameColor2 ? (
+                    {topThree[2].nameColor1 && topThree[2].nameColor2 && (topThree[2].isPremium || topThree[2].isAdmin) ? (
                       <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": topThree[2].nameColor1, "--grad-c2": topThree[2].nameColor2 }}>
                         <span className="animated-gradient-username">{topThree[2].username}</span>
                       </span>
@@ -690,7 +690,7 @@ export default function Leaderboard() {
                       />
                       <div className="table-trainer-info">
                         <div className="table-trainer-name-row">
-                          {trainer.nameColor1 && trainer.nameColor2 ? (
+                          {trainer.nameColor1 && trainer.nameColor2 && (trainer.isPremium || trainer.isAdmin) ? (
                             <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": trainer.nameColor1, "--grad-c2": trainer.nameColor2 }}>
                               <span className="animated-gradient-username table-trainer-name">{trainer.username}</span>
                             </span>

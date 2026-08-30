@@ -700,7 +700,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                   />
                 </div>
 
-                {user.nameColor1 && user.nameColor2 ? (
+                {user.nameColor1 && user.nameColor2 && (user.isPremium || user.isAdmin) ? (
                   <span
                     className="animated-gradient-username-wrapper max-w-[85px] sm:max-w-[120px] md:max-w-[170px]"
                     style={{ "--grad-c1": user.nameColor1, "--grad-c2": user.nameColor2 }}
@@ -739,7 +739,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                         <span className="text-[12px] text-[var(--text-muted)] font-medium tracking-wide">
                           Hello,
                         </span>
-                        {user.nameColor1 && user.nameColor2 ? (
+                        {user.nameColor1 && user.nameColor2 && (user.isPremium || user.isAdmin) ? (
                           <span
                             className="animated-gradient-username-wrapper inline-block truncate"
                             style={{ "--grad-c1": user.nameColor1, "--grad-c2": user.nameColor2 }}

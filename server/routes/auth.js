@@ -311,6 +311,8 @@ router.post("/login", authLimiter, async (req, res) => {
       cookieOptions.domain = '.ultimatedextracker.com';
     }
 
+    const membershipInfo = await getMembershipBadgeInfo(user._id);
+
     const responseData = {
       message: "Login successful",
       user: {
@@ -320,10 +322,15 @@ router.post("/login", authLimiter, async (req, res) => {
         hasPassword: Boolean(user.password),
         createdAt: user.createdAt,
         profileTrainer: user.profileTrainer,
+        nameColor1: user.nameColor1 || user.nameGradientColor1 || null,
+        nameColor2: user.nameColor2 || user.nameGradientColor2 || null,
         avatar: user.avatar || null,
         verified: true,
         isAdmin: Boolean(user.isAdmin),
         isContentCreator: Boolean(user.isContentCreator),
+        isPremium: Boolean(membershipInfo.isPremium),
+        premiumMonths: membershipInfo.premiumMonths || 0,
+        premiumSince: membershipInfo.premiumSince || null,
         youtubeUrl: user.youtubeUrl || null,
         twitchUrl: user.twitchUrl || null,
         dexPreferences: user.dexPreferences || null,
@@ -548,6 +555,8 @@ router.post("/verify-code", async (req, res) => {
       cookieOptions.domain = '.ultimatedextracker.com';
     }
 
+    const membershipInfo = await getMembershipBadgeInfo(user._id);
+
     res
       .cookie("token", token, cookieOptions)
       .json({
@@ -558,9 +567,15 @@ router.post("/verify-code", async (req, res) => {
           email: user.email,
           hasPassword: Boolean(user.password),
           profileTrainer: user.profileTrainer,
+          nameColor1: user.nameColor1 || user.nameGradientColor1 || null,
+          nameColor2: user.nameColor2 || user.nameGradientColor2 || null,
+          avatar: user.avatar || null,
           createdAt: user.createdAt,
           verified: true,
           isAdmin: user.isAdmin,
+          isPremium: Boolean(membershipInfo.isPremium),
+          premiumMonths: membershipInfo.premiumMonths || 0,
+          premiumSince: membershipInfo.premiumSince || null,
           onboarding: user.onboarding,
           needsProfileSetup: Boolean(user.needsProfileSetup),
         },
@@ -868,8 +883,13 @@ router.put("/profile", authenticateUser, async (req, res) => {
 
     await user.save();
 
+    const membershipInfo = await getMembershipBadgeInfo(user._id);
+
     res.json({
       message: "Profile updated", user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
         bio: user.bio,
         location: user.location,
         gender: user.gender,
@@ -880,6 +900,10 @@ router.put("/profile", authenticateUser, async (req, res) => {
         favoriteTrainers: user.favoriteTrainers,
         favoriteCategoryOrder: user.favoriteCategoryOrder || [],
         profileTrainer: user.profileTrainer,
+        nameColor1: user.nameColor1 || user.nameGradientColor1 || null,
+        nameColor2: user.nameColor2 || user.nameGradientColor2 || null,
+        nameGradientColor1: user.nameGradientColor1 || user.nameColor1 || null,
+        nameGradientColor2: user.nameGradientColor2 || user.nameColor2 || null,
         avatar: user.avatar || null,
         switchFriendCode: user.switchFriendCode,
         goFriendCode: user.goFriendCode,
@@ -893,7 +917,11 @@ router.put("/profile", authenticateUser, async (req, res) => {
         accentColor: user.accentColor || 'yellow',
         siteTheme: user.siteTheme || 'dark',
         onboarding: user.onboarding,
+        isAdmin: user.isAdmin,
         isContentCreator: user.isContentCreator || false,
+        isPremium: Boolean(membershipInfo.isPremium),
+        premiumMonths: membershipInfo.premiumMonths || 0,
+        premiumSince: membershipInfo.premiumSince || null,
         youtubeUrl: user.youtubeUrl || null,
         twitchUrl: user.twitchUrl || null,
       }

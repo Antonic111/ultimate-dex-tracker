@@ -105,7 +105,7 @@ function formatGoFCInput(value) {
 
 export default function Profile() {
     const navigate = useNavigate();
-    const { username, email, createdAt, loading, setUser } = useUser();
+    const { username, email, createdAt, loading, setUser, isPremium, isAdmin } = useUser();
 
     const [useHomeSprites, setUseHomeSprites] = useState(() => {
         try {
@@ -778,7 +778,7 @@ export default function Profile() {
                     <div className="profile-top-line">
                         <h1 className="profile-username">
                             <span className="inline-flex items-center gap-2.5">
-                                {form.nameColor1 && form.nameColor2 ? (
+                                {form.nameColor1 && form.nameColor2 && (isPremium || isAdmin) ? (
                                     <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": form.nameColor1, "--grad-c2": form.nameColor2 }}>
                                         <span className="animated-gradient-username">
                                             {username}
