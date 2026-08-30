@@ -482,9 +482,9 @@ export default function NotificationDropdown({ user, showMessage }) {
             /* REGULAR NOTIFICATIONS LIST VIEW */
             <>
               {/* Header */}
-              <div className="p-3.5 px-4 border-b border-white/[0.08] flex items-center justify-between bg-black/20 shrink-0">
+              <div className="p-3.5 px-4 border-b border-[var(--border-color)] flex items-center justify-between bg-black/5 dark:bg-black/20 shrink-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-white text-sm tracking-wide">
+                  <span className="font-extrabold text-[var(--text)] text-sm tracking-wide">
                     Notifications
                   </span>
                   {unreadCount > 0 && (
@@ -514,7 +514,7 @@ export default function NotificationDropdown({ user, showMessage }) {
                         type="button"
                         onClick={handleMarkAllRead}
                         disabled={unreadCount === 0}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/[0.08] transition disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                        className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-black/5 dark:hover:bg-white/[0.08] transition disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                         title="Mark all as read"
                       >
                         <CheckCheck size={16} />
@@ -523,7 +523,7 @@ export default function NotificationDropdown({ user, showMessage }) {
                       <button
                         type="button"
                         onClick={handleDeleteAll}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition cursor-pointer"
+                        className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-red-400 hover:bg-red-500/10 transition cursor-pointer"
                         title="Clear all notifications"
                       >
                         <Trash2 size={16} />
@@ -535,14 +535,14 @@ export default function NotificationDropdown({ user, showMessage }) {
 
               {/* Filter Tabs */}
               {notifications.length > 0 && (
-                <div className="flex items-center gap-2 px-4 py-2 border-b border-white/[0.05] bg-white/[0.01]">
+                <div className="flex items-center gap-2 px-4 py-2 border-b border-[var(--border-color)] bg-black/[0.02] dark:bg-white/[0.01]">
                   <button
                     type="button"
                     onClick={() => setActiveTab("all")}
                     className={`text-xs font-bold px-2.5 py-1 rounded-lg transition cursor-pointer ${
                       activeTab === "all"
-                        ? "bg-white/10 text-white"
-                        : "text-gray-400 hover:text-gray-200"
+                        ? "bg-black/10 dark:bg-white/10 text-[var(--text)]"
+                        : "text-[var(--text-muted)] hover:text-[var(--text)]"
                     }`}
                   >
                     All ({notifications.length})
@@ -552,8 +552,8 @@ export default function NotificationDropdown({ user, showMessage }) {
                     onClick={() => setActiveTab("unread")}
                     className={`text-xs font-bold px-2.5 py-1 rounded-lg transition cursor-pointer flex items-center gap-1.5 ${
                       activeTab === "unread"
-                        ? "bg-white/10 text-[var(--accent)]"
-                        : "text-gray-400 hover:text-gray-200"
+                        ? "bg-black/10 dark:bg-white/10 text-[var(--accent)]"
+                        : "text-[var(--text-muted)] hover:text-[var(--text)]"
                     }`}
                   >
                     <span>Unread</span>
@@ -565,21 +565,21 @@ export default function NotificationDropdown({ user, showMessage }) {
               )}
 
               {/* Notification List Container */}
-              <div className="overflow-y-auto custom-scrollbar flex-1 max-h-[420px] divide-y divide-white/[0.04]">
+              <div className="overflow-y-auto custom-scrollbar flex-1 max-h-[420px] divide-y divide-[var(--border-color)]">
             {isLoading && notifications.length === 0 ? (
-              <div className="py-12 flex flex-col items-center justify-center text-gray-400 gap-2">
+              <div className="py-12 flex flex-col items-center justify-center text-[var(--text-muted)] gap-2">
                 <Loader2 size={24} className="animate-spin text-[var(--accent)]" />
                 <span className="text-xs font-medium">Loading notifications...</span>
               </div>
             ) : displayedNotifications.length === 0 ? (
               <div className="py-12 px-6 flex flex-col items-center justify-center text-center">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-gray-400 mb-3 shadow-inner">
+                <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/[0.04] border border-[var(--border-color)] flex items-center justify-center text-[var(--text-muted)] mb-3 shadow-inner">
                   <Bell size={22} className="opacity-40" />
                 </div>
-                <p className="text-sm font-bold text-white mb-1">
+                <p className="text-sm font-bold text-[var(--text)] mb-1">
                   {activeTab === "unread" ? "No unread notifications" : "All caught up!"}
                 </p>
-                <p className="text-xs text-gray-400 max-w-[220px]">
+                <p className="text-xs text-[var(--text-muted)] max-w-[220px]">
                   {activeTab === "unread"
                     ? "You've read all your notifications and announcements."
                     : "Server announcements and alerts will appear right here."}
@@ -593,8 +593,8 @@ export default function NotificationDropdown({ user, showMessage }) {
                     key={notif.id}
                     className={`p-3.5 px-4 transition-colors group relative flex gap-3 text-left ${
                       isUnread
-                        ? "bg-white/[0.035] hover:bg-white/[0.06]"
-                        : "opacity-75 hover:opacity-100 hover:bg-white/[0.02]"
+                        ? "bg-black/[0.02] dark:bg-white/[0.035] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                        : "opacity-75 hover:opacity-100 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
                     }`}
                   >
                     {/* Icon Badge */}
@@ -602,7 +602,7 @@ export default function NotificationDropdown({ user, showMessage }) {
                       <div className={`w-8 h-8 rounded-xl flex items-center justify-center border shadow-sm ${
                         isUnread
                           ? "bg-[var(--accent)]/15 border-[var(--accent)]/30"
-                          : "bg-white/[0.04] border-white/[0.08]"
+                          : "bg-black/5 dark:bg-white/[0.04] border-[var(--border-color)]"
                       }`}>
                         {getTypeIcon(notif.type, notif.priority)}
                       </div>
@@ -612,7 +612,7 @@ export default function NotificationDropdown({ user, showMessage }) {
                     <div className="flex-1 min-w-0 pr-12">
                       <div className="flex items-center gap-1.5 flex-wrap mb-1">
                         <span className={`text-xs font-extrabold line-clamp-1 ${
-                          isUnread ? "text-white" : "text-gray-300"
+                          isUnread ? "text-[var(--text)]" : "text-[var(--text-muted)]"
                         }`}>
                           {notif.title}
                         </span>
@@ -622,7 +622,7 @@ export default function NotificationDropdown({ user, showMessage }) {
                         )}
                       </div>
 
-                      <p className="text-xs text-gray-300 whitespace-pre-wrap leading-relaxed break-words mb-2">
+                      <p className="text-xs text-[var(--text)]/80 whitespace-pre-wrap leading-relaxed break-words mb-2">
                         {notif.message}
                       </p>
 

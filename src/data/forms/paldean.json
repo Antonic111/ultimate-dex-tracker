@@ -8,10 +8,10 @@
       "fighting"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10250.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10250.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10250.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10250.png"
+      "front_default": "/Sprites/trimmed/pokemon/10250.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10250.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10250.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10250.png"
     },
     "gen": 1,
     "evolution": {
@@ -37,10 +37,10 @@
       "fire"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10251.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10251.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10251.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10251.png"
+      "front_default": "/Sprites/trimmed/pokemon/10251.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10251.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10251.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10251.png"
     },
     "gen": 1,
     "evolution": {
@@ -68,10 +68,10 @@
       "water"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10252.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10252.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10252.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10252.png"
+      "front_default": "/Sprites/trimmed/pokemon/10252.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10252.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10252.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10252.png"
     },
     "gen": 1,
     "evolution": {
@@ -101,10 +101,10 @@
       "ground"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10253.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10253.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10253.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10253.png"
+      "front_default": "/Sprites/trimmed/pokemon/10253.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10253.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10253.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10253.png"
     },
     "gen": 2,
     "evolution": {

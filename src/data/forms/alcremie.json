@@ -8,10 +8,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-cream-strawberry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-cream-strawberry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-cream-strawberry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-cream-strawberry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-cream-strawberry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-cream-strawberry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-cream-strawberry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-cream-strawberry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -38,10 +38,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-matcha-cream-strawberry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-matcha-cream-strawberry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-matcha-cream-strawberry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-matcha-cream-strawberry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-matcha-cream-strawberry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-matcha-cream-strawberry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-matcha-cream-strawberry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-matcha-cream-strawberry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -68,10 +68,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-mint-cream-strawberry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-mint-cream-strawberry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-mint-cream-strawberry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-mint-cream-strawberry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-mint-cream-strawberry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-mint-cream-strawberry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-mint-cream-strawberry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-mint-cream-strawberry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -98,10 +98,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-lemon-cream-strawberry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-lemon-cream-strawberry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-lemon-cream-strawberry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-lemon-cream-strawberry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-lemon-cream-strawberry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-lemon-cream-strawberry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-lemon-cream-strawberry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-lemon-cream-strawberry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -128,10 +128,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-salted-cream-strawberry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-salted-cream-strawberry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-salted-cream-strawberry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-salted-cream-strawberry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-salted-cream-strawberry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-salted-cream-strawberry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-salted-cream-strawberry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-salted-cream-strawberry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -158,10 +158,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-swirl-strawberry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-swirl-strawberry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-swirl-strawberry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-swirl-strawberry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-swirl-strawberry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-swirl-strawberry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-swirl-strawberry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-swirl-strawberry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -188,10 +188,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-caramel-swirl-strawberry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-caramel-swirl-strawberry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-caramel-swirl-strawberry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-caramel-swirl-strawberry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-caramel-swirl-strawberry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-caramel-swirl-strawberry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-caramel-swirl-strawberry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-caramel-swirl-strawberry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -218,10 +218,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-rainbow-swirl-strawberry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-rainbow-swirl-strawberry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-rainbow-swirl-strawberry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-rainbow-swirl-strawberry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-rainbow-swirl-strawberry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-rainbow-swirl-strawberry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-rainbow-swirl-strawberry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-rainbow-swirl-strawberry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -248,10 +248,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-vanilla-cream-berry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-vanilla-cream-berry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-vanilla-cream-berry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-vanilla-cream-berry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-vanilla-cream-berry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-vanilla-cream-berry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-vanilla-cream-berry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-vanilla-cream-berry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -278,10 +278,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-cream-berry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-cream-berry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-cream-berry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-cream-berry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-cream-berry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-cream-berry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-cream-berry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-cream-berry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -308,10 +308,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-matcha-cream-berry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-matcha-cream-berry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-matcha-cream-berry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-matcha-cream-berry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-matcha-cream-berry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-matcha-cream-berry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-matcha-cream-berry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-matcha-cream-berry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -338,10 +338,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-mint-cream-berry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-mint-cream-berry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-mint-cream-berry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-mint-cream-berry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-mint-cream-berry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-mint-cream-berry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-mint-cream-berry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-mint-cream-berry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -368,10 +368,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-lemon-cream-berry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-lemon-cream-berry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-lemon-cream-berry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-lemon-cream-berry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-lemon-cream-berry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-lemon-cream-berry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-lemon-cream-berry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-lemon-cream-berry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -398,10 +398,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-salted-cream-berry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-salted-cream-berry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-salted-cream-berry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-salted-cream-berry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-salted-cream-berry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-salted-cream-berry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-salted-cream-berry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-salted-cream-berry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -428,10 +428,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-swirl-berry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-swirl-berry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-swirl-berry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-swirl-berry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-swirl-berry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-swirl-berry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-swirl-berry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-swirl-berry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -458,10 +458,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-caramel-swirl-berry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-caramel-swirl-berry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-caramel-swirl-berry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-caramel-swirl-berry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-caramel-swirl-berry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-caramel-swirl-berry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-caramel-swirl-berry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-caramel-swirl-berry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -488,10 +488,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-rainbow-swirl-berry-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-rainbow-swirl-berry-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-rainbow-swirl-berry-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-rainbow-swirl-berry-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-rainbow-swirl-berry-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-rainbow-swirl-berry-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-rainbow-swirl-berry-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-rainbow-swirl-berry-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -518,10 +518,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-vanilla-cream-love-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-vanilla-cream-love-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-vanilla-cream-love-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-vanilla-cream-love-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-vanilla-cream-love-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-vanilla-cream-love-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-vanilla-cream-love-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-vanilla-cream-love-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -548,10 +548,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-cream-love-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-cream-love-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-cream-love-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-cream-love-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-cream-love-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-cream-love-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-cream-love-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-cream-love-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -578,10 +578,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-matcha-cream-love-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-matcha-cream-love-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-matcha-cream-love-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-matcha-cream-love-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-matcha-cream-love-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-matcha-cream-love-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-matcha-cream-love-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-matcha-cream-love-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -608,10 +608,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-mint-cream-love-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-mint-cream-love-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-mint-cream-love-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-mint-cream-love-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-mint-cream-love-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-mint-cream-love-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-mint-cream-love-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-mint-cream-love-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -638,10 +638,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-lemon-cream-love-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-lemon-cream-love-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-lemon-cream-love-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-lemon-cream-love-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-lemon-cream-love-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-lemon-cream-love-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-lemon-cream-love-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-lemon-cream-love-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -668,10 +668,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-salted-cream-love-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-salted-cream-love-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-salted-cream-love-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-salted-cream-love-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-salted-cream-love-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-salted-cream-love-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-salted-cream-love-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-salted-cream-love-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -698,10 +698,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-swirl-love-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-swirl-love-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-swirl-love-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-swirl-love-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-swirl-love-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-swirl-love-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-swirl-love-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-swirl-love-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -727,10 +727,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-caramel-swirl-love-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-caramel-swirl-love-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-caramel-swirl-love-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-caramel-swirl-love-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-caramel-swirl-love-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-caramel-swirl-love-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-caramel-swirl-love-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-caramel-swirl-love-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -757,10 +757,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-rainbow-swirl-love-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-rainbow-swirl-love-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-rainbow-swirl-love-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-rainbow-swirl-love-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-rainbow-swirl-love-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-rainbow-swirl-love-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-rainbow-swirl-love-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-rainbow-swirl-love-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -787,10 +787,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-vanilla-cream-star-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-vanilla-cream-star-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-vanilla-cream-star-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-vanilla-cream-star-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-vanilla-cream-star-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-vanilla-cream-star-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-vanilla-cream-star-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-vanilla-cream-star-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -817,10 +817,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-cream-star-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-cream-star-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-cream-star-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-cream-star-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-cream-star-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-cream-star-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-cream-star-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-cream-star-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -847,10 +847,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-matcha-cream-star-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-matcha-cream-star-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-matcha-cream-star-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-matcha-cream-star-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-matcha-cream-star-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-matcha-cream-star-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-matcha-cream-star-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-matcha-cream-star-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -877,10 +877,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-mint-cream-star-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-mint-cream-star-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-mint-cream-star-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-mint-cream-star-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-mint-cream-star-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-mint-cream-star-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-mint-cream-star-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-mint-cream-star-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -907,10 +907,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-lemon-cream-star-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-lemon-cream-star-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-lemon-cream-star-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-lemon-cream-star-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-lemon-cream-star-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-lemon-cream-star-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-lemon-cream-star-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-lemon-cream-star-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -936,10 +936,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-salted-cream-star-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-salted-cream-star-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-salted-cream-star-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-salted-cream-star-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-salted-cream-star-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-salted-cream-star-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-salted-cream-star-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-salted-cream-star-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -966,10 +966,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-swirl-star-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-swirl-star-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-swirl-star-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-swirl-star-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-swirl-star-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-swirl-star-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-swirl-star-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-swirl-star-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -996,10 +996,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-caramel-swirl-star-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-caramel-swirl-star-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-caramel-swirl-star-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-caramel-swirl-star-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-caramel-swirl-star-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-caramel-swirl-star-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-caramel-swirl-star-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-caramel-swirl-star-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1026,10 +1026,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-rainbow-swirl-star-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-rainbow-swirl-star-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-rainbow-swirl-star-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-rainbow-swirl-star-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-rainbow-swirl-star-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-rainbow-swirl-star-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-rainbow-swirl-star-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-rainbow-swirl-star-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1056,10 +1056,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-vanilla-cream-clover-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-vanilla-cream-clover-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-vanilla-cream-clover-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-vanilla-cream-clover-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-vanilla-cream-clover-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-vanilla-cream-clover-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-vanilla-cream-clover-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-vanilla-cream-clover-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1086,10 +1086,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-cream-clover-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-cream-clover-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-cream-clover-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-cream-clover-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-cream-clover-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-cream-clover-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-cream-clover-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-cream-clover-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1116,10 +1116,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-matcha-cream-clover-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-matcha-cream-clover-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-matcha-cream-clover-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-matcha-cream-clover-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-matcha-cream-clover-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-matcha-cream-clover-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-matcha-cream-clover-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-matcha-cream-clover-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1146,10 +1146,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-mint-cream-clover-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-mint-cream-clover-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-mint-cream-clover-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-mint-cream-clover-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-mint-cream-clover-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-mint-cream-clover-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-mint-cream-clover-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-mint-cream-clover-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1176,10 +1176,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-lemon-cream-clover-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-lemon-cream-clover-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-lemon-cream-clover-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-lemon-cream-clover-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-lemon-cream-clover-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-lemon-cream-clover-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-lemon-cream-clover-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-lemon-cream-clover-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1206,10 +1206,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-salted-cream-clover-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-salted-cream-clover-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-salted-cream-clover-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-salted-cream-clover-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-salted-cream-clover-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-salted-cream-clover-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-salted-cream-clover-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-salted-cream-clover-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1236,10 +1236,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-swirl-clover-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-swirl-clover-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-swirl-clover-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-swirl-clover-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-swirl-clover-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-swirl-clover-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-swirl-clover-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-swirl-clover-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1266,10 +1266,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-caramel-swirl-clover-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-caramel-swirl-clover-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-caramel-swirl-clover-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-caramel-swirl-clover-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-caramel-swirl-clover-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-caramel-swirl-clover-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-caramel-swirl-clover-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-caramel-swirl-clover-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1295,10 +1295,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-rainbow-swirl-clover-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-rainbow-swirl-clover-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-rainbow-swirl-clover-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-rainbow-swirl-clover-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-rainbow-swirl-clover-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-rainbow-swirl-clover-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-rainbow-swirl-clover-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-rainbow-swirl-clover-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1325,10 +1325,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-vanilla-cream-flower-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-vanilla-cream-flower-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-vanilla-cream-flower-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-vanilla-cream-flower-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-vanilla-cream-flower-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-vanilla-cream-flower-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-vanilla-cream-flower-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-vanilla-cream-flower-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1355,10 +1355,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-cream-flower-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-cream-flower-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-cream-flower-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-cream-flower-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-cream-flower-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-cream-flower-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-cream-flower-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-cream-flower-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1385,10 +1385,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-matcha-cream-flower-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-matcha-cream-flower-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-matcha-cream-flower-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-matcha-cream-flower-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-matcha-cream-flower-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-matcha-cream-flower-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-matcha-cream-flower-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-matcha-cream-flower-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1415,10 +1415,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-mint-cream-flower-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-mint-cream-flower-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-mint-cream-flower-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-mint-cream-flower-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-mint-cream-flower-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-mint-cream-flower-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-mint-cream-flower-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-mint-cream-flower-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1445,10 +1445,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-lemon-cream-flower-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-lemon-cream-flower-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-lemon-cream-flower-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-lemon-cream-flower-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-lemon-cream-flower-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-lemon-cream-flower-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-lemon-cream-flower-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-lemon-cream-flower-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1475,10 +1475,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-salted-cream-flower-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-salted-cream-flower-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-salted-cream-flower-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-salted-cream-flower-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-salted-cream-flower-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-salted-cream-flower-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-salted-cream-flower-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-salted-cream-flower-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1505,10 +1505,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-swirl-flower-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-swirl-flower-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-swirl-flower-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-swirl-flower-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-swirl-flower-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-swirl-flower-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-swirl-flower-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-swirl-flower-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1535,10 +1535,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-caramel-swirl-flower-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-caramel-swirl-flower-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-caramel-swirl-flower-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-caramel-swirl-flower-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-caramel-swirl-flower-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-caramel-swirl-flower-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-caramel-swirl-flower-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-caramel-swirl-flower-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1565,10 +1565,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-rainbow-swirl-flower-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-rainbow-swirl-flower-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-rainbow-swirl-flower-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-rainbow-swirl-flower-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-rainbow-swirl-flower-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-rainbow-swirl-flower-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-rainbow-swirl-flower-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-rainbow-swirl-flower-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1595,10 +1595,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-vanilla-cream-ribbon-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-vanilla-cream-ribbon-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-vanilla-cream-ribbon-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-vanilla-cream-ribbon-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-vanilla-cream-ribbon-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-vanilla-cream-ribbon-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-vanilla-cream-ribbon-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-vanilla-cream-ribbon-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1625,10 +1625,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-cream-ribbon-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-cream-ribbon-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-cream-ribbon-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-cream-ribbon-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-cream-ribbon-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-cream-ribbon-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-cream-ribbon-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-cream-ribbon-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1654,10 +1654,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-matcha-cream-ribbon-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-matcha-cream-ribbon-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-matcha-cream-ribbon-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-matcha-cream-ribbon-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-matcha-cream-ribbon-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-matcha-cream-ribbon-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-matcha-cream-ribbon-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-matcha-cream-ribbon-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1684,10 +1684,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-mint-cream-ribbon-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-mint-cream-ribbon-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-mint-cream-ribbon-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-mint-cream-ribbon-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-mint-cream-ribbon-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-mint-cream-ribbon-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-mint-cream-ribbon-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-mint-cream-ribbon-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1714,10 +1714,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-lemon-cream-ribbon-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-lemon-cream-ribbon-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-lemon-cream-ribbon-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-lemon-cream-ribbon-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-lemon-cream-ribbon-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-lemon-cream-ribbon-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-lemon-cream-ribbon-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-lemon-cream-ribbon-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1744,10 +1744,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-salted-cream-ribbon-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-salted-cream-ribbon-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-salted-cream-ribbon-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-salted-cream-ribbon-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-salted-cream-ribbon-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-salted-cream-ribbon-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-salted-cream-ribbon-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-salted-cream-ribbon-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1774,10 +1774,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-ruby-swirl-ribbon-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-ruby-swirl-ribbon-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-ruby-swirl-ribbon-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-ruby-swirl-ribbon-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-ruby-swirl-ribbon-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-ruby-swirl-ribbon-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-ruby-swirl-ribbon-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-ruby-swirl-ribbon-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1804,10 +1804,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-caramel-swirl-ribbon-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-caramel-swirl-ribbon-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-caramel-swirl-ribbon-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-caramel-swirl-ribbon-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-caramel-swirl-ribbon-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-caramel-swirl-ribbon-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-caramel-swirl-ribbon-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-caramel-swirl-ribbon-sweet.png"
     },
     "gen": 8,
     "evolution": {
@@ -1834,10 +1834,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/869-rainbow-swirl-ribbon-sweet.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/869-rainbow-swirl-ribbon-sweet.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/869-rainbow-swirl-ribbon-sweet.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/869-rainbow-swirl-ribbon-sweet.png"
+      "front_default": "/Sprites/trimmed/pokemon/869-rainbow-swirl-ribbon-sweet.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/869-rainbow-swirl-ribbon-sweet.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/869-rainbow-swirl-ribbon-sweet.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/869-rainbow-swirl-ribbon-sweet.png"
     },
     "gen": 8,
     "evolution": {

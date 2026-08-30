@@ -382,3 +382,18 @@ html, body {
     padding: 12px 16px 14px 16px;
   }
 }
+
+/* ==========================================================================
+   LIGHT THEME MODAL STYLES
+   ========================================================================== */
+[data-theme="light"] .udt-modal-panel {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .udt-modal-header {
+  background: #ffffff;
+}
+
+[data-theme="light"] .udt-modal-footer {
+  background: #f8fafc;
+}

@@ -3,6 +3,7 @@ import { Check, Trash2, Sparkles, Gamepad2, User, Trophy, Search, X } from "luci
 import { Modal } from "./Modal";
 import { Button } from "./Button";
 import SearchField from "./FormField/SearchField";
+import { PokeballIcon } from "./SearchBar";
 import "../../css/FavoriteSelectionModal.css";
 
 const POKEMON_FORM_CATEGORIES = [
@@ -235,8 +236,9 @@ export default function FavoriteSelectionModal({
         if (isPokemonModal) return <Sparkles size={22} />;
         if (isGameModal) return <Gamepad2 size={22} />;
         if (isTrainerModal) return <User size={22} />;
+        if (isBallModal) return <PokeballIcon size={22} />;
         return <Trophy size={22} />;
-    }, [isPokemonModal, isGameModal, isTrainerModal]);
+    }, [isPokemonModal, isGameModal, isTrainerModal, isBallModal]);
 
     const chosenCount = useMemo(() => {
         return tempSelection.filter(Boolean).length;

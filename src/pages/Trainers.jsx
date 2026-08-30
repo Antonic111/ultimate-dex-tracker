@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import "flag-icons/css/flag-icons.min.css";
 import "../css/Trainers.css";
+import PremiumIcon from "../components/Shared/PremiumIcon";
+import { AdminIcon, ContentCreatorIcon } from "../components/Shared/BadgeIcons";
 import { COUNTRY_OPTIONS } from "../data/countries";
 import { getUserAvatarUrl } from "../utils/profileUtils";
 import {
@@ -750,7 +752,15 @@ export default function Trainers() {
                       />
                       <div className="trainer-meta">
                         <div className="trainer-name">
-                          {u.username}
+                          {u.nameColor1 && u.nameColor2 ? (
+                            <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": u.nameColor1, "--grad-c2": u.nameColor2 }}>
+                              <span className="animated-gradient-username">
+                                {u.username}
+                              </span>
+                            </span>
+                          ) : (
+                            u.username
+                          )}
                         </div>
                         <div className="trainer-sub trainer-sub-icons">
                           {(() => {
@@ -758,29 +768,41 @@ export default function Trainers() {
                             const flag = code ? <span className={`fi fi-${code}`} /> : null;
                             const g = genderIcon(u.gender);
                             const hasMeta = flag || g;
-                            const hasBadge = u.isAdmin || u.isContentCreator;
+                            const hasBadge = u.isPremium || u.isAdmin || u.isContentCreator;
                             return (
                               <>
                                 {flag}
                                 {flag && g ? <span className="dot-sep" /> : null}
                                 {g}
                                 {hasMeta && hasBadge ? <span className="dot-sep" /> : null}
+                                {u.isPremium && (
+                                  <span className="crown-wrapper">
+                                    <PremiumIcon
+                                      size={14}
+                                      color="#f59e0b"
+                                      style={{ flexShrink: 0 }}
+                                    />
+                                    <span className="crown-tooltip">
+                                      {u.premiumMonths === 1 ? '1 month membership' : `${u.premiumMonths || 1} months membership`}
+                                    </span>
+                                  </span>
+                                )}
                                 {u.isAdmin && (
                                   <span className="crown-wrapper">
-                                    <Crown
+                                    <AdminIcon
                                       size={14}
-                                      strokeWidth={2.5}
-                                      style={{ color: "#fbbf24", flexShrink: 0 }}
+                                      color="#38bdf8"
+                                      style={{ flexShrink: 0 }}
                                     />
                                     <span className="crown-tooltip">Admin</span>
                                   </span>
                                 )}
                                 {u.isContentCreator && (
                                   <span className="crown-wrapper">
-                                    <Video
+                                    <ContentCreatorIcon
                                       size={14}
-                                      strokeWidth={2.5}
-                                      style={{ color: "#fbbf24", flexShrink: 0 }}
+                                      color="#ef4444"
+                                      style={{ flexShrink: 0 }}
                                     />
                                     <span className="crown-tooltip">Content Creator</span>
                                   </span>

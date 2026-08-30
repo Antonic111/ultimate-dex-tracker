@@ -56,6 +56,13 @@ const Bingo = lazy(() => import("./pages/Bingo"));
 const Admin = lazy(() => import("./pages/Admin"));
 const HuntPopout = lazy(() => import("./pages/HuntPopout"));
 const MMOTool = lazy(() => import("./pages/MMOTool"));
+const StreamerTools = lazy(() => import("./pages/StreamerTools"));
+const OverlayEditor = lazy(() => import("./pages/OverlayEditor"));
+const OBSOverlayPage = lazy(() => import("./pages/OBSOverlayPage"));
+const Membership = lazy(() => import("./pages/Membership"));
+const MembershipCheckout = lazy(() => import("./pages/MembershipCheckout"));
+const Shop = lazy(() => import("./pages/Shop"));
+import { EntitlementProvider } from "./components/Shared/EntitlementContext";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./config/queryClient";
 import { LoadingProvider, useLoading } from "./components/Shared/LoadingContext";
@@ -197,35 +204,53 @@ const LocationListener = ({ onNavigateToHome }) => {
   return null; // This component doesn't render anything
 };
 
-// Wrapper components to hide header/footer/extras on popout window and admin panel
+// Wrapper components to hide header/footer/extras on popout window, standalone editor, and overlay
+const isStandaloneRoute = (pathname) => {
+  return (
+    pathname.startsWith('/hunt-popout') ||
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/overlay/hunt') ||
+    pathname.startsWith('/streamer-tools/overlay')
+  );
+};
+
 const HeaderWrapper = (props) => {
   const location = useLocation();
-  if (location.pathname.startsWith('/hunt-popout') || location.pathname.startsWith('/admin')) return null;
+  if (isStandaloneRoute(location.pathname)) return null;
   return <HeaderWithConditionalAuth {...props} />;
 };
 
 const FooterWrapper = ({ user }) => {
   const location = useLocation();
-  if (location.pathname.startsWith('/hunt-popout') || location.pathname.startsWith('/admin')) return null;
+  if (isStandaloneRoute(location.pathname)) return null;
   if (location.pathname === '/' && !user?.username) return null;
   return <Footer />;
 };
 
 const SidebarWrapper = () => {
   const location = useLocation();
-  if (location.pathname.startsWith('/hunt-popout') || location.pathname.startsWith('/admin')) return null;
+  if (isStandaloneRoute(location.pathname)) return null;
   return <RecentCatchesSidebar />;
 };
 
 const ScrollbarWrapper = () => {
   const location = useLocation();
-  if (location.pathname.startsWith('/hunt-popout')) return null;
+  if (
+    location.pathname.startsWith('/hunt-popout') ||
+    location.pathname.startsWith('/overlay/hunt') ||
+    location.pathname.startsWith('/streamer-tools/overlay')
+  ) return null;
   return <CustomScrollbar />;
 };
 
 const OnboardingWrapper = ({ user, onTutorialActiveChange }) => {
   const location = useLocation();
-  if (location.pathname.startsWith('/hunt-popout') || !user?.username) return null;
+  if (
+    location.pathname.startsWith('/hunt-popout') ||
+    location.pathname.startsWith('/overlay/hunt') ||
+    location.pathname.startsWith('/streamer-tools/overlay') ||
+    !user?.username
+  ) return null;
   return <OnboardingManager onTutorialActiveChange={onTutorialActiveChange} />;
 };
 
@@ -461,6 +486,8 @@ export default function App() {
     email: null,
     createdAt: null,
     profileTrainer: null,
+    nameColor1: null,
+    nameColor2: null,
     avatar: null,
     verified: false,
     progressBars: [],
@@ -2297,7 +2324,8 @@ export default function App() {
       <ThemeProvider>
         <LoadingProvider>
           <UserContext.Provider value={{ ...user, user, setUser: handleUserUpdate, loading }}>
-            <MessageProvider>
+            <EntitlementProvider>
+              <MessageProvider>
               <Router>
                 <div className="flex flex-col min-h-screen">
                   <BackgroundFetchIndicator />
@@ -2790,6 +2818,36 @@ export default function App() {
                         }
                       />
                       <Route
+                        path="/membership"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <Membership />
+                            </PageTransition>
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/membership/checkout"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <MembershipCheckout />
+                            </PageTransition>
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/shop"
+                        element={
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <Shop />
+                            </PageTransition>
+                          </Suspense>
+                        }
+                      />
+                      <Route
                         path="/mmo-tool"
                         element={
                           <RequireAuth loading={loading} authReady={authReady} user={user}>
@@ -2892,6 +2950,41 @@ export default function App() {
                         }
                       />
 
+                      <Route
+                        path="/streamer-tools"
+                        element={
+                          <RequireAuth loading={loading} authReady={authReady} user={user}>
+                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                              <PageTransition>
+                                <StreamerTools />
+                              </PageTransition>
+                            </Suspense>
+                          </RequireAuth>
+                        }
+                      />
+
+                      {/* Fullscreen Dedicated Overlay Workspace - no auth wrapper blockage if already logged in */}
+                      <Route
+                        path="/streamer-tools/overlay"
+                        element={
+                          <RequireAuth loading={loading} authReady={authReady} user={user}>
+                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                              <OverlayEditor />
+                            </Suspense>
+                          </RequireAuth>
+                        }
+                      />
+
+                      {/* Public OBS Browser Source overlay route - completely standalone, no auth wrapper */}
+                      <Route
+                        path="/overlay/hunt/:token"
+                        element={
+                          <Suspense fallback={null}>
+                            <OBSOverlayPage />
+                          </Suspense>
+                        }
+                      />
+
                       {/* Hunt popout - standalone window, no auth wrapper */}
                       <Route
                         path="/hunt-popout"
@@ -2962,7 +3055,8 @@ export default function App() {
               />
               <AppThemeSync username={user?.username} />
             </MessageProvider>
-          </UserContext.Provider>
+          </EntitlementProvider>
+        </UserContext.Provider>
         </LoadingProvider>
       </ThemeProvider>
     </QueryClientProvider>

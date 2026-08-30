@@ -244,28 +244,32 @@
 }
 
 .filter-option:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--dropdown-hover, rgba(255, 255, 255, 0.05));
 }
 
 .filter-option.active {
-  @apply bg-[var(--accent)] text-black font-semibold;
+  color: var(--accent);
+  font-weight: 600;
 }
 
 /* Changelog Entries */
 .changelog-entries {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .changelog-entry {
-  border-left: 8px solid var(--accent);
-  padding-left: 1.5rem;
-  position: relative;
-  background: var(--pokemon-box-bg2);
+  background: var(--pokemon-box-bg);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 1.5rem;
-  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+}
+
+.changelog-entry:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .changelog-header {
@@ -305,11 +309,11 @@
 
 .changelog-version {
   background: var(--accent);
-  color: var(--main-bg);
+  color: #000000;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .changelog-date {

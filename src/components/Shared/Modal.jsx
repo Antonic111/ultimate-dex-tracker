@@ -57,18 +57,10 @@ export function Modal({
   const isClosingRef = useRef(false);
 
   const handleClose = (callback) => {
-    if (isClosingRef.current) return;
-    isClosingRef.current = true;
-    setClosing(true);
-    setTimeout(() => {
-      if (typeof callback === "function") {
-        callback();
-      }
-      onClose?.();
-      setClosing(false);
-      setMounted(false);
-      isClosingRef.current = false;
-    }, 180);
+    if (typeof callback === "function") {
+      callback();
+    }
+    onClose?.();
   };
 
   // Preserve the last non-empty content while closing so content never abruptly disappears

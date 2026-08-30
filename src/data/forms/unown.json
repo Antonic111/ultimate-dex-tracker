@@ -8,10 +8,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-b.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-b.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-b.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-b.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-b.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-b.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-b.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-b.png"
     },
     "gen": 2,
     "evolution": {
@@ -40,10 +40,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-c.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-c.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-c.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-c.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-c.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-c.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-c.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-c.png"
     },
     "gen": 2,
     "evolution": {
@@ -72,10 +72,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-d.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-d.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-d.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-d.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-d.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-d.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-d.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-d.png"
     },
     "gen": 2,
     "evolution": {
@@ -104,10 +104,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-e.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-e.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-e.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-e.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-e.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-e.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-e.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-e.png"
     },
     "gen": 2,
     "evolution": {
@@ -136,10 +136,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-f.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-f.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-f.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-f.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-f.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-f.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-f.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-f.png"
     },
     "gen": 2,
     "evolution": {
@@ -168,10 +168,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-g.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-g.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-g.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-g.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-g.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-g.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-g.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-g.png"
     },
     "gen": 2,
     "evolution": {
@@ -200,10 +200,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-h.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-h.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-h.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-h.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-h.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-h.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-h.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-h.png"
     },
     "gen": 2,
     "evolution": {
@@ -232,10 +232,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-i.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-i.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-i.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-i.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-i.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-i.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-i.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-i.png"
     },
     "gen": 2,
     "evolution": {
@@ -264,10 +264,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-j.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-j.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-j.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-j.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-j.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-j.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-j.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-j.png"
     },
     "gen": 2,
     "evolution": {
@@ -296,10 +296,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-k.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-k.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-k.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-k.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-k.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-k.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-k.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-k.png"
     },
     "gen": 2,
     "evolution": {
@@ -328,10 +328,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-l.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-l.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-l.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-l.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-l.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-l.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-l.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-l.png"
     },
     "gen": 2,
     "evolution": {
@@ -360,10 +360,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-m.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-m.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-m.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-m.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-m.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-m.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-m.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-m.png"
     },
     "gen": 2,
     "evolution": {
@@ -392,10 +392,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-n.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-n.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-n.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-n.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-n.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-n.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-n.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-n.png"
     },
     "gen": 2,
     "evolution": {
@@ -424,10 +424,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-o.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-o.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-o.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-o.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-o.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-o.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-o.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-o.png"
     },
     "gen": 2,
     "evolution": {
@@ -456,10 +456,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-p.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-p.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-p.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-p.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-p.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-p.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-p.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-p.png"
     },
     "gen": 2,
     "evolution": {
@@ -488,10 +488,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-q.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-q.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-q.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-q.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-q.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-q.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-q.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-q.png"
     },
     "gen": 2,
     "evolution": {
@@ -520,10 +520,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-r.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-r.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-r.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-r.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-r.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-r.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-r.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-r.png"
     },
     "gen": 2,
     "evolution": {
@@ -552,10 +552,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-s.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-s.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-s.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-s.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-s.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-s.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-s.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-s.png"
     },
     "gen": 2,
     "evolution": {
@@ -584,10 +584,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-t.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-t.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-t.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-t.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-t.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-t.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-t.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-t.png"
     },
     "gen": 2,
     "evolution": {
@@ -616,10 +616,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-u.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-u.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-u.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-u.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-u.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-u.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-u.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-u.png"
     },
     "gen": 2,
     "evolution": {
@@ -648,10 +648,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-v.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-v.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-v.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-v.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-v.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-v.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-v.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-v.png"
     },
     "gen": 2,
     "evolution": {
@@ -680,10 +680,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-w.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-w.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-w.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-w.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-w.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-w.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-w.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-w.png"
     },
     "gen": 2,
     "evolution": {
@@ -712,10 +712,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-x.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-x.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-x.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-x.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-x.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-x.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-x.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-x.png"
     },
     "gen": 2,
     "evolution": {
@@ -744,10 +744,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-y.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-y.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-y.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-y.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-y.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-y.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-y.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-y.png"
     },
     "gen": 2,
     "evolution": {
@@ -776,10 +776,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-z.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-z.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-z.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-z.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-z.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-z.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-z.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-z.png"
     },
     "gen": 2,
     "evolution": {
@@ -808,10 +808,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-exclamation.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-exclamation.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-exclamation.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-exclamation.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-exclamation.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-exclamation.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-exclamation.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-exclamation.png"
     },
     "gen": 2,
     "evolution": {
@@ -840,10 +840,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-question.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-question.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-question.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-question.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-question.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-question.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-question.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-question.png"
     },
     "gen": 2,
     "evolution": {
@@ -872,10 +872,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-b.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-b.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-b.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-b.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-b.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-b.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-b.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-b.png"
     },
     "gen": 2,
     "evolution": {
@@ -904,10 +904,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-c.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-c.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-c.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-c.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-c.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-c.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-c.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-c.png"
     },
     "gen": 2,
     "evolution": {
@@ -936,10 +936,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-d.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-d.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-d.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-d.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-d.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-d.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-d.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-d.png"
     },
     "gen": 2,
     "evolution": {
@@ -968,10 +968,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-e.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-e.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-e.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-e.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-e.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-e.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-e.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-e.png"
     },
     "gen": 2,
     "evolution": {
@@ -1000,10 +1000,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-f.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-f.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-f.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-f.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-f.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-f.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-f.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-f.png"
     },
     "gen": 2,
     "evolution": {
@@ -1032,10 +1032,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-g.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-g.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-g.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-g.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-g.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-g.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-g.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-g.png"
     },
     "gen": 2,
     "evolution": {
@@ -1064,10 +1064,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-h.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-h.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-h.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-h.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-h.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-h.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-h.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-h.png"
     },
     "gen": 2,
     "evolution": {
@@ -1096,10 +1096,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-i.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-i.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-i.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-i.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-i.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-i.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-i.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-i.png"
     },
     "gen": 2,
     "evolution": {
@@ -1128,10 +1128,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-j.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-j.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-j.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-j.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-j.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-j.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-j.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-j.png"
     },
     "gen": 2,
     "evolution": {
@@ -1160,10 +1160,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-k.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-k.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-k.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-k.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-k.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-k.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-k.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-k.png"
     },
     "gen": 2,
     "evolution": {
@@ -1192,10 +1192,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-l.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-l.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-l.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-l.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-l.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-l.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-l.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-l.png"
     },
     "gen": 2,
     "evolution": {
@@ -1224,10 +1224,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-m.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-m.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-m.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-m.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-m.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-m.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-m.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-m.png"
     },
     "gen": 2,
     "evolution": {
@@ -1256,10 +1256,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-n.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-n.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-n.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-n.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-n.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-n.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-n.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-n.png"
     },
     "gen": 2,
     "evolution": {
@@ -1288,10 +1288,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-o.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-o.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-o.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-o.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-o.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-o.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-o.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-o.png"
     },
     "gen": 2,
     "evolution": {
@@ -1320,10 +1320,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-p.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-p.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-p.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-p.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-p.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-p.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-p.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-p.png"
     },
     "gen": 2,
     "evolution": {
@@ -1352,10 +1352,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-q.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-q.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-q.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-q.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-q.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-q.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-q.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-q.png"
     },
     "gen": 2,
     "evolution": {
@@ -1384,10 +1384,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-r.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-r.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-r.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-r.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-r.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-r.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-r.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-r.png"
     },
     "gen": 2,
     "evolution": {
@@ -1416,10 +1416,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-s.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-s.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-s.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-s.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-s.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-s.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-s.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-s.png"
     },
     "gen": 2,
     "evolution": {
@@ -1448,10 +1448,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-t.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-t.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-t.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-t.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-t.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-t.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-t.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-t.png"
     },
     "gen": 2,
     "evolution": {
@@ -1480,10 +1480,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-u.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-u.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-u.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-u.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-u.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-u.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-u.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-u.png"
     },
     "gen": 2,
     "evolution": {
@@ -1512,10 +1512,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-v.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-v.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-v.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-v.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-v.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-v.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-v.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-v.png"
     },
     "gen": 2,
     "evolution": {
@@ -1544,10 +1544,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-w.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-w.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-w.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-w.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-w.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-w.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-w.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-w.png"
     },
     "gen": 2,
     "evolution": {
@@ -1576,10 +1576,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-x.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-x.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-x.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-x.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-x.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-x.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-x.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-x.png"
     },
     "gen": 2,
     "evolution": {
@@ -1608,10 +1608,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-y.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-y.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-y.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-y.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-y.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-y.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-y.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-y.png"
     },
     "gen": 2,
     "evolution": {
@@ -1640,10 +1640,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-z.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-z.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-z.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-z.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-z.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-z.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-z.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-z.png"
     },
     "gen": 2,
     "evolution": {
@@ -1672,10 +1672,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-exclamation.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-exclamation.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-exclamation.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-exclamation.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-exclamation.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-exclamation.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-exclamation.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-exclamation.png"
     },
     "gen": 2,
     "evolution": {
@@ -1704,10 +1704,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/201-question.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/201-question.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/201-question.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/201-question.png"
+      "front_default": "/Sprites/trimmed/pokemon/201-question.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/201-question.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/201-question.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/201-question.png"
     },
     "gen": 2,
     "evolution": {

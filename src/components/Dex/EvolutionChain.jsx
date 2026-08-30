@@ -101,6 +101,7 @@ function EvoSprite({ mon, size = 44, showShiny = false, onPokemonSelect = null, 
         className="evo-img"
         width={size}
         height={size}
+        loading="lazy"
       />
       {isSelected && (
         <div className="evo-sprite-selection-indicator">

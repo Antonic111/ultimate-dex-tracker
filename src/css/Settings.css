@@ -1058,3 +1058,11 @@
     justify-content: center !important;
   }
 }
+
+/* ==========================================================================
+   LIGHT MODE SETTINGS STYLING
+   ========================================================================== */
+[data-theme="light"] .settings-sidebar,
+[data-theme="light"] .settings-card {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}

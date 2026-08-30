@@ -310,3 +310,28 @@
     animation-duration: 1.5s;
   }
 }
+
+/* ==========================================================================
+   LIGHT MODE BUTTON STYLING
+   ========================================================================== */
+[data-theme="light"] .udt-btn--secondary {
+  background-color: #f1f5f9;
+  color: var(--text, #0f172a);
+  border-color: var(--border-color, #e2e8f0);
+}
+
+[data-theme="light"] .udt-btn--secondary:hover:not(:disabled) {
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
+  color: var(--text, #0f172a);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .udt-btn--ghost {
+  color: var(--text-muted, #475569);
+}
+
+[data-theme="light"] .udt-btn--ghost:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--text, #0f172a);
+}

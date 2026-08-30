@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, User, Settings, Users, Database, Tally5, FileText, Shield, ShieldUser, Crown, Menu, X, Grid3x3, MessageCircleWarning, ListChecks, Heart, ChevronDown, ChevronRight, Sparkles } from "lucide-react";
+import { LogOut, User, Settings, Users, Database, Tally5, FileText, Shield, ShieldUser, Crown, Menu, X, Grid3x3, MessageCircleWarning, ListChecks, Heart, ChevronDown, ChevronRight, Sparkles, Tv, ShoppingBag, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { authAPI } from './utils/api';
 import { useTheme } from "./components/Shared/ThemeContext";
@@ -8,11 +8,157 @@ import changelogData from "./data/changelog.json";
 import NotificationDropdown from "./components/Notifications/NotificationDropdown";
 import { getUserAvatarUrl } from "./utils/profileUtils";
 
+const NAV_DROPDOWNS = [
+  {
+    id: "tracking",
+    label: "Tracking",
+    requiresAuth: true,
+    items: [
+      {
+        to: "/counters",
+        label: "Counters",
+        description: "Shiny encounter tracker",
+        icon: Tally5,
+        iconRotate: "-1deg",
+        color: "text-amber-400",
+        bgColor: "bg-amber-500/10",
+        borderColor: "border-amber-500/20",
+        tutorialId: "nav-counters",
+      },
+      {
+        to: "/mmo-tool",
+        label: "MMO Tool",
+        description: "Massive mass outbreak tracker",
+        icon: ListChecks,
+        color: "text-emerald-400",
+        bgColor: "bg-emerald-500/10",
+        borderColor: "border-emerald-500/20",
+        tutorialId: "nav-mmo",
+      },
+      {
+        to: "/bingo",
+        label: "Bingo",
+        description: "Interactive shiny bingo cards",
+        icon: Grid3x3,
+        color: "text-cyan-400",
+        bgColor: "bg-cyan-500/10",
+        borderColor: "border-cyan-500/20",
+        tutorialId: "nav-bingo",
+      },
+    ],
+  },
+  {
+    id: "community",
+    label: "Community",
+    requiresAuth: false,
+    items: [
+      {
+        to: "/trainers",
+        label: "Trainers",
+        description: "Discover and follow trainers",
+        icon: Users,
+        color: "text-blue-400",
+        bgColor: "bg-blue-500/10",
+        borderColor: "border-blue-500/20",
+        tutorialId: "nav-trainers",
+      },
+      {
+        to: "/leaderboard",
+        label: "Leaderboards",
+        description: "Global shiny rankings & stats",
+        icon: Crown,
+        color: "text-yellow-400",
+        bgColor: "bg-yellow-500/10",
+        borderColor: "border-yellow-500/20",
+      },
+    ],
+  },
+  {
+    id: "tools",
+    label: "Tools",
+    requiresAuth: true,
+    items: [
+      {
+        to: "/streamer-tools",
+        label: "Streamer Tools",
+        description: "OBS hunt overlay",
+        icon: Tv,
+        color: "text-purple-400",
+        bgColor: "bg-purple-500/10",
+        borderColor: "border-purple-500/20",
+      },
+      {
+        to: "/backup",
+        label: "Backup",
+        description: "Export or restore your dex data",
+        icon: Database,
+        color: "text-indigo-400",
+        bgColor: "bg-indigo-500/10",
+        borderColor: "border-indigo-500/20",
+      },
+    ],
+  },
+  {
+    id: "shop",
+    label: "Store",
+    requiresAuth: false,
+    items: [
+      {
+        to: "/shop",
+        label: "Store",
+        description: "Trainer cosmetics & badges",
+        icon: ShoppingBag,
+        color: "text-pink-400",
+        bgColor: "bg-pink-500/10",
+        borderColor: "border-pink-500/20",
+      },
+      {
+        to: "/membership",
+        label: "Membership",
+        description: "Unlock supporter perks & badge",
+        icon: Sparkles,
+        color: "text-amber-400",
+        bgColor: "bg-amber-500/10",
+        borderColor: "border-amber-500/20",
+      },
+    ],
+  },
+  {
+    id: "about",
+    label: "About",
+    requiresAuth: false,
+    items: [
+      {
+        to: "/changelog",
+        label: "Changelog",
+        description: "Patch notes & feature updates",
+        icon: FileText,
+        color: "text-sky-400",
+        bgColor: "bg-sky-500/10",
+        borderColor: "border-sky-500/20",
+        hasBadge: true,
+      },
+      {
+        to: "/feedback",
+        label: "Feedback",
+        description: "Report bugs & suggest features",
+        icon: MessageCircleWarning,
+        color: "text-rose-400",
+        bgColor: "bg-rose-500/10",
+        borderColor: "border-rose-500/20",
+      },
+    ],
+  },
+];
+
 export default function HeaderWithConditionalAuth({ user, setUser, showMenu, setShowMenu, userMenuRef }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [hasNewUpdate, setHasNewUpdate] = useState(false);
+  const [activeNavDropdown, setActiveNavDropdown] = useState(null);
+  const navContainerRef = useRef(null);
+  const navTimerRef = useRef(null);
 
   // 1/8192 Shiny Logo Easter Egg (persists for 1 hour once triggered)
   const [isRainbowLogo, setIsRainbowLogo] = useState(() => {
@@ -67,15 +213,19 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
     }
   }, [location.pathname]);
 
-  // Close the menu after login/logout or on any navigation
-  useEffect(() => { setShowMenu(false); }, [user?.username, location.pathname]);
+  // Close menus on navigation
+  useEffect(() => {
+    setShowMenu(false);
+    setShowMobileNav(false);
+    setActiveNavDropdown(null);
+  }, [user?.username, location.pathname]);
 
-  // Automatically open the profile menu when tutorial targets it
+  // Automatically open the target menu when tutorial targets it
   useEffect(() => {
     const handleTutorialStep = (e) => {
       const targetId = e.detail?.targetId;
       
-      const isMobileNavTarget = ['nav-trainers', 'nav-counters', 'nav-mmo', 'nav-bingo'].includes(targetId);
+      const isMobileNavTarget = ['nav-trainers', 'nav-counters', 'nav-mmo', 'nav-bingo', 'nav-leaderboard'].includes(targetId);
       const isProfileNavTarget = ['nav-settings', 'nav-profile'].includes(targetId);
 
       if (isProfileNavTarget) {
@@ -84,35 +234,42 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
         setShowMenu(false);
       }
       
-      if (isMobileNavTarget) {
+      if (['nav-counters', 'nav-mmo', 'nav-bingo'].includes(targetId)) {
+        if (window.innerWidth >= 1280) {
+          setActiveNavDropdown('tracking');
+        } else {
+          setShowMobileNav(true);
+        }
+      } else if (['nav-trainers', 'nav-leaderboard'].includes(targetId)) {
+        if (window.innerWidth >= 1280) {
+          setActiveNavDropdown('community');
+        } else {
+          setShowMobileNav(true);
+        }
+      } else if (isMobileNavTarget) {
         if (window.innerWidth < 1280) {
           setShowMobileNav(true);
         }
       } else {
         setShowMobileNav(false);
+        setActiveNavDropdown(null);
       }
     };
     window.addEventListener('tutorialStepChange', handleTutorialStep);
     return () => window.removeEventListener('tutorialStepChange', handleTutorialStep);
   }, []);
 
-  // Close mobile nav on navigation
-  useEffect(() => { setShowMobileNav(false); }, [location.pathname]);
-
   // Prevent body scroll when mobile nav is open
   useEffect(() => {
     if (showMobileNav) {
       document.body.style.overflow = 'hidden';
 
-      // Close dropdown on scroll events
       const handleScroll = (event) => {
-        // Only close if it's a wheel event or touch scroll, not programmatic
         if (event.type === 'wheel' || event.type === 'touchmove') {
           setShowMobileNav(false);
         }
       };
 
-      // Use capture phase to catch scroll events before they're handled
       document.addEventListener('wheel', handleScroll, { passive: true, capture: true });
       document.addEventListener('touchmove', handleScroll, { passive: true, capture: true });
 
@@ -125,7 +282,6 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
       document.body.style.overflow = 'unset';
     }
 
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -134,15 +290,12 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
   // Prevent body scroll when profile menu is open
   useEffect(() => {
     if (showMenu) {
-      // Close dropdown on scroll events
       const handleScroll = (event) => {
-        // Only close if it's a wheel event or touch scroll, not programmatic
         if (event.type === 'wheel' || event.type === 'touchmove') {
           setShowMenu(false);
         }
       };
 
-      // Use capture phase to catch scroll events before they're handled
       document.addEventListener('wheel', handleScroll, { passive: true, capture: true });
       document.addEventListener('touchmove', handleScroll, { passive: true, capture: true });
 
@@ -152,39 +305,70 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
       };
     }
 
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [showMenu]);
 
-  // Handle clicking outside the dropdown to close it
+  // Handle clicking outside any dropdown to close it
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (!showMenu && !showMobileNav) return;
+      if (!showMenu && !showMobileNav && !activeNavDropdown) return;
       
-      // Let the tutorial strictly manage menu states while active
       if (document.body.classList.contains('tutorial-active')) return;
 
-      // Check if click is outside the user menu wrapper
       if (showMenu && userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setShowMenu(false);
       }
 
-      // Check if click is outside the mobile nav dropdown AND outside the toggle button
       if (showMobileNav && !event.target.closest('.mobile-nav-dropdown') && !event.target.closest('.mobile-nav-toggle-btn')) {
         setShowMobileNav(false);
       }
+
+      if (activeNavDropdown && navContainerRef.current && !navContainerRef.current.contains(event.target)) {
+        setActiveNavDropdown(null);
+      }
     };
 
-    if (showMenu || showMobileNav) {
+    if (showMenu || showMobileNav || activeNavDropdown) {
       document.addEventListener('mousedown', handleClickOutside);
 
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [showMenu, showMobileNav]);
+  }, [showMenu, showMobileNav, activeNavDropdown, userMenuRef]);
+
+  const handleNavMouseEnter = (id) => {
+    if (navTimerRef.current) {
+      clearTimeout(navTimerRef.current);
+      navTimerRef.current = null;
+    }
+    setActiveNavDropdown(id);
+  };
+
+  const handleNavMouseLeave = () => {
+    if (navTimerRef.current) {
+      clearTimeout(navTimerRef.current);
+    }
+    navTimerRef.current = setTimeout(() => {
+      setActiveNavDropdown(null);
+    }, 150);
+  };
+
+  const handleNavClick = (id) => {
+    if (navTimerRef.current) {
+      clearTimeout(navTimerRef.current);
+      navTimerRef.current = null;
+    }
+    setActiveNavDropdown((prev) => (prev === id ? null : id));
+  };
+
+  const isDropdownActive = (dropdown) => {
+    return dropdown.items.some(
+      (item) => location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to + '/'))
+    );
+  };
 
   const { theme, resolvedTheme, accent } = useTheme(); // has "dark"/"light" + your accent color
 
@@ -205,7 +389,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
   const isAuthPage = ['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password', '/complete-signup'].includes(location.pathname);
 
   return (
-    <header className={`relative z-[100] bg-[var(--header)] transition-[background-color] duration-[var(--transition-speed)] border-b-8 ${location.pathname === '/' ? 'sticky top-0' : ''}`} style={{ borderColor: 'var(--accent)' }}>
+    <header className="sticky top-0 z-[100] bg-[var(--header)] transition-[background-color] duration-[var(--transition-speed)] border-b-8" style={{ borderColor: 'var(--accent)' }}>
       <div className="w-full h-[80px] md:h-[130px] max-h-[80px] md:max-h-[130px] mx-auto flex items-center justify-between px-3 md:px-8 md:pr-6 relative">
 
         {/* Logo — far left */}
@@ -293,110 +477,120 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
           )}
         </div>
 
-        {/* Desktop Navigation — absolutely centered */}
+        {/* Desktop Navigation — absolutely centered with prominent options */}
         {!['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password', '/complete-signup'].includes(location.pathname) && !user?.needsProfileSetup && (
-          <nav className="hidden xl:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 pointer-events-none">
+          <nav ref={navContainerRef} className="hidden xl:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 pointer-events-none">
             <div className="flex items-center gap-1 pointer-events-auto">
+              {NAV_DROPDOWNS.map((dropdown) => {
+                const isActive = isDropdownActive(dropdown);
+                const isOpen = activeNavDropdown === dropdown.id;
 
-              <Link
-                data-tutorial-id="nav-trainers"
-                to="/trainers"
-                className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/trainers'
-                  ? 'text-[var(--accent)]'
-                  : 'text-white/80 hover:text-[var(--accent)] hover:opacity-100'
-                  }`}
-              >
-                <Users size={19} className="flex-shrink-0" />
-                <span>Trainers</span>
-                <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${location.pathname === '/trainers' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
-                  }`} style={{ transformOrigin: 'center' }} />
-              </Link>
+                return (
+                  <div
+                    key={dropdown.id}
+                    className="relative flex justify-center"
+                    onMouseEnter={() => handleNavMouseEnter(dropdown.id)}
+                    onMouseLeave={handleNavMouseLeave}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleNavClick(dropdown.id)}
+                      className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 cursor-pointer select-none bg-transparent border-0 outline-none ${
+                        isActive || isOpen
+                          ? 'text-[var(--accent)]'
+                          : 'text-[var(--text)]/80 hover:text-[var(--accent)]'
+                      }`}
+                      aria-expanded={isOpen}
+                      aria-label={`${dropdown.label} menu`}
+                    >
+                      <span>{dropdown.label}</span>
+                      <ChevronDown
+                        size={16}
+                        strokeWidth={2.5}
+                        className={`transition-transform duration-200 flex-shrink-0 ${
+                          isOpen ? 'rotate-180 text-[var(--accent)]' : 'text-[var(--text)]/60 group-hover:text-[var(--accent)]'
+                        }`}
+                      />
+                      <span
+                        className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${
+                          isActive
+                            ? 'opacity-100 scale-x-100'
+                            : isOpen
+                            ? 'opacity-60 scale-x-75'
+                            : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
+                        }`}
+                        style={{ transformOrigin: 'center' }}
+                      />
+                    </button>
 
-              {user?.username && (
-                <Link
-                  data-tutorial-id="nav-counters"
-                  to="/counters"
-                  className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/counters'
-                    ? 'text-[var(--accent)]'
-                    : 'text-white/80 hover:text-[var(--accent)] hover:opacity-100'
-                    }`}
-                >
-                  <Tally5 size={19} className="flex-shrink-0" style={{ transform: 'rotate(-1deg)' }} />
-                  <span>Counters</span>
-                  <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${location.pathname === '/counters' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
-                    }`} style={{ transformOrigin: 'center' }} />
-                </Link>
-              )}
+                    {/* Dropdown Menu Panel */}
+                    <AnimatePresence>
+                      {isOpen && (
+                        <motion.div
+                          key={`nav-dropdown-${dropdown.id}`}
+                          initial={{ opacity: 0, y: 6, x: "-50%", scale: 0.96 }}
+                          animate={{ opacity: 1, y: 0, x: "-50%", scale: 1 }}
+                          exit={{ opacity: 0, y: 4, x: "-50%", scale: 0.96 }}
+                          transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                          style={{ transformOrigin: "top center" }}
+                          className="absolute top-[calc(100%+6px)] left-1/2 w-[285px] bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-2xl p-2 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow),0_20px_45px_rgba(0,0,0,0.7)] z-50 backdrop-blur-[16px] overflow-hidden flex flex-col gap-1 pointer-events-auto"
+                          onMouseEnter={() => handleNavMouseEnter(dropdown.id)}
+                          onMouseLeave={handleNavMouseLeave}
+                        >
+                          {dropdown.items.map((item) => {
+                            const ItemIcon = item.icon;
+                            const isItemActive = location.pathname === item.to;
 
-              {user?.username && (
-                <Link
-                  data-tutorial-id="nav-mmo"
-                  to="/mmo-tool"
-                  className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/mmo-tool'
-                    ? 'text-[var(--accent)]'
-                    : 'text-white/80 hover:text-[var(--accent)] hover:opacity-100'
-                    }`}
-                >
-                  <ListChecks size={19} className="flex-shrink-0" />
-                  <span className="whitespace-nowrap">MMO Tool</span>
-                  <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${location.pathname === '/mmo-tool' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
-                    }`} style={{ transformOrigin: 'center' }} />
-                </Link>
-              )}
+                            return (
+                              <Link
+                                key={item.to}
+                                data-tutorial-id={item.tutorialId}
+                                to={item.to}
+                                onClick={() => setActiveNavDropdown(null)}
+                                className={`group/item flex items-center justify-between p-2.5 rounded-xl transition-all duration-150 text-left no-underline cursor-pointer ${
+                                  isItemActive
+                                    ? 'bg-[var(--accent)]/15 text-[var(--accent)]'
+                                    : 'hover:bg-black/5 dark:hover:bg-white/[0.08] text-[var(--text)]'
+                                }`}
+                              >
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div
+                                    className={`w-9 h-9 rounded-xl ${item.bgColor} border ${item.borderColor} flex items-center justify-center ${item.color} group-hover/item:scale-105 transition-transform flex-shrink-0`}
+                                  >
+                                    <ItemIcon size={17} style={item.iconRotate ? { transform: `rotate(${item.iconRotate})` } : undefined} />
+                                  </div>
+                                  <div className="flex flex-col min-w-0">
+                                    <div className="flex items-center gap-1.5">
+                                      <span className={`font-bold text-[14px] leading-snug group-hover/item:text-[var(--accent)] transition-colors whitespace-nowrap ${isItemActive ? 'text-[var(--accent)]' : 'text-[var(--text)]'}`}>
+                                        {item.label}
+                                      </span>
+                                      {item.hasBadge && hasNewUpdate && (
+                                        <span className="px-1.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider text-white bg-red-500 rounded-full leading-none shadow-sm">
+                                          New
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="text-[11px] text-[var(--text-muted)] font-normal truncate">
+                                      {item.description}
+                                    </span>
+                                  </div>
+                                </div>
 
-              {user?.username && (
-                <Link
-                  data-tutorial-id="nav-bingo"
-                  to="/bingo"
-                  className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/bingo'
-                    ? 'text-[var(--accent)]'
-                    : 'text-white/80 hover:text-[var(--accent)] hover:opacity-100'
-                    }`}
-                >
-                  <Grid3x3 size={19} className="flex-shrink-0" />
-                  <span className="whitespace-nowrap">Bingo</span>
-                  <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${location.pathname === '/bingo' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
-                    }`} style={{ transformOrigin: 'center' }} />
-                </Link>
-              )}
-
-              {user?.username && (
-                <Link
-                  to="/changelog"
-                  className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${location.pathname === '/changelog'
-                    ? 'text-[var(--accent)]'
-                    : 'text-white/80 hover:text-[var(--accent)] hover:opacity-100'
-                    }`}
-                >
-                  <FileText size={19} className="flex-shrink-0" />
-                  <span className="relative whitespace-nowrap">
-                    Changelog
-                    {hasNewUpdate && (
-                      <span className="absolute -top-2 -right-7 px-[5px] py-[3px] text-[0.7rem] font-bold uppercase tracking-wider text-white bg-red-500 rounded-full leading-none shadow-sm pointer-events-none">New</span>
-                    )}
-                  </span>
-                  <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${location.pathname === '/changelog' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
-                    }`} style={{ transformOrigin: 'center' }} />
-                </Link>
-              )}
-
-              {user?.username && (
-                <Link
-                  to="/feedback"
-                  className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 no-underline ${
-                    location.pathname === '/feedback'
-                      ? 'text-[var(--accent)]'
-                      : 'text-white/80 hover:text-[var(--accent)] hover:opacity-100'
-                  }`}
-                >
-                  <MessageCircleWarning size={19} className="flex-shrink-0" />
-                  <span className="whitespace-nowrap">Feedback</span>
-                  <span className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${
-                    location.pathname === '/feedback' ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
-                  }`} style={{ transformOrigin: 'center' }} />
-                </Link>
-              )}
-
+                                {/* Animated Arrow coming out smoothly from text on hover */}
+                                <div className="relative flex items-center justify-center w-5 h-5 flex-shrink-0 ml-1">
+                                  <div className="text-[var(--accent)] opacity-0 -translate-x-2.5 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200 ease-out flex items-center">
+                                    <ArrowRight size={15} strokeWidth={2.5} />
+                                  </div>
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
             </div>
           </nav>
         )}
@@ -410,86 +604,59 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.96 }}
               transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-              className="mobile-nav-dropdown xl:hidden fixed top-[92px] left-3 right-3 bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-2xl py-2 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow),0_20px_40px_rgba(0,0,0,0.6)] z-50 backdrop-blur-[16px] overflow-hidden"
+              className="mobile-nav-dropdown xl:hidden fixed top-[92px] left-3 right-3 bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-2xl py-2 px-1 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow),0_20px_40px_rgba(0,0,0,0.6)] z-50 backdrop-blur-[16px] overflow-hidden max-h-[calc(100vh-110px)] overflow-y-auto"
             >
-              <Link
-                data-tutorial-id="nav-trainers"
-                to="/trainers"
-                className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/trainers' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
-                onClick={() => setShowMobileNav(false)}
-              >
-                <div className="flex items-center gap-3">
-                  <Users size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
-                  Trainers
-                </div>
-              </Link>
-
-              {user?.username && (
-                <>
-                  <Link
-                    data-tutorial-id="nav-counters"
-                    to="/counters"
-                    className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/counters' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
-                    onClick={() => setShowMobileNav(false)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Tally5 size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
-                      Counters
+              <div className="flex flex-col gap-2 p-1">
+                {NAV_DROPDOWNS.map((category) => (
+                  <div key={category.id} className="flex flex-col">
+                    <div className="px-3 pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                      {category.label}
                     </div>
-                  </Link>
+                    <div className="flex flex-col gap-0.5">
+                      {category.items.map((item) => {
+                        const ItemIcon = item.icon;
+                        const isItemActive = location.pathname === item.to;
 
-                  <Link
-                    data-tutorial-id="nav-mmo"
-                    to="/mmo-tool"
-                    className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/mmo-tool' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
-                    onClick={() => setShowMobileNav(false)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <ListChecks size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
-                      <span className="whitespace-nowrap">MMO Tool</span>
+                        return (
+                          <Link
+                            key={item.to}
+                            data-tutorial-id={item.tutorialId}
+                            to={item.to}
+                            onClick={() => setShowMobileNav(false)}
+                            className={`group/mob flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-150 text-left no-underline ${
+                              isItemActive
+                                ? 'bg-[var(--accent)]/15 text-[var(--accent)]'
+                                : 'hover:bg-black/5 dark:hover:bg-white/[0.08] text-[var(--text)]'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className={`w-8 h-8 rounded-lg ${item.bgColor} border ${item.borderColor} flex items-center justify-center ${item.color} flex-shrink-0`}>
+                                <ItemIcon size={16} style={item.iconRotate ? { transform: `rotate(${item.iconRotate})` } : undefined} />
+                              </div>
+                              <div className="flex flex-col min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <span className={`font-bold text-[13.5px] leading-snug group-hover/mob:text-[var(--accent)] transition-colors ${isItemActive ? 'text-[var(--accent)]' : 'text-[var(--text)]'}`}>
+                                    {item.label}
+                                  </span>
+                                  {item.hasBadge && hasNewUpdate && (
+                                    <span className="px-1.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider text-white bg-red-500 rounded-full leading-none shadow-sm">
+                                      New
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-[11px] text-[var(--text-muted)] font-normal truncate">
+                                  {item.description}
+                                </span>
+                              </div>
+                            </div>
+                            <ChevronRight size={15} className="text-[var(--text-muted)] group-hover/mob:text-[var(--accent)] group-hover/mob:translate-x-0.5 transition-all flex-shrink-0 ml-2" />
+                          </Link>
+                        );
+                      })}
                     </div>
-                  </Link>
-
-                  <Link
-                    data-tutorial-id="nav-bingo"
-                    to="/bingo"
-                    className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/bingo' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
-                    onClick={() => setShowMobileNav(false)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Grid3x3 size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
-                      <span className="whitespace-nowrap">Bingo</span>
-                    </div>
-                  </Link>
-
-                  <Link
-                    to="/changelog"
-                    className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/changelog' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
-                    onClick={() => setShowMobileNav(false)}
-                  >
-                    <div className="flex items-center gap-3 w-full">
-                      <FileText size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
-                      <span className="flex items-center gap-2 whitespace-nowrap">
-                        Changelog
-                        {hasNewUpdate && (
-                          <span className="px-1.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider text-white bg-red-500 rounded-full leading-none">New</span>
-                        )}
-                      </span>
-                    </div>
-                  </Link>
-
-                  <Link
-                    to="/feedback"
-                    className={`flex items-center w-full gap-3 px-[18px] py-3 text-[0.95rem] font-medium text-left cursor-pointer transition-all duration-200 relative overflow-hidden ${location.pathname === '/feedback' ? 'bg-[var(--dropdown-item-hover-bg)] text-[var(--dropdown-item-hover-text)]' : 'text-[var(--dropdown-item-text)] hover:bg-[var(--dropdown-item-hover-bg)] hover:text-[var(--dropdown-item-hover-text)]'}`}
-                    onClick={() => setShowMobileNav(false)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <MessageCircleWarning size={16} className="flex-shrink-0 text-[var(--dropdown-icon)]" />
-                      <span className="whitespace-nowrap">Feedback</span>
-                    </div>
-                  </Link>
-                </>
-              )}
+                  </div>
+                ))}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -503,7 +670,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
             </div>
 
             {/* Subtle Vertical Divider */}
-            <div className="h-6 md:h-7 w-[1px] bg-white/20 flex-shrink-0" />
+            <div className="h-6 md:h-7 w-[1px] bg-[var(--border-color)] flex-shrink-0" />
 
             {/* Profile Dropdown Trigger */}
             <div className="relative flex items-center" ref={userMenuRef}>
@@ -533,13 +700,24 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                   />
                 </div>
 
-                <span className="font-bold text-white text-[13px] sm:text-[14px] md:text-[16px] tracking-wide group-hover:text-[var(--accent)] transition-colors duration-200 whitespace-nowrap overflow-hidden text-ellipsis max-w-[85px] sm:max-w-[120px] md:max-w-[170px]">
-                  {user.username}
-                </span>
+                {user.nameColor1 && user.nameColor2 ? (
+                  <span
+                    className="animated-gradient-username-wrapper max-w-[85px] sm:max-w-[120px] md:max-w-[170px]"
+                    style={{ "--grad-c1": user.nameColor1, "--grad-c2": user.nameColor2 }}
+                  >
+                    <span className="animated-gradient-username font-bold text-[13px] sm:text-[14px] md:text-[16px] tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">
+                      {user.username}
+                    </span>
+                  </span>
+                ) : (
+                  <span className="font-bold text-[var(--text)] text-[13px] sm:text-[14px] md:text-[16px] tracking-wide group-hover:text-[var(--accent)] transition-colors duration-200 whitespace-nowrap overflow-hidden text-ellipsis max-w-[85px] sm:max-w-[120px] md:max-w-[170px]">
+                    {user.username}
+                  </span>
+                )}
 
                 <ChevronDown
                   strokeWidth={3}
-                  className={`w-5 h-5 sm:w-4.5 sm:h-4.5 min-w-[20px] min-h-[20px] text-white group-hover:text-[var(--accent)] transition-transform duration-200 flex-shrink-0 ${
+                  className={`w-5 h-5 sm:w-4.5 sm:h-4.5 min-w-[20px] min-h-[20px] text-[var(--text)] group-hover:text-[var(--accent)] transition-transform duration-200 flex-shrink-0 ${
                     showMenu ? "rotate-180 text-[var(--accent)]" : ""
                   }`}
                 />
@@ -556,14 +734,25 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                     className="fixed top-[92px] right-3 w-[calc(100vw-24px)] max-w-[310px] sm:absolute sm:top-[calc(100%+16px)] sm:right-0 sm:w-[310px] bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-2xl p-3 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow),0_20px_45px_rgba(0,0,0,0.7)] z-50 backdrop-blur-[16px] overflow-hidden flex flex-col"
                   >
                     {/* User Header Section */}
-                    <div className="relative flex items-center justify-between gap-3 p-2.5 pb-3.5 border-b border-white/[0.08] mb-2">
+                    <div className="relative flex items-center justify-between gap-3 p-2.5 pb-3.5 border-b border-[var(--border-color)] mb-2">
                       <div className="flex flex-col min-w-0 flex-1 z-10">
-                        <span className="text-[12px] text-gray-400 font-medium tracking-wide">
+                        <span className="text-[12px] text-[var(--text-muted)] font-medium tracking-wide">
                           Hello,
                         </span>
-                        <span className="font-extrabold text-white text-[18px] leading-snug truncate">
-                          {user.username}
-                        </span>
+                        {user.nameColor1 && user.nameColor2 ? (
+                          <span
+                            className="animated-gradient-username-wrapper inline-block truncate"
+                            style={{ "--grad-c1": user.nameColor1, "--grad-c2": user.nameColor2 }}
+                          >
+                            <span className="animated-gradient-username font-extrabold text-[18px] leading-snug truncate">
+                              {user.username}
+                            </span>
+                          </span>
+                        ) : (
+                          <span className="font-extrabold text-[var(--text)] text-[18px] leading-snug truncate">
+                            {user.username}
+                          </span>
+                        )}
                       </div>
 
                       {/* Accent-colored Sparkle centered with the header */}
@@ -590,7 +779,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                       <Link
                         data-tutorial-id="nav-profile"
                         to="/profile"
-                        className="group flex items-center justify-between p-2 rounded-xl transition-all duration-150 hover:bg-white/[0.07] text-left no-underline"
+                        className="group flex items-center justify-between p-2 rounded-xl transition-all duration-150 hover:bg-black/5 dark:hover:bg-white/[0.07] text-left no-underline"
                         onClick={handleCloseMenu}
                       >
                         <div className="flex items-center gap-3">
@@ -598,22 +787,22 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                             <User size={18} />
                           </div>
                           <div className="flex flex-col">
-                            <span className="font-bold text-white text-[14px] leading-snug group-hover:text-cyan-300 transition-colors">
+                            <span className="font-bold text-[var(--text)] text-[14px] leading-snug group-hover:text-cyan-500 transition-colors">
                               Profile
                             </span>
-                            <span className="text-[11px] text-gray-400 font-normal">
+                            <span className="text-[11px] text-[var(--text-muted)] font-normal">
                               View your trainer profile
                             </span>
                           </div>
                         </div>
-                        <ChevronRight size={16} className="text-gray-500 group-hover:text-white group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                        <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--text)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                       </Link>
 
                       {/* Settings */}
                       <Link
                         data-tutorial-id="nav-settings"
                         to="/settings"
-                        className="group flex items-center justify-between p-2 rounded-xl transition-all duration-150 hover:bg-white/[0.07] text-left no-underline"
+                        className="group flex items-center justify-between p-2 rounded-xl transition-all duration-150 hover:bg-black/5 dark:hover:bg-white/[0.07] text-left no-underline"
                         onClick={handleCloseMenu}
                       >
                         <div className="flex items-center gap-3">
@@ -621,21 +810,21 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                             <Settings size={18} />
                           </div>
                           <div className="flex flex-col">
-                            <span className="font-bold text-white text-[14px] leading-snug group-hover:text-sky-300 transition-colors">
+                            <span className="font-bold text-[var(--text)] text-[14px] leading-snug group-hover:text-sky-500 transition-colors">
                               Settings
                             </span>
-                            <span className="text-[11px] text-gray-400 font-normal">
+                            <span className="text-[11px] text-[var(--text-muted)] font-normal">
                               Manage your preferences
                             </span>
                           </div>
                         </div>
-                        <ChevronRight size={16} className="text-gray-500 group-hover:text-white group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                        <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--text)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                       </Link>
 
                       {/* Backup */}
                       <Link
                         to="/backup"
-                        className="group flex items-center justify-between p-2 rounded-xl transition-all duration-150 hover:bg-white/[0.07] text-left no-underline"
+                        className="group flex items-center justify-between p-2 rounded-xl transition-all duration-150 hover:bg-black/5 dark:hover:bg-white/[0.07] text-left no-underline"
                         onClick={handleCloseMenu}
                       >
                         <div className="flex items-center gap-3">
@@ -643,22 +832,22 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                             <Database size={18} />
                           </div>
                           <div className="flex flex-col">
-                            <span className="font-bold text-white text-[14px] leading-snug group-hover:text-purple-300 transition-colors">
+                            <span className="font-bold text-[var(--text)] text-[14px] leading-snug group-hover:text-purple-500 transition-colors">
                               Backup
                             </span>
-                            <span className="text-[11px] text-gray-400 font-normal">
+                            <span className="text-[11px] text-[var(--text-muted)] font-normal">
                               Export or restore your data
                             </span>
                           </div>
                         </div>
-                        <ChevronRight size={16} className="text-gray-500 group-hover:text-white group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                        <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--text)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                       </Link>
 
                       {/* Admin */}
                       {user?.isAdmin && (
                         <Link
                           to="/admin"
-                          className="group flex items-center justify-between p-2 rounded-xl transition-all duration-150 hover:bg-white/[0.07] text-left no-underline"
+                          className="group flex items-center justify-between p-2 rounded-xl transition-all duration-150 hover:bg-black/5 dark:hover:bg-white/[0.07] text-left no-underline"
                           onClick={handleCloseMenu}
                         >
                           <div className="flex items-center gap-3">
@@ -666,20 +855,20 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                               <Shield size={18} />
                             </div>
                             <div className="flex flex-col">
-                              <span className="font-bold text-white text-[14px] leading-snug group-hover:text-amber-300 transition-colors">
+                              <span className="font-bold text-[var(--text)] text-[14px] leading-snug group-hover:text-amber-500 transition-colors">
                                 Admin
                               </span>
-                              <span className="text-[11px] text-gray-400 font-normal">
+                              <span className="text-[11px] text-[var(--text-muted)] font-normal">
                                 Site administration panel
                               </span>
                             </div>
                           </div>
-                          <ChevronRight size={16} className="text-gray-500 group-hover:text-white group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                          <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--text)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                         </Link>
                       )}
 
                       {/* Divider */}
-                      <div className="h-[1px] bg-white/[0.08] my-1 mx-1" />
+                      <div className="h-[1px] bg-[var(--border-color)] my-1 mx-1" />
 
                       {/* Logout */}
                       <button
@@ -707,10 +896,10 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                             <LogOut size={18} />
                           </div>
                           <div className="flex flex-col">
-                            <span className="font-bold text-white text-[14px] leading-snug group-hover:text-rose-400 transition-colors">
+                            <span className="font-bold text-[var(--text)] text-[14px] leading-snug group-hover:text-rose-400 transition-colors">
                               Logout
                             </span>
-                            <span className="text-[11px] text-gray-400 font-normal">
+                            <span className="text-[11px] text-[var(--text-muted)] font-normal">
                               Sign out of your account
                             </span>
                           </div>

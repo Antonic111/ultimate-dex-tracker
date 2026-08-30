@@ -1036,6 +1036,7 @@ export default function Settings() {
                       </div>
                     </div>
 
+
                     <div className="settings-autosave-footer">
                       <Check size={12} color="var(--accent)" />
                       <span>Changes saved automatically</span>

@@ -1,0 +1,903 @@
+/* ============================================================
+   Edit Profile Modal Styles
+   Clean, modern, cohesive dark/light UI
+   ============================================================ */
+
+/* ── Tab Navigation Bar ────────────────────────────────────── */
+.epm-tabs-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 18px 0;
+    border-bottom: 1px solid var(--dividers, rgba(255, 255, 255, 0.08));
+    background: var(--card-bg, #181818);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.epm-tabs-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.epm-nav-tab {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.18s, border-color 0.18s, background-color 0.18s;
+    position: relative;
+    bottom: -1px;
+}
+
+.epm-nav-tab:hover {
+    color: var(--text, #ffffff);
+    background: var(--progress-bg, rgba(255, 255, 255, 0.04));
+}
+
+.epm-nav-tab.active {
+    color: var(--accent, #ffe76a);
+    border-bottom-color: var(--accent, #ffe76a);
+    background: transparent;
+}
+
+/* ── Tab Content Panel ─────────────────────────────────────── */
+.epm-panel {
+    padding: 18px 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 320px;
+    box-sizing: border-box;
+}
+
+/* ── Two-Column Row ────────────────────────────────────────── */
+.epm-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+@media (max-width: 540px) {
+    .epm-row-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Section Header & Label ────────────────────────────────── */
+.epm-section-header {
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+    margin-bottom: -4px;
+}
+
+.epm-section-header.between {
+    justify-content: space-between;
+}
+
+.epm-section-title {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted, rgba(255, 255, 255, 0.45));
+}
+
+.epm-member-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+/* ── Avatar Header Card (General Info Tab) ─────────────────── */
+.epm-avatar-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    background: var(--progress-bg, #222222);
+    border-radius: 12px;
+    border: 1px solid var(--dividers, rgba(255, 255, 255, 0.08));
+}
+
+.epm-avatar-preview-wrap {
+    flex-shrink: 0;
+}
+
+.epm-avatar-btn {
+    position: relative;
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    border: 2px solid var(--accent, #ffe76a);
+    background: var(--card-bg, #181818);
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    display: block;
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.epm-avatar-btn:hover {
+    opacity: 0.92;
+    transform: scale(1.02);
+}
+
+.epm-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 50%;
+}
+
+.epm-avatar-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.18s;
+    pointer-events: none;
+    color: #ffffff;
+    font-size: 0.62rem;
+    font-weight: 700;
+}
+
+.epm-avatar-btn:hover .epm-avatar-overlay {
+    opacity: 1;
+}
+
+.epm-avatar-details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.epm-avatar-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text, #ffffff);
+}
+
+.epm-avatar-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+    margin: 0 0 4px 0;
+    line-height: 1.35;
+}
+
+.epm-avatar-action-btn {
+    align-self: flex-start;
+}
+
+/* ── Name Style / Gradient Studio ─────────────────────────── */
+.epm-gradient-preview-card {
+    background: var(--progress-bg, #222222);
+    border: 1px solid var(--dividers, rgba(255, 255, 255, 0.08));
+    border-radius: 12px;
+    padding: 16px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.epm-preview-card-tag {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted, rgba(255, 255, 255, 0.4));
+}
+
+.epm-gradient-preview-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 10px 0 2px;
+}
+
+.animated-gradient-username-wrapper {
+    display: inline-flex;
+    align-items: center;
+    overflow: visible;
+    padding: 2px 6px;
+    margin: -2px -6px;
+    filter: drop-shadow(-1px -1px 8px color-mix(in srgb, var(--grad-c1, #ec4899) 50%, transparent))
+            drop-shadow(1px 1px 9px color-mix(in srgb, var(--grad-c2, #8b5cf6) 50%, transparent));
+}
+
+.epm-gradient-preview-text {
+    display: inline-block !important;
+    font-size: 1.45rem;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    background: linear-gradient(135deg, var(--grad-c1, #ec4899), var(--grad-c2, #8b5cf6)) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    color: transparent !important;
+    transition: all 0.2s ease;
+}
+
+.epm-gradient-preview-plain {
+    display: inline-block;
+    font-size: 1.45rem;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    color: var(--text, #ffffff);
+}
+
+.epm-gradient-preview-sub {
+    font-size: 0.72rem;
+    color: var(--text-muted, rgba(255, 255, 255, 0.4));
+    margin: 4px 0 0 0;
+}
+
+.epm-gradient-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--progress-bg, #222222);
+    border: 1px solid var(--dividers, rgba(255, 255, 255, 0.08));
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.epm-gradient-inputs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+@media (max-width: 480px) {
+    .epm-gradient-inputs-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.epm-color-picker-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.epm-color-picker-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted, rgba(255, 255, 255, 0.45));
+}
+
+.epm-color-swatch-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--card-bg, #181818);
+    border: 1px solid var(--dividers, rgba(255, 255, 255, 0.12));
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.18s;
+}
+
+.epm-color-swatch-btn:hover {
+    border-color: var(--accent, #ffe76a);
+}
+
+.epm-color-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    flex-shrink: 0;
+}
+
+.epm-color-hex {
+    font-family: monospace;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--text, #ffffff);
+    text-transform: uppercase;
+}
+
+.epm-presets-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.epm-presets-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted, rgba(255, 255, 255, 0.45));
+}
+
+.epm-presets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+    gap: 6px;
+}
+
+.epm-preset-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 7px;
+    background: var(--card-bg, #181818);
+    border: 1px solid var(--dividers, rgba(255, 255, 255, 0.1));
+    color: var(--text, #ffffff);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.16s ease;
+    text-align: left;
+}
+
+.epm-preset-chip:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: var(--progress-bg, #222222);
+}
+
+.epm-preset-chip.selected {
+    border-color: var(--accent) !important;
+    background: color-mix(in srgb, var(--accent) 15%, transparent) !important;
+    color: var(--accent) !important;
+}
+
+.epm-preset-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.epm-reset-gradient-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 2px;
+    transition: color 0.18s;
+    align-self: flex-start;
+}
+
+.epm-reset-gradient-btn:hover {
+    color: #f87171;
+}
+
+/* ── Locked Gradient Box (Non-Members) ─────────────────────── */
+.epm-locked-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    padding: 24px 20px;
+    background: var(--progress-bg, #222222);
+    border: 1px dashed rgba(251, 191, 36, 0.3);
+    border-radius: 12px;
+}
+
+.epm-locked-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(251, 191, 36, 0.12);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fbbf24;
+}
+
+.epm-locked-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #fbbf24;
+}
+
+.epm-locked-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+    margin: 0;
+    max-width: 380px;
+    line-height: 1.4;
+}
+
+/* ── Favorites Section ─────────────────────────────────────── */
+.epm-favorites-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: -4px;
+}
+
+.epm-favorites-header-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.epm-favorites-title {
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text, #ffffff);
+}
+
+.epm-favorites-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted, rgba(255, 255, 255, 0.7));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.epm-favorites-limit-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted, rgba(255, 255, 255, 0.4));
+}
+
+.epm-favorites-intro {
+    font-size: 0.76rem;
+    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+    margin: 0;
+    line-height: 1.4;
+}
+
+.epm-favorites-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.epm-favorite-category-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--progress-bg, #222222);
+    border: 1px solid var(--dividers, rgba(255, 255, 255, 0.08));
+    border-radius: 12px;
+}
+
+.epm-favorite-category-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.epm-favorite-category-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.epm-favorite-category-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text, #ffffff);
+}
+
+.epm-favorite-category-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.epm-order-btns-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: var(--card-bg, #181818);
+    border: 1px solid var(--dividers, rgba(255, 255, 255, 0.1));
+    border-radius: 6px;
+    padding: 1px;
+}
+
+.epm-order-btn {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-muted, rgba(255, 255, 255, 0.6));
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.epm-order-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text, #ffffff);
+}
+
+.epm-order-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+}
+
+.epm-remove-cat-btn {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card-bg, #181818);
+    border: 1px solid var(--dividers, rgba(255, 255, 255, 0.1));
+    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.epm-remove-cat-btn:hover {
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.3);
+    background: rgba(248, 113, 113, 0.1);
+}
+
+.epm-category-edit-btn {
+    padding: 4px 10px !important;
+    font-size: 0.75rem !important;
+}
+
+.epm-favorite-slots-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.epm-favorite-slot-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.epm-favorite-slot-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    background: var(--card-bg, #181818);
+    border: 1px solid var(--dividers, rgba(255, 255, 255, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.epm-favorite-slot-box.read-only {
+    cursor: default;
+    pointer-events: none;
+}
+
+.epm-slot-rank-badge {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    font-size: 0.58rem;
+    font-weight: 800;
+    color: #fbbf24;
+    line-height: 1;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    z-index: 2;
+}
+
+.epm-slot-img {
+    width: 82%;
+    height: 82%;
+    object-fit: contain;
+    image-rendering: auto;
+    z-index: 1;
+}
+
+.epm-slot-shiny-sparkle {
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    color: #fbbf24;
+    filter: drop-shadow(0 0 3px #fbbf24);
+    z-index: 2;
+}
+
+.epm-slot-placeholder {
+    color: var(--text-muted, rgba(255, 255, 255, 0.2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.epm-slot-name-label {
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+    text-align: center;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.epm-favorite-slot-item.filled .epm-slot-name-label {
+    color: var(--text, #ffffff);
+}
+
+/* ── Add Category Box ──────────────────────────────────────── */
+.epm-add-category-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px;
+    background: var(--progress-bg, #222222);
+    border: 1px dashed var(--dividers, rgba(255, 255, 255, 0.15));
+    border-radius: 12px;
+}
+
+.epm-add-category-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+}
+
+.epm-add-category-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.epm-add-cat-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: var(--card-bg, #181818);
+    border: 1px solid var(--dividers, rgba(255, 255, 255, 0.12));
+    color: var(--text, #ffffff);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+
+.epm-add-cat-chip:hover {
+    border-color: var(--accent) !important;
+    background: color-mix(in srgb, var(--accent) 12%, transparent) !important;
+    color: var(--accent) !important;
+}
+
+/* ── Member Categories Unlock Card ─────────────────────────── */
+.epm-categories-member-unlock-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(251, 191, 36, 0.06);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 10px;
+    flex-wrap: wrap;
+}
+
+.epm-unlock-card-text {
+    font-size: 0.75rem;
+    color: var(--text-muted, rgba(255, 255, 255, 0.7));
+}
+
+.epm-unlock-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fbbf24;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.epm-unlock-card-link:hover {
+    text-decoration: underline;
+}
+
+/* ── Social Links Tab ──────────────────────────────────────── */
+.epm-social-creator-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    background: var(--progress-bg, #222222);
+    border-left: 3px solid var(--accent, #ffe76a);
+    border-radius: 8px;
+}
+
+.epm-social-creator-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.epm-social-creator-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent, #ffe76a);
+}
+
+.epm-creator-status-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.epm-creator-status-tag.pending {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.epm-social-creator-text {
+    font-size: 0.76rem;
+    color: var(--text-muted, rgba(255, 255, 255, 0.55));
+    margin: 0;
+    line-height: 1.4;
+}
+
+.epm-social-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.epm-request-creator-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    background: var(--progress-bg, #222222);
+    border: 1px solid var(--dividers, rgba(255, 255, 255, 0.08));
+    border-radius: 12px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.epm-request-creator-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 220px;
+}
+
+.epm-request-creator-title {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text, #ffffff);
+}
+
+.epm-request-creator-desc {
+    font-size: 0.74rem;
+    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+    line-height: 1.35;
+}
+
+/* ── Light Mode Support ────────────────────────────────────── */
+[data-theme="light"] .epm-tabs-nav,
+.light-mode .epm-tabs-nav {
+    background: #ffffff;
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .epm-nav-tab,
+.light-mode .epm-nav-tab {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .epm-nav-tab:hover,
+.light-mode .epm-nav-tab:hover {
+    color: #111827;
+    background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .epm-avatar-card,
+[data-theme="light"] .epm-gradient-preview-card,
+[data-theme="light"] .epm-gradient-controls,
+[data-theme="light"] .epm-locked-card,
+[data-theme="light"] .epm-favorite-category-card,
+[data-theme="light"] .epm-social-creator-card,
+[data-theme="light"] .epm-add-category-box,
+[data-theme="light"] .epm-request-creator-cta,
+.light-mode .epm-avatar-card,
+.light-mode .epm-gradient-preview-card,
+.light-mode .epm-gradient-controls,
+.light-mode .epm-locked-card,
+.light-mode .epm-favorite-category-card,
+.light-mode .epm-social-creator-card,
+.light-mode .epm-add-category-box,
+.light-mode .epm-request-creator-cta {
+    background: #f8fafc;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .epm-color-swatch-btn,
+[data-theme="light"] .epm-preset-chip,
+[data-theme="light"] .epm-favorite-slot-box,
+[data-theme="light"] .epm-order-btns-group,
+[data-theme="light"] .epm-remove-cat-btn,
+[data-theme="light"] .epm-add-cat-chip,
+.light-mode .epm-color-swatch-btn,
+.light-mode .epm-preset-chip,
+.light-mode .epm-favorite-slot-box,
+.light-mode .epm-order-btns-group,
+.light-mode .epm-remove-cat-btn,
+.light-mode .epm-add-cat-chip {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+}

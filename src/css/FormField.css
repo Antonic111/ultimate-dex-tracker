@@ -16,7 +16,14 @@
 }
 
 [data-theme="light"] {
-  --udt-field-placeholder: var(--searchbar-placeholder-text, rgba(0, 0, 0, 0.42));
+  --udt-field-bg: var(--searchbar-inputs, #f8fafc);
+  --udt-field-border: var(--border-color, #e2e8f0);
+  --udt-field-border-hover: #cbd5e1;
+  --udt-field-text: var(--text, #0f172a);
+  --udt-field-placeholder: var(--searchbar-placeholder-text, #64748b);
+  --udt-field-label: var(--text, #0f172a);
+  --udt-field-helper: var(--profile-labels, #475569);
+  --udt-field-focus-ring: color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
 /* ==========================================================================
@@ -144,6 +151,26 @@
 /* ==========================================================================
    4. SIZES
    ========================================================================== */
+
+/* Extra Small (xs) */
+.udt-form-field--xs .udt-field-control:not(.udt-field-control--textarea) {
+  height: 32px;
+  min-height: 32px;
+  border-radius: 8px;
+}
+.udt-form-field--xs .udt-field-input,
+.udt-form-field--xs .udt-select-trigger,
+.udt-form-field--xs .udt-select-search-inline {
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  height: 100%;
+}
+.udt-form-field--xs .udt-field-icon-start {
+  padding-left: 8px;
+}
+.udt-form-field--xs .udt-field-icon-end {
+  padding-right: 8px;
+}
 
 /* Small (sm) */
 .udt-form-field--sm .udt-field-control:not(.udt-field-control--textarea) {
@@ -741,7 +768,7 @@ input[type="number"].udt-field-input {
 
 .udt-select-option:hover:not(.udt-select-option--disabled),
 .udt-select-option--focused:not(.udt-select-option--disabled) {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--dropdown-item-hover-bg, rgba(255, 255, 255, 0.08));
   color: var(--accent, #ffe76a);
 }
 

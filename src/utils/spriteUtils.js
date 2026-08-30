@@ -97,6 +97,19 @@ export function resolvePokemon(entryOrPokemon) {
 }
 
 /**
+ * Converts a raw PokeAPI sprite URL to the local pre-trimmed static asset path.
+ * @param {string} url - Original sprite URL
+ * @returns {string} Trimmed local asset path or original fallback
+ */
+export function toTrimmedSpriteUrl(url) {
+    if (!url || typeof url !== 'string') return url;
+    if (url.includes('raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/')) {
+        return url.replace('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/', '/Sprites/trimmed/pokemon/');
+    }
+    return url;
+}
+
+/**
  * Gets the appropriate sprite URL for a Pokémon, considering shiny status and HOME sprite preference.
  * Reliably resolves sprites even for legacy hunt records or partial Pokémon objects.
  * 
@@ -111,31 +124,28 @@ export function getSpriteUrl(pokemon, isShiny = false, useHomeSprites = false) {
     }
 
     const resolved = resolvePokemon(pokemon) || pokemon;
+    let finalUrl = '/fallback.png';
 
     if (resolved && resolved.sprites) {
         if (!useHomeSprites) {
-            return isShiny && resolved.sprites.front_shiny
+            finalUrl = isShiny && resolved.sprites.front_shiny
                 ? resolved.sprites.front_shiny
                 : (resolved.sprites.front_default || resolved.sprites.other?.['official-artwork']?.front_default || '/fallback.png');
-        }
-
-        // User prefers HOME sprites - fall back to front sprites if home sprite is unavailable
-        if (isShiny) {
-            return resolved.sprites.home_shiny || resolved.sprites.front_shiny || resolved.sprites.front_default || '/fallback.png';
         } else {
-            return resolved.sprites.home_default || resolved.sprites.front_default || '/fallback.png';
+            // User prefers HOME sprites - fall back to front sprites if home sprite is unavailable
+            if (isShiny) {
+                finalUrl = resolved.sprites.home_shiny || resolved.sprites.front_shiny || resolved.sprites.front_default || '/fallback.png';
+            } else {
+                finalUrl = resolved.sprites.home_default || resolved.sprites.front_default || '/fallback.png';
+            }
         }
+    } else if (typeof pokemon === 'object' && pokemon.image) {
+        finalUrl = transformSpriteUrlForViewer(pokemon.image, useHomeSprites);
+    } else if (typeof pokemon === 'string' && pokemon.startsWith('http')) {
+        finalUrl = transformSpriteUrlForViewer(pokemon, useHomeSprites);
     }
 
-    // If pokemon has an existing static image URL, transform it according to viewer preferences
-    if (typeof pokemon === 'object' && pokemon.image) {
-        return transformSpriteUrlForViewer(pokemon.image, useHomeSprites);
-    }
-    if (typeof pokemon === 'string' && pokemon.startsWith('http')) {
-        return transformSpriteUrlForViewer(pokemon, useHomeSprites);
-    }
-
-    return '/fallback.png';
+    return toTrimmedSpriteUrl(finalUrl);
 }
 
 /**
@@ -149,10 +159,9 @@ export function getSpriteUrl(pokemon, isShiny = false, useHomeSprites = false) {
 export function transformSpriteUrlForViewer(url, useHomeSprites = false) {
     if (!url) return '/fallback.png';
     
-    // We can only reliably transform PokeAPI URLs without the full pokemon object
-    if (url.includes('githubusercontent.com/PokeAPI')) {
+    // Handle trimmed local sprites
+    if (url.includes('/Sprites/trimmed/pokemon/')) {
         if (useHomeSprites) {
-            // Transform to HOME
             if (!url.includes('/other/home/')) {
                 if (url.includes('/shiny/')) {
                     return url.replace('/pokemon/shiny/', '/pokemon/other/home/shiny/');
@@ -161,7 +170,6 @@ export function transformSpriteUrlForViewer(url, useHomeSprites = false) {
                 }
             }
         } else {
-            // Transform back to default (if it was sent as a HOME sprite by a user who has it ON)
             if (url.includes('/other/home/')) {
                 if (url.includes('/shiny/')) {
                     return url.replace('/pokemon/other/home/shiny/', '/pokemon/shiny/');
@@ -170,6 +178,31 @@ export function transformSpriteUrlForViewer(url, useHomeSprites = false) {
                 }
             }
         }
+        return url;
+    }
+
+    // We can only reliably transform PokeAPI URLs without the full pokemon object
+    if (url.includes('githubusercontent.com/PokeAPI')) {
+        if (useHomeSprites) {
+            // Transform to HOME
+            if (!url.includes('/other/home/')) {
+                if (url.includes('/shiny/')) {
+                    return toTrimmedSpriteUrl(url.replace('/pokemon/shiny/', '/pokemon/other/home/shiny/'));
+                } else {
+                    return toTrimmedSpriteUrl(url.replace('/pokemon/', '/pokemon/other/home/'));
+                }
+            }
+        } else {
+            // Transform back to default (if it was sent as a HOME sprite by a user who has it ON)
+            if (url.includes('/other/home/')) {
+                if (url.includes('/shiny/')) {
+                    return toTrimmedSpriteUrl(url.replace('/pokemon/other/home/shiny/', '/pokemon/shiny/'));
+                } else {
+                    return toTrimmedSpriteUrl(url.replace('/pokemon/other/home/', '/pokemon/'));
+                }
+            }
+        }
+        return toTrimmedSpriteUrl(url);
     }
     // Handle Local Sprites
     if (url.startsWith('/Sprites/')) {

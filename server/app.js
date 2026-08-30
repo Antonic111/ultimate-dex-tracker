@@ -9,15 +9,19 @@ import profileRoutes from "./routes/profiles.js";
 import bugReportRoutes from "./routes/bugReports.js";
 import recentCatchesRoutes from "./routes/recentCatches.js";
 import notificationsRoutes from "./routes/notifications.js";
+import streamerToolsRoutes from "./routes/streamerTools.js";
+import monetizationRoutes from "./routes/monetization.js";
+import { recordRequestMetric } from "./utils/metricsCollector.js";
+import compression from "compression";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load environment variables from both .env and .env.local (and parent dir)
-dotenv.config();
-dotenv.config({ path: ".env.local" });
-dotenv.config({ path: "../.env" });
-dotenv.config({ path: "../.env.local" });
+dotenv.config({ path: path.resolve(__dirname, "../.env.local"), override: true });
+dotenv.config({ path: path.resolve(__dirname, "../.env"), override: true });
+dotenv.config({ path: path.resolve(__dirname, ".env.local"), override: true });
+dotenv.config({ path: path.resolve(__dirname, ".env"), override: true });
 
 const app = express();
 
@@ -66,10 +70,33 @@ app.use((req, res, next) => {
   next();
 });
 
+// Compress all HTTP response payloads (Gzip/Brotli)
+app.use(compression());
+
 app.use(cookieParser());
-// Increase body size limits to handle larger payloads (e.g., caught maps, progress bars)
-app.use(express.json({ limit: "2mb" }));
+// Increase body size limits to handle larger payloads and capture rawBody for webhook HMAC verification
+app.use(
+  express.json({
+    limit: "2mb",
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+
+// Real-time API response metrics collector middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    // Only track API calls (skip static asset pings like /uploads)
+    if (req.originalUrl && req.originalUrl.startsWith("/api") && !req.originalUrl.startsWith("/api/admin/system-stats")) {
+      const durationMs = Date.now() - start;
+      recordRequestMetric(req.method, req.originalUrl, durationMs, res.statusCode);
+    }
+  });
+  next();
+});
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
@@ -112,6 +139,8 @@ app.use("/api/profiles", profileRoutes);
 app.use("/api/bug-reports", bugReportRoutes);
 app.use("/api/recent-catches", recentCatchesRoutes);
 app.use("/api/notifications", notificationsRoutes);
+app.use("/api", streamerToolsRoutes);
+app.use("/api/monetization", monetizationRoutes);
 
 // Global error handler for oversized payloads and other errors
 app.use((err, req, res, next) => {

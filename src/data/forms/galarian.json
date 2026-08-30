@@ -7,10 +7,10 @@
       "steel"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10161.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10161.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10161.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10161.png"
+      "front_default": "/Sprites/trimmed/pokemon/10161.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10161.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10161.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10161.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -43,10 +43,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10162.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10162.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10162.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10162.png"
+      "front_default": "/Sprites/trimmed/pokemon/10162.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10162.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10162.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10162.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -82,10 +82,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10163.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10163.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10163.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10163.png"
+      "front_default": "/Sprites/trimmed/pokemon/10163.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10163.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10163.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10163.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -118,10 +118,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10164.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10164.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10164.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10164.png"
+      "front_default": "/Sprites/trimmed/pokemon/10164.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10164.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10164.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10164.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -160,10 +160,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10165.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10165.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10165.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10165.png"
+      "front_default": "/Sprites/trimmed/pokemon/10165.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10165.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10165.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10165.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -195,10 +195,10 @@
       "fighting"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10166.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10166.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10166.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10166.png"
+      "front_default": "/Sprites/trimmed/pokemon/10166.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10166.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10166.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10166.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -232,10 +232,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10167.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10167.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10167.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10167.png"
+      "front_default": "/Sprites/trimmed/pokemon/10167.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10167.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10167.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10167.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -266,10 +266,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10168.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10168.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10168.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10168.png"
+      "front_default": "/Sprites/trimmed/pokemon/10168.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10168.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10168.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10168.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -309,10 +309,10 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10169.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10169.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10169.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10169.png"
+      "front_default": "/Sprites/trimmed/pokemon/10169.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10169.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10169.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10169.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -340,10 +340,10 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10170.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10170.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10170.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10170.png"
+      "front_default": "/Sprites/trimmed/pokemon/10170.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10170.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10170.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10170.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -372,10 +372,10 @@
       "flying"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10171.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10171.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10171.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10171.png"
+      "front_default": "/Sprites/trimmed/pokemon/10171.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10171.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10171.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10171.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -405,10 +405,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10172.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10172.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10172.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10172.png"
+      "front_default": "/Sprites/trimmed/pokemon/10172.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10172.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10172.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10172.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -441,10 +441,10 @@
       "ghost"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10173.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10173.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10173.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10173.png"
+      "front_default": "/Sprites/trimmed/pokemon/10173.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10173.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10173.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10173.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -478,10 +478,10 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10174.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10174.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10174.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10174.png"
+      "front_default": "/Sprites/trimmed/pokemon/10174.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10174.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10174.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10174.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -517,10 +517,10 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10175.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10175.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10175.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10175.png"
+      "front_default": "/Sprites/trimmed/pokemon/10175.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10175.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10175.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10175.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -559,10 +559,10 @@
       "ice"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10176.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10176.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10176.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10176.png"
+      "front_default": "/Sprites/trimmed/pokemon/10176.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10176.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10176.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10176.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -593,10 +593,10 @@
       "ice"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10177.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10177.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10177.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10177.png"
+      "front_default": "/Sprites/trimmed/pokemon/10177.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10177.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10177.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10177.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -628,10 +628,10 @@
       "ghost"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10179.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10179.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10179.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10179.png"
+      "front_default": "/Sprites/trimmed/pokemon/10179.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10179.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10179.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10179.png"
     },
     "gen": 8,
     "formType": "galarian",
@@ -665,10 +665,10 @@
       "steel"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10180.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10180.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10180.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10180.png"
+      "front_default": "/Sprites/trimmed/pokemon/10180.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10180.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10180.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10180.png"
     },
     "gen": 8,
     "formType": "galarian",

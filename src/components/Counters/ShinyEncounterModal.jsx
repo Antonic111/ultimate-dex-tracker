@@ -362,7 +362,7 @@ export default function ShinyEncounterModal({
                     />
                   </div>
                   <div>
-                    <h4 className="text-base font-black text-white">
+                    <h4 className="text-base font-black text-[var(--text)]">
                       {formatPokemonName(hunt.pokemon?.name)}
                     </h4>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -406,7 +406,7 @@ export default function ShinyEncounterModal({
                       <button
                         key={pkm.stableId || `${pkm.id}-${pkm.name}`}
                         type="button"
-                        className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-[var(--accent)] transition text-left group cursor-pointer"
+                        className="flex items-center gap-2.5 p-2 rounded-xl bg-black/5 dark:bg-white/[0.04] hover:bg-black/10 dark:hover:bg-white/[0.08] border border-[var(--border-color)] hover:border-[var(--accent)] transition text-left group cursor-pointer"
                         onClick={() => handleSelectShinyPokemon(pkm, false)}
                       >
                         <img
@@ -416,7 +416,7 @@ export default function ShinyEncounterModal({
                           style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
                         />
                         <div className="flex flex-col min-w-0">
-                          <span className="text-xs font-bold text-white line-clamp-1">
+                          <span className="text-xs font-bold text-[var(--text)] line-clamp-1">
                             {formatPokemonName(pkm.name)}
                           </span>
                           <div className="flex items-center gap-1.5 mt-0.5">
@@ -484,7 +484,7 @@ export default function ShinyEncounterModal({
                       <button
                         key={pokemon.stableId || `${pokemon.id}-${pokemon.name}`}
                         type="button"
-                        className="flex flex-col items-center pt-0 pb-2 px-1.5 rounded-xl border transition group text-left relative overflow-hidden bg-white/[0.03] border-white/[0.08] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10 cursor-pointer"
+                        className="flex flex-col items-center pt-0 pb-2 px-1.5 rounded-xl border transition group text-left relative overflow-hidden bg-black/5 dark:bg-white/[0.03] border-[var(--border-color)] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10 cursor-pointer"
                         onClick={() => handleSelectShinyPokemon(pokemon, false)}
                       >
                         <img
@@ -494,7 +494,7 @@ export default function ShinyEncounterModal({
                           style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
                         />
                         <div className="flex flex-col items-center w-full -mt-2.5 relative z-10">
-                          <span className="text-xs font-bold text-white text-center line-clamp-1 max-w-[95%]">
+                          <span className="text-xs font-bold text-[var(--text)] text-center line-clamp-1 max-w-[95%]">
                             {formatPokemonName(pokemon.name)}
                           </span>
                           {dexNum && (
@@ -525,7 +525,7 @@ export default function ShinyEncounterModal({
         {step === 2 && selectedPokemon && (
           <div className="space-y-4">
             {/* Identity Banner */}
-            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-white/[0.04] border border-white/10">
+            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-black/5 dark:bg-white/[0.04] border border-[var(--border-color)]">
               <img
                 src={getPokemonImage(selectedPokemon)}
                 alt=""
@@ -533,7 +533,7 @@ export default function ShinyEncounterModal({
                 style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
               />
               <div>
-                <h4 className="font-extrabold text-white text-base">
+                <h4 className="font-extrabold text-[var(--text)] text-base">
                   Shiny {formatPokemonName(selectedPokemon?.name)}
                 </h4>
                 <div className="flex items-center gap-2 mt-0.5">
@@ -695,26 +695,26 @@ export default function ShinyEncounterModal({
                     style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
                   />
 
-                  <h3 className="text-2xl font-black text-white tracking-wide">
+                  <h3 className="text-2xl font-black text-[var(--text)] tracking-wide">
                     Shiny {formatPokemonName(selectedPokemon?.name)}
                   </h3>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full mt-2 text-center">
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/10">
+                    <div className="p-2 rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)]">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Phase</span>
-                      <span className="text-sm font-black text-white">Phase {phaseResult.phaseNumber}</span>
+                      <span className="text-sm font-black text-[var(--text)]">Phase {phaseResult.phaseNumber}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/10">
+                    <div className="p-2 rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)]">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Phase Checks</span>
-                      <span className="text-sm font-black text-emerald-400">{phaseResult.phaseChecks.toLocaleString()}</span>
+                      <span className="text-sm font-black text-emerald-500">{phaseResult.phaseChecks.toLocaleString()}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/10">
+                    <div className="p-2 rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)]">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Total Checks</span>
-                      <span className="text-sm font-black text-white">{phaseResult.totalChecks.toLocaleString()}</span>
+                      <span className="text-sm font-black text-[var(--text)]">{phaseResult.totalChecks.toLocaleString()}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/10">
+                    <div className="p-2 rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)]">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Total Time</span>
-                      <span className="text-sm font-black text-emerald-400 font-mono">{formatDigitalTime(phaseResult.elapsedMs)}</span>
+                      <span className="text-sm font-black text-emerald-500 font-mono">{formatDigitalTime(phaseResult.elapsedMs)}</span>
                     </div>
                   </div>
 
@@ -731,7 +731,7 @@ export default function ShinyEncounterModal({
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {hunt.phases.map(p => (
-                        <div key={p.id} className="flex items-center gap-1.5 bg-white/[0.04] border border-white/[0.08] rounded-lg px-2.5 py-1 text-xs text-white">
+                        <div key={p.id} className="flex items-center gap-1.5 bg-black/5 dark:bg-white/[0.04] border border-[var(--border-color)] rounded-lg px-2.5 py-1 text-xs text-[var(--text)]">
                           {p.outcome === "failed" ? (
                             <HeartCrack size={12} className="text-rose-400 shrink-0" strokeWidth={2.5} />
                           ) : (
@@ -794,26 +794,26 @@ export default function ShinyEncounterModal({
                     style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
                   />
 
-                  <h3 className="text-2xl font-black text-white tracking-wide">
+                  <h3 className="text-2xl font-black text-[var(--text)] tracking-wide">
                     Shiny {formatPokemonName(selectedPokemon?.name)}
                   </h3>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full mt-2 text-center">
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/10">
+                    <div className="p-2 rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)]">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Phase</span>
-                      <span className="text-sm font-black text-white">Phase {phaseResult.phaseNumber}</span>
+                      <span className="text-sm font-black text-[var(--text)]">Phase {phaseResult.phaseNumber}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/10">
+                    <div className="p-2 rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)]">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Phase Checks</span>
-                      <span className="text-sm font-black text-emerald-400">{phaseResult.phaseChecks.toLocaleString()}</span>
+                      <span className="text-sm font-black text-emerald-500">{phaseResult.phaseChecks.toLocaleString()}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/10">
+                    <div className="p-2 rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)]">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Total Checks</span>
-                      <span className="text-sm font-black text-white">{phaseResult.totalChecks.toLocaleString()}</span>
+                      <span className="text-sm font-black text-[var(--text)]">{phaseResult.totalChecks.toLocaleString()}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/10">
+                    <div className="p-2 rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)]">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Total Time</span>
-                      <span className="text-sm font-black text-emerald-400 font-mono">{formatDigitalTime(phaseResult.elapsedMs)}</span>
+                      <span className="text-sm font-black text-emerald-500 font-mono">{formatDigitalTime(phaseResult.elapsedMs)}</span>
                     </div>
                   </div>
 
@@ -830,7 +830,7 @@ export default function ShinyEncounterModal({
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {hunt.phases.map(p => (
-                        <div key={p.id} className="flex items-center gap-1.5 bg-white/[0.04] border border-white/[0.08] rounded-lg px-2.5 py-1 text-xs text-white">
+                        <div key={p.id} className="flex items-center gap-1.5 bg-black/5 dark:bg-white/[0.04] border border-[var(--border-color)] rounded-lg px-2.5 py-1 text-xs text-[var(--text)]">
                           {p.outcome === "failed" ? (
                             <HeartCrack size={12} className="text-rose-400 shrink-0" strokeWidth={2.5} />
                           ) : (
@@ -893,7 +893,7 @@ export default function ShinyEncounterModal({
                     style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
                   />
 
-                  <h3 className="text-xl font-black text-white tracking-wide">
+                  <h3 className="text-xl font-black text-[var(--text)] tracking-wide">
                     Shiny {formatPokemonName(selectedPokemon?.name)}
                   </h3>
                   <span className="text-xs text-rose-400 font-bold uppercase tracking-wider -mt-1">
@@ -903,21 +903,21 @@ export default function ShinyEncounterModal({
                   </span>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full mt-2 text-center">
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/10">
+                    <div className="p-2 rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)]">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Phase</span>
-                      <span className="text-sm font-black text-white">Phase {phaseResult.phaseNumber}</span>
+                      <span className="text-sm font-black text-[var(--text)]">Phase {phaseResult.phaseNumber}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/10">
+                    <div className="p-2 rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)]">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Phase Checks</span>
-                      <span className="text-sm font-black text-rose-400">{phaseResult.phaseChecks.toLocaleString()}</span>
+                      <span className="text-sm font-black text-rose-500">{phaseResult.phaseChecks.toLocaleString()}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/10">
+                    <div className="p-2 rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)]">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Total Checks</span>
-                      <span className="text-sm font-black text-white">{phaseResult.totalChecks.toLocaleString()}</span>
+                      <span className="text-sm font-black text-[var(--text)]">{phaseResult.totalChecks.toLocaleString()}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/10">
+                    <div className="p-2 rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)]">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Total Time</span>
-                      <span className="text-sm font-black text-white font-mono">{formatDigitalTime(phaseResult.elapsedMs)}</span>
+                      <span className="text-sm font-black text-[var(--text)] font-mono">{formatDigitalTime(phaseResult.elapsedMs)}</span>
                     </div>
                   </div>
 

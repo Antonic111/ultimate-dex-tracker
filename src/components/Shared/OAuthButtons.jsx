@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import "../../css/OAuthButtons.css";
 import { buildApiUrl } from "../../config/api.js";
 
@@ -36,9 +37,51 @@ export default function OAuthButtons({
   dividerPosition = "top",
 }) {
   const [loadingProvider, setLoadingProvider] = useState(null);
+  const location = useLocation();
+  const resetTimerRef = useRef(null);
+
+  // Reset loading state whenever path/search changes
+  useEffect(() => {
+    setLoadingProvider(null);
+    if (resetTimerRef.current) {
+      clearTimeout(resetTimerRef.current);
+    }
+  }, [location.pathname, location.search]);
+
+  // Reset loading state when restoring from BFCache (back/forward), window focus, visibility change, or custom reset event
+  useEffect(() => {
+    const handleReset = () => {
+      setLoadingProvider(null);
+      if (resetTimerRef.current) {
+        clearTimeout(resetTimerRef.current);
+      }
+    };
+
+    window.addEventListener("pageshow", handleReset);
+    window.addEventListener("focus", handleReset);
+    window.addEventListener("resetOAuthLoading", handleReset);
+    document.addEventListener("visibilitychange", handleReset);
+
+    return () => {
+      window.removeEventListener("pageshow", handleReset);
+      window.removeEventListener("focus", handleReset);
+      window.removeEventListener("resetOAuthLoading", handleReset);
+      document.removeEventListener("visibilitychange", handleReset);
+      if (resetTimerRef.current) {
+        clearTimeout(resetTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleOAuth = (provider) => {
     setLoadingProvider(provider);
+
+    // Fallback safety timer: auto-clear after 6 seconds if navigation did not unload the page
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = setTimeout(() => {
+      setLoadingProvider(null);
+    }, 6000);
+
     window.location.href = buildApiUrl(`/auth/${provider}`);
   };
 

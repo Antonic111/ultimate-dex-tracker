@@ -2,6 +2,8 @@ import { useEffect, useState, useContext, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import "../css/Profile.css";
 import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight, Video } from "lucide-react";
+import PremiumIcon from "../components/Shared/PremiumIcon";
+import { AdminIcon, ContentCreatorIcon } from "../components/Shared/BadgeIcons";
 import { YoutubeIcon, TwitchIcon } from "../components/Shared/SocialIcons";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import pokemonData from "../data/pokemon.json";
@@ -670,14 +672,33 @@ export default function PublicProfile() {
                     <div className="profile-top-line">
                         <h1 className="profile-username">
                             <span className="inline-flex items-center gap-2.5">
-                                <span>{data.username}</span>
+                                {data.nameColor1 && data.nameColor2 ? (
+                                    <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": data.nameColor1, "--grad-c2": data.nameColor2 }}>
+                                        <span className="animated-gradient-username">
+                                            {data.username}
+                                        </span>
+                                    </span>
+                                ) : (
+                                    <span>{data.username}</span>
+                                )}
+                                {data.isPremium && (
+                                    <span className="crown-wrapper">
+                                        <PremiumIcon
+                                            size={26}
+                                            color="#f59e0b"
+                                            style={{ flexShrink: 0, cursor: "default" }}
+                                        />
+                                        <span className="crown-tooltip">
+                                            {data.premiumMonths === 1 ? '1 month membership' : `${data.premiumMonths || 1} months membership`}
+                                        </span>
+                                    </span>
+                                )}
                                 {data.isAdmin && (
                                     <span className="crown-wrapper">
-                                        <Crown
-                                            size={26}
-                                            strokeWidth={2.5}
+                                        <AdminIcon
+                                            size={24}
+                                            color="#38bdf8"
                                             style={{
-                                                color: "#fbbf24",
                                                 flexShrink: 0
                                             }}
                                         />
@@ -686,11 +707,10 @@ export default function PublicProfile() {
                                 )}
                                 {data.isContentCreator && (
                                     <span className="crown-wrapper">
-                                        <Video
-                                            size={26}
-                                            strokeWidth={2.5}
+                                        <ContentCreatorIcon
+                                            size={24}
+                                            color="#ef4444"
                                             style={{
-                                                color: "#fbbf24",
                                                 flexShrink: 0
                                             }}
                                         />

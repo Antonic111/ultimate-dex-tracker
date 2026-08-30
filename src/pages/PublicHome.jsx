@@ -536,6 +536,23 @@ export default function PublicHome() {
   // Carousel Slides for Section 3
   const showcaseSlides = [
     {
+      id: "detailed-tracking",
+      badge: "DETAILED POKEMON LOGS",
+      title: "Detailed Pokemon Logs",
+      description: "Save extensive details for every caught Pokémon in your Living Dex.",
+      image: "/landing_page/images/sidebar-and-grid.png",
+      imageAlt: "Detailed Pokémon Sidebar & Living Dex Grid Preview",
+      bullets: [
+        "Log caught games & Poké Balls",
+        "Track marks & ribbon completion",
+        "Record custom notes & caught dates",
+        "Save encounter checks & hunt data",
+        "Filter and search by custom criteria"
+      ],
+      ctaText: "Start Tracking",
+      ctaLink: "/dex"
+    },
+    {
       id: "hunt-tracker",
       badge: "TRACK EVERY HUNT",
       title: "Powerful Hunt Tracker",
@@ -553,9 +570,26 @@ export default function PublicHome() {
       ctaLink: "/counters"
     },
     {
+      id: "mmo-tracker",
+      badge: "LEGENDS ARCEUS TOOL",
+      title: "MMO Tracker",
+      description: "Optimize your Hisui shiny hunts with our custom permutation tracker.",
+      image: "/landing_page/images/mmo.png",
+      imageAlt: "Massive Mass Outbreak Permutation Tracker Preview",
+      bullets: [
+        "Permutation path calculation",
+        "Interactive permutation charts",
+        "Ghost spawn & bonus wave support",
+        "Step-by-step despawn routing",
+        "Live sync with your hunts"
+      ],
+      ctaText: "Open MMO Tool",
+      ctaLink: "/mmo"
+    },
+    {
       id: "collection-statistics",
       badge: "DETAILED STATISTICS",
-      title: "See Your Collection Like Never Before",
+      title: "Detailed Stats",
       description: "Beautiful charts and statistics to visualize your progress.",
       image: "/landing_page/images/stats.png",
       imageAlt: "Collection Statistics Dashboard Preview",
@@ -585,6 +619,23 @@ export default function PublicHome() {
       ],
       ctaText: "Explore Trainers",
       ctaLink: "/trainers"
+    },
+    {
+      id: "global-leaderboards",
+      badge: "COMPETITIVE RANKS",
+      title: "Detailed Leaderboards",
+      description: "Compete with collectors worldwide and climb the shiny dex rankings.",
+      image: "/landing_page/images/leaderboard.png",
+      imageAlt: "Community Leaderboard Standings Preview",
+      bullets: [
+        "Overall shiny dex rankings",
+        "Category & regional leaderboards",
+        "Track top hunt streaks",
+        "Real-time leaderboard updates",
+        "Supporter & trainer badges"
+      ],
+      ctaText: "View Leaderboard",
+      ctaLink: "/leaderboard"
     }
   ];
 

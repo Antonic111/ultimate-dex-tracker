@@ -593,7 +593,7 @@
 .hunt-phase-item-name {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text, #ffffff);
 }
 
 .hunt-phase-item-metrics {
@@ -1501,7 +1501,7 @@
 .empty-state-title {
   font-size: 1.85rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text, #ffffff);
   margin: 0;
   letter-spacing: -0.015em;
   line-height: 1.25;
@@ -1617,7 +1617,7 @@
 .history-stat-value {
   font-size: 1.125rem;
   font-weight: 900;
-  color: #ffffff;
+  color: var(--text, #ffffff);
   font-family: inherit;
   line-height: 1.2;
 }
@@ -1640,9 +1640,9 @@
   width: 100%;
   padding: 0.625rem 2.25rem 0.625rem 2.5rem;
   border-radius: 0.75rem;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: var(--searchbar-inputs, rgba(0, 0, 0, 0.3));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  color: var(--text, #ffffff);
   font-size: 0.875rem;
   font-weight: 500;
   outline: none;
@@ -1774,7 +1774,7 @@
 .history-entry-pokemon-name {
   font-size: 1.125rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text, #ffffff);
   letter-spacing: -0.01em;
 }
 
@@ -2179,7 +2179,7 @@
   gap: 8px;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text, #ffffff);
 }
 
 .sparkling-power-badge {
@@ -2273,7 +2273,7 @@
 .hunt-odds-pokemon-name {
   font-size: 1.15rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text, #ffffff);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -2594,4 +2594,64 @@ img.pixelated,
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
+}
+
+/* ==========================================================================
+   LIGHT MODE COUNTERS STYLING
+   ========================================================================== */
+[data-theme="light"] .hunt-card,
+[data-theme="light"] .hunt-card-compact {
+  background: #ffffff;
+  border-color: var(--border-color);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .hunt-card-compact:hover,
+[data-theme="light"] .hunt-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .hunt-odds-identity-card {
+  background: #ffffff;
+  border-color: var(--border-color);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .hunt-modal-card {
+  background: #f8fafc;
+  border-color: var(--border-color);
+}
+
+[data-theme="light"] .hunt-modifiers-box,
+[data-theme="light"] .hunt-phase-shelf {
+  background: #f8fafc;
+  border-color: var(--border-color);
+}
+
+[data-theme="light"] .hunt-phase-chip {
+  background: #f1f5f9;
+  border-color: var(--border-color);
+  color: #0f172a;
+}
+
+[data-theme="light"] .history-entry-card {
+  background: #ffffff;
+  border-color: var(--border-color);
+}
+
+[data-theme="light"] .history-meta-pill {
+  background: #f1f5f9;
+  border-color: var(--border-color);
+  color: #0f172a;
+}
+
+[data-theme="light"] .sparkling-level-stepper {
+  background: #f1f5f9;
+  border-color: var(--border-color);
+}
+
+[data-theme="light"] .sparkling-power-card {
+  background: #ffffff;
+  border-color: var(--border-color);
 }

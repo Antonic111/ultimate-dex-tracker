@@ -7,10 +7,10 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10091.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10091.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10091.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10091.png"
+      "front_default": "/Sprites/trimmed/pokemon/10091.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10091.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10091.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10091.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -45,10 +45,10 @@
       "normal"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10092.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10092.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10092.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10092.png"
+      "front_default": "/Sprites/trimmed/pokemon/10092.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10092.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10092.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10092.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -81,10 +81,10 @@
       "psychic"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10100.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10100.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10100.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10100.png"
+      "front_default": "/Sprites/trimmed/pokemon/10100.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10100.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10100.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10100.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -117,10 +117,10 @@
       "steel"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10101.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10101.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10101.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10101.png"
+      "front_default": "/Sprites/trimmed/pokemon/10101.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10101.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10101.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10101.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -153,10 +153,10 @@
       "steel"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10102.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10102.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10102.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10102.png"
+      "front_default": "/Sprites/trimmed/pokemon/10102.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10102.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10102.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10102.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -185,10 +185,10 @@
       "ice"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10103.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10103.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10103.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10103.png"
+      "front_default": "/Sprites/trimmed/pokemon/10103.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10103.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10103.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10103.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -222,10 +222,10 @@
       "fairy"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10104.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10104.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10104.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10104.png"
+      "front_default": "/Sprites/trimmed/pokemon/10104.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10104.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10104.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10104.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -257,10 +257,10 @@
       "steel"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10105.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10105.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10105.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10105.png"
+      "front_default": "/Sprites/trimmed/pokemon/10105.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10105.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10105.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10105.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -294,10 +294,10 @@
       "steel"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10106.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10106.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10106.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10106.png"
+      "front_default": "/Sprites/trimmed/pokemon/10106.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10106.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10106.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10106.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -329,10 +329,10 @@
       "dark"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10107.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10107.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10107.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10107.png"
+      "front_default": "/Sprites/trimmed/pokemon/10107.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10107.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10107.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10107.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -365,10 +365,10 @@
       "dark"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10108.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10108.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10108.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10108.png"
+      "front_default": "/Sprites/trimmed/pokemon/10108.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10108.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10108.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10108.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -401,10 +401,10 @@
       "electric"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10109.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10109.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10109.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10109.png"
+      "front_default": "/Sprites/trimmed/pokemon/10109.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10109.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10109.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10109.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -438,10 +438,10 @@
       "electric"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10110.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10110.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10110.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10110.png"
+      "front_default": "/Sprites/trimmed/pokemon/10110.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10110.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10110.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10110.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -479,10 +479,10 @@
       "electric"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10111.png ",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10111.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10111.png ",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10111.png"
+      "front_default": "/Sprites/trimmed/pokemon/10111.png ",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10111.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10111.png ",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10111.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -515,10 +515,10 @@
       "dark"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10112.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10112.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10112.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10112.png"
+      "front_default": "/Sprites/trimmed/pokemon/10112.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10112.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10112.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10112.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -553,10 +553,10 @@
       "dark"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10113.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10113.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10113.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10113.png"
+      "front_default": "/Sprites/trimmed/pokemon/10113.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10113.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10113.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10113.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -588,10 +588,10 @@
       "dragon"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10114.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10114.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10114.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10114.png"
+      "front_default": "/Sprites/trimmed/pokemon/10114.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10114.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10114.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10114.png"
     },
     "gen": 7,
     "formType": "alolan",
@@ -623,10 +623,10 @@
       "ghost"
     ],
     "sprites": {
-      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10115.png",
-      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10115.png",
-      "home_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10115.png",
-      "home_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10115.png"
+      "front_default": "/Sprites/trimmed/pokemon/10115.png",
+      "front_shiny": "/Sprites/trimmed/pokemon/shiny/10115.png",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/10115.png",
+      "home_shiny": "/Sprites/trimmed/pokemon/other/home/shiny/10115.png"
     },
     "gen": 7,
     "formType": "alolan",

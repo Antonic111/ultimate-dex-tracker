@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { createPortal } from "react-dom";
-import { Lock, ArrowLeft, UserX } from "lucide-react";
-import { useUser, useLoading, useMessage, LoadingSpinner, SectionLoader, Button } from "../components/Shared";
-import { profileAPI, caughtAPI, creatorAPI } from "../utils/api";
+import { Lock, UserX } from "lucide-react";
+import { useUser, useLoading, useMessage, SectionLoader } from "../components/Shared";
+import { profileAPI, caughtAPI } from "../utils/api";
 import { getFilteredFormsData } from "../utils/dexPreferences";
 import { calculateProfileStats, extractYoutubeHandle, extractTwitchHandle } from "../utils/profileUtils";
 import pokemonData from "../data/pokemon.json";
@@ -17,6 +16,7 @@ import ProfileInfoBox from "../components/Profile/ProfileInfoBox";
 import ProfileStatsGrid from "../components/Profile/ProfileStatsGrid";
 import ProfileFavorites from "../components/Profile/ProfileFavorites";
 import ProfileModals from "../components/Profile/ProfileModals";
+import EditProfileModal from "../components/Profile/EditProfileModal";
 
 import "../css/Profile.css";
 import "../css/ProfileRedesign.css";
@@ -39,17 +39,16 @@ export default function ProfilePage() {
 
     const [profileData, setProfileData] = useState(null);
     const [statsData, setStatsData] = useState({ stats: null, recentAdded: [] });
-    
+
     // UI states
-    const [isEditing, setIsEditing] = useState(false);
-    const [pendingNavigation, setPendingNavigation] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
     const [likeBurst, setLikeBurst] = useState(0);
     const [refreshKey, setRefreshKey] = useState(0);
 
-    // Editing form state
+    // Profile form state (read display only — editing happens in modal)
     const [form, setForm] = useState({
         bio: "",
         location: "",
@@ -58,25 +57,29 @@ export default function ProfilePage() {
         avatar: null,
         pendingAvatarFile: null,
         pendingAvatarRemoved: false,
+        nameColor1: null,
+        nameColor2: null,
         favoriteGames: ["", "", "", "", ""],
         favoritePokemon: ["", "", "", "", ""],
         favoritePokemonShiny: [false, false, false, false, false],
         favoriteBalls: ["", "", "", "", ""],
         favoriteTrainers: ["", "", "", "", ""],
+        favoriteCategoryOrder: ["pokemon", "games"],
         switchFriendCode: "",
         goFriendCode: "",
         youtubeUrl: "",
         twitchUrl: "",
     });
-    const formBeforeEditRef = useRef(null);
 
-    // Creator / Admin
+    // Creator / Admin / Premium
     const [isAdmin, setIsAdmin] = useState(false);
     const [isContentCreator, setIsContentCreator] = useState(false);
+    const [isPremium, setIsPremium] = useState(false);
+    const [premiumMonths, setPremiumMonths] = useState(0);
     const [creatorStatus, setCreatorStatus] = useState("none");
     const [showCreatorModal, setShowCreatorModal] = useState(false);
-    
-    // Selection Modals
+
+    // Selection Modals (used by ProfileModals for non-edit context & by EditProfileModal)
     const [showTrainerModal, setShowTrainerModal] = useState(false);
     const [showGameModal, setShowGameModal] = useState(false);
     const [gameSlotIndex, setGameSlotIndex] = useState(null);
@@ -158,45 +161,9 @@ export default function ProfilePage() {
         return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
     }, []);
 
-    useEffect(() => {
-        if (!isEditing) return;
-        const handleBeforeUnload = (e) => { e.preventDefault(); e.returnValue = ''; };
-        const handleClick = (e) => {
-            const link = e.target.closest('a');
-            if (link && link.href && link.origin === window.location.origin) {
-                e.preventDefault(); e.stopPropagation();
-                setPendingNavigation(link.getAttribute('href') || '/');
-            }
-        };
-        window.addEventListener('beforeunload', handleBeforeUnload);
-        document.addEventListener('click', handleClick, { capture: true });
-        return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-            document.removeEventListener('click', handleClick, { capture: true });
-        };
-    }, [isEditing]);
-
-    useEffect(() => {
-        const preventScroll = (e) => e.preventDefault();
-        if (pendingNavigation) {
-            document.body.style.overflow = 'hidden';
-            document.addEventListener('wheel', preventScroll, { passive: false });
-            document.addEventListener('touchmove', preventScroll, { passive: false });
-        } else {
-            document.body.style.overflow = '';
-            document.removeEventListener('wheel', preventScroll);
-            document.removeEventListener('touchmove', preventScroll);
-        }
-        return () => {
-            document.body.style.overflow = '';
-            document.removeEventListener('wheel', preventScroll);
-            document.removeEventListener('touchmove', preventScroll);
-        };
-    }, [pendingNavigation]);
-
     // Fetch Profile Data
     useEffect(() => {
-        if (!targetUsername && !isOwner) return; // Wait until ready
+        if (!targetUsername && !isOwner) return;
         if (isOwner && userLoading) return;
 
         let ignore = false;
@@ -217,252 +184,139 @@ export default function ProfilePage() {
                         gender: data.gender ?? prev.gender,
                         profileTrainer: data.profileTrainer ?? prev.profileTrainer,
                         avatar: data.avatar ?? prev.avatar,
-                        favoriteGames: Array.isArray(data.favoriteGames) ? [...data.favoriteGames] : prev.favoriteGames,
-                        favoritePokemon: Array.isArray(data.favoritePokemon) ? [...data.favoritePokemon] : prev.favoritePokemon,
-                        favoritePokemonShiny: Array.isArray(data.favoritePokemonShiny) ? [...data.favoritePokemonShiny] : prev.favoritePokemonShiny,
-                        favoriteBalls: Array.isArray(data.favoriteBalls) ? [...data.favoriteBalls] : (prev.favoriteBalls || ["", "", "", "", ""]),
-                        favoriteTrainers: Array.isArray(data.favoriteTrainers) ? [...data.favoriteTrainers] : (prev.favoriteTrainers || ["", "", "", "", ""]),
+                        nameColor1: data.nameColor1 ?? data.nameGradientColor1 ?? prev.nameColor1,
+                        nameColor2: data.nameColor2 ?? data.nameGradientColor2 ?? prev.nameColor2,
+                        favoriteGames: data.favoriteGames?.length ? data.favoriteGames : prev.favoriteGames,
+                        favoritePokemon: data.favoritePokemon?.length ? data.favoritePokemon : prev.favoritePokemon,
+                        favoritePokemonShiny: data.favoritePokemonShiny?.length ? data.favoritePokemonShiny : prev.favoritePokemonShiny,
+                        favoriteBalls: data.favoriteBalls?.length ? data.favoriteBalls : prev.favoriteBalls,
+                        favoriteTrainers: data.favoriteTrainers?.length ? data.favoriteTrainers : prev.favoriteTrainers,
+                        favoriteCategoryOrder: Array.isArray(data.favoriteCategoryOrder) ? data.favoriteCategoryOrder : prev.favoriteCategoryOrder,
                         switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode,
                         goFriendCode: data.goFriendCode ?? prev.goFriendCode,
-                        youtubeUrl: extractYoutubeHandle(data.youtubeUrl) || "",
-                        twitchUrl: extractTwitchHandle(data.twitchUrl) || ""
+                        youtubeUrl: data.youtubeUrl ? extractYoutubeHandle(data.youtubeUrl) : prev.youtubeUrl,
+                        twitchUrl: data.twitchUrl ? extractTwitchHandle(data.twitchUrl) : prev.twitchUrl,
                     }));
-                    setIsAdmin(data.isAdmin ?? false);
-                    setIsContentCreator(data.isContentCreator ?? false);
-                    if (!data.isContentCreator) {
-                        creatorAPI.getStatus().then(res => { if (!ignore) setCreatorStatus(res.status); }).catch(() => {});
-                    } else {
-                        setCreatorStatus("approved");
-                    }
-                    setProfileOwnerPreferences(dexPreferences);
+                    setIsAdmin(Boolean(data.isAdmin));
+                    setIsContentCreator(Boolean(data.isContentCreator));
+                    setIsPremium(Boolean(data.isPremium));
+                    setPremiumMonths(data.premiumMonths || 0);
+                    setCreatorStatus(data.creatorStatus || "none");
+                    setLikeCount(data.likeCount || 0);
+                    setHasLiked(Boolean(data.hasLiked));
                 } else {
                     const data = await profileAPI.getPublicProfile(targetUsername);
                     if (ignore) return;
                     setProfileData(data);
                     setForm(prev => ({
                         ...prev,
-                        bio: data.bio, location: data.location, gender: data.gender, profileTrainer: data.profileTrainer,
-                        avatar: data.avatar || null,
-                        favoriteGames: data.favoriteGames || [], favoritePokemon: data.favoritePokemon || [],
-                        favoritePokemonShiny: data.favoritePokemonShiny || [],
-                        favoriteBalls: data.favoriteBalls || [],
-                        favoriteTrainers: data.favoriteTrainers || [],
-                        switchFriendCode: data.switchFriendCode,
-                        goFriendCode: data.goFriendCode,
-                        youtubeUrl: extractYoutubeHandle(data.youtubeUrl) || "",
-                        twitchUrl: extractTwitchHandle(data.twitchUrl) || ""
+                        bio: data.bio ?? prev.bio,
+                        location: data.location ?? prev.location,
+                        gender: data.gender ?? prev.gender,
+                        profileTrainer: data.profileTrainer ?? prev.profileTrainer,
+                        avatar: data.avatar ?? prev.avatar,
+                        nameColor1: data.nameColor1 ?? data.nameGradientColor1 ?? prev.nameColor1,
+                        nameColor2: data.nameColor2 ?? data.nameGradientColor2 ?? prev.nameColor2,
+                        favoriteGames: data.favoriteGames?.length ? data.favoriteGames : prev.favoriteGames,
+                        favoritePokemon: data.favoritePokemon?.length ? data.favoritePokemon : prev.favoritePokemon,
+                        favoritePokemonShiny: data.favoritePokemonShiny?.length ? data.favoritePokemonShiny : prev.favoritePokemonShiny,
+                        favoriteBalls: data.favoriteBalls?.length ? data.favoriteBalls : prev.favoriteBalls,
+                        favoriteTrainers: data.favoriteTrainers?.length ? data.favoriteTrainers : prev.favoriteTrainers,
+                        favoriteCategoryOrder: Array.isArray(data.favoriteCategoryOrder) ? data.favoriteCategoryOrder : prev.favoriteCategoryOrder,
+                        switchFriendCode: data.switchFriendCode ?? prev.switchFriendCode,
+                        goFriendCode: data.goFriendCode ?? prev.goFriendCode,
+                        youtubeUrl: data.youtubeUrl ? extractYoutubeHandle(data.youtubeUrl) : prev.youtubeUrl,
+                        twitchUrl: data.twitchUrl ? extractTwitchHandle(data.twitchUrl) : prev.twitchUrl,
                     }));
-                    setIsAdmin(data.isAdmin ?? false);
-                    setIsContentCreator(data.isContentCreator ?? false);
-                    
-                    const prefs = data.dexPreferences || {
-                        showGenderForms: true, showAlolanForms: true, showGalarianForms: true, showHisuianForms: true,
-                        showPaldeanForms: true, showGmaxForms: true, showUnownForms: true, showOtherForms: true,
-                        showAlcremieForms: true, showVivillonForms: true, showAlphaForms: true, showAlphaOtherForms: true,
-                        showMightyForms: true,
-                    };
-                    setProfileOwnerPreferences(prefs);
+                    setIsAdmin(Boolean(data.isAdmin));
+                    setIsContentCreator(Boolean(data.isContentCreator));
+                    setIsPremium(Boolean(data.isPremium));
+                    setPremiumMonths(data.premiumMonths || 0);
+                    setLikeCount(data.likeCount || 0);
+                    setHasLiked(Boolean(data.hasLiked));
+                    if (data.dexPreferences) setProfileOwnerPreferences(data.dexPreferences);
                 }
             } catch (err) {
                 console.error("Failed to fetch profile:", err);
-                if (!ignore && !isOwner) {
-                    setProfileOwnerPreferences({
-                        showGenderForms: true, showAlolanForms: true, showGalarianForms: true, showHisuianForms: true,
-                        showPaldeanForms: true, showGmaxForms: true, showUnownForms: true, showOtherForms: true,
-                        showAlcremieForms: true, showVivillonForms: true, showAlphaForms: true, showAlphaOtherForms: true,
-                        showMightyForms: true,
-                    });
-                }
             } finally {
                 if (!ignore) setLoading('profile-data', false);
             }
         };
+
         fetchData();
         return () => { ignore = true; };
-    }, [isOwner, targetUsername, userLoading, dexPreferences]); // Added dexPreferences to sync owner prefs if they change
+    }, [targetUsername, isOwner, userLoading, refreshKey]);
 
-    // Fetch Profile Stats
-    const optimisticOrderRef = useRef(null);
+    // Fetch stats
     useEffect(() => {
-        if (!targetUsername && !isOwner) return;
-        if (!isOwner && !profileOwnerPreferences) return; // Wait for prefs to calculate correctly
-        
+        if (!targetUsername) return;
         let ignore = false;
-        if (!statsData.stats) {
-            setLoading('profile-stats', true);
-        }
 
-        const loadStats = async () => {
+        const fetchStats = async () => {
             try {
                 let map = {};
                 if (isOwner) {
-                    const serverMap = await caughtAPI.getCaughtData();
-                    map = serverMap;
                     try {
+                        const serverMap = await caughtAPI.getCaughtData();
+                        map = serverMap || {};
                         const raw = localStorage.getItem(`caughtInfoMap:${currentUsername}`);
                         if (raw) {
                             const localCache = JSON.parse(raw);
                             if (localCache && typeof localCache === 'object') {
-                                map = { ...serverMap, ...localCache };
+                                map = { ...map, ...localCache };
                             }
                         }
-                    } catch {}
-                    if (!optimisticOrderRef.current) {
-                        try {
-                            const stored = JSON.parse(sessionStorage.getItem('recentCatchOrder') || '[]');
-                            if (stored.length > 0) optimisticOrderRef.current = stored;
-                        } catch {}
+                    } catch (e) {
+                        console.error("Failed to load owner caught data:", e);
                     }
                 } else {
                     const response = await profileAPI.getPublicCaughtData(targetUsername);
-                    map = response?.caughtPokemon || {};
+                    map = response?.caughtPokemon || response || {};
                 }
 
-                const prefsToUse = isOwner ? dexPreferences : profileOwnerPreferences;
-                const result = calculateProfileStats(map, prefsToUse, optimisticOrderRef.current);
-                
-                if (!ignore) {
-                    setStatsData(result);
-                }
+                if (ignore) return;
+                const prefs = isOwner ? dexPreferences : profileOwnerPreferences;
+                const { stats, recentAdded } = calculateProfileStats(map, prefs);
+                setStatsData({ stats, recentAdded });
             } catch (err) {
-                console.error("Failed to load stats:", err);
-                if (!ignore) {
-                    const prefsToUse = isOwner ? dexPreferences : profileOwnerPreferences;
-                    setStatsData(calculateProfileStats({}, prefsToUse, []));
-                }
-            } finally {
-                if (!ignore) setLoading('profile-stats', false);
+                console.error("Failed to fetch stats:", err);
             }
         };
-        loadStats();
+
+        fetchStats();
         return () => { ignore = true; };
-    }, [isOwner, targetUsername, profileOwnerPreferences, dexPreferences, refreshKey, currentUsername]);
+    }, [targetUsername, isOwner, currentUsername, dexPreferences, profileOwnerPreferences, refreshKey]);
 
-    // Likes & Visibility logic
-    useEffect(() => {
-        if (!targetUsername) return;
-        let ignore = false;
-        const fetchLikes = async () => {
-            if (document.hidden) return;
-            try {
-                const { hasLiked: userHasLiked, likeCount: count } = await profileAPI.getProfileLikes(targetUsername);
-                if (!ignore) {
-                    setLikeCount(count);
-                    setHasLiked(userHasLiked);
-                }
-            } catch {}
-        };
-        fetchLikes();
-
-        const handleFocus = () => { if (!document.hidden) fetchLikes(); };
-        window.addEventListener('focus', handleFocus);
-        window.addEventListener('visibilitychange', handleFocus);
-
-        return () => {
-            ignore = true;
-            window.removeEventListener('focus', handleFocus);
-            window.removeEventListener('visibilitychange', handleFocus);
-        };
-    }, [targetUsername]);
-
-    const refreshRecentPokemon = () => setRefreshKey(prev => prev + 1);
-
-    useEffect(() => {
-        const handleVisibilityChange = () => { if (!document.hidden) refreshRecentPokemon(); };
-        const handleFocus = () => refreshRecentPokemon();
-        
-        const handleCaughtDataChanged = (e) => {
-            if (!isOwner) return;
-            const { pokemon, caughtInfo, wasCaught, isShiny, isNewEntry } = e?.detail || {};
-            if (pokemon && caughtInfo && (!wasCaught || isNewEntry)) {
-                setStatsData(prev => {
-                    const newEntry = { mon: pokemon, info: { ...caughtInfo, isShiny: !!isShiny } };
-                    const filtered = prev.recentAdded.filter(p => p.mon?.stableId !== pokemon.stableId || !!p.info?.isShiny !== !!isShiny);
-                    const next = [newEntry, ...filtered].slice(0, 5);
-                    optimisticOrderRef.current = next.map(p => ({ stableId: p.mon?.stableId, isShiny: !!p.info?.isShiny }));
-                    return { ...prev, recentAdded: next };
-                });
-            } else if (pokemon && caughtInfo && wasCaught) {
-                setStatsData(prev => {
-                    const next = prev.recentAdded.map(p => {
-                        if (p.mon?.stableId === pokemon.stableId && !!p.info?.isShiny === !!isShiny) {
-                            return { ...p, info: { ...caughtInfo, isShiny: !!isShiny } };
-                        }
-                        return p;
-                    });
-                    return { ...prev, recentAdded: next };
-                });
-            } else if (pokemon && !caughtInfo) {
-                setStatsData(prev => {
-                    const next = prev.recentAdded.filter(p => !(p.mon?.stableId === pokemon.stableId && !!p.info?.isShiny === !!isShiny));
-                    optimisticOrderRef.current = next.map(p => ({ stableId: p.mon?.stableId, isShiny: !!p.info?.isShiny }));
-                    return { ...prev, recentAdded: next };
-                });
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        window.addEventListener('focus', handleFocus);
-        window.addEventListener('caughtDataChanged', handleCaughtDataChanged);
-
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-            window.removeEventListener('focus', handleFocus);
-            window.removeEventListener('caughtDataChanged', handleCaughtDataChanged);
-        };
-    }, [isOwner]);
-
-    const isPrivate = !isOwner && !isViewerAdmin && !profileData?.isPrivateAdminView && (profileData?.isProfilePublic === false || profileData?.isPrivate);
-
-    const isProfileLoading = (isOwner && userLoading) || isLoading('profile-data') || (!isPrivate && (isLoading('profile-stats') || !statsData.stats));
-
-    if (isProfileLoading) {
+    // Loading / error states
+    if (isLoading('profile-data') && !profileData) {
         return (
             <div className="profile-page">
-                <SectionLoader minHeight="60vh" message="Loading trainer profile..." />
+                <SectionLoader text="Loading trainer profile..." />
             </div>
         );
     }
 
-    if (isPrivate) {
+    if (!isOwner && !profileData) {
         return (
-            <div className="profile-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '65vh' }}>
-                <div className="stats-private-card fade-in-up">
-                    <Lock className="stats-private-icon" />
-                    <h2>This Profile is Private</h2>
-                    <p>{targetUsername || "This trainer"}'s collection and profile are hidden by their privacy settings.</p>
-                    <Button
-                        as={Link}
-                        to="/trainers"
-                        variant="secondary"
-                        size="sm"
-                        className="stats-back-btn"
-                        icon={<ArrowLeft size={16} />}
-                    >
-                        Back to Trainers
-                    </Button>
+            <div className="profile-page">
+                <div className="profile-not-found">
+                    <UserX size={48} className="text-gray-500 mb-4" />
+                    <h2>Trainer Not Found</h2>
+                    <p>This profile doesn't exist or has been set to private.</p>
+                    <Link to="/" className="btn-primary mt-4">Go Home</Link>
                 </div>
             </div>
         );
     }
 
-    if (!profileData && !isOwner) {
+    if (!isOwner && profileData?.isProfilePublic === false && !isViewerAdmin) {
         return (
-            <div className="profile-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '65vh' }}>
-                <div className="stats-private-card fade-in-up">
-                    <UserX className="stats-private-icon" />
-                    <h2>Trainer Not Found</h2>
-                    <p>We couldn't find a trainer with the username "{targetUsername}".</p>
-                    <Button
-                        as={Link}
-                        to="/trainers"
-                        variant="secondary"
-                        size="sm"
-                        className="stats-back-btn"
-                        icon={<ArrowLeft size={16} />}
-                    >
-                        Back to Trainers
-                    </Button>
+            <div className="profile-page">
+                <div className="profile-private">
+                    <Lock size={48} className="text-gray-500 mb-4" />
+                    <h2>Private Profile</h2>
+                    <p>This trainer's profile is set to private.</p>
+                    <Link to="/" className="btn-primary mt-4">Go Home</Link>
                 </div>
             </div>
         );
@@ -484,15 +338,15 @@ export default function ProfilePage() {
                 </div>
             )}
 
-            <ProfileHero 
+            <ProfileHero
                 username={targetUsername}
                 createdAt={createdAt}
                 isOwner={isOwner}
-                isEditing={isEditing}
                 isAdmin={isAdmin}
                 isContentCreator={isContentCreator}
+                isPremium={isPremium}
+                premiumMonths={premiumMonths}
                 form={form}
-                setForm={setForm}
                 likeCount={likeCount}
                 hasLiked={hasLiked}
                 likeLoading={likeLoading}
@@ -503,34 +357,31 @@ export default function ProfilePage() {
                 setLikeBurst={setLikeBurst}
                 creatorStatus={creatorStatus}
                 setShowCreatorModal={setShowCreatorModal}
-                setIsEditing={setIsEditing}
-                formBeforeEditRef={formBeforeEditRef}
-                setUser={setUser}
                 currentUsername={currentUsername}
-                setShowTrainerModal={setShowTrainerModal}
+                onOpenEditModal={() => setShowEditModal(true)}
                 isOnline={isOwner ? true : Boolean(profileData?.isOnline)}
             />
 
-            <ProfileTopStats 
-                stats={statsData.stats} 
+            <ProfileTopStats
+                stats={statsData.stats}
                 targetUsername={targetUsername}
                 isOwner={isOwner}
                 hasBingoData={isOwner ? true : Boolean(profileData?.hasBingoData)}
             />
 
-            <div className={`profile-columns-container ${isEditing ? "editing-mode" : ""}`}>
+            <div className="profile-columns-container">
                 <div className="profile-left-col">
-                    <ProfileInfoBox 
+                    <ProfileInfoBox
                         isOwner={isOwner}
-                        isEditing={isEditing}
+                        isEditing={false}
                         form={form}
                         setForm={setForm}
                         isContentCreator={isContentCreator}
                         isAdmin={isAdmin}
                     />
-                    <ProfileFavorites 
+                    <ProfileFavorites
                         isOwner={isOwner}
-                        isEditing={isEditing}
+                        isEditing={false}
                         form={form}
                         useHomeSprites={useHomeSprites}
                         POKEMON_OPTIONS={POKEMON_OPTIONS}
@@ -542,20 +393,39 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="profile-right-col">
-                    <ProfileStatsGrid 
-                        stats={statsData.stats} 
-                        recentAdded={statsData.recentAdded} 
-                        useHomeSprites={useHomeSprites} 
-                        targetUsername={targetUsername} 
+                    <ProfileStatsGrid
+                        stats={statsData.stats}
+                        recentAdded={statsData.recentAdded}
+                        useHomeSprites={useHomeSprites}
+                        targetUsername={targetUsername}
                         isStatsPublic={profileData?.isStatsPublic}
                         isOwner={isOwner}
                     />
                 </div>
             </div>
 
-            <ProfileModals 
+            {/* Edit Profile Modal — replaces inline editing entirely */}
+            {isOwner && (
+                <EditProfileModal
+                    isOpen={showEditModal}
+                    onClose={() => setShowEditModal(false)}
+                    username={targetUsername || currentUsername}
+                    form={form}
+                    setForm={setForm}
+                    setUser={setUser}
+                    isPremium={isPremium}
+                    isAdmin={isAdmin}
+                    isContentCreator={isContentCreator}
+                    creatorStatus={creatorStatus}
+                    onRequestCreator={() => setShowCreatorModal(true)}
+                    POKEMON_OPTIONS={POKEMON_OPTIONS}
+                    onSaved={() => setRefreshKey(k => k + 1)}
+                />
+            )}
+
+            <ProfileModals
                 isOwner={isOwner}
-                isEditing={isEditing}
+                isEditing={false}
                 form={form}
                 setForm={setForm}
                 showCreatorModal={showCreatorModal}
@@ -574,9 +444,9 @@ export default function ProfilePage() {
                 showFavoriteTrainerModal={showFavoriteTrainerModal}
                 setShowFavoriteTrainerModal={setShowFavoriteTrainerModal}
                 POKEMON_OPTIONS={POKEMON_OPTIONS}
-                pendingNavigation={pendingNavigation}
-                setPendingNavigation={setPendingNavigation}
-                setIsEditing={setIsEditing}
+                pendingNavigation={null}
+                setPendingNavigation={() => {}}
+                setIsEditing={() => {}}
             />
         </div>
     );

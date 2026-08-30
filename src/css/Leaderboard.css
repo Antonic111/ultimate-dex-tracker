@@ -1004,3 +1004,64 @@
     margin: 0 auto;
   }
 }
+
+/* ==========================================================================
+   LIGHT MODE LEADERBOARD STYLING
+   ========================================================================== */
+[data-theme="light"] .leaderboard-controls-row,
+[data-theme="light"] .leaderboard-table-card {
+  background: #ffffff;
+  border-color: var(--border-color, #e2e8f0);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .leaderboard-table-head {
+  background: #f8fafc;
+  border-bottom-color: var(--border-color, #e2e8f0);
+  color: var(--text-muted, #475569);
+}
+
+[data-theme="light"] .leaderboard-row {
+  background: #ffffff;
+  border-bottom-color: var(--border-color, #e2e8f0);
+  color: var(--text, #0f172a);
+}
+
+[data-theme="light"] .leaderboard-row:hover {
+  background: #f8fafc;
+}
+
+[data-theme="light"] .leaderboard-row:hover .btn-table-view {
+  background-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .table-progress-bar-track {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .rank-pill.rank-standard {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #0f172a;
+}
+
+[data-theme="light"] .metric-badge {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #0f172a;
+}
+
+[data-theme="light"] .leaderboard-pagination-footer {
+  background: #ffffff;
+  border-top-color: var(--border-color, #e2e8f0);
+}
+
+[data-theme="light"] .podium-avatar-wrap.rank-1,
+[data-theme="light"] .podium-avatar-wrap.rank-2,
+[data-theme="light"] .podium-avatar-wrap.rank-3 {
+  background: #f8fafc;
+}

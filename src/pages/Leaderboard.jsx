@@ -377,7 +377,15 @@ export default function Leaderboard() {
                     />
                   </div>
 
-                  <h3 className="podium-username">{topThree[1].username}</h3>
+                  <h3 className="podium-username">
+                    {topThree[1].nameColor1 && topThree[1].nameColor2 ? (
+                      <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": topThree[1].nameColor1, "--grad-c2": topThree[1].nameColor2 }}>
+                        <span className="animated-gradient-username">{topThree[1].username}</span>
+                      </span>
+                    ) : (
+                      topThree[1].username
+                    )}
+                  </h3>
 
                   <div className="podium-country">
                     {(() => {
@@ -465,7 +473,15 @@ export default function Leaderboard() {
                     />
                   </div>
 
-                  <h3 className="podium-username">{topThree[0].username}</h3>
+                  <h3 className="podium-username">
+                    {topThree[0].nameColor1 && topThree[0].nameColor2 ? (
+                      <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": topThree[0].nameColor1, "--grad-c2": topThree[0].nameColor2 }}>
+                        <span className="animated-gradient-username">{topThree[0].username}</span>
+                      </span>
+                    ) : (
+                      topThree[0].username
+                    )}
+                  </h3>
 
                   <div className="podium-country">
                     {(() => {
@@ -551,7 +567,15 @@ export default function Leaderboard() {
                     />
                   </div>
 
-                  <h3 className="podium-username">{topThree[2].username}</h3>
+                  <h3 className="podium-username">
+                    {topThree[2].nameColor1 && topThree[2].nameColor2 ? (
+                      <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": topThree[2].nameColor1, "--grad-c2": topThree[2].nameColor2 }}>
+                        <span className="animated-gradient-username">{topThree[2].username}</span>
+                      </span>
+                    ) : (
+                      topThree[2].username
+                    )}
+                  </h3>
 
                   <div className="podium-country">
                     {(() => {
@@ -666,7 +690,13 @@ export default function Leaderboard() {
                       />
                       <div className="table-trainer-info">
                         <div className="table-trainer-name-row">
-                          <span className="table-trainer-name">{trainer.username}</span>
+                          {trainer.nameColor1 && trainer.nameColor2 ? (
+                            <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": trainer.nameColor1, "--grad-c2": trainer.nameColor2 }}>
+                              <span className="animated-gradient-username table-trainer-name">{trainer.username}</span>
+                            </span>
+                          ) : (
+                            <span className="table-trainer-name">{trainer.username}</span>
+                          )}
                           {isCurrentUser && <span className="you-badge">YOU</span>}
                         </div>
                       </div>

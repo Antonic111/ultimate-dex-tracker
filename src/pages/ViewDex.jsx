@@ -578,31 +578,30 @@ export default function ViewDex() {
 
     return (
         <>
-            <div className="page-container fade-in-content">
-                <DexView
-                    viewingUsername={username}
-                    allMons={allMons}
-                    caughtInfoMap={caughtInfoMap}
-                    dexSections={dexSections}
-                    progressBarsOverride={progressBars}
-                    filters={filters}
-                    setFilters={setFilters}
-                    showShiny={showShiny}
-                    setShowShiny={setShowShiny}
-                    showForms={showForms}
-                    setShowForms={setShowForms}
-                    selectedPokemon={selectedPokemon}
-                    setSelectedPokemon={setSelectedPokemon}
-                    sidebarOpen={sidebarOpen}
-                    setSidebarOpen={setSidebarOpen}
-                    readOnly={true}
-                    title={`${username}'s Living Dex`}
-                    customFilterMons={customFilterMons}
-                    externalLinkPreference={externalLinkPreference}
-                    viewedUserShinyCharmGames={viewedUserShinyCharmGames}
-                    profileOwnerDexPreferences={profileOwnerPreferences}
-                />
-            </div>
+            <DexView
+                viewingUsername={username}
+                allMons={allMons}
+                caught={caughtInfoMap}
+                caughtInfoMap={caughtInfoMap}
+                dexSections={dexSections}
+                progressBarsOverride={progressBars}
+                filters={filters}
+                setFilters={setFilters}
+                showShiny={showShiny}
+                setShowShiny={setShowShiny}
+                showForms={showForms}
+                setShowForms={setShowForms}
+                selectedPokemon={selectedPokemon}
+                setSelectedPokemon={setSelectedPokemon}
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+                readOnly={true}
+                title={`${username}'s Living Dex`}
+                customFilterMons={customFilterMons}
+                externalLinkPreference={externalLinkPreference}
+                viewedUserShinyCharmGames={viewedUserShinyCharmGames}
+                profileOwnerDexPreferences={profileOwnerPreferences}
+            />
 
             {/* Sidebar - rendered outside page container to avoid stacking context issues */}
             <Sidebar
@@ -620,6 +619,7 @@ export default function ViewDex() {
                 viewingUsername={username}
                 onPokemonSelect={setSelectedPokemon}
                 externalLinkPreference={externalLinkPreference}
+                dexPreferences={profileOwnerPreferences}
             />
         </>
     );

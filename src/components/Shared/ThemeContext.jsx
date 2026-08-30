@@ -77,6 +77,8 @@ export function ThemeProvider({ children }) {
     document.documentElement.setAttribute("data-accent", accent);
     document.documentElement.style.setProperty("--accent", accentMap[accent] || accentMap.yellow);
     document.documentElement.style.setProperty("--accent-hover", accentHoverMap[accent] || accentHoverMap.yellow);
+    document.documentElement.style.setProperty("--site-accent", accentMap[accent] || accentMap.yellow);
+    document.documentElement.style.setProperty("--site-accent-hover", accentHoverMap[accent] || accentHoverMap.yellow);
   }, [accent]);
 
   // Called once after login/auth with values from the server profile

@@ -1,6 +1,8 @@
 import React from 'react';
 import { LinkIcon, Heart, Crown, Video, Clock, Camera, NotebookPen, SquareX } from "lucide-react";
 import { YoutubeIcon, TwitchIcon } from "../Shared/SocialIcons";
+import PremiumIcon from "../Shared/PremiumIcon";
+import { AdminIcon, ContentCreatorIcon } from "../Shared/BadgeIcons";
 import { profileAPI } from "../../utils/api";
 import { useMessage } from "../Shared/MessageContext";
 import { useLoading } from "../Shared/LoadingContext";
@@ -11,7 +13,7 @@ const SWITCH_FC_RE = /^SW-\d{4}-\d{4}-\d{4}$/;
 const GO_FC_RE = /^\d{4} \d{4} \d{4}$/;
 
 export default function ProfileHeader({
-    username, createdAt, isOwner, isEditing, isAdmin, isContentCreator,
+    username, createdAt, isOwner, isEditing, isAdmin, isContentCreator, isPremium, premiumMonths,
     form, setForm, likeCount, hasLiked, likeLoading, likeBurst,
     setLikeCount, setHasLiked, setLikeLoading, setLikeBurst,
     creatorStatus, setShowCreatorModal, setIsEditing, formBeforeEditRef, setUser, currentUsername
@@ -141,6 +143,10 @@ export default function ProfileHeader({
             await profileAPI.updateProfile({
                 bio: form.bio, location: form.location, gender: form.gender, profileTrainer: form.profileTrainer,
                 avatar: finalAvatar,
+                nameColor1: form.nameColor1 || null,
+                nameColor2: form.nameColor2 || null,
+                nameGradientColor1: form.nameColor1 || null,
+                nameGradientColor2: form.nameColor2 || null,
                 favoriteGames: reorderedGames, favoritePokemon: reorderedPokemon, favoritePokemonShiny: reorderedShiny,
                 favoriteBalls: reorderedBalls, favoriteTrainers: reorderedTrainers,
                 switchFriendCode: fc, goFriendCode: goFc, youtubeUrl: finalYoutube, twitchUrl: finalTwitch,
@@ -150,6 +156,8 @@ export default function ProfileHeader({
             setForm((prev) => ({
                 ...prev,
                 avatar: finalAvatar,
+                nameColor1: form.nameColor1 || null,
+                nameColor2: form.nameColor2 || null,
                 pendingAvatarFile: null,
                 pendingAvatarRemoved: false,
                 favoriteGames: reorderedGames,
@@ -173,18 +181,24 @@ export default function ProfileHeader({
         }
     };
 
+    const hasGradient = Boolean(form.nameColor1 && form.nameColor2);
+    const gradientStyle = hasGradient ? {
+        "--grad-c1": form.nameColor1,
+        "--grad-c2": form.nameColor2,
+    } : undefined;
+
     return (
         <div className="profile-header-card">
             <div className="profile-header-left">
                 <div
-                    className="profile-avatar-wrapper"
+                    className="profile-avatar-container"
                     onClick={() => { if (isOwner && isEditing) setShowTrainerModal(true); }}
                     style={{ cursor: (isOwner && isEditing) ? "pointer" : "default" }}
                 >
                     <img
                         src={getUserAvatarUrl(form.avatar ? { avatar: form.avatar } : form)}
                         alt="Avatar"
-                        className="profile-avatar-img"
+                        className="profile-avatar"
                     />
                     {isOwner && isEditing && (
                         <div className="profile-avatar-edit-overlay">
@@ -197,16 +211,32 @@ export default function ProfileHeader({
                     <div className="profile-name-row">
                         <h1 className="profile-username">
                             <span className="inline-flex items-center gap-2.5">
-                                <span>{username}</span>
+                                {hasGradient ? (
+                                    <span className="animated-gradient-username-wrapper" style={gradientStyle}>
+                                        <span className="animated-gradient-username">
+                                            {username}
+                                        </span>
+                                    </span>
+                                ) : (
+                                    <span>{username}</span>
+                                )}
+                                {isPremium && (
+                                    <span className="crown-wrapper">
+                                        <PremiumIcon size={26} color="#f59e0b" style={{ flexShrink: 0, cursor: "default" }} />
+                                        <span className="crown-tooltip">
+                                            {premiumMonths === 1 ? '1 month membership' : `${premiumMonths || 1} months membership`}
+                                        </span>
+                                    </span>
+                                )}
                                 {isAdmin && (
                                     <span className="crown-wrapper">
-                                        <Crown size={26} strokeWidth={2.5} style={{ color: "#fbbf24", flexShrink: 0, cursor: "default" }} />
+                                        <AdminIcon size={24} color="#38bdf8" style={{ flexShrink: 0, cursor: "default" }} />
                                         <span className="crown-tooltip">Admin</span>
                                     </span>
                                 )}
                                 {isContentCreator && (
                                     <span className="crown-wrapper">
-                                        <Video size={26} strokeWidth={2.5} style={{ color: "#fbbf24", flexShrink: 0, cursor: "default" }} />
+                                        <ContentCreatorIcon size={24} color="#ef4444" style={{ flexShrink: 0, cursor: "default" }} />
                                         <span className="crown-tooltip">Content Creator</span>
                                     </span>
                                 )}
@@ -215,13 +245,13 @@ export default function ProfileHeader({
 
                         <div className="profile-likes-display">
                             <button
-                                className={`profile-like-btn ${hasLiked ? 'liked' : ''} ${!currentUsername && !isOwner ? 'disabled' : ''}`}
+                                className={`profile-like-btn ${(hasLiked || isOwner) ? 'liked' : ''} ${!currentUsername && !isOwner ? 'disabled' : ''} ${isOwner ? 'owner-view' : ''}`}
                                 onClick={handleLike}
                                 disabled={likeLoading || !currentUsername || isOwner}
-                                title={!currentUsername ? "Log in to like" : (hasLiked ? "Remove like" : "Like profile")}
+                                title={isOwner ? "Total likes received on your profile" : (!currentUsername ? "Log in to like" : (hasLiked ? "Remove like" : "Like profile"))}
                             >
                                 <span className="like-heart-anchor">
-                                    <Heart size={16} fill={hasLiked ? "currentColor" : "none"} />
+                                    <Heart size={16} fill={(hasLiked || isOwner) ? "currentColor" : "none"} />
                                     {likeBurst > 0 && (
                                         <span key={likeBurst} aria-hidden="true">
                                             <span className="like-heart">❤</span>

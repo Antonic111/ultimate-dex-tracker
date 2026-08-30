@@ -89,6 +89,7 @@ export const getDexPreferences = () => {
                 blockGOExclusiveShinies: false,
                 blockNOOTExclusiveShinies: false,
                 hideLockedShinies: false,
+                useHomeSprites: false,
                 dexViewMode: 'categorized',
                 ...parsedPrefs // User preferences override defaults
             };
@@ -115,6 +116,7 @@ export const getDexPreferences = () => {
         blockGOExclusiveShinies: false,
         blockNOOTExclusiveShinies: false,
         hideLockedShinies: false,
+        useHomeSprites: false,
         dexViewMode: 'categorized',
     };
 };

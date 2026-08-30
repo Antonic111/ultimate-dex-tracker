@@ -403,11 +403,10 @@ export default function DexView({
                 <div className="dex-shiny-segmented-control" role="group" aria-label="Pokemon sprite display mode">
                     <button
                         type="button"
-                        className={`dex-shiny-segmented-btn ${!showShiny ? 'active is-regular' : ''}`}
+                        className={`dex-shiny-segmented-btn ${!showShiny ? 'active' : ''}`}
                         onClick={() => setShowShiny(false)}
                         title="Show regular Pokémon sprites"
                     >
-                        <span className="dex-segmented-dot" />
                         <span>Regular</span>
                     </button>
                     <button
@@ -438,7 +437,7 @@ export default function DexView({
             )}
 
             {/* Main Dex Section */}
-            <div className="main-bg page-animate-3">
+            <div className="main-bg page-container page-animate-3">
                 <DexCategoryTabs
                     tabs={availableTabs}
                     activeTab={effectiveActiveTab}
@@ -456,9 +455,10 @@ export default function DexView({
                             sidebarOpen={sidebarOpen}
                             title={section.title}
                             pokemonList={filteredMons}
-                            caught={caught || {}}
+                            caught={caught || caughtInfoMap || {}}
                             isCaught={(poke) => {
-                                const val = (caught || {})[getCaughtKey(poke, null, showShiny)];
+                                const key = getCaughtKey(poke, null, showShiny);
+                                const val = (caught || {})[key] ?? (caughtInfoMap || {})[key];
                                 return typeof val === 'boolean' ? val : !!(val && val.caught !== false && (val.entries?.length > 0 || val.caught === true));
                             }}
                             hasFail={(poke) => {
@@ -490,6 +490,7 @@ export default function DexView({
                     viewingUsername={viewingUsername}
                     onPokemonSelect={setSelectedPokemon}
                     externalLinkPreference={externalLinkPreference}
+                    dexPreferences={profileOwnerDexPreferences}
                 />
             )}
         </>

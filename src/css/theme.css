@@ -13,6 +13,7 @@
   /* Neutral Text Tones */
   --text-muted: #888888;
   --text-secondary: #888888;
+  --border-color: #333333;
 }
 
 [data-theme="dark"] {
@@ -144,208 +145,131 @@
 }
 
 [data-theme="light"] {
-  /* GLOBALS - Improved light mode with better blending */
-  --accent: #fbbf24;
-  /* amber-400 */
-  --accent-hover: #f59e0b;
-  /* amber-500 */
-  --dividers: #d1d5db;
-  /* gray-300 - softer */
-  --main-bg: #fafafa;
-  /* slightly off-white for better blending */
-  --main-bg2: #f3f4f6;
-  /* gray-100 */
-  --text: #1f2937;
-  /* gray-800 - better contrast than gray-900 */
-  --text-muted: #6b7280;
-  /* gray-500 */
-  --text-secondary: #6b7280;
-  /* gray-500 */
-  --header-hello: #4b5563;
-  /* gray-600 - softer */
+  /* GLOBALS - Soft slate low-glare foundation */
+  --accent: #d97706;
+  --accent-hover: #b45309;
+  --accent-rgb: 217, 119, 6;
+  --dividers: #e2e8f0;
+  --main-bg: #f0f2f5;
+  --main-bg2: #e2e8f0;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --text-secondary: #475569;
+  --header-hello: #334155;
 
   /* APP.CSS */
-  --header: #f8fafc;
-  /* slate-50 - softer than gray-100 */
-  --grid-headers: #1f2937;
-  /* gray-800 */
-  --grid-desc: #4b5563;
-  /* gray-600 */
-  --main-grid-divider: #9ca3af;
-  /* gray-400 */
+  --header: #ffffff;
+  --grid-headers: #0f172a;
+  --grid-desc: #475569;
+  --main-grid-divider: #cbd5e1;
+  --divider1: rgba(0, 0, 0, 0.08);
+  --divider2: var(--accent);
   --pokemon-box-bg: #ffffff;
-  /* white */
   --pokemon-box-bg2: #f8fafc;
-  /* slate-50 */
-  --border-color: #d1d5db;
-  /* gray-300 - more visible than gray-200 */
-  --pokeslot: #f3f4f6;
-  /* gray-100 */
-  --pokename: #1f2937;
-  /* gray-800 */
-  --collapse-btn: #4b5563;
-  /* gray-600 */
+  --border-color: #e2e8f0;
+  --pokeslot: #f8fafc;
+  --pokename: #0f172a;
+  --collapse-btn: #334155;
   --collapse-icon: #ffffff;
-  /* white */
 
   /* AUTH.CSS */
   --auth-boxes: #ffffff;
-  /* white */
-  --text-color: #1f2937;
-  /* gray-800 */
-  --remember-me-text: #4b5563;
-  /* gray-600 */
-  --svg-icons: #6b7280;
-  /* gray-500 */
+  --text-color: #0f172a;
+  --remember-me-text: #475569;
+  --svg-icons: #64748b;
   --user-dropdown: #ffffff;
-  /* white */
   --nav-link-bg: rgba(0, 0, 0, 0.04);
   --nav-link-border: rgba(0, 0, 0, 0.08);
-  --nav-link-hover-bg: rgba(0, 0, 0, 0.06);
-  --nav-link-text: #4b5563;
-  /* gray-600 */
-  --nav-link-hover-text: #1f2937;
-  /* gray-800 */
-  --nav-link-shadow: rgba(0, 0, 0, 0.08);
+  --nav-link-hover-bg: rgba(0, 0, 0, 0.07);
+  --nav-link-text: #1e293b;
+  --nav-link-hover-text: #0f172a;
+  --nav-link-shadow: rgba(0, 0, 0, 0.04);
   --dropdown-bg: #ffffff;
-  /* white */
-  --dropdown-border: #d1d5db;
-  /* gray-300 */
-  --dropdown-item-text: #4b5563;
-  /* gray-600 */
-  --dropdown-item-hover-bg: #f8fafc;
-  /* slate-50 */
-  --dropdown-item-hover-text: #1f2937;
-  /* gray-800 */
-  --dropdown-icon: #6b7280;
-  /* gray-500 */
-  --dropdown-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-  --dropdown-inset-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.04);
+  --dropdown-border: #e2e8f0;
+  --dropdown-item-text: #0f172a;
+  --dropdown-item-hover-bg: #f1f5f9;
+  --dropdown-item-hover-text: #0f172a;
+  --dropdown-icon: #475569;
+  --dropdown-shadow: 0 14px 36px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  --dropdown-inset-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 
   /* SCROLLBAR VARIABLES */
-  --scrollbar-bg: #e5e7eb;
-  /* neutral-200 */
-  --scrollbar-track: rgba(0, 0, 0, 0.06);
-  --scrollbar-thumb: var(--accent);
+  --scrollbar-bg: #e2e8f0;
+  --scrollbar-track: rgba(0, 0, 0, 0.04);
+  --scrollbar-thumb: #cbd5e1;
 
   /* CONFIRMDIALOG.CSS */
   --confirm-panel: #ffffff;
-  /* white */
-  --confirm-panel-text: #111827;
-  /* gray-900 */
+  --confirm-panel-text: #0f172a;
 
   /* SIDEBAR.CSS */
-  --sidebar-bg: #f8fafc;
-  /* slate-50 */
+  --sidebar-bg: #ffffff;
   --sidebar-pokemon-bg: #ffffff;
-  /* white */
-  --sidebar-text: #1f2937;
-  /* gray-800 */
-  --sidebar-edit-inputs: #ffffff;
-  /* white */
+  --sidebar-text: #0f172a;
+  --sidebar-edit-inputs: #f8fafc;
   --sidebar-display: #ffffff;
-  /* white */
 
   /* EVOLUTIONCHAIN.CSS */
-  --evo-arrow: #6b7280;
-  /* gray-500 */
+  --evo-arrow: #64748b;
   --evo-bg: #ffffff;
-  /* white */
-  --evo-text: #1f2937;
-  /* gray-800 */
+  --evo-text: #0f172a;
 
   /* PROFILE.CSS */
   --profile-card-bg: #ffffff;
-  /* white */
   --profile-top-bg: #f8fafc;
-  /* slate-50 */
-  --profile-text: #1f2937;
-  /* gray-800 */
-  --profile-labels: #6b7280;
-  /* gray-500 */
+  --profile-text: #0f172a;
+  --profile-labels: #475569;
   --profile-fields: #f8fafc;
-  /* slate-50 */
 
   /* FAVORITESELECTIONMODAL.CSS */
   --profile-modal-bg: #ffffff;
-  /* white */
   --profile-modal-boxes: #f8fafc;
-  /* slate-50 */
   --profile-modal-search-bg: #ffffff;
-  /* white */
 
   /* SEARCHBAR.CSS */
   --searchbar-bg: #ffffff;
-  /* white */
   --searchbar-inputs: #f8fafc;
-  /* slate-50 */
-  --searchbar-dropdown: #f8fafc;
-  /* slate-50 */
-  --searchbar-dropdown-selected: #d1d5db;
-  /* gray-300 */
-  --searchbar-placeholder-text: #9ca3af;
-  /* gray-400 */
+  --searchbar-dropdown: #ffffff;
+  --searchbar-dropdown-selected: #e2e8f0;
+  --searchbar-placeholder-text: #64748b;
 
   /* PROGRESSBARS.CSS */
-  --progressbar-info: #6b7280;
-  /* gray-500 */
+  --progressbar-info: #475569;
   --progressbar-bg: #f8fafc;
-  /* slate-50 */
-  --progressbar-track: #d1d5db;
-  /* gray-300 */
+  --progressbar-track: #e2e8f0;
   --progress-bg: #ffffff;
-  /* white */
-  --progress-icons: #4b5563;
-  /* gray-600 */
+  --progress-icons: #334155;
   --progressbar-input: #f8fafc;
-  /* slate-50 */
-  --modal-buttons: #f8fafc;
-  /* slate-50 */
-  --modal-buttons-hover: #d1d5db;
-  /* gray-300 */
-  --modal-buttons-hover-text: #4b5563;
-  /* gray-600 */
+  --modal-buttons: #f1f5f9;
+  --modal-buttons-hover: #e2e8f0;
+  --modal-buttons-hover-text: #0f172a;
   --modal-inputs: #f8fafc;
-  /* slate-50 */
   --modal-dropdown: #ffffff;
-  /* white */
   --template-buttons: #f8fafc;
-  /* slate-50 */
 
   /* WELCOMEPAGE.CSS */
-  --welcome-text: #4b5563;
-  /* gray-600 */
+  --welcome-text: #334155;
 
   /* SETTINGS.CSS */
   --settings-bg: #ffffff;
-  /* white */
   --settings-input: #f8fafc;
-  /* slate-50 */
 
   /* TRAINERS.CSS */
   --trainer-search-bg: #f8fafc;
-  /* slate-50 */
-  --trainer-search-border: #d1d5db;
-  /* gray-300 */
-  --trainer-search-text: #4b5563;
-  /* gray-600 */
-  --trainer-search-placeholder: #9ca3af;
-  /* gray-400 */
+  --trainer-search-border: #e2e8f0;
+  --trainer-search-text: #0f172a;
+  --trainer-search-placeholder: #64748b;
   --trainer-card-bg: #ffffff;
-  /* white */
-  --trainer-card-border: #e5e7eb;
-  /* gray-200 */
-  --trainer-card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --trainer-card-hover-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --trainer-avatar-border: #d1d5db;
-  /* gray-300 */
-  --trainer-avatar-bg: #f3f4f6;
-  /* gray-100 */
+  --trainer-card-border: #e2e8f0;
+  --trainer-card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --trainer-card-hover-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  --trainer-avatar-border: #cbd5e1;
+  --trainer-avatar-bg: #f1f5f9;
 
-  --skeleton-bg: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
+  --skeleton-bg: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 37%, #f1f5f9 63%);
 
   /* INPUT PLACEHOLDER STYLES */
-  --input-placeholder: #9ca3af;
+  --input-placeholder: #64748b;
 }
 
 /* Example usage:

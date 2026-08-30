@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
 import { useUser } from './UserContext';
 import { buildApiUrl } from '../../config/api';
-import { findPokemon, formatPokemonName } from '../../utils';
-import { transformSpriteUrlForViewer } from '../../utils/spriteUtils';
+import { findPokemon, formatPokemonName, getFormDisplayName } from '../../utils';
+import { transformSpriteUrlForViewer, getSpriteUrl } from '../../utils/spriteUtils';
 import { getUserAvatarUrl } from '../../utils/profileUtils';
 import pokemonData from '../../data/pokemon.json';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
@@ -28,7 +29,8 @@ const timeAgo = (dateStr) => {
 const RecentCatchesSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { username } = useUser();
+  const user = useUser();
+  const { username, isGlobalFeedPublic, profileTrainer, avatar } = user || {};
   const [catches, setCatches] = useState([]);
   const [hoveredCatch, setHoveredCatch] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -40,6 +42,16 @@ const RecentCatchesSidebar = () => {
       return false;
     }
   });
+
+  const userRef = useRef({ username, isGlobalFeedPublic, profileTrainer, avatar });
+  useEffect(() => {
+    userRef.current = { username, isGlobalFeedPublic, profileTrainer, avatar };
+  }, [username, isGlobalFeedPublic, profileTrainer, avatar]);
+
+  const useHomeSpritesRef = useRef(useHomeSprites);
+  useEffect(() => {
+    useHomeSpritesRef.current = useHomeSprites;
+  }, [useHomeSprites]);
 
   useEffect(() => {
     const handlePrefsChange = () => {
@@ -84,12 +96,66 @@ const RecentCatchesSidebar = () => {
     window.addEventListener('visibilitychange', handleVisibility);
     window.addEventListener('focus', handleVisibility);
 
-    // Refresh when user catches a Pokemon locally
-    const handleCatchChange = () => {
-      // Small delay to allow backend to persist before fetching
-      setTimeout(fetchRecent, 500);
+    // Optimistically update recent catches feed when user catches/uncatches a Pokémon locally
+    const handleCatchChange = (event) => {
+      const detail = event?.detail;
+      if (!detail) {
+        fetchRecent();
+        return;
+      }
+
+      const currentUser = userRef.current;
+      const isFeedPublic = currentUser?.isGlobalFeedPublic !== false;
+      const isCaught = detail.caughtInfo ? !!detail.caughtInfo.caught : !detail.wasCaught;
+
+      if (isCaught && isFeedPublic && detail.pokemon && currentUser?.username) {
+        const poke = detail.pokemon;
+        const isShiny = !!detail.isShiny;
+        const pokeName = formatPokemonName(poke.name);
+        const formName = getFormDisplayName(poke) || null;
+        const sprite = getSpriteUrl(poke, isShiny, useHomeSpritesRef.current);
+
+        const tempCatch = {
+          _id: `temp-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          pokemonName: pokeName,
+          formName: formName,
+          sprite: sprite,
+          username: currentUser.username,
+          profileTrainer: currentUser.profileTrainer || null,
+          avatar: currentUser.avatar || null,
+          caughtAt: new Date().toISOString()
+        };
+
+        setCatches(prev => {
+          const filtered = prev.filter(c => !(
+            c.username === currentUser.username &&
+            c.pokemonName === pokeName &&
+            (c.formName || null) === formName &&
+            c._id?.toString().startsWith('temp-')
+          ));
+          return [tempCatch, ...filtered].slice(0, 25);
+        });
+      } else if (!isCaught && detail.pokemon && currentUser?.username) {
+        const pokeName = formatPokemonName(detail.pokemon.name);
+        const formName = getFormDisplayName(detail.pokemon) || null;
+        setCatches(prev => prev.filter(c => !(
+          c.username === currentUser.username &&
+          c.pokemonName === pokeName &&
+          (c.formName || null) === formName
+        )));
+      }
+
+      // Safety fallback fetch after 1 second
+      setTimeout(fetchRecent, 1000);
     };
+
+    // When backend finishes saving the catch, synchronize immediately with the server
+    const handleRecentCatchesUpdated = () => {
+      fetchRecent();
+    };
+
     window.addEventListener('caughtDataChanged', handleCatchChange);
+    window.addEventListener('recentCatchesUpdated', handleRecentCatchesUpdated);
 
     // Gentle 60s background refresh only if page is visible
     const interval = setInterval(() => {
@@ -100,6 +166,7 @@ const RecentCatchesSidebar = () => {
       window.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('focus', handleVisibility);
       window.removeEventListener('caughtDataChanged', handleCatchChange);
+      window.removeEventListener('recentCatchesUpdated', handleRecentCatchesUpdated);
       clearInterval(interval);
     };
   }, []);
@@ -132,77 +199,90 @@ const RecentCatchesSidebar = () => {
         <div className="w-full h-full overflow-hidden">
           <div className={`w-[150px] md:w-[190px] h-full flex flex-col items-center transition-opacity duration-300 ${isMinimized ? 'opacity-0' : 'opacity-100'}`}>
             {catches.length === 0 ? (
-          <div className="text-center text-[var(--text-muted)] mt-4 text-[0.65rem] font-bold uppercase rotate-180" style={{ writingMode: 'vertical-rl' }}>
-            No recent catches
-          </div>
-        ) : (
-          <div 
-            key={catches[0]?._id || catches[0]?.caughtAt || 'empty'}
-            className="w-full flex flex-col animate-[slideDownCatchWrapper_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)_forwards]"
-          >
-            {catches.map((c, i) => {
-              let baseName = c.pokemonName;
-              let formName = c.formName || null;
-
-              if (!formName && c.pokemonName) {
-                const matchedBase = sortedBaseNames.find(bn => c.pokemonName === bn || c.pokemonName.startsWith(bn + ' '));
-                if (matchedBase) {
-                  baseName = matchedBase;
-                  if (c.pokemonName.length > matchedBase.length) {
-                    formName = c.pokemonName.substring(matchedBase.length).trim();
-                  }
-                }
-              }
-
-              return (
-                <div 
-                  key={c._id || i} 
-                  onClick={() => navigate(`/u/${c.username}`)}
-                  className={`group relative flex flex-col items-center justify-center w-full aspect-square border-b border-[var(--border-color)] bg-transparent hover:bg-black/20 transition-colors cursor-pointer overflow-hidden ${i === 0 ? 'animate-[slideDownCatch_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)_forwards]' : ''}`}
-                >
-                  {/* Default View (Sprite + Name) */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-1 pointer-events-none">
-                    {c.sprite && (c.sprite.includes('/shiny/') || c.sprite.includes('-shiny') || c.sprite.includes('_shiny')) && (
-                      <div className="absolute top-1.5 left-1.5 z-10 transition-all duration-200 group-hover:opacity-0 group-hover:translate-y-4" style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.8))' }}>
-                        <Sparkles size={20} color="#facc15" fill="#facc15" />
-                      </div>
-                    )}
-                    <img src={transformSpriteUrlForViewer(c.sprite, useHomeSprites)} alt={c.pokemonName} className="w-full h-full object-contain drop-shadow-lg transition-all duration-200 ease-in group-hover:translate-y-8 group-hover:opacity-0 group-hover:scale-95" style={{ imageRendering: 'pixelated' }} onError={e => e.target.style.display = 'none'} />
-                    <div className="absolute bottom-2 left-2 right-2 flex flex-col items-start gap-0 transition-all duration-200 ease-in group-hover:-translate-x-[150%] group-hover:opacity-0 pointer-events-none">
-                    {formName && (
-                      <div 
-                        className="text-[0.6rem] md:text-[0.65rem] text-white/80 font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-full"
-                        style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
-                      >
-                        {formName}
-                      </div>
-                    )}
-                    <div 
-                      className="truncate text-[0.85rem] md:text-[0.95rem] font-bold text-white w-full text-left leading-tight"
-                      style={{ textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 3px rgba(0,0,0,1)' }}
-                    >
-                      {baseName}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Hover View (Avatar + Username + Time) */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-2 bg-[var(--pokemon-box-bg2)]/95 backdrop-blur-md z-10 opacity-0 translate-y-8 pointer-events-none transition-all duration-300 ease-out delay-0 group-hover:opacity-100 group-hover:translate-y-0 group-hover:delay-75">
-                  <div className="w-[60%] max-w-[75px] aspect-square rounded-full border-2 border-[var(--trainer-avatar-border)] bg-[var(--trainer-avatar-bg)] overflow-hidden flex items-center justify-center mb-2 shadow-md">
-                    <img 
-                      src={getUserAvatarUrl(c)} 
-                      alt={c.username} 
-                      className="w-full h-full object-cover" 
-                      onError={e => e.target.style.display = 'none'} 
-                    />
-                  </div>
-                  <div className="font-bold text-[var(--accent)] text-[0.95rem] md:text-[1.05rem] leading-tight truncate w-full text-center">{c.username}</div>
-                  <div className="text-[0.7rem] md:text-[0.75rem] text-white/75 leading-tight mt-1">{timeAgo(c.caughtAt)}</div>
-                </div>
+              <div className="text-center text-[var(--text-muted)] mt-4 text-[0.65rem] font-bold uppercase rotate-180" style={{ writingMode: 'vertical-rl' }}>
+                No recent catches
               </div>
-            )})}
-          </div>
-        )}
+            ) : (
+              <div className="w-full flex flex-col">
+                <AnimatePresence mode="popLayout" initial={false}>
+                  {catches.map((c) => {
+                    let baseName = c.pokemonName;
+                    let formName = c.formName || null;
+
+                    if (!formName && c.pokemonName) {
+                      const matchedBase = sortedBaseNames.find(bn => c.pokemonName === bn || c.pokemonName.startsWith(bn + ' '));
+                      if (matchedBase) {
+                        baseName = matchedBase;
+                        if (c.pokemonName.length > matchedBase.length) {
+                          formName = c.pokemonName.substring(matchedBase.length).trim();
+                        }
+                      }
+                    }
+
+                    const itemKey = c._id || `${c.username}-${c.pokemonName}-${c.caughtAt || ''}`;
+
+                    return (
+                      <motion.div 
+                        layout
+                        key={itemKey}
+                        initial={{ opacity: 0, y: -24, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.85, transition: { duration: 0.22, ease: "easeOut" } }}
+                        transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                        onClick={() => navigate(`/u/${c.username}`)}
+                        className="group relative flex flex-col items-center justify-center w-full aspect-square border-b border-[var(--border-color)] bg-transparent hover:bg-black/20 transition-colors cursor-pointer overflow-hidden"
+                      >
+                        {/* Default View (Sprite + Name) */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-1 pointer-events-none">
+                          {c.sprite && (c.sprite.includes('/shiny/') || c.sprite.includes('-shiny') || c.sprite.includes('_shiny')) && (
+                            <div className="absolute top-1.5 left-1.5 z-10 transition-all duration-200 group-hover:opacity-0 group-hover:translate-y-4" style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.8))' }}>
+                              <Sparkles size={20} color="#facc15" fill="#facc15" />
+                            </div>
+                          )}
+                          <img
+                            src={transformSpriteUrlForViewer(c.sprite, useHomeSprites)}
+                            alt={c.pokemonName}
+                            className="w-full h-full object-contain p-4 md:p-5 pb-6 md:pb-7 drop-shadow-lg transition-all duration-200 ease-in group-hover:translate-y-8 group-hover:opacity-0 group-hover:scale-95"
+                            style={{ imageRendering: useHomeSprites ? 'auto' : 'pixelated' }}
+                            onError={e => e.target.style.display = 'none'}
+                          />
+                          <div className="absolute bottom-2 left-2 right-2 flex flex-col items-start gap-0 transition-all duration-200 ease-in group-hover:-translate-x-[150%] group-hover:opacity-0 pointer-events-none">
+                            {formName && (
+                              <div 
+                                className="text-[0.6rem] md:text-[0.65rem] text-white/80 font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-full"
+                                style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
+                              >
+                                {formName}
+                              </div>
+                            )}
+                            <div 
+                              className="truncate text-[0.85rem] md:text-[0.95rem] font-bold text-white w-full text-left leading-tight"
+                              style={{ textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 3px rgba(0,0,0,1)' }}
+                            >
+                              {baseName}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Hover View (Avatar + Username + Time) */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-2 bg-[var(--pokemon-box-bg2)]/95 backdrop-blur-md z-10 opacity-0 translate-y-8 pointer-events-none transition-all duration-300 ease-out delay-0 group-hover:opacity-100 group-hover:translate-y-0 group-hover:delay-75">
+                          <div className="w-[60%] max-w-[75px] aspect-square rounded-full border-2 border-[var(--trainer-avatar-border)] bg-[var(--trainer-avatar-bg)] overflow-hidden flex items-center justify-center mb-2 shadow-md">
+                            <img 
+                              src={getUserAvatarUrl(c)} 
+                              alt={c.username} 
+                              className="w-full h-full object-cover" 
+                              onError={e => e.target.style.display = 'none'} 
+                            />
+                          </div>
+                          <div className="font-bold text-[var(--accent)] text-[0.95rem] md:text-[1.05rem] leading-tight truncate w-full text-center">{c.username}</div>
+                          <div className="text-[0.7rem] md:text-[0.75rem] text-white/75 leading-tight mt-1">{timeAgo(c.caughtAt)}</div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
         </div>
       </div>

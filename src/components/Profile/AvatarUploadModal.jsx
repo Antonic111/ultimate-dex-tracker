@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import {
     Upload, Trash2, CheckCircle2, AlertCircle, ShieldCheck,
     Camera, ZoomIn, ZoomOut, RotateCw, RotateCcw, RefreshCw, Move,
-    Image as ImageIcon, Sparkles, Check
+    Image as ImageIcon, Sparkles, Check, Crown, ArrowRight
 } from "lucide-react";
 import { Modal } from "../Shared/Modal";
 import { Button } from "../Shared/Button";
@@ -10,10 +11,11 @@ import { useUser } from "../Shared";
 import { getUserAvatarUrl } from "../../utils/profileUtils";
 import "../../css/AvatarUploadModal.css";
 
-const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
+const MAX_STATIC_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_GIF_FILE_SIZE = 8 * 1024 * 1024;    // 8MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const CANVAS_SIZE = 280; // Preview canvas dimension in px
-const EXPORT_SIZE = 400; // High-res final exported avatar size in px
+const EXPORT_SIZE = 256; // Standard 256x256 max resolution for processed avatars
 
 export const DEFAULT_AVATARS = [
     { id: "butterfree", name: "Butterfree", url: "/data/default_profile_pictures/butterfree.png" },
@@ -109,6 +111,7 @@ export default function AvatarUploadModal({
         setErrorMessage("");
         if (!file) return;
 
+        const isMember = Boolean(user?.isPremium || user?.isAdmin);
         const isGifFile = file.type === "image/gif" || file.name.toLowerCase().endsWith(".gif");
         setIsGif(isGifFile);
 
@@ -117,9 +120,16 @@ export default function AvatarUploadModal({
             return;
         }
 
-        if (file.size > MAX_FILE_SIZE) {
-            setErrorMessage("File is too large. Maximum allowed size is 8MB.");
-            return;
+        if (isGifFile) {
+            if (file.size > MAX_GIF_FILE_SIZE) {
+                setErrorMessage("Animated GIF exceeds maximum allowed upload size of 8MB.");
+                return;
+            }
+        } else {
+            if (file.size > MAX_STATIC_FILE_SIZE) {
+                setErrorMessage("Static picture exceeds maximum allowed upload size of 5MB.");
+                return;
+            }
         }
 
         setSelectedFile(file);
@@ -412,9 +422,11 @@ export default function AvatarUploadModal({
         ? selectedDefaultUrl
         : getUserAvatarUrl(activeAvatar ? { avatar: activeAvatar } : user);
 
+    const isMember = Boolean(user?.isPremium || user?.isAdmin);
+
     const isApplyDisabled = activeTab === "defaults"
         ? (!selectedDefaultUrl || selectedDefaultUrl === activeAvatar)
-        : (!selectedFile || isProcessing);
+        : (!selectedFile || isProcessing || (isGif && !isMember));
 
     return (
         <Modal
@@ -551,7 +563,7 @@ export default function AvatarUploadModal({
                                     {isCustomAvatar ? "Current Custom Picture" : "Active Default Avatar"}
                                 </div>
                                 <div className="avatar-preview-meta">
-                                    Supports JPG, PNG, WebP, and animated GIFs up to 8MB.
+                                    Supports JPG, PNG, WebP (up to 5MB) • Animated GIFs up to 8MB (Members Only)
                                 </div>
                             </div>
                         </div>
@@ -579,13 +591,13 @@ export default function AvatarUploadModal({
                                 <span className="avatar-dropzone-bold">Click to upload</span> or drag and drop
                             </div>
                             <div className="avatar-dropzone-sub">
-                                Square image recommended for best circular fit
+                                Images automatically optimized to 256×256 px • Square fit recommended
                             </div>
                         </div>
                     </>
                 ) : isGif ? (
                     /* Animated GIF Preview Stage */
-                    <div className="avatar-gif-stage-wrap">
+                    <div className="avatar-gif-stage-wrap space-y-3">
                         <div className="avatar-gif-preview-container">
                             <img
                                 src={previewUrl}
@@ -593,10 +605,29 @@ export default function AvatarUploadModal({
                                 className="avatar-gif-preview-img"
                             />
                         </div>
-                        <div className="avatar-gif-badge">
-                            <Sparkles size={16} className="avatar-gif-badge-icon" />
-                            <span><strong>Animated GIF Detected</strong> — Animation frames and playback will be 100% preserved!</span>
-                        </div>
+                        {!isMember ? (
+                            <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex flex-col items-center gap-2 text-center text-xs text-rose-200 shadow-sm">
+                                <div className="flex items-center gap-1.5 font-black text-rose-400 text-sm">
+                                    <Crown size={18} className="text-amber-400 shrink-0" />
+                                    <span>Ultimate Membership Feature</span>
+                                </div>
+                                <p className="text-[12px] text-[#ccc] leading-relaxed max-w-sm">
+                                    Animated GIF avatars are exclusive to Ultimate Members. Upgrade your membership to enable animated profile pictures!
+                                </p>
+                                <Link
+                                    to="/membership"
+                                    className="inline-flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-[var(--accent)] text-black font-extrabold text-xs no-underline hover:opacity-90 transition-all mt-1"
+                                >
+                                    <span>View Membership Options</span>
+                                    <ArrowRight size={14} strokeWidth={2.5} />
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="avatar-gif-badge">
+                                <Sparkles size={16} className="avatar-gif-badge-icon" />
+                                <span><strong>Animated GIF Avatar</strong> — Automatically converted into ultra-smooth, lightweight animated WebP!</span>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     /* Interactive Crop & Resize Stage for Static Images */

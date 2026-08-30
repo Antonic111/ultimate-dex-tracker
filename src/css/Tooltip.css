@@ -169,40 +169,52 @@
    HOVER / ACTIVE VISIBILITY TRIGGER
    ========================================================================== */
 
-.udt-tooltip-wrapper:hover .udt-tooltip,
-.udt-tooltip-wrapper:focus-within .udt-tooltip,
-.udt-tooltip.is-visible {
+.udt-tooltip.is-dismissed {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.udt-tooltip-wrapper:active .udt-tooltip {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.udt-tooltip-wrapper:hover .udt-tooltip:not(.is-dismissed),
+.udt-tooltip-wrapper:has(:focus-visible) .udt-tooltip:not(.is-dismissed),
+.udt-tooltip.is-visible:not(.is-dismissed) {
   opacity: 1;
   visibility: visible;
 }
 
-.udt-tooltip-wrapper:hover .udt-tooltip--top.udt-tooltip--center,
-.udt-tooltip.is-visible.udt-tooltip--top.udt-tooltip--center {
+.udt-tooltip-wrapper:hover .udt-tooltip--top.udt-tooltip--center:not(.is-dismissed),
+.udt-tooltip.is-visible.udt-tooltip--top.udt-tooltip--center:not(.is-dismissed) {
   transform: translateX(-50%) translateY(0);
 }
 
-.udt-tooltip-wrapper:hover .udt-tooltip--top.udt-tooltip--start,
-.udt-tooltip-wrapper:hover .udt-tooltip--top.udt-tooltip--end,
-.udt-tooltip.is-visible.udt-tooltip--top.udt-tooltip--start,
-.udt-tooltip.is-visible.udt-tooltip--top.udt-tooltip--end {
+.udt-tooltip-wrapper:hover .udt-tooltip--top.udt-tooltip--start:not(.is-dismissed),
+.udt-tooltip-wrapper:hover .udt-tooltip--top.udt-tooltip--end:not(.is-dismissed),
+.udt-tooltip.is-visible.udt-tooltip--top.udt-tooltip--start:not(.is-dismissed),
+.udt-tooltip.is-visible.udt-tooltip--top.udt-tooltip--end:not(.is-dismissed) {
   transform: translateY(0);
 }
 
-.udt-tooltip-wrapper:hover .udt-tooltip--bottom.udt-tooltip--center,
-.udt-tooltip.is-visible.udt-tooltip--bottom.udt-tooltip--center {
+.udt-tooltip-wrapper:hover .udt-tooltip--bottom.udt-tooltip--center:not(.is-dismissed),
+.udt-tooltip.is-visible.udt-tooltip--bottom.udt-tooltip--center:not(.is-dismissed) {
   transform: translateX(-50%) translateY(0);
 }
 
-.udt-tooltip-wrapper:hover .udt-tooltip--bottom.udt-tooltip--start,
-.udt-tooltip-wrapper:hover .udt-tooltip--bottom.udt-tooltip--end,
-.udt-tooltip.is-visible.udt-tooltip--bottom.udt-tooltip--start,
-.udt-tooltip.is-visible.udt-tooltip--bottom.udt-tooltip--end {
+.udt-tooltip-wrapper:hover .udt-tooltip--bottom.udt-tooltip--start:not(.is-dismissed),
+.udt-tooltip-wrapper:hover .udt-tooltip--bottom.udt-tooltip--end:not(.is-dismissed),
+.udt-tooltip.is-visible.udt-tooltip--bottom.udt-tooltip--start:not(.is-dismissed),
+.udt-tooltip.is-visible.udt-tooltip--bottom.udt-tooltip--end:not(.is-dismissed) {
   transform: translateY(0);
 }
 
-.udt-tooltip-wrapper:hover .udt-tooltip--left,
-.udt-tooltip-wrapper:hover .udt-tooltip--right,
-.udt-tooltip.is-visible.udt-tooltip--left,
-.udt-tooltip.is-visible.udt-tooltip--right {
+.udt-tooltip-wrapper:hover .udt-tooltip--left:not(.is-dismissed),
+.udt-tooltip-wrapper:hover .udt-tooltip--right:not(.is-dismissed),
+.udt-tooltip.is-visible.udt-tooltip--left:not(.is-dismissed),
+.udt-tooltip.is-visible.udt-tooltip--right:not(.is-dismissed) {
   transform: translateY(-50%) translateX(0);
 }

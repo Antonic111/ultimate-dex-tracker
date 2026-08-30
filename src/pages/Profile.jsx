@@ -1,28 +1,25 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { createPortal } from "react-dom";
 import { useUser } from "../components/Shared/UserContext";
 import "../css/Profile.css";
-import { NotebookPen, Trophy, Mars, Venus, VenusAndMars, Globe, PencilLine, SquareX, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight, Video, Clock, Youtube, Twitch } from "lucide-react";
-import FavoriteSelectionModal from "../components/Shared/FavoriteSelectionModal";
+import { NotebookPen, Trophy, Mars, Venus, VenusAndMars, Globe, Link as LinkIcon, Heart, Sparkles, ChevronLeft, ChevronRight, Video, Clock, Youtube, Twitch } from "lucide-react";
+import PremiumIcon from "../components/Shared/PremiumIcon";
+import { AdminIcon, ContentCreatorIcon } from "../components/Shared/BadgeIcons";
 import CreatorRequestModal from "../components/Shared/CreatorRequestModal";
+import EditProfileModal from "../components/Profile/EditProfileModal";
 import "flag-icons/css/flag-icons.min.css";
 import { COUNTRY_OPTIONS } from "../data/countries";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../Constants";
 import pokemonData from "../data/pokemon.json";
 import { formatPokemonName, getFormDisplayName } from "../utils";
 import { getSpriteUrl } from "../utils/spriteUtils";
-import trainerOptions from "../trainers.json";
 import { useNavigate } from "react-router-dom";
 import { useMessage } from "../components/Shared/MessageContext";
 import formsData from "../utils/loadFormsData";
 import { getCaughtKey } from "../caughtStorage";
 import { useLoading } from "../components/Shared/LoadingContext";
 import { LoadingSpinner, SkeletonLoader } from "../components/Shared";
-import { validateContent } from "../../shared/contentFilter";
 import { profileAPI, caughtAPI, creatorAPI } from "../utils/api";
 import { getFilteredFormsData } from "../utils/dexPreferences";
-import { normalizeYoutubeUrl, normalizeTwitchUrl } from "../utils/profileUtils";
-import { InputField, SelectField, TextAreaField } from "../components/Shared/FormField";
 
 const FORM_TYPES_FOR_FAVORITES = [
     "alolan",
@@ -183,67 +180,7 @@ export default function Profile() {
         return [...BASE_POKEMON_OPTIONS, ...FORM_POKEMON_OPTIONS];
     }, [BASE_POKEMON_OPTIONS, FORM_POKEMON_OPTIONS]);
 
-    const [isEditing, setIsEditing] = useState(false);
-    const [pendingNavigation, setPendingNavigation] = useState(null);
-
-    useEffect(() => {
-        if (!isEditing) return;
-
-        const handleBeforeUnload = (e) => {
-            e.preventDefault();
-            e.returnValue = '';
-        };
-        window.addEventListener('beforeunload', handleBeforeUnload);
-
-        const handleClick = (e) => {
-            const link = e.target.closest('a');
-            
-            if (link && link.href && link.origin === window.location.origin) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Store the path they were trying to navigate to and show the modal
-                setPendingNavigation(link.getAttribute('href') || '/');
-            }
-        };
-
-        // Use capture phase so we intercept before React Router's delegated event listeners
-        document.addEventListener('click', handleClick, { capture: true });
-
-        return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-            document.removeEventListener('click', handleClick, { capture: true });
-        };
-    }, [isEditing]);
-
-    useEffect(() => {
-        const preventScroll = (e) => {
-            e.preventDefault();
-        };
-
-        if (pendingNavigation) {
-            document.body.style.overflow = 'hidden';
-            document.addEventListener('wheel', preventScroll, { passive: false });
-            document.addEventListener('touchmove', preventScroll, { passive: false });
-        } else {
-            document.body.style.overflow = '';
-            document.removeEventListener('wheel', preventScroll);
-            document.removeEventListener('touchmove', preventScroll);
-        }
-
-        return () => {
-            document.body.style.overflow = '';
-            document.removeEventListener('wheel', preventScroll);
-            document.removeEventListener('touchmove', preventScroll);
-        };
-    }, [pendingNavigation]);
-
-    const [showGameModal, setShowGameModal] = useState(false);
-    const [gameSlotIndex, setGameSlotIndex] = useState(null);
-    const [showPokemonModal, setShowPokemonModal] = useState(false);
-    const [pokemonSlotIndex, setPokemonSlotIndex] = useState(null);
-    const [showTrainerModal, setShowTrainerModal] = useState(false);
-    const formBeforeEditRef = useRef(null);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
@@ -755,40 +692,6 @@ export default function Profile() {
         }
     };
 
-    const reorderToFront = (arr, fill = null) => {
-        const cleaned = arr.filter((v) => v !== null && v !== undefined);
-        return [...cleaned, ...Array(5 - cleaned.length).fill(fill)];
-    };
-
-    const reorderGames = (arr) => {
-        const valid = arr.filter(v => v !== "" && v !== null && v !== undefined);
-        const padded = [...valid, ...Array(5 - valid.length).fill("")];
-        return padded.slice(0, 5);
-    };
-
-    const openPokemonModal = (index) => {
-        setPokemonSlotIndex(index);
-        setShowPokemonModal(true);
-    };
-
-    const updatePokemonAtIndex = (value, isShiny) => {
-    const handleSaveGames = (newGames) => {
-        const updated = Array.from({ length: 5 }, (_, i) => newGames[i] || "");
-        setForm(prev => ({ ...prev, favoriteGames: updated }));
-        setShowGameModal(false);
-    };
-
-    const handleSavePokemon = (newPokemon, newShiny) => {
-        const updatedPoke = Array.from({ length: 5 }, (_, i) => newPokemon[i] || "");
-        const updatedShiny = Array.from({ length: 5 }, (_, i) => Boolean(newShiny?.[i]));
-        setForm(prev => ({
-            ...prev,
-            favoritePokemon: updatedPoke,
-            favoritePokemonShiny: updatedShiny
-        }));
-        setShowPokemonModal(false);
-    };
-
     const refreshRecentPokemon = () => {
         setRefreshKey(prev => prev + 1);
     };
@@ -875,14 +778,21 @@ export default function Profile() {
                     <div className="profile-top-line">
                         <h1 className="profile-username">
                             <span className="inline-flex items-center gap-2.5">
-                                <span>{username}</span>
+                                {form.nameColor1 && form.nameColor2 ? (
+                                    <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": form.nameColor1, "--grad-c2": form.nameColor2 }}>
+                                        <span className="animated-gradient-username">
+                                            {username}
+                                        </span>
+                                    </span>
+                                ) : (
+                                    <span>{username}</span>
+                                )}
                                 {isAdmin && (
                                     <span className="crown-wrapper">
-                                        <Crown
-                                            size={26}
-                                            strokeWidth={2.5}
+                                        <AdminIcon
+                                            size={24}
+                                            color="#38bdf8"
                                             style={{
-                                                color: "#fbbf24",
                                                 flexShrink: 0
                                             }}
                                         />
@@ -891,11 +801,10 @@ export default function Profile() {
                                 )}
                                 {isContentCreator && (
                                     <span className="crown-wrapper">
-                                        <Video
-                                            size={26}
-                                            strokeWidth={2.5}
+                                        <ContentCreatorIcon
+                                            size={24}
+                                            color="#ef4444"
                                             style={{
-                                                color: "#fbbf24",
                                                 flexShrink: 0
                                             }}
                                         />
@@ -972,135 +881,27 @@ export default function Profile() {
                         )}
 
                         <button
-                            className={`profile-edit-btn ${isEditing ? "active" : ""}`}
-                            disabled={isLoading('save-profile')}
-                            onClick={async () => {
-                                if (isEditing) {
-                                    const fc = (form.switchFriendCode || "").toUpperCase().trim();
-
-                                    if (fc && !SWITCH_FC_RE.test(fc)) {
-                                        showMessage("Friend code must be like: SW-1234-5678-9012", "error");
-                                        return;
-                                    }
-
-                                    const goFc = (form.goFriendCode || "").trim();
-
-                                    if (goFc && !GO_FC_RE.test(goFc)) {
-                                        showMessage("Pokémon GO Friend code must be like: 0000 0000 0000", "error");
-                                        return;
-                                    }
-
-                                    let finalYoutube = normalizeYoutubeUrl(form.youtubeUrl);
-                                    let finalTwitch = normalizeTwitchUrl(form.twitchUrl);
-
-                                    const reorderedGames = reorderGames(form.favoriteGames);
-                                    const reorderedPokemon = reorderToFront(form.favoritePokemon, "");
-                                    const reorderedShiny = reorderToFront(form.favoritePokemonShiny, false);
-
-                                    try {
-                                        // Validate bio at save-time
-                                        const bioValidation = validateContent(String(form.bio || ''), 'bio');
-                                        if (!bioValidation.isValid) {
-                                            showMessage(`${bioValidation.error}`, 'error');
-                                            return;
-                                        }
-                                        setLoading('save-profile', true);
-                                        await profileAPI.updateProfile({
-                                            bio: form.bio,
-                                            location: form.location,
-                                            gender: form.gender,
-                                            profileTrainer: form.profileTrainer,
-                                            favoriteGames: reorderedGames,
-                                            favoritePokemon: reorderedPokemon,
-                                            favoritePokemonShiny: reorderedShiny,
-                                            switchFriendCode: fc,
-                                            goFriendCode: goFc,
-                                            youtubeUrl: finalYoutube,
-                                            twitchUrl: finalTwitch,
-                                        });
-
-                                        showMessage("Profile changes saved", "success");
-
-                                        setForm((prev) => ({
-                                            ...prev,
-                                            favoriteGames: reorderedGames,
-                                            favoritePokemon: reorderedPokemon,
-                                            favoritePokemonShiny: reorderedShiny,
-                                            profileTrainer: form.profileTrainer,
-                                            switchFriendCode: fc,
-                                            goFriendCode: goFc,
-                                            youtubeUrl: finalYoutube,
-                                            twitchUrl: finalTwitch,
-                                        }));
-                                        // Update the header avatar immediately
-                                        setUser((prev) => ({
-                                            ...prev,
-                                            profileTrainer: form.profileTrainer || prev.profileTrainer,
-                                        }));
-
-                                        setIsEditing(false);
-                                    } catch (err) {
-                                        showMessage("Failed to update profile", "error");
-                                    } finally {
-                                        setLoading('save-profile', false);
-                                    }
-
-                                    return;
-                                }
-
-                                formBeforeEditRef.current = JSON.parse(JSON.stringify(form));
-                                setIsEditing(true);
-                            }}
+                            className="profile-edit-btn"
+                            onClick={() => setShowEditModal(true)}
+                            title="Edit Profile"
                         >
                             <NotebookPen size={16} className="edit-icon" />
-                            <span>{isEditing ? "Save" : "Edit"}</span>
+                            <span>Edit</span>
                         </button>
-
-                        {isEditing && (
-                            <button
-                                className="profile-cancel-btn"
-                                onClick={() => {
-                                    if (formBeforeEditRef.current) setForm(formBeforeEditRef.current);
-                                    setIsEditing(false);
-                                    showMessage("Changes discarded", "info");
-                                }}
-                            >
-                                <SquareX size={16} />
-                                Cancel
-                            </button>
-                        )}
                     </div>
                 </div>
             </div>
 
-            <div className={`profile-two-column ${isEditing ? "editing-mode" : ""}`}>
+            <div className="profile-two-column">
                 <div className="profile-left">
                     <div className="profile-header-row">
                         <div className="profile-avatar-block" style={{ position: "relative" }}>
-                            <div
-                                className="profile-avatar"
-                                onClick={() => isEditing && setShowTrainerModal(true)}
-                                style={{ cursor: isEditing ? "pointer" : "default" }}
-                            >
+                            <div className="profile-avatar">
                                 <img
                                     src={`/data/trainer_sprites/${form.profileTrainer || "ash.png"}`}
                                     alt="Trainer"
                                     className="profile-avatar-img"
                                 />
-
-                                {isEditing && (
-                                    <PencilLine
-                                        size={45}
-                                        strokeWidth={2}
-                                        className="edit-overlay-icon"
-                                        style={{
-                                            position: "absolute",
-                                            top: "0px",
-                                            right: "0px",
-                                            background: "none",
-                                        }}
-                                    />
-                                )}
                             </div>
                         </div>
 
@@ -1109,18 +910,6 @@ export default function Profile() {
                                 <label>Bio</label>
                                 {isLoading('profile-data') ? (
                                     <SkeletonLoader type="text" lines={2} height="60px" />
-                                ) : isEditing ? (
-                                    <TextAreaField
-                                        id="profile-bio"
-                                        value={form.bio || ""}
-                                        onChange={(e) => setForm({ ...form, bio: e.target.value })}
-                                        placeholder="Tell us about yourself..."
-                                        maxLength={250}
-                                        showCount
-                                        resize="none"
-                                        rows={4}
-                                        fullWidth
-                                    />
                                 ) : (
                                     <div className="field-display">
                                         {form.bio && form.bio.length > 150 ? `${form.bio.slice(0, 150)}…` : (form.bio || "N/A")}
@@ -1133,288 +922,112 @@ export default function Profile() {
                     <div className="profile-row-split">
                         <div className="profile-field">
                             <label>Location</label>
-                            {isEditing ? (
-                                <SelectField
-                                    id="profile-location"
-                                    options={COUNTRY_OPTIONS.map(country => ({
-                                        label: country.name,
-                                        value: country.name,
-                                        icon: <span className={`fi fi-${country.code.toLowerCase()}`} />
-                                    }))}
-                                    value={form.location || ""}
-                                    onChange={(value) => setForm({ ...form, location: value })}
-                                    placeholder="Select location"
-                                    searchable
-                                    searchPlaceholder="Search country..."
-                                    clearable
-                                    size="md"
-                                    fullWidth
-                                    startIcon={
-                                        (() => {
-                                            const selected = COUNTRY_OPTIONS.find(c => c.name === form.location);
-                                            if (selected) {
-                                                return <span className={`fi fi-${selected.code.toLowerCase()}`} />;
-                                            }
-                                            return <Globe size={16} />;
-                                        })()
-                                    }
-                                />
-                            ) : (
-                                <div className="field-display">
-                                    {(() => {
-                                        const selected = COUNTRY_OPTIONS.find(c => c.name === form.location);
-                                        return selected ? (
-                                            <>
-                                                <span className={`fi fi-${selected.code.toLowerCase()}`} style={{ marginRight: "8px" }} />
-                                                {selected.name}
-                                            </>
-                                        ) : (
-                                            form.location || "N/A"
-                                        );
-                                    })()}
-                                </div>
-                            )}
+                            <div className="field-display">
+                                {(() => {
+                                    const selected = COUNTRY_OPTIONS.find(c => c.name === form.location);
+                                    return selected ? (
+                                        <>
+                                            <span className={`fi fi-${selected.code.toLowerCase()}`} style={{ marginRight: "8px" }} />
+                                            {selected.name}
+                                        </>
+                                    ) : (
+                                        form.location || "N/A"
+                                    );
+                                })()}
+                            </div>
                         </div>
 
                         <div className="profile-field">
                             <label>Gender</label>
-                            {isEditing ? (
-                                <SelectField
-                                    id="profile-gender"
-                                    options={[
-                                        { label: "Male", value: "Male", icon: <Mars size={18} color="#4aaaff" /> },
-                                        { label: "Female", value: "Female", icon: <Venus size={18} color="#ff6ec7" /> },
-                                        { label: "Other", value: "Other", icon: <VenusAndMars size={18} color="#ffffff" /> },
-                                    ]}
-                                    value={form.gender || ""}
-                                    onChange={(value) => setForm({ ...form, gender: value })}
-                                    placeholder="Select gender"
-                                    clearable
-                                    size="md"
-                                    fullWidth
-                                    startIcon={
-                                        (() => {
-                                            if (form.gender === "Male") return <Mars size={16} color="#4aaaff" />;
-                                            if (form.gender === "Female") return <Venus size={16} color="#ff6ec7" />;
-                                            if (form.gender === "Other") return <VenusAndMars size={16} color="#ffffff" />;
-                                            return <VenusAndMars size={16} />;
-                                        })()
-                                    }
-                                />
-                            ) : (
-                                <div className="field-display">
-                                    {form.gender === "Male" && <Mars size={16} color="#4aaaff" style={{ marginRight: "6px" }} />}
-                                    {form.gender === "Female" && <Venus size={16} color="#ff6ec7" style={{ marginRight: "6px" }} />}
-                                    {form.gender === "Other" && <VenusAndMars size={16} color="#ffffff" style={{ marginRight: "6px" }} />}
-                                    {form.gender || "N/A"}
-                                </div>
-                            )}
+                            <div className="field-display">
+                                {form.gender === "Male" && <Mars size={16} color="#4aaaff" style={{ marginRight: "6px" }} />}
+                                {form.gender === "Female" && <Venus size={16} color="#ff6ec7" style={{ marginRight: "6px" }} />}
+                                {form.gender === "Other" && <VenusAndMars size={16} color="#ffffff" style={{ marginRight: "6px" }} />}
+                                {form.gender || "N/A"}
+                            </div>
                         </div>
                     </div>
 
                     <div className="profile-row-split">
-                        {(isEditing || form.switchFriendCode) && (
+                        {form.switchFriendCode && (
                         <div className="profile-field">
                             <label>Nintendo Switch Friend Code</label>
-                            {isEditing ? (
-                                <InputField
-                                    id="profile-switch-fc"
-                                    type="text"
-                                    placeholder="SW-1234-5678-9012"
-                                    value={form.switchFriendCode || ""}
-                                    onChange={(e) => setForm({ ...form, switchFriendCode: formatSwitchFCInput(e.target.value) })}
-                                    onPaste={(e) => {
-                                        e.preventDefault();
-                                        const text = (e.clipboardData || window.clipboardData).getData("text");
-                                        setForm({ ...form, switchFriendCode: formatSwitchFCInput(text) });
-                                    }}
-                                    startIcon={<img src="/data/friend_code_icons/switch.png" alt="Switch" className="w-5 h-5 object-contain" />}
-                                    inputMode="numeric"
-                                    autoComplete="off"
-                                    maxLength={17}
-                                    pattern="^SW-\d{4}-\d{4}-\d{4}$"
-                                    title="Format: SW-1234-5678-9012"
-                                    clearable
-                                    onClear={() => setForm({ ...form, switchFriendCode: "" })}
-                                    size="md"
-                                    fullWidth
-                                />
-                            ) : (
-                                <div className="field-display">
-                                    <img src="/data/friend_code_icons/switch.png" alt="Switch" className="w-5 h-5 object-contain" style={{ marginRight: "6px" }} />
-                                    <span>{form.switchFriendCode}</span>
-                                </div>
-                            )}
+                            <div className="field-display">
+                                <img src="/data/friend_code_icons/switch.png" alt="Switch" className="w-5 h-5 object-contain" style={{ marginRight: "6px" }} />
+                                <span>{form.switchFriendCode}</span>
+                            </div>
                         </div>
                         )}
 
-                        {(isEditing || form.goFriendCode) && (
+                        {form.goFriendCode && (
                             <div className="profile-field">
                                 <label>Pokémon GO Friend Code</label>
-                                {isEditing ? (
-                                    <InputField
-                                        id="profile-go-fc"
-                                        type="text"
-                                        placeholder="0000 0000 0000"
-                                        value={form.goFriendCode || ""}
-                                        onChange={(e) => setForm({ ...form, goFriendCode: formatGoFCInput(e.target.value) })}
-                                        onPaste={(e) => {
-                                            e.preventDefault();
-                                            const text = (e.clipboardData || window.clipboardData).getData("text");
-                                            setForm({ ...form, goFriendCode: formatGoFCInput(text) });
-                                        }}
-                                        startIcon={<img src="/data/friend_code_icons/go.png" alt="Pokémon GO" className="w-5 h-5 object-contain" />}
-                                        inputMode="numeric"
-                                        autoComplete="off"
-                                        maxLength={14}
-                                        pattern="^\d{4} \d{4} \d{4}$"
-                                        title="Format: 0000 0000 0000"
-                                        clearable
-                                        onClear={() => setForm({ ...form, goFriendCode: "" })}
-                                        size="md"
-                                        fullWidth
-                                    />
-                                ) : (
-                                    <div className="field-display">
-                                        <img src="/data/friend_code_icons/go.png" alt="Pokémon GO" className="w-5 h-5 object-contain" style={{ marginRight: "6px" }} />
-                                        <span>{form.goFriendCode}</span>
-                                    </div>
-                                )}
+                                <div className="field-display">
+                                    <img src="/data/friend_code_icons/go.png" alt="Pokémon GO" className="w-5 h-5 object-contain" style={{ marginRight: "6px" }} />
+                                    <span>{form.goFriendCode}</span>
+                                </div>
                             </div>
-                        )}
-
-                        {isContentCreator && isEditing && (
-                            <>
-                                <div className="profile-field">
-                                    <label><Youtube size={16} color="#ef4444" /> YouTube URL</label>
-                                    <InputField
-                                        id="profile-youtube"
-                                        type="url"
-                                        placeholder="https://youtube.com/@YourChannel"
-                                        value={form.youtubeUrl || ""}
-                                        onChange={(e) => setForm({ ...form, youtubeUrl: e.target.value })}
-                                        startIcon={<Youtube size={16} color="#ef4444" />}
-                                        clearable
-                                        onClear={() => setForm({ ...form, youtubeUrl: "" })}
-                                        size="md"
-                                        fullWidth
-                                    />
-                                </div>
-                                <div className="profile-field">
-                                    <label><Twitch size={16} color="#a855f7" /> Twitch URL</label>
-                                    <InputField
-                                        id="profile-twitch"
-                                        type="url"
-                                        placeholder="https://twitch.tv/yourchannel"
-                                        value={form.twitchUrl || ""}
-                                        onChange={(e) => setForm({ ...form, twitchUrl: e.target.value })}
-                                        startIcon={<Twitch size={16} color="#a855f7" />}
-                                        clearable
-                                        onClear={() => setForm({ ...form, twitchUrl: "" })}
-                                        size="md"
-                                        fullWidth
-                                    />
-                                </div>
-                            </>
                         )}
                     </div>
 
                     <div className="profile-ranking-group">
-                        {isEditing || form.favoriteGames.some(g => g) ? (
+                        {form.favoriteGames.some(g => g) && (
                             <>
                                 <h3>Favorite Games</h3>
                                 <div className="profile-rank-row">
                                     {Array.from({ length: 5 }).map((_, index) => {
                                         const game = form.favoriteGames[index];
                                         const gameData = GAME_OPTIONS_TWO.find(g => g.value === game);
-                                        const isEmpty = !gameData;
-
+                                        if (!gameData) return null;
                                         return (
-                                            <div
-                                                key={index}
-                                                className="profile-rank-item"
-                                                onClick={() => isEditing && openGameModal(index)}
-                                            >
-                                                {index < 3 && !isEmpty && (
+                                            <div key={index} className="profile-rank-item">
+                                                {index < 3 && (
                                                     <div className={`trophy-icon trophy-${index + 1}`}>
                                                         <Trophy size={16} />
                                                     </div>
                                                 )}
-
-                                                {isEmpty ? (
-                                                    isEditing ? (
-                                                        <div className="empty-game-slot">
-                                                            <PencilLine className="edit-icon" size={22} strokeWidth={2} />
-                                                        </div>
-                                                    ) : (
-                                                        <div style={{ width: "96px", height: "96px" }} />
-                                                    )
-                                                ) : (
-                                                    <div className="profile-game-box">
-                                                        <img src={gameData.image} alt={gameData.name} className="game-img" />
-                                                    </div>
-                                                )}
-
-                                                <div className="rank-label">{!isEmpty ? gameData.name : null}</div>
+                                                <div className="profile-game-box">
+                                                    <img src={gameData.image} alt={gameData.name} className="game-img" />
+                                                </div>
+                                                <div className="rank-label">{gameData.name}</div>
                                             </div>
                                         );
                                     })}
                                 </div>
                             </>
-                        ) : null}
+                        )}
 
-                        {isEditing || form.favoritePokemon.some(p => p) ? (
+                        {form.favoritePokemon.some(p => p) && (
                             <>
                                 <h3>Favorite Pokémon</h3>
                                 <div className="profile-rank-row">
                                     {Array.from({ length: 5 }).map((_, index) => {
                                         const poke = form.favoritePokemon[index];
                                         const data = POKEMON_OPTIONS.find(p => p.value === poke);
-                                        const isEmpty = !data;
-
+                                        if (!data) return null;
                                         return (
-                                            <div
-                                                key={index}
-                                                className="profile-rank-item"
-                                                onClick={() => isEditing && openPokemonModal(index)}
-                                            >
-                                                {index < 3 && !isEmpty && (
+                                            <div key={index} className="profile-rank-item">
+                                                {index < 3 && (
                                                     <div className={`trophy-icon trophy-${index + 1}`}>
                                                         <Trophy size={16} />
                                                     </div>
                                                 )}
-
-                                                {isEmpty ? (
-                                                    isEditing ? (
-                                                        <div className="empty-pokemon-slot">
-                                                            <PencilLine className="edit-icon" size={22} strokeWidth={2} />
-                                                        </div>
-                                                    ) : (
-                                                        <div style={{ width: "96px", height: "96px" }} />
-                                                    )
-                                                ) : (
-                                                    <div className="profile-pokemon-box">
-                                                        <img
-                                                            src={
-                                                                form.favoritePokemonShiny[index]
-                                                                    ? data.shinyImage
-                                                                    : data.image
-                                                            }
-                                                            alt={data.name}
-                                                            className="pokemon-img"
-                                                        />
-                                                    </div>
-                                                )}
-
+                                                <div className="profile-pokemon-box">
+                                                    <img
+                                                        src={form.favoritePokemonShiny[index] ? data.shinyImage : data.image}
+                                                        alt={data.name}
+                                                        className="pokemon-img"
+                                                    />
+                                                </div>
                                                 <div className="rank-label">
-                                                    {data?.name ? formatPokemonName(data.value) : null}
+                                                    {formatPokemonName(data.value)}
                                                 </div>
                                             </div>
                                         );
                                     })}
                                 </div>
                             </>
-                        ) : null}
+                        )}
                     </div>
                 </div>
 
@@ -1584,85 +1197,25 @@ export default function Profile() {
                 </div>
             </div>
 
-            <FavoriteSelectionModal
-                isOpen={showGameModal}
-                onClose={() => setShowGameModal(false)}
-                title="Select Favorite Games"
-                options={GAME_OPTIONS_TWO}
-                selected={form.favoriteGames || []}
-                onChange={handleSaveGames}
-                max={5}
-            />
-            <FavoriteSelectionModal
-                isOpen={showPokemonModal}
-                onClose={() => setShowPokemonModal(false)}
-                title="Select Favorite Pokémon"
-                options={POKEMON_OPTIONS}
-                selected={form.favoritePokemon || []}
-                selectedShiny={form.favoritePokemonShiny || []}
-                onChange={handleSavePokemon}
-                max={5}
-            />
             <CreatorRequestModal
                 isOpen={showCreatorModal}
                 onClose={() => setShowCreatorModal(false)}
                 onSubmitted={() => setCreatorStatus('pending')}
             />
-            <FavoriteSelectionModal
-                isOpen={showTrainerModal}
-                onClose={() => setShowTrainerModal(false)}
-                title="Choose a Trainer"
-                options={trainerOptions.map(t => ({
-                    name: t.name,
-                    value: t.filename,
-                    image: `/data/trainer_sprites/${t.filename}`,
-                }))}
-                selected={form.profileTrainer ? [form.profileTrainer] : []}
-                onChange={(val) => {
-                    setForm({ ...form, profileTrainer: val[0] });
-                    setShowTrainerModal(false);
-                }}
-                max={1}
-                showHoverPreview
-            />
 
-            {pendingNavigation && createPortal(
-                <div 
-                    className="fixed inset-0 z-[20000] animate-[fadeIn_0.3s_ease-out]"
-                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-                >
-                    <div className="bg-black/80 w-full h-full flex items-center justify-center">
-                        <div 
-                            className="bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-md w-full mx-4 shadow-xl animate-[slideIn_0.3s_ease-out] text-center" 
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <h2 className="text-xl font-semibold text-[var(--accent)] mb-4">Unsaved Changes</h2>
-                            <p className="text-gray-300 mb-6">
-                                You have unsaved changes. Are you sure you want to leave without saving?
-                            </p>
-                            <div className="flex gap-3 justify-center">
-                                <button 
-                                    className="px-4 py-2 rounded-lg bg-transparent border-2 border-[var(--dividers)] text-[var(--text)] hover:bg-[var(--dividers)] transition-colors font-semibold"
-                                    onClick={() => setPendingNavigation(null)}
-                                >
-                                    Stay
-                                </button>
-                                <button 
-                                    className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-black hover:text-white transition-colors font-semibold"
-                                    onClick={() => {
-                                        setIsEditing(false);
-                                        setTimeout(() => navigate(pendingNavigation), 0);
-                                        setPendingNavigation(null);
-                                    }}
-                                >
-                                    Leave
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>,
-                document.body
-            )}
+            <EditProfileModal
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                form={form}
+                username={username}
+                isContentCreator={isContentCreator}
+                pokemonOptions={POKEMON_OPTIONS}
+                showMessage={showMessage}
+                setLoading={setLoading}
+                isLoading={isLoading}
+                setUser={setUser}
+                onSaved={(updatedForm) => setForm(prev => ({ ...prev, ...updatedForm }))}
+            />
         </div>
     );
 }

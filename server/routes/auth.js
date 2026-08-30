@@ -19,8 +19,18 @@ import RecentCatch from "../models/RecentCatch.js";
 import LinkedProvider from "../models/LinkedProvider.js";
 import BugReport from "../models/BugReport.js";
 import { broadcastNewCatch } from "./recentCatches.js";
+import { notifyOverlayStream } from "./streamerTools.js";
 import { isValidPokemonKey } from "../utils/validPokemonKeys.js";
 import { moderateImage } from "../utils/sightengine.js";
+import { 
+  getMembershipBadgeInfo, 
+  getBatchMembershipBadgeInfo, 
+  grantAdminPremium, 
+  revokeAdminPremium, 
+  getAdminUserEntitlementDetails 
+} from "../utils/entitlementService.js";
+import { optimizeAvatar } from "../utils/avatarOptimizer.js";
+import { getSystemTelemetry } from "../utils/metricsCollector.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,7 +42,7 @@ const __dirname = path.dirname(__filename);
 const avatarUpload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB max
+    fileSize: 8 * 1024 * 1024, // 8MB max upload limit
   },
   fileFilter: (req, file, cb) => {
     const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -356,7 +366,10 @@ router.get("/me", async (req, res) => {
       return res.status(200).json({ authenticated: false });
     }
 
-    const user = await User.findById(userId).select("-__v");
+    const [user, membershipInfo] = await Promise.all([
+      User.findById(userId).select("-__v"),
+      getMembershipBadgeInfo(userId),
+    ]);
     if (!user) return res.status(200).json({ authenticated: false });
 
     res.json({
@@ -365,11 +378,16 @@ router.get("/me", async (req, res) => {
       hasPassword: Boolean(user.password),
       createdAt: user.createdAt,
       profileTrainer: user.profileTrainer,
+      nameColor1: user.nameColor1 || user.nameGradientColor1 || null,
+      nameColor2: user.nameColor2 || user.nameGradientColor2 || null,
       avatar: user.avatar || null,
       verified: user.verified,
       progressBars: user.progressBars || [],
       isAdmin: user.isAdmin,
       isContentCreator: user.isContentCreator || false,
+      isPremium: Boolean(membershipInfo.isPremium),
+      premiumMonths: membershipInfo.premiumMonths || 0,
+      premiumSince: membershipInfo.premiumSince || null,
       youtubeUrl: user.youtubeUrl || null,
       twitchUrl: user.twitchUrl || null,
       onboarding: user.onboarding,
@@ -715,9 +733,14 @@ router.put("/profile", authenticateUser, async (req, res) => {
     if (req.body.favoritePokemonShiny !== undefined) user.favoritePokemonShiny = req.body.favoritePokemonShiny;
     if (req.body.favoriteBalls !== undefined) user.favoriteBalls = sanitizedData.favoriteBalls;
     if (req.body.favoriteTrainers !== undefined) user.favoriteTrainers = sanitizedData.favoriteTrainers;
+    if (req.body.favoriteCategoryOrder !== undefined) user.favoriteCategoryOrder = Array.isArray(req.body.favoriteCategoryOrder) ? req.body.favoriteCategoryOrder : [];
     if (req.body.switchFriendCode !== undefined) user.switchFriendCode = sanitizedData.switchFriendCode;
     if (req.body.goFriendCode !== undefined) user.goFriendCode = sanitizedData.goFriendCode;
     if (req.body.profileTrainer !== undefined) user.profileTrainer = sanitizedData.profileTrainer;
+    if (req.body.nameColor1 !== undefined) user.nameColor1 = sanitizedData.nameColor1 || null;
+    if (req.body.nameColor2 !== undefined) user.nameColor2 = sanitizedData.nameColor2 || null;
+    if (req.body.nameGradientColor1 !== undefined) user.nameGradientColor1 = sanitizedData.nameGradientColor1 || null;
+    if (req.body.nameGradientColor2 !== undefined) user.nameGradientColor2 = sanitizedData.nameGradientColor2 || null;
     if (req.body.avatar !== undefined) user.avatar = sanitizedData.avatar;
     if (req.body.huntHotkey !== undefined) user.huntHotkey = sanitizedData.huntHotkey;
 
@@ -855,6 +878,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
         favoritePokemonShiny: user.favoritePokemonShiny,
         favoriteBalls: user.favoriteBalls,
         favoriteTrainers: user.favoriteTrainers,
+        favoriteCategoryOrder: user.favoriteCategoryOrder || [],
         profileTrainer: user.profileTrainer,
         avatar: user.avatar || null,
         switchFriendCode: user.switchFriendCode,
@@ -880,12 +904,12 @@ router.put("/profile", authenticateUser, async (req, res) => {
   }
 });
 
-// POST /api/users/avatar - Upload and moderate custom profile avatar with Sightengine
+// POST /api/users/avatar - Upload and moderate custom profile avatar with Sightengine & Sharp
 router.post("/users/avatar", authenticateUser, (req, res, next) => {
   avatarUpload.single("avatar")(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       if (err.code === "LIMIT_FILE_SIZE") {
-        return res.status(400).json({ error: "Image is too large. Maximum file size is 5MB." });
+        return res.status(400).json({ error: "Image is too large. Maximum file size is 8MB for GIFs and 5MB for static images." });
       }
       return res.status(400).json({ error: `Upload error: ${err.message}` });
     } else if (err) {
@@ -902,7 +926,11 @@ router.post("/users/avatar", authenticateUser, (req, res, next) => {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: "User not found." });
 
-    // AI Content Moderation via Sightengine
+    // Check membership status for GIF / animated upload permissions
+    const membershipInfo = await getMembershipBadgeInfo(req.userId);
+    const isPremium = Boolean(membershipInfo.isPremium || user.isAdmin);
+
+    // AI Content Moderation via Sightengine on raw upload
     const moderation = await moderateImage(req.file.buffer, req.file.mimetype, req.file.originalname);
     if (!moderation.approved) {
       return res.status(400).json({
@@ -910,22 +938,29 @@ router.post("/users/avatar", authenticateUser, (req, res, next) => {
       });
     }
 
-    // Store avatar as a base64 data URI directly in MongoDB.
-    // This avoids needing a writable filesystem (Vercel serverless is read-only).
-    const mimeType = req.file.mimetype || "image/jpeg";
-    const base64Data = req.file.buffer.toString("base64");
-    const dataUri = `data:${mimeType};base64,${base64Data}`;
+    // Image optimization: resize to max 256x256, convert GIFs/static to WebP, enforce limits
+    let optimizationResult;
+    try {
+      optimizationResult = await optimizeAvatar(req.file.buffer, req.file.mimetype, isPremium);
+    } catch (optErr) {
+      const status = optErr.statusCode || 400;
+      return res.status(status).json({
+        error: optErr.message || "Failed to process image."
+      });
+    }
 
-    user.avatar = dataUri;
+    // Store optimized lightweight data URI directly in MongoDB
+    user.avatar = optimizationResult.dataUri;
     await user.save();
 
     res.json({
-      message: "Profile picture uploaded successfully!",
-      avatar: dataUri,
+      message: "Profile picture uploaded and optimized successfully!",
+      avatar: optimizationResult.dataUri,
+      isAnimated: optimizationResult.isAnimated,
     });
   } catch (err) {
     console.error("🔥 Error uploading avatar:", err);
-    res.status(500).json({ error: "Failed to upload profile picture." });
+    res.status(500).json({ error: err.message || "Failed to upload profile picture." });
   }
 });
 
@@ -976,7 +1011,10 @@ router.get("/profile", authenticateUser, async (req, res) => {
   if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const user = await User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny favoriteBalls favoriteTrainers profileTrainer avatar switchFriendCode goFriendCode isProfilePublic isGlobalFeedPublic isLeaderboardPublic isFriendCodesPublic isStatsPublic likes dexPreferences externalLinkPreference shinyCharmGames huntHotkey isAdmin accentColor siteTheme isContentCreator youtubeUrl twitchUrl lastActiveAt");
+    const [user, membershipInfo] = await Promise.all([
+      User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny favoriteBalls favoriteTrainers favoriteCategoryOrder profileTrainer nameColor1 nameColor2 nameGradientColor1 nameGradientColor2 avatar switchFriendCode goFriendCode isProfilePublic isGlobalFeedPublic isLeaderboardPublic isFriendCodesPublic isStatsPublic likes dexPreferences externalLinkPreference shinyCharmGames huntHotkey isAdmin accentColor siteTheme isContentCreator youtubeUrl twitchUrl lastActiveAt"),
+      getMembershipBadgeInfo(req.userId),
+    ]);
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -989,7 +1027,12 @@ router.get("/profile", authenticateUser, async (req, res) => {
       favoritePokemonShiny: user.favoritePokemonShiny,
       favoriteBalls: user.favoriteBalls,
       favoriteTrainers: user.favoriteTrainers,
+      favoriteCategoryOrder: user.favoriteCategoryOrder || [],
       profileTrainer: user.profileTrainer,
+      nameColor1: user.nameColor1 || user.nameGradientColor1 || null,
+      nameColor2: user.nameColor2 || user.nameGradientColor2 || null,
+      nameGradientColor1: user.nameGradientColor1 || user.nameColor1 || null,
+      nameGradientColor2: user.nameGradientColor2 || user.nameColor2 || null,
       avatar: user.avatar || null,
       switchFriendCode: user.switchFriendCode,
       goFriendCode: user.goFriendCode,
@@ -1007,6 +1050,9 @@ router.get("/profile", authenticateUser, async (req, res) => {
       accentColor: user.accentColor || 'yellow',
       siteTheme: user.siteTheme || 'dark',
       isContentCreator: user.isContentCreator || false,
+      isPremium: Boolean(membershipInfo.isPremium),
+      premiumMonths: membershipInfo.premiumMonths || 0,
+      premiumSince: membershipInfo.premiumSince || null,
       youtubeUrl: user.youtubeUrl || null,
       twitchUrl: user.twitchUrl || null,
       lastActiveAt: user.lastActiveAt,
@@ -1218,7 +1264,7 @@ router.put("/caught/:key", authenticateUser, async (req, res) => {
     if (newCatchTrigger && newCatchTrigger.pokemonName && newCatchTrigger.sprite && newCatchTrigger.username) {
       try {
         // Enforce feed privacy: do NOT broadcast or record catches if user has disabled global feed
-        const currentUser = await User.findById(req.userId).select("isGlobalFeedPublic username").lean();
+        const currentUser = await User.findById(req.userId).select("isGlobalFeedPublic username avatar").lean();
         if (currentUser && currentUser.isGlobalFeedPublic === false) {
           return res.json({ success: true });
         }
@@ -1240,7 +1286,7 @@ router.put("/caught/:key", authenticateUser, async (req, res) => {
             sprite: newCatchTrigger.sprite,
             username: newCatchTrigger.username,
             profileTrainer: newCatchTrigger.profileTrainer || null,
-            avatar: user.avatar || newCatchTrigger.avatar || null
+            avatar: currentUser?.avatar || newCatchTrigger.avatar || null
           });
           await recentCatch.save();
           
@@ -1780,6 +1826,10 @@ router.get("/users/public", async (req, res) => {
         $project: {
           username: 1,
           profileTrainer: 1,
+          nameColor1: 1,
+          nameColor2: 1,
+          nameGradientColor1: 1,
+          nameGradientColor2: 1,
           avatar: 1,
           bio: 1,
           location: 1,
@@ -1852,11 +1902,21 @@ router.get("/users/public", async (req, res) => {
     ];
 
     const items = await User.aggregate(base);
+    const badgeMap = await getBatchMembershipBadgeInfo(items.map((i) => i._id));
+    const itemsWithBadges = items.map((item) => {
+      const badge = badgeMap.get(item._id.toString());
+      return {
+        ...item,
+        isPremium: Boolean(badge?.isPremium),
+        premiumMonths: badge?.premiumMonths || 0,
+      };
+    });
+
     // Get total count of all matching documents (including verified filter)
     // For random mode without query, we still need the total count
     const total = await User.countDocuments(match);
 
-    res.json({ items, total, page, pageSize });
+    res.json({ items: itemsWithBadges, total, page, pageSize });
   } catch (error) {
     console.error('Error getting public users:', error);
     res.status(500).json({ error: "Server error" });
@@ -1889,12 +1949,15 @@ router.get("/users/:username/public", async (req, res) => {
     const u = await User.findOne({
       username: req.params.username
     })
-      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny favoriteBalls favoriteTrainers profileTrainer avatar createdAt switchFriendCode goFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin bingoGrid isContentCreator youtubeUrl twitchUrl lastActiveAt isProfilePublic isGlobalFeedPublic isLeaderboardPublic isStatsPublic")
+      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny favoriteBalls favoriteTrainers favoriteCategoryOrder profileTrainer nameColor1 nameColor2 nameGradientColor1 nameGradientColor2 avatar createdAt switchFriendCode goFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin bingoGrid isContentCreator youtubeUrl twitchUrl lastActiveAt isProfilePublic isGlobalFeedPublic isLeaderboardPublic isStatsPublic")
       .lean();
 
     if (!u) return res.status(404).json({ error: "User not found" });
 
-    const requesterIsAdmin = await checkRequesterIsAdmin(req);
+    const [requesterIsAdmin, membershipInfo] = await Promise.all([
+      checkRequesterIsAdmin(req),
+      getMembershipBadgeInfo(u._id),
+    ]);
 
     if (u.isProfilePublic === false && !requesterIsAdmin) {
       return res.status(200).json({
@@ -1929,6 +1992,9 @@ router.get("/users/:username/public", async (req, res) => {
 
     res.json({
       ...u,
+      isPremium: Boolean(membershipInfo.isPremium),
+      premiumMonths: membershipInfo.premiumMonths || 0,
+      premiumSince: membershipInfo.premiumSince || null,
       likeCount,
       hasBingoData,
       isOnline,
@@ -2175,6 +2241,9 @@ router.put("/hunts", authenticateUser, async (req, res) => {
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
+    // Notify active overlay streams of the updated hunt state
+    notifyOverlayStream(req.userId, "HUNT_DATA_CHANGED", { currentHuntId: user.currentHuntId });
+
     res.json({ success: true });
   } catch (err) {
     console.error('Error updating hunt data:', err);
@@ -2295,6 +2364,9 @@ router.get("/admin/users", authenticateUser, requireAdmin, async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
+    const userIds = rawUsers.map(u => u._id);
+    const entitlementMap = await getAdminUserEntitlementDetails(userIds);
+
     const users = rawUsers.map(u => {
       let createdAt = u.createdAt;
       if (!createdAt && u._id) {
@@ -2307,10 +2379,23 @@ router.get("/admin/users", authenticateUser, requireAdmin, async (req, res) => {
           // ignore
         }
       }
+      const entInfo = entitlementMap.get(u._id.toString()) || {
+        isPremium: false,
+        premiumSource: 'none',
+        premiumExpiresAt: null,
+        adminGrant: null,
+        subscription: null
+      };
+
       return {
         ...u,
         createdAt: createdAt || new Date(),
-        lastActiveAt: u.lastActiveAt || createdAt || new Date()
+        lastActiveAt: u.lastActiveAt || createdAt || new Date(),
+        isPremium: entInfo.isPremium,
+        premiumSource: entInfo.premiumSource,
+        premiumExpiresAt: entInfo.premiumExpiresAt,
+        adminGrant: entInfo.adminGrant,
+        subscription: entInfo.subscription
       };
     });
 
@@ -2318,6 +2403,66 @@ router.get("/admin/users", authenticateUser, requireAdmin, async (req, res) => {
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+// POST /api/admin/users/:id/grant-premium - Grant or update admin premium entitlement (admin only)
+router.post("/admin/users/:id/grant-premium", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { grantType = "months", months = 1, days = 30, untilDate = null, note = "" } = req.body;
+
+    const user = await User.findById(id).select("username");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const entitlement = await grantAdminPremium({
+      userId: id,
+      grantType,
+      months,
+      days,
+      untilDate,
+      grantedBy: req.userId,
+      note,
+    });
+
+    const detailsMap = await getAdminUserEntitlementDetails([id]);
+    const userEnt = detailsMap.get(id.toString());
+
+    res.json({
+      message: `Premium granted successfully to @${user.username}`,
+      entitlement,
+      userEnt,
+    });
+  } catch (error) {
+    console.error("Error granting admin premium:", error);
+    res.status(500).json({ error: error.message || "Failed to grant premium" });
+  }
+});
+
+// POST /api/admin/users/:id/revoke-premium - Revoke admin-granted premium entitlement (admin only)
+router.post("/admin/users/:id/revoke-premium", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(id).select("username");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    await revokeAdminPremium(id);
+
+    const detailsMap = await getAdminUserEntitlementDetails([id]);
+    const userEnt = detailsMap.get(id.toString());
+
+    res.json({
+      message: `Admin-granted premium revoked for @${user.username}`,
+      userEnt,
+    });
+  } catch (error) {
+    console.error("Error revoking admin premium:", error);
+    res.status(500).json({ error: error.message || "Failed to revoke admin premium" });
   }
 });
 
@@ -2378,23 +2523,13 @@ router.delete("/admin/users/:id", authenticateUser, requireAdmin, async (req, re
   }
 });
 
-// GET /api/admin/system-stats - System health and server uptime (admin only)
+// GET /api/admin/system-stats - System health, real-time performance telemetry, and database latency (admin only)
 router.get("/admin/system-stats", authenticateUser, requireAdmin, async (req, res) => {
   try {
-    const uptimeSeconds = process.uptime();
-    const memoryUsage = process.memoryUsage();
-    const dbState = mongoose.connection.readyState === 1 ? 'Healthy' : 'Connecting/Error';
-    
-    res.json({
-      uptimeSeconds,
-      uptimeFormatted: `${Math.floor(uptimeSeconds / 3600)}h ${Math.floor((uptimeSeconds % 3600) / 60)}m`,
-      serverStatus: 'Operational',
-      uptimePercent: '99.98%',
-      databaseStatus: dbState,
-      memoryUsedMB: Math.round(memoryUsage.heapUsed / 1024 / 1024),
-      nodeVersion: process.version
-    });
+    const telemetry = await getSystemTelemetry();
+    res.json(telemetry);
   } catch (error) {
+    console.error("GET /api/admin/system-stats error:", error);
     res.status(500).json({ error: "Failed to fetch system stats" });
   }
 });

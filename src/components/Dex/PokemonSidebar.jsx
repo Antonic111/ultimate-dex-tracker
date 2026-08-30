@@ -281,6 +281,27 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   const username = userContext?.username;
   const [shinyCharmGames, setShinyCharmGames] = useState(userContext?.shinyCharmGames || []);
 
+  const [localDexPrefs, setLocalDexPrefs] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('dexPreferences')) || {};
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    const handlePrefsChange = () => {
+      try {
+        setLocalDexPrefs(JSON.parse(localStorage.getItem('dexPreferences')) || {});
+      } catch { }
+    };
+    window.addEventListener('dexPreferencesChanged', handlePrefsChange);
+    return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
+  }, []);
+
+  // Sprite style (HOME vs Gen 5) is ALWAYS driven by the current user's/viewer's account setting
+  const viewerUseHomeSprites = Boolean(localDexPrefs.useHomeSprites);
+
   useEffect(() => {
     if (userContext?.shinyCharmGames && Array.isArray(userContext.shinyCharmGames)) {
       setShinyCharmGames(userContext.shinyCharmGames);
@@ -770,29 +791,30 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     if (!pokemon || !showShiny) return false;
     if (isOriginBall) return true;
     
-    // Use provided dexPreferences or default to true for blocking rules to be safe
+    // Use provided dexPreferences or default to true for blocking rules when editing own dex
+    const defaultBlock = !readOnly;
     const prefs = dexPreferences || { 
-      blockUnobtainableShinies: true, 
-      blockGOExclusiveShinies: true, 
-      blockNOOTExclusiveShinies: true 
+      blockUnobtainableShinies: defaultBlock, 
+      blockGOExclusiveShinies: defaultBlock, 
+      blockNOOTExclusiveShinies: defaultBlock 
     };
 
     const pokeId = String(pokemon.id).padStart(4, "0");
     const pokeName = pokemon.name?.toLowerCase() || '';
     
-    const isBlockedUnobtainableById = prefs.blockUnobtainableShinies && UNOBTAINABLE_SHINY_DEX_NUMBERS.includes(pokeId);
-    const isBlockedUnobtainableByForm = prefs.blockUnobtainableShinies && UNOBTAINABLE_SHINY_FORM_NAMES.some(formName => pokeName === formName.toLowerCase());
+    const isBlockedUnobtainableById = !!prefs.blockUnobtainableShinies && UNOBTAINABLE_SHINY_DEX_NUMBERS.includes(pokeId);
+    const isBlockedUnobtainableByForm = !!prefs.blockUnobtainableShinies && UNOBTAINABLE_SHINY_FORM_NAMES.some(formName => pokeName === formName.toLowerCase());
     
-    const isBlockedGOById = prefs.blockGOExclusiveShinies && GO_EXCLUSIVE_SHINY_DEX_NUMBERS.includes(pokeId);
-    const isBlockedGOByForm = prefs.blockGOExclusiveShinies && GO_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokeName === formName.toLowerCase());
+    const isBlockedGOById = !!prefs.blockGOExclusiveShinies && GO_EXCLUSIVE_SHINY_DEX_NUMBERS.includes(pokeId);
+    const isBlockedGOByForm = !!prefs.blockGOExclusiveShinies && GO_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokeName === formName.toLowerCase());
     
-    const isBlockedNOOTById = prefs.blockNOOTExclusiveShinies && NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.includes(pokeId);
-    const isBlockedNOOTByForm = prefs.blockNOOTExclusiveShinies && NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokeName === formName.toLowerCase());
+    const isBlockedNOOTById = !!prefs.blockNOOTExclusiveShinies && NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS.includes(pokeId);
+    const isBlockedNOOTByForm = !!prefs.blockNOOTExclusiveShinies && NO_OT_EXCLUSIVE_SHINY_FORM_NAMES.some(formName => pokeName === formName.toLowerCase());
     
     return isBlockedUnobtainableById || isBlockedUnobtainableByForm || 
            isBlockedGOById || isBlockedGOByForm || 
            isBlockedNOOTById || isBlockedNOOTByForm;
-  }, [pokemon, showShiny, dexPreferences]);
+  }, [pokemon, showShiny, dexPreferences, readOnly]);
 
   // Force close sidebar if trying to view a blocked shiny
   useEffect(() => {
@@ -1812,7 +1834,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   const gameObj = GAME_OPTIONS.find(opt => opt.value === (editData?.game ?? ""));
   const markObj = MARK_OPTIONS.find(opt => opt.value === (editData?.mark ?? ""));
 
-  const pokeImg = getSpriteUrl(pokemon, showShiny, dexPreferences?.useHomeSprites);
+  const pokeImg = getSpriteUrl(pokemon, showShiny, viewerUseHomeSprites);
   const pokeName = formatPokemonName(pokemon?.name);
   const pokeTypes = pokemon?.types || [];
 
@@ -2345,7 +2367,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
         <div className="sidebar-info-section-divider"></div>
         <div className="related-forms-list">
           {relatedForms.map((form) => {
-            const imgSrc = getSpriteUrl(form, showShiny, dexPreferences?.useHomeSprites);
+            const imgSrc = getSpriteUrl(form, showShiny, viewerUseHomeSprites);
             const formLabel = getFormDisplayName(form) || formatPokemonName(form.name);
             const isClickable = onPokemonSelect !== null;
 
@@ -2407,6 +2429,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                     className="sidebar-form-item-img"
                     width={38}
                     height={38}
+                    loading="lazy"
                   />
                   {iconSrc && (
                     <div
@@ -2447,6 +2470,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
             src={pokeImg}
             alt={pokeName}
             className="sidebar-header-avatar-img"
+            style={{ imageRendering: viewerUseHomeSprites ? 'auto' : 'pixelated' }}
             width={82}
             height={82}
           />
@@ -3365,7 +3389,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                   )}
 
                   {/* Evolution Chain */}
-                  {pokemon && <EvolutionChain pokemon={pokemon} showShiny={showShiny} onPokemonSelect={onPokemonSelect} dexPreferences={dexPreferences} />}
+                  {pokemon && <EvolutionChain pokemon={pokemon} showShiny={showShiny} onPokemonSelect={onPokemonSelect} dexPreferences={{ ...dexPreferences, useHomeSprites: viewerUseHomeSprites }} />}
 
                   {/* Related Forms Section */}
                   {renderRelatedFormsSection()}
@@ -3739,9 +3763,11 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
               className="w-[105px] flex flex-col items-center justify-start bg-[#2a2a2a] border border-[#444] rounded-[15px] p-2.5 hover:border-[var(--accent)] hover:bg-[#333] transition-all cursor-pointer"
             >
               <img 
-                src={getSpriteUrl(opt, showShiny, dexPreferences?.useHomeSprites)} 
+                src={getSpriteUrl(opt, showShiny, viewerUseHomeSprites)} 
                 alt={opt.name} 
                 className="w-12 h-12 object-contain filter drop-shadow-md mb-1.5"
+                style={{ imageRendering: viewerUseHomeSprites ? 'auto' : 'pixelated' }}
+                loading="lazy"
               />
               <span className="text-xs font-bold text-center text-white break-words w-full" style={{ lineHeight: '1.2' }}>
                 {formatPokemonName(opt.name)}
@@ -3776,7 +3802,6 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                       src={pokeImg} 
                       alt={pokeName} 
                       className="w-full h-full object-contain image-render-pixelated" 
-                      style={{ imageRendering: 'pixelated' }}
                     />
                   </div>
                   <div>

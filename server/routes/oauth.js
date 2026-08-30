@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 import User from "../models/User.js";
 import LinkedProvider from "../models/LinkedProvider.js";
 import { generateOAuthState, verifyOAuthState } from "../middleware/oauthState.js";
-import { authLimiter } from "../middleware/rateLimit.js";
+import { oauthLimiter } from "../middleware/rateLimit.js";
 import { authenticateUser } from "../middleware/authenticateUser.js";
 
 // Ensure env vars are loaded
@@ -232,7 +232,7 @@ async function resolveOAuthUser({ provider, providerAccountId, providerEmail, em
 // ─── Google ───────────────────────────────────────────────────────────────────
 
 // Start Google OAuth (login)
-router.get("/auth/google", authLimiter, (req, res) => {
+router.get("/auth/google", oauthLimiter, (req, res) => {
   const { clientId, redirectUri, scopes } = getGoogleConfig(req);
   if (!clientId) {
     return res.status(503).json({ error: "Google OAuth is not configured on this server. Please set GOOGLE_CLIENT_ID in your environment." });
@@ -340,7 +340,7 @@ router.get("/auth/google/callback", async (req, res) => {
 // ─── Discord ──────────────────────────────────────────────────────────────────
 
 // Start Discord OAuth (login)
-router.get("/auth/discord", authLimiter, (req, res) => {
+router.get("/auth/discord", oauthLimiter, (req, res) => {
   const { clientId, redirectUri, scopes } = getDiscordConfig(req);
   if (!clientId) {
     return res.status(503).json({ error: "Discord OAuth is not configured on this server. Please set DISCORD_CLIENT_ID in your environment." });

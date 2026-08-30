@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Shield, ArrowLeft } from "lucide-react";
+import { Shield, ArrowLeft, CreditCard, Tv, Sparkles, Video, Lock } from "lucide-react";
 import "../css/LegalPages.css";
 
 export default function LegalPrivacy() {
@@ -19,11 +19,11 @@ export default function LegalPrivacy() {
         <h1 className="legal-title">Privacy Policy</h1>
         <div className="legal-meta">
           <span className="legal-meta-item">
-            <strong>Effective Date:</strong> August 19, 2026
+            <strong>Effective Date:</strong> August 29, 2026
           </span>
           <span className="legal-meta-item">•</span>
           <span className="legal-meta-item">
-            <strong>Last Updated:</strong> August 19, 2026
+            <strong>Last Updated:</strong> August 29, 2026
           </span>
         </div>
       </div>
@@ -33,36 +33,38 @@ export default function LegalPrivacy() {
         <nav className="legal-toc" aria-label="Table of Contents">
           <div className="legal-toc-title">Table of Contents</div>
           <ul className="legal-toc-list">
-            <li><a href="#intro" className="legal-toc-link">1. Introduction</a></li>
+            <li><a href="#intro" className="legal-toc-link">1. Introduction & Trademark Notice</a></li>
             <li><a href="#info-we-collect" className="legal-toc-link">2. Information We Collect</a></li>
             <li><a href="#oauth-data" className="legal-toc-link">3. Google & Discord Logins</a></li>
             <li><a href="#tracker-data" className="legal-toc-link">4. Pokémon & Tracker Data</a></li>
-            <li><a href="#cookies-storage" className="legal-toc-link">5. Cookies & Local Storage</a></li>
-            <li><a href="#how-we-use" className="legal-toc-link">6. How We Use Information</a></li>
-            <li><a href="#third-parties" className="legal-toc-link">7. Third-Party Service Providers</a></li>
-            <li><a href="#retention-deletion" className="legal-toc-link">8. Data Retention & Account Deletion</a></li>
-            <li><a href="#security" className="legal-toc-link">9. Security Measures</a></li>
-            <li><a href="#children" className="legal-toc-link">10. Children's Privacy</a></li>
-            <li><a href="#user-rights" className="legal-toc-link">11. Your Privacy Rights</a></li>
-            <li><a href="#changes" className="legal-toc-link">12. Changes to This Policy</a></li>
-            <li><a href="#contact" className="legal-toc-link">13. Contact & Governance</a></li>
+            <li><a href="#streamer-tools-privacy" className="legal-toc-link">5. Streamer Tools & Overlays</a></li>
+            <li><a href="#payments-billing" className="legal-toc-link">6. Payments & Billing (Paddle)</a></li>
+            <li><a href="#cookies-storage" className="legal-toc-link">7. Cookies & Local Storage</a></li>
+            <li><a href="#how-we-use" className="legal-toc-link">8. How We Use Information</a></li>
+            <li><a href="#third-parties" className="legal-toc-link">9. Third-Party Service Providers</a></li>
+            <li><a href="#retention-deletion" className="legal-toc-link">10. Data Retention, Reset & Deletion</a></li>
+            <li><a href="#security" className="legal-toc-link">11. Security Measures</a></li>
+            <li><a href="#children" className="legal-toc-link">12. Children's Privacy</a></li>
+            <li><a href="#user-rights" className="legal-toc-link">13. Your Privacy Rights</a></li>
+            <li><a href="#changes" className="legal-toc-link">14. Changes to This Policy</a></li>
+            <li><a href="#contact" className="legal-toc-link">15. Contact & Governance</a></li>
           </ul>
         </nav>
 
         {/* Section 1 */}
         <section id="intro" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">1</span> Introduction
+            <span className="section-number">1</span> Introduction & Trademark Notice
           </h2>
           <p className="legal-paragraph">
-            Welcome to <strong>Ultimate Dex Tracker</strong> ("we", "our", or "the Service"), accessible at <a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a>. Ultimate Dex Tracker is an independent, fan-made application designed to help Pokémon enthusiasts record, manage, and celebrate their Pokémon collections, living Dex progress, and shiny hunts across video game generations.
+            Welcome to <strong>Ultimate Dex Tracker</strong> ("we", "our", or "the Service"), accessible at <a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a>. Ultimate Dex Tracker is an independent, fan-made web application designed to help Pokémon enthusiasts record living Dex progress, manage shiny hunts, configure streaming overlays, and participate in community features.
           </p>
           <p className="legal-paragraph">
-            This Privacy Policy explains what personal information we collect when you use our website, why we collect it, how it is stored and processed, and your rights regarding your data. We are committed to collecting only the minimum data necessary to provide a reliable, personal tracking experience.
+            This Privacy Policy explains what personal information we collect, why we collect it, how it is stored and processed, and your rights regarding your data. We are committed to data minimization and transparency.
           </p>
           <div className="legal-callout">
             <div className="legal-callout-title">Pokémon & Nintendo Trademark Notice</div>
-            Ultimate Dex Tracker is an unofficial fan project and is <strong>not</strong> affiliated with, endorsed by, sponsored by, or associated with Nintendo, GAME FREAK, or The Pokémon Company. All Pokémon trademarks, names, and sprite representations are property of their respective owners.
+            Ultimate Dex Tracker is an unofficial fan project and is <strong>not</strong> affiliated with, endorsed by, sponsored by, or associated with Nintendo Co., Ltd., GAME FREAK inc., Creatures Inc., or The Pokémon Company. All Pokémon trademarks, names, and sprite representations are property of their respective owners.
           </div>
         </section>
 
@@ -72,22 +74,23 @@ export default function LegalPrivacy() {
             <span className="section-number">2</span> Information We Collect
           </h2>
           <p className="legal-paragraph">
-            We collect information you provide directly to us when creating an account, adjusting preferences, or interacting with features:
+            We collect information you provide directly to us when creating an account, adjusting preferences, purchasing a membership, or interacting with features:
           </p>
           
           <h3 className="legal-subsection-title">A. Account Credentials & Profile Details</h3>
           <ul className="legal-list">
             <li><strong>Username:</strong> A public identifier you choose (3–15 characters) displayed on your profile, public dex (if public), and recent catches feed.</li>
-            <li><strong>Email Address:</strong> Used for account creation, email verification, password reset codes, and important transactional account notices.</li>
-            <li><strong>Password:</strong> If you register via email and password, your password is encrypted using a one-way cryptographic hash (bcrypt with salt factor 10) before being stored. Plaintext passwords are never saved or accessible to us.</li>
-            <li><strong>Profile Customizations (Optional):</strong> Bio, location, gender identifier, Switch friend code, Pokémon GO friend code, favorite games, favorite Pokémon, avatar trainer sprite, and external database link preferences (e.g., Serebii, Bulbapedia, PokémonDB, Smogon).</li>
+            <li><strong>Email Address:</strong> Used for account creation, email verification, password reset codes, transactional receipts, and important account notices.</li>
+            <li><strong>Password:</strong> If you register via email and password, your password is encrypted using a one-way cryptographic hash (bcrypt with salt factor 10). Plaintext passwords are never saved or accessible to us.</li>
+            <li><strong>Profile Customizations (Optional):</strong> Bio, location, gender identifier, Switch friend code, Pokémon GO friend code, favorite games, favorite Pokémon, favorite balls, favorite trainers, avatar trainer sprite, custom gradient colors, and external database link preferences.</li>
+            <li><strong>Custom Avatars & GIFs (Optional):</strong> If you upload a custom avatar or animated GIF (available with Membership), the image file is uploaded and processed through our media storage infrastructure.</li>
             <li><strong>Social Media Links (Optional):</strong> YouTube channel or Twitch channel URLs submitted for content creator badges or public profiles.</li>
           </ul>
 
-          <h3 className="legal-subsection-title">B. User Submissions & Feedback</h3>
+          <h3 className="legal-subsection-title">B. User Submissions & Creator Applications</h3>
           <ul className="legal-list">
             <li><strong>Bug Reports & Feedback:</strong> Titles, descriptions, and categories submitted through our in-app feedback modal. Users may submit reports anonymously or linked to their account.</li>
-            <li><strong>Creator Requests:</strong> Subscriber counts, channel URLs, and content type details submitted by trainers applying for verified creator status.</li>
+            <li><strong>Creator Requests:</strong> Channel URLs, follower/subscriber counts, and content category descriptions submitted when applying for a verified Content Creator badge.</li>
           </ul>
         </section>
 
@@ -97,7 +100,7 @@ export default function LegalPrivacy() {
             <span className="section-number">3</span> Google & Discord Authentication
           </h2>
           <p className="legal-paragraph">
-            You may choose to sign in to Ultimate Dex Tracker or link external identity providers using Google or Discord OAuth 2.0. We request only the minimal necessary scopes:
+            You may choose to sign in to Ultimate Dex Tracker or link external identity providers using Google or Discord OAuth 2.0. We request only minimal necessary identity scopes:
           </p>
 
           <div className="legal-table-wrapper">
@@ -128,7 +131,7 @@ export default function LegalPrivacy() {
           </div>
 
           <p className="legal-paragraph">
-            <strong>Account Linking & Unlinking:</strong> Existing users can link or unlink their Google or Discord accounts at any time in <em>Settings &gt; Connected Accounts</em>. We enforce safety checks ensuring you cannot unlink your only authentication method without setting a password first, protecting you from accidental lockout.
+            <strong>Account Linking & Unlinking:</strong> You can link or unlink your Google or Discord accounts at any time in <em>Settings &gt; Connected Accounts</em>. We enforce safety checks ensuring you cannot unlink your only authentication method without setting a password first.
           </p>
           <p className="legal-paragraph">
             We do <strong>not</strong> request access to your contacts, private messages, drive files, Discord servers/guilds, or any other permissions outside of basic identity verification.
@@ -145,25 +148,47 @@ export default function LegalPrivacy() {
           </p>
           <ul className="legal-list">
             <li><strong>Caught Pokémon Records:</strong> Caught flags, timestamps, custom entry notes, nicknames, Poké Ball types, marks/ribbons, encounter methods, game origins, hunt encounter counts, and stopwatch elapsed hunt times.</li>
-            <li><strong>Active & Paused Shiny Hunts:</strong> Target Pokémon, hunt modifiers (e.g., Shiny Charm, research levels, lure status, sparkling power), check increments, and probability charts.</li>
-            <li><strong>Dex Preferences & Filters:</strong> Form display preferences (e.g., Alolan, Galarian, Hisuian, Paldean, Gigantamax, Alpha, gender differences), shiny lock exclusions, and view modes (categorized vs. unified).</li>
-            <li><strong>Bingo Grids & MMO Tools:</strong> Active bingo tiles, Pokémon targets, and Massive Mass Outbreak permutation state.</li>
-            <li><strong>Recent Catches Feed:</strong> When you mark a Pokémon as caught, an entry (Pokémon name, sprite, your username, and profile sprite) is added to the live Recent Catches board for the community (unless disabled in your Privacy Settings).</li>
-            <li><strong>Granular Privacy Settings:</strong> We provide full granular control over what you share with the community in <em>Settings &gt; Privacy</em>:
-              <ul style={{ marginTop: "6px", marginLeft: "16px" }}>
-                <li><strong>Public / Private Profile:</strong> Toggle whether your trainer card and profile are viewable by other trainers.</li>
-                <li><strong>Global Live Feed:</strong> Choose whether your newly caught Pokémon are broadcast to the community live feed.</li>
-                <li><strong>Leaderboard Visibility:</strong> Choose whether your collection count and ranking appear on the public Leaderboards.</li>
-                <li><strong>Detailed Stats Page:</strong> Control whether other users can view your dedicated full statistics and generation breakdown page.</li>
-              </ul>
-            </li>
+            <li><strong>Active & Paused Shiny Hunts:</strong> Target Pokémon, hunt modifiers (Shiny Charm, research levels, sparkling power), check increments, and probability metrics.</li>
+            <li><strong>Dex Preferences & Filters:</strong> Form display toggles (Alolan, Galarian, Hisuian, Paldean, Gigantamax, Alpha, gender differences), shiny lock exclusions, and view modes.</li>
+            <li><strong>Bingo Grids & Progress Bars:</strong> Active bingo tiles, custom tracked Pokémon targets, and completion milestones.</li>
+            <li><strong>Recent Catches Feed:</strong> When you mark a Pokémon as caught, an entry is added to the live community activity feed (unless disabled in your Privacy Settings).</li>
+            <li><strong>Granular Privacy Settings:</strong> Full control over what you share with the community in <em>Settings &gt; Privacy</em> (Public Profile toggle, Live Feed toggle, Leaderboard Visibility, and Detailed Stats Page).</li>
           </ul>
         </section>
 
         {/* Section 5 */}
+        <section id="streamer-tools-privacy" className="legal-section">
+          <h2 className="legal-section-title">
+            <span className="section-number">5</span> Streamer Tools & Overlays
+          </h2>
+          <p className="legal-paragraph">
+            Our Streamer Tools generate specialized browser source overlay URLs (e.g. <code>/overlay/:token</code>) for use in broadcasting software such as OBS Studio or Streamlabs.
+          </p>
+          <ul className="legal-list">
+            <li><strong>Read-Only Access Tokens:</strong> Overlay links use a cryptographically generated, read-only token. Accessing the overlay URL allows the browser source to retrieve only the public data necessary to display the overlay (such as your current hunt target, counter number, and living Dex progress). It does <strong>not</strong> provide access to your email address, password, billing records, or account management settings.</li>
+            <li><strong>Token Invalidation:</strong> If you accidentally display your overlay URL on stream, you can regenerate a new token at any time in <em>Streamer Tools</em>, which instantly invalidates all previous overlay URLs.</li>
+          </ul>
+        </section>
+
+        {/* Section 6 */}
+        <section id="payments-billing" className="legal-section">
+          <h2 className="legal-section-title">
+            <span className="section-number">6</span> Payments & Billing (Paddle as Merchant of Record)
+          </h2>
+          <p className="legal-paragraph">
+            Optional recurring memberships are processed by our Merchant of Record, <strong>Paddle.com</strong> (Paddle Payments Ltd / Paddle.com Market Ltd).
+          </p>
+          <ul className="legal-list">
+            <li><strong>Zero Storage of Payment Card Data:</strong> When you subscribe to a membership, all credit card numbers, PayPal credentials, billing addresses, and tax identifiers are collected and processed directly by Paddle in compliance with PCI-DSS Level 1 standards. Ultimate Dex Tracker never receives, processes, or stores your credit card numbers or banking credentials.</li>
+            <li><strong>Subscription Metadata Stored:</strong> To provision membership perks on your account, our database stores only non-sensitive subscription metadata received from Paddle webhooks: your Paddle Customer ID, Subscription ID, subscription status (e.g., <code>active</code>, <code>past_due</code>, <code>canceled</code>), current billing cycle end date, and subscription creation timestamp.</li>
+            <li><strong>Transaction Invoices & Receipts:</strong> Invoices, payment confirmation receipts, and subscription management links are dispatched directly by Paddle to your billing email.</li>
+          </ul>
+        </section>
+
+        {/* Section 7 */}
         <section id="cookies-storage" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">5</span> Cookies & Local Storage
+            <span className="section-number">7</span> Cookies & Local Storage
           </h2>
           <p className="legal-paragraph">
             We use browser cookies and local storage exclusively for essential operational and preference purposes. We do <strong>not</strong> use third-party advertising tracking cookies.
@@ -171,7 +196,7 @@ export default function LegalPrivacy() {
           
           <h3 className="legal-subsection-title">A. Cookies</h3>
           <ul className="legal-list">
-            <li><code>token</code> (Authentication Cookie): An <code>HttpOnly</code>, <code>Secure</code> (HTTPS in production), <code>SameSite</code> cookie containing a signed JSON Web Token (JWT). This keeps you logged in securely across sessions and expires after 30 days.</li>
+            <li><code>token</code> (Authentication Cookie): An <code>HttpOnly</code>, <code>Secure</code> (HTTPS in production), <code>SameSite</code> cookie containing a signed JSON Web Token (JWT). This maintains your login session securely across pages and expires after 30 days.</li>
           </ul>
 
           <h3 className="legal-subsection-title">B. Browser Local Storage</h3>
@@ -184,26 +209,26 @@ export default function LegalPrivacy() {
           </ul>
         </section>
 
-        {/* Section 6 */}
+        {/* Section 8 */}
         <section id="how-we-use" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">6</span> How We Use Information
+            <span className="section-number">8</span> How We Use Information
           </h2>
           <p className="legal-paragraph">
             We process your information strictly for the following operational purposes:
           </p>
           <ul className="legal-list">
-            <li><strong>Providing the Service:</strong> Authenticating your identity, syncing your collection across devices, saving counters, and rendering your tracker.</li>
+            <li><strong>Providing the Service:</strong> Authenticating your identity, syncing your collection across devices, saving counters, rendering overlays, and provisioning membership perks.</li>
             <li><strong>Account Security & Verification:</strong> Dispatching 6-digit verification codes for registration, email address updates, password resets, and account deletion confirmation.</li>
             <li><strong>Abuse Prevention & Rate Limiting:</strong> Enforcing rate limits on authentication and API routes to protect our community against brute force attacks and denial-of-service attempts.</li>
             <li><strong>Service Performance:</strong> Monitoring page load performance and aggregate runtime metrics through Vercel Speed Insights.</li>
           </ul>
         </section>
 
-        {/* Section 7 */}
+        {/* Section 9 */}
         <section id="third-parties" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">7</span> Third-Party Service Providers
+            <span className="section-number">9</span> Third-Party Service Providers
           </h2>
           <p className="legal-paragraph">
             We do not sell, rent, or trade your personal information. We share data only with the trusted infrastructure providers essential to operating the website:
@@ -221,10 +246,16 @@ export default function LegalPrivacy() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Vercel</strong></td>
-                  <td>Web Hosting, Edge CDN, Speed Insights & Performance Telemetry</td>
-                  <td>IP address, request headers, browser user agent, page performance metrics</td>
+                  <td><strong>Vercel Inc.</strong></td>
+                  <td>Web Hosting, Edge CDN & Performance Telemetry</td>
+                  <td>IP address, request headers, browser user agent, performance metrics</td>
                   <td><a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">Vercel Privacy Policy</a></td>
+                </tr>
+                <tr>
+                  <td><strong>Paddle.com</strong></td>
+                  <td>Merchant of Record & Subscription Billing</td>
+                  <td>Customer email, billing address, payment details, subscription status</td>
+                  <td><a href="https://paddle.com/legal/privacy" target="_blank" rel="noopener noreferrer">Paddle Privacy Policy</a></td>
                 </tr>
                 <tr>
                   <td><strong>MongoDB Inc.</strong></td>
@@ -255,13 +286,13 @@ export default function LegalPrivacy() {
           </div>
         </section>
 
-        {/* Section 8 */}
+        {/* Section 10 */}
         <section id="retention-deletion" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">8</span> Data Retention, Collection Reset & Account Deletion
+            <span className="section-number">10</span> Data Retention, Collection Reset & Account Deletion
           </h2>
           <p className="legal-paragraph">
-            We retain your personal information and Pokémon tracking data for as long as your account remains active. We provide two self-serve destructive actions within <em>Settings &gt; Danger Zone</em>, each protected by 2-factor email verification code confirmation and username matching to prevent accidental loss:
+            We retain your personal information and Pokémon tracking data for as long as your account remains active. We provide two self-serve destructive actions within <em>Settings &gt; Danger Zone</em>, each protected by 2-factor email verification code confirmation and username matching:
           </p>
 
           <h3 className="legal-subsection-title">A. Reset All Collection Data</h3>
@@ -270,7 +301,7 @@ export default function LegalPrivacy() {
           </p>
           <ul className="legal-list">
             <li><strong>Data Wiped:</strong> All caught Pokémon, shiny hunt counters, timers, check increments, custom progress bars, and bingo card progress are permanently wiped. Public feed catch broadcasts associated with your username are removed.</li>
-            <li><strong>Data Retained:</strong> Your username, email address, password, login credentials, linked Google/Discord accounts, profile metadata, and theme preferences remain active.</li>
+            <li><strong>Data Retained:</strong> Your username, email address, password, login credentials, linked Google/Discord accounts, profile metadata, active membership status, and theme preferences remain active.</li>
           </ul>
 
           <h3 className="legal-subsection-title">B. Permanent Account Deletion</h3>
@@ -292,10 +323,10 @@ export default function LegalPrivacy() {
           </ul>
         </section>
 
-        {/* Section 9 */}
+        {/* Section 11 */}
         <section id="security" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">9</span> Security Measures
+            <span className="section-number">11</span> Security Measures
           </h2>
           <p className="legal-paragraph">
             We employ industry-standard administrative and technical security measures to safeguard your information:
@@ -303,29 +334,29 @@ export default function LegalPrivacy() {
           <ul className="legal-list">
             <li><strong>Password Hashing:</strong> Passwords are protected with bcrypt using 10 salt rounds.</li>
             <li><strong>HTTPS Encryption:</strong> All data transmitted between your browser and our servers is encrypted using Transport Layer Security (TLS/HTTPS).</li>
-            <li><strong>Secure Cookie Flags:</strong> Authentication cookies are marked <code>HttpOnly</code> (inaccessible to malicious client-side JavaScript) and <code>Secure</code>.</li>
+            <li><strong>Secure Cookie Flags:</strong> Authentication cookies are marked <code>HttpOnly</code> (inaccessible to client-side JavaScript) and <code>Secure</code>.</li>
             <li><strong>CSRF & State Validation:</strong> OAuth authorization exchanges employ signed JWT state parameters to prevent Cross-Site Request Forgery.</li>
             <li><strong>Rate Limiting & 2FA Codes:</strong> Sensitive operations (login, email updates, password changes, collection reset, and account deletion) are protected by rate limiters and one-time 6-digit email confirmation codes.</li>
           </ul>
         </section>
 
-        {/* Section 10 */}
+        {/* Section 12 */}
         <section id="children" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">10</span> Children's Privacy
+            <span className="section-number">12</span> Children's Privacy
           </h2>
           <p className="legal-paragraph">
-            Ultimate Dex Tracker is not intended for children under 13. If you are under the age at which you may legally consent to these Terms in your jurisdiction, you may only use the Service with the involvement and consent of a parent or legal guardian. If you are a parent or guardian and believe that your child has provided us with personal information without consent, please contact us via our Community Discord or in-app feedback, and we will promptly delete the account and associated records.
+            Ultimate Dex Tracker is not directed to children under 13. If you are under the age of majority in your jurisdiction, you may only use the Service with the consent of a parent or legal guardian. If you are a parent or guardian and believe that your child has provided us with personal information without consent, please contact us, and we will promptly delete the account and associated records.
           </p>
         </section>
 
-        {/* Section 11 */}
+        {/* Section 13 */}
         <section id="user-rights" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">11</span> Your Privacy Rights
+            <span className="section-number">13</span> Your Privacy Rights
           </h2>
           <p className="legal-paragraph">
-            Depending on where you live and the laws applicable to Ultimate Dex Tracker, you may have certain rights regarding your personal information:
+            Depending on where you reside (including under GDPR, CCPA/CPRA, and Canadian PIPEDA regulations), you have rights regarding your personal information:
           </p>
           <ul className="legal-list">
             <li><strong>Right to Access:</strong> You can view all your profile details, settings, and caught Pokémon data at any time inside your dashboard.</li>
@@ -337,23 +368,23 @@ export default function LegalPrivacy() {
           </ul>
         </section>
 
-        {/* Section 12 */}
+        {/* Section 14 */}
         <section id="changes" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">12</span> Changes to This Privacy Policy
+            <span className="section-number">14</span> Changes to This Privacy Policy
           </h2>
           <p className="legal-paragraph">
-            We may update this Privacy Policy from time to time to reflect changes in our features, operational practices, or legal requirements. When updates are made, we will revise the "Last Updated" date at the top of this page. We encourage you to review this policy periodically.
+            We may update this Privacy Policy periodically to reflect updates to our features, legal standards, or operational practices. When updates are made, we will revise the "Last Updated" date at the top of this page.
           </p>
         </section>
 
-        {/* Section 13 */}
+        {/* Section 15 */}
         <section id="contact" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">13</span> Contact & Governance
+            <span className="section-number">15</span> Contact & Governance
           </h2>
           <p className="legal-paragraph">
-            If you have questions, feedback, or privacy-related inquiries regarding this Privacy Policy, you can reach out through the following official channels:
+            If you have questions, feedback, or privacy inquiries regarding this Privacy Policy, please contact us via our official channels:
           </p>
           <ul className="legal-list">
             <li><strong>Developer & Creator:</strong> Antonic (Solo Developer)</li>

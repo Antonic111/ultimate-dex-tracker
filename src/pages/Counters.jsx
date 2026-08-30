@@ -37,7 +37,8 @@ import {
   ChevronLeft,
   RefreshCw,
   Trophy,
-  XCircle
+  XCircle,
+  Tv
 } from "lucide-react";
 import { BALL_OPTIONS, MARK_OPTIONS, GAME_OPTIONS } from "../Constants";
 import {
@@ -390,18 +391,18 @@ function OddsMatrixView({ game = "Scarlet", method = "Random Encounters", modifi
   if (isUltraWormhole) {
     return (
       <div className="hunt-modal-card overflow-hidden !p-0">
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10 bg-white/[0.02]">
-          <span className="text-xs font-extrabold uppercase tracking-wider text-white">
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--border-color)] bg-black/[0.02] dark:bg-white/[0.02]">
+          <span className="text-xs font-extrabold uppercase tracking-wider text-[var(--text)]">
             Current Odds:
           </span>
         </div>
-        <div className="w-full bg-black/50 p-4 flex flex-col items-center justify-center gap-2.5 shadow-inner">
+        <div className="w-full bg-black/5 dark:bg-black/50 p-4 flex flex-col items-center justify-center gap-2.5 shadow-inner">
           <div className="flex items-center justify-center gap-3">
-            <div className="px-4 py-2 rounded-xl border border-emerald-500/80 bg-black/60 text-emerald-400 font-extrabold text-lg font-mono shadow-sm">
+            <div className="px-4 py-2 rounded-xl border border-emerald-500/80 bg-black/5 dark:bg-black/60 text-emerald-400 font-extrabold text-lg font-mono shadow-sm">
               1%
             </div>
-            <span className="text-white text-base font-bold">→</span>
-            <div className="px-4 py-2 rounded-xl border border-emerald-500/80 bg-black/60 text-emerald-400 font-extrabold text-lg font-mono shadow-sm">
+            <span className="text-[var(--text)] text-base font-bold">→</span>
+            <div className="px-4 py-2 rounded-xl border border-emerald-500/80 bg-black/5 dark:bg-black/60 text-emerald-400 font-extrabold text-lg font-mono shadow-sm">
               36%
             </div>
           </div>
@@ -552,19 +553,19 @@ function OddsMatrixView({ game = "Scarlet", method = "Random Encounters", modifi
 
   return (
     <div className="hunt-modal-card overflow-hidden !p-0">
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10 bg-white/[0.02]">
-        <span className="text-xs font-extrabold uppercase tracking-wider text-white">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--border-color)] bg-black/[0.02] dark:bg-white/[0.02]">
+        <span className="text-xs font-extrabold uppercase tracking-wider text-[var(--text)]">
           {title}
         </span>
         {buffSummary && (
-          <span className="text-[11px] font-semibold text-gray-300 bg-white/[0.06] border border-white/10 px-2 py-0.5 rounded-md">
+          <span className="text-[11px] font-semibold text-[var(--text-muted)] bg-black/5 dark:bg-white/[0.06] border border-[var(--border-color)] px-2 py-0.5 rounded-md">
             {buffSummary}
           </span>
         )}
       </div>
 
       {isTableStyle ? (
-        <div className="w-full bg-black/50">
+        <div className="w-full bg-black/5 dark:bg-black/50">
           <table className="w-full text-xs border-collapse">
             <thead>
               <tr className="bg-[var(--accent)] text-black font-extrabold uppercase tracking-wider">
@@ -572,7 +573,7 @@ function OddsMatrixView({ game = "Scarlet", method = "Random Encounters", modifi
                 <th className="py-2.5 px-4 text-right w-1/2">Odds</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 font-semibold">
+            <tbody className="divide-y divide-[var(--border-color)] font-semibold">
               {rows.map((r, i) => {
                 const isCurrent = r.isCurrent;
                 return (
@@ -581,12 +582,12 @@ function OddsMatrixView({ game = "Scarlet", method = "Random Encounters", modifi
                     className={`transition ${
                       isCurrent
                         ? "bg-[var(--accent)]/15 font-bold"
-                        : "hover:bg-white/[0.02] text-gray-300"
+                        : "hover:bg-black/5 dark:hover:bg-white/[0.02] text-[var(--text-muted)]"
                     }`}
                   >
                     <td className="py-2.5 px-4 text-left">
                       <div className="flex items-center gap-1.5">
-                        <span className={isCurrent ? "text-[var(--accent)] font-extrabold" : "text-white"}>
+                        <span className={isCurrent ? "text-[var(--accent)] font-extrabold" : "text-[var(--text)]"}>
                           {r.trigger}
                         </span>
                         {isCurrent && (
@@ -596,7 +597,7 @@ function OddsMatrixView({ game = "Scarlet", method = "Random Encounters", modifi
                         )}
                       </div>
                     </td>
-                    <td className={`py-2.5 px-4 text-right font-mono font-bold ${isCurrent ? "text-[var(--accent)] font-black" : "text-white"}`}>
+                    <td className={`py-2.5 px-4 text-right font-mono font-bold ${isCurrent ? "text-[var(--accent)] font-black" : "text-[var(--text)]"}`}>
                       1 / {r.odds.toLocaleString()}
                     </td>
                   </tr>
@@ -605,13 +606,13 @@ function OddsMatrixView({ game = "Scarlet", method = "Random Encounters", modifi
             </tbody>
           </table>
           {note && (
-            <div className="p-3 text-center text-[11px] text-gray-400 italic border-t border-white/10 bg-black/25 leading-relaxed">
+            <div className="p-3 text-center text-[11px] text-[var(--text-muted)] italic border-t border-[var(--border-color)] bg-black/5 dark:bg-black/25 leading-relaxed">
               {note}
             </div>
           )}
         </div>
       ) : (
-        <div className="p-3.5 bg-black/50">
+        <div className="p-3.5 bg-black/5 dark:bg-black/50">
           <div className="grid grid-cols-2 gap-2">
             {rows.map((r, i) => {
               const isCurrent = r.isCurrent;
@@ -621,11 +622,11 @@ function OddsMatrixView({ game = "Scarlet", method = "Random Encounters", modifi
                   className={`flex items-center justify-between sm:flex-col sm:items-start p-2.5 rounded-xl border transition ${
                     isCurrent
                       ? "bg-[var(--accent)]/10 border-[var(--accent)]/50"
-                      : "bg-black/30 border-white/5"
+                      : "bg-black/5 dark:bg-black/30 border-[var(--border-color)]"
                   }`}
                 >
                   <div className="flex items-center gap-1.5">
-                    <span className={`text-xs font-bold ${isCurrent ? "text-[var(--accent)]" : "text-gray-300"}`}>
+                    <span className={`text-xs font-bold ${isCurrent ? "text-[var(--accent)]" : "text-[var(--text-muted)]"}`}>
                       {r.trigger}
                     </span>
                     {isCurrent && (
@@ -634,7 +635,7 @@ function OddsMatrixView({ game = "Scarlet", method = "Random Encounters", modifi
                       </span>
                     )}
                   </div>
-                  <span className="text-sm font-extrabold text-white font-mono sm:mt-1">
+                  <span className="text-sm font-extrabold text-[var(--text)] font-mono sm:mt-1">
                     1 / {r.odds.toLocaleString()}
                   </span>
                 </div>
@@ -765,7 +766,14 @@ export default function Counters() {
   const [lastCheckTimes, setLastCheckTimes] = useState({});
   const [totalCheckTimes, setTotalCheckTimes] = useState({});
   const [pausedHunts, setPausedHunts] = useState(new Set());
-  const [huntIncrements, setHuntIncrements] = useState({});
+  const [huntIncrements, setHuntIncrements] = useState(() => {
+    try {
+      const saved = localStorage.getItem("dex_hunt_increments");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
 
   // Context Menu Dropdown state
   const [openMenuHuntId, setOpenMenuHuntId] = useState(null);
@@ -1148,23 +1156,37 @@ export default function Counters() {
     return activeHunts.reduce((acc, h) => acc + (h.checks || 0), 0);
   }, [activeHunts]);
 
-  // ── BroadcastChannel Real-Time Sync & Recovery ────────────────────────────
   const channelRef = useRef(null);
   const allActiveHuntsRef = useRef(allActiveHunts);
   allActiveHuntsRef.current = allActiveHunts;
-
   const saveTimeoutRef = useRef(null);
-  const debouncedSave = useCallback((huntsToSave, nextCurrentHuntId = currentHuntId) => {
+
+  const debouncedSave = useCallback((huntsToSave, nextCurrentHuntId = currentHuntId, immediate = false) => {
     if (!username) return;
     setCachedHuntsData({ activeHunts: huntsToSave });
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(async () => {
+
+    const performSave = async () => {
       try {
-        await huntAPI.updateHuntData({ activeHunts: huntsToSave, currentHuntId: nextCurrentHuntId });
+        const incMap = {};
+        huntsToSave.forEach(h => {
+          if (h.increment) incMap[String(h.id)] = Number(h.increment);
+        });
+        await huntAPI.updateHuntData({
+          activeHunts: huntsToSave,
+          currentHuntId: nextCurrentHuntId,
+          huntIncrements: incMap
+        });
       } catch (err) {
         console.error("Failed to save hunts to backend:", err);
       }
-    }, 450);
+    };
+
+    if (immediate) {
+      performSave();
+    } else {
+      saveTimeoutRef.current = setTimeout(performSave, 100);
+    }
   }, [username, currentHuntId]);
 
   const handleToggleCollapsePhases = useCallback((huntId) => {
@@ -1250,13 +1272,21 @@ export default function Counters() {
       const normalized = cached.activeHunts.map(h => normalizeHunt(h));
       setAllActiveHunts(normalized);
       const savedCollapsed = {};
+      const incMap = {};
       normalized.forEach(h => {
         if (h.isPhasesCollapsed !== undefined) {
           savedCollapsed[h.id] = !!h.isPhasesCollapsed;
         }
+        if (h.increment) {
+          incMap[h.id] = Number(h.increment);
+          incMap[String(h.id)] = Number(h.increment);
+        }
       });
       if (Object.keys(savedCollapsed).length > 0) {
         setCollapsedPhasesMap(prev => ({ ...savedCollapsed, ...prev }));
+      }
+      if (Object.keys(incMap).length > 0) {
+        setHuntIncrements(prev => ({ ...prev, ...incMap }));
       }
     }
 
@@ -1270,13 +1300,33 @@ export default function Counters() {
         setCachedHuntsData({ activeHunts: normalized });
 
         const savedCollapsed = {};
+        const incMap = {};
+        if (data.huntIncrements && typeof data.huntIncrements === "object") {
+          Object.entries(data.huntIncrements).forEach(([k, v]) => {
+            incMap[k] = Number(v) || 1;
+            incMap[String(k)] = Number(v) || 1;
+          });
+        }
         normalized.forEach(h => {
           if (h.isPhasesCollapsed !== undefined) {
             savedCollapsed[h.id] = !!h.isPhasesCollapsed;
           }
+          if (h.increment) {
+            incMap[h.id] = Number(h.increment);
+            incMap[String(h.id)] = Number(h.increment);
+          }
         });
         if (Object.keys(savedCollapsed).length > 0) {
           setCollapsedPhasesMap(prev => ({ ...savedCollapsed, ...prev }));
+        }
+        if (Object.keys(incMap).length > 0) {
+          setHuntIncrements(prev => {
+            const merged = { ...prev, ...incMap };
+            try {
+              localStorage.setItem("dex_hunt_increments", JSON.stringify(merged));
+            } catch {}
+            return merged;
+          });
         }
 
         if (data.currentHuntId != null) {
@@ -1290,7 +1340,6 @@ export default function Counters() {
           }
         }
       }
-      if (data?.huntIncrements) setHuntIncrements(data.huntIncrements);
     }).catch(() => { });
   }, [username]);
 
@@ -1789,7 +1838,10 @@ export default function Counters() {
 
   // ── Canonical Action Handlers ─────────────────────────────────────────────
   const handleAddCheck = (huntId, customDelta = null) => {
-    const delta = customDelta !== null ? customDelta : (huntIncrements[huntId] || 1);
+    const target = allActiveHunts.find(h => String(h.id) === String(huntId) || String(h.huntId) === String(huntId));
+    const delta = customDelta !== null
+      ? customDelta
+      : (huntIncrements[huntId] || huntIncrements[String(huntId)] || target?.increment || 1);
     const now = Date.now();
     const action = {
       type: "INCREMENT",
@@ -1806,15 +1858,19 @@ export default function Counters() {
       channelRef.current.broadcast({
         type: "HUNT_ACTION",
         huntId,
-        action
+        action,
+        hunts: nextHunts
       });
     }
 
     debouncedSave(nextHunts);
   };
 
-  const handleDecreaseCheck = (huntId) => {
-    const delta = huntIncrements[huntId] || 1;
+  const handleDecreaseCheck = (huntId, customDelta = null) => {
+    const target = allActiveHunts.find(h => String(h.id) === String(huntId) || String(h.huntId) === String(huntId));
+    const delta = customDelta !== null
+      ? customDelta
+      : (huntIncrements[huntId] || huntIncrements[String(huntId)] || target?.increment || 1);
     const now = Date.now();
     const action = {
       type: "DECREMENT",
@@ -1831,7 +1887,8 @@ export default function Counters() {
       channelRef.current.broadcast({
         type: "HUNT_ACTION",
         huntId,
-        action
+        action,
+        hunts: nextHunts
       });
     }
 
@@ -1854,11 +1911,12 @@ export default function Counters() {
       channelRef.current.broadcast({
         type: "HUNT_ACTION",
         huntId,
-        action
+        action,
+        hunts: nextHunts
       });
     }
 
-    debouncedSave(nextHunts);
+    debouncedSave(nextHunts, currentHuntId, true);
   };
 
   const handleConfirmResetTimer = (huntId) => {
@@ -1879,11 +1937,12 @@ export default function Counters() {
       channelRef.current.broadcast({
         type: "HUNT_ACTION",
         huntId,
-        action
+        action,
+        hunts: nextHunts
       });
     }
 
-    debouncedSave(nextHunts);
+    debouncedSave(nextHunts, currentHuntId, true);
   };
 
   const handleSwitchCurrentHunt = (newHuntId) => {
@@ -1915,6 +1974,15 @@ export default function Counters() {
     try {
       localStorage.setItem("currentHuntId", String(newHuntId));
     } catch {}
+
+    if (channelRef.current) {
+      channelRef.current.broadcast({
+        type: "CURRENT_HUNT_CHANGED",
+        currentHuntId: newHuntId,
+        hunt: updatedHunts.find(h => String(h.id) === String(newHuntId))
+      });
+    }
+
     debouncedSave(updatedHunts, newHuntId);
   };
 
@@ -2183,7 +2251,11 @@ export default function Counters() {
     }
 
     const updatedHunts = [newHunt, ...normalizedActiveHunts];
-    const updatedIncrements = { ...huntIncrements, [now]: huntIncrement };
+    const updatedIncrements = { ...huntIncrements, [now]: huntIncrement, [String(now)]: huntIncrement };
+
+    try {
+      localStorage.setItem("dex_hunt_increments", JSON.stringify(updatedIncrements));
+    } catch {}
 
     setAllActiveHunts(updatedHunts);
     setCurrentHuntId(now);
@@ -2947,7 +3019,7 @@ export default function Counters() {
 
     return (
       <div className="space-y-3">
-        <label className="hunt-modal-label !text-white text-white font-bold">
+        <label className="hunt-modal-label font-bold text-[var(--text)]">
           Active Modifiers & Boosts
         </label>
 
@@ -3194,7 +3266,7 @@ export default function Counters() {
         getFormDisplayName={getFormDisplayName}
         hotkey={hotkey}
         decrementHotkey={decrementHotkey}
-        huntIncrement={huntIncrements[hunt.id] || 1}
+        huntIncrement={huntIncrements[hunt.id] || huntIncrements[String(hunt.id)] || hunt.increment || 1}
         metricMode={metricMode}
         onToggleMetricMode={toggleMetricMode}
         isPhasesCollapsed={!!collapsedPhasesMap[hunt.id]}
@@ -3218,7 +3290,7 @@ export default function Counters() {
             hours,
             minutes,
             seconds,
-            manualIncrements: huntIncrements[h.id] || huntIncrements[String(h.id)] || 1
+            manualIncrements: huntIncrements[h.id] || huntIncrements[String(h.id)] || h.increment || 1
           });
           setSettingsModal({ show: true, hunt: h });
         }}
@@ -3337,6 +3409,16 @@ export default function Counters() {
               {formatHotkeyLabel(hotkey)}
             </span>
           </div>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => navigate("/streamer-tools")}
+            icon={<Tv size={16} />}
+            title="Configure OBS Browser Source Hunt Overlay"
+          >
+            <span>Overlay</span>
+          </Button>
 
           <Button
             variant="secondary"
@@ -3781,7 +3863,7 @@ export default function Counters() {
                           style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
                         />
                         <div className="flex flex-col items-center w-full -mt-2.5 relative z-10">
-                          <span className="text-xs font-bold text-white text-center line-clamp-1 max-w-[95%]">
+                          <span className="text-xs font-bold text-[var(--text)] text-center line-clamp-1 max-w-[95%]">
                             {formatPokemonName(pokemon.name)}
                           </span>
                           {dexNum && (
@@ -3845,7 +3927,7 @@ export default function Counters() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-black text-white">
+                      <span className="text-sm font-black text-[var(--text)]">
                         Selected Phases
                       </span>
                       <span className="text-sm font-bold text-[var(--accent)]">
@@ -3869,7 +3951,7 @@ export default function Counters() {
                       {huntWizard.possiblePhases.map(pkm => (
                         <div
                           key={pkm.stableId || `${pkm.id}-${pkm.name}`}
-                          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.05] border border-white/10 text-xs font-bold text-white shadow-sm hover:border-white/20 transition group"
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/5 dark:bg-white/[0.05] border border-[var(--border-color)] text-xs font-bold text-[var(--text)] shadow-sm hover:border-white/20 transition group"
                         >
                           <span>{formatPokemonName(pkm.name)}</span>
                           <button
@@ -3929,7 +4011,7 @@ export default function Counters() {
                           style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined}
                         />
                         <div className="flex flex-col items-center w-full -mt-2.5 relative z-10">
-                          <span className="text-xs font-bold text-white text-center line-clamp-1 max-w-[95%]">
+                          <span className="text-xs font-bold text-[var(--text)] text-center line-clamp-1 max-w-[95%]">
                             {formatPokemonName(pkm.name)}
                           </span>
                           {dexNum && (
@@ -3980,23 +4062,23 @@ export default function Counters() {
             {huntWizard.step === 3 && (
               <div className="space-y-4">
                 <div className="hunt-modal-card space-y-3 p-4">
-                  <div className="text-xs font-extrabold uppercase tracking-wider text-white">
+                  <div className="text-xs font-extrabold uppercase tracking-wider text-[var(--text)]">
                     Counter & Initial Settings
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* 1. Starting Encounters */}
                     <div>
-                      <label className="hunt-modal-label !text-white text-white font-bold">
+                      <label className="hunt-modal-label font-bold text-[var(--text)]">
                         Starting Encounters
                       </label>
-                      <p className="text-[11px] text-gray-400 mb-1.5">
+                      <p className="text-[11px] text-[var(--text-muted)] mb-1.5">
                         Already started hunting before tracking here? Enter your existing check count.
                       </p>
-                      <div className="flex items-stretch rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden">
+                      <div className="flex items-stretch rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)] focus-within:border-[var(--accent)] transition overflow-hidden">
                         <input
                           type="number"
                           min="0"
-                          className="w-full bg-transparent pl-3 pr-2 py-2 text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="w-full bg-transparent pl-3 pr-2 py-2 text-sm text-[var(--text)] font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           value={huntWizard.startingChecks}
                           onChange={(e) => {
                             const v = e.target.value;
@@ -4010,10 +4092,10 @@ export default function Counters() {
                           onBlur={() => setHuntWizard(prev => ({ ...prev, startingChecks: Math.max(0, parseInt(prev.startingChecks, 10) || 0) }))}
                           placeholder="0"
                         />
-                        <div className="flex flex-col border-l border-white/10 divide-y divide-white/10 shrink-0">
+                        <div className="flex flex-col border-l border-[var(--border-color)] divide-y divide-[var(--border-color)] shrink-0">
                           <button
                             type="button"
-                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            className="px-2.5 flex-1 bg-black/5 dark:bg-white/[0.03] hover:bg-[var(--accent)] text-[var(--text-muted)] hover:text-black transition flex items-center justify-center"
                             onClick={() => setHuntWizard(prev => ({ ...prev, startingChecks: (parseInt(prev.startingChecks, 10) || 0) + 1 }))}
                             title="Increment"
                           >
@@ -4021,7 +4103,7 @@ export default function Counters() {
                           </button>
                           <button
                             type="button"
-                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            className="px-2.5 flex-1 bg-black/5 dark:bg-white/[0.03] hover:bg-[var(--accent)] text-[var(--text-muted)] hover:text-black transition flex items-center justify-center"
                             onClick={() => setHuntWizard(prev => ({ ...prev, startingChecks: Math.max(0, (parseInt(prev.startingChecks, 10) || 0) - 1) }))}
                             title="Decrement"
                           >
@@ -4033,17 +4115,17 @@ export default function Counters() {
 
                     {/* 2. Step Increment */}
                     <div>
-                      <label className="hunt-modal-label !text-white text-white font-bold">
+                      <label className="hunt-modal-label font-bold text-[var(--text)]">
                         Step Increment
                       </label>
-                      <p className="text-[11px] text-gray-400 mb-1.5">
+                      <p className="text-[11px] text-[var(--text-muted)] mb-1.5">
                         How many encounters are added per count increment (default 1).
                       </p>
-                      <div className="flex items-stretch rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden">
+                      <div className="flex items-stretch rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)] focus-within:border-[var(--accent)] transition overflow-hidden">
                         <input
                           type="number"
                           min="1"
-                          className="w-full bg-transparent pl-3 pr-2 py-2 text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="w-full bg-transparent pl-3 pr-2 py-2 text-sm text-[var(--text)] font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           value={huntWizard.increment}
                           onChange={(e) => {
                             const v = e.target.value;
@@ -4057,10 +4139,10 @@ export default function Counters() {
                           onBlur={() => setHuntWizard(prev => ({ ...prev, increment: Math.max(1, parseInt(prev.increment, 10) || 1) }))}
                           placeholder="1"
                         />
-                        <div className="flex flex-col border-l border-white/10 divide-y divide-white/10 shrink-0">
+                        <div className="flex flex-col border-l border-[var(--border-color)] divide-y divide-[var(--border-color)] shrink-0">
                           <button
                             type="button"
-                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            className="px-2.5 flex-1 bg-black/5 dark:bg-white/[0.03] hover:bg-[var(--accent)] text-[var(--text-muted)] hover:text-black transition flex items-center justify-center"
                             onClick={() => setHuntWizard(prev => ({ ...prev, increment: (parseInt(prev.increment, 10) || 1) + 1 }))}
                             title="Increment"
                           >
@@ -4068,7 +4150,7 @@ export default function Counters() {
                           </button>
                           <button
                             type="button"
-                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            className="px-2.5 flex-1 bg-black/5 dark:bg-white/[0.03] hover:bg-[var(--accent)] text-[var(--text-muted)] hover:text-black transition flex items-center justify-center"
                             onClick={() => setHuntWizard(prev => ({ ...prev, increment: Math.max(1, (parseInt(prev.increment, 10) || 1) - 1) }))}
                             title="Decrement"
                           >
@@ -4080,47 +4162,47 @@ export default function Counters() {
 
                     {/* 3. Starting Elapsed Time */}
                     <div>
-                      <label className="hunt-modal-label !text-white text-white font-bold">
+                      <label className="hunt-modal-label font-bold text-[var(--text)]">
                         Starting Elapsed Time
                       </label>
-                      <p className="text-[11px] text-gray-400 mb-1.5">
+                      <p className="text-[11px] text-[var(--text-muted)] mb-1.5">
                         Time already spent on this hunt (Hours, Minutes, Seconds).
                       </p>
                       <div className="grid grid-cols-3 gap-2">
-                        <div className="flex items-center rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden px-2.5 py-1.5">
+                        <div className="flex items-center rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)] focus-within:border-[var(--accent)] transition overflow-hidden px-2.5 py-1.5">
                           <input
                             type="number"
                             min="0"
-                            className="w-full bg-transparent text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="w-full bg-transparent text-sm text-[var(--text)] font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             placeholder="0"
                             value={huntWizard.startHours}
                             onChange={(e) => setHuntWizard(prev => ({ ...prev, startHours: e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value, 10) || 0) }))}
                           />
-                          <span className="text-xs text-gray-400 font-bold ml-1">h</span>
+                          <span className="text-xs text-[var(--text-muted)] font-bold ml-1">h</span>
                         </div>
-                        <div className="flex items-center rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden px-2.5 py-1.5">
+                        <div className="flex items-center rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)] focus-within:border-[var(--accent)] transition overflow-hidden px-2.5 py-1.5">
                           <input
                             type="number"
                             min="0"
                             max="59"
-                            className="w-full bg-transparent text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="w-full bg-transparent text-sm text-[var(--text)] font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             placeholder="0"
                             value={huntWizard.startMinutes}
                             onChange={(e) => setHuntWizard(prev => ({ ...prev, startMinutes: e.target.value === "" ? "" : Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)) }))}
                           />
-                          <span className="text-xs text-gray-400 font-bold ml-1">m</span>
+                          <span className="text-xs text-[var(--text-muted)] font-bold ml-1">m</span>
                         </div>
-                        <div className="flex items-center rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden px-2.5 py-1.5">
+                        <div className="flex items-center rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)] focus-within:border-[var(--accent)] transition overflow-hidden px-2.5 py-1.5">
                           <input
                             type="number"
                             min="0"
                             max="59"
-                            className="w-full bg-transparent text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="w-full bg-transparent text-sm text-[var(--text)] font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             placeholder="0"
                             value={huntWizard.startSeconds}
                             onChange={(e) => setHuntWizard(prev => ({ ...prev, startSeconds: e.target.value === "" ? "" : Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)) }))}
                           />
-                          <span className="text-xs text-gray-400 font-bold ml-1">s</span>
+                          <span className="text-xs text-[var(--text-muted)] font-bold ml-1">s</span>
                         </div>
                       </div>
                     </div>
@@ -4128,7 +4210,7 @@ export default function Counters() {
                     {/* 4. Estimated Checks per Second / Pace */}
                     <div>
                       <div className="flex items-center justify-between">
-                        <label className="hunt-modal-label !text-white text-white font-bold">
+                        <label className="hunt-modal-label font-bold text-[var(--text)]">
                           Estimated Check Pace
                         </label>
                         {(() => {
@@ -4195,29 +4277,29 @@ export default function Counters() {
                 />
 
                 {/* Initial Counter & Pacing Settings Summary Card */}
-                <div className="hunt-modal-card space-y-2.5 p-3.5 bg-white/[0.03] border border-white/10 rounded-xl">
-                  <div className="flex items-center justify-between text-xs border-b border-white/[0.08] pb-2">
-                    <span className="font-extrabold text-white uppercase tracking-wider flex items-center gap-1.5">
+                <div className="hunt-modal-card space-y-2.5 p-3.5 bg-black/5 dark:bg-white/[0.03] border border-[var(--border-color)] rounded-xl">
+                  <div className="flex items-center justify-between text-xs border-b border-[var(--border-color)] pb-2">
+                    <span className="font-extrabold text-[var(--text)] uppercase tracking-wider flex items-center gap-1.5">
                       <Clock size={13} className="text-[var(--accent)]" /> Counter & Pacing Settings
                     </span>
-                    <span className="text-gray-400 text-[11px]">Configured for hunt start</span>
+                    <span className="text-[var(--text-muted)] text-[11px]">Configured for hunt start</span>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-left">
-                    <div className="p-2.5 rounded-lg bg-black/30 border border-white/5 flex flex-col justify-between">
+                    <div className="p-2.5 rounded-lg bg-black/5 dark:bg-black/30 border border-[var(--border-color)] flex flex-col justify-between">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Starting Checks</span>
-                      <span className="text-sm font-extrabold text-white mt-1">
+                      <span className="text-sm font-extrabold text-[var(--text)] mt-1">
                         {(parseInt(huntWizard.startingChecks, 10) || 0).toLocaleString()}
                       </span>
                     </div>
-                    <div className="p-2.5 rounded-lg bg-black/30 border border-white/5 flex flex-col justify-between">
+                    <div className="p-2.5 rounded-lg bg-black/5 dark:bg-black/30 border border-[var(--border-color)] flex flex-col justify-between">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Step Increment</span>
                       <span className="text-sm font-extrabold text-[var(--accent)] mt-1">
                         +{huntWizard.increment || 1}
                       </span>
                     </div>
-                    <div className="p-2.5 rounded-lg bg-black/30 border border-white/5 flex flex-col justify-between">
+                    <div className="p-2.5 rounded-lg bg-black/5 dark:bg-black/30 border border-[var(--border-color)] flex flex-col justify-between">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Starting Elapsed</span>
-                      <span className="text-sm font-extrabold text-white mt-1">
+                      <span className="text-sm font-extrabold text-[var(--text)] mt-1">
                         {(() => {
                           const h = parseInt(huntWizard.startHours, 10) || 0;
                           const m = parseInt(huntWizard.startMinutes, 10) || 0;
@@ -4227,7 +4309,7 @@ export default function Counters() {
                         })()}
                       </span>
                     </div>
-                    <div className="p-2.5 rounded-lg bg-black/30 border border-white/5 flex flex-col justify-between">
+                    <div className="p-2.5 rounded-lg bg-black/5 dark:bg-black/30 border border-[var(--border-color)] flex flex-col justify-between">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Estimated Pace</span>
                       <span className="text-sm font-extrabold text-emerald-400 mt-1">
                         {parseFloat(huntWizard.estimatedPaceSec) > 0
@@ -4242,14 +4324,14 @@ export default function Counters() {
                 {huntWizard.possiblePhases.length > 0 && (
                   <div className="hunt-modal-card space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-extrabold text-gray-300 uppercase tracking-wider">
+                      <span className="font-extrabold text-[var(--text-muted)] uppercase tracking-wider">
                         Configured Phase Targets ({huntWizard.possiblePhases.length})
                       </span>
-                      <span className="text-gray-400 text-[11px]">Tracked alongside main target</span>
+                      <span className="text-[var(--text-muted)] text-[11px]">Tracked alongside main target</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {huntWizard.possiblePhases.map(pkm => (
-                        <div key={pkm.stableId || `${pkm.id}-${pkm.name}`} className="flex items-center gap-1.5 bg-white/[0.04] border border-white/[0.08] rounded-lg px-2 py-1 text-xs text-white">
+                        <div key={pkm.stableId || `${pkm.id}-${pkm.name}`} className="flex items-center gap-1.5 bg-black/5 dark:bg-white/[0.04] border border-[var(--border-color)] rounded-lg px-2 py-1 text-xs text-[var(--text)]">
                           <img src={getPokemonImage(pkm)} alt="" className={`w-4 h-4 object-contain ${!useHomeSprites ? "pixelated" : ""}`} style={!useHomeSprites ? { imageRendering: "pixelated" } : undefined} />
                           <span className="font-semibold">{formatPokemonName(pkm.name)}</span>
                         </div>
@@ -4440,7 +4522,7 @@ export default function Counters() {
                             )}
                           </span>
                         </div>
-                        <h4 className="font-bold text-white text-sm">
+                        <h4 className="font-bold text-[var(--text)] text-sm">
                           Shiny {formatPokemonName(phase.pokemon?.name)}
                         </h4>
                         <p className="text-[11px] text-gray-400">
@@ -4523,6 +4605,10 @@ export default function Counters() {
           const updatedHunts = applyHuntActionToState(allActiveHunts, action, now);
           const updatedIncrements = { ...huntIncrements, [huntId]: payload.increment, [String(huntId)]: payload.increment };
 
+          try {
+            localStorage.setItem("dex_hunt_increments", JSON.stringify(updatedIncrements));
+          } catch {}
+
           setAllActiveHunts(updatedHunts);
           setHuntIncrements(updatedIncrements);
           setCachedHuntsData({ activeHunts: updatedHunts });
@@ -4585,7 +4671,7 @@ export default function Counters() {
                   <span className="w-5 h-5 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center text-xs font-black">
                     −
                   </span>
-                  <span className="text-xs font-black text-white uppercase tracking-wider">
+                  <span className="text-xs font-black text-[var(--text)] uppercase tracking-wider">
                     Subtract Check
                   </span>
                 </div>
@@ -4672,7 +4758,7 @@ export default function Counters() {
                   <span className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-xs font-black">
                     +
                   </span>
-                  <span className="text-xs font-black text-white uppercase tracking-wider">
+                  <span className="text-xs font-black text-[var(--text)] uppercase tracking-wider">
                     Add Check
                   </span>
                 </div>

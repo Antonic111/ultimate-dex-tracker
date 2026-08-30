@@ -64,6 +64,25 @@
   @apply flex flex-col gap-1.5;
 }
 
+.animated-gradient-username-wrapper {
+  display: inline-flex;
+  align-items: center;
+  overflow: visible;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  filter: drop-shadow(-1px -1px 6px color-mix(in srgb, var(--grad-c1, #ec4899) 35%, transparent))
+          drop-shadow(1px 1px 7px color-mix(in srgb, var(--grad-c2, #8b5cf6) 35%, transparent));
+}
+
+.animated-gradient-username {
+  background: linear-gradient(135deg, var(--grad-c1, #ec4899), var(--grad-c2, #8b5cf6)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+  display: inline-block !important;
+}
+
 .profile-hero-username {
   @apply text-3xl font-bold m-0 flex items-center gap-2;
   color: var(--profile-text);
@@ -74,7 +93,7 @@
 }
 
 .hero-social-link {
-  @apply flex items-center justify-center w-8 h-8 rounded-full bg-white/5 text-white transition hover:bg-white/20;
+  @apply flex items-center justify-center w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 text-[var(--text)] transition hover:bg-black/10 dark:hover:bg-white/20;
   /* Reset browser button defaults so <button> matches <a> exactly */
   box-sizing: border-box;
   border: none;
@@ -143,23 +162,29 @@
   color: #f87171;
 }
 
-.hero-like-btn.liked {
-  color: #ef4444;
+.hero-like-btn.liked,
+.hero-like-btn.owner-view {
+  color: #ef4444 !important;
 }
 
-.hero-like-btn.disabled {
+.hero-like-btn.owner-view {
+  cursor: default;
+  opacity: 1;
+}
+
+.hero-like-btn.disabled:not(.owner-view) {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.hero-like-btn.disabled:hover {
+.hero-like-btn.disabled:not(.owner-view):hover {
   color: #9ca3af;
 }
 
 .hero-like-count {
   font-size: 12px;
   font-weight: 700;
-  color: #e5e7eb;
+  color: var(--text, #0f172a);
   line-height: 1;
 }
 
@@ -224,30 +249,30 @@
 }
 
 .profile-hero-bio {
-  @apply mt-5 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] rounded-lg p-4 max-w-lg relative;
+  @apply mt-5 bg-black/[0.03] dark:bg-[rgba(255,255,255,0.03)] border border-[var(--border-color)] rounded-lg p-4 max-w-lg relative;
 }
 
 .bio-label {
-  @apply absolute -top-[11px] left-4 px-2.5 py-0.5 rounded text-[10px] font-bold text-gray-300 uppercase flex items-center gap-1;
-  background: #0f0f0f;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  @apply absolute -top-[11px] left-4 px-2.5 py-0.5 rounded text-[10px] font-bold text-[var(--text)] uppercase flex items-center gap-1;
+  background: var(--profile-card-bg, #ffffff);
+  border: 1px solid var(--border-color);
 }
 
 .bio-label .quote-mark {
-  @apply text-[13px] text-gray-300;
+  @apply text-[13px] text-[var(--text-muted)];
   line-height: 0;
   position: relative;
   top: 1px;
 }
 
 .bio-char-limit {
-  @apply absolute -top-[11px] right-4 px-2 py-0.5 rounded text-[10px] font-bold text-gray-400 uppercase tracking-wider;
-  background: #0f0f0f;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  @apply absolute -top-[11px] right-4 px-2 py-0.5 rounded text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider;
+  background: var(--profile-card-bg, #ffffff);
+  border: 1px solid var(--border-color);
 }
 
 .bio-content p {
-  @apply text-sm text-gray-300 m-0 leading-relaxed;
+  @apply text-sm text-[var(--text)] m-0 leading-relaxed;
 }
 
 /* Seamless textarea within bio card (no double box) */
@@ -269,7 +294,7 @@
   padding: 0 !important;
   font-size: 0.875rem !important;
   line-height: 1.625 !important;
-  color: #e5e7eb !important;
+  color: var(--text, #0f172a) !important;
   min-height: 60px;
 }
 
@@ -302,7 +327,7 @@
 }
 
 .top-stat-value {
-  @apply text-4xl font-black text-white flex items-center justify-center h-16;
+  @apply text-4xl font-black text-[var(--text)] flex items-center justify-center h-16;
 }
 
 .top-stat-chart {
@@ -314,7 +339,7 @@
 }
 
 .donut-bg {
-  @apply fill-transparent stroke-white/5 stroke-[4px];
+  @apply fill-transparent stroke-black/10 dark:stroke-white/5 stroke-[4px];
 }
 
 .donut-progress {
@@ -335,7 +360,7 @@
 }
 
 .donut-text {
-  @apply absolute text-[13px] font-bold text-white;
+  @apply absolute text-[13px] font-bold text-[var(--text)];
 }
 
 .top-stat-accent-line {
@@ -359,16 +384,16 @@
 
 .profile-top-stats-links {
   @apply flex flex-col w-[280px];
-  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 1px solid var(--border-color);
 }
 
 .top-stat-link-btn {
-  @apply flex-1 flex items-center justify-between px-6 transition hover:bg-white/5 bg-transparent border-0 rounded-none;
+  @apply flex-1 flex items-center justify-between px-6 transition hover:bg-black/5 dark:hover:bg-white/5 bg-transparent border-0 rounded-none;
   text-decoration: none !important;
 }
 
 .top-stat-link-btn:first-child:not(:last-child) {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .link-btn-content {
@@ -376,7 +401,7 @@
 }
 
 .link-btn-title {
-  @apply flex items-center gap-2 text-sm font-bold text-white;
+  @apply flex items-center gap-2 text-sm font-bold text-[var(--text)];
 }
 
 .link-btn-subtitle {
@@ -386,25 +411,27 @@
 /* 3. Columns */
 .profile-columns-container {
   @apply w-full max-w-[1300px] flex gap-6;
-  align-items: stretch;
+  align-items: flex-start;
 }
 
 .profile-left-col {
   @apply w-[650px] flex flex-col flex-shrink-0 bg-[var(--profile-card-bg)] rounded-xl border border-[var(--border-color)] overflow-hidden;
+  height: auto;
+  align-self: flex-start;
 }
 
 .profile-right-col {
   @apply flex-1 flex flex-col gap-6 flex-shrink-0;
-  align-self: stretch;
+  align-self: flex-start;
 }
 
 /* Info Box */
 .profile-info-box-container {
-  @apply p-6 border-b border-[rgba(255,255,255,0.05)];
+  @apply p-6 border-b border-[var(--border-color)];
 }
 
 .profile-section-title {
-  @apply text-[14px] font-bold text-gray-300 uppercase tracking-wider mb-5 flex items-center gap-2 m-0;
+  @apply text-[14px] font-bold text-[var(--text)] uppercase tracking-wider mb-5 flex items-center gap-2 m-0;
 }
 
 .profile-section-title svg {
@@ -431,7 +458,7 @@
 }
 
 .info-value {
-  @apply text-[14px] text-gray-200 text-right gap-1.5;
+  @apply text-[14px] text-[var(--text)] text-right gap-1.5;
 }
 
 .info-edit-wrapper {
@@ -445,7 +472,7 @@
 
 /* Profile Favorites Section Background */
 .profile-favorites-section {
-  @apply p-6 border-b border-[rgba(255,255,255,0.05)] w-full mb-0 bg-transparent rounded-none;
+  @apply p-6 border-b border-[var(--border-color)] w-full mb-0 bg-transparent rounded-none;
 }
 
 .profile-favorites-section:last-child {
@@ -457,10 +484,10 @@
   @apply bg-[var(--profile-card-bg)] rounded-xl border border-[var(--border-color)] p-6;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1.25rem;
   flex: 1;
-  height: 100%;
+  height: auto;
   box-sizing: border-box;
 }
 
@@ -762,4 +789,174 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     border-right: none;
   }
+}
+
+/* ==========================================================================
+   LIGHT MODE PROFILE REDESIGN STYLING
+   ========================================================================== */
+[data-theme="light"] .profile-hero-section,
+[data-theme="light"] .profile-top-stats-container,
+[data-theme="light"] .profile-left-col,
+[data-theme="light"] .profile-stats-grid {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .top-stat-card.border-l-dark,
+[data-theme="light"] .top-stat-card {
+  border-left-color: var(--border-color, #e2e8f0);
+}
+
+[data-theme="light"] .recent-field .profile-rank-item,
+[data-theme="light"] .recent-pokemon-item {
+  background: #f8fafc;
+  border-color: var(--border-color, #e2e8f0);
+}
+
+[data-theme="light"] .recent-field .profile-rank-item:hover,
+[data-theme="light"] .recent-pokemon-item:hover {
+  background: #f1f5f9;
+  border-color: var(--accent);
+}
+
+[data-theme="light"] .hero-social-likes {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* ==========================================================================
+   ANIMATED NAME GRADIENT PANEL
+   ========================================================================== */
+.profile-name-gradient-panel {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+[data-theme="light"] .profile-name-gradient-panel {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.gradient-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.gradient-color-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.gradient-color-input-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gradient-input-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.gradient-color-swatch-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.gradient-color-swatch-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.gradient-color-preview-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.gradient-color-hex-text {
+  font-size: 12px;
+  font-family: monospace;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+[data-theme="light"] .gradient-color-swatch-btn {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .gradient-color-hex-text {
+  color: #1e293b;
+}
+
+.gradient-presets-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gradient-presets-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gradient-preset-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.gradient-preset-chip:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.gradient-preset-chip.active {
+  background: color-mix(in srgb, var(--accent, #ffe76a) 18%, transparent);
+  border-color: var(--accent, #ffe76a);
+  color: var(--accent, #ffe76a);
+}
+
+.gradient-preset-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.gradient-panel-locked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 4px 0 2px 0;
 }

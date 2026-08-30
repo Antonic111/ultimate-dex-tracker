@@ -44,26 +44,10 @@ router.get("/", async (req, res) => {
         continue;
       }
 
-      // Verify that user actually has caught Pokemon in their account
-      const caughtMap = u.caughtPokemon || {};
-      const caughtKeys = typeof caughtMap === 'object' ? Object.keys(caughtMap) : [];
-      if (caughtKeys.length === 0) {
-        // User has 0 caught Pokemon on profile — orphaned catch record
-        staleCatchIds.push(c._id);
-        continue;
-      }
-
       validCatches.push({
         ...c,
         avatar: u.avatar || null
       });
-    }
-
-    // Auto-purge stale orphaned catches from the database
-    if (staleCatchIds.length > 0) {
-      RecentCatch.deleteMany({ _id: { $in: staleCatchIds } }).catch(err =>
-        console.error("Error purging orphaned recent catches:", err)
-      );
     }
 
     res.json(validCatches.slice(0, 25));

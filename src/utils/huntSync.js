@@ -66,7 +66,7 @@ export const getHuntElapsedTime = (hunt, now = Date.now()) => {
 /**
  * Normalizes any hunt object into the canonical timestamp & versioned schema.
  */
-export const normalizeHunt = (hunt, now = Date.now(), legacyTotals = {}, legacyLasts = {}, legacyPaused = new Set()) => {
+export const normalizeHunt = (hunt, now = Date.now(), legacyTotals = {}, legacyLasts = {}, legacyPaused = new Set(), legacyIncrements = {}) => {
   if (!hunt) return null;
   const huntId = hunt.id || hunt.huntId || now;
   const isLegacyPaused = legacyPaused.has(huntId) || legacyPaused.has(String(huntId)) || legacyPaused.has(Number(huntId));
@@ -83,11 +83,11 @@ export const normalizeHunt = (hunt, now = Date.now(), legacyTotals = {}, legacyL
   const pokemonName = hunt.pokemonName || pokemon?.name || hunt.targetPokemon || hunt.target || "";
 
   // Normalize startedAt and timestamps
-  let startedAt = hunt.startedAt || hunt.startTime;
+  let startedAt = Number(hunt.startedAt || hunt.startTime) || 0;
   if (typeof startedAt === "string") {
     const parsed = new Date(startedAt).getTime();
     if (!isNaN(parsed)) startedAt = parsed;
-    else startedAt = null;
+    else startedAt = 0;
   }
 
   let totalPausedMs = Number(hunt.totalPausedMs) || 0;
@@ -98,7 +98,7 @@ export const normalizeHunt = (hunt, now = Date.now(), legacyTotals = {}, legacyL
   const accumulatedMs = accumulatedTime > 0 && accumulatedTime < 100000 && !hunt.elapsedMs ? accumulatedTime * 1000 : accumulatedTime;
 
   // Prevent ancient calendar creation dates (e.g. from months/years ago in startDate) from blowing up the timer
-  const isSuspiciousStartTime = startedAt && (now - startedAt > 86400000) && (!hunt.totalPausedMs || hunt.totalPausedMs === 0) && (accumulatedMs < (now - startedAt - 3600000));
+  const isSuspiciousStartTime = startedAt && (now - startedAt > 86400000) && (!hunt.totalPausedMs || hunt.totalPausedMs === 0) && (accumulatedMs > 0 && accumulatedMs < (now - startedAt - 3600000));
 
   if (!startedAt || isSuspiciousStartTime) {
     if (accumulatedMs > 0) {
@@ -121,6 +121,23 @@ export const normalizeHunt = (hunt, now = Date.now(), legacyTotals = {}, legacyL
 
   // Normalize checks
   const checks = Number(hunt.checks ?? hunt.currentChecks ?? hunt.rolls ?? hunt.count ?? hunt.totalChecks ?? 0) || 0;
+
+  // Normalize increment
+  let localIncrements = {};
+  if (!legacyIncrements || Object.keys(legacyIncrements).length === 0) {
+    try {
+      const raw = localStorage.getItem("dex_hunt_increments");
+      if (raw) localIncrements = JSON.parse(raw);
+    } catch {}
+  }
+  const incMap = { ...(localIncrements || {}), ...(legacyIncrements || {}) };
+  const huntIncrement = Math.max(1, Number(
+    hunt.increment ||
+    hunt.huntIncrement ||
+    incMap[huntId] ||
+    incMap[String(huntId)] ||
+    1
+  ));
 
   // Normalize game & method
   let game = hunt.game || "";
@@ -221,6 +238,7 @@ export const normalizeHunt = (hunt, now = Date.now(), legacyTotals = {}, legacyL
     game,
     method,
     checks,
+    increment: huntIncrement,
     status: isPaused ? "paused" : "running",
     isPaused,
     startedAt,
@@ -316,19 +334,19 @@ export const updateHuntWithAction = (hunt, action, now = Date.now()) => {
     }
 
     case "PAUSE": {
-      if (current.status === "paused") return current;
+      if (current.status === "paused" && current.isPaused && current.pausedAt) return current;
       return {
         ...current,
         status: "paused",
         isPaused: true,
-        pausedAt: now,
+        pausedAt: current.pausedAt || now,
         version,
         updatedAt: now
       };
     }
 
     case "RESUME": {
-      if (current.status === "running") return current;
+      if (current.status === "running" && !current.isPaused && !current.pausedAt) return current;
       const pausedDuration = current.pausedAt ? Math.max(0, now - current.pausedAt) : 0;
       return {
         ...current,
@@ -342,7 +360,7 @@ export const updateHuntWithAction = (hunt, action, now = Date.now()) => {
     }
 
     case "TOGGLE_PAUSE": {
-      if (current.status === "paused") {
+      if (current.status === "paused" || current.isPaused || !!current.pausedAt) {
         return updateHuntWithAction(current, { type: "RESUME" }, now);
       }
       return updateHuntWithAction(current, { type: "PAUSE" }, now);
@@ -352,8 +370,13 @@ export const updateHuntWithAction = (hunt, action, now = Date.now()) => {
       return {
         ...current,
         startedAt: now,
+        startTime: now,
         totalPausedMs: 0,
-        pausedAt: current.status === "paused" ? now : null,
+        pausedAt: (current.status === "paused" || current.isPaused) ? now : null,
+        elapsedMs: 0,
+        time: 0,
+        totalTime: 0,
+        lastCheckAt: now,
         stats: {},
         version,
         updatedAt: now
@@ -377,20 +400,32 @@ export const updateHuntWithAction = (hunt, action, now = Date.now()) => {
       };
     }
 
+    case "ADJUST_VALUES":
     case "UPDATE_PROPERTIES": {
-      const payload = action.payload || {};
+      const payload = action.payload || action || {};
       let nextStartedAt = current.startedAt;
       let nextTotalPaused = current.totalPausedMs;
 
       // If user manually adjusts hours/minutes/seconds in Adjust Values modal
-      if (payload.overrideElapsedMs !== undefined) {
-        nextStartedAt = now - payload.overrideElapsedMs;
+      const overrideElapsed = payload.overrideElapsedMs !== undefined ? payload.overrideElapsedMs : payload.elapsedMs;
+      if (overrideElapsed !== undefined && overrideElapsed !== null) {
+        nextStartedAt = now - overrideElapsed;
         nextTotalPaused = 0;
       }
 
+      const nextIncrement = payload.increment !== undefined
+        ? Math.max(1, Number(payload.increment))
+        : (payload.manualIncrements ? Math.max(1, Number(payload.manualIncrements)) : (current.increment || 1));
+
+      const nextChecks = payload.checks !== undefined
+        ? Math.max(0, Number(payload.checks))
+        : (payload.manualChecks !== undefined ? Math.max(0, Number(payload.manualChecks)) : current.checks);
+
       return {
         ...current,
-        ...payload,
+        ...(action.payload || {}),
+        checks: nextChecks,
+        increment: nextIncrement,
         startedAt: nextStartedAt,
         totalPausedMs: nextTotalPaused,
         version,

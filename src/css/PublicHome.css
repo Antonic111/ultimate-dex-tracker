@@ -784,9 +784,22 @@ body.landing-page-active #root::-webkit-scrollbar,
   z-index: 25;
   pointer-events: none !important;
   user-select: none;
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.8));
-  transform-style: preserve-3d;
-  transform: translateZ(35px);
+  overflow: visible;
+}
+
+.floating-sprite::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 14px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 75%);
+  border-radius: 50%;
+  filter: blur(4px);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .floating-pokemon-img {
@@ -794,41 +807,46 @@ body.landing-page-active #root::-webkit-scrollbar,
   image-rendering: pixelated;
   pointer-events: none !important;
   user-select: none;
+  filter: none !important;
+  box-sizing: border-box;
 }
 
 .sprite-mew {
-  top: -70px;
-  right: -80px;
+  top: -80px;
+  right: -90px;
   animation: floatMew 4.5s ease-in-out infinite;
 }
 
 .sprite-mew .floating-pokemon-img {
-  width: 130px;
-  height: 130px;
+  width: 155px;
+  height: 155px;
+  padding: 8px;
   object-fit: contain;
 }
 
 .sprite-gyarados {
-  bottom: -100px;
-  right: -120px;
+  bottom: -110px;
+  right: -130px;
   animation: floatGyarados 5.5s ease-in-out infinite;
 }
 
 .sprite-gyarados .floating-pokemon-img {
-  width: 185px;
-  height: 185px;
+  width: 215px;
+  height: 215px;
+  padding: 8px;
   object-fit: contain;
 }
 
 .sprite-pikachu {
-  bottom: -40px;
-  left: -40px;
+  bottom: -50px;
+  left: -50px;
   animation: floatPikachu 3.8s ease-in-out infinite;
 }
 
 .sprite-pikachu .floating-pokemon-img {
-  width: 120px;
-  height: 120px;
+  width: 145px;
+  height: 145px;
+  padding: 8px;
   object-fit: contain;
 }
 
@@ -3747,4 +3765,223 @@ body.landing-page-active #root::-webkit-scrollbar,
     width: 36px !important;
     height: 36px !important;
   }
+}
+
+/* ==========================================================================
+   LIGHT MODE LANDING PAGE STYLING
+   ========================================================================== */
+[data-theme="light"] .public-home-snap-container {
+  background: #f0f2f5;
+  color: #0f172a;
+}
+
+[data-theme="light"] .hero-main-title,
+[data-theme="light"] .section-title-large {
+  color: #0f172a;
+}
+
+[data-theme="light"] .hero-main-desc,
+[data-theme="light"] .section-subtitle,
+[data-theme="light"] .hero-account-link {
+  color: #475569;
+}
+
+[data-theme="light"] .hero-platform-badge {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  color: var(--accent, #d97706);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .stat-pill-num {
+  color: #0f172a;
+}
+
+[data-theme="light"] .stat-pill-desc {
+  color: #64748b;
+}
+
+[data-theme="light"] .btn-hero-secondary {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .btn-hero-secondary:hover {
+  background: #f1f5f9;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+[data-theme="light"] .showcase-slide-card,
+[data-theme="light"] .master-feature-card,
+[data-theme="light"] .landing-card,
+[data-theme="light"] .hero-dex-card,
+[data-theme="light"] .interactive-dex-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .master-card-title,
+[data-theme="light"] .showcase-title {
+  color: #0f172a;
+}
+
+[data-theme="light"] .master-card-desc,
+[data-theme="light"] .showcase-desc {
+  color: #64748b;
+}
+
+[data-theme="light"] .showcase-bullet-item {
+  color: #0f172a;
+}
+
+[data-theme="light"] .bullet-check-icon {
+  background: #f1f5f9;
+  color: var(--accent, #d97706);
+}
+
+[data-theme="light"] .feature-icon-wrapper {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .showcase-badge {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: var(--accent, #d97706);
+}
+
+/* Interactive Living Dex Card in Hero */
+[data-theme="light"] .real-site-dex-container {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .real-progress-box,
+[data-theme="light"] .real-searchbar-container,
+[data-theme="light"] .real-dex-tabs-bar,
+[data-theme="light"] .real-dex-box-container {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .real-progress-inner-card,
+[data-theme="light"] .real-search-field,
+[data-theme="light"] .real-dropdown-field,
+[data-theme="light"] .real-pokemon-slot {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .real-pokemon-slot:hover {
+  background: #f1f5f9;
+  border-color: var(--accent);
+}
+
+[data-theme="light"] .real-progress-heading,
+[data-theme="light"] .real-meta-title,
+[data-theme="light"] .real-search-input,
+[data-theme="light"] .real-shiny-text,
+[data-theme="light"] .real-dex-title,
+[data-theme="light"] .real-slot-name,
+[data-theme="light"] .real-slot-num {
+  color: #0f172a;
+}
+
+[data-theme="light"] .real-meta-stats,
+[data-theme="light"] .real-dropdown-label,
+[data-theme="light"] .real-dex-subtitle {
+  color: #64748b;
+}
+
+[data-theme="light"] .real-progress-track {
+  background: #e2e8f0;
+}
+
+[data-theme="light"] .real-searchbar-bottom-row {
+  border-top-color: #e2e8f0;
+}
+
+[data-theme="light"] .real-shiny-toggle-wrap .switch-slider {
+  background: #cbd5e1;
+  border-color: #94a3b8;
+}
+
+[data-theme="light"] .real-dex-tab-btn {
+  color: #64748b;
+}
+
+[data-theme="light"] .real-dex-tab-btn:hover {
+  color: #0f172a;
+}
+
+/* Bottom CTA Banner */
+[data-theme="light"] .bottom-cta-banner {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .banner-title {
+  color: #0f172a;
+}
+
+[data-theme="light"] .banner-subtitle {
+  color: #64748b;
+}
+
+[data-theme="light"] .carousel-nav-arrow {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .carousel-nav-arrow:hover {
+  background: #f1f5f9;
+  color: var(--accent);
+}
+
+[data-theme="light"] .scroll-hint-arrow {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: #e2e8f0;
+  color: var(--accent, #d97706);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .scroll-hint-arrow:hover {
+  background: var(--accent);
+  color: #000000;
+}
+
+[data-theme="light"] .indicator-tooltip {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .section-indicator-dot {
+  background: rgba(0, 0, 0, 0.15);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .section-indicator-dot.active {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+[data-theme="light"] .ambient-float-item {
+  opacity: 0.07 !important;
+}
+
+[data-theme="light"] .ambient-pikachu.item-2 {
+  opacity: 0.06 !important;
+}
+
+[data-theme="light"] .floating-sprite::after {
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0) 75%);
 }

@@ -460,6 +460,28 @@ export const huntAPI = {
   },
 };
 
+export const streamerOverlayAPI = {
+  // Get overlay configuration
+  async getOverlayConfig() {
+    return api.get('/streamer-tools/overlay');
+  },
+
+  // Update overlay configuration
+  async updateOverlayConfig(config) {
+    return api.put('/streamer-tools/overlay', config);
+  },
+
+  // Regenerate overlay token
+  async regenerateToken() {
+    return api.post('/streamer-tools/overlay/regenerate-token');
+  },
+
+  // Public endpoint for OBS browser source
+  async getPublicOverlayData(token) {
+    return api.get(`/overlay/public/${encodeURIComponent(token)}`);
+  },
+};
+
 export const bingoAPI = {
   // Get bingo data
   async getBingo() {

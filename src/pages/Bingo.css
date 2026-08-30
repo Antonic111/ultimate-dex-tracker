@@ -54,7 +54,7 @@
     align-items: center;
     justify-content: center;
     background: var(--accent);
-    color: var(--main-bg);
+    color: #000000;
     font-size: 2rem;
     font-weight: 800;
     border-radius: 8px;
@@ -408,12 +408,12 @@
 
     .bingo-info-box {
         display: block;
-        background-color: var(--searchbar-dropdown);
-        border: 1px solid #27272a;
+        background-color: var(--pokemon-box-bg);
+        border: 1px solid var(--border-color);
         border-radius: 8px;
         padding: 0.75rem 1rem;
         margin: 0 0 1.5rem 0;
-        color: #e4e4e7;
+        color: var(--text);
         font-size: 0.85rem;
         text-align: left;
         line-height: 1.5;

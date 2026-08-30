@@ -7,6 +7,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ultimate Dex Tracker</title>
 
+  <!-- Google Fonts for Streamer Overlay & UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Pixelify+Sans:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800;900&family=Press+Start+2P&family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <!-- Preload Critical Landing Font to Prevent Layout Shift -->
   <link rel="preload" href="/landing_page/BowlbyOne-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous" />
 
@@ -196,12 +201,14 @@
   <script type="module" src="/src/main.jsx"></script>
   <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
   <script>
-    kofiWidgetOverlay.draw('antonic111', {
-      'type': 'floating-chat',
-      'floating-chat.donateButton.text': 'Tip Me',
-      'floating-chat.donateButton.background-color': '#323842',
-      'floating-chat.donateButton.text-color': '#fff'
-    });
+    if (!window.location.pathname.startsWith('/overlay/') && !window.location.pathname.startsWith('/hunt-popout')) {
+      kofiWidgetOverlay.draw('antonic111', {
+        'type': 'floating-chat',
+        'floating-chat.donateButton.text': 'Tip Me',
+        'floating-chat.donateButton.background-color': '#323842',
+        'floating-chat.donateButton.text-color': '#fff'
+      });
+    }
   </script>
   <style>
     /* Force Ko-Fi widget to bottom left */
@@ -225,6 +232,26 @@
     body.admin-page .floatingchat-container-wrap,
     body.admin-page .floatingchat-container-wrap-mobi,
     body.admin-page .floating-chat-kofi-popup-iframe,
+    body.obs-overlay-mode div[id^="kofi-widget-overlay"],
+    body.obs-overlay-mode iframe[src*="ko-fi"],
+    body.obs-overlay-mode .floatingchat-container-wrap,
+    body.obs-overlay-mode .floatingchat-container-wrap-mobi,
+    body.obs-overlay-mode .floating-chat-kofi-popup-iframe,
+    body.overlay-editor-active div[id^="kofi-widget-overlay"],
+    body.overlay-editor-active iframe[src*="ko-fi"],
+    body.overlay-editor-active .floatingchat-container-wrap,
+    body.overlay-editor-active .floatingchat-container-wrap-mobi,
+    body.overlay-editor-active .floating-chat-kofi-popup-iframe,
+    body:has(.overlay-editor-studio-container) div[id^="kofi-widget-overlay"],
+    body:has(.overlay-editor-studio-container) iframe[src*="ko-fi"],
+    body:has(.overlay-editor-studio-container) .floatingchat-container-wrap,
+    body:has(.overlay-editor-studio-container) .floatingchat-container-wrap-mobi,
+    body:has(.overlay-editor-studio-container) .floating-chat-kofi-popup-iframe,
+    body:has(.obs-overlay-viewport) div[id^="kofi-widget-overlay"],
+    body:has(.obs-overlay-viewport) iframe[src*="ko-fi"],
+    body:has(.obs-overlay-viewport) .floatingchat-container-wrap,
+    body:has(.obs-overlay-viewport) .floatingchat-container-wrap-mobi,
+    body:has(.obs-overlay-viewport) .floating-chat-kofi-popup-iframe,
     body:has(.admin-fullscreen-window) div[id^="kofi-widget-overlay"],
     body:has(.admin-fullscreen-window) iframe[src*="ko-fi"],
     body:has(.admin-fullscreen-window) .floatingchat-container-wrap,

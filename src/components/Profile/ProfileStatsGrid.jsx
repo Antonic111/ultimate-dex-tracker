@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Sparkles, BarChart2 } from "lucide-react";
 import { Button } from "../Shared/Button";
+import { Tooltip } from "../Shared/Tooltip";
 import { GAME_OPTIONS_TWO, BALL_OPTIONS, MARK_OPTIONS } from "../../Constants";
 import { getSpriteUrl } from "../../utils/spriteUtils";
 import { formatPokemonName } from "../../utils";
@@ -64,15 +65,16 @@ export default function ProfileStatsGrid({ stats, recentAdded, useHomeSprites, t
                 <div className={`field-display stat-icon-row${(() => { const s = (stats.allGames || []).slice(statPage.games * STAT_PAGE_SIZE, (statPage.games + 1) * STAT_PAGE_SIZE); return s.length === STAT_PAGE_SIZE ? ' stat-icon-row--full' : ''; })()}`}>
                     {stats.allGames && stats.allGames.length > 0 ? (
                         stats.allGames.slice(statPage.games * STAT_PAGE_SIZE, (statPage.games + 1) * STAT_PAGE_SIZE).map((g, i) => (
-                            <div key={i} className="stat-icon-item">
-                                <span className="stat-icon-tooltip">{g.name}</span>
-                                {g.image ? (
-                                    <img src={g.image} alt={g.name} className="stat-icon-img" />
-                                ) : (
-                                    <span className="stat-icon-text">{g.name}</span>
-                                )}
-                                <span className="stat-icon-count">{g.count}</span>
-                            </div>
+                            <Tooltip key={i} content={g.name} position="top">
+                                <div className="stat-icon-item">
+                                    {g.image ? (
+                                        <img src={g.image} alt={g.name} className="stat-icon-img" />
+                                    ) : (
+                                        <span className="stat-icon-text">{g.name}</span>
+                                    )}
+                                    <span className="stat-icon-count">{g.count}</span>
+                                </div>
+                            </Tooltip>
                         ))
                     ) : "—"}
                 </div>
@@ -109,15 +111,16 @@ export default function ProfileStatsGrid({ stats, recentAdded, useHomeSprites, t
                 <div className={`field-display stat-icon-row${(() => { const s = (stats.allBalls || []).slice(statPage.balls * STAT_PAGE_SIZE, (statPage.balls + 1) * STAT_PAGE_SIZE); return s.length === STAT_PAGE_SIZE ? ' stat-icon-row--full' : ''; })()}`}>
                     {stats.allBalls && stats.allBalls.length > 0 ? (
                         stats.allBalls.slice(statPage.balls * STAT_PAGE_SIZE, (statPage.balls + 1) * STAT_PAGE_SIZE).map((b, i) => (
-                            <div key={i} className="stat-icon-item">
-                                <span className="stat-icon-tooltip">{b.name}</span>
-                                {b.image ? (
-                                    <img src={b.image} alt={b.name} className="stat-icon-img" />
-                                ) : (
-                                    <span className="stat-icon-text">{b.name}</span>
-                                )}
-                                <span className="stat-icon-count">{b.count}</span>
-                            </div>
+                            <Tooltip key={i} content={b.name} position="top">
+                                <div className="stat-icon-item">
+                                    {b.image ? (
+                                        <img src={b.image} alt={b.name} className="stat-icon-img" />
+                                    ) : (
+                                        <span className="stat-icon-text">{b.name}</span>
+                                    )}
+                                    <span className="stat-icon-count">{b.count}</span>
+                                </div>
+                            </Tooltip>
                         ))
                     ) : "—"}
                 </div>
@@ -154,15 +157,16 @@ export default function ProfileStatsGrid({ stats, recentAdded, useHomeSprites, t
                 <div className={`field-display stat-icon-row${(() => { const s = (stats.allMarks || []).slice(statPage.marks * STAT_PAGE_SIZE, (statPage.marks + 1) * STAT_PAGE_SIZE); return s.length === STAT_PAGE_SIZE ? ' stat-icon-row--full' : ''; })()}`}>
                     {stats.allMarks && stats.allMarks.length > 0 ? (
                         stats.allMarks.slice(statPage.marks * STAT_PAGE_SIZE, (statPage.marks + 1) * STAT_PAGE_SIZE).map((m, i) => (
-                            <div key={i} className="stat-icon-item">
-                                <span className="stat-icon-tooltip">{m.name}</span>
-                                {m.image ? (
-                                    <img src={m.image} alt={m.name} className="stat-icon-img" />
-                                ) : (
-                                    <span className="stat-icon-text">{m.name}</span>
-                                )}
-                                <span className="stat-icon-count">{m.count}</span>
-                            </div>
+                            <Tooltip key={i} content={m.name} position="top">
+                                <div className="stat-icon-item">
+                                    {m.image ? (
+                                        <img src={m.image} alt={m.name} className="stat-icon-img" />
+                                    ) : (
+                                        <span className="stat-icon-text">{m.name}</span>
+                                    )}
+                                    <span className="stat-icon-count">{m.count}</span>
+                                </div>
+                            </Tooltip>
                         ))
                     ) : "—"}
                 </div>

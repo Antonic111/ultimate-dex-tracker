@@ -430,3 +430,68 @@
     height: 600px;
   }
 }
+
+/* ==========================================================================
+   LIGHT MODE FOOTER STYLING
+   ========================================================================== */
+[data-theme="light"] .site-footer {
+  background-color: var(--header, #ffffff);
+  border-top-color: var(--accent);
+  color: var(--text, #0f172a);
+}
+
+[data-theme="light"] .footer-support-btn {
+  border-color: #cbd5e1;
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+[data-theme="light"] .footer-support-btn:hover {
+  background: #f1f5f9;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+[data-theme="light"] .footer-social-btn {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #334155;
+}
+
+[data-theme="light"] .footer-social-btn:hover {
+  background: #e2e8f0;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+[data-theme="light"] .footer-nav-link {
+  color: #475569;
+}
+
+[data-theme="light"] .footer-nav-link:hover {
+  color: var(--accent);
+}
+
+[data-theme="light"] .footer-nav-link svg {
+  color: #64748b;
+}
+
+[data-theme="light"] .footer-nav-link:hover svg {
+  color: var(--accent);
+}
+
+[data-theme="light"] .footer-brand-desc,
+[data-theme="light"] .footer-legal-body,
+[data-theme="light"] .footer-bottom-left,
+[data-theme="light"] .footer-tagline,
+[data-theme="light"] .footer-bottom-right {
+  color: #64748b;
+}
+
+[data-theme="light"] .footer-bottom-inner {
+  border-top-color: #e2e8f0;
+}
+
+[data-theme="light"] .footer-logo-layer1 {
+  filter: brightness(0) saturate(100%) invert(8%);
+}

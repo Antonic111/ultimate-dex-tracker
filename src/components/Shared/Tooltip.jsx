@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState, useCallback } from "react";
 import "../../css/Tooltip.css";
 
 /**
@@ -29,10 +29,48 @@ export const Tooltip = forwardRef(function Tooltip(
     className = "",
     tooltipClassName = "",
     children,
+    onMouseDown,
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
     ...rest
   },
   ref
 ) {
+  const [isDismissed, setIsDismissed] = useState(false);
+
+  const handleMouseEnter = useCallback(
+    (e) => {
+      setIsDismissed(false);
+      onMouseEnter?.(e);
+    },
+    [onMouseEnter]
+  );
+
+  const handleMouseLeave = useCallback(
+    (e) => {
+      setIsDismissed(false);
+      onMouseLeave?.(e);
+    },
+    [onMouseLeave]
+  );
+
+  const handleMouseDown = useCallback(
+    (e) => {
+      setIsDismissed(true);
+      onMouseDown?.(e);
+    },
+    [onMouseDown]
+  );
+
+  const handleClick = useCallback(
+    (e) => {
+      setIsDismissed(true);
+      onClick?.(e);
+    },
+    [onClick]
+  );
+
   if (!content || disabled) {
     return children;
   }
@@ -42,6 +80,7 @@ export const Tooltip = forwardRef(function Tooltip(
     `udt-tooltip--${position}`,
     `udt-tooltip--${align}`,
     wrap ? "udt-tooltip--wrap" : "",
+    isDismissed ? "is-dismissed" : "",
     tooltipClassName,
   ]
     .filter(Boolean)
@@ -60,6 +99,10 @@ export const Tooltip = forwardRef(function Tooltip(
     <span
       ref={ref}
       className={`udt-tooltip-wrapper ${className}`.trim()}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onMouseDown={handleMouseDown}
+      onClick={handleClick}
       {...rest}
     >
       {children}

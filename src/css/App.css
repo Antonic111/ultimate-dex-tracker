@@ -607,14 +607,42 @@ body {
     visibility: hidden;
   }
 
-  /* Hide scrollbar elements on landing page */
+  /* Hide scrollbar elements on landing page, obs overlay, popout, and editor */
   body.landing-page-active::before,
   body.landing-page-active::after,
-  body.landing-page-active .custom-scrollbar-thumb {
+  body.landing-page-active .custom-scrollbar-thumb,
+  body.landing-page-active .custom-scrollbar-click-track,
+  body.obs-overlay-mode::before,
+  body.obs-overlay-mode::after,
+  body.obs-overlay-mode .custom-scrollbar-thumb,
+  body.obs-overlay-mode .custom-scrollbar-click-track,
+  body:has(.obs-overlay-viewport)::before,
+  body:has(.obs-overlay-viewport)::after,
+  body:has(.obs-overlay-viewport) .custom-scrollbar-thumb,
+  body:has(.obs-overlay-viewport) .custom-scrollbar-click-track,
+  body.popout-mode::before,
+  body.popout-mode::after,
+  body.popout-mode .custom-scrollbar-thumb,
+  body.popout-mode .custom-scrollbar-click-track,
+  body.overlay-editor-active::before,
+  body.overlay-editor-active::after,
+  body.overlay-editor-active .custom-scrollbar-thumb,
+  body.overlay-editor-active .custom-scrollbar-click-track,
+  body:has(.overlay-editor-studio-container)::before,
+  body:has(.overlay-editor-studio-container)::after,
+  body:has(.overlay-editor-studio-container) .custom-scrollbar-thumb,
+  body:has(.overlay-editor-studio-container) .custom-scrollbar-click-track,
+  body:has(.overlay-editor-workspace)::before,
+  body:has(.overlay-editor-workspace)::after,
+  body:has(.overlay-editor-workspace) .custom-scrollbar-thumb,
+  body:has(.overlay-editor-workspace) .custom-scrollbar-click-track {
     display: none !important;
+    content: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
     width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
   }
 
   /* Custom scrollbar thumb - will be positioned by JavaScript (theme-aware) */
@@ -809,4 +837,24 @@ body {
     font-size: 0.82rem;
     gap: 5px;
   }
+}
+
+/* ==========================================================================
+   MEMBERSHIP & CHECKOUT THEME & BORDER SYSTEM
+   ========================================================================== */
+.membership-page .bg-\[var\(--pokemon-box-bg\)\],
+.membership-page .bg-\[var\(--auth-boxes\)\],
+.membership-checkout-page .bg-\[var\(--pokemon-box-bg\)\],
+.membership-checkout-page .bg-\[var\(--auth-boxes\)\] {
+  border-color: var(--border-color, #333333) !important;
+}
+
+[data-theme="dark"] .membership-page [class*="border"],
+[data-theme="dark"] .membership-checkout-page [class*="border"] {
+  border-color: var(--border-color, #333333) !important;
+}
+
+[data-theme="light"] .membership-page [class*="border"],
+[data-theme="light"] .membership-checkout-page [class*="border"] {
+  border-color: #e2e8f0 !important;
 }

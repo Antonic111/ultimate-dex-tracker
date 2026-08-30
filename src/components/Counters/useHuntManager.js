@@ -17,6 +17,7 @@ import {
   createHuntChannel
 } from "../../utils/huntSync";
 import { getSpriteUrl, resolvePokemon, cleanPokemonNameOrKey } from "../../utils/spriteUtils";
+import { calculateOdds } from "../../utils/huntSystem";
 import { validateContent } from "../../../shared/contentFilter";
 
 export function useHuntManager({
@@ -242,7 +243,7 @@ export function useHuntManager({
   // ── Debounced Backend & Local Persistence ─────────────────────────────────
   const saveTimeoutRef = useRef(null);
 
-  const debouncedSave = useCallback((huntsToSave, activeId = currentHuntId) => {
+  const debouncedSave = useCallback((huntsToSave, activeId = currentHuntId, immediate = false) => {
     const listToSave = huntsToSave || allActiveHuntsRef.current;
     try {
       localStorage.setItem("activeHunts", JSON.stringify(listToSave));
@@ -253,12 +254,19 @@ export function useHuntManager({
 
     if (username) {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-      saveTimeoutRef.current = setTimeout(() => {
+
+      const performSave = () => {
         huntAPI.updateHuntData({
           activeHunts: listToSave,
           currentHuntId: activeId
         }).catch(err => console.error("Failed to save hunts to backend:", err));
-      }, 350);
+      };
+
+      if (immediate) {
+        performSave();
+      } else {
+        saveTimeoutRef.current = setTimeout(performSave, 100);
+      }
     }
   }, [username, currentHuntId]);
 
@@ -406,8 +414,10 @@ export function useHuntManager({
       timestamp: now
     };
 
+    let nextState = null;
     setAllActiveHunts(prev => {
       const next = applyHuntActionToState(prev, action, now);
+      nextState = next;
       setCachedHuntsData({ activeHunts: next });
       debouncedSave(next);
       return next;
@@ -417,7 +427,8 @@ export function useHuntManager({
       channelRef.current.broadcast({
         type: "HUNT_ACTION",
         huntId,
-        action
+        action,
+        hunts: nextState
       });
     }
   }, [huntIncrements, debouncedSave]);
@@ -433,8 +444,10 @@ export function useHuntManager({
       timestamp: now
     };
 
+    let nextState = null;
     setAllActiveHunts(prev => {
       const next = applyHuntActionToState(prev, action, now);
+      nextState = next;
       setCachedHuntsData({ activeHunts: next });
       debouncedSave(next);
       return next;
@@ -444,7 +457,8 @@ export function useHuntManager({
       channelRef.current.broadcast({
         type: "HUNT_ACTION",
         huntId,
-        action
+        action,
+        hunts: nextState
       });
     }
   }, [huntIncrements, debouncedSave]);
@@ -458,10 +472,12 @@ export function useHuntManager({
       timestamp: now
     };
 
+    let nextState = null;
     setAllActiveHunts(prev => {
       const next = applyHuntActionToState(prev, action, now);
+      nextState = next;
       setCachedHuntsData({ activeHunts: next });
-      debouncedSave(next);
+      debouncedSave(next, currentHuntId, true);
       return next;
     });
 
@@ -469,10 +485,11 @@ export function useHuntManager({
       channelRef.current.broadcast({
         type: "HUNT_ACTION",
         huntId,
-        action
+        action,
+        hunts: nextState
       });
     }
-  }, [debouncedSave]);
+  }, [debouncedSave, currentHuntId]);
 
   const handleConfirmResetTimer = useCallback((huntId) => {
     const now = Date.now();
@@ -482,10 +499,12 @@ export function useHuntManager({
       timestamp: now
     };
 
+    let nextState = null;
     setAllActiveHunts(prev => {
       const next = applyHuntActionToState(prev, action, now);
+      nextState = next;
       setCachedHuntsData({ activeHunts: next });
-      debouncedSave(next);
+      debouncedSave(next, currentHuntId, true);
       return next;
     });
 
@@ -496,10 +515,11 @@ export function useHuntManager({
       channelRef.current.broadcast({
         type: "HUNT_ACTION",
         huntId,
-        action
+        action,
+        hunts: nextState
       });
     }
-  }, [debouncedSave, showMessage]);
+  }, [debouncedSave, showMessage, currentHuntId]);
 
   const handleDeleteHunt = useCallback((huntId) => {
     const nextHunts = allActiveHuntsRef.current.filter(h => String(h.id) !== String(huntId));
@@ -615,8 +635,13 @@ export function useHuntManager({
     });
 
     const action = {
-      type: "ADJUST_VALUES",
+      type: "UPDATE_PROPERTIES",
       huntId: hunt.id,
+      payload: {
+        checks: newChecks,
+        increment: newIncrement,
+        overrideElapsedMs: newElapsedMs
+      },
       checks: newChecks,
       elapsedMs: newElapsedMs,
       increment: newIncrement,
@@ -1242,7 +1267,11 @@ export function useHuntManager({
     }
 
     const updatedHunts = [newHunt, ...normalizedActiveHunts];
-    const updatedIncrements = { ...huntIncrements, [now]: huntIncrement };
+    const updatedIncrements = { ...huntIncrements, [now]: huntIncrement, [String(now)]: huntIncrement };
+
+    try {
+      localStorage.setItem("dex_hunt_increments", JSON.stringify(updatedIncrements));
+    } catch {}
 
     setAllActiveHunts(updatedHunts);
     setCurrentHuntId(now);

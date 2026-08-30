@@ -20,7 +20,8 @@ import {
   AlertCircle,
   ChevronLeft,
   ChevronRight,
-  RefreshCw
+  RefreshCw,
+  Activity
 } from "lucide-react";
 
 export default function DetailedHuntCard({
@@ -91,6 +92,15 @@ export default function DetailedHuntCard({
   }, [menuOpen, onCloseMenu, onToggleMenu]);
 
   if (!hunt) return null;
+
+  const effectiveIncrement = Math.max(
+    1,
+    Number(
+      (huntIncrement !== undefined && huntIncrement !== null && huntIncrement > 1)
+        ? huntIncrement
+        : (hunt.increment || hunt.huntIncrement || huntIncrement || 1)
+    )
+  );
 
   const isPaused = hunt.status === "paused" || hunt.isPaused;
   const totalElapsedMs = getHuntElapsedTime(hunt);
@@ -375,8 +385,9 @@ export default function DetailedHuntCard({
         <div className="hunt-metric-box">
           <span className="hunt-metric-label">Elapsed Time</span>
           <span className="hunt-metric-value time">{formatDigitalTime(totalElapsedMs)}</span>
-          <span className="hunt-metric-subtext">
-            ⏱ {totalOverallChecks > 0 && totalElapsedMs > 0 ? `${formatIntervalTime(totalElapsedMs / 1000 / totalOverallChecks)} / check` : "0.0s / check"}
+          <span className="hunt-metric-subtext flex items-center justify-center sm:justify-start gap-1">
+            <Activity size={12} className="opacity-60 shrink-0" />
+            <span>{totalOverallChecks > 0 && totalElapsedMs > 0 ? `${formatIntervalTime(totalElapsedMs / 1000 / totalOverallChecks)} / check` : "0.0s / check"}</span>
           </span>
         </div>
       </div>
@@ -386,10 +397,10 @@ export default function DetailedHuntCard({
         <button
           type="button"
           className="hunt-btn-minus"
-          onClick={() => onDecreaseCheck && onDecreaseCheck(hunt.id)}
-          title={`Decrease encounters by ${huntIncrement}${decrementHotkey ? ` (Hotkey: ${decrementHotkey === " " ? "SPACE" : decrementHotkey.toUpperCase()})` : ""}`}
+          onClick={() => onDecreaseCheck && onDecreaseCheck(hunt.id, effectiveIncrement)}
+          title={`Decrease encounters by ${effectiveIncrement}${decrementHotkey ? ` (Hotkey: ${decrementHotkey === " " ? "SPACE" : decrementHotkey.toUpperCase()})` : ""}`}
         >
-          −{huntIncrement}
+          −{effectiveIncrement}
         </button>
 
         <button
@@ -404,10 +415,10 @@ export default function DetailedHuntCard({
         <button
           type="button"
           className="hunt-btn-plus"
-          onClick={() => onAddCheck && onAddCheck(hunt.id)}
-          title={`Add ${huntIncrement} encounter (Hotkey: ${hotkey === " " ? "SPACE" : hotkey.toUpperCase()})`}
+          onClick={() => onAddCheck && onAddCheck(hunt.id, effectiveIncrement)}
+          title={`Add ${effectiveIncrement} encounter (Hotkey: ${hotkey === " " ? "SPACE" : hotkey.toUpperCase()})`}
         >
-          +{huntIncrement}
+          +{effectiveIncrement}
         </button>
       </div>
 

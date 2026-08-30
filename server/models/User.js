@@ -87,9 +87,14 @@ const userSchema = new mongoose.Schema({
   favoritePokemonShiny: [Boolean],
   favoriteBalls: [String],
   favoriteTrainers: [String],
+  favoriteCategoryOrder: { type: [String], default: ["pokemon", "games"] },
   switchFriendCode: String,
   goFriendCode: String,
   profileTrainer: String,
+  nameColor1: { type: String, default: null },
+  nameColor2: { type: String, default: null },
+  nameGradientColor1: { type: String, default: null },
+  nameGradientColor2: { type: String, default: null },
   avatar: {
     type: String,
     default: () => {
@@ -290,6 +295,11 @@ const userSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
+// Query & Sorting Performance Indexes
+userSchema.index({ createdAt: -1 });
+userSchema.index({ lastActiveAt: -1 });
+userSchema.index({ isAdmin: 1 });
+userSchema.index({ isSuspended: 1 });
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {

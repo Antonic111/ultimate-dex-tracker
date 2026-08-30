@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, NumberField } from "../Shared";
 import { Sliders, Check } from "lucide-react";
+import { getHuntElapsedTime } from "../../utils/huntSync";
 
 const formatPokemonName = (name) => {
   if (!name) return "";
@@ -24,7 +25,7 @@ export default function AdjustHuntModal({
 
   useEffect(() => {
     if (hunt && isOpen) {
-      const elapsedMs = hunt.elapsedMs || 0;
+      const elapsedMs = getHuntElapsedTime(hunt);
       const totalSec = Math.floor(elapsedMs / 1000);
       const h = Math.floor(totalSec / 3600);
       const m = Math.floor((totalSec % 3600) / 60);

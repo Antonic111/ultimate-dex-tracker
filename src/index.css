@@ -141,7 +141,7 @@ body {
 }
 
 [data-theme="light"] {
-  --site-background: linear-gradient(to right, #f5f5f5 0%, #f5f5f5 20%, #fafafa 40%, #fafafa 60%, #f5f5f5 80%, #f5f5f5 100%);
+  --site-background: #f0f2f5;
 }
 
 /* Custom scrollbar styling */
@@ -251,7 +251,7 @@ img[src*="/other/home/"] {
   font-weight: 800 !important;
   letter-spacing: -0.025em !important;
   line-height: 1.15 !important;
-  color: var(--text-color, #ffffff) !important;
+  color: var(--text-color, var(--text, #0f172a)) !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
@@ -372,6 +372,9 @@ img[src*="/other/home/"] {
 .backup-page,
 .settings-page,
 .admin-page,
+.membership-page,
+.membership-checkout-page,
+.shop-page,
 .login-page-container,
 .register-page-container,
 .forgot-page-container,
@@ -381,7 +384,7 @@ img[src*="/other/home/"] {
 .email-sent-page-container,
 .legal-page-container {
   animation: universalPageFadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 
 /* Prevent animation transform stacking contexts when modals are open */
@@ -409,5 +412,59 @@ html.modal-open .settings-page {
   width: 100%;
   min-height: 0;
 }
+
+/* ── Standalone OBS Browser Source Overlay Rules ────────────────────────── */
+html.obs-overlay-mode,
+html:has(.obs-overlay-viewport),
+body.obs-overlay-mode,
+body:has(.obs-overlay-viewport),
+body.obs-overlay-mode #root,
+body:has(.obs-overlay-viewport) #root,
+body.obs-overlay-mode main,
+body:has(.obs-overlay-viewport) main,
+body.obs-overlay-mode .min-h-screen,
+body:has(.obs-overlay-viewport) .min-h-screen,
+body.obs-overlay-mode .flex.flex-col.min-h-screen,
+body:has(.obs-overlay-viewport) .flex.flex-col.min-h-screen {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  scrollbar-gutter: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html.obs-overlay-mode::-webkit-scrollbar,
+body.obs-overlay-mode::-webkit-scrollbar,
+body.obs-overlay-mode #root::-webkit-scrollbar,
+html:has(.obs-overlay-viewport)::-webkit-scrollbar,
+body:has(.obs-overlay-viewport)::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+html.obs-overlay-mode::before,
+html.obs-overlay-mode::after,
+body.obs-overlay-mode::before,
+body.obs-overlay-mode::after,
+html:has(.obs-overlay-viewport)::before,
+html:has(.obs-overlay-viewport)::after,
+body:has(.obs-overlay-viewport)::before,
+body:has(.obs-overlay-viewport)::after {
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+
 
 

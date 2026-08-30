@@ -260,6 +260,10 @@ export function sanitizeProfileData(profileData) {
         sanitized[fieldName] = value;
         continue;
       }
+      else if (fieldName === 'nameColor1' || fieldName === 'nameColor2' || fieldName === 'nameGradientColor1' || fieldName === 'nameGradientColor2') {
+        sanitized[fieldName] = value;
+        continue;
+      }
       else if (fieldName === 'huntHotkey') fieldType = 'huntHotkey';
       
       const result = sanitizeInput(value, fieldType);

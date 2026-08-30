@@ -437,7 +437,7 @@ export default function MMOTool({ useHomeSprites = false }) {
 
     return (
       <div className="space-y-3">
-        <label className="hunt-modal-label !text-white text-white font-bold">
+        <label className="hunt-modal-label font-bold text-[var(--text)]">
           Active Modifiers & Boosts (Legends: Arceus)
         </label>
 
@@ -1250,16 +1250,16 @@ export default function MMOTool({ useHomeSprites = false }) {
                   className="w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 transition text-left cursor-pointer group"
                   onClick={() => setHuntWizard(prev => ({ ...prev, allowAnyPhase: prev.allowAnyPhase === false }))}
                 >
-                  <div className="flex items-center gap-2 text-gray-300 font-medium text-xs">
+                  <div className="flex items-center gap-2 text-[var(--text-muted)] font-medium text-xs">
                     <span className="text-[var(--accent)] font-black text-sm leading-none">+</span>
                     <span>Any obtainable Pokémon can phase at any time</span>
                   </div>
                   <div className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 shrink-0 ${
                     huntWizard.allowAnyPhase !== false
                       ? "bg-[var(--accent)]"
-                      : "bg-white/20"
+                      : "bg-[var(--border-color)]"
                   }`}>
-                    <div className={`w-4 h-4 rounded-full bg-black shadow-sm transition-transform ${
+                    <div className={`w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${
                       huntWizard.allowAnyPhase !== false ? "translate-x-4" : "translate-x-0"
                     }`} />
                   </div>
@@ -1271,22 +1271,22 @@ export default function MMOTool({ useHomeSprites = false }) {
             {huntWizard.step === 3 && (
               <div className="space-y-4">
                 <div className="hunt-modal-card space-y-3 p-4">
-                  <div className="text-xs font-extrabold uppercase tracking-wider text-white">
+                  <div className="text-xs font-extrabold uppercase tracking-wider text-[var(--text)]">
                     Counter & Initial Settings
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="hunt-modal-label !text-white text-white font-bold">
+                      <label className="hunt-modal-label font-bold text-[var(--text)]">
                         Starting Encounters
                       </label>
-                      <p className="text-[11px] text-gray-400 mb-1.5">
+                      <p className="text-[11px] text-[var(--text-muted)] mb-1.5">
                         Already started hunting before tracking here? Enter your existing check count.
                       </p>
-                      <div className="flex items-stretch rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden">
+                      <div className="flex items-stretch rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)] focus-within:border-[var(--accent)] transition overflow-hidden">
                         <input
                           type="number"
                           min="0"
-                          className="w-full bg-transparent pl-3 pr-2 py-2 text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="w-full bg-transparent pl-3 pr-2 py-2 text-sm text-[var(--text)] font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           value={huntWizard.startChecks}
                           onChange={(e) => {
                             const v = e.target.value;
@@ -1300,10 +1300,10 @@ export default function MMOTool({ useHomeSprites = false }) {
                           onBlur={() => setHuntWizard(prev => ({ ...prev, startChecks: Math.max(0, parseInt(prev.startChecks, 10) || 0) }))}
                           placeholder="0"
                         />
-                        <div className="flex flex-col border-l border-white/10 divide-y divide-white/10 shrink-0">
+                        <div className="flex flex-col border-l border-[var(--border-color)] divide-y divide-[var(--border-color)] shrink-0">
                           <button
                             type="button"
-                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            className="px-2.5 flex-1 bg-black/5 dark:bg-white/[0.03] hover:bg-[var(--accent)] text-[var(--text-muted)] hover:text-black transition flex items-center justify-center"
                             onClick={() => setHuntWizard(prev => ({ ...prev, startChecks: (parseInt(prev.startChecks, 10) || 0) + 1 }))}
                             title="Increment"
                           >
@@ -1311,7 +1311,7 @@ export default function MMOTool({ useHomeSprites = false }) {
                           </button>
                           <button
                             type="button"
-                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            className="px-2.5 flex-1 bg-black/5 dark:bg-white/[0.03] hover:bg-[var(--accent)] text-[var(--text-muted)] hover:text-black transition flex items-center justify-center"
                             onClick={() => setHuntWizard(prev => ({ ...prev, startChecks: Math.max(0, (parseInt(prev.startChecks, 10) || 0) - 1) }))}
                             title="Decrement"
                           >
@@ -1322,17 +1322,17 @@ export default function MMOTool({ useHomeSprites = false }) {
                     </div>
 
                     <div>
-                      <label className="hunt-modal-label !text-white text-white font-bold">
+                      <label className="hunt-modal-label font-bold text-[var(--text)]">
                         Step Increment
                       </label>
-                      <p className="text-[11px] text-gray-400 mb-1.5">
+                      <p className="text-[11px] text-[var(--text-muted)] mb-1.5">
                         How many encounters are added per count increment (default 1).
                       </p>
-                      <div className="flex items-stretch rounded-xl bg-black/40 border border-white/10 focus-within:border-[var(--accent)] transition overflow-hidden">
+                      <div className="flex items-stretch rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)] focus-within:border-[var(--accent)] transition overflow-hidden">
                         <input
                           type="number"
                           min="1"
-                          className="w-full bg-transparent pl-3 pr-2 py-2 text-sm text-white font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="w-full bg-transparent pl-3 pr-2 py-2 text-sm text-[var(--text)] font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           value={huntWizard.huntIncrement}
                           onChange={(e) => {
                             const v = e.target.value;
@@ -1346,10 +1346,10 @@ export default function MMOTool({ useHomeSprites = false }) {
                           onBlur={() => setHuntWizard(prev => ({ ...prev, huntIncrement: Math.max(1, parseInt(prev.huntIncrement, 10) || 1) }))}
                           placeholder="1"
                         />
-                        <div className="flex flex-col border-l border-white/10 divide-y divide-white/10 shrink-0">
+                        <div className="flex flex-col border-l border-[var(--border-color)] divide-y divide-[var(--border-color)] shrink-0">
                           <button
                             type="button"
-                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            className="px-2.5 flex-1 bg-black/5 dark:bg-white/[0.03] hover:bg-[var(--accent)] text-[var(--text-muted)] hover:text-black transition flex items-center justify-center"
                             onClick={() => setHuntWizard(prev => ({ ...prev, huntIncrement: (parseInt(prev.huntIncrement, 10) || 1) + 1 }))}
                             title="Increment"
                           >
@@ -1357,7 +1357,7 @@ export default function MMOTool({ useHomeSprites = false }) {
                           </button>
                           <button
                             type="button"
-                            className="px-2.5 flex-1 bg-white/[0.03] hover:bg-[var(--accent)] text-gray-300 hover:text-black transition flex items-center justify-center"
+                            className="px-2.5 flex-1 bg-black/5 dark:bg-white/[0.03] hover:bg-[var(--accent)] text-[var(--text-muted)] hover:text-black transition flex items-center justify-center"
                             onClick={() => setHuntWizard(prev => ({ ...prev, huntIncrement: Math.max(1, (parseInt(prev.huntIncrement, 10) || 1) - 1) }))}
                             title="Decrement"
                           >
@@ -1368,47 +1368,47 @@ export default function MMOTool({ useHomeSprites = false }) {
                     </div>
 
                     <div className="sm:col-span-2 flex flex-col items-center text-center">
-                      <label className="hunt-modal-label !text-white text-white font-bold text-center">
+                      <label className="hunt-modal-label font-bold text-[var(--text)] text-center">
                         Starting Elapsed Time
                       </label>
-                      <p className="text-[11px] text-gray-400 mb-1.5 text-center">
+                      <p className="text-[11px] text-[var(--text-muted)] mb-1.5 text-center">
                         Time already spent on this hunt (Hours, Minutes, Seconds).
                       </p>
                       <div className="grid grid-cols-3 gap-2 w-full max-w-sm">
-                        <div className="flex items-center rounded-xl bg-black/40 border border-white/10 px-2.5 py-1.5">
+                        <div className="flex items-center rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)] px-2.5 py-1.5">
                           <input
                             type="number"
                             min="0"
-                            className="w-full bg-transparent text-sm text-white font-bold focus:outline-none text-center"
+                            className="w-full bg-transparent text-sm text-[var(--text)] font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center"
                             placeholder="0"
                             value={huntWizard.startTime.hours || ""}
                             onChange={(e) => setHuntWizard(prev => ({ ...prev, startTime: { ...prev.startTime, hours: e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value, 10) || 0) } }))}
                           />
-                          <span className="text-xs text-gray-400 font-bold ml-1">h</span>
+                          <span className="text-xs text-[var(--text-muted)] font-bold ml-1">h</span>
                         </div>
-                        <div className="flex items-center rounded-xl bg-black/40 border border-white/10 px-2.5 py-1.5">
+                        <div className="flex items-center rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)] px-2.5 py-1.5">
                           <input
                             type="number"
                             min="0"
                             max="59"
-                            className="w-full bg-transparent text-sm text-white font-bold focus:outline-none text-center"
+                            className="w-full bg-transparent text-sm text-[var(--text)] font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center"
                             placeholder="0"
                             value={huntWizard.startTime.minutes || ""}
                             onChange={(e) => setHuntWizard(prev => ({ ...prev, startTime: { ...prev.startTime, minutes: e.target.value === "" ? "" : Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)) } }))}
                           />
-                          <span className="text-xs text-gray-400 font-bold ml-1">m</span>
+                          <span className="text-xs text-[var(--text-muted)] font-bold ml-1">m</span>
                         </div>
-                        <div className="flex items-center rounded-xl bg-black/40 border border-white/10 px-2.5 py-1.5">
+                        <div className="flex items-center rounded-xl bg-black/5 dark:bg-black/40 border border-[var(--border-color)] px-2.5 py-1.5">
                           <input
                             type="number"
                             min="0"
                             max="59"
-                            className="w-full bg-transparent text-sm text-white font-bold focus:outline-none text-center"
+                            className="w-full bg-transparent text-sm text-[var(--text)] font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center"
                             placeholder="0"
                             value={huntWizard.startTime.seconds || ""}
                             onChange={(e) => setHuntWizard(prev => ({ ...prev, startTime: { ...prev.startTime, seconds: e.target.value === "" ? "" : Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)) } }))}
                           />
-                          <span className="text-xs text-gray-400 font-bold ml-1">s</span>
+                          <span className="text-xs text-[var(--text-muted)] font-bold ml-1">s</span>
                         </div>
                       </div>
                     </div>

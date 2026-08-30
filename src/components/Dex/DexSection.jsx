@@ -48,23 +48,25 @@ export default function DexSection({
   const [transitionReady, setTransitionReady] = useState(false);
   const contentRef = useRef(null);
   
-  const [useHomeSprites, setUseHomeSprites] = useState(() => {
+  const [dexPrefs, setDexPrefs] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false;
+      return JSON.parse(localStorage.getItem('dexPreferences')) || {};
     } catch {
-      return false;
+      return {};
     }
   });
 
   useEffect(() => {
     const handlePrefsChange = () => {
       try {
-        setUseHomeSprites(JSON.parse(localStorage.getItem('dexPreferences'))?.useHomeSprites || false);
+        setDexPrefs(JSON.parse(localStorage.getItem('dexPreferences')) || {});
       } catch { }
     };
     window.addEventListener('dexPreferencesChanged', handlePrefsChange);
     return () => window.removeEventListener('dexPreferencesChanged', handlePrefsChange);
   }, []);
+
+  const useHomeSprites = Boolean(dexPrefs.useHomeSprites);
   const nameCacheRef = useRef(new Map());
   const dexNumberCacheRef = useRef(new Map());
   const touchTimerRef = useRef(null);
@@ -468,6 +470,7 @@ export default function DexSection({
                             displayName={displayName}
                             dexNumber={getDexNumber(poke?.id)}
                             priorityLoad={!useHomeSprites && absoluteIndex < 30}
+                            useHomeSprites={useHomeSprites}
                             onSelect={onSelect}
                             onToggleCaught={onToggleCaught}
                             handleTouchStart={handleTouchStart}

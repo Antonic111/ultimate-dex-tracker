@@ -17,6 +17,7 @@ function PokemonGridItem({
   displayName,
   dexNumber,
   priorityLoad = false,
+  useHomeSprites = false,
   onSelect,
   onToggleCaught,
   handleTouchStart,
@@ -24,6 +25,7 @@ function PokemonGridItem({
   handleTouchEnd,
   handleTouchCancel,
 }) {
+  const activeSrc = sprite;
   const cardBackground = isCaught
     ? "linear-gradient(to top, rgba(21, 128, 61, 0.4), rgba(34, 197, 94, 0.2))"
     : (hasFail
@@ -123,30 +125,33 @@ function PokemonGridItem({
         </button>
       )}
 
-      {sprite ? (
+      {activeSrc ? (
         <img
-          src={sprite}
+          src={activeSrc}
           alt={poke.name}
-          className="w-12 h-12 md:w-16 md:h-16 object-contain"
+          className="object-contain transition-all duration-150 w-12 h-12 md:w-[60px] md:h-[60px] max-w-[82%] max-h-[60%] my-auto"
           width={64}
           height={64}
           loading={priorityLoad ? "eager" : "lazy"}
           decoding="async"
           draggable={false}
           onError={(e) => (e.currentTarget.style.display = "none")}
-          style={{ filter: isBlocked ? "grayscale(100%)" : "none" }}
+          style={{
+            filter: isBlocked ? "grayscale(100%)" : "none",
+            imageRendering: !useHomeSprites ? "pixelated" : "auto",
+          }}
         />
       ) : null}
 
       <span
-        className="absolute top-0 md:-top-1 left-1 right-1 text-center text-xs md:text-2xl font-medium truncate"
+        className="absolute top-0 md:-top-1 left-1 right-1 text-center text-xs md:text-2xl font-medium truncate pointer-events-none"
         style={{ color: "var(--text)", fontSize: "clamp(6.5px, 1.2vw, 14px)", textShadow: "1px 1px 2px rgba(0,0,0,0.8)" }}
       >
         {displayName}
       </span>
 
       <span
-        className="absolute bottom-0 md:-bottom-1 left-1 right-1 text-center text-xs md:text-2xl font-medium"
+        className="absolute bottom-0 md:-bottom-1 left-1 right-1 text-center text-xs md:text-2xl font-medium pointer-events-none"
         style={{ color: "var(--accent)", fontSize: "clamp(10px, 1.2vw, 14px)", textShadow: "1px 1px 2px rgba(0,0,0,0.8)" }}
       >
         {dexNumber || formatDexNumber(poke?.id)}
@@ -163,6 +168,7 @@ export default memo(PokemonGridItem, (prev, next) => {
     prev.hasFail === next.hasFail &&
     prev.isBlocked === next.isBlocked &&
     prev.sprite === next.sprite &&
+    prev.useHomeSprites === next.useHomeSprites &&
     prev.readOnly === next.readOnly &&
     prev.displayName === next.displayName &&
     prev.dexNumber === next.dexNumber &&

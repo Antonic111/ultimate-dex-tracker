@@ -19,6 +19,7 @@ export default function OAuthCallback({ onLogin }) {
     const error = searchParams.get("error");
 
     if (error) {
+      window.dispatchEvent(new CustomEvent("resetOAuthLoading"));
       showMessage(decodeURIComponent(error), "error");
       navigate("/login", { replace: true });
       return;
@@ -78,12 +79,14 @@ export default function OAuthCallback({ onLogin }) {
             navigate("/", { replace: true });
           }
         } catch (err) {
+          window.dispatchEvent(new CustomEvent("resetOAuthLoading"));
           console.error("OAuth callback error:", err);
           showMessage(err.message || "Failed to finalize login", "error");
           navigate("/login", { replace: true });
         }
       })();
     } else {
+      window.dispatchEvent(new CustomEvent("resetOAuthLoading"));
       navigate("/login", { replace: true });
     }
   }, [searchParams, navigate, showMessage, onLogin]);
