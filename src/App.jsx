@@ -637,6 +637,8 @@ export default function App() {
 
         setUser({
           ...userData,
+          nameColor1: userData.nameColor1 || userData.nameGradientColor1 || null,
+          nameColor2: userData.nameColor2 || userData.nameGradientColor2 || null,
           progressBars: finalProgressBars
         });
       } else if (authError) {
@@ -677,7 +679,11 @@ export default function App() {
                     const freshData = await authAPI.getCurrentUser();
                     if (freshData && freshData.username) {
                       console.log('Background refresh successful, updating user data');
-                      setUser(freshData);
+                      setUser({
+                        ...freshData,
+                        nameColor1: freshData.nameColor1 || freshData.nameGradientColor1 || null,
+                        nameColor2: freshData.nameColor2 || freshData.nameGradientColor2 || null,
+                      });
                     }
                   } catch (refreshError) {
                     console.log('Background refresh failed, keeping backup data');
@@ -688,19 +694,27 @@ export default function App() {
               }
             }
           } catch (backupError) {
-            console.log('Mobile backup failed:', backupError.message);
+            console.error('Error reading mobile backup:', backupError);
           }
         }
 
-        // Clear user data if no valid backup or not mobile
-        setUser(null);
+        // On desktop or mobile with no valid backup: clear user state
+        setUser({
+          username: null,
+          email: null,
+          createdAt: null,
+          profileTrainer: null,
+          avatar: null,
+          verified: false,
+          progressBars: [],
+          onboarding: null,
+        });
       } else {
         // Clear user data if not authenticated
         setUser(null);
       }
     } catch (error) {
-      console.log('Auth check failed:', error.message);
-      setUser(null);
+      console.error('Auth check error:', error);
     } finally {
       if (!silent) {
         setLoading(false);
@@ -711,13 +725,18 @@ export default function App() {
 
   // Custom setUser function that handles login properly
   const handleUserUpdate = (newUserData) => {
+    const normalizedData = {
+      ...newUserData,
+      nameColor1: newUserData?.nameColor1 || newUserData?.nameGradientColor1 || null,
+      nameColor2: newUserData?.nameColor2 || newUserData?.nameGradientColor2 || null,
+    };
 
     // If this is a login (has username and progressBars), set the flag
-    if (newUserData.username && newUserData.progressBars) {
+    if (normalizedData.username && normalizedData.progressBars) {
       setJustLoggedIn(true);
     }
 
-    setUser(newUserData);
+    setUser(normalizedData);
 
     // Mobile fallback: Store user data in localStorage as backup
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);

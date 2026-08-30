@@ -1935,6 +1935,8 @@ router.get("/users/public", async (req, res) => {
       const badge = badgeMap.get(item._id.toString());
       return {
         ...item,
+        nameColor1: item.nameColor1 || item.nameGradientColor1 || null,
+        nameColor2: item.nameColor2 || item.nameGradientColor2 || null,
         isPremium: Boolean(badge?.isPremium),
         premiumMonths: badge?.premiumMonths || 0,
       };

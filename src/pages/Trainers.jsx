@@ -752,15 +752,19 @@ export default function Trainers() {
                       />
                       <div className="trainer-meta">
                         <div className="trainer-name">
-                          {u.nameColor1 && u.nameColor2 && (u.isPremium || u.isAdmin) ? (
-                            <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": u.nameColor1, "--grad-c2": u.nameColor2 }}>
-                              <span className="animated-gradient-username">
-                                {u.username}
+                          {(() => {
+                            const c1 = u.nameColor1 || u.nameGradientColor1;
+                            const c2 = u.nameColor2 || u.nameGradientColor2;
+                            return c1 && c2 && (u.isPremium || u.isAdmin) ? (
+                              <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": c1, "--grad-c2": c2 }}>
+                                <span className="animated-gradient-username">
+                                  {u.username}
+                                </span>
                               </span>
-                            </span>
-                          ) : (
-                            u.username
-                          )}
+                            ) : (
+                              u.username
+                            );
+                          })()}
                         </div>
                         <div className="trainer-sub trainer-sub-icons">
                           {(() => {

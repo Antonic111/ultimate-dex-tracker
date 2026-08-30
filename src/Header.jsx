@@ -700,20 +700,24 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                   />
                 </div>
 
-                {user.nameColor1 && user.nameColor2 && (user.isPremium || user.isAdmin) ? (
-                  <span
-                    className="animated-gradient-username-wrapper max-w-[85px] sm:max-w-[120px] md:max-w-[170px]"
-                    style={{ "--grad-c1": user.nameColor1, "--grad-c2": user.nameColor2 }}
-                  >
-                    <span className="animated-gradient-username font-bold text-[13px] sm:text-[14px] md:text-[16px] tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">
+                {(() => {
+                  const c1 = user.nameColor1 || user.nameGradientColor1;
+                  const c2 = user.nameColor2 || user.nameGradientColor2;
+                  return c1 && c2 && (user.isPremium || user.isAdmin) ? (
+                    <span
+                      className="animated-gradient-username-wrapper max-w-[85px] sm:max-w-[120px] md:max-w-[170px]"
+                      style={{ "--grad-c1": c1, "--grad-c2": c2 }}
+                    >
+                      <span className="animated-gradient-username font-bold text-[13px] sm:text-[14px] md:text-[16px] tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">
+                        {user.username}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="font-bold text-[var(--text)] text-[13px] sm:text-[14px] md:text-[16px] tracking-wide group-hover:text-[var(--accent)] transition-colors duration-200 whitespace-nowrap overflow-hidden text-ellipsis max-w-[85px] sm:max-w-[120px] md:max-w-[170px]">
                       {user.username}
                     </span>
-                  </span>
-                ) : (
-                  <span className="font-bold text-[var(--text)] text-[13px] sm:text-[14px] md:text-[16px] tracking-wide group-hover:text-[var(--accent)] transition-colors duration-200 whitespace-nowrap overflow-hidden text-ellipsis max-w-[85px] sm:max-w-[120px] md:max-w-[170px]">
-                    {user.username}
-                  </span>
-                )}
+                  );
+                })()}
 
                 <ChevronDown
                   strokeWidth={3}
@@ -739,20 +743,24 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                         <span className="text-[12px] text-[var(--text-muted)] font-medium tracking-wide">
                           Hello,
                         </span>
-                        {user.nameColor1 && user.nameColor2 && (user.isPremium || user.isAdmin) ? (
-                          <span
-                            className="animated-gradient-username-wrapper inline-block truncate"
-                            style={{ "--grad-c1": user.nameColor1, "--grad-c2": user.nameColor2 }}
-                          >
-                            <span className="animated-gradient-username font-extrabold text-[18px] leading-snug truncate">
+                        {(() => {
+                          const c1 = user.nameColor1 || user.nameGradientColor1;
+                          const c2 = user.nameColor2 || user.nameGradientColor2;
+                          return c1 && c2 && (user.isPremium || user.isAdmin) ? (
+                            <span
+                              className="animated-gradient-username-wrapper inline-block truncate"
+                              style={{ "--grad-c1": c1, "--grad-c2": c2 }}
+                            >
+                              <span className="animated-gradient-username font-extrabold text-[18px] leading-snug truncate">
+                                {user.username}
+                              </span>
+                            </span>
+                          ) : (
+                            <span className="font-extrabold text-[var(--text)] text-[18px] leading-snug truncate">
                               {user.username}
                             </span>
-                          </span>
-                        ) : (
-                          <span className="font-extrabold text-[var(--text)] text-[18px] leading-snug truncate">
-                            {user.username}
-                          </span>
-                        )}
+                          );
+                        })()}
                       </div>
 
                       {/* Accent-colored Sparkle centered with the header */}
