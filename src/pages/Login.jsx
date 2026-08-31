@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { User, Lock, LogIn, ArrowRight } from "lucide-react";
+import { User, Lock, LogIn, ArrowRight, ShieldCheck } from "lucide-react";
 import { useMessage } from "../components/Shared/MessageContext";
 import { authAPI, progressAPI, profileAPI } from "../utils/api.js";
 import TextField from "../components/Shared/FormField/TextField.jsx";
@@ -17,6 +17,8 @@ export default function Login({ onLogin }) {
   const clickedRef = useRef(false);
 
   const showVerifiedMessage = searchParams.get("verified") === "1";
+  const isAdminMode = searchParams.get("admin") === "true";
+  const redirectTarget = searchParams.get("redirect");
 
   useEffect(() => {
     if (showVerifiedMessage) {
@@ -45,6 +47,15 @@ export default function Login({ onLogin }) {
         password: form.password,
         rememberMe: form.rememberMe,
       });
+
+      // If accessed via admin mode, strictly require admin privileges
+      if (isAdminMode && !loginData.user.isAdmin) {
+        localStorage.removeItem("authToken");
+        showMessage("Access Denied: Only administrators can log in via this portal.", "error");
+        setLoading(false);
+        clickedRef.current = false;
+        return;
+      }
 
       // Check if the user is verified from the login response
       if (!loginData.user.verified) {
@@ -99,7 +110,11 @@ export default function Login({ onLogin }) {
         } catch (_) {}
       }
 
-      navigate("/");
+      if (isAdminMode || loginData.user.isAdmin) {
+        navigate(redirectTarget || "/admin");
+      } else {
+        navigate(redirectTarget || "/");
+      }
     } catch (err) {
       if (err.message && err.message.includes("Account not verified")) {
         if (err.data && err.data.email) {
@@ -132,13 +147,34 @@ export default function Login({ onLogin }) {
   return (
     <div className={`login-page-container ${loading ? "is-submitting" : ""}`}>
       <div className="login-card">
+        {isAdminMode && (
+          <div
+            style={{
+              marginBottom: "16px",
+              padding: "8px 12px",
+              borderRadius: "10px",
+              backgroundColor: "rgba(230, 40, 41, 0.12)",
+              border: "1px solid rgba(230, 40, 41, 0.3)",
+              color: "#e62829",
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "6px",
+            }}
+          >
+            <ShieldCheck size={15} /> Admin Sign-In Portal
+          </div>
+        )}
+
         {/* Header Title and Subtitle */}
         <div className="login-header">
           <h1 className="login-title">
-            WELCOME <span className="login-title-accent">BACK</span>
+            {isAdminMode ? "ADMIN" : "WELCOME"} <span className="login-title-accent">{isAdminMode ? "PORTAL" : "BACK"}</span>
           </h1>
           <p className="login-subtitle">
-            <span>Log in to continue your Pokémon journey</span>
+            <span>{isAdminMode ? "Sign in with your administrator credentials" : "Log in to continue your Pokémon journey"}</span>
             <span className="login-sparkle-icon" aria-hidden="true" />
           </p>
         </div>

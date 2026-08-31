@@ -308,16 +308,16 @@ export default function EditProfileModal({
                 location:         form.location,
                 gender:           form.gender,
                 avatar:           finalAvatar,
-                nameColor1:       isMember ? (form.nameColor1 || null) : null,
-                nameColor2:       isMember ? (form.nameColor2 || null) : null,
-                nameGradientColor1: isMember ? (form.nameColor1 || null) : null,
-                nameGradientColor2: isMember ? (form.nameColor2 || null) : null,
+                nameColor1:       form.nameColor1 || null,
+                nameColor2:       form.nameColor2 || null,
+                nameGradientColor1: form.nameColor1 || null,
+                nameGradientColor2: form.nameColor2 || null,
                 favoriteGames:    reorderedGames,
                 favoritePokemon:  reorderedPokemon,
                 favoritePokemonShiny: reorderedShiny,
                 favoriteBalls:    reorderedBalls,
                 favoriteTrainers: reorderedTrainers,
-                favoriteCategoryOrder: allowedCats,
+                favoriteCategoryOrder: form.favoriteCategoryOrder || allowedCats,
                 switchFriendCode: fc,
                 goFriendCode:     goFc,
                 youtubeUrl:       finalYoutube,
@@ -330,14 +330,14 @@ export default function EditProfileModal({
                 avatar:           finalAvatar,
                 pendingAvatarFile: null,
                 pendingAvatarRemoved: false,
-                nameColor1:       isMember ? (form.nameColor1 || null) : null,
-                nameColor2:       isMember ? (form.nameColor2 || null) : null,
+                nameColor1:       form.nameColor1 || null,
+                nameColor2:       form.nameColor2 || null,
                 favoriteGames:    reorderedGames,
                 favoritePokemon:  reorderedPokemon,
                 favoritePokemonShiny: reorderedShiny,
                 favoriteBalls:    reorderedBalls,
                 favoriteTrainers: reorderedTrainers,
-                favoriteCategoryOrder: allowedCats,
+                favoriteCategoryOrder: form.favoriteCategoryOrder || allowedCats,
                 switchFriendCode: fc,
                 goFriendCode:     goFc,
                 youtubeUrl:       extractYoutubeHandle(finalYoutube),
@@ -345,7 +345,16 @@ export default function EditProfileModal({
             };
 
             if (setParentForm) setParentForm(savedForm);
-            if (setUser) setUser(prev => ({ ...prev, avatar: finalAvatar !== undefined ? finalAvatar : prev.avatar }));
+            if (setUser) {
+                setUser(prev => ({
+                    ...prev,
+                    avatar: finalAvatar !== undefined ? finalAvatar : prev.avatar,
+                    nameColor1: form.nameColor1 || null,
+                    nameColor2: form.nameColor2 || null,
+                    nameGradientColor1: form.nameColor1 || null,
+                    nameGradientColor2: form.nameColor2 || null,
+                }));
+            }
 
             showMessage("Profile changes saved successfully", "success");
             if (onSaved) onSaved();

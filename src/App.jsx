@@ -232,6 +232,7 @@ export const isPublicExemptMaintenanceRoute = (pathname, user) => {
     cleanPath === '/refunds' ||
     cleanPath === '/membership' ||
     cleanPath === '/membership/checkout' ||
+    cleanPath === '/login' ||
     cleanPath.startsWith('/overlay/hunt') ||
     cleanPath.startsWith('/admin')
   );
@@ -248,19 +249,26 @@ const MaintenanceRouteGuard = ({ isMaintenanceActive, user, children }) => {
 const HeaderWrapper = (props) => {
   const location = useLocation();
   if (isStandaloneRoute(location.pathname)) return null;
+  if (props.isMaintenanceActive && !isPublicExemptMaintenanceRoute(location.pathname, props.user)) {
+    return null;
+  }
   return <HeaderWithConditionalAuth {...props} />;
 };
 
-const FooterWrapper = ({ user }) => {
+const FooterWrapper = ({ user, isMaintenanceActive }) => {
   const location = useLocation();
   if (isStandaloneRoute(location.pathname)) return null;
+  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(location.pathname, user)) {
+    return null;
+  }
   if (location.pathname === '/' && !user?.username) return null;
   return <Footer />;
 };
 
-const SidebarWrapper = ({ isMaintenanceActive }) => {
+const SidebarWrapper = ({ isMaintenanceActive, user }) => {
   const location = useLocation();
-  if (isStandaloneRoute(location.pathname) || isMaintenanceActive) return null;
+  if (isStandaloneRoute(location.pathname)) return null;
+  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(location.pathname, user)) return null;
   return <RecentCatchesSidebar />;
 };
 
@@ -444,11 +452,13 @@ function hasMeaningfulInfo(info) {
 }
 
 function RequireAuth({ loading, authReady, user, children }) {
+  const location = useLocation();
   if (loading || !authReady) {
     return null; // Don't show anything, let the Profile component handle loading
   }
   if (!user?.username) {
-    return <Navigate to="/login" replace />;
+    const isAdminRoute = location.pathname.startsWith('/admin');
+    return <Navigate to={isAdminRoute ? "/login?admin=true" : "/login"} replace />;
   }
   if (user?.needsProfileSetup) {
     return <Navigate to="/complete-signup" replace />;
@@ -457,11 +467,12 @@ function RequireAuth({ loading, authReady, user, children }) {
 }
 
 function RequireAdmin({ loading, authReady, user, children }) {
+  const location = useLocation();
   if (loading || !authReady) {
     return null;
   }
   if (!user?.username) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login?admin=true" replace />;
   }
   if (!user?.isAdmin) {
     return <Navigate to="/" replace />;
@@ -2408,7 +2419,7 @@ export default function App() {
               <Router>
                 <div className="flex flex-col min-h-screen">
                   <BackgroundFetchIndicator />
-                  <SidebarWrapper isMaintenanceActive={isMaintenanceActive} />
+                  <SidebarWrapper isMaintenanceActive={isMaintenanceActive} user={user} />
 
                   <CloseSidebarOnRouteChange
                     setSidebarOpen={setSidebarOpen}
@@ -2480,6 +2491,7 @@ export default function App() {
                     showMenu={showMenu}
                     setShowMenu={setShowMenu}
                     userMenuRef={userMenuRef}
+                    isMaintenanceActive={isMaintenanceActive}
                   />
 
                   {/* Global Loading Indicator */}
@@ -3129,7 +3141,7 @@ export default function App() {
                   </MaintenanceRouteGuard>
                 </main>
 
-                  <FooterWrapper user={user} />
+                  <FooterWrapper user={user} isMaintenanceActive={isMaintenanceActive} />
 
                   {/* Custom Scrollbar for Desktop */}
                   <ScrollbarWrapper />

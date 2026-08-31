@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useUser } from "../components/Shared/UserContext";
 import { useEntitlements } from "../hooks/useEntitlements";
 import { useMessage } from "../components/Shared/MessageContext";
@@ -84,45 +84,91 @@ const WHY_UPGRADE_ITEMS = [
 ];
 
 export default function Membership() {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const { isPremium, subscription, loading: entitlementsLoading, refreshStatus } =
     useEntitlements();
   const { showMessage } = useMessage();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const previewParam = searchParams.get("preview") || searchParams.get("state");
 
   const [displayPrice, setDisplayPrice] = useState("$4.99");
-  const [isProcessing, setIsProcessing] = useState(
-    searchParams.get("status") === "processing" || Boolean(searchParams.get("session_id"))
-  );
   const [portalLoading, setPortalLoading] = useState(false);
   const [stripeCheckoutLoading, setStripeCheckoutLoading] = useState(false);
+  const [testActionLoading, setTestActionLoading] = useState(false);
 
-  // Poll refreshStatus when redirected back from Stripe Checkout
-  useEffect(() => {
-    if (searchParams.get("status") === "processing" || searchParams.get("session_id")) {
-      setIsProcessing(true);
-      const interval = setInterval(async () => {
-        const res = await refreshStatus(true);
-        if (res?.isPremium) {
-          setIsProcessing(false);
-          clearInterval(interval);
-          showMessage("Welcome to Premium! Your subscription is active.", "success");
-        }
-      }, 2500);
+  const handleTestResetMembership = async () => {
+    try {
+      setTestActionLoading(true);
+      const token = localStorage.getItem("authToken");
+      const headers = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const timeout = setTimeout(() => {
-        clearInterval(interval);
-        setIsProcessing(false);
-      }, 25000);
+      const res = await fetch(buildApiUrl("/monetization/test/reset-membership"), {
+        method: "POST",
+        headers,
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to reset membership");
 
-      return () => {
-        clearInterval(interval);
-        clearTimeout(timeout);
-      };
+      showMessage("Membership removed successfully for testing.", "success");
+      if (setUser) {
+        setUser((prev) => ({
+          ...prev,
+          isPremium: false,
+        }));
+      }
+      await refreshStatus();
+    } catch (err) {
+      showMessage(err.message, "error");
+    } finally {
+      setTestActionLoading(false);
     }
-  }, [searchParams, refreshStatus, showMessage]);
+  };
+
+  const handleTestGrantMembership = async () => {
+    try {
+      setTestActionLoading(true);
+      const token = localStorage.getItem("authToken");
+      const headers = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch(buildApiUrl("/monetization/test/grant-membership"), {
+        method: "POST",
+        headers,
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to grant membership");
+
+      showMessage("Test membership granted for 30 days.", "success");
+      if (setUser) {
+        setUser((prev) => ({
+          ...prev,
+          isPremium: true,
+        }));
+      }
+      await refreshStatus();
+    } catch (err) {
+      showMessage(err.message, "error");
+    } finally {
+      setTestActionLoading(false);
+    }
+  };
+
+  // If redirected back from Stripe with status or session_id, forward directly to the confirmation steps modal
+  useEffect(() => {
+    const status = searchParams.get("status");
+    const sessionId = searchParams.get("session_id");
+    if (status === "processing" || status === "success" || sessionId) {
+      navigate(
+        `/membership/checkout?status=success${sessionId ? `&session_id=${sessionId}` : ""}`,
+        { replace: true }
+      );
+    }
+  }, [searchParams, navigate]);
 
   const handleOpenStripePortal = async () => {
     try {
@@ -273,24 +319,6 @@ export default function Membership() {
           </p>
         </div>
 
-        {/* Processing State Banner */}
-        {isProcessing && (
-          <div className="bg-[var(--pokemon-box-bg)] border border-[var(--accent)]/30 rounded-2xl p-4 sm:p-5 flex items-center gap-4 animate-pulse">
-            <Loader2
-              className="animate-spin text-[var(--accent)] flex-shrink-0"
-              size={24}
-            />
-            <div>
-              <h2 className="text-base font-bold text-[var(--text)]">
-                Confirming Your Subscription
-              </h2>
-              <p className="text-xs sm:text-sm text-[var(--text-muted)]">
-                Your payment was received. We are synchronizing your membership with our
-                servers...
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* ============================================================ */}
         {/* 1. ACTIVE SUBSCRIBER STATE (LIVE STATE VIEW) */}
@@ -718,6 +746,60 @@ export default function Membership() {
               </div>
             </div>
           </>
+        )}
+
+        {/* Developer / Antonic Testing Controls */}
+        {(user?.username?.toLowerCase() === "antonic" || user?.isAdmin) && (
+          <div className="mt-8 p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
+                <Sliders size={18} />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+                  Developer Testing Tool ({user?.username})
+                </div>
+                <div className="text-xs text-[var(--text-muted)]">
+                  Live Membership Status:{" "}
+                  <span className="font-bold text-[var(--text)]">
+                    {effectiveIsPremium ? "Active Member" : "Free / Non-Member"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 w-full sm:w-auto">
+              {effectiveIsPremium ? (
+                <button
+                  type="button"
+                  onClick={handleTestResetMembership}
+                  disabled={testActionLoading}
+                  className="w-full sm:w-auto px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-400 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                >
+                  {testActionLoading ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <RotateCcw size={14} />
+                  )}
+                  Remove Membership (Testing)
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleTestGrantMembership}
+                  disabled={testActionLoading}
+                  className="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-400 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                >
+                  {testActionLoading ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Sparkles size={14} />
+                  )}
+                  Grant 30-Day Membership (Testing)
+                </button>
+              )}
+            </div>
+          </div>
         )}
       </div>
 

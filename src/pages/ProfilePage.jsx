@@ -383,6 +383,7 @@ export default function ProfilePage() {
                         isOwner={isOwner}
                         isEditing={false}
                         form={form}
+                        isPremium={isPremium}
                         useHomeSprites={useHomeSprites}
                         POKEMON_OPTIONS={POKEMON_OPTIONS}
                         openGameModal={(i) => { setGameSlotIndex(i); setShowGameModal(true); }}

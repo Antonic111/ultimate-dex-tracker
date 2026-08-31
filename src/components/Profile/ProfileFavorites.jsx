@@ -27,6 +27,7 @@ export default function ProfileFavorites({
   isOwner,
   isEditing,
   form,
+  isPremium = false,
   useHomeSprites = false,
   POKEMON_OPTIONS = [],
   openGameModal,
@@ -150,6 +151,11 @@ export default function ProfileFavorites({
   const showBallsCard = isEditing || hasAnyBalls;
   const showTrainersCard = isEditing || hasAnyTrainers;
 
+  const rawCats = (Array.isArray(form.favoriteCategoryOrder) && form.favoriteCategoryOrder.length > 0)
+    ? form.favoriteCategoryOrder
+    : ['pokemon', 'games', 'balls', 'trainers'];
+  const visibleCategoryList = isPremium ? rawCats : rawCats.slice(0, 2);
+
   return (
     <div 
       className="profile-favorites-container"
@@ -164,10 +170,7 @@ export default function ProfileFavorites({
 
       {/* Showcase Grid */}
       <div className="favorites-2x2-grid">
-        {((Array.isArray(form.favoriteCategoryOrder) && form.favoriteCategoryOrder.length > 0)
-          ? form.favoriteCategoryOrder
-          : ['pokemon', 'games', 'balls', 'trainers']
-        ).map((catKey) => {
+        {visibleCategoryList.map((catKey) => {
           if (catKey === 'pokemon' && showPokemonCard) {
             return (
               <div 

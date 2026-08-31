@@ -136,7 +136,7 @@ const NAV_DROPDOWNS = [
   {
     id: "about",
     label: "About",
-    requiresAuth: false,
+    requiresAuth: true,
     items: [
       {
         to: "/changelog",
@@ -147,6 +147,7 @@ const NAV_DROPDOWNS = [
         bgColor: "bg-sky-500/10",
         borderColor: "border-sky-500/20",
         hasBadge: true,
+        requiresAuth: true,
       },
       {
         to: "/feedback",
@@ -156,6 +157,7 @@ const NAV_DROPDOWNS = [
         color: "text-rose-400",
         bgColor: "bg-rose-500/10",
         borderColor: "border-rose-500/20",
+        requiresAuth: true,
       },
     ],
   },
@@ -491,7 +493,15 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
         {!['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password', '/complete-signup'].includes(location.pathname) && !user?.needsProfileSetup && (
           <nav ref={navContainerRef} className="hidden xl:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 pointer-events-none">
             <div className="flex items-center gap-1 pointer-events-auto">
-              {NAV_DROPDOWNS.map((dropdown) => {
+              {NAV_DROPDOWNS
+                .filter((dropdown) => {
+                  if (dropdown.requiresAuth && !user?.username) return false;
+                  const accessibleItems = dropdown.items.filter(
+                    (item) => (!item.adminOnly || user?.isAdmin) && (!item.requiresAuth || user?.username)
+                  );
+                  return accessibleItems.length > 0;
+                })
+                .map((dropdown) => {
                 const isActive = isDropdownActive(dropdown);
                 const isOpen = activeNavDropdown === dropdown.id;
 
@@ -548,7 +558,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                           onMouseLeave={handleNavMouseLeave}
                         >
                           {dropdown.items
-                            .filter(item => !item.adminOnly || user?.isAdmin)
+                            .filter(item => (!item.adminOnly || user?.isAdmin) && (!item.requiresAuth || user?.username))
                             .map((item) => {
                             const ItemIcon = item.icon;
                             const isItemActive = location.pathname === item.to;
@@ -619,14 +629,22 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
               className="mobile-nav-dropdown xl:hidden fixed top-[92px] left-3 right-3 bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-2xl py-2 px-1 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow),0_20px_40px_rgba(0,0,0,0.6)] z-50 backdrop-blur-[16px] overflow-hidden max-h-[calc(100vh-110px)] overflow-y-auto"
             >
               <div className="flex flex-col gap-2 p-1">
-                {NAV_DROPDOWNS.map((category) => (
+                {NAV_DROPDOWNS
+                  .filter((category) => {
+                    if (category.requiresAuth && !user?.username) return false;
+                    const accessibleItems = category.items.filter(
+                      (item) => (!item.adminOnly || user?.isAdmin) && (!item.requiresAuth || user?.username)
+                    );
+                    return accessibleItems.length > 0;
+                  })
+                  .map((category) => (
                   <div key={category.id} className="flex flex-col">
                     <div className="px-3 pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
                       {category.label}
                     </div>
                     <div className="flex flex-col gap-0.5">
                       {category.items
-                        .filter(item => !item.adminOnly || user?.isAdmin)
+                        .filter(item => (!item.adminOnly || user?.isAdmin) && (!item.requiresAuth || user?.username))
                         .map((item) => {
                         const ItemIcon = item.icon;
                         const isItemActive = location.pathname === item.to;
@@ -670,6 +688,26 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                     </div>
                   </div>
                 ))}
+
+                {/* Mobile Logged-Out Action Links */}
+                {!user?.username && (
+                  <div className="mt-2 pt-2 border-t border-[var(--border-color)] px-2 flex flex-col gap-2">
+                    <Link
+                      to="/login"
+                      onClick={() => setShowMobileNav(false)}
+                      className="w-full text-center py-2.5 rounded-xl text-sm font-bold text-[var(--text)] bg-black/5 dark:bg-white/[0.06] hover:bg-black/10 dark:hover:bg-white/[0.12] border border-[var(--border-color)] transition-all no-underline shadow-sm"
+                    >
+                      Log In
+                    </Link>
+                    <Link
+                      to="/register"
+                      onClick={() => setShowMobileNav(false)}
+                      className="w-full text-center py-2.5 rounded-xl text-sm font-bold bg-[var(--accent)] text-black hover:opacity-90 active:scale-95 transition-all no-underline shadow-sm"
+                    >
+                      Register
+                    </Link>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -932,6 +970,24 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                 )}
               </AnimatePresence>
             </div>
+          </nav>
+        )}
+
+        {/* Logged-out Header Actions */}
+        {!user?.username && !isAuthPage && (
+          <nav className="ml-auto pr-2 md:pr-4 flex items-center gap-2.5 sm:gap-3">
+            <Link
+              to="/login"
+              className="px-4 py-2 rounded-xl text-[13px] sm:text-[14px] font-bold text-[var(--text)] bg-black/5 dark:bg-white/[0.06] hover:bg-black/10 dark:hover:bg-white/[0.12] border border-[var(--border-color)] hover:border-[var(--accent)]/50 shadow-sm transition-all duration-150 no-underline flex items-center justify-center select-none active:scale-95"
+            >
+              Log In
+            </Link>
+            <Link
+              to="/register"
+              className="px-4 py-2 rounded-xl text-[13px] sm:text-[14px] font-bold bg-[var(--accent)] hover:bg-[var(--accent)]/90 text-black shadow-sm transition-all duration-150 no-underline flex items-center justify-center select-none active:scale-95"
+            >
+              Register
+            </Link>
           </nav>
         )}
       </div>

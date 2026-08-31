@@ -28,6 +28,20 @@ export function getStripeClient() {
 }
 
 /**
+ * Safely parse a Stripe unix timestamp (in seconds) or Date into a valid Date object.
+ * Prevents CastError on MongoDB when properties are undefined or missing.
+ */
+function safeDate(timestamp, defaultDate = new Date()) {
+  if (timestamp === undefined || timestamp === null) return defaultDate;
+  if (timestamp instanceof Date && !isNaN(timestamp.getTime())) return timestamp;
+  const num = Number(timestamp);
+  if (isNaN(num)) return defaultDate;
+  const ms = num < 10000000000 ? num * 1000 : num;
+  const date = new Date(ms);
+  return isNaN(date.getTime()) ? defaultDate : date;
+}
+
+/**
  * Verify Stripe webhook signature using raw request body Buffer.
  * @param {Buffer|string} rawBody - Raw unparsed HTTP body
  * @param {string} signature - stripe-signature header value
@@ -104,7 +118,7 @@ export async function createStripeCheckoutSession({ userId, origin }) {
         username: user.username || "",
       },
     },
-    success_url: `${baseOrigin}/membership?status=processing&session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${baseOrigin}/membership/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${baseOrigin}/membership`,
   };
 
@@ -263,8 +277,11 @@ async function handleCheckoutSessionCompleted(session) {
   const stripeSub = await stripe.subscriptions.retrieve(subscriptionId);
 
   const priceId = stripeSub.items?.data?.[0]?.price?.id || process.env.STRIPE_PRICE_ID || "monthly_premium";
-  const currentPeriodStart = new Date(stripeSub.current_period_start * 1000);
-  const currentPeriodEnd = new Date(stripeSub.current_period_end * 1000);
+  const currentPeriodStart = safeDate(stripeSub.current_period_start);
+  const currentPeriodEnd = safeDate(
+    stripeSub.current_period_end,
+    new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  );
 
   const subDoc = await Subscription.findOneAndUpdate(
     { subscriptionId: stripeSub.id },
@@ -275,11 +292,11 @@ async function handleCheckoutSessionCompleted(session) {
       subscriptionId: stripeSub.id,
       priceId,
       productId: "membership_premium_monthly",
-      status: stripeSub.status,
+      status: stripeSub.status || "active",
       currentPeriodStart,
       currentPeriodEnd,
       cancelAtPeriodEnd: Boolean(stripeSub.cancel_at_period_end),
-      canceledAt: stripeSub.canceled_at ? new Date(stripeSub.canceled_at * 1000) : null,
+      canceledAt: stripeSub.canceled_at ? safeDate(stripeSub.canceled_at, null) : null,
       metadata: stripeSub.metadata || {},
     },
     { upsert: true, new: true, setDefaultsOnInsert: true }
@@ -390,15 +407,18 @@ async function handleCustomerSubscriptionUpdated(stripeSub) {
   console.log(`[Stripe Webhook] customer.subscription.updated for ${stripeSub.id}: status=${stripeSub.status}, cancelAtEnd=${stripeSub.cancel_at_period_end}`);
 
   let subDoc = await Subscription.findOne({ subscriptionId: stripeSub.id });
-  const currentPeriodStart = new Date(stripeSub.current_period_start * 1000);
-  const currentPeriodEnd = new Date(stripeSub.current_period_end * 1000);
+  const currentPeriodStart = safeDate(stripeSub.current_period_start);
+  const currentPeriodEnd = safeDate(
+    stripeSub.current_period_end,
+    new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  );
 
   if (subDoc) {
-    subDoc.status = stripeSub.status;
+    subDoc.status = stripeSub.status || "active";
     subDoc.currentPeriodStart = currentPeriodStart;
     subDoc.currentPeriodEnd = currentPeriodEnd;
     subDoc.cancelAtPeriodEnd = Boolean(stripeSub.cancel_at_period_end);
-    subDoc.canceledAt = stripeSub.canceled_at ? new Date(stripeSub.canceled_at * 1000) : null;
+    subDoc.canceledAt = stripeSub.canceled_at ? safeDate(stripeSub.canceled_at, null) : null;
     await subDoc.save();
     await syncSubscriptionEntitlements(subDoc);
   } else {
@@ -419,11 +439,11 @@ async function handleCustomerSubscriptionUpdated(stripeSub) {
           subscriptionId: stripeSub.id,
           priceId: stripeSub.items?.data?.[0]?.price?.id || process.env.STRIPE_PRICE_ID,
           productId: "membership_premium_monthly",
-          status: stripeSub.status,
+          status: stripeSub.status || "active",
           currentPeriodStart,
           currentPeriodEnd,
           cancelAtPeriodEnd: Boolean(stripeSub.cancel_at_period_end),
-          canceledAt: stripeSub.canceled_at ? new Date(stripeSub.canceled_at * 1000) : null,
+          canceledAt: stripeSub.canceled_at ? safeDate(stripeSub.canceled_at, null) : null,
           metadata: stripeSub.metadata || {},
         },
         { upsert: true, new: true, setDefaultsOnInsert: true }
@@ -453,4 +473,131 @@ async function handleCustomerSubscriptionDeleted(stripeSub) {
   // Revoke ONLY entitlements tied to this specific Stripe subscription ID
   await revokeEntitlementsBySource(stripeSub.id);
   console.log(`[Stripe Webhook] Revoked subscription entitlements for source ${stripeSub.id}`);
+}
+
+/**
+ * Direct sync helper: reconcile user subscription state directly with Stripe API.
+ * Called during /api/monetization/sync and after checkout to ensure immediate activation even if webhooks are delayed.
+ * @param {Object} params
+ * @param {string|mongoose.Types.ObjectId} params.userId
+ * @param {string} [params.sessionId]
+ */
+export async function syncUserSubscriptionFromStripe({ userId, sessionId }) {
+  if (!process.env.STRIPE_SECRET_KEY) return null;
+  const stripe = getStripeClient();
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return null;
+
+    let targetSubscription = null;
+    let customerId = user.stripeCustomerId;
+
+    // 1. If a checkout sessionId is provided, retrieve session and expand subscription
+    if (sessionId) {
+      try {
+        const session = await stripe.checkout.sessions.retrieve(sessionId, {
+          expand: ["subscription", "customer"],
+        });
+        if (session && session.subscription) {
+          targetSubscription =
+            typeof session.subscription === "string"
+              ? await stripe.subscriptions.retrieve(session.subscription)
+              : session.subscription;
+
+          if (session.customer) {
+            customerId =
+              typeof session.customer === "string"
+                ? session.customer
+                : session.customer.id;
+          }
+        }
+      } catch (err) {
+        console.warn(`[Stripe Sync] Could not retrieve session ${sessionId}:`, err.message);
+      }
+    }
+
+    // 2. If no target subscription resolved yet, search by customer ID or email on Stripe
+    if (!targetSubscription) {
+      if (!customerId && user.email) {
+        try {
+          const customers = await stripe.customers.list({
+            email: user.email.toLowerCase(),
+            limit: 1,
+          });
+          if (customers.data?.length > 0) {
+            customerId = customers.data[0].id;
+          }
+        } catch (err) {
+          console.warn("[Stripe Sync] Customer email search failed:", err.message);
+        }
+      }
+
+      if (customerId) {
+        try {
+          const subs = await stripe.subscriptions.list({
+            customer: customerId,
+            status: "all",
+            limit: 3,
+          });
+          targetSubscription =
+            subs.data.find(
+              (s) => s.status === "active" || s.status === "trialing"
+            ) || subs.data[0];
+        } catch (err) {
+          console.warn("[Stripe Sync] Subscriptions list failed:", err.message);
+        }
+      }
+    }
+
+    // 3. Update customerId on user if changed/found
+    if (customerId && (!user.stripeCustomerId || user.stripeCustomerId !== customerId)) {
+      user.stripeCustomerId = customerId;
+      await user.save().catch(() => {});
+    }
+
+    // 4. If a Stripe subscription exists, upsert to DB and synchronize entitlements
+    if (targetSubscription) {
+      const currentPeriodStart = safeDate(targetSubscription.current_period_start);
+      const currentPeriodEnd = safeDate(
+        targetSubscription.current_period_end,
+        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      );
+      const priceId =
+        targetSubscription.items?.data?.[0]?.price?.id ||
+        process.env.STRIPE_PRICE_ID ||
+        "monthly_premium";
+
+      const subDoc = await Subscription.findOneAndUpdate(
+        { subscriptionId: targetSubscription.id },
+        {
+          userId: user._id,
+          provider: "stripe",
+          customerId: customerId || targetSubscription.customer,
+          subscriptionId: targetSubscription.id,
+          priceId,
+          productId: "membership_premium_monthly",
+          status: targetSubscription.status || "active",
+          currentPeriodStart,
+          currentPeriodEnd,
+          cancelAtPeriodEnd: Boolean(targetSubscription.cancel_at_period_end),
+          canceledAt: targetSubscription.canceled_at
+            ? safeDate(targetSubscription.canceled_at, null)
+            : null,
+          metadata: targetSubscription.metadata || {},
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+
+      await syncSubscriptionEntitlements(subDoc);
+      console.log(
+        `[Stripe Sync] Successfully synced user ${user._id} subscription ${targetSubscription.id} (status: ${targetSubscription.status})`
+      );
+      return subDoc;
+    }
+  } catch (err) {
+    console.error("[Stripe Sync] Unexpected sync error:", err);
+  }
+
+  return null;
 }

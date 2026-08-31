@@ -169,8 +169,15 @@ export default function ProfileHeader({
                 goFriendCode: goFc,
                 youtubeUrl: extractYoutubeHandle(finalYoutube),
                 twitchUrl: extractTwitchHandle(finalTwitch),
+            setUser((prev) => ({
+                ...prev,
+                profileTrainer: form.profileTrainer || prev.profileTrainer,
+                avatar: finalAvatar !== undefined ? finalAvatar : prev.avatar,
+                nameColor1: form.nameColor1 || null,
+                nameColor2: form.nameColor2 || null,
+                nameGradientColor1: form.nameColor1 || null,
+                nameGradientColor2: form.nameColor2 || null,
             }));
-            setUser((prev) => ({ ...prev, profileTrainer: form.profileTrainer || prev.profileTrainer, avatar: finalAvatar !== undefined ? finalAvatar : prev.avatar }));
             setIsEditing(false);
         } catch (err) {
             console.error("Failed to update profile:", err);
