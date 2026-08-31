@@ -239,9 +239,35 @@ export async function createStripeCheckoutSession({ userId, origin }) {
     }
   }
 
-  // Reuse existing Stripe customer if stored; otherwise provide customer_email
+  // Validate existing Stripe customer if stored to prevent cross-environment test/live errors
   if (user.stripeCustomerId) {
-    sessionParams.customer = user.stripeCustomerId;
+    try {
+      const existingCustomer = await stripe.customers.retrieve(user.stripeCustomerId);
+      if (existingCustomer && !existingCustomer.deleted) {
+        sessionParams.customer = user.stripeCustomerId;
+      } else {
+        user.stripeCustomerId = null;
+        await user.save().catch(() => {});
+        if (user.email) {
+          sessionParams.customer_email = user.email;
+        }
+      }
+    } catch (custErr) {
+      const isMissing =
+        custErr.statusCode === 404 ||
+        custErr.raw?.statusCode === 404 ||
+        custErr.code === "resource_missing";
+      if (isMissing) {
+        console.warn(`[Stripe Checkout] Customer ${user.stripeCustomerId} does not exist in active Stripe environment. Auto-clearing.`);
+        user.stripeCustomerId = null;
+        await user.save().catch(() => {});
+        if (user.email) {
+          sessionParams.customer_email = user.email;
+        }
+      } else {
+        throw custErr;
+      }
+    }
   } else if (user.email) {
     sessionParams.customer_email = user.email;
   }
@@ -280,6 +306,28 @@ export async function createStripePortalSession({ userId, origin }) {
       customerId = sub.customerId;
       user.stripeCustomerId = customerId;
       await user.save().catch(() => {});
+    }
+  }
+
+  // Validate customer existence in active Stripe environment
+  if (customerId) {
+    try {
+      const existingCustomer = await stripe.customers.retrieve(customerId);
+      if (!existingCustomer || existingCustomer.deleted) {
+        customerId = null;
+        user.stripeCustomerId = null;
+        await user.save().catch(() => {});
+      }
+    } catch (custErr) {
+      const isMissing =
+        custErr.statusCode === 404 ||
+        custErr.raw?.statusCode === 404 ||
+        custErr.code === "resource_missing";
+      if (isMissing) {
+        customerId = null;
+        user.stripeCustomerId = null;
+        await user.save().catch(() => {});
+      }
     }
   }
 
@@ -672,7 +720,42 @@ export async function syncUserSubscriptionFromStripe({ userId, sessionId }) {
               (s) => s.status === "active" || s.status === "trialing"
             ) || subs.data[0];
         } catch (err) {
-          console.warn("[Stripe Sync] Subscriptions list failed:", err.message);
+          const isMissing =
+            err.statusCode === 404 ||
+            err.raw?.statusCode === 404 ||
+            err.code === "resource_missing";
+          if (isMissing) {
+            console.warn(`[Stripe Sync] Customer ${customerId} not found in active Stripe environment. Clearing.`);
+            customerId = null;
+            user.stripeCustomerId = null;
+            await user.save().catch(() => {});
+          } else {
+            console.warn("[Stripe Sync] Subscriptions list failed:", err.message);
+          }
+        }
+      }
+
+      // If customerId was invalid or not found, try searching by user email on active Stripe environment
+      if (!targetSubscription && !customerId && user.email) {
+        try {
+          const customers = await stripe.customers.list({
+            email: user.email.toLowerCase(),
+            limit: 1,
+          });
+          if (customers.data?.length > 0) {
+            customerId = customers.data[0].id;
+            const subs = await stripe.subscriptions.list({
+              customer: customerId,
+              status: "all",
+              limit: 3,
+            });
+            targetSubscription =
+              subs.data.find(
+                (s) => s.status === "active" || s.status === "trialing"
+              ) || subs.data[0];
+          }
+        } catch (emailErr) {
+          console.warn("[Stripe Sync] Email customer lookup failed:", emailErr.message);
         }
       }
     }

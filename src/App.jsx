@@ -244,6 +244,8 @@ export const isPublicExemptMaintenanceRoute = (pathname, user) => {
     cleanPath === '/refunds' ||
     cleanPath === '/membership' ||
     cleanPath === '/membership/checkout' ||
+    cleanPath === '/complete-signup' ||
+    cleanPath.startsWith('/oauth') ||
     cleanPath.startsWith('/overlay/hunt') ||
     cleanPath.startsWith('/admin')
   );
