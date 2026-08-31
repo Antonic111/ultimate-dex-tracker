@@ -297,6 +297,11 @@ const userSchema = new mongoose.Schema({
   stripeCustomerId: {
     type: String,
     default: null
+  },
+  // Stripe Premium Purchase History (for first-time introductory discount eligibility)
+  hasPurchasedStripePremium: {
+    type: Boolean,
+    default: false,
   }
 }, { timestamps: true });
 
@@ -306,6 +311,7 @@ userSchema.index({ lastActiveAt: -1 });
 userSchema.index({ isAdmin: 1 });
 userSchema.index({ isSuspended: 1 });
 userSchema.index({ stripeCustomerId: 1 }, { sparse: true });
+userSchema.index({ hasPurchasedStripePremium: 1 });
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {

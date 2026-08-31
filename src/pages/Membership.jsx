@@ -85,8 +85,13 @@ const WHY_UPGRADE_ITEMS = [
 
 export default function Membership() {
   const { user, setUser } = useUser();
-  const { isPremium, subscription, loading: entitlementsLoading, refreshStatus } =
-    useEntitlements();
+  const {
+    isPremium,
+    subscription,
+    isEligibleForIntroDiscount,
+    loading: entitlementsLoading,
+    refreshStatus,
+  } = useEntitlements();
   const { showMessage } = useMessage();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -597,24 +602,50 @@ export default function Membership() {
               {/* RIGHT CARD: Pricing & CTA Action (5 cols) */}
               <div className="lg:col-span-5 bg-[var(--pokemon-box-bg)] border border-[var(--border-color)] rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col justify-between text-center space-y-6">
                 <div className="space-y-6">
-                  {/* Best Value Badge */}
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/5 dark:bg-[var(--pokemon-box-bg2,#242424)] border border-[var(--border-color)] text-[var(--accent)] text-xs font-extrabold uppercase tracking-wider mx-auto shadow-sm">
-                    <Star size={12} className="fill-current" />
-                    Best Value
-                  </div>
+                  {/* Badge */}
+                  {isEligibleForIntroDiscount ? (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-extrabold uppercase tracking-wider mx-auto shadow-sm">
+                      <Sparkles size={12} className="fill-current" />
+                      20% Off First Month
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/5 dark:bg-[var(--pokemon-box-bg2,#242424)] border border-[var(--border-color)] text-[var(--accent)] text-xs font-extrabold uppercase tracking-wider mx-auto shadow-sm">
+                      <Star size={12} className="fill-current" />
+                      Best Value
+                    </div>
+                  )}
 
                   {/* Price Display */}
-                  <div className="space-y-1">
-                    <div className="text-4xl sm:text-5xl font-black text-[var(--text)] tracking-tight">
-                      {displayPrice || "$4.99"}
+                  {isEligibleForIntroDiscount ? (
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="text-xl sm:text-2xl text-[var(--text-muted)] line-through font-bold">
+                          $4.99
+                        </span>
+                        <span className="text-4xl sm:text-5xl font-black text-[var(--text)] tracking-tight">
+                          $3.99
+                        </span>
+                      </div>
+                      <div className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">
+                        first month
+                      </div>
+                      <p className="text-xs text-amber-400/90 font-medium pt-1">
+                        20% off your first month, then $4.99/month.
+                      </p>
                     </div>
-                    <div className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">
-                      / month
+                  ) : (
+                    <div className="space-y-1">
+                      <div className="text-4xl sm:text-5xl font-black text-[var(--text)] tracking-tight">
+                        {displayPrice || "$4.99"}
+                      </div>
+                      <div className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">
+                        / month
+                      </div>
+                      <p className="text-xs text-[var(--text-muted)] pt-1">
+                        Billed monthly. Cancel anytime.
+                      </p>
                     </div>
-                    <p className="text-xs text-[var(--text-muted)] pt-1">
-                      Billed monthly. Cancel anytime.
-                    </p>
-                  </div>
+                  )}
 
                   <div className="border-t border-[var(--border-color)]" />
 

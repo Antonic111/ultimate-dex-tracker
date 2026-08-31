@@ -6,6 +6,7 @@ const EntitlementContext = createContext({
   entitlements: [],
   subscription: null,
   isPremium: false,
+  isEligibleForIntroDiscount: true,
   loading: true,
   hasEntitlement: () => false,
   refreshStatus: async () => {},
@@ -16,6 +17,7 @@ export function EntitlementProvider({ children }) {
   const [entitlements, setEntitlements] = useState([]);
   const [subscription, setSubscription] = useState(null);
   const [isPremium, setIsPremium] = useState(false);
+  const [isEligibleForIntroDiscount, setIsEligibleForIntroDiscount] = useState(true);
   const [loading, setLoading] = useState(true);
   const initialLoadedRef = useRef(false);
 
@@ -24,6 +26,7 @@ export function EntitlementProvider({ children }) {
       setEntitlements([]);
       setSubscription(null);
       setIsPremium(false);
+      setIsEligibleForIntroDiscount(true);
       setLoading(false);
       return null;
     }
@@ -48,12 +51,14 @@ export function EntitlementProvider({ children }) {
         setEntitlements(data.entitlements || []);
         setSubscription(data.subscription || null);
         setIsPremium(Boolean(data.isPremium));
+        setIsEligibleForIntroDiscount(data.isEligibleForIntroDiscount !== undefined ? Boolean(data.isEligibleForIntroDiscount) : true);
         initialLoadedRef.current = true;
         return data;
       } else {
         setEntitlements([]);
         setSubscription(null);
         setIsPremium(false);
+        setIsEligibleForIntroDiscount(true);
         return null;
       }
     } catch (err) {
@@ -83,6 +88,7 @@ export function EntitlementProvider({ children }) {
         entitlements,
         subscription,
         isPremium,
+        isEligibleForIntroDiscount,
         loading,
         hasEntitlement,
         refreshStatus: (silent = true) => fetchStatus(silent),

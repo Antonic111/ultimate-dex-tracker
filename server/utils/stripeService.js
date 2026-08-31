@@ -56,8 +56,108 @@ export function constructStripeWebhookEvent(rawBody, signature, webhookSecret) {
   return stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
 }
 
+let cachedIntroCouponId = null;
+
+/**
+ * Retrieve or create the reusable 10%-off-once Stripe coupon for introductory first-month discounts.
+ * Coupon is created in the environment corresponding to the active STRIPE_SECRET_KEY (sk_test or sk_live).
+ * @returns {Promise<string>} Coupon ID
+ */
+export async function getOrCreateIntroductoryCoupon() {
+  const stripe = getStripeClient();
+  const configuredId = process.env.STRIPE_FIRST_MONTH_COUPON_ID;
+  const couponId = configuredId || "intro_first_month_20pct";
+
+  if (cachedIntroCouponId) {
+    return cachedIntroCouponId;
+  }
+
+  try {
+    const existing = await stripe.coupons.retrieve(couponId);
+    if (existing && existing.valid) {
+      cachedIntroCouponId = existing.id;
+      return existing.id;
+    }
+  } catch (err) {
+    // 404 is expected on first run before creation
+    const isNotFound =
+      err.statusCode === 404 ||
+      err.raw?.statusCode === 404 ||
+      err.code === "resource_missing";
+    if (!isNotFound) {
+      console.warn("[Stripe] Warning retrieving intro coupon:", err.message);
+    }
+  }
+
+  try {
+    const created = await stripe.coupons.create({
+      id: couponId,
+      name: "20% Off First Month",
+      percent_off: 20,
+      duration: "once",
+      metadata: {
+        app: "ultimate-dex-tracker",
+        type: "introductory_offer",
+      },
+    });
+    console.log(`[Stripe] Successfully created introductory 20% discount coupon: ${created.id}`);
+    cachedIntroCouponId = created.id;
+    return created.id;
+  } catch (createErr) {
+    // If it already exists (e.g. concurrent creation), retrieve it
+    if (
+      createErr.code === "resource_already_exists" ||
+      createErr.raw?.code === "resource_already_exists"
+    ) {
+      const existing = await stripe.coupons.retrieve(couponId);
+      cachedIntroCouponId = existing.id;
+      return existing.id;
+    }
+    console.error("[Stripe] Failed to create introductory coupon:", createErr.message);
+    throw createErr;
+  }
+}
+
+/**
+ * Determine whether a user is eligible for the introductory 10% first-month discount.
+ * Eligible ONLY if the user has never previously had a paid Stripe Premium subscription.
+ * Ineligible if they previously completed checkout, had an active/canceled/expired Stripe subscription.
+ * Manual/admin grants do not disqualify the user.
+ * @param {string|mongoose.Types.ObjectId} userId
+ * @returns {Promise<boolean>}
+ */
+export async function isUserEligibleForIntroDiscount(userId) {
+  if (!userId) return false;
+
+  try {
+    const user = await User.findById(userId).select("hasPurchasedStripePremium stripeCustomerId");
+    if (!user) return false;
+
+    // Explicit durable purchase flag
+    if (user.hasPurchasedStripePremium) {
+      return false;
+    }
+
+    // Historical Stripe subscription records in database
+    const existingStripeSub = await Subscription.exists({
+      userId,
+      provider: "stripe",
+    });
+
+    if (existingStripeSub) {
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error("[Stripe] Error checking intro discount eligibility:", err);
+    return false;
+  }
+}
+
 /**
  * Create a Stripe Checkout session with Stripe Managed Payments enabled.
+ * Automatically applies 10% off first-month coupon for first-time paid subscribers.
  * @param {Object} params
  * @param {string|mongoose.Types.ObjectId} params.userId - Authenticated user ID
  * @param {string} [params.origin] - Request origin for return URLs
@@ -94,6 +194,7 @@ export async function createStripeCheckoutSession({ userId, origin }) {
   }
 
   const baseOrigin = origin || process.env.FRONTEND_URL || "https://www.ultimatedextracker.com";
+  const isEligible = await isUserEligibleForIntroDiscount(userId);
 
   const sessionParams = {
     mode: "subscription",
@@ -111,16 +212,32 @@ export async function createStripeCheckoutSession({ userId, origin }) {
     metadata: {
       userId: user._id.toString(),
       username: user.username || "",
+      introDiscountApplied: isEligible ? "true" : "false",
     },
     subscription_data: {
       metadata: {
         userId: user._id.toString(),
         username: user.username || "",
+        introDiscountApplied: isEligible ? "true" : "false",
       },
     },
     success_url: `${baseOrigin}/membership/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${baseOrigin}/membership`,
   };
+
+  let couponApplied = null;
+  // Apply introductory 10% first-month coupon if user is eligible
+  if (isEligible) {
+    try {
+      const couponId = await getOrCreateIntroductoryCoupon();
+      if (couponId) {
+        sessionParams.discounts = [{ coupon: couponId }];
+        couponApplied = couponId;
+      }
+    } catch (discountErr) {
+      console.error("[Stripe Checkout] Failed to retrieve or create introductory coupon:", discountErr.message);
+    }
+  }
 
   // Reuse existing Stripe customer if stored; otherwise provide customer_email
   if (user.stripeCustomerId) {
@@ -129,7 +246,12 @@ export async function createStripeCheckoutSession({ userId, origin }) {
     sessionParams.customer_email = user.email;
   }
 
+  console.log(`[Stripe Checkout] Creating session: userId=${user._id}, isEligible=${isEligible}, couponApplied=${couponApplied || "none"}, discountsAttached=${Boolean(sessionParams.discounts?.length)}`);
+
   const session = await stripe.checkout.sessions.create(sessionParams);
+
+  console.log(`[Stripe Checkout] Created session ${session.id}: amount_total=${session.amount_total}, amount_subtotal=${session.amount_subtotal}, discountsCount=${session.discounts?.length || 0}`);
+
   return session.url;
 }
 
@@ -303,6 +425,7 @@ async function handleCheckoutSessionCompleted(session) {
   );
 
   await syncSubscriptionEntitlements(subDoc);
+  await User.findByIdAndUpdate(finalUserId, { $set: { hasPurchasedStripePremium: true } }).catch(() => {});
   console.log(`[Stripe Webhook] Subscribed user ${finalUserId} with status ${stripeSub.status} until ${currentPeriodEnd.toISOString()}`);
 }
 
@@ -336,6 +459,9 @@ async function handleInvoicePaid(invoice) {
     subDoc.currentPeriodEnd = periodEnd;
     await subDoc.save();
     await syncSubscriptionEntitlements(subDoc);
+    if (subDoc.userId) {
+      await User.findByIdAndUpdate(subDoc.userId, { $set: { hasPurchasedStripePremium: true } }).catch(() => {});
+    }
     console.log(`[Stripe Webhook] invoice.paid updated subscription ${subscriptionId} end date to ${periodEnd.toISOString()}`);
   } else {
     // If subscription record not yet created by checkout.session.completed, retrieve and insert
@@ -367,6 +493,7 @@ async function handleInvoicePaid(invoice) {
         { upsert: true, new: true, setDefaultsOnInsert: true }
       );
       await syncSubscriptionEntitlements(newSub);
+      await User.findByIdAndUpdate(userId, { $set: { hasPurchasedStripePremium: true } }).catch(() => {});
     }
   }
 }
@@ -590,6 +717,7 @@ export async function syncUserSubscriptionFromStripe({ userId, sessionId }) {
       );
 
       await syncSubscriptionEntitlements(subDoc);
+      await User.findByIdAndUpdate(user._id, { $set: { hasPurchasedStripePremium: true } }).catch(() => {});
       console.log(
         `[Stripe Sync] Successfully synced user ${user._id} subscription ${targetSubscription.id} (status: ${targetSubscription.status})`
       );

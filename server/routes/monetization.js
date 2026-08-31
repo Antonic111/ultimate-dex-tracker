@@ -4,6 +4,7 @@ import { getUserEntitlements } from "../utils/entitlementService.js";
 import {
   createStripePortalSession,
   syncUserSubscriptionFromStripe,
+  isUserEligibleForIntroDiscount,
 } from "../utils/stripeService.js";
 import Subscription from "../models/Subscription.js";
 import Product from "../models/Product.js";
@@ -20,17 +21,19 @@ router.get("/status", authenticateUser, async (req, res) => {
   try {
     const userId = req.userId;
 
-    let [subscription, entitlements] = await Promise.all([
+    let [subscription, entitlements, isEligibleForIntroDiscount] = await Promise.all([
       Subscription.findOne({ userId }).sort({ createdAt: -1 }),
       getUserEntitlements(userId),
+      isUserEligibleForIntroDiscount(userId),
     ]);
 
     // If not premium in DB, attempt a quick sync with Stripe
     if (!entitlements.includes("premium") && process.env.STRIPE_SECRET_KEY) {
       await syncUserSubscriptionFromStripe({ userId }).catch(() => {});
-      [subscription, entitlements] = await Promise.all([
+      [subscription, entitlements, isEligibleForIntroDiscount] = await Promise.all([
         Subscription.findOne({ userId }).sort({ createdAt: -1 }),
         getUserEntitlements(userId),
+        isUserEligibleForIntroDiscount(userId),
       ]);
     }
 
@@ -39,6 +42,7 @@ router.get("/status", authenticateUser, async (req, res) => {
     res.json({
       isPremium,
       entitlements,
+      isEligibleForIntroDiscount,
       subscription: subscription
         ? {
             id: subscription.subscriptionId,
@@ -180,10 +184,11 @@ router.post("/test/reset-membership", authenticateUser, async (req, res) => {
     await Subscription.deleteMany({ userId: targetUserId });
     await UserEntitlement.deleteMany({ userId: targetUserId, entitlement: "premium" });
 
-    // 3. Clear stripeCustomerId on User to detach from Stripe test customer, but PRESERVE user cosmetic customizations
+    // 3. Clear stripeCustomerId and reset hasPurchasedStripePremium for testing, but PRESERVE user cosmetic customizations
     await User.findByIdAndUpdate(targetUserId, {
       $set: {
         stripeCustomerId: null,
+        hasPurchasedStripePremium: false,
       },
     });
 

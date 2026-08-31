@@ -223,10 +223,17 @@ export const isPublicExemptMaintenanceRoute = (pathname, user) => {
     return true;
   }
 
-  const cleanPath = (pathname || '').split('?')[0].split('#')[0].replace(/\/+$/, '') || '/';
+  const rawPath = typeof pathname === 'string' ? pathname : (typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : '');
+  const cleanPath = rawPath.split('?')[0].split('#')[0].replace(/\/+$/, '') || '/';
+  const hasAdminQuery = rawPath.includes('admin=true') || (typeof window !== 'undefined' && window.location.search.includes('admin=true'));
   
   // Public landing page is read-only and must be visible to crawlers and reviewers so site doesn't appear "Offline/Under Construction"
   if (cleanPath === '/' && (!user || !user.username)) {
+    return true;
+  }
+
+  // Admin login flow during maintenance: only allow /admin or /login?admin=true
+  if (cleanPath === '/login' && hasAdminQuery) {
     return true;
   }
 
@@ -237,9 +244,6 @@ export const isPublicExemptMaintenanceRoute = (pathname, user) => {
     cleanPath === '/refunds' ||
     cleanPath === '/membership' ||
     cleanPath === '/membership/checkout' ||
-    cleanPath === '/login' ||
-    cleanPath === '/complete-signup' ||
-    cleanPath.startsWith('/oauth') ||
     cleanPath.startsWith('/overlay/hunt') ||
     cleanPath.startsWith('/admin')
   );
@@ -247,7 +251,8 @@ export const isPublicExemptMaintenanceRoute = (pathname, user) => {
 
 const MaintenanceRouteGuard = ({ isMaintenanceActive, user, children }) => {
   const location = useLocation();
-  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(location.pathname, user)) {
+  const fullPath = location.pathname + location.search;
+  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(fullPath, user)) {
     return <MaintenanceScreen />;
   }
   return children;
@@ -255,8 +260,9 @@ const MaintenanceRouteGuard = ({ isMaintenanceActive, user, children }) => {
 
 const HeaderWrapper = (props) => {
   const location = useLocation();
+  const fullPath = location.pathname + location.search;
   if (isStandaloneRoute(location.pathname)) return null;
-  if (props.isMaintenanceActive && !isPublicExemptMaintenanceRoute(location.pathname, props.user)) {
+  if (props.isMaintenanceActive && !isPublicExemptMaintenanceRoute(fullPath, props.user)) {
     return null;
   }
   return <HeaderWithConditionalAuth {...props} />;
@@ -264,8 +270,9 @@ const HeaderWrapper = (props) => {
 
 const FooterWrapper = ({ user, isMaintenanceActive }) => {
   const location = useLocation();
+  const fullPath = location.pathname + location.search;
   if (isStandaloneRoute(location.pathname)) return null;
-  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(location.pathname, user)) {
+  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(fullPath, user)) {
     return null;
   }
   if (location.pathname === '/' && !user?.username) return null;
@@ -274,8 +281,9 @@ const FooterWrapper = ({ user, isMaintenanceActive }) => {
 
 const SidebarWrapper = ({ isMaintenanceActive, user }) => {
   const location = useLocation();
+  const fullPath = location.pathname + location.search;
   if (isStandaloneRoute(location.pathname)) return null;
-  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(location.pathname, user)) return null;
+  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(fullPath, user)) return null;
   return <RecentCatchesSidebar />;
 };
 
@@ -2405,7 +2413,7 @@ export default function App() {
     maintenanceMode && (!user || !user.isAdmin) && !isLocalhost && isMaintenanceTime
   );
   
-  if (!loading && isMaintenanceActive && !isPublicExemptMaintenanceRoute(window.location.pathname, user)) {
+  if (!loading && isMaintenanceActive && !isPublicExemptMaintenanceRoute(window.location.pathname + window.location.search, user)) {
     return <MaintenanceScreen />;
   }
 
