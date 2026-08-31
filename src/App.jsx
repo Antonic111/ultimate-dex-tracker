@@ -218,6 +218,11 @@ const isStandaloneRoute = (pathname) => {
 
 // Public compliance, legal, marketing, and pricing routes that must remain accessible to crawlers and reviewers during maintenance
 export const isPublicExemptMaintenanceRoute = (pathname, user) => {
+  // Admins have unrestricted access to all routes during maintenance
+  if (user?.isAdmin) {
+    return true;
+  }
+
   const cleanPath = (pathname || '').split('?')[0].split('#')[0].replace(/\/+$/, '') || '/';
   
   // Public landing page is read-only and must be visible to crawlers and reviewers so site doesn't appear "Offline/Under Construction"
@@ -233,6 +238,8 @@ export const isPublicExemptMaintenanceRoute = (pathname, user) => {
     cleanPath === '/membership' ||
     cleanPath === '/membership/checkout' ||
     cleanPath === '/login' ||
+    cleanPath === '/complete-signup' ||
+    cleanPath.startsWith('/oauth') ||
     cleanPath.startsWith('/overlay/hunt') ||
     cleanPath.startsWith('/admin')
   );
@@ -2398,7 +2405,7 @@ export default function App() {
     maintenanceMode && (!user || !user.isAdmin) && !isLocalhost && isMaintenanceTime
   );
   
-  if (isMaintenanceActive && !isPublicExemptMaintenanceRoute(window.location.pathname, user)) {
+  if (!loading && isMaintenanceActive && !isPublicExemptMaintenanceRoute(window.location.pathname, user)) {
     return <MaintenanceScreen />;
   }
 

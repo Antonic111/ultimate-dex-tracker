@@ -61,9 +61,6 @@ const MaintenanceScreen = () => {
           <a href="/refund-policy" style={{ color: '#e62829', textDecoration: 'underline', transition: 'opacity 0.2s', fontWeight: 600 }}>
             Refund Policy
           </a>
-          <a href="/admin" style={{ color: '#e62829', textDecoration: 'underline', transition: 'opacity 0.2s', fontWeight: 600 }}>
-            Admin Access
-          </a>
         </nav>
       </div>
       
