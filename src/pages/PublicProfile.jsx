@@ -675,7 +675,7 @@ export default function PublicProfile() {
                                 {(() => {
                                     const c1 = data.nameColor1 || data.nameGradientColor1;
                                     const c2 = data.nameColor2 || data.nameGradientColor2;
-                                    return c1 && c2 && (data.isPremium || data.isAdmin) ? (
+                                    return c1 && c2 && data.isPremium ? (
                                         <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": c1, "--grad-c2": c2 }}>
                                             <span className="animated-gradient-username">
                                                 {data.username}

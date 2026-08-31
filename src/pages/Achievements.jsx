@@ -284,6 +284,54 @@ export default function Achievements() {
   );
 }
 
+export const TIER_CONFIG = {
+  bronze: {
+    name: 'Bronze',
+    borderUrl: '/badges/borders-and-background/front-border-bronze.png?v=3',
+    backBorderUrl: '/badges/borders-and-background/back-border-bronze.png?v=3',
+    stars: '★',
+    starCount: 1,
+    className: 'tier-bronze'
+  },
+  silver: {
+    name: 'Silver',
+    borderUrl: '/badges/borders-and-background/front-border-silver.png?v=4',
+    backBorderUrl: '/badges/borders-and-background/back-border-silver.png?v=4',
+    stars: '★ ★',
+    starCount: 2,
+    className: 'tier-silver'
+  },
+  gold: {
+    name: 'Gold',
+    borderUrl: '/badges/borders-and-background/front-border-gold.png?v=3',
+    backBorderUrl: '/badges/borders-and-background/back-border-gold.png?v=3',
+    stars: '★ ★ ★',
+    starCount: 3,
+    className: 'tier-gold'
+  },
+  diamond: {
+    name: 'Diamond',
+    borderUrl: '/badges/borders-and-background/front-border-diamond.png?v=3',
+    backBorderUrl: '/badges/borders-and-background/back-border-diamond.png?v=3',
+    stars: '★ ★ ★ ★',
+    starCount: 4,
+    className: 'tier-diamond'
+  },
+  master: {
+    name: 'Diamond',
+    borderUrl: '/badges/borders-and-background/front-border-diamond.png?v=3',
+    backBorderUrl: '/badges/borders-and-background/back-border-diamond.png?v=3',
+    stars: '★ ★ ★ ★',
+    starCount: 4,
+    className: 'tier-diamond'
+  }
+};
+
+export function getBadgeTierConfig(badge) {
+  const rawTier = (badge?.tier || 'bronze').toLowerCase();
+  return TIER_CONFIG[rawTier] || TIER_CONFIG.bronze;
+}
+
 /**
  * Clean Badge Card:
  * Image for the badge (locked or not), Name, and Description
@@ -295,6 +343,7 @@ function AchievementCard({ achievement, onSelect }) {
 
   const displayName = isSecret && isLocked ? '???' : achievement.name;
   const displayDesc = isSecret && isLocked ? 'Secret achievement.' : achievement.description;
+  const tierConfig = getBadgeTierConfig(achievement);
 
   return (
     <div
@@ -310,10 +359,14 @@ function AchievementCard({ achievement, onSelect }) {
       }}
       title={`Click to preview ${displayName} in 3D`}
     >
-      {/* Badge Image: neutral empty state or artwork, with lock */}
+      {/* Badge Image: 3-layer composite with background, badge, and tier border */}
       <div className={`achievement-badge-frame ${achievement.artwork ? 'has-artwork' : ''} ${isLocked ? 'is-locked' : ''}`}>
         {achievement.artwork ? (
-          <img src={achievement.artwork} alt={displayName} />
+          <div className="achievement-badge-composite">
+            <img src="/badges/borders-and-background/background.png" alt="" className="composite-bg" draggable={false} />
+            <img src={achievement.artwork} alt={displayName} className="composite-badge" draggable={false} />
+            <img src={tierConfig.borderUrl} alt="" className="composite-border" draggable={false} />
+          </div>
         ) : (
           <>
             <ImageIcon size={26} style={{ opacity: 0.45, marginBottom: 3 }} />
@@ -353,13 +406,11 @@ const COIN_SEGMENTS = Array.from({ length: 32 }, (_, i) => i * 11.25);
  */
 function FloatingBadgeViewer({ badge, originRect, onClose }) {
   const cardRef = useRef(null);
-
-  // Drag & Physics State
   const isDragging = useRef(false);
   const isFlipping = useRef(false);
   const isSnapping = useRef(false);
 
-  // 3D Rotations (Degrees)
+  // 3D Rotations (Degrees) - Center straight ahead at 0, 0
   const flipRotX = useRef(0);
   const flipRotY = useRef(0);
   const spinVelX = useRef(0);
@@ -379,17 +430,17 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
   const currentTiltX = useRef(0);
   const currentTiltY = useRef(0);
   const currentFloatY = useRef(0);
+  const dragFloatY = useRef(0);
 
   const [draggingState, setDraggingState] = useState(false);
+
+  const [activeTier, setActiveTier] = useState(() => (badge.tier || 'bronze').toLowerCase());
 
   const isLocked = !badge.unlocked;
   const isSecret = badge.isSecret || badge.type === 'secret';
   const displayName = isSecret && isLocked ? '???' : badge.name;
   const displayDesc = isSecret && isLocked ? 'Secret achievement.' : badge.description;
-
-  // Star rating: 1 star for bronze, expandable to 2 for silver, 3 for gold, 4 for master
-  const starCount = badge.tier === 'master' ? 4 : badge.tier === 'gold' ? 3 : badge.tier === 'silver' ? 2 : 1;
-  const starsString = Array.from({ length: starCount }, () => '★').join(' ');
+  const tierConfig = getBadgeTierConfig({ ...badge, tier: activeTier });
 
   // Prevent background scrolling without touching body overflow
   useEffect(() => {
@@ -415,26 +466,21 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  // Active 3D Mouse Following Perspective Tilt (Across Entire Viewport)
+  // Active 3D Mouse Following Perspective Tilt (Centered at 0, 0)
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (isDragging.current) return;
 
-      let coinCenterX = window.innerWidth / 2;
-      let coinCenterY = window.innerHeight / 2;
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
 
-      if (cardRef.current) {
-        const rect = cardRef.current.getBoundingClientRect();
-        coinCenterX = rect.left + rect.width / 2;
-        coinCenterY = rect.top + rect.height / 2;
-      }
+      // Normalized distance from center (-1 to +1)
+      const normX = Math.max(-1, Math.min(1, (e.clientX - centerX) / (centerX || 1)));
+      const normY = Math.max(-1, Math.min(1, (e.clientY - centerY) / (centerY || 1)));
 
-      const normX = Math.max(-1, Math.min(1, (e.clientX - coinCenterX) / (window.innerWidth / 2 || 1)));
-      const normY = Math.max(-1, Math.min(1, (e.clientY - coinCenterY) / (window.innerHeight / 2 || 1)));
-
-      // Stronger, more responsive 3D mouse following tilt
-      targetTiltX.current = -normY * 30;
-      targetTiltY.current = normX * 30;
+      // Dynamic tilt: moving mouse up tilts up, right tilts right
+      targetTiltX.current = -normY * 22;
+      targetTiltY.current = normX * 22;
     };
 
     const handleMouseLeave = () => {
@@ -451,15 +497,24 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
     };
   }, []);
 
-  // Pointer Handlers for Controlled Drag & Deliberate Flick
+  // Pointer Drag & Flick Handlers
   const handlePointerDown = (e) => {
-    if (e.button !== 0 && e.pointerType === 'mouse') return;
-
     isDragging.current = true;
     isFlipping.current = false;
     isSnapping.current = false;
     spinVelX.current = 0;
     spinVelY.current = 0;
+
+    // Absorb any active hover tilt directly into flipRot so there is ZERO jump in angle
+    flipRotX.current += currentTiltX.current;
+    flipRotY.current += currentTiltY.current;
+    currentTiltX.current = 0;
+    currentTiltY.current = 0;
+    targetTiltX.current = 0;
+    targetTiltY.current = 0;
+
+    // Lock the current floating position so the coin drags from its EXACT spot without lifting
+    dragFloatY.current = currentFloatY.current;
 
     const now = performance.now();
     pointerStart.current = { x: e.clientX, y: e.clientY, time: now };
@@ -470,7 +525,7 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
     setDraggingState(true);
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
-    } catch {}
+    } catch { }
   };
 
   const handlePointerMove = (e) => {
@@ -478,17 +533,22 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
 
     const now = performance.now();
     const dt = Math.max(1, now - lastPointer.current.time);
-    const deltaX = e.clientX - lastPointer.current.x;
-    const deltaY = e.clientY - lastPointer.current.y;
+    const dx = e.clientX - lastPointer.current.x;
+    const dy = e.clientY - lastPointer.current.y;
 
-    const instVx = deltaX / dt;
-    const instVy = deltaY / dt;
-    smoothedVx.current = smoothedVx.current * 0.35 + instVx * 0.65;
-    smoothedVy.current = smoothedVy.current * 0.35 + instVy * 0.65;
+    flipRotY.current += dx * 0.72;
+    flipRotX.current -= dy * 0.72;
 
-    // Solid, weighted 3D drag (not twitchy)
-    flipRotY.current += deltaX * 0.42;
-    flipRotX.current -= deltaY * 0.42;
+    if (dt > 80) {
+      // Stationary pause during drag
+      smoothedVx.current = 0;
+      smoothedVy.current = 0;
+    } else {
+      const vx = dx / dt;
+      const vy = dy / dt;
+      smoothedVx.current = smoothedVx.current * 0.4 + vx * 0.6;
+      smoothedVy.current = smoothedVy.current * 0.4 + vy * 0.6;
+    }
 
     lastPointer.current = { x: e.clientX, y: e.clientY, time: now };
   };
@@ -500,30 +560,45 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
 
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {}
+    } catch { }
+
+    // Resume idle breathing smoothly from the drag height
+    currentFloatY.current = dragFloatY.current;
 
     const now = performance.now();
-    const totalDist = Math.hypot(e.clientX - pointerStart.current.x, e.clientY - pointerStart.current.y);
-    const totalTime = now - pointerStart.current.time;
-    const speed = Math.hypot(smoothedVx.current, smoothedVy.current);
+    const timeSinceLastMove = now - lastPointer.current.time;
 
-    // Deliberate flick (speed > 0.75px/ms, distance > 40px in under 380ms)
-    const isFlick = speed > 0.75 && totalDist > 40 && totalTime < 380;
+    // If pointer was held still before release (> 50ms), release velocity is STRICTLY 0
+    let vx = 0;
+    let vy = 0;
 
-    if (isFlick) {
+    if (timeSinceLastMove <= 50) {
+      const decay = Math.max(0, 1 - (timeSinceLastMove / 50));
+      vx = smoothedVx.current * decay;
+      vy = smoothedVy.current * decay;
+    }
+
+    const speed = Math.hypot(vx, vy);
+
+    // Only spin if released with actual moving momentum
+    if (speed > 0.15) {
       isFlipping.current = true;
-      // Generous rotational velocity: spins freely for a bit
-      spinVelY.current = Math.max(-28, Math.min(28, smoothedVx.current * 16));
-      spinVelX.current = Math.max(-28, Math.min(28, -smoothedVy.current * 16));
+      isSnapping.current = false;
+      spinVelY.current = Math.max(-22, Math.min(22, vx * 16));
+      spinVelX.current = Math.max(-22, Math.min(22, -vy * 16));
     } else {
-      // Normal slow drag release: softly ease to closest 180° face
-      targetSnapX.current = Math.round(flipRotX.current / 180) * 180;
-      targetSnapY.current = Math.round(flipRotY.current / 180) * 180;
+      // Released while held still or slow drag -> settle directly to nearest face
+      isFlipping.current = false;
+      spinVelX.current = 0;
+      spinVelY.current = 0;
+      const targetFace = Math.round(flipRotY.current / 180);
+      targetSnapX.current = 0;
+      targetSnapY.current = targetFace * 180;
       isSnapping.current = true;
     }
   };
 
-  // Continuous Animation Loop (Inertia, Damping & Harmonic Float)
+  // Continuous Animation Loop
   useEffect(() => {
     let rafId;
 
@@ -532,40 +607,44 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
       const floatOffset = Math.sin(time * 1.5) * 6;
 
       if (isFlipping.current) {
-        // Spin freely with pure, natural momentum
         flipRotX.current += spinVelX.current;
         flipRotY.current += spinVelY.current;
 
-        // Gentle air resistance: spins for a bit, gradually coasting down
-        spinVelX.current *= 0.980;
-        spinVelY.current *= 0.980;
+        // Smooth air resistance friction
+        spinVelX.current *= 0.982;
+        spinVelY.current *= 0.982;
 
         const currentSpeed = Math.hypot(spinVelX.current, spinVelY.current);
 
-        // Only when the spin has naturally coasted down to a crawl, slowly snap
-        if (currentSpeed < 0.45) {
-          targetSnapX.current = Math.round(flipRotX.current / 180) * 180;
-          targetSnapY.current = Math.round(flipRotY.current / 180) * 180;
+        // ONLY trigger snapping once it has completely come to a stop!
+        if (currentSpeed < 0.02) {
+          spinVelX.current = 0;
+          spinVelY.current = 0;
           isFlipping.current = false;
+
+          const targetFace = Math.round(flipRotY.current / 180);
+          targetSnapX.current = 0;
+          targetSnapY.current = targetFace * 180;
           isSnapping.current = true;
         }
       } else if (isSnapping.current) {
-        // Very slow, gentle settling into the resting face (soft glide, no snap)
         const diffX = targetSnapX.current - flipRotX.current;
         const diffY = targetSnapY.current - flipRotY.current;
-        flipRotX.current += diffX * 0.042;
-        flipRotY.current += diffY * 0.042;
 
-        if (Math.abs(diffX) < 0.04 && Math.abs(diffY) < 0.04) {
+        flipRotX.current += diffX * 0.075;
+        flipRotY.current += diffY * 0.075;
+
+        if (Math.abs(diffX) < 0.05 && Math.abs(diffY) < 0.05) {
           flipRotX.current = targetSnapX.current;
           flipRotY.current = targetSnapY.current;
           isSnapping.current = false;
         }
-      } else if (!isDragging.current) {
-        // Active mouse following across viewport + gentle breathing
-        currentTiltX.current += (targetTiltX.current - currentTiltX.current) * 0.09;
-        currentTiltY.current += (targetTiltY.current - currentTiltY.current) * 0.09;
-        currentFloatY.current += (floatOffset - currentFloatY.current) * 0.09;
+      }
+
+      if (!isDragging.current) {
+        currentTiltX.current += (targetTiltX.current - currentTiltX.current) * 0.12;
+        currentTiltY.current += (targetTiltY.current - currentTiltY.current) * 0.12;
+        currentFloatY.current += (floatOffset - currentFloatY.current) * 0.1;
       }
 
       if (cardRef.current) {
@@ -574,11 +653,15 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
           cardRef.current.classList.toggle('is-spinning', isMotionActive);
         }
 
-        const totalRotX = flipRotX.current + (!isDragging.current && !isFlipping.current ? currentTiltX.current : 0);
-        const totalRotY = flipRotY.current + (!isDragging.current && !isFlipping.current ? currentTiltY.current : 0);
-        const floatY = !isDragging.current && !isFlipping.current ? currentFloatY.current : 0;
+        const totalRotX = flipRotX.current + currentTiltX.current;
+        const totalRotY = flipRotY.current + currentTiltY.current;
+        const floatY = isDragging.current ? dragFloatY.current : currentFloatY.current;
 
         cardRef.current.style.transform = `perspective(1200px) translateY(${floatY.toFixed(2)}px) rotateX(${totalRotX.toFixed(2)}deg) rotateY(${totalRotY.toFixed(2)}deg)`;
+
+        // Dynamic Global Light Reflection Angle based on 3D tilt & spin
+        const lightAngle = (135 - totalRotY * 1.6 - totalRotX * 0.9 + 3600) % 360;
+        cardRef.current.style.setProperty('--border-light-angle', `${lightAngle.toFixed(1)}deg`);
       }
 
       rafId = requestAnimationFrame(animate);
@@ -591,24 +674,15 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
     };
   }, []);
 
-  // Compute offset from origin position on screen to viewport center
   const targetCenterY = typeof window !== 'undefined' ? window.innerHeight / 2 : 300;
   const targetCenterX = typeof window !== 'undefined' ? window.innerWidth / 2 : 400;
 
   const dx = originRect ? originRect.x - targetCenterX : 0;
   const dy = originRect ? originRect.y - targetCenterY : 0;
-  const initScale = originRect ? Math.max(0.25, originRect.width / 280) : 0.35;
+  const initScale = originRect ? 78 / 280 : 0.8;
 
   return (
-    <motion.div
-      className="floating-badge-overlay"
-      role="dialog"
-      aria-modal="true"
-      initial={{ opacity: 0, backdropFilter: 'blur(0px)', WebkitBackdropFilter: 'blur(0px)' }}
-      animate={{ opacity: 1, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
-      exit={{ opacity: 0, backdropFilter: 'blur(0px)', WebkitBackdropFilter: 'blur(0px)' }}
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-    >
+    <div className="floating-badge-overlay">
       {/* Static Info Box pinned at top center */}
       <motion.div
         className="floating-badge-static-info"
@@ -633,25 +707,42 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
               Unlocked
             </span>
           )}
+          {/* Interactive Tier Switcher (Replaces category tag) */}
+          <div className="floating-badge-tier-selector" role="tablist" aria-label="Select Badge Tier">
+            {['bronze', 'silver', 'gold', 'diamond'].map((tierKey) => {
+              const cfg = TIER_CONFIG[tierKey];
+              const isSelected = activeTier === tierKey;
+              return (
+                <button
+                  key={tierKey}
+                  type="button"
+                  role="tab"
+                  aria-selected={isSelected}
+                  className={`floating-badge-tier-pill tier-${tierKey} ${isSelected ? 'is-active' : ''}`}
+                  onClick={() => setActiveTier(tierKey)}
+                  title={`View ${cfg.name} Medal`}
+                >
+                  <span className="tier-dot" />
+                  {cfg.name}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </motion.div>
 
       {/* Close button at top right */}
-      <motion.button
+      <button
         type="button"
         className="floating-badge-close-btn"
         onClick={onClose}
         title="Close (Esc)"
         aria-label="Close floating badge viewer"
-        initial={{ opacity: 0, scale: 0.7 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.7 }}
-        transition={{ delay: 0.1, duration: 0.2 }}
       >
         <X size={22} />
-      </motion.button>
+      </button>
 
-      {/* 3D Floating Coin (The ONLY 3D object) */}
+      {/* 3D Floating Coin Viewport */}
       <motion.div
         className="floating-badge-viewport"
         onClick={(e) => e.stopPropagation()}
@@ -668,7 +759,7 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
         <div className="floating-badge-coin-wrapper">
           <div
             ref={cardRef}
-            className={`floating-badge-coin-3d ${draggingState ? 'is-dragging' : ''}`}
+            className={`floating-badge-coin-3d ${tierConfig.className} ${draggingState ? 'is-dragging' : ''}`}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
@@ -681,21 +772,51 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
                   key={idx}
                   className="coin-edge-segment"
                   style={{
+                    '--seg-angle': `${angle}deg`,
                     transform: `rotateZ(${angle}deg) translateY(calc(-1 * var(--coin-radius, 140px))) rotateX(90deg)`
                   }}
                 />
               ))}
             </div>
 
-            {/* Front Face with Badge Artwork (Photo matches coin diameter with no extra edge) */}
+            {/* Front Face: Flat Background base with 3D Extruded Badge and Flat Border */}
             <div className="coin-face-front">
+              {/* 1. Flat Base Background */}
+              <img
+                src="/badges/borders-and-background/background.png"
+                alt="Background"
+                className="coin-flat-background"
+                draggable={false}
+              />
+
+              {/* 2. Overlapping Solid 3D Extruded Badge Emblem (Seamless 0.5px Slices) */}
               {badge.artwork ? (
-                <img
-                  src={badge.artwork}
-                  alt={displayName}
-                  className={`floating-badge-img ${isLocked ? 'is-locked' : ''}`}
-                  draggable={false}
-                />
+                <div className="coin-3d-badge-layer">
+                  <img src={badge.artwork} alt="" className="badge-slice slice-1" draggable={false} />
+                  <img src={badge.artwork} alt="" className="badge-slice slice-2" draggable={false} />
+                  <img src={badge.artwork} alt="" className="badge-slice slice-3" draggable={false} />
+                  <img src={badge.artwork} alt="" className="badge-slice slice-4" draggable={false} />
+                  <img src={badge.artwork} alt="" className="badge-slice slice-5" draggable={false} />
+                  <img src={badge.artwork} alt="" className="badge-slice slice-6" draggable={false} />
+                  <img src={badge.artwork} alt="" className="badge-slice slice-7" draggable={false} />
+                  <img src={badge.artwork} alt="" className="badge-slice slice-8" draggable={false} />
+                  <img
+                    src={badge.artwork}
+                    alt={displayName}
+                    className={`badge-slice slice-top ${isLocked ? 'is-locked' : ''}`}
+                    draggable={false}
+                  />
+                  {/* Subtle Specular Glisten strictly on the badge emblem itself */}
+                  {!isLocked && (
+                    <div
+                      className="badge-emblem-glisten"
+                      style={{
+                        WebkitMaskImage: `url("${badge.artwork}")`,
+                        maskImage: `url("${badge.artwork}")`
+                      }}
+                    />
+                  )}
+                </div>
               ) : (
                 <div className="floating-badge-placeholder">
                   <ImageIcon size={52} style={{ opacity: 0.45 }} />
@@ -704,14 +825,37 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
                   </span>
                 </div>
               )}
-              {/* Metallic Specular Glisten Sweep */}
-              <div className="coin-shine-sweep" />
+
+              {/* 3. Overlapping Flat Tier Border */}
+              <img
+                src={tierConfig.borderUrl}
+                alt={`${tierConfig.name} Border`}
+                className="coin-flat-border"
+                draggable={false}
+              />
+
+              {/* Recessed Cavity Inner Bevel & Wall Inset Shadow */}
+              <div className="coin-cavity-inset-shadow" />
+
+              {/* Dynamic Global Light Specular Shine on Border */}
+              <div className="coin-border-shine" />
             </div>
 
-            {/* Back Face with Metallic Collector's Seal (Cherish Ball + Bronze Star) */}
+            {/* Back Face: Minted Commemorative Reverse with Matching Back Rim */}
             <div className="coin-face-back">
+              {/* Dedicated Matching Back Rim Border */}
+              <img
+                src={tierConfig.backBorderUrl}
+                alt=""
+                className="coin-flat-border"
+                draggable={false}
+              />
+
+              {/* Recessed Cavity Inset Wall Shadow */}
+              <div className="coin-cavity-inset-shadow" />
+
               <div className="coin-back-inner-ring">
-                <div className="coin-back-stars">{starsString}</div>
+                <div className="coin-back-stars">{tierConfig.stars}</div>
                 <div className="coin-back-cherishball">
                   <svg viewBox="0 0 100 100" className="cherishball-svg">
                     <defs>
@@ -719,19 +863,20 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
                         <stop offset="0%" stopColor="#f87171" />
                         <stop offset="30%" stopColor="#dc2626" />
                         <stop offset="72%" stopColor="#991b1b" />
-                        <stop offset="100%" stopColor="#681212" />
+                        <stop offset="100%" stopColor="#550f0f" />
                       </radialGradient>
                       <radialGradient id="cherishBtn" cx="35%" cy="35%" r="60%">
-                        <stop offset="0%" stopColor="#ef4444" />
-                        <stop offset="100%" stopColor="#991b1b" />
+                        <stop offset="0%" stopColor="#fca5a5" />
+                        <stop offset="35%" stopColor="#ef4444" />
+                        <stop offset="100%" stopColor="#7f1d1d" />
                       </radialGradient>
                     </defs>
 
                     {/* Red Base Sphere */}
-                    <circle cx="50" cy="50" r="48" fill="url(#cherishSphere)" stroke="#18181b" strokeWidth="1.5" />
+                    <circle cx="50" cy="50" r="48" fill="url(#cherishSphere)" stroke="#18181b" strokeWidth="1.8" />
 
                     {/* Horizontal Seam */}
-                    <line x1="2" y1="50" x2="98" y2="50" stroke="#18181b" strokeWidth="3" />
+                    <line x1="2" y1="50" x2="98" y2="50" stroke="#18181b" strokeWidth="3.2" />
 
                     {/* Left Black Bracket Pad */}
                     <path d="M 5 36 C 20 36 28 42 28 50 C 28 58 20 64 5 64 C 2 56 2 44 5 36 Z" fill="#18181b" />
@@ -747,14 +892,15 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
                     <circle cx="50" cy="50" r="19" fill="none" stroke="#18181b" strokeWidth="6.5" />
 
                     {/* Center Red Button */}
-                    <circle cx="50" cy="50" r="12" fill="url(#cherishBtn)" stroke="#18181b" strokeWidth="1.2" />
+                    <circle cx="50" cy="50" r="12" fill="url(#cherishBtn)" stroke="#18181b" strokeWidth="1.5" />
                   </svg>
                 </div>
                 <span className="coin-back-text">ULTIMATE DEX</span>
                 <span className="coin-back-subtext">TRACKER</span>
               </div>
-              {/* Metallic Specular Glisten Sweep */}
-              <div className="coin-shine-sweep" />
+
+              {/* Dynamic Global Light Specular Shine on Back Border */}
+              <div className="coin-border-shine" />
             </div>
           </div>
 
@@ -762,6 +908,6 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
           <div className="coin-floor-shadow" />
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }

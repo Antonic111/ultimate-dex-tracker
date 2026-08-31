@@ -118,14 +118,14 @@ export default function TermsOfService() {
             Ultimate Dex Tracker offers optional recurring paid memberships that unlock premium cosmetic perks and streamer enhancements (such as animated GIF profile avatars, removal of overlay watermarks, custom dual-color gradient usernames with glowing aura drop-shadows, and unlocking all 4 favorite profile categories).
           </p>
 
-          <h3 className="legal-subsection-title">A. Merchant of Record (Paddle)</h3>
+          <h3 className="legal-subsection-title">A. Merchant of Record & Payment Processing (Stripe)</h3>
           <p className="legal-paragraph">
-            Our order process and billing is conducted by our Merchant of Record, <strong>Paddle.com</strong> (Paddle Payments Ltd or Paddle.com Market Ltd). Paddle acts as the legal seller and Merchant of Record for all membership transactions. When you purchase a membership:
+            Our order process and billing is conducted by our Merchant of Record and payment processor, <strong>Stripe</strong> (via Stripe Managed Payments). Stripe acts as the authorized Merchant of Record for membership transactions. When you purchase a membership:
           </p>
           <ul className="legal-list">
-            <li>Your payment details, billing address, and transaction processing are handled directly by Paddle in compliance with PCI-DSS security standards. Ultimate Dex Tracker never stores or has access to your full credit card numbers or banking data.</li>
-            <li>Paddle is responsible for calculating, collecting, and remitting applicable sales tax, VAT, or GST based on your billing jurisdiction.</li>
-            <li>By completing a purchase, you agree to Paddle's <a href="https://paddle.com/legal/checkout-buyer-terms" target="_blank" rel="noopener noreferrer">Checkout Buyer Terms</a> and <a href="https://paddle.com/legal/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</li>
+            <li>Your payment details, billing address, and transaction processing are handled directly by Stripe in compliance with PCI-DSS Level 1 security standards. Ultimate Dex Tracker never stores or has access to your full credit card numbers or banking data.</li>
+            <li>Stripe is responsible for calculating, collecting, and remitting applicable sales tax, VAT, or GST based on your billing jurisdiction.</li>
+            <li>By completing a purchase, you agree to Stripe's <a href="https://stripe.com/checkout/terms" target="_blank" rel="noopener noreferrer">Checkout Terms</a> and <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</li>
           </ul>
 
           <h3 className="legal-subsection-title">B. Subscription Billing & Automatic Renewal</h3>
@@ -135,7 +135,7 @@ export default function TermsOfService() {
 
           <h3 className="legal-subsection-title">C. Cancellation Policy</h3>
           <p className="legal-paragraph">
-            You may cancel your membership at any time with no cancellation fees. To cancel, navigate to <em>Membership &gt; Manage Subscription</em> or click the subscription management link provided in your Paddle receipt email. Upon cancellation:
+            You may cancel your membership at any time with no cancellation fees. To cancel, navigate to <em>Membership &gt; Manage Subscription</em> to access the Stripe Customer Portal, or use the cancellation link in your Stripe email receipt. Upon cancellation:
           </p>
           <ul className="legal-list">
             <li>Your subscription will remain active, and you will retain access to all membership perks until the end of your current paid billing period.</li>
@@ -306,8 +306,8 @@ export default function TermsOfService() {
             If you have questions regarding these Terms of Service, customer support, or billing, please use the appropriate channel:
           </p>
           <ul className="legal-list">
-            <li><strong>Customer & Technical Support:</strong> <a href="mailto:support@ultimatedextracker.com">support@ultimatedextracker.com</a></li>
-            <li><strong>Billing, Receipts & Refunds:</strong> Handled by Merchant of Record at <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
+            <li><strong>Customer & Technical Support:</strong> Available through our on-site <Link to="/feedback">Feedback & Support form</Link></li>
+            <li><strong>Billing, Receipts & Invoices:</strong> Handled securely via the Stripe Customer Portal accessible in your Membership settings</li>
             <li><strong>Developer & Creator:</strong> Antonic (Solo Developer)</li>
             <li><strong>Developer Portfolio:</strong> <a href="https://antonic.ca" target="_blank" rel="noopener noreferrer">antonic.ca</a></li>
             <li><strong>Website:</strong> <a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a></li>

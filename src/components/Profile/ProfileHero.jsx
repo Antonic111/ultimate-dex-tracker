@@ -64,7 +64,7 @@ export default function ProfileHero({
 
     const c1 = form.nameColor1 || form.nameGradientColor1;
     const c2 = form.nameColor2 || form.nameGradientColor2;
-    const hasGradient = Boolean(c1 && c2 && (isPremium || isAdmin));
+    const hasGradient = Boolean(c1 && c2 && isPremium);
     const gradientStyle = hasGradient ? {
         "--grad-c1": c1,
         "--grad-c2": c2,

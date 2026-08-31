@@ -23,6 +23,7 @@ import { notifyOverlayStream } from "./streamerTools.js";
 import { isValidPokemonKey } from "../utils/validPokemonKeys.js";
 import { moderateImage } from "../utils/sightengine.js";
 import { 
+  getUserEntitlements,
   getMembershipBadgeInfo, 
   getBatchMembershipBadgeInfo, 
   grantAdminPremium, 
@@ -322,8 +323,8 @@ router.post("/login", authLimiter, async (req, res) => {
         hasPassword: Boolean(user.password),
         createdAt: user.createdAt,
         profileTrainer: user.profileTrainer,
-        nameColor1: user.nameColor1 || user.nameGradientColor1 || null,
-        nameColor2: user.nameColor2 || user.nameGradientColor2 || null,
+        nameColor1: membershipInfo.isPremium ? (user.nameColor1 || user.nameGradientColor1 || null) : null,
+        nameColor2: membershipInfo.isPremium ? (user.nameColor2 || user.nameGradientColor2 || null) : null,
         avatar: user.avatar || null,
         verified: true,
         isAdmin: Boolean(user.isAdmin),
@@ -385,8 +386,8 @@ router.get("/me", async (req, res) => {
       hasPassword: Boolean(user.password),
       createdAt: user.createdAt,
       profileTrainer: user.profileTrainer,
-      nameColor1: user.nameColor1 || user.nameGradientColor1 || null,
-      nameColor2: user.nameColor2 || user.nameGradientColor2 || null,
+      nameColor1: membershipInfo.isPremium ? (user.nameColor1 || user.nameGradientColor1 || null) : null,
+      nameColor2: membershipInfo.isPremium ? (user.nameColor2 || user.nameGradientColor2 || null) : null,
       avatar: user.avatar || null,
       verified: user.verified,
       progressBars: user.progressBars || [],
@@ -748,14 +749,39 @@ router.put("/profile", authenticateUser, async (req, res) => {
     if (req.body.favoritePokemonShiny !== undefined) user.favoritePokemonShiny = req.body.favoritePokemonShiny;
     if (req.body.favoriteBalls !== undefined) user.favoriteBalls = sanitizedData.favoriteBalls;
     if (req.body.favoriteTrainers !== undefined) user.favoriteTrainers = sanitizedData.favoriteTrainers;
-    if (req.body.favoriteCategoryOrder !== undefined) user.favoriteCategoryOrder = Array.isArray(req.body.favoriteCategoryOrder) ? req.body.favoriteCategoryOrder : [];
     if (req.body.switchFriendCode !== undefined) user.switchFriendCode = sanitizedData.switchFriendCode;
     if (req.body.goFriendCode !== undefined) user.goFriendCode = sanitizedData.goFriendCode;
     if (req.body.profileTrainer !== undefined) user.profileTrainer = sanitizedData.profileTrainer;
-    if (req.body.nameColor1 !== undefined) user.nameColor1 = sanitizedData.nameColor1 || null;
-    if (req.body.nameColor2 !== undefined) user.nameColor2 = sanitizedData.nameColor2 || null;
-    if (req.body.nameGradientColor1 !== undefined) user.nameGradientColor1 = sanitizedData.nameGradientColor1 || null;
-    if (req.body.nameGradientColor2 !== undefined) user.nameGradientColor2 = sanitizedData.nameGradientColor2 || null;
+
+    // Premium features gating
+    const userEntitlements = await getUserEntitlements(user._id);
+    const isUserPremium = userEntitlements.includes("premium");
+
+    if (isUserPremium) {
+      if (req.body.nameColor1 !== undefined) user.nameColor1 = sanitizedData.nameColor1 || null;
+      if (req.body.nameColor2 !== undefined) user.nameColor2 = sanitizedData.nameColor2 || null;
+      if (req.body.nameGradientColor1 !== undefined) user.nameGradientColor1 = sanitizedData.nameGradientColor1 || null;
+      if (req.body.nameGradientColor2 !== undefined) user.nameGradientColor2 = sanitizedData.nameGradientColor2 || null;
+      if (req.body.favoriteCategoryOrder !== undefined) {
+        user.favoriteCategoryOrder = Array.isArray(req.body.favoriteCategoryOrder)
+          ? req.body.favoriteCategoryOrder.slice(0, 4)
+          : [];
+      }
+    } else {
+      // Non-premium user: reset gradient colors and cap favorite categories to 2
+      user.nameColor1 = null;
+      user.nameColor2 = null;
+      user.nameGradientColor1 = null;
+      user.nameGradientColor2 = null;
+      if (req.body.favoriteCategoryOrder !== undefined) {
+        user.favoriteCategoryOrder = Array.isArray(req.body.favoriteCategoryOrder)
+          ? req.body.favoriteCategoryOrder.slice(0, 2)
+          : [];
+      } else if (Array.isArray(user.favoriteCategoryOrder) && user.favoriteCategoryOrder.length > 2) {
+        user.favoriteCategoryOrder = user.favoriteCategoryOrder.slice(0, 2);
+      }
+    }
+
     if (req.body.avatar !== undefined) user.avatar = sanitizedData.avatar;
     if (req.body.huntHotkey !== undefined) user.huntHotkey = sanitizedData.huntHotkey;
 
@@ -900,10 +926,10 @@ router.put("/profile", authenticateUser, async (req, res) => {
         favoriteTrainers: user.favoriteTrainers,
         favoriteCategoryOrder: user.favoriteCategoryOrder || [],
         profileTrainer: user.profileTrainer,
-        nameColor1: user.nameColor1 || user.nameGradientColor1 || null,
-        nameColor2: user.nameColor2 || user.nameGradientColor2 || null,
-        nameGradientColor1: user.nameGradientColor1 || user.nameColor1 || null,
-        nameGradientColor2: user.nameGradientColor2 || user.nameColor2 || null,
+        nameColor1: membershipInfo.isPremium ? (user.nameColor1 || user.nameGradientColor1 || null) : null,
+        nameColor2: membershipInfo.isPremium ? (user.nameColor2 || user.nameGradientColor2 || null) : null,
+        nameGradientColor1: membershipInfo.isPremium ? (user.nameGradientColor1 || user.nameColor1 || null) : null,
+        nameGradientColor2: membershipInfo.isPremium ? (user.nameGradientColor2 || user.nameColor2 || null) : null,
         avatar: user.avatar || null,
         switchFriendCode: user.switchFriendCode,
         goFriendCode: user.goFriendCode,
@@ -1057,10 +1083,10 @@ router.get("/profile", authenticateUser, async (req, res) => {
       favoriteTrainers: user.favoriteTrainers,
       favoriteCategoryOrder: user.favoriteCategoryOrder || [],
       profileTrainer: user.profileTrainer,
-      nameColor1: user.nameColor1 || user.nameGradientColor1 || null,
-      nameColor2: user.nameColor2 || user.nameGradientColor2 || null,
-      nameGradientColor1: user.nameGradientColor1 || user.nameColor1 || null,
-      nameGradientColor2: user.nameGradientColor2 || user.nameColor2 || null,
+      nameColor1: membershipInfo.isPremium ? (user.nameColor1 || user.nameGradientColor1 || null) : null,
+      nameColor2: membershipInfo.isPremium ? (user.nameColor2 || user.nameGradientColor2 || null) : null,
+      nameGradientColor1: membershipInfo.isPremium ? (user.nameGradientColor1 || user.nameColor1 || null) : null,
+      nameGradientColor2: membershipInfo.isPremium ? (user.nameGradientColor2 || user.nameColor2 || null) : null,
       avatar: user.avatar || null,
       switchFriendCode: user.switchFriendCode,
       goFriendCode: user.goFriendCode,

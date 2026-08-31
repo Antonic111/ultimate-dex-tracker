@@ -292,6 +292,11 @@ const userSchema = new mongoose.Schema({
   migrationVersion: {
     type: String,
     default: "1.0"
+  },
+  // Stripe Customer ID
+  stripeCustomerId: {
+    type: String,
+    default: null
   }
 }, { timestamps: true });
 
@@ -300,6 +305,7 @@ userSchema.index({ createdAt: -1 });
 userSchema.index({ lastActiveAt: -1 });
 userSchema.index({ isAdmin: 1 });
 userSchema.index({ isSuspended: 1 });
+userSchema.index({ stripeCustomerId: 1 }, { sparse: true });
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {

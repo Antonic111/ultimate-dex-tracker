@@ -327,9 +327,9 @@ export const INITIAL_ACHIEVEMENTS = [
     enabled: true,
     unlocked: true,
     sortOrder: 20,
-    artwork: '/badges/patisserie-chef/regular-bronze.png',
+    artwork: '/badges/patisserie-chef/patisserie-chef.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: null, requirementDescription: 'Not configured', artworkUrl: '/badges/patisserie-chef/regular-bronze.png' },
+      { id: 't1', name: 'Bronze', order: 1, threshold: null, requirementDescription: 'Not configured', artworkUrl: '/badges/patisserie-chef/patisserie-chef.png' },
       { id: 't2', name: 'Silver', order: 2, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
       { id: 't3', name: 'Gold', order: 3, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
       { id: 't4', name: 'Diamond', order: 4, threshold: null, requirementDescription: 'Not configured', artworkUrl: null }

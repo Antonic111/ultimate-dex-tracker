@@ -47,11 +47,11 @@ const productSchema = new mongoose.Schema(
       amount: { type: Number, default: 0 },
       currency: { type: String, default: "USD" },
     },
-    paddleProductId: {
+    stripeProductId: {
       type: String,
       default: null,
     },
-    paddlePriceId: {
+    stripePriceId: {
       type: String,
       default: null,
     },

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useUser } from "../components/Shared/UserContext";
 import { useEntitlements } from "../hooks/useEntitlements";
-import { getPaddleConfig, fetchPaddlePricePreview } from "../utils/paddle";
 import { useMessage } from "../components/Shared/MessageContext";
+import { buildApiUrl } from "../config/api";
 import {
   Sparkles,
   CheckCircle2,
@@ -92,24 +92,97 @@ export default function Membership() {
 
   const previewParam = searchParams.get("preview") || searchParams.get("state");
 
-  const [displayPrice, setDisplayPrice] = useState(null);
+  const [displayPrice, setDisplayPrice] = useState("$4.99");
   const [isProcessing, setIsProcessing] = useState(
-    searchParams.get("status") === "processing"
+    searchParams.get("status") === "processing" || Boolean(searchParams.get("session_id"))
   );
-  const [paddleConfig, setPaddleConfig] = useState(null);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [stripeCheckoutLoading, setStripeCheckoutLoading] = useState(false);
 
+  // Poll refreshStatus when redirected back from Stripe Checkout
   useEffect(() => {
-    getPaddleConfig().then((config) => {
-      setPaddleConfig(config);
-      if (config?.monthlyPriceId) {
-        fetchPaddlePricePreview(config.monthlyPriceId).then((price) => {
-          if (price?.formattedPrice) {
-            setDisplayPrice(price.formattedPrice);
-          }
-        });
+    if (searchParams.get("status") === "processing" || searchParams.get("session_id")) {
+      setIsProcessing(true);
+      const interval = setInterval(async () => {
+        const res = await refreshStatus(true);
+        if (res?.isPremium) {
+          setIsProcessing(false);
+          clearInterval(interval);
+          showMessage("Welcome to Premium! Your subscription is active.", "success");
+        }
+      }, 2500);
+
+      const timeout = setTimeout(() => {
+        clearInterval(interval);
+        setIsProcessing(false);
+      }, 25000);
+
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
+    }
+  }, [searchParams, refreshStatus, showMessage]);
+
+  const handleOpenStripePortal = async () => {
+    try {
+      setPortalLoading(true);
+      const token = localStorage.getItem("authToken");
+      const headers = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch(buildApiUrl("/stripe/create-portal-session"), {
+        method: "POST",
+        headers,
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to open Stripe billing portal.");
       }
-    });
-  }, []);
+
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error("Error opening Stripe portal:", err);
+      showMessage(err.message || "Failed to open billing portal.", "error");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
+  const handleStartStripeCheckout = async () => {
+    try {
+      setStripeCheckoutLoading(true);
+      const token = localStorage.getItem("authToken");
+      const headers = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch(buildApiUrl("/stripe/create-checkout-session"), {
+        method: "POST",
+        headers,
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to create Stripe checkout session.");
+      }
+
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error("Error starting Stripe checkout:", err);
+      showMessage(err.message || "Failed to start Stripe checkout.", "error");
+    } finally {
+      setStripeCheckoutLoading(false);
+    }
+  };
 
   // Compute effective state taking preview parameters into account
   const effectiveUser = previewParam === "logged_out" ? null : user;
@@ -132,8 +205,8 @@ export default function Membership() {
           ).toISOString(),
           status: "active",
           managementUrls: {
-            updatePaymentMethod: "https://paddle.com",
-            cancel: "https://paddle.com",
+            updatePaymentMethod: "https://billing.stripe.com",
+            cancel: "https://billing.stripe.com",
           },
         }
       : previewParam === "past_due"
@@ -142,8 +215,8 @@ export default function Membership() {
           currentPeriodEnd: new Date().toISOString(),
           status: "past_due",
           managementUrls: {
-            updatePaymentMethod: "https://paddle.com",
-            cancel: "https://paddle.com",
+            updatePaymentMethod: "https://billing.stripe.com",
+            cancel: "https://billing.stripe.com",
           },
         }
       : previewParam === "active"
@@ -154,8 +227,8 @@ export default function Membership() {
           ).toISOString(),
           status: "active",
           managementUrls: {
-            updatePaymentMethod: "https://paddle.com",
-            cancel: "https://paddle.com",
+            updatePaymentMethod: "https://billing.stripe.com",
+            cancel: "https://billing.stripe.com",
           },
         }
       : subscription;
@@ -335,59 +408,35 @@ export default function Membership() {
 
               {/* Bottom 2 Action Buttons Side-by-Side */}
               <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {effectiveSubscription?.managementUrls?.updatePaymentMethod ? (
-                  <a
-                    href={effectiveSubscription.managementUrls.updatePaymentMethod}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-4 px-6 rounded-2xl bg-black/5 dark:bg-[var(--pokemon-box-bg2,#242424)] hover:bg-black/10 dark:hover:bg-white/[0.08] border border-[var(--border-color)] text-[var(--text)] font-bold text-sm flex items-center justify-center gap-2 transition-all no-underline cursor-pointer"
-                  >
+                <button
+                  type="button"
+                  onClick={handleOpenStripePortal}
+                  disabled={portalLoading}
+                  className="w-full py-4 px-6 rounded-2xl bg-black/5 dark:bg-[var(--pokemon-box-bg2,#242424)] hover:bg-black/10 dark:hover:bg-white/[0.08] border border-[var(--border-color)] text-[var(--text)] font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  {portalLoading ? (
+                    <Loader2 size={18} className="animate-spin text-[var(--accent)]" />
+                  ) : (
                     <CreditCard size={18} />
-                    <span>Update Payment Method</span>
-                    <ExternalLink size={14} className="text-[var(--text-muted)]" />
-                  </a>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      showMessage("Payment portal is ready for live management.", "info")
-                    }
-                    className="w-full py-4 px-6 rounded-2xl bg-black/5 dark:bg-[var(--pokemon-box-bg2,#242424)] hover:bg-black/10 dark:hover:bg-white/[0.08] border border-[var(--border-color)] text-[var(--text)] font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
-                  >
-                    <CreditCard size={18} />
-                    <span>Update Payment Method</span>
-                    <ExternalLink size={14} className="text-[var(--text-muted)]" />
-                  </button>
-                )}
+                  )}
+                  <span>Update Payment Method</span>
+                  <ExternalLink size={14} className="text-[var(--text-muted)]" />
+                </button>
 
-                {effectiveSubscription?.managementUrls?.cancel &&
-                !effectiveSubscription.cancelAtPeriodEnd ? (
-                  <a
-                    href={effectiveSubscription.managementUrls.cancel}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-4 px-6 rounded-2xl bg-red-500/10 hover:bg-red-500/15 border border-red-500/25 text-red-400 font-bold text-sm flex items-center justify-center gap-2 transition-all no-underline cursor-pointer"
-                  >
+                <button
+                  type="button"
+                  onClick={handleOpenStripePortal}
+                  disabled={portalLoading}
+                  className="w-full py-4 px-6 rounded-2xl bg-red-500/10 hover:bg-red-500/15 border border-red-500/25 text-red-400 font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  {portalLoading ? (
+                    <Loader2 size={18} className="animate-spin text-red-400" />
+                  ) : (
                     <Shield size={18} />
-                    <span>Manage / Cancel Subscription</span>
-                    <ExternalLink size={14} />
-                  </a>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      showMessage(
-                        "Subscription is active. Manage anytime through customer portal.",
-                        "info"
-                      )
-                    }
-                    className="w-full py-4 px-6 rounded-2xl bg-red-500/10 hover:bg-red-500/15 border border-red-500/25 text-red-400 font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
-                  >
-                    <Shield size={18} />
-                    <span>Manage / Cancel Subscription</span>
-                    <ExternalLink size={14} />
-                  </button>
-                )}
+                  )}
+                  <span>Manage / Cancel Subscription</span>
+                  <ExternalLink size={14} />
+                </button>
               </div>
             </div>
 
@@ -429,11 +478,10 @@ export default function Membership() {
                 </div>
               </div>
 
-              <a
-                href="https://paddle.net"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3.5 no-underline hover:opacity-90 transition-opacity"
+              <button
+                type="button"
+                onClick={handleOpenStripePortal}
+                className="flex items-center gap-3.5 no-underline hover:opacity-90 transition-opacity text-left bg-transparent border-0 cursor-pointer p-0"
               >
                 <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center flex-shrink-0">
                   <Headphones size={18} />
@@ -443,10 +491,10 @@ export default function Membership() {
                     Billing Support <ExternalLink size={11} className="text-[var(--text-muted)]" />
                   </div>
                   <div className="text-[11px] text-[var(--text-muted)]">
-                    Paddle handles receipts, invoices, and payment support.
+                    Stripe manages invoices, receipts, and payment methods.
                   </div>
                 </div>
-              </a>
+              </button>
             </div>
           </>
         )}
@@ -507,13 +555,13 @@ export default function Membership() {
                   </div>
                 </div>
 
-                {/* Bottom Paddle Guarantee */}
+                {/* Bottom Stripe Guarantee */}
                 <div className="pt-4 border-t border-[var(--border-color)] flex items-center gap-2.5 text-xs text-[var(--text-muted)]">
                   <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
                     <Lock size={12} />
                   </div>
                   <span>
-                    Secure billing powered by <strong className="text-[var(--text)]">Paddle</strong>. Cancel anytime.
+                    Secure billing powered by <strong className="text-[var(--text)]">Stripe</strong>. Cancel anytime.
                   </span>
                 </div>
               </div>
@@ -530,7 +578,7 @@ export default function Membership() {
                   {/* Price Display */}
                   <div className="space-y-1">
                     <div className="text-4xl sm:text-5xl font-black text-[var(--text)] tracking-tight">
-                      {displayPrice || "$5.64"}
+                      {displayPrice || "$4.99"}
                     </div>
                     <div className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">
                       / month
@@ -566,17 +614,23 @@ export default function Membership() {
                 {/* Action Button */}
                 <div className="pt-2">
                   {effectiveUser?.username ? (
-                    <Link
-                      to="/membership/checkout"
-                      className="w-full inline-flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-[var(--accent)] text-black font-extrabold text-base shadow-lg hover:opacity-90 active:scale-[0.98] transition-all no-underline cursor-pointer"
+                    <button
+                      type="button"
+                      onClick={handleStartStripeCheckout}
+                      disabled={stripeCheckoutLoading}
+                      className="w-full inline-flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-[var(--accent)] text-black font-extrabold text-base shadow-lg hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer border-0"
                     >
-                      <Sparkles size={18} />
-                      Upgrade to Premium
+                      {stripeCheckoutLoading ? (
+                        <Loader2 size={18} className="animate-spin text-black" />
+                      ) : (
+                        <Sparkles size={18} />
+                      )}
+                      <span>Upgrade to Premium</span>
                       <ArrowRight size={16} />
-                    </Link>
+                    </button>
                   ) : (
                     <Link
-                      to="/login?redirect=/membership/checkout"
+                      to="/login?redirect=/membership"
                       className="w-full inline-flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-[var(--accent)] text-black font-extrabold text-base shadow-lg hover:opacity-90 active:scale-[0.98] transition-all no-underline cursor-pointer"
                     >
                       <Sparkles size={18} />

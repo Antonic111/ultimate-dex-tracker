@@ -10,7 +10,7 @@ const subscriptionSchema = new mongoose.Schema(
     },
     provider: {
       type: String,
-      default: "paddle",
+      default: "stripe",
       required: true,
     },
     customerId: {
@@ -35,7 +35,17 @@ const subscriptionSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["active", "trialing", "past_due", "paused", "canceled", "deleted"],
+      enum: [
+        "active",
+        "trialing",
+        "past_due",
+        "paused",
+        "canceled",
+        "deleted",
+        "incomplete",
+        "incomplete_expired",
+        "unpaid",
+      ],
       default: "active",
       required: true,
       index: true,

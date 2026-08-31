@@ -717,7 +717,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                 {(() => {
                   const c1 = user.nameColor1 || user.nameGradientColor1;
                   const c2 = user.nameColor2 || user.nameGradientColor2;
-                  return c1 && c2 && (user.isPremium || user.isAdmin) ? (
+                  return c1 && c2 && user.isPremium ? (
                     <span
                       className="animated-gradient-username-wrapper max-w-[85px] sm:max-w-[120px] md:max-w-[170px]"
                       style={{ "--grad-c1": c1, "--grad-c2": c2 }}
@@ -760,7 +760,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                         {(() => {
                           const c1 = user.nameColor1 || user.nameGradientColor1;
                           const c2 = user.nameColor2 || user.nameGradientColor2;
-                          return c1 && c2 && (user.isPremium || user.isAdmin) ? (
+                          return c1 && c2 && user.isPremium ? (
                             <span
                               className="animated-gradient-username-wrapper inline-block truncate"
                               style={{ "--grad-c1": c1, "--grad-c2": c2 }}

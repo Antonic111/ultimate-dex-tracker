@@ -111,7 +111,7 @@ export default function AvatarUploadModal({
         setErrorMessage("");
         if (!file) return;
 
-        const isMember = Boolean(user?.isPremium || user?.isAdmin);
+        const isMember = Boolean(user?.isPremium);
         const isGifFile = file.type === "image/gif" || file.name.toLowerCase().endsWith(".gif");
         setIsGif(isGifFile);
 
@@ -422,7 +422,7 @@ export default function AvatarUploadModal({
         ? selectedDefaultUrl
         : getUserAvatarUrl(activeAvatar ? { avatar: activeAvatar } : user);
 
-    const isMember = Boolean(user?.isPremium || user?.isAdmin);
+    const isMember = Boolean(user?.isPremium);
 
     const isApplyDisabled = activeTab === "defaults"
         ? (!selectedDefaultUrl || selectedDefaultUrl === activeAvatar)

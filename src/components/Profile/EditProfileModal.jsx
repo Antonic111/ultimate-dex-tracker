@@ -105,7 +105,7 @@ export default function EditProfileModal({
     const [showAvatarModal, setShowAvatarModal]   = useState(false);
     const [showCreatorModal, setShowCreatorModal] = useState(false);
 
-    const isMember = Boolean(isPremium || isAdmin);
+    const isMember = Boolean(isPremium);
     const maxFavoriteCategories = isMember ? 4 : 2;
 
     // Helper to derive default categories from existing data

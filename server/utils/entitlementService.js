@@ -296,7 +296,7 @@ export async function grantAdminPremium({
 
 /**
  * Revoke only admin-granted premium membership for a user.
- * Preserves any active paid Paddle subscriptions intact.
+ * Preserves any active paid Stripe subscriptions intact.
  *
  * @param {string|mongoose.Types.ObjectId} userId
  */

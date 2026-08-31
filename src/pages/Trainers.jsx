@@ -755,7 +755,7 @@ export default function Trainers() {
                           {(() => {
                             const c1 = u.nameColor1 || u.nameGradientColor1;
                             const c2 = u.nameColor2 || u.nameGradientColor2;
-                            return c1 && c2 && (u.isPremium || u.isAdmin) ? (
+                            return c1 && c2 && u.isPremium ? (
                               <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": c1, "--grad-c2": c2 }}>
                                 <span className="animated-gradient-username">
                                   {u.username}

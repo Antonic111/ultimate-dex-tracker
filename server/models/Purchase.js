@@ -15,7 +15,7 @@ const purchaseSchema = new mongoose.Schema(
     },
     provider: {
       type: String,
-      default: "paddle",
+      default: "stripe",
       required: true,
     },
     transactionId: {

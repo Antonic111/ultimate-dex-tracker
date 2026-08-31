@@ -38,7 +38,7 @@ export default function LegalPrivacy() {
             <li><a href="#oauth-data" className="legal-toc-link">3. Google & Discord Logins</a></li>
             <li><a href="#tracker-data" className="legal-toc-link">4. Pokémon & Tracker Data</a></li>
             <li><a href="#streamer-tools-privacy" className="legal-toc-link">5. Streamer Tools & Overlays</a></li>
-            <li><a href="#payments-billing" className="legal-toc-link">6. Payments & Billing (Paddle)</a></li>
+            <li><a href="#payments-billing" className="legal-toc-link">6. Payments & Billing (Stripe)</a></li>
             <li><a href="#cookies-storage" className="legal-toc-link">7. Cookies & Local Storage</a></li>
             <li><a href="#how-we-use" className="legal-toc-link">8. How We Use Information</a></li>
             <li><a href="#third-parties" className="legal-toc-link">9. Third-Party Service Providers</a></li>
@@ -172,15 +172,15 @@ export default function LegalPrivacy() {
         {/* Section 6 */}
         <section id="payments-billing" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">6</span> Payments & Billing (Paddle as Merchant of Record)
+            <span className="section-number">6</span> Payments & Billing (Stripe Managed Payments)
           </h2>
           <p className="legal-paragraph">
-            Optional recurring memberships are processed by our Merchant of Record, <strong>Paddle.com</strong> (Paddle Payments Ltd / Paddle.com Market Ltd).
+            Optional recurring memberships are processed by our Merchant of Record, <strong>Stripe</strong> (via Stripe Managed Payments).
           </p>
           <ul className="legal-list">
-            <li><strong>Zero Storage of Payment Card Data:</strong> When you subscribe to a membership, all credit card numbers, PayPal credentials, billing addresses, and tax identifiers are collected and processed directly by Paddle in compliance with PCI-DSS Level 1 standards. Ultimate Dex Tracker never receives, processes, or stores your credit card numbers or banking credentials.</li>
-            <li><strong>Subscription Metadata Stored:</strong> To provision membership perks on your account, our database stores only non-sensitive subscription metadata received from Paddle webhooks: your Paddle Customer ID, Subscription ID, subscription status (e.g., <code>active</code>, <code>past_due</code>, <code>canceled</code>), current billing cycle end date, and subscription creation timestamp.</li>
-            <li><strong>Transaction Invoices & Receipts:</strong> Invoices, payment confirmation receipts, and subscription management links are dispatched directly by Paddle to your billing email.</li>
+            <li><strong>Zero Storage of Payment Card Data:</strong> When you subscribe to a membership, all credit card numbers, Apple Pay/Google Pay tokens, billing addresses, and tax identifiers are collected and processed directly by Stripe in compliance with PCI-DSS Level 1 standards. Ultimate Dex Tracker never receives, processes, or stores your credit card numbers or banking credentials.</li>
+            <li><strong>Subscription Metadata Stored:</strong> To provision membership perks on your account, our database stores only non-sensitive subscription metadata received from Stripe webhooks: your Stripe Customer ID, Subscription ID, subscription status (e.g., <code>active</code>, <code>past_due</code>, <code>canceled</code>), current billing cycle end date, and subscription creation timestamp.</li>
+            <li><strong>Transaction Invoices & Receipts:</strong> Invoices, payment confirmation receipts, and self-service Customer Portal links are dispatched directly by Stripe to your billing email.</li>
           </ul>
         </section>
 
@@ -251,10 +251,10 @@ export default function LegalPrivacy() {
                   <td><a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">Vercel Privacy Policy</a></td>
                 </tr>
                 <tr>
-                  <td><strong>Paddle.com</strong></td>
-                  <td>Merchant of Record & Subscription Billing</td>
+                  <td><strong>Stripe Inc.</strong></td>
+                  <td>Merchant of Record & Subscription Billing (Stripe Managed Payments)</td>
                   <td>Customer email, billing address, payment details, subscription status</td>
-                  <td><a href="https://paddle.com/legal/privacy" target="_blank" rel="noopener noreferrer">Paddle Privacy Policy</a></td>
+                  <td><a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer">Stripe Privacy Policy</a></td>
                 </tr>
                 <tr>
                   <td><strong>MongoDB Inc.</strong></td>
@@ -386,8 +386,8 @@ export default function LegalPrivacy() {
             If you have questions regarding this Privacy Policy, your personal data, or billing inquiries, please use the appropriate channel:
           </p>
           <ul className="legal-list">
-            <li><strong>Privacy & Data Inquiries:</strong> <a href="mailto:support@ultimatedextracker.com">support@ultimatedextracker.com</a></li>
-            <li><strong>Billing & Payment Privacy:</strong> Handled by Merchant of Record at <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
+            <li><strong>Privacy & Data Inquiries:</strong> Available through our on-site <Link to="/feedback">Feedback & Support form</Link></li>
+            <li><strong>Billing & Payment Privacy:</strong> Handled securely via the Stripe Customer Portal accessible in your Membership settings</li>
             <li><strong>Developer & Creator:</strong> Antonic (Solo Developer)</li>
             <li><strong>Developer Portfolio:</strong> <a href="https://antonic.ca" target="_blank" rel="noopener noreferrer">antonic.ca</a></li>
             <li><strong>Website:</strong> <a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a></li>

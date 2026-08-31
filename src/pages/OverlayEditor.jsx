@@ -882,15 +882,7 @@ export default function OverlayEditor() {
   const { showMessage } = useMessage();
   const { accent } = useTheme();
   const { user } = useUser();
-  const { isPremium } = useEntitlements();
-  const isMember = Boolean(
-    isPremium ||
-    user?.isPremium ||
-    user?.isAdmin ||
-    user?.role === "admin" ||
-    user?.is_premium ||
-    user?.membership
-  );
+  const isMember = Boolean(isPremium || user?.isPremium);
   const themeAccentHex = ACCENT_COLOR_MAP[accent] || accent || "#facc15";
 
   // Overlay state from backend

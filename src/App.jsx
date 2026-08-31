@@ -766,16 +766,29 @@ export default function App() {
     }
   };
 
-  // Custom setUser function that handles login properly
+  // Custom setUser function that handles login properly and supports functional updates
   const handleUserUpdate = (newUserData) => {
-    const normalizedData = {
+    if (typeof newUserData === 'function') {
+      setUser((prev) => {
+        const computed = newUserData(prev);
+        if (!computed) return null;
+        return {
+          ...computed,
+          nameColor1: computed?.nameColor1 || computed?.nameGradientColor1 || null,
+          nameColor2: computed?.nameColor2 || computed?.nameGradientColor2 || null,
+        };
+      });
+      return;
+    }
+
+    const normalizedData = newUserData ? {
       ...newUserData,
       nameColor1: newUserData?.nameColor1 || newUserData?.nameGradientColor1 || null,
       nameColor2: newUserData?.nameColor2 || newUserData?.nameGradientColor2 || null,
-    };
+    } : null;
 
     // If this is a login (has username and progressBars), set the flag
-    if (normalizedData.username && normalizedData.progressBars) {
+    if (normalizedData?.username && normalizedData?.progressBars) {
       setJustLoggedIn(true);
     }
 

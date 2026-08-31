@@ -52,7 +52,7 @@ export default function RefundPolicy() {
             This Refund and Cancellation Policy applies to all paid subscriptions and digital memberships purchased on <strong>Ultimate Dex Tracker</strong> (<a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a>).
           </p>
           <p className="legal-paragraph">
-            All orders, transactions, billing, tax calculation, and payment processing are fulfilled by our authorized Merchant of Record, <strong>Paddle.com</strong> (Paddle Payments Ltd / Paddle.com Market Ltd). Paddle is the merchant of record for all our transactions and provides customer service and dispute assistance in partnership with us.
+            All orders, transactions, billing, tax calculation, and payment processing are fulfilled by our authorized Merchant of Record, <strong>Stripe</strong> (via Stripe Managed Payments). Stripe acts as the legal Merchant of Record for all our membership transactions and provides customer billing support in partnership with us.
           </p>
           <div className="legal-callout">
             <div className="legal-callout-title">Digital Fan-Made Service</div>
@@ -69,7 +69,7 @@ export default function RefundPolicy() {
             You may cancel your monthly Premium Membership at any time with no questions asked, cancellation fees, or penalties.
           </p>
           <ul className="legal-list">
-            <li><strong>Self-Service Cancellation:</strong> You can cancel your subscription instantly at any time by visiting your profile settings, clicking <em>"Manage Subscription"</em>, or using the cancellation link provided in every Paddle email invoice receipt.</li>
+            <li><strong>Self-Service Cancellation:</strong> You can cancel your subscription instantly at any time by visiting your profile settings, clicking <em>"Manage Subscription"</em> to open the Stripe Customer Portal, or using the cancellation link provided in every Stripe email invoice receipt.</li>
             <li><strong>Keep Your Perks Until Period End:</strong> When you cancel, your subscription will not renew for subsequent billing cycles. You will retain full access to all Premium benefits (including custom avatars, animated GIFs, 4 favorite categories, streamer overlays, and gold badges) until the final second of your current prepaid billing period.</li>
             <li><strong>No Automatic Termination:</strong> Canceling a subscription does not delete your Pokémon collection, shiny hunt logs, or account data.</li>
           </ul>
@@ -112,7 +112,7 @@ export default function RefundPolicy() {
             <span className="section-number">4</span> How to Request a Refund
           </h2>
           <p className="legal-paragraph">
-            All billing, transactions, and refund disbursements are processed exclusively by our authorized Merchant of Record, <strong>Paddle</strong>. To ensure the fastest possible resolution, all refund requests should be submitted directly to Paddle:
+            All billing, transactions, and refund disbursements are processed by our authorized Merchant of Record, <strong>Stripe</strong>. To request a refund:
           </p>
           <div className="legal-table-wrapper">
             <table className="legal-table">
@@ -125,14 +125,14 @@ export default function RefundPolicy() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Paddle Buyer Support (Recommended)</strong></td>
-                  <td>Visit <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a> and enter your email address or transaction Order ID to look up your purchase and submit a refund request directly.</td>
+                  <td><strong>Feedback & Support Form</strong></td>
+                  <td>Submit a ticket via our <Link to="/feedback">Feedback & Support</Link> page with your account username to request an immediate review.</td>
                   <td>Within 24 hours</td>
                 </tr>
                 <tr>
-                  <td><strong>Email Receipt Link</strong></td>
-                  <td>Click the <em>"Manage Subscription"</em>, <em>"View Invoice"</em>, or <em>"Contact Support"</em> link located at the bottom of any email receipt received from Paddle after purchase.</td>
-                  <td>Instant lookup & fast processing</td>
+                  <td><strong>Stripe Billing Portal / Receipt Link</strong></td>
+                  <td>Click the <em>"Manage Subscription"</em> or <em>"View Invoice"</em> link located in your <Link to="/membership">Membership Settings</Link> or at the bottom of any email receipt received from Stripe.</td>
+                  <td>Instant lookup</td>
                 </tr>
               </tbody>
             </table>
@@ -145,18 +145,18 @@ export default function RefundPolicy() {
             <span className="section-number">5</span> Refund Processing Times & Method
           </h2>
           <ul className="legal-list">
-            <li><strong>Original Payment Method:</strong> All approved refunds are credited back directly to the original payment method used during checkout (Credit/Debit Card, PayPal, Apple Pay, or Google Pay). Paddle cannot issue refunds to alternate accounts or third parties.</li>
-            <li><strong>Bank Processing Times:</strong> Once Paddle processes the refund, it typically reflects in your bank or card statement within <strong>3 to 5 business days</strong> (depending on your financial institution).</li>
+            <li><strong>Original Payment Method:</strong> All approved refunds are credited back directly to the original payment method used during checkout (Credit/Debit Card, Apple Pay, or Google Pay). Refunds cannot be issued to alternate accounts or third parties.</li>
+            <li><strong>Bank Processing Times:</strong> Once a refund is initiated, it typically reflects in your bank or card statement within <strong>3 to 5 business days</strong> (depending on your financial institution).</li>
           </ul>
         </section>
 
         {/* Section 6 */}
         <section id="chargebacks" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">6</span> Chargebacks & Friendly Fraud
+            <span className="section-number">6</span> Chargebacks & Inquiries
           </h2>
           <p className="legal-paragraph">
-            If you do not recognize a charge or have a question about your bill, please look up your transaction with Paddle Buyer Support (<a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a>) before initiating a bank dispute or chargeback. Paddle can quickly look up receipts, cancel subscriptions, and issue eligible refunds directly.
+            If you do not recognize a charge or have a question about your bill, please inspect your invoices via the Stripe Customer Portal in your <Link to="/membership">Membership Settings</Link> or submit a message through the <Link to="/feedback">Feedback & Support</Link> page before initiating a bank dispute or chargeback. We can quickly look up receipts, cancel subscriptions, and issue eligible refunds directly.
           </p>
         </section>
 
@@ -169,9 +169,8 @@ export default function RefundPolicy() {
             For all questions regarding memberships, transactions, receipts, cancellations, or refunds:
           </p>
           <ul className="legal-list">
-            <li><strong>Customer & Billing Support:</strong> <a href="mailto:support@ultimatedextracker.com">support@ultimatedextracker.com</a></li>
-            <li><strong>Paddle Buyer Support (Direct Refunds):</strong> <a href="https://paddle.net" target="_blank" rel="noopener noreferrer">paddle.net</a></li>
-            <li><strong>Paddle Help Center:</strong> <a href="https://paddle.com/help" target="_blank" rel="noopener noreferrer">paddle.com/help</a></li>
+            <li><strong>Support & Bug Reports:</strong> Available through the on-site <Link to="/feedback">Feedback & Support Form</Link></li>
+            <li><strong>Self-Service Billing Portal:</strong> Accessible via <Link to="/membership">Membership Settings</Link></li>
             <li><strong>Website:</strong> <a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a></li>
           </ul>
         </section>

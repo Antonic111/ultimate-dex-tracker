@@ -203,16 +203,14 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <a
-                href="https://paddle.net"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/membership"
                 className="footer-nav-link"
-                title="Paddle Buyer Support & Invoice Lookup"
+                title="Manage Membership & Invoices"
               >
                 <HelpCircle size={15} />
-                <span>Buyer Help</span>
-              </a>
+                <span>Billing Help</span>
+              </Link>
             </li>
             <li>
               <Link to="/terms" className="footer-nav-link">

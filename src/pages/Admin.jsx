@@ -2540,14 +2540,14 @@ const Admin = () => {
             </div>
           </div>
 
-          {/* Paddle Subscription Protection Notice */}
+          {/* Stripe Subscription Protection Notice */}
           {premiumTargetUser?.subscription && (
             <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-start gap-2.5 text-xs text-amber-200">
               <AlertCircle size={16} className="text-amber-400 shrink-0 mt-0.5" />
               <div className="flex flex-col">
-                <span className="font-bold text-amber-300">Active Paddle Subscription Detected</span>
+                <span className="font-bold text-amber-300">Active Stripe Subscription Detected</span>
                 <p className="text-[11px] text-[#ccc] mt-0.5">
-                  This user has a self-paid subscription. Admin grants are stored independently in the entitlement system and will never overwrite or cancel their billing.
+                  This user has an active Stripe subscription. Admin grants are stored independently in the entitlement system and will never overwrite or cancel their Stripe billing.
                 </p>
               </div>
             </div>

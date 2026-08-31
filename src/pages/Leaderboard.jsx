@@ -381,7 +381,7 @@ export default function Leaderboard() {
                     {(() => {
                       const c1 = topThree[1].nameColor1 || topThree[1].nameGradientColor1;
                       const c2 = topThree[1].nameColor2 || topThree[1].nameGradientColor2;
-                      return c1 && c2 && (topThree[1].isPremium || topThree[1].isAdmin) ? (
+                      return c1 && c2 && topThree[1].isPremium ? (
                         <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": c1, "--grad-c2": c2 }}>
                           <span className="animated-gradient-username">{topThree[1].username}</span>
                         </span>
@@ -481,7 +481,7 @@ export default function Leaderboard() {
                     {(() => {
                       const c1 = topThree[0].nameColor1 || topThree[0].nameGradientColor1;
                       const c2 = topThree[0].nameColor2 || topThree[0].nameGradientColor2;
-                      return c1 && c2 && (topThree[0].isPremium || topThree[0].isAdmin) ? (
+                      return c1 && c2 && topThree[0].isPremium ? (
                         <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": c1, "--grad-c2": c2 }}>
                           <span className="animated-gradient-username">{topThree[0].username}</span>
                         </span>
@@ -579,7 +579,7 @@ export default function Leaderboard() {
                     {(() => {
                       const c1 = topThree[2].nameColor1 || topThree[2].nameGradientColor1;
                       const c2 = topThree[2].nameColor2 || topThree[2].nameGradientColor2;
-                      return c1 && c2 && (topThree[2].isPremium || topThree[2].isAdmin) ? (
+                      return c1 && c2 && topThree[2].isPremium ? (
                         <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": c1, "--grad-c2": c2 }}>
                           <span className="animated-gradient-username">{topThree[2].username}</span>
                         </span>
@@ -705,7 +705,7 @@ export default function Leaderboard() {
                           {(() => {
                             const c1 = trainer.nameColor1 || trainer.nameGradientColor1;
                             const c2 = trainer.nameColor2 || trainer.nameGradientColor2;
-                            return c1 && c2 && (trainer.isPremium || trainer.isAdmin) ? (
+                            return c1 && c2 && trainer.isPremium ? (
                               <span className="animated-gradient-username-wrapper" style={{ "--grad-c1": c1, "--grad-c2": c2 }}>
                                 <span className="animated-gradient-username table-trainer-name">{trainer.username}</span>
                               </span>

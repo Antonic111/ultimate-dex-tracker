@@ -305,14 +305,47 @@
   object-fit: contain;
 }
 
+.achievement-badge-composite {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.composite-bg,
+.composite-badge,
+.composite-border {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+
+.composite-bg {
+  z-index: 1;
+}
+
+.composite-badge {
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.75));
+}
+
+.composite-border {
+  z-index: 3;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
+}
+
 .achievement-badge-frame.has-artwork {
   border: none;
   background: transparent;
   padding: 0;
-}
-
-.achievement-badge-frame.has-artwork img {
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
 }
 
 .achievement-badge-frame.is-locked {
@@ -365,7 +398,8 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: var(--z-modal-overlay, 10050); /* Covers entire screen so header is blurred underneath */
+  z-index: var(--z-modal-overlay, 10050);
+  /* Covers entire screen so header is blurred underneath */
   background: rgba(6, 6, 8, 0.78);
   display: flex;
   flex-direction: column;
@@ -417,14 +451,14 @@
 :root {
   --coin-size: 280px;
   --coin-radius: 140px;
-  --coin-thickness: 18px;
+  --coin-thickness: 12px; /* Authentic minted medal thickness (reduced by 33%) */
 }
 
 @media (max-width: 640px) {
   :root {
     --coin-size: 220px;
     --coin-radius: 110px;
-    --coin-thickness: 16px;
+    --coin-thickness: 10px;
   }
 }
 
@@ -448,49 +482,227 @@
   touch-action: none;
 }
 
-.floating-badge-coin-3d.is-dragging {
+.floating-badge-coin-3d.is-dragging,
+.floating-badge-coin-3d.is-dragging .coin-face-front,
+.floating-badge-coin-3d.is-dragging .coin-face-back {
   cursor: grabbing;
 }
 
-/* Front Face (Uses the photo's own illustrated edge directly) */
+/* Front Face: 3-Layer 3D Composite (Flush Border, Recessed Floor, 3D Badge) */
 .coin-face-front {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  transform: translateZ(calc(var(--coin-thickness, 18px) / 2));
+  transform: translateZ(calc(var(--coin-thickness, 12px) / 2));
   transform-style: preserve-3d;
-  backface-visibility: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  border: none;
-  box-shadow: none;
+  pointer-events: auto;
+  cursor: grab;
+  box-shadow: 0 0 0 0.5px #7a4515;
 }
 
-/* Back Face */
-/* Back Face (Matching Bronze Badge) */
+/* 1. Base: Flat Background (Recessed inside the coin cavity) */
+.coin-flat-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  transform: translateZ(-2px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* 2. Overlapping 3D Extruded Badge (Rises from recessed cavity) */
+.coin-3d-badge-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.badge-slice {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.badge-slice.slice-1 {
+  transform: translateZ(-1.7px);
+  filter: brightness(0.22) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+}
+.badge-slice.slice-2 {
+  transform: translateZ(-1.35px);
+  filter: brightness(0.30);
+}
+.badge-slice.slice-3 {
+  transform: translateZ(-1.0px);
+  filter: brightness(0.38);
+}
+.badge-slice.slice-4 {
+  transform: translateZ(-0.65px);
+  filter: brightness(0.48);
+}
+.badge-slice.slice-5 {
+  transform: translateZ(-0.3px);
+  filter: brightness(0.60);
+}
+.badge-slice.slice-6 {
+  transform: translateZ(0.1px);
+  filter: brightness(0.72);
+}
+.badge-slice.slice-7 {
+  transform: translateZ(0.5px);
+  filter: brightness(0.84);
+}
+.badge-slice.slice-8 {
+  transform: translateZ(0.85px);
+  filter: brightness(0.94);
+}
+.badge-slice.slice-top {
+  transform: translateZ(1.2px);
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.85));
+}
+.badge-slice.slice-top.is-locked {
+  filter: grayscale(1) opacity(0.55) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7));
+}
+
+/* Recessed Cavity Inner Bevel & Wall Inset Shadow (Physically seats artwork inside the medal) */
+.coin-cavity-inset-shadow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateZ(0.1px);
+  width: calc(var(--coin-size, 280px) * 0.875);
+  height: calc(var(--coin-size, 280px) * 0.875);
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.75),
+    inset 0 0 12px rgba(0, 0, 0, 0.65),
+    inset 0 -1.5px 3px rgba(255, 220, 160, 0.2);
+  border: 1px solid rgba(40, 20, 5, 0.6);
+  z-index: 9;
+}
+
+/* Specular Glisten strictly masked to the badge emblem */
+.badge-emblem-glisten {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateZ(1.8px);
+  pointer-events: none;
+  overflow: hidden;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  z-index: 5;
+}
+
+.badge-emblem-glisten::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -60%;
+  width: 220%;
+  height: 220%;
+  background: linear-gradient(
+    115deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.12) 44%,
+    rgba(255, 255, 255, 0.75) 50%,
+    rgba(255, 255, 255, 0.12) 56%,
+    transparent 62%
+  );
+  transform: rotate(25deg) translateY(-140%);
+  animation: emblemLightSweep 9s ease-in-out infinite;
+}
+
+@keyframes emblemLightSweep {
+  0% {
+    transform: rotate(25deg) translateY(-140%);
+  }
+  16% {
+    transform: rotate(25deg) translateY(140%);
+  }
+  100% {
+    transform: rotate(25deg) translateY(140%);
+  }
+}
+
+/* Pause badge glisten during drag / spin */
+.floating-badge-coin-3d.is-spinning .badge-emblem-glisten,
+.floating-badge-coin-3d.is-dragging .badge-emblem-glisten {
+  opacity: 0;
+}
+
+.floating-badge-coin-3d.is-spinning .badge-emblem-glisten::before,
+.floating-badge-coin-3d.is-dragging .badge-emblem-glisten::before {
+  animation-play-state: paused;
+}
+
+/* 3. Bronze Border: Sits flush at Z = 0px directly connecting to the cylinder edge */
+.coin-flat-border {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  transform: translateZ(0px);
+  z-index: 10;
+}
+
+/* Dynamic Global Light Specular Shine on Border */
+.coin-border-shine {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateZ(0.6px);
+  pointer-events: none;
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(circle closest-side at center, transparent 0% 86.2%, #000 87.2%, #000 99.5%, transparent 100%);
+  mask-image: radial-gradient(circle closest-side at center, transparent 0% 86.2%, #000 87.2%, #000 99.5%, transparent 100%);
+  mix-blend-mode: screen;
+  opacity: 0.95;
+  z-index: 15;
+}
+
+/* Back Face: Unified manufactured medal with dark recessed enamel basin */
 .coin-face-back {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  transform: translateZ(calc(-1 * var(--coin-thickness, 18px) / 2)) rotateY(180deg);
+  transform: translateZ(calc(-1 * var(--coin-thickness, 12px) / 2)) rotateY(180deg);
   transform-style: preserve-3d;
   backface-visibility: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 35% 35%, #d99149 0%, #b7702c 52%, #8f521c 100%);
-  border: 4px solid #8f521c;
-  box-shadow: inset 0 0 16px rgba(60, 30, 8, 0.65),
-              inset 0 0 0 2px rgba(255, 235, 170, 0.35),
-              0 16px 28px rgba(0, 0, 0, 0.65);
+  background: radial-gradient(circle at 45% 45%, #1e1c1a 0%, #131211 65%, #0a0908 100%);
+  box-shadow: 0 0 0 0.5px #7a4515;
   overflow: hidden;
-  color: #381a03;
+  pointer-events: auto;
+  cursor: grab;
 }
 
-/* 3D Edge Cylinder (Reeded Edge colored with #b7702c) */
+/* 3D Edge Cylinder: Finely machined satin-milled bronze reeding */
 .coin-edge-cylinder {
   position: absolute;
   inset: 0;
@@ -503,107 +715,87 @@
   top: 50%;
   left: 50%;
   width: calc(var(--coin-radius, 140px) * 0.198);
-  height: var(--coin-thickness, 18px);
+  height: var(--coin-thickness, 12px);
   margin-left: calc(-1 * var(--coin-radius, 140px) * 0.099);
-  margin-top: calc(-0.5 * var(--coin-thickness, 18px));
+  margin-top: calc(-0.5 * var(--coin-thickness, 12px));
   transform-style: preserve-3d;
   backface-visibility: hidden;
-  background: repeating-linear-gradient(
-    to right,
-    #7a4515 0px,
-    #b7702c 1.2px,
-    #ffe2a4 2.4px,
-    #b7702c 3.6px,
-    #7a4515 5.5px
-  );
-  box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.7),
-              inset 0 -2px 2px rgba(0, 0, 0, 0.75);
+  background: repeating-linear-gradient(to right,
+      #8c4d1b 0px,
+      #b7702c 1.6px,
+      #cf8a42 2.8px,
+      #b7702c 4.0px,
+      #8c4d1b 5.6px);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 230, 180, 0.35),
+    inset 0 -1px 1px rgba(60, 25, 5, 0.55);
 }
 
-
-
-/* Diagonal Specular Light Flare Sweep */
-.coin-shine-sweep {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 9;
-  opacity: 1;
-  transition: opacity 0.2s ease;
-}
-
-/* Pause and hide glisten while spinning or dragging */
-.floating-badge-coin-3d.is-spinning .coin-shine-sweep {
-  opacity: 0;
-}
-
-.floating-badge-coin-3d.is-spinning .coin-shine-sweep::before {
-  animation-play-state: paused;
-}
-
-.coin-shine-sweep::before {
+/* Dynamic Global Light Specular Shine on 3D Edge Segments */
+.coin-edge-segment::after {
   content: '';
   position: absolute;
-  top: -60%;
-  left: -60%;
-  width: 220%;
-  height: 220%;
+  inset: 0;
   background: linear-gradient(
-    115deg,
-    transparent 38%,
-    rgba(255, 255, 255, 0.08) 44%,
-    rgba(255, 255, 255, 0.65) 50%,
-    rgba(255, 255, 255, 0.08) 56%,
-    transparent 62%
+    to bottom,
+    rgba(255, 245, 220, 0.55) 0%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 245, 220, 0.55) 100%
   );
-  transform: rotate(25deg) translateY(-120%);
-  animation: badgeLightSweep 4s ease-in-out infinite;
+  opacity: calc(
+    max(0, cos(var(--seg-angle, 0deg) - var(--border-light-angle, 135deg))) * 0.75 +
+    max(0, cos(var(--seg-angle, 0deg) - var(--border-light-angle, 135deg) - 180deg)) * 0.22
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
 }
 
-@keyframes badgeLightSweep {
-  0% {
-    transform: rotate(25deg) translateY(-120%);
-  }
-  30%, 100% {
-    transform: rotate(25deg) translateY(120%);
-  }
+/* Dynamic Shadow on Edge Segments Facing Away from Light */
+.coin-edge-segment::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(14, 6, 2, 0.65);
+  opacity: calc(max(0, sin(var(--seg-angle, 0deg) - var(--border-light-angle, 135deg))) * 0.45);
+  pointer-events: none;
 }
 
-/* Back Face Ornamentation */
+/* Back Face Stamped Minting Details (Dotted line removed) */
 .coin-back-inner-ring {
-  width: 82%;
-  height: 82%;
+  width: 78%;
+  height: 78%;
   border-radius: 50%;
-  border: 2px dashed rgba(60, 30, 8, 0.45);
-  box-shadow: inset 0 0 14px rgba(60, 30, 8, 0.25);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  z-index: 2;
+  gap: 2px;
 }
 
 .coin-back-stars {
-  font-size: 1.4rem;
-  color: #fff3c4;
-  text-shadow: 0 1px 3px rgba(60, 30, 8, 0.8),
-               0 0 10px rgba(255, 240, 180, 0.8);
+  font-size: 1.1rem;
+  color: #e09b4c;
+  letter-spacing: 0.22em;
+  text-shadow:
+    0 1px 0 rgba(255, 230, 175, 0.65),
+    0 -1px 0 rgba(35, 12, 2, 0.9),
+    0 2px 4px rgba(0, 0, 0, 0.85);
   margin-bottom: 2px;
   line-height: 1;
 }
 
-/* Cherish Ball Engraving */
+/* Cherish Ball Minted Relief */
 .coin-back-cherishball {
-  width: 72px;
-  height: 72px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
+  margin: 3px 0;
 }
 
 .cherishball-svg {
@@ -613,23 +805,225 @@
 }
 
 .coin-back-text {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 900;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #381a03;
-  text-shadow: 0 1px 0 rgba(255, 220, 170, 0.5),
-               0 2px 4px rgba(60, 30, 8, 0.3);
-  margin-top: 6px;
+  color: #d68f40;
+  text-shadow:
+    0 1px 0 rgba(255, 230, 175, 0.55),
+    0 -1px 0 rgba(35, 12, 2, 0.95),
+    0 2px 3px rgba(0, 0, 0, 0.85);
+  margin-top: 4px;
 }
 
 .coin-back-subtext {
-  font-size: 0.64rem;
+  font-size: 0.62rem;
   font-weight: 800;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
-  color: #542b0a;
-  text-shadow: 0 1px 0 rgba(255, 220, 170, 0.4);
+  color: #9e6428;
+  text-shadow: 0 1px 0 rgba(255, 220, 160, 0.3);
+}
+
+/* ── Tier Variations: Bronze, Silver, Gold, Diamond ─────────────────── */
+
+/* 1. Bronze Tier (Default) */
+.floating-badge-coin-3d.tier-bronze .coin-face-front,
+.floating-badge-coin-3d.tier-bronze .coin-face-back {
+  box-shadow: 0 0 0 0.5px #7a4515;
+}
+.floating-badge-coin-3d.tier-bronze .coin-edge-segment {
+  background: repeating-linear-gradient(to right,
+      #8c4d1b 0px,
+      #b7702c 1.6px,
+      #cf8a42 2.8px,
+      #b7702c 4.0px,
+      #8c4d1b 5.6px);
+}
+.floating-badge-coin-3d.tier-bronze .coin-back-stars {
+  color: #e09b4c;
+  text-shadow: 0 1px 0 rgba(255, 230, 175, 0.65), 0 -1px 0 rgba(35, 12, 2, 0.9), 0 2px 4px rgba(0, 0, 0, 0.85);
+}
+.floating-badge-coin-3d.tier-bronze .coin-back-text {
+  color: #d68f40;
+  text-shadow: 0 1px 0 rgba(255, 230, 175, 0.55), 0 -1px 0 rgba(35, 12, 2, 0.95), 0 2px 3px rgba(0, 0, 0, 0.85);
+}
+.floating-badge-coin-3d.tier-bronze .coin-back-subtext {
+  color: #9e6428;
+  text-shadow: 0 1px 0 rgba(255, 220, 160, 0.3);
+}
+.floating-badge-coin-3d.tier-bronze .coin-border-shine {
+  background: conic-gradient(
+    from var(--border-light-angle, 135deg),
+    transparent 0deg,
+    rgba(255, 235, 205, 0.15) 20deg,
+    rgba(255, 250, 235, 0.85) 45deg,
+    rgba(255, 235, 205, 0.15) 70deg,
+    transparent 95deg,
+    transparent 195deg,
+    rgba(255, 235, 205, 0.10) 210deg,
+    rgba(255, 245, 225, 0.45) 225deg,
+    rgba(255, 235, 205, 0.10) 240deg,
+    transparent 265deg
+  );
+}
+
+/* 2. Silver Tier */
+.floating-badge-coin-3d.tier-silver .coin-face-front,
+.floating-badge-coin-3d.tier-silver .coin-face-back {
+  box-shadow: 0 0 0 0.5px #64748b;
+}
+.floating-badge-coin-3d.tier-silver .coin-edge-segment {
+  background: repeating-linear-gradient(to right,
+      #334155 0px,
+      #64748b 1.6px,
+      #cbd5e1 2.8px,
+      #64748b 4.0px,
+      #334155 5.6px);
+  box-shadow:
+    inset 0 1px 1px rgba(241, 245, 249, 0.55),
+    inset 0 -1px 1px rgba(15, 23, 42, 0.7);
+}
+.floating-badge-coin-3d.tier-silver .coin-edge-segment::after {
+  background: linear-gradient(
+    to bottom,
+    rgba(203, 213, 225, 0.6) 0%,
+    rgba(255, 255, 255, 0.90) 50%,
+    rgba(203, 213, 225, 0.6) 100%
+  );
+}
+.floating-badge-coin-3d.tier-silver .coin-border-shine {
+  background: conic-gradient(
+    from var(--border-light-angle, 135deg),
+    transparent 0deg,
+    rgba(240, 248, 255, 0.20) 20deg,
+    rgba(255, 255, 255, 0.95) 45deg,
+    rgba(240, 248, 255, 0.20) 70deg,
+    transparent 95deg,
+    transparent 195deg,
+    rgba(240, 248, 255, 0.12) 210deg,
+    rgba(255, 255, 255, 0.55) 225deg,
+    rgba(240, 248, 255, 0.12) 240deg,
+    transparent 265deg
+  );
+}
+.floating-badge-coin-3d.tier-silver .coin-back-stars {
+  color: #cbd5e1;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 -1px 0 rgba(15, 23, 42, 0.95), 0 2px 4px rgba(0, 0, 0, 0.85);
+}
+.floating-badge-coin-3d.tier-silver .coin-back-text {
+  color: #94a3b8;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7), 0 -1px 0 rgba(15, 23, 42, 0.95), 0 2px 3px rgba(0, 0, 0, 0.85);
+}
+.floating-badge-coin-3d.tier-silver .coin-back-subtext {
+  color: #64748b;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+/* 3. Gold Tier */
+.floating-badge-coin-3d.tier-gold .coin-face-front,
+.floating-badge-coin-3d.tier-gold .coin-face-front,
+.floating-badge-coin-3d.tier-gold .coin-face-back {
+  box-shadow: 0 0 0 0.5px #b45309;
+}
+.floating-badge-coin-3d.tier-gold .coin-edge-segment {
+  background: repeating-linear-gradient(to right,
+      #92400e 0px,
+      #f59e0b 1.6px,
+      #fef08a 2.8px,
+      #f59e0b 4.0px,
+      #92400e 5.6px);
+  box-shadow:
+    inset 0 1px 1px rgba(254, 240, 138, 0.65),
+    inset 0 -1px 1px rgba(120, 53, 15, 0.7);
+}
+.floating-badge-coin-3d.tier-gold .coin-edge-segment::after {
+  background: linear-gradient(
+    to bottom,
+    rgba(254, 240, 138, 0.65) 0%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(254, 240, 138, 0.65) 100%
+  );
+}
+.floating-badge-coin-3d.tier-gold .coin-border-shine {
+  background: conic-gradient(
+    from var(--border-light-angle, 135deg),
+    transparent 0deg,
+    rgba(254, 240, 138, 0.20) 20deg,
+    rgba(255, 255, 245, 0.95) 45deg,
+    rgba(254, 240, 138, 0.20) 70deg,
+    transparent 95deg,
+    transparent 195deg,
+    rgba(254, 240, 138, 0.12) 210deg,
+    rgba(255, 250, 225, 0.55) 225deg,
+    rgba(254, 240, 138, 0.12) 240deg,
+    transparent 265deg
+  );
+}
+.floating-badge-coin-3d.tier-gold .coin-back-stars {
+  color: #fbbf24;
+  text-shadow: 0 1px 0 rgba(254, 249, 195, 0.85), 0 -1px 0 rgba(120, 53, 15, 0.95), 0 2px 4px rgba(0, 0, 0, 0.85);
+}
+.floating-badge-coin-3d.tier-gold .coin-back-text {
+  color: #f59e0b;
+  text-shadow: 0 1px 0 rgba(254, 249, 195, 0.8), 0 -1px 0 rgba(120, 53, 15, 0.95), 0 2px 3px rgba(0, 0, 0, 0.85);
+}
+.floating-badge-coin-3d.tier-gold .coin-back-subtext {
+  color: #b45309;
+  text-shadow: 0 1px 0 rgba(254, 240, 138, 0.4);
+}
+
+/* 4. Diamond Tier */
+.floating-badge-coin-3d.tier-diamond .coin-face-front,
+.floating-badge-coin-3d.tier-diamond .coin-face-back {
+  box-shadow: 0 0 0 0.5px #0284c7;
+}
+.floating-badge-coin-3d.tier-diamond .coin-edge-segment {
+  background: repeating-linear-gradient(to right,
+      #0369a1 0px,
+      #38bdf8 1.6px,
+      #e0f2fe 2.8px,
+      #38bdf8 4.0px,
+      #0369a1 5.6px);
+  box-shadow:
+    inset 0 1px 1px rgba(224, 242, 254, 0.6),
+    inset 0 -1px 1px rgba(8, 47, 73, 0.7);
+}
+.floating-badge-coin-3d.tier-diamond .coin-edge-segment::after {
+  background: linear-gradient(
+    to bottom,
+    rgba(186, 230, 253, 0.65) 0%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(186, 230, 253, 0.65) 100%
+  );
+}
+.floating-badge-coin-3d.tier-diamond .coin-border-shine {
+  background: conic-gradient(
+    from var(--border-light-angle, 135deg),
+    transparent 0deg,
+    rgba(186, 230, 253, 0.25) 20deg,
+    rgba(255, 255, 255, 0.95) 45deg,
+    rgba(186, 230, 253, 0.25) 70deg,
+    transparent 95deg,
+    transparent 195deg,
+    rgba(186, 230, 253, 0.15) 210deg,
+    rgba(224, 242, 254, 0.60) 225deg,
+    rgba(186, 230, 253, 0.15) 240deg,
+    transparent 265deg
+  );
+}
+.floating-badge-coin-3d.tier-diamond .coin-back-stars {
+  color: #38bdf8;
+  text-shadow: 0 1px 0 rgba(224, 242, 254, 0.9), 0 -1px 0 rgba(8, 47, 73, 0.95), 0 2px 4px rgba(0, 0, 0, 0.85);
+}
+.floating-badge-coin-3d.tier-diamond .coin-back-text {
+  color: #38bdf8;
+  text-shadow: 0 1px 0 rgba(224, 242, 254, 0.85), 0 -1px 0 rgba(8, 47, 73, 0.95), 0 2px 3px rgba(0, 0, 0, 0.85);
+}
+.floating-badge-coin-3d.tier-diamond .coin-back-subtext {
+  color: #0284c7;
+  text-shadow: 0 1px 0 rgba(186, 230, 253, 0.5);
 }
 
 /* Floor Shadow & Drag Hint */
@@ -692,7 +1086,7 @@
   width: fit-content;
   max-width: min(520px, calc(100vw - 120px));
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5),
-              0 0 20px rgba(0, 0, 0, 0.2);
+    0 0 20px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -755,3 +1149,89 @@
   border: 1px solid rgba(239, 68, 68, 0.35);
 }
 
+/* Interactive Tier Switcher Pills */
+.floating-badge-tier-selector {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  padding: 2px 3px;
+  gap: 3px;
+}
+
+.floating-badge-tier-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 0.70rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  letter-spacing: 0.03em;
+  user-select: none;
+}
+
+.floating-badge-tier-pill:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.floating-badge-tier-pill .tier-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.floating-badge-tier-pill.tier-bronze .tier-dot {
+  background: #d97736;
+  box-shadow: 0 0 5px rgba(217, 119, 54, 0.6);
+}
+.floating-badge-tier-pill.tier-silver .tier-dot {
+  background: #94a3b8;
+  box-shadow: 0 0 5px rgba(148, 163, 184, 0.7);
+}
+.floating-badge-tier-pill.tier-gold .tier-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.7);
+}
+.floating-badge-tier-pill.tier-diamond .tier-dot {
+  background: #38bdf8;
+  box-shadow: 0 0 5px rgba(56, 189, 248, 0.7);
+}
+
+/* Active Selected State */
+.floating-badge-tier-pill.is-active {
+  color: #ffffff;
+}
+
+.floating-badge-tier-pill.tier-bronze.is-active {
+  background: rgba(183, 112, 44, 0.28);
+  border-color: rgba(217, 119, 54, 0.55);
+  box-shadow: 0 0 10px rgba(183, 112, 44, 0.35);
+}
+
+.floating-badge-tier-pill.tier-silver.is-active {
+  background: rgba(148, 163, 184, 0.25);
+  border-color: rgba(226, 232, 240, 0.55);
+  box-shadow: 0 0 10px rgba(226, 232, 240, 0.35);
+}
+
+.floating-badge-tier-pill.tier-gold.is-active {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: rgba(251, 191, 36, 0.65);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+}
+
+.floating-badge-tier-pill.tier-diamond.is-active {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: rgba(56, 189, 248, 0.65);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+}
