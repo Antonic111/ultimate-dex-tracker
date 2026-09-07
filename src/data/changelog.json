@@ -1,477 +1,722 @@
 [
   {
-    "date": "2026-08-30",
     "version": "v1.2.1",
-    "type": "feature",
-    "title": "",
-    "description": "",
-    "features": [
-      "Revamped the Favorites section on profile pages, adding support for favorite Trainers and Poké Balls, along with additional games that can now be selected as favorites even if they aren’t tracked by the site.",
-      "Added V1 of Streamer Tools, allowing you to create customizable OBS and Streamlabs overlays that connect directly to the Counters page and dynamically display your active hunts and their details in real time.",
-      "Added a new Membership page, allowing users to purchase a monthly membership and unlock additional benefits across the site.",
-      "Added the ability for members to apply a custom animated gradient to their profile name for even more profile customization.",
-      "Revamped how we edit profile information on the page to prevent page shifting and a cleaner/easier experience."
-    ],
-    "fixes": [
-      "Updated the Counters page history to properly display phases and fails instead of incorrectly showing the hunt target.",
-      "Updated the phase list on the Counters page to show the correct overall count for all phases and fails, instead of counting each one individually.",
-      "Attempted to improve legacy hunt compatibility on the Counters page to more accurately work with the new revamped system.",
-      "Fixed an issue where increasing a hunt’s increment value could break the hunt, stop the timer from progressing, and cause the value to reset after refreshing the page.",
-      "Fixed an issue where new catches were not appearing in the Global Feed, and improved the animations when entries are added or removed.",
-      "Fixed an issue where failed Google or Discord login/register attempts could leave the buttons stuck loading indefinitely, requiring a page refresh before trying again.",
-      "Added consistent sprite trimming across the entire site, removing unnecessary empty space for a cleaner and more uniform appearance.",
-      "Attempted to improve Light Mode across the site for better readability and consistency. Dark Mode is still highly recommended lol.",
-      "Fixed an issue where caught Pokémon could incorrectly appear as uncaught when viewing another user's public Full Dex.",
-      "Made the header sticky on all pages.",
-      "Fixed an issue where locked Pokémon on your own account could incorrectly remain hidden when viewing another user's public profile with no lock settings enabled.",
-      "Fixed an issue where viewing another user's profile with HOME sprites could display inconsistent sprites if you had Gen 5 sprites enabled. Sprites will now correctly follow your account settings.",
-      "Added more visuals and improved existing images in the third section of the landing page for a more polished and engaging presentation.",
-      "Changed the role SVGs to more detailed versions.",
-      "Removed the stroked background behind the sprites in the sidebar."
+    "date": "2026-08-30",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added V1 of **Streamer Tools**, allowing you to create customizable OBS and Streamlabs overlays that connect directly to the **Counters page** and dynamically display your active hunts and their details in real time.",
+          "Added a new **Membership page**, allowing users to purchase a monthly membership and unlock additional benefits across the site.",
+          "Added the ability for members to apply a custom animated gradient to their profile name for even more profile customization."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Revamped the **Favorites** section on profile pages, adding support for favorite **Trainers** and **Poké Balls**, along with additional games that can now be selected as favorites even if they aren’t tracked by the site.",
+          "Revamped how we edit profile information on the page to prevent page shifting and a cleaner/easier experience.",
+          "Updated the **Counters page** history to properly display phases and fails instead of incorrectly showing the hunt target.",
+          "Updated the phase list on the **Counters page** to show the correct overall count for all phases and fails, instead of counting each one individually.",
+          "Added consistent sprite trimming across the entire site, removing unnecessary empty space for a cleaner and more uniform appearance.",
+          "Made the header sticky on all pages.",
+          "Added more visuals and improved existing images in the third section of the landing page for a more polished and engaging presentation.",
+          "Changed the role SVGs to more detailed versions."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Attempted to improve legacy hunt compatibility on the **Counters page** to more accurately work with the new revamped system.",
+          "Fixed an issue where increasing a hunt’s increment value could break the hunt, stop the timer from progressing, and cause the value to reset after refreshing the page.",
+          "Fixed an issue where new catches were not appearing in the **Global Feed**, and improved the animations when entries are added or removed.",
+          "Fixed an issue where failed Google or Discord login/register attempts could leave the buttons stuck loading indefinitely, requiring a page refresh before trying again.",
+          "Attempted to improve **Light Mode** across the site for better readability and consistency. **Dark Mode** is still highly recommended lol.",
+          "Fixed an issue where caught Pokémon could incorrectly appear as uncaught when viewing another user's public **Full Dex**.",
+          "Fixed an issue where locked Pokémon on your own account could incorrectly remain hidden when viewing another user's public profile with no lock settings enabled.",
+          "Fixed an issue where viewing another user's profile with **HOME sprites** could display inconsistent sprites if you had **Gen 5 sprites** enabled. Sprites will now correctly follow your account settings."
+        ]
+      },
+      {
+        "type": "removed",
+        "items": [
+          "Removed the stroked background behind the sprites in the sidebar."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-08-23",
     "version": "v1.2.0",
-    "type": "feature",
-    "title": "",
-    "description": "",
-    "features": [
-      "Added Google and Discord login/register support, making it easier to create an account or sign in. Existing users can also link their Google or Discord account from the Settings page for faster login without creating a duplicate account.",
-      "Completely revamped the Counters page with improved stability, significantly upgraded design and overall functionality and added phase and fail tracking.",
-      "Carried over the revamped modals and improved flow from the Counters page to the MMO Tools page for a more modern look and smoother experience.",
-      "Completely revamped the sites settings page for a cleaner visual presentation.",
-      "Added a Reset All Collection Data setting in the settings page.",
-      "Expanded on our privacy settings in the settings page to allow you to set specific things to private or public.",
-      "Completely revamped the sites landing page with a more polished and modern visual design to better encourange people to use the site.",
-      "Completely revamped the sites footer with a more polished and modern visual while also decreasing the size so it does not take as much space.",
-      "Completely revamped the trainers page with a more polished and modern visual design to better display trainer cards and show interesting global stats.",
-      "Added a Leaderboard page accessible from the Trainers page, showcasing the top 50 trainers.",
-      "Added skeleton loaders throughout the site to make page transitions feel smoother and more polished.",
-      "Added Origin Ball Dialga and Origin Ball Palkia to the regular Other Forms category.",
-      "Revamped buttons, fields and modals across the entire site for a cleaner, more consistent look and feel.",
-      "Added a notice to the Shiny Charm modal explaining how the feature works.",
-      "Added Privacy Policy & Terms of Service pages for future legal purposes.",
-      "Revamped every single page related to login/register.",
-      "Added a Notifications section to the header, allowing admins to instantly share important announcements and updates with all users.",
-      "Added a Fails section to the sidebar. Fails can be tracked through the Counters page, appear in red on uncaught Pokémon in the grid, and can now be found using the search filters.",
-      "Restyled dividers across the site for a cleaner and more consistent appearance.",
-      "Synced page animations and header spacing across the site for a cleaner and more consistent experience.",
-      "Added an checkbox option to the Type search filter dropdown to search specifically for Pokémon with dual typings.",
-      "Added the option to make progress bars for categories, example - Legendary, Mythical, Paradox, etc",
-      "Added default avatars with the option to upload a custom profile image, including AI-powered NSFW detection for added safety."
-    ],
-    "fixes": [
-      "Prevented entries from private profiles from appearing on the global live feed.",
-      "Fixed an issue where caught Pokémon in the global feed would remain visible after being marked as uncaught.",
-      "Fixed an issue where evolved Pokémon would display incorrect shiny odds after evolving in the sidebar.",
-      "Updated Alpha Pokémon so they can now only be caught in Pokémon Legends: Z-A and Pokémon Legends: Arceus.",
-      "Moved Checks and Modifiers to the Catch Info section while editing, while keeping them under Hunt Details when viewing an entry.",
-      "Selecting Pokémon Legends: Arceus will now automatically clear any incompatible Poké Ball, preventing illegal ball combinations.",
-      "Removed the Origin Ball as an available Poké Ball option, as it cannot be used to catch Pokémon.",
-      "The Shiny Charm modifier will now be automatically selected when adding a new entry if the selected game has the Shiny Charm acquired.",
-      "Selecting Perfect Research in the sidebar will now automatically select Research Level 10 in Pokémon Legends: Arceus.",
-      "Hopefully fixed an issue where Pokémon sprites could fail to appear for hunts on the Counter and MMO Tool pages.",
-      "Assigned each game its own set of obtainable Poké Balls, helping prevent illegal ball combinations when creating entries.",
-      "Updated the Caught In Game, Ball Caught, Mark/Ribbon, and Hunt Method searches to only show values associated with Pokémon you've actually caught.",
-      "Replaced the custom bad word filter with a more advanced online filtering system for better detection and fewer false positives.",
-      "Fixed an issue where the sidebar displayed an unnecessary gap when the scrollbar wasn't visible.",
-      "Removed gender forms from appearing when filtering by Pokémon catchable in Red, Green, Blue, and Yellow.",
-      "Removed alpha unowns from appearing when filtering by Pokémon catchable in any games outside Legends Arceus."
+    "date": "2026-08-23",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added Google and Discord login/register support, making it easier to create an account or sign in. Existing users can also link their Google or Discord account from the Settings page for faster login without creating a duplicate account.",
+          "Carried over the revamped modals and improved flow from the **Counters page** to the **MMO Tools page** for a more modern look and smoother experience.",
+          "Added a **Reset All Collection Data** setting in the **Settings page**.",
+          "Expanded on our privacy settings in the **Settings page** to allow you to set specific things to private or public.",
+          "Added a **Leaderboard page** accessible from the **Trainers page**, showcasing the top 50 trainers.",
+          "Added **Origin Ball Dialga** and **Origin Ball Palkia** to the regular **Other Forms** category.",
+          "Added **Privacy Policy & Terms of Service** pages for future legal purposes.",
+          "Added a Notifications section to the header, allowing admins to instantly share important announcements and updates with all users.",
+          "Added a **Fails** section to the sidebar. Fails can be tracked through the **Counters page**, appear in red on uncaught Pokémon in the grid, and can now be found using the search filters.",
+          "Added the option to make progress bars for categories, example - **Legendary**, **Mythical**, **Paradox**, etc",
+          "Added default avatars with the option to upload a custom profile image, including AI-powered NSFW detection for added safety."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Completely revamped the **Counters page** with improved stability, significantly upgraded design and overall functionality and added phase and fail tracking.",
+          "Completely revamped the sites **Settings page** for a cleaner visual presentation.",
+          "Completely revamped the sites landing page with a more polished and modern visual design to better encourange people to use the site.",
+          "Completely revamped the sites footer with a more polished and modern visual while also decreasing the size so it does not take as much space.",
+          "Completely revamped the **Trainers page** with a more polished and modern visual design to better display trainer cards and show interesting global stats.",
+          "Added skeleton loaders throughout the site to make page transitions feel smoother and more polished.",
+          "Revamped buttons, fields and modals across the entire site for a cleaner, more consistent look and feel.",
+          "Added a notice to the **Shiny Charm** modal explaining how the feature works.",
+          "Revamped every single page related to login/register.",
+          "Restyled dividers across the site for a cleaner and more consistent appearance.",
+          "Synced page animations and header spacing across the site for a cleaner and more consistent experience.",
+          "Added an checkbox option to the **Type** search filter dropdown to search specifically for Pokémon with dual typings.",
+          "Updated **Alpha Pokémon** so they can now only be caught in **Pokémon Legends: Z-A** and **Pokémon Legends: Arceus**.",
+          "Moved **Checks** and **Modifiers** to the **Catch Info** section while editing, while keeping them under **Hunt Details** when viewing an entry.",
+          "Selecting **Pokémon Legends: Arceus** will now automatically clear any incompatible Poké Ball, preventing illegal ball combinations.",
+          "Selecting **Perfect Research** in the sidebar will now automatically select **Research Level 10** in **Pokémon Legends: Arceus**.",
+          "Assigned each game its own set of obtainable Poké Balls, helping prevent illegal ball combinations when creating entries.",
+          "Updated the **Caught In Game**, **Ball Caught**, **Mark/Ribbon**, and **Hunt Method** searches to only show values associated with Pokémon you've actually caught.",
+          "Replaced the custom bad word filter with a more advanced online filtering system for better detection and fewer false positives."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Prevented entries from private profiles from appearing on the global live feed.",
+          "Fixed an issue where caught Pokémon in the global feed would remain visible after being marked as uncaught.",
+          "Fixed an issue where evolved Pokémon would display incorrect shiny odds after evolving in the sidebar.",
+          "The **Shiny Charm** modifier will now be automatically selected when adding a new entry if the selected game has the Shiny Charm acquired.",
+          "Hopefully fixed an issue where Pokémon sprites could fail to appear for hunts on the **Counter** and **MMO Tool** pages.",
+          "Fixed an issue where the sidebar displayed an unnecessary gap when the scrollbar wasn't visible."
+        ]
+      },
+      {
+        "type": "removed",
+        "items": [
+          "Removed the **Origin Ball** as an available Poké Ball option, as it cannot be used to catch Pokémon.",
+          "Removed gender forms from appearing when filtering by Pokémon catchable in **Red, Green, Blue, and Yellow**.",
+          "Removed alpha unowns from appearing when filtering by Pokémon catchable in any games outside **Legends Arceus**."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-08-17",
     "version": "v1.1.9",
-    "type": "feature",
-    "title": "",
-    "description": "",
-    "features": [
-      "Completely revamped the profile page with a more polished and modern visual design.",
-      "Completely revamped the sidebar with a more polished and modern visual design and improved functionality.",
-      "Added two new sidebar actions: Duplicate Entry and Copy Summary.",
-      "Added an interactive onboarding tutorial for new users. Existing users can replay it anytime from the Settings page by clicking **Replay Tutorial**.",
-      "Added a 'Recommended Balls' section to each Pokémon's sidebar, displaying the best Poké Balls for both regular and shiny forms based on color matching.",
-      "The shiny toggle now becomes sticky beneath the header while scrolling, keeping it accessible as you browse the Pokédex.",
-      "Added the ability to display your Pokémon GO Friend Code on your profile page.",
-      "Added icons for Nintendo Switch Friend Code and Pokémon GO Friend Code to improve profile readability.",
-      "Added a **Show Full Box** toggle when searching for a Pokémon. When enabled, the entire box is displayed, making it easier to match and sort Pokémon with Pokémon HOME.",
-      "Added a new **Mighty Pokémon** category containing all Mightiest Mark event raid Pokémon (visible only when viewing the regular Pokédex).",
-      "Replaced traditional categories that rendered all 2,000+ Pokémon at once with category tabs, significantly improving performance and functionality.",
-      "Added more accent color options and improved the color selector visuals in both Settings and the onboarding setup.",
-      "Added a dedicated **Full Stats** page accessible from the Collection Overview section on trainer profiles, featuring in-depth analytics for generations (Gen 1-9), categories, Poké Ball vaults, marks & ribbons, games, and hunt methods.",
-      "Added a 1/8,192 chance to encounter a special Easter egg logo when visiting the site.",
-      "Visually improved all emails sent by the site, including authentication and password reset emails, for a cleaner and more polished look."
-    ],
-    "fixes": [
-      "Updated all social links to direct to antonic.ca instead of solo.to, and updated handles to reflect the username change from antonic111 to official-antonic.",
-      "Added a confirmation modal that warns users before leaving or refreshing the Profile Edit page with unsaved changes.",
-      "Collapsed categories now remain collapsed when switching between regular and shiny Pokémon.",
-      "Fixed an issue where the console would log an authentication error when accessing the site while not logged in.",
-      "Merged the public profile and personal profile pages into a single shared profile implementation.",
-      "Fixed Galarian Mr. Mime and Alpha Galarian Mr. Mime names to correctly include the period (.) in their names.",
-      "Fixed an issue where Pokémon Legends: Arceus modifiers were not being selected correctly when adding a Pokémon while the Legends: Arceus Shiny Charm was saved to the account.",
-      "Removed the Mightiest Mark option from every Pokemon besides the Mighty category.",
-      "Implemented numerous performance optimizations to reduce resource usage and hosting costs since I am paying out of pocket for this website and not making anything :)",
-      "Merged Alpha Gender's & Other's into the Alpha Forms category to simplify and clean up the category structure.",
-      "Split the site logo into three separate layers to enable future accent color customization and theming improvements.",
-      "Added a simple transition animation to Pokémon when switching between categories.",
-      "Fixed an issue where the sticky header would disappear while a modal was open.",
-      "Blended the obtainable game icons into the sidebar for a cleaner, more polished look.",
-      "Replaced the Pokémon HOME sprite toggle in the settings with a visual selector that includes sprite previews."
+    "date": "2026-08-17",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added two new sidebar actions: **Duplicate Entry** and **Copy Summary**.",
+          "Added an interactive onboarding tutorial for new users. Existing users can replay it anytime from the Settings page by clicking **Replay Tutorial**.",
+          "Added a **\"Recommended Balls\"** section to each Pokémon's sidebar, displaying the best Poké Balls for both regular and shiny forms based on color matching.",
+          "Added the ability to display your **Pokémon GO Friend Code** on your profile page.",
+          "Added icons for **Nintendo Switch Friend Code** and **Pokémon GO Friend Code** to improve profile readability.",
+          "Added a **Show Full Box** toggle when searching for a Pokémon. When enabled, the entire box is displayed, making it easier to match and sort Pokémon with Pokémon HOME.",
+          "Added a new **Mighty Pokémon** category containing all Mightiest Mark event raid Pokémon (visible only when viewing the regular Pokédex).",
+          "Added more accent color options and improved the color selector visuals in both Settings and the onboarding setup.",
+          "Added a dedicated **Full Stats** page accessible from the **Collection Overview** section on trainer profiles, featuring in-depth analytics for generations (Gen 1-9), categories, Poké Ball vaults, marks & ribbons, games, and hunt methods.",
+          "Added a 1/8,192 chance to encounter a special Easter egg logo when visiting the site."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Completely revamped the profile page with a more polished and modern visual design.",
+          "Completely revamped the sidebar with a more polished and modern visual design and improved functionality.",
+          "The **shiny toggle** now becomes sticky beneath the header while scrolling, keeping it accessible as you browse the Pokédex.",
+          "Replaced traditional categories that rendered all 2,000+ Pokémon at once with category tabs, significantly improving performance and functionality.",
+          "Visually improved all emails sent by the site, including authentication and password reset emails, for a cleaner and more polished look.",
+          "Updated all social links to direct to antonic.ca instead of solo.to, and updated handles to reflect the username change from antonic111 to official-antonic.",
+          "Merged the public profile and personal profile pages into a single shared profile implementation.",
+          "Implemented numerous performance optimizations to reduce resource usage and hosting costs since I am paying out of pocket for this website and not making anything :)",
+          "Merged **Alpha Gender's & Other's** into the **Alpha Forms** category to simplify and clean up the category structure.",
+          "Split the site logo into three separate layers to enable future accent color customization and theming improvements.",
+          "Blended the obtainable game icons into the sidebar for a cleaner, more polished look.",
+          "Replaced the **Pokémon HOME** sprite toggle in the settings with a visual selector that includes sprite previews."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Added a confirmation modal that warns users before leaving or refreshing the Profile Edit page with unsaved changes.",
+          "Collapsed categories now remain collapsed when switching between regular and shiny Pokémon.",
+          "Fixed an issue where the console would log an authentication error when accessing the site while not logged in.",
+          "Fixed **Galarian Mr. Mime** and **Alpha Galarian Mr. Mime** names to correctly include the period (.) in their names.",
+          "Fixed an issue where **Pokémon Legends: Arceus** modifiers were not being selected correctly when adding a Pokémon while the **Legends: Arceus Shiny Charm** was saved to the account.",
+          "Added a simple transition animation to Pokémon when switching between categories.",
+          "Fixed an issue where the sticky header would disappear while a modal was open."
+        ]
+      },
+      {
+        "type": "removed",
+        "items": [
+          "Removed the **Mightiest Mark** option from every Pokemon besides the **Mighty** category."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-07-12",
     "version": "v1.1.8",
-    "type": "feature",
-    "title": "",
-    "description": "",
-    "features": [
-      "Added a new settings toggle to switch all site-wide Pokémon sprites between the default Gen 5 pixel sprites and Pokémon HOME-style sprites."
-    ],
-    "fixes": []
+    "date": "2026-07-12",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added a new settings toggle to switch all site-wide Pokémon sprites between the default **Gen 5** pixel sprites and **Pokémon HOME**-style sprites."
+        ]
+      }
+    ]
   },
   {
-    "date": "2026-07-10",
     "version": "v1.1.7",
-    "type": "feature",
-    "title": "",
-    "description": "",
-    "features": [
-      "Added a desktop-only Live Activity Feed to the main grid, displaying recent Pokémon catches from users across the site.",
-      "Added sidebar tabs to separate Data and Info, reducing vertical scrolling and making navigation easier.",
-      "Added the ability to track nicknames for each Pokémon you catch.",
-      "Replaced the \"Leave a Tip\" buttons in the header and footer with a floating Ko-fi tip button in the bottom left corner."
-    ],
-    "fixes": [
-      "Ultra Wormhole encounter odds in the sidebar have been updated to display as 1%–36% instead of 1/4096.",
-      "Scarlet & Violet Outbreak + Level 3 Sandwich shiny odds have been corrected to 1/512 without any check data.",
-      "Strange Ball can now be assigned to all Pokémon.",
-      "Editing a Pokémon that was previously marked as Caught will no longer create a duplicate entry in the Recent Entries section. Only newly added entries will appear there.",
-      "Pokémon HOME entries no longer display shiny odds, and the Checks field in the sidebar is now disabled since gift Pokémon from HOME cannot be checked.",
-      "Fixed a form name mismatch affecting Shiny Furfrou.",
-      "Upscaled the Natural Form Furfrou regular, shiny, and alpha sprites to match the sizing of the other Furfrou forms."
+    "date": "2026-07-10",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added a desktop-only **Live Activity Feed** to the main grid, displaying recent Pokémon catches from users across the site.",
+          "Added sidebar tabs to separate **Data** and **Info**, reducing vertical scrolling and making navigation easier.",
+          "Added the ability to track nicknames for each Pokémon you catch."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Replaced the **\"Leave a Tip\"** buttons in the header and footer with a floating **Ko-fi** tip button in the bottom left corner.",
+          "**Ultra Wormhole** encounter odds in the sidebar have been updated to display as **1%–36%** instead of **1/4096**.",
+          "**Scarlet & Violet** Outbreak + Level 3 Sandwich shiny odds have been corrected to **1/512** without any check data.",
+          "**Strange Ball** can now be assigned to all Pokémon.",
+          "Editing a Pokémon that was previously marked as **Caught** will no longer create a duplicate entry in the **Recent Entries** section. Only newly added entries will appear there.",
+          "**Pokémon HOME** entries no longer display shiny odds, and the **Checks** field in the sidebar is now disabled since gift Pokémon from **HOME** cannot be checked.",
+          "Upscaled the **Natural Form Furfrou** regular, shiny, and alpha sprites to match the sizing of the other Furfrou forms."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Fixed a form name mismatch affecting **Shiny Furfrou**."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-06-29",
     "version": "v1.1.6",
-    "type": "fix",
-    "title": "",
-    "description": "",
-    "features": [],
-    "fixes": [
-      "Added support for hunting non-Alpha Pokémon in the Legends: Arceus MMO Tool page.",
-      "In the Counters page, permutation hunts can no longer be completed from this view, as this was causing issues.",
-      "Added Eternal Floette forme and marked it as unobtainable in the shiny list, displaying a lock icon over it.",
-      "Added Keldeo Resolute forme and marked it as unobtainable in the shiny list, displaying a lock icon over it.",
-      "Added Alpha Garden Forme Vivillon and marked it as unobtainable in the shiny list, displaying a lock icon over it.",
-      "Fixed an issue where locked Pokémon could still be viewed in the sidebar and marked as caught or have data added.",
-      "Fixed multiple issues where Pokémon were not appearing in the recent catches bar on the profile page after being marked as caught.",
-      "Added Pokémon HOME as a game to allow HOME gift rewards to be tracked and recorded accurately.",
-      "Updated the **Track 2,067 Pokémon Forms & Variants** counter on the homepage to automatically update whenever new Pokémon are added.",
-      "Fixed an issue on the homepage where only regular Pokémon sprites were displayed instead of a mix of regular and shiny sprites.",
-      "Reworded **Pokémon Caught Worldwide** to **Pokémon Tracked Worldwide** on the public home page.",
-      "Added a new badge to the changelog tab in the header that highlights updates you haven't viewed yet, just like this one!",
-      "Fixed an autofill issue on the Settings page affecting Google Chrome users.",
-      "Added a **Leave a Tip** button to the header so users can optionally support the site and help with upkeep. All tips are completely optional and greatly appreciated.",
-      "Replaced the MMO Tool SVG to something more fitting.",
-      "Fixed an issue where evolutions with regional pre-evolutions were displaying the incorrect regional form.",
-      "Hidden the evolution chain section in the sidebar for Pokémon that do not have any evolutions."
+    "date": "2026-06-29",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added support for hunting non-Alpha Pokémon in the **Legends: Arceus MMO Tool** page.",
+          "Added **Eternal Floette** forme and marked it as unobtainable in the shiny list, displaying a lock icon over it.",
+          "Added **Keldeo Resolute** forme and marked it as unobtainable in the shiny list, displaying a lock icon over it.",
+          "Added **Alpha Garden Forme Vivillon** and marked it as unobtainable in the shiny list, displaying a lock icon over it.",
+          "Added **Pokémon HOME** as a game to allow **HOME** gift rewards to be tracked and recorded accurately.",
+          "Added a new badge to the **Changelog** tab in the header that highlights updates you haven't viewed yet, just like this one!",
+          "Added a **Leave a Tip** button to the header so users can optionally support the site and help with upkeep. All tips are completely optional and greatly appreciated."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "In the **Counters page**, permutation hunts can no longer be completed from this view, as this was causing issues.",
+          "Updated the **Track 2,067 Pokémon Forms & Variants** counter on the homepage to automatically update whenever new Pokémon are added.",
+          "Reworded **Pokémon Caught Worldwide** to **Pokémon Tracked Worldwide** on the public home page.",
+          "Replaced the **MMO Tool** SVG to something more fitting.",
+          "Hidden the evolution chain section in the sidebar for Pokémon that do not have any evolutions."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Fixed an issue where locked Pokémon could still be viewed in the sidebar and marked as caught or have data added.",
+          "Fixed multiple issues where Pokémon were not appearing in the recent catches bar on the profile page after being marked as caught.",
+          "Fixed an issue on the homepage where only regular Pokémon sprites were displayed instead of a mix of regular and shiny sprites.",
+          "Fixed an autofill issue on the Settings page affecting Google Chrome users.",
+          "Fixed an issue where evolutions with regional pre-evolutions were displaying the incorrect regional form."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-06-18",
     "version": "v1.1.5",
-    "type": "feature",
-    "title": "",
-    "description": "",
-    "features": [
-      "Added the MMO Tools page, featuring a comprehensive Pokémon Legends: Arceus Permutation Hunt Tracker fully integrated with the main Dex and Counters pages for seamless hunt tracking and progress management."
-    ],
-    "fixes": [
-      "Fixed an issue where the Favorite Games and Favorite Pokémon sections were not visible on public profile pages.",
-      "Updated the public homepage to display shiny Pokémon sprites instead of standard sprites.",
-      "Fixed a issue where viewing someones public profile page was not showing the Favorite Games and Favorite Pokemon sections."
+    "date": "2026-06-18",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added the **MMO Tools page**, featuring a comprehensive **Pokémon Legends: Arceus Permutation Hunt Tracker** fully integrated with the main Dex and **Counters pages** for seamless hunt tracking and progress management."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Updated the public homepage to display shiny Pokémon sprites instead of standard sprites."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Fixed an issue where the **Favorite Games** and **Favorite Pokémon** sections were not visible on public profile pages.",
+          "Fixed a issue where viewing someones public profile page was not showing the **Favorite Games** and **Favorite Pokemon** sections."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-05-31",
     "version": "v1.1.4",
-    "type": "feature",
-    "title": "",
-    "description": "",
-    "features": [
-      "Added an option on the profile page to request a Content Creator role for Twitch or YouTube accounts.",
-      "Verified Content Creators will get a badge on their profile and in the trainers page.",
-      "Verified Content Creators can add and edit YouTube/Twitch links on their profile.",
-      "Redisigned the site header for a better visual look and functionality.",
-      "Moved the **Report a Bug** and **Request a Feature** sections out of the Changelog page and into their own dedicated tabs, making them easier to find and more visible to users.",
-      "Added support for Google Autofill on all the login/register related pages, making it easier and faster to sign in using saved credentials.",
-      "Added tooltips on the profile page so that hovering over games, Poké Balls, and marks now displays their full item names.",
-      "Added some improvments and stats to the sites landing page."
-    ],
-    "fixes": [
-      "Fixed some security issues.",
-      "Added the divider bar to the **Changelog** and **Feedback** pages for consistency with the rest of the site.",
-      "Website accent colors are now saved to your account, allowing your color preferences to sync across devices and persist between sessions.",
-      "Fixed some admin related issues.",
-      "Fixed the **Remember Me** checkbox on the login page. It should now correctly keep you signed in when enabled.",
-      "Implemented various SEO improvements to enhance search engine visibility and improve how the website appears in Google search results.",
-      "Fixed the save button in the profile picture modal so it now correctly matches the site’s accent color.",
-      "Profile picture changes now update the site header instantly without requiring a page refresh.",
-      "Profile page pictures are now slightly zoomed in for a more natural appearance.",
-      "Made badges and icons in the profile page slightly bigger and better aligned.",
-      "If a trainer does not have a bio set it will now show nothing in the trainers page instead of **No bio yet**",
-      "Maintenance mode banner has some visual improvments."
+    "date": "2026-05-31",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added an option on the profile page to request a **Content Creator** role for **Twitch** or **YouTube** accounts.",
+          "Verified **Content Creators** will get a badge on their profile and in the **Trainers page**.",
+          "Verified **Content Creators** can add and edit **YouTube**/**Twitch** links on their profile.",
+          "Added support for **Google Autofill** on all the login/register related pages, making it easier and faster to sign in using saved credentials."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Redisigned the site header for a better visual look and functionality.",
+          "Moved the **Report a Bug** and **Request a Feature** sections out of the Changelog page and into their own dedicated tabs, making them easier to find and more visible to users.",
+          "Added tooltips on the profile page so that hovering over games, Poké Balls, and marks now displays their full item names.",
+          "Added some improvments and stats to the sites landing page.",
+          "Added the divider bar to the **Changelog** and **Feedback** pages for consistency with the rest of the site.",
+          "Website accent colors are now saved to your account, allowing your color preferences to sync across devices and persist between sessions.",
+          "Profile picture changes now update the site header instantly without requiring a page refresh.",
+          "Profile page pictures are now slightly zoomed in for a more natural appearance.",
+          "Made badges and icons in the profile page slightly bigger and better aligned.",
+          "If a trainer does not have a bio set it will now show nothing in the trainers page instead of **No bio yet**",
+          "Maintenance mode banner has some visual improvments."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Fixed some admin related issues.",
+          "Fixed the **Remember Me** checkbox on the login page. It should now correctly keep you signed in when enabled.",
+          "Implemented various SEO improvements to enhance search engine visibility and improve how the website appears in Google search results.",
+          "Fixed the save button in the profile picture modal so it now correctly matches the site’s accent color."
+        ]
+      },
+      {
+        "type": "security",
+        "items": [
+          "Fixed some security issues."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-04-17",
     "version": "v1.1.3",
-    "type": "feature",
-    "title": "",
-    "description": "",
-    "features": [
-      "Added the ability to pop-out hunts on the counters page."
-    ],
-    "fixes": [
-      "Removed the hotkey display in the counters page on mobile phones.",
-      "Changed Hunt History to just History on the counters page to better fit on mobile.",
-      "Evolving Pokemon with multiple evolve paths will now give you an option to select the evolution."
+    "date": "2026-04-17",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added the ability to pop-out hunts on the **Counters page**."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Changed **\"Hunt History\"** to just **\"History\"** on the **Counters page** to better fit on mobile.",
+          "Evolving Pokemon with multiple evolve paths will now give you an option to select the evolution."
+        ]
+      },
+      {
+        "type": "removed",
+        "items": [
+          "Removed the hotkey display in the **Counters page** on mobile phones."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-04-06",
     "version": "v1.1.2",
-    "type": "feature",
-    "title": "",
-    "description": "",
-    "features": [
-      "Added a new Maintenance screen that will now warn people and remind them to save when the website is about to go down for future updates etc.",
-      "Added to ability to add multiple Pokemon to a BINGO slot and they will slideshow through the sprites.",
-      "Added a evolve feature to Pokemon in the sidebar that sends the Mons data to its evolutions if any.",
-      "Added the ability to assign a hotkey to up the checks in the Counters page.",
-      "Added a history section to the Counters page to view your recent hunts."
-    ],
-    "fixes": [
-      "Fixed broken sprites for Alpha Rotoms and Alpha Wormadams.",
-      "Fixed a issue where all the Alpha Genders & Other's Box's were showing number 1 instead of increasing each box.",
-      "Fixed a issue where Pokemon that should be locked were becoming unlocked while adding new data to the site.",
-      "Fixed a issue where the recent entries on the profile page were not updating when a new entry was added.",
-      "Multiple admin related fixes.",
-      "Many page shift fixes and interaction speed fixes for improved user experience.",
-      "Added styling to the Not Caught text in the sidebar when viewing your own not caught pokemon."
+    "date": "2026-04-06",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added a new **Maintenance screen** that will now warn people and remind them to save when the website is about to go down for future updates etc.",
+          "Added to ability to add multiple Pokemon to a **BINGO** slot and they will slideshow through the sprites.",
+          "Added a **evolve** feature to Pokemon in the sidebar that sends the Mons data to its evolutions if any.",
+          "Added the ability to assign a hotkey to up the checks in the **Counters page**.",
+          "Added a **History** section to the **Counters page** to view your recent hunts."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Many page shift fixes and interaction speed fixes for improved user experience.",
+          "Added styling to the **\"Not Caught\"** text in the sidebar when viewing your own not caught pokemon."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Fixed broken sprites for **Alpha Rotoms** and **Alpha Wormadams**.",
+          "Fixed a issue where all the **Alpha Genders & Other's** Box's were showing number 1 instead of increasing each box.",
+          "Fixed a issue where Pokemon that should be locked were becoming unlocked while adding new data to the site.",
+          "Fixed a issue where the recent entries on the profile page were not updating when a new entry was added.",
+          "Multiple admin related fixes."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-04-02",
     "version": "v1.1.1",
-    "type": "feature",
-    "title": "",
-    "description": "",
-    "features": [
-      "Updated profile pages to display more collection statistics and uses visual icons instead of plain numbers.",
-      "Added the Show Evolutions toggle when searching in the Pseudo Legendary, Starters, Fossil Mons & Baby Mons categories."
-    ],
-    "fixes": [
-      "Refined the recent entries on the profile page to improve what mons get displayed and include entries from the counters page.",
-      "Fixed Alpha Litleo showing as a female gender form instead of just Alpha Litleo.",
-      "Fixed Noivern appearing under Pseudo Legendary search filter.",
-      "Renamed Starter Lines search category to now just Staters to match the new Show Evolution toggle related to it.",
-      "Fixed a bunch of broken sprites in the Other Forms category."
+    "date": "2026-04-02",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added the **Show Evolutions** toggle when searching in the **Pseudo Legendary**, **Starters**, **Fossil Mons** & **Baby Mons** categories."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Updated profile pages to display more collection statistics and uses visual icons instead of plain numbers.",
+          "Refined the recent entries on the profile page to improve what mons get displayed and include entries from the counters page."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Fixed **Alpha Litleo** showing as a female gender form instead of just **Alpha Litleo**.",
+          "Fixed **Noivern** appearing under **Pseudo Legendary** search filter.",
+          "Renamed **\"Starter Lines\"** search category to now just **\"Staters\"** to match the new **Show Evolution** toggle related to it.",
+          "Fixed a bunch of broken sprites in the **Other Forms** category."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-02-14",
     "version": "v1.1.0",
-    "type": "feature",
-    "title": "",
-    "description": "",
-    "features": [
-      "BINGO page added! plan and track the hunts you wanna do throughout the year and share your progress with friends.",
-      "Added a button on public profile views to also view the persons BINGO sheet if there is any data set."
-    ],
-    "fixes": [
-      "Added a back button to the public profile dex and bingo pages so you dont get stuck on the page.",
-      "Added the ability to hover over game icons on the BINGO page on PC to view the games full name."
+    "date": "2026-02-14",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "**BINGO page** added! plan and track the hunts you wanna do throughout the year and share your progress with friends.",
+          "Added a button on public profile views to also view the persons **BINGO sheet** if there is any data set."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Added a back button to the public profile dex and bingo pages so you dont get stuck on the page.",
+          "Added the ability to hover over game icons on the **BINGO page** on PC to view the games full name."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-02-09",
     "version": "v1.0.8",
-    "type": "feature",
-    "title": "",
-    "description": "",
-    "features": [
-      "Added a 'Related Forms' section to the Pokemon sidebar that shows all variant forms (GMAX, Alpha, Gender, Regional, etc.) for the selected Pokemon.",
-      "Evolution chains in the sidebar now display Alpha forms when an Alpha Pokemon is selected.",
-      "Added tooltips to the 'Obtainable In' game icons in the sidebar to display full game names on hover.",
-      "Added sorting by oldest and newest accounts to the trainers page."
-    ],
-    "fixes": [
-      "Fixed an issue where manually adjusting a counter's value would delete the entire hunt.",
-      "Improved styling in the Hunt Settings modal for encounter count and increment adjustments.",
-      "Resolved inconsistencies where the Shiny Charm modifier was not applied when starting a new hunt.",
-      "Fixed female hippopotas ID being 450 instead of 459, (Anyone who had data on this pokemon will need to re-add it (sorry!)).",
-      "Fixed alpha unova lilligant ID since I am a idiot and wrote it incorrectly.",
-      "Fixed some forms not showing when searching with the 'Show Evolutions' toggle on.",
-      "Fixed an issue where shiny locks were not correctly displayed on Pokémon that should have been locked.",
-      "Fixed a aligment issue with the quick links in the footer on mobile devices.",
-      "Fixed an issue where guest users were unable to navigate back to the home page after viewing a profile.",
-      "Fixed an issue on mobile where the background remained scrollable while the sidebar was open.",
-      "Fixed the hamburger menu overlapping the sidebar on mobile devices.",
-      "Fixed an issue where page controls on the trainers page were stacked vertically instead of horizontally.",
-      "Moved the page controls on the changelogs page to be above so they dont shift when changing pages.",
-      "Simplified changelog pagination to display '1' instead of '1-1' when viewing a single update."
+    "date": "2026-02-09",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added a **\"Related Forms\"** section to the Pokemon sidebar that shows all variant forms (GMAX, Alpha, Gender, Regional, etc.) for the selected Pokemon.",
+          "Added sorting by oldest and newest accounts to the **Trainers page**."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Evolution chains in the sidebar now display **Alpha forms** when an **Alpha Pokemon** is selected.",
+          "Added tooltips to the **\"Obtainable In\"** game icons in the sidebar to display full game names on hover.",
+          "Improved styling in the **Hunt Settings** modal for encounter count and increment adjustments.",
+          "Moved the page controls on the **changelogs page** to be above so they dont shift when changing pages.",
+          "Simplified changelog pagination to display **\"1\"** instead of **\"1-1\"** when viewing a single update."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Fixed an issue where manually adjusting a counter's value would delete the entire hunt.",
+          "Resolved inconsistencies where the **Shiny Charm** modifier was not applied when starting a new hunt.",
+          "Fixed **Female Hippopotas** ID being 450 instead of 459, (Anyone who had data on this pokemon will need to re-add it (sorry!)).",
+          "Fixed **Alpha Unova Lilligant** ID since I am a idiot and wrote it incorrectly.",
+          "Fixed some forms not showing when searching with the **\"Show Evolutions\"** toggle on.",
+          "Fixed an issue where shiny locks were not correctly displayed on Pokémon that should have been locked.",
+          "Fixed a aligment issue with the quick links in the footer on mobile devices.",
+          "Fixed an issue where guest users were unable to navigate back to the home page after viewing a profile.",
+          "Fixed an issue on mobile where the background remained scrollable while the sidebar was open.",
+          "Fixed the hamburger menu overlapping the sidebar on mobile devices.",
+          "Fixed an issue where page controls on the trainers page were stacked vertically instead of horizontally."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-02-01",
     "version": "v1.0.7",
-    "type": "feature",
-    "title": "Search Improvements",
-    "description": "",
-    "features": [
-      "Added the ability to multi-search across all categories. For example, you can now search for Pokémon with both the Mighty Mark and the Common Mark."
-    ],
-    "fixes": [
-      "Improved the sites loading screen with added animations and better visuals.",
-      "Removed the sparkle animation from the title on the public home page.",
-      "Added a shimmer animation to the title on the public home page.",
-      "Updated registration button icons to a pen and paper design for a more professional appearance.",
-      "Resolved layout shifts caused by Pokémon displays on the landing page.",
-      "Fixed a issue that would not allow users to open the Caught/Uncaught search dropdown.",
-      "Fixed an issue where autofilling an email in the settings would cause the field to appear white instead of the site's theme color."
+    "date": "2026-02-01",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added the ability to multi-search across all categories. For example, you can now search for Pokémon with both the **Mighty Mark** and the **Common Mark**."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Improved the sites loading screen with added animations and better visuals.",
+          "Added a shimmer animation to the title on the public home page.",
+          "Updated registration button icons to a pen and paper design for a more professional appearance."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Resolved layout shifts caused by Pokémon displays on the landing page.",
+          "Fixed a issue that would not allow users to open the **Caught/Uncaught** search dropdown.",
+          "Fixed an issue where autofilling an email in the settings would cause the field to appear white instead of the site's theme color."
+        ]
+      },
+      {
+        "type": "removed",
+        "items": [
+          "Removed the sparkle animation from the title on the public home page."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-01-28",
     "version": "v1.0.6",
-    "type": "fix",
-    "title": "Scrollbar fixes, SEO improvements & Performance improvements",
-    "description": "",
-    "features": [
-      "Added a search option for game obtainable in.",
-      "Advanced the obtainable in data to also include version exclusives."
-    ],
-    "fixes": [
-      "Switched to new backend server to help with performance and stability !!!BIG CHANGE HOPEFULLY DOESNT BREAK ANYTHING!!!.",
-      "Cloudflare removed and hopefully logins/registers will be quicker now.",
-      "Scrollbar now works correctly on all pages and devices.",
-      "SEO improvements to help with Google AdSense verification & search engine results.",
-      "Performance improvements to the website to help with lag on the main dex display.",
-      "Tracking 2059 Pokemon on home page changed to Tracking 2064 Pokemon to be correct lol.",
-      "Made the Made by Antonic text on the public home page clickable leading to my solo.to profile."
+    "date": "2026-01-28",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added a search option for **\"Game Obtainable In\"**.",
+          "Advanced the obtainable in data to also include version exclusives."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Switched to new backend server to help with performance and stability !!!BIG CHANGE HOPEFULLY DOESNT BREAK ANYTHING!!!.",
+          "SEO improvements to help with Google AdSense verification & search engine results.",
+          "Performance improvements to the website to help with lag on the main dex display.",
+          "Made the **\"Made by Antonic\"** text on the public home page clickable leading to my solo.to profile."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Scrollbar now works correctly on all pages and devices.",
+          "**\"Tracking 2059 Pokemon\"** on home page changed to **\"Tracking 2064 Pokemon\"** to be correct lol."
+        ]
+      },
+      {
+        "type": "removed",
+        "items": [
+          "**Cloudflare** removed and hopefully logins/registers will be quicker now."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-01-21",
     "version": "v1.0.5",
-    "type": "feature",
-    "title": "Mobile fixes & Dex Preferences expansion",
-    "description": "",
-    "features": [
-      "Split up the options to block GO and NO OT exclusive shinies into two separate options.",
-      "Added a option to completly hide all locked pokemon.",
-      "Added new Dex Preferences to change the view mode of the dex to categorized or alphabetical."
-    ],
-    "fixes": [
-      "Resolved a critical mobile bug where clicking a caught Pokémon slot in the main grid caused data loss.",
-      "Fixed a issue on certain mobile devices where the sidebar would appear on all taps instead of holds.",
-      "Fixed Alpha Male Sneasel in the Alpha Genders & Other's category having a wrong Id causing issues with the numbers. (Anyone who had data on this pokemon will need to re-add it (sorry!)).",
-      "Bug fixes & compatibility improvements for iOS devices. (Needs Testing)",
-      "Adjusted the trainer page buttons to change pages to be more in uniform and cleaner looking.",
-      "Fixed a bug where people could not submit bug reports or feature requests.",
-      "Fixed an issue where modal animations would break upon a fresh login."
+    "date": "2026-01-21",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Added a option to completly hide all locked pokemon.",
+          "Added new **Dex Preferences** to change the view mode of the dex to categorized or alphabetical."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Split up the options to block **GO** and **NO OT** exclusive shinies into two separate options.",
+          "Adjusted the trainer page buttons to change pages to be more in uniform and cleaner looking."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Resolved a critical mobile bug where clicking a caught Pokémon slot in the main grid caused data loss.",
+          "Fixed a issue on certain mobile devices where the sidebar would appear on all taps instead of holds.",
+          "Fixed **Alpha Male Sneasel** in the **Alpha Genders & Other's** category having a wrong Id causing issues with the numbers. (Anyone who had data on this pokemon will need to re-add it (sorry!)).",
+          "Bug fixes & compatibility improvements for iOS devices. (Needs Testing)",
+          "Fixed a bug where people could not submit bug reports or feature requests.",
+          "Fixed an issue where modal animations would break upon a fresh login."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-01-19",
     "version": "v1.0.4",
-    "type": "fix",
-    "title": "Alpha Regional Forms added & Removed Kantonian Electrode",
-    "description": "",
-    "features": [
-      "Alpha Alolan Raichu added.",
-      "Galarian Alpha Slowpoke line added.",
-      "Galarian Alpha Stunfisk added.",
-      "Alpha Johto Qwilfish added.",
-      "You can now update your account's email address from the settings page."
-    ],
-    "fixes": [
-      "Alpha Kantonian Electrode removed from Alpha Genders & Other's category.",
-      "Fixed scrollbar not appearing in certain situations.",
-      "Unique IDs added to all Pokemon, Forms, and other data for future proofing, performance and stability.",
-      "Fixed alignment of the search icon on the changelogs page.",
-      "Fixed a bug where clicking Mark All with a locked pokemon would set the locked pokemon as caught.",
-      "Accent color buttons in the settings page now display a checkmark to clearly show the selected color."
+    "date": "2026-01-19",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "**Alpha Alolan Raichu** added.",
+          "**Galarian Alpha Slowpoke line** added.",
+          "**Galarian Alpha Stunfisk** added.",
+          "**Alpha Johto Qwilfish** added.",
+          "You can now update your account's email address from the settings page."
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Unique IDs added to all Pokemon, Forms, and other data for future proofing, performance and stability.",
+          "Accent color buttons in the settings page now display a checkmark to clearly show the selected color."
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Fixed scrollbar not appearing in certain situations.",
+          "Fixed alignment of the search icon on the changelogs page.",
+          "Fixed a bug where clicking **\"Mark All\"** with a locked pokemon would set the locked pokemon as caught."
+        ]
+      },
+      {
+        "type": "removed",
+        "items": [
+          "**Alpha Kantonian Electrode** removed from **Alpha Genders & Other's** category."
+        ]
+      }
     ]
   },
   {
-    "date": "2026-01-02",
     "version": "v1.0.3",
-    "type": "feature",
-    "title": "Legends Z-A Pokemon Added & Some Small Features/Fixes",
-    "description": "",
-    "features": [
-      "All Legends Z-A and Mega Dimensions DLC Pokemon added and will now show under the obtainable games section along with all the alpha forms",
-      "When searching for a Pokemon by name a new switch will appear allowing you to show that Pokemon's evolutions also in the search results",
-      "Legends Z-A added with all methods and shiny odds when tracking a hunt",
-      "Sidebar will now display how long the hunt took if you use the built-in counter on the website",
-      "Sidebar will now automatically display the shiny odds and will ask for modifiers (shiny charm, sparkling power, etc.) when tracking a hunt",
-      "Shiny Charm button added under the search that allows you to manage the games you have shiny charm so it auto sets the modifier when you add a pokemon or hunt",
-      "Shiny Charm button seconds as a display to show off what games you have shiny charm on when viewing a profile",
-      "2 NEW settings added to show a lock icon over shiny locked pokemon and/or Pokemon GO & NO OT exclusive shinies"
-    ],
-    "fixes": [
-      "Changed wording for some tags in the sidebar such as Male now says Male Form and Female now says Female Form",
-      "Alpha Others category now organized by dex number instead of Hisui dex order",
-      "Sidebar icons replaced with actual SVG icons instead of basic emojis",
-      "Many performance improvements and code cleanup"
+    "date": "2026-01-02",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "All **Legends Z-A** and **Mega Dimensions DLC** Pokemon added and will now show under the obtainable games section along with all the alpha forms",
+          "When searching for a Pokemon by name a new switch will appear allowing you to show that Pokemon's evolutions also in the search results",
+          "**Legends Z-A** added with all methods and shiny odds when tracking a hunt",
+          "Sidebar will now display how long the hunt took if you use the built-in counter on the website",
+          "Sidebar will now automatically display the shiny odds and will ask for modifiers (shiny charm, sparkling power, etc.) when tracking a hunt",
+          "**Shiny Charm** button added under the search that allows you to manage the games you have shiny charm so it auto sets the modifier when you add a pokemon or hunt",
+          "**Shiny Charm** button seconds as a display to show off what games you have shiny charm on when viewing a profile",
+          "2 NEW settings added to show a lock icon over shiny locked pokemon and/or **Pokemon GO** & **NO OT** exclusive shinies"
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Changed wording for some tags in the sidebar such as **\"Male\"** now says **\"Male Form\"** and **\"Female\"** now says **\"Female Form\"**",
+          "**Alpha Others** category now organized by dex number instead of Hisui dex order",
+          "Many performance improvements and code cleanup"
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Sidebar icons replaced with actual SVG icons instead of basic emojis"
+        ]
+      }
     ]
   },
   {
-    "date": "2025-11-24",
     "version": "v1.0.2",
-    "type": "feature",
-    "title": "Admin Badge, Profile Icon Cleanup & Some Other Fixes",
-    "description": "",
-    "features": [
-      "Crown icon added to admin profile pages and trainers page",
-      "Tooltips added to admin crown icon and sharable link icon",
-      "Instagram & tiktok icons added to the footer"
-    ],
-    "fixes": [
-      "Fixed loading screen visual issue where spinner and dots appeared merged together",
-      "Hovering the likes button will no longer have a background color",
-      "Likes button will now be colored red when viewing a profile not logged in",
-      "Improved sanitization of input fields to prevent XSS attacks"
+    "date": "2025-11-24",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "**Crown icon** added to admin profile pages and trainers page",
+          "Tooltips added to admin **crown icon** and **sharable link icon**",
+          "**Instagram & TikTok** icons added to the footer"
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Fixed loading screen visual issue where spinner and dots appeared merged together",
+          "Hovering the likes button will no longer have a background color",
+          "Likes button will now be colored red when viewing a profile not logged in"
+        ]
+      },
+      {
+        "type": "security",
+        "items": [
+          "Improved sanitization of input fields to prevent XSS attacks"
+        ]
+      }
     ]
   },
   {
-    "date": "2025-10-17",
     "version": "v1.0.1",
-    "type": "feature",
-    "title": "Legends Z-A Mobile Fixes Admin Panels & Many Other Fixes",
-    "description": "",
-    "features": [
-      "Mobile header now uses a mobile hamburger menu instead of tabs",
-      "Changelog page added (This page) here you can see updates like you are reading and also submit bug reports or feature requests below",
-      "Admins and admin panel added (Only accessible to admins)",
-      "Legends Z-A game added as a new game option when adding information to a pokemon (ZA Alpha Pokemon coming soon)",
-      "Legends Z-A added as a game option with odds calculation when tracking a hunt"
-    ],
-    "fixes": [
-      "Fixed profile dropdown visibility and scroll issue on mobile",
-      "Fixed mobile layout issues related to the search bar on Changelog and Trainers pages"
-    ],
-    "changes": [
-      "Enhanced mobile header sizing and profile picture",
-      "Improved mobile dropdown styling",
-      "Alpha not hisuian Arcanine and Zoroark removed from Alpha Genders & Other's category",
-      "Alpha Forms is now sorted by national dex number instead of hisui dex order"
+    "date": "2025-10-17",
+    "published": true,
+    "sections": [
+      {
+        "type": "feature",
+        "items": [
+          "Mobile header now uses a mobile hamburger menu instead of tabs",
+          "**Changelog page** added (This page) here you can see updates like you are reading and also submit bug reports or feature requests below",
+          "**Admins and Admin Panel** added (Only accessible to admins)",
+          "**Legends Z-A** game added as a new game option when adding information to a pokemon (ZA Alpha Pokemon coming soon)",
+          "**Legends Z-A** added as a game option with odds calculation when tracking a hunt"
+        ]
+      },
+      {
+        "type": "improvement",
+        "items": [
+          "Enhanced mobile header sizing and profile picture",
+          "Improved mobile dropdown styling",
+          "**Alpha Forms** is now sorted by national dex number instead of hisui dex order"
+        ]
+      },
+      {
+        "type": "fix",
+        "items": [
+          "Fixed profile dropdown visibility and scroll issue on mobile",
+          "Fixed mobile layout issues related to the search bar on Changelog and Trainers pages"
+        ]
+      },
+      {
+        "type": "removed",
+        "items": [
+          "**Alpha not hisuian Arcanine and Zoroark** removed from **Alpha Genders & Other's** category"
+        ]
+      }
     ]
   }
 ]

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, User, Settings, Users, Database, Tally5, FileText, Shield, ShieldUser, Crown, Menu, X, Grid3x3, MessageCircleWarning, ListChecks, Heart, ChevronDown, ChevronRight, Sparkles, Tv, ShoppingBag, ArrowRight, Award } from "lucide-react";
+import { LogOut, User, Settings, Users, Database, Tally5, FileText, Shield, ShieldUser, Crown, Menu, X, Grid3x3, MessageCircleWarning, MessageSquare, ListChecks, Heart, ChevronDown, ChevronRight, Sparkles, Tv, ShoppingBag, ArrowRight, Award } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { authAPI } from './utils/api';
 import { useTheme } from "./components/Shared/ThemeContext";
@@ -150,14 +150,14 @@ const NAV_DROPDOWNS = [
         requiresAuth: true,
       },
       {
-        to: "/feedback",
-        label: "Feedback",
-        description: "Report bugs & suggest features",
-        icon: MessageCircleWarning,
+        to: "/support",
+        label: "Support",
+        description: "Help center, bug reports & guides",
+        icon: MessageSquare,
         color: "text-rose-400",
         bgColor: "bg-rose-500/10",
         borderColor: "border-rose-500/20",
-        requiresAuth: true,
+        requiresAuth: false,
       },
     ],
   },
@@ -171,6 +171,22 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
   const [activeNavDropdown, setActiveNavDropdown] = useState(null);
   const navContainerRef = useRef(null);
   const navTimerRef = useRef(null);
+
+  // Responsive Mobile Detection
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(
+        window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      );
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // 1/8192 Shiny Logo Easter Egg (persists for 1 hour once triggered)
   const [isRainbowLogo, setIsRainbowLogo] = useState(() => {
@@ -236,7 +252,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
   useEffect(() => {
     const handleTutorialStep = (e) => {
       const targetId = e.detail?.targetId;
-      
+
       const isMobileNavTarget = ['nav-trainers', 'nav-counters', 'nav-mmo', 'nav-bingo', 'nav-leaderboard'].includes(targetId);
       const isProfileNavTarget = ['nav-settings', 'nav-profile'].includes(targetId);
 
@@ -245,7 +261,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
       } else {
         setShowMenu(false);
       }
-      
+
       if (['nav-counters', 'nav-mmo', 'nav-bingo'].includes(targetId)) {
         if (window.innerWidth >= 1280) {
           setActiveNavDropdown('tracking');
@@ -275,58 +291,31 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
   useEffect(() => {
     if (showMobileNav) {
       document.body.style.overflow = 'hidden';
-
-      const handleScroll = (event) => {
-        if (event.type === 'wheel' || event.type === 'touchmove') {
-          setShowMobileNav(false);
-        }
-      };
-
-      document.addEventListener('wheel', handleScroll, { passive: true, capture: true });
-      document.addEventListener('touchmove', handleScroll, { passive: true, capture: true });
-
       return () => {
         document.body.style.overflow = 'unset';
-        document.removeEventListener('wheel', handleScroll, { capture: true });
-        document.removeEventListener('touchmove', handleScroll, { capture: true });
       };
     } else {
       document.body.style.overflow = 'unset';
     }
-
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
   }, [showMobileNav]);
 
-  // Prevent body scroll when profile menu is open
+  // Prevent body scroll when profile menu is open on small screens
   useEffect(() => {
-    if (showMenu) {
-      const handleScroll = (event) => {
-        if (event.type === 'wheel' || event.type === 'touchmove') {
-          setShowMenu(false);
-        }
-      };
-
-      document.addEventListener('wheel', handleScroll, { passive: true, capture: true });
-      document.addEventListener('touchmove', handleScroll, { passive: true, capture: true });
-
+    if (showMenu && window.innerWidth < 640) {
+      document.body.style.overflow = 'hidden';
       return () => {
-        document.removeEventListener('wheel', handleScroll, { capture: true });
-        document.removeEventListener('touchmove', handleScroll, { capture: true });
+        document.body.style.overflow = 'unset';
       };
-    }
-
-    return () => {
+    } else if (!showMobileNav) {
       document.body.style.overflow = 'unset';
-    };
-  }, [showMenu]);
+    }
+  }, [showMenu, showMobileNav]);
 
-  // Handle clicking outside any dropdown to close it
+  // Handle clicking or tapping outside any dropdown to close it
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleOutsideClick = (event) => {
       if (!showMenu && !showMobileNav && !activeNavDropdown) return;
-      
+
       if (document.body.classList.contains('tutorial-active')) return;
 
       if (showMenu && userMenuRef.current && !userMenuRef.current.contains(event.target)) {
@@ -343,10 +332,12 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
     };
 
     if (showMenu || showMobileNav || activeNavDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('mousedown', handleOutsideClick);
+      document.addEventListener('touchstart', handleOutsideClick, { passive: true });
 
       return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener('mousedown', handleOutsideClick);
+        document.removeEventListener('touchstart', handleOutsideClick);
       };
     }
   }, [showMenu, showMobileNav, activeNavDropdown, userMenuRef]);
@@ -401,18 +392,17 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
   const isAuthPage = ['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password', '/complete-signup'].includes(location.pathname);
 
   return (
-    <header className="sticky top-0 z-[100] bg-[var(--header)] transition-[background-color] duration-[var(--transition-speed)] border-b-8" style={{ borderColor: 'var(--accent)' }}>
-      <div className="w-full h-[80px] md:h-[130px] max-h-[80px] md:max-h-[130px] mx-auto flex items-center justify-between px-3 md:px-8 md:pr-6 relative">
+    <header className="sticky top-0 z-[100] bg-[var(--header)] transition-[background-color] duration-[var(--transition-speed)] border-b-8 w-full" style={{ borderColor: 'var(--accent)' }}>
+      <div className="w-full max-w-full h-[80px] md:h-[130px] max-h-[80px] md:max-h-[130px] mx-auto flex items-center justify-between px-3 md:px-8 md:pr-6 relative">
 
         {/* Logo — far left */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <Link
             to={location.pathname === '/complete-signup' || user?.needsProfileSetup ? '#' : '/'}
-            className={`flex items-center text-decoration-none ${
-              location.pathname === '/complete-signup' || user?.needsProfileSetup
-                ? 'cursor-default pointer-events-none'
-                : 'hover:text-[var(--accent)] focus:text-[var(--accent)] active:text-[var(--accent)] hover:outline-none focus:outline-none'
-            }`}
+            className={`flex items-center text-decoration-none ${location.pathname === '/complete-signup' || user?.needsProfileSetup
+              ? 'cursor-default pointer-events-none'
+              : 'hover:text-[var(--accent)] focus:text-[var(--accent)] active:text-[var(--accent)] hover:outline-none focus:outline-none'
+              }`}
             aria-label="Ultimate Dex Tracker"
             onClick={(e) => {
               if (location.pathname === '/complete-signup' || user?.needsProfileSetup) {
@@ -502,117 +492,113 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                   return accessibleItems.length > 0;
                 })
                 .map((dropdown) => {
-                const isActive = isDropdownActive(dropdown);
-                const isOpen = activeNavDropdown === dropdown.id;
+                  const isActive = isDropdownActive(dropdown);
+                  const isOpen = activeNavDropdown === dropdown.id;
 
-                return (
-                  <div
-                    key={dropdown.id}
-                    className="relative flex justify-center"
-                    onMouseEnter={() => handleNavMouseEnter(dropdown.id)}
-                    onMouseLeave={handleNavMouseLeave}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => handleNavClick(dropdown.id)}
-                      className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 cursor-pointer select-none bg-transparent border-0 outline-none ${
-                        isActive || isOpen
+                  return (
+                    <div
+                      key={dropdown.id}
+                      className="relative flex justify-center"
+                      onMouseEnter={() => handleNavMouseEnter(dropdown.id)}
+                      onMouseLeave={handleNavMouseLeave}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleNavClick(dropdown.id)}
+                        className={`group relative flex items-center gap-2 px-5 pt-2 pb-3 text-lg font-semibold tracking-wide transition-colors duration-200 cursor-pointer select-none bg-transparent border-0 outline-none ${isActive || isOpen
                           ? 'text-[var(--accent)]'
                           : 'text-[var(--text)]/80 hover:text-[var(--accent)]'
-                      }`}
-                      aria-expanded={isOpen}
-                      aria-label={`${dropdown.label} menu`}
-                    >
-                      <span>{dropdown.label}</span>
-                      <ChevronDown
-                        size={16}
-                        strokeWidth={2.5}
-                        className={`transition-transform duration-200 flex-shrink-0 ${
-                          isOpen ? 'rotate-180 text-[var(--accent)]' : 'text-[var(--text)]/60 group-hover:text-[var(--accent)]'
-                        }`}
-                      />
-                      <span
-                        className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${
-                          isActive
+                          }`}
+                        aria-expanded={isOpen}
+                        aria-label={`${dropdown.label} menu`}
+                      >
+                        <span>{dropdown.label}</span>
+                        <ChevronDown
+                          size={16}
+                          strokeWidth={2.5}
+                          className={`transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180 text-[var(--accent)]' : 'text-[var(--text)]/60 group-hover:text-[var(--accent)]'
+                            }`}
+                        />
+                        <span
+                          className={`absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-[var(--accent)] transition-all duration-200 ${isActive
                             ? 'opacity-100 scale-x-100'
                             : isOpen
-                            ? 'opacity-60 scale-x-75'
-                            : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
-                        }`}
-                        style={{ transformOrigin: 'center' }}
-                      />
-                    </button>
+                              ? 'opacity-60 scale-x-75'
+                              : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
+                            }`}
+                          style={{ transformOrigin: 'center' }}
+                        />
+                      </button>
 
-                    {/* Dropdown Menu Panel */}
-                    <AnimatePresence>
-                      {isOpen && (
-                        <motion.div
-                          key={`nav-dropdown-${dropdown.id}`}
-                          initial={{ opacity: 0, y: 6, x: "-50%", scale: 0.96 }}
-                          animate={{ opacity: 1, y: 0, x: "-50%", scale: 1 }}
-                          exit={{ opacity: 0, y: 4, x: "-50%", scale: 0.96 }}
-                          transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
-                          style={{ transformOrigin: "top center" }}
-                          className="absolute top-[calc(100%+6px)] left-1/2 w-[285px] bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-2xl p-2 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow),0_20px_45px_rgba(0,0,0,0.7)] z-50 backdrop-blur-[16px] overflow-hidden flex flex-col gap-1 pointer-events-auto"
-                          onMouseEnter={() => handleNavMouseEnter(dropdown.id)}
-                          onMouseLeave={handleNavMouseLeave}
-                        >
-                          {dropdown.items
-                            .filter(item => (!item.adminOnly || user?.isAdmin) && (!item.requiresAuth || user?.username))
-                            .map((item) => {
-                            const ItemIcon = item.icon;
-                            const isItemActive = location.pathname === item.to;
+                      {/* Dropdown Menu Panel */}
+                      <AnimatePresence>
+                        {isOpen && (
+                          <motion.div
+                            key={`nav-dropdown-${dropdown.id}`}
+                            initial={{ opacity: 0, y: 6, x: "-50%", scale: 0.96 }}
+                            animate={{ opacity: 1, y: 0, x: "-50%", scale: 1 }}
+                            exit={{ opacity: 0, y: 4, x: "-50%", scale: 0.96 }}
+                            transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                            style={{ transformOrigin: "top center" }}
+                            className="absolute top-[calc(100%+6px)] left-1/2 w-[285px] bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-2xl p-2 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow),0_20px_45px_rgba(0,0,0,0.7)] z-50 backdrop-blur-[16px] overflow-hidden flex flex-col gap-1 pointer-events-auto"
+                            onMouseEnter={() => handleNavMouseEnter(dropdown.id)}
+                            onMouseLeave={handleNavMouseLeave}
+                          >
+                            {dropdown.items
+                              .filter(item => (!item.adminOnly || user?.isAdmin) && (!item.requiresAuth || user?.username))
+                              .map((item) => {
+                                const ItemIcon = item.icon;
+                                const isItemActive = location.pathname === item.to;
 
-                            return (
-                              <Link
-                                key={item.to}
-                                data-tutorial-id={item.tutorialId}
-                                to={item.to}
-                                onClick={() => setActiveNavDropdown(null)}
-                                className={`group/item flex items-center justify-between p-2.5 rounded-xl transition-all duration-150 text-left no-underline cursor-pointer ${
-                                  isItemActive
-                                    ? 'bg-[var(--accent)]/15 text-[var(--accent)]'
-                                    : 'hover:bg-black/5 dark:hover:bg-white/[0.08] text-[var(--text)]'
-                                }`}
-                              >
-                                <div className="flex items-center gap-3 min-w-0">
-                                  <div
-                                    className={`w-9 h-9 rounded-xl ${item.bgColor} border ${item.borderColor} flex items-center justify-center ${item.color} group-hover/item:scale-105 transition-transform flex-shrink-0`}
+                                return (
+                                  <Link
+                                    key={item.to}
+                                    data-tutorial-id={item.tutorialId}
+                                    to={item.to}
+                                    onClick={() => setActiveNavDropdown(null)}
+                                    className={`group/item flex items-center justify-between p-2.5 rounded-xl transition-all duration-150 text-left no-underline cursor-pointer ${isItemActive
+                                      ? 'bg-[var(--accent)]/15 text-[var(--accent)]'
+                                      : 'hover:bg-black/5 dark:hover:bg-white/[0.08] text-[var(--text)]'
+                                      }`}
                                   >
-                                    <ItemIcon size={17} style={item.iconRotate ? { transform: `rotate(${item.iconRotate})` } : undefined} />
-                                  </div>
-                                  <div className="flex flex-col min-w-0">
-                                    <div className="flex items-center gap-1.5">
-                                      <span className={`font-bold text-[14px] leading-snug group-hover/item:text-[var(--accent)] transition-colors whitespace-nowrap ${isItemActive ? 'text-[var(--accent)]' : 'text-[var(--text)]'}`}>
-                                        {item.label}
-                                      </span>
-                                      {item.hasBadge && hasNewUpdate && (
-                                        <span className="px-1.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider text-white bg-red-500 rounded-full leading-none shadow-sm">
-                                          New
+                                    <div className="flex items-center gap-3 min-w-0">
+                                      <div
+                                        className={`w-9 h-9 rounded-xl ${item.bgColor} border ${item.borderColor} flex items-center justify-center ${item.color} group-hover/item:scale-105 transition-transform flex-shrink-0`}
+                                      >
+                                        <ItemIcon size={17} style={item.iconRotate ? { transform: `rotate(${item.iconRotate})` } : undefined} />
+                                      </div>
+                                      <div className="flex flex-col min-w-0">
+                                        <div className="flex items-center gap-1.5">
+                                          <span className={`font-bold text-[14px] leading-snug group-hover/item:text-[var(--accent)] transition-colors whitespace-nowrap ${isItemActive ? 'text-[var(--accent)]' : 'text-[var(--text)]'}`}>
+                                            {item.label}
+                                          </span>
+                                          {item.hasBadge && hasNewUpdate && (
+                                            <span className="px-1.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider text-white bg-red-500 rounded-full leading-none shadow-sm">
+                                              New
+                                            </span>
+                                          )}
+                                        </div>
+                                        <span className="text-[11px] text-[var(--text-muted)] font-normal truncate">
+                                          {item.description}
                                         </span>
-                                      )}
+                                      </div>
                                     </div>
-                                    <span className="text-[11px] text-[var(--text-muted)] font-normal truncate">
-                                      {item.description}
-                                    </span>
-                                  </div>
-                                </div>
 
-                                {/* Animated Arrow coming out smoothly from text on hover */}
-                                <div className="relative flex items-center justify-center w-5 h-5 flex-shrink-0 ml-1">
-                                  <div className="text-[var(--accent)] opacity-0 -translate-x-2.5 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200 ease-out flex items-center">
-                                    <ArrowRight size={15} strokeWidth={2.5} />
-                                  </div>
-                                </div>
-                              </Link>
-                            );
-                          })}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                );
-              })}
+                                    {/* Animated Arrow coming out smoothly from text on hover */}
+                                    <div className="relative flex items-center justify-center w-5 h-5 flex-shrink-0 ml-1">
+                                      <div className="text-[var(--accent)] opacity-0 -translate-x-2.5 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-200 ease-out flex items-center">
+                                        <ArrowRight size={15} strokeWidth={2.5} />
+                                      </div>
+                                    </div>
+                                  </Link>
+                                );
+                              })}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
             </div>
           </nav>
         )}
@@ -626,7 +612,8 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.96 }}
               transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-              className="mobile-nav-dropdown xl:hidden fixed top-[92px] left-3 right-3 bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-2xl py-2 px-1 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow),0_20px_40px_rgba(0,0,0,0.6)] z-50 backdrop-blur-[16px] overflow-hidden max-h-[calc(100vh-110px)] overflow-y-auto"
+              className="mobile-nav-dropdown xl:hidden fixed top-[92px] left-3 right-3 bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-2xl py-2 px-1 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow),0_20px_40px_rgba(0,0,0,0.6)] z-50 backdrop-blur-[16px] max-h-[calc(100dvh-110px)] max-h-[calc(100vh-110px)] overflow-y-auto overscroll-contain"
+              style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
             >
               <div className="flex flex-col gap-2 p-1">
                 {NAV_DROPDOWNS
@@ -638,56 +625,55 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                     return accessibleItems.length > 0;
                   })
                   .map((category) => (
-                  <div key={category.id} className="flex flex-col">
-                    <div className="px-3 pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                      {category.label}
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      {category.items
-                        .filter(item => (!item.adminOnly || user?.isAdmin) && (!item.requiresAuth || user?.username))
-                        .map((item) => {
-                        const ItemIcon = item.icon;
-                        const isItemActive = location.pathname === item.to;
+                    <div key={category.id} className="flex flex-col">
+                      <div className="px-3 pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                        {category.label}
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        {category.items
+                          .filter(item => (!item.adminOnly || user?.isAdmin) && (!item.requiresAuth || user?.username))
+                          .map((item) => {
+                            const ItemIcon = item.icon;
+                            const isItemActive = location.pathname === item.to;
 
-                        return (
-                          <Link
-                            key={item.to}
-                            data-tutorial-id={item.tutorialId}
-                            to={item.to}
-                            onClick={() => setShowMobileNav(false)}
-                            className={`group/mob flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-150 text-left no-underline ${
-                              isItemActive
-                                ? 'bg-[var(--accent)]/15 text-[var(--accent)]'
-                                : 'hover:bg-black/5 dark:hover:bg-white/[0.08] text-[var(--text)]'
-                            }`}
-                          >
-                            <div className="flex items-center gap-3 min-w-0">
-                              <div className={`w-8 h-8 rounded-lg ${item.bgColor} border ${item.borderColor} flex items-center justify-center ${item.color} flex-shrink-0`}>
-                                <ItemIcon size={16} style={item.iconRotate ? { transform: `rotate(${item.iconRotate})` } : undefined} />
-                              </div>
-                              <div className="flex flex-col min-w-0">
-                                <div className="flex items-center gap-1.5">
-                                  <span className={`font-bold text-[13.5px] leading-snug group-hover/mob:text-[var(--accent)] transition-colors ${isItemActive ? 'text-[var(--accent)]' : 'text-[var(--text)]'}`}>
-                                    {item.label}
-                                  </span>
-                                  {item.hasBadge && hasNewUpdate && (
-                                    <span className="px-1.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider text-white bg-red-500 rounded-full leading-none shadow-sm">
-                                      New
+                            return (
+                              <Link
+                                key={item.to}
+                                data-tutorial-id={item.tutorialId}
+                                to={item.to}
+                                onClick={() => setShowMobileNav(false)}
+                                className={`group/mob flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-150 text-left no-underline ${isItemActive
+                                  ? 'bg-[var(--accent)]/15 text-[var(--accent)]'
+                                  : 'hover:bg-black/5 dark:hover:bg-white/[0.08] text-[var(--text)]'
+                                  }`}
+                              >
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div className={`w-8 h-8 rounded-lg ${item.bgColor} border ${item.borderColor} flex items-center justify-center ${item.color} flex-shrink-0`}>
+                                    <ItemIcon size={16} style={item.iconRotate ? { transform: `rotate(${item.iconRotate})` } : undefined} />
+                                  </div>
+                                  <div className="flex flex-col min-w-0">
+                                    <div className="flex items-center gap-1.5">
+                                      <span className={`font-bold text-[13.5px] leading-snug group-hover/mob:text-[var(--accent)] transition-colors ${isItemActive ? 'text-[var(--accent)]' : 'text-[var(--text)]'}`}>
+                                        {item.label}
+                                      </span>
+                                      {item.hasBadge && hasNewUpdate && (
+                                        <span className="px-1.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider text-white bg-red-500 rounded-full leading-none shadow-sm">
+                                          New
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="text-[11px] text-[var(--text-muted)] font-normal truncate">
+                                      {item.description}
                                     </span>
-                                  )}
+                                  </div>
                                 </div>
-                                <span className="text-[11px] text-[var(--text-muted)] font-normal truncate">
-                                  {item.description}
-                                </span>
-                              </div>
-                            </div>
-                            <ChevronRight size={15} className="text-[var(--text-muted)] group-hover/mob:text-[var(--accent)] group-hover/mob:translate-x-0.5 transition-all flex-shrink-0 ml-2" />
-                          </Link>
-                        );
-                      })}
+                                <ChevronRight size={15} className="text-[var(--text-muted)] group-hover/mob:text-[var(--accent)] group-hover/mob:translate-x-0.5 transition-all flex-shrink-0 ml-2" />
+                              </Link>
+                            );
+                          })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
 
                 {/* Mobile Logged-Out Action Links */}
                 {!user?.username && (
@@ -715,9 +701,9 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
 
 
         {user?.username && !['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password', '/complete-signup'].includes(location.pathname) && !user?.needsProfileSetup && (
-          <nav className="ml-auto pr-2 md:pr-4 flex items-center gap-3 md:gap-4.5">
+          <nav className="ml-auto pr-1 md:pr-4 flex items-center gap-2 sm:gap-3 md:gap-4.5 flex-shrink-0">
             {/* Notification Bell */}
-            <div className="flex items-center">
+            <div className="flex items-center flex-shrink-0">
               <NotificationDropdown user={user} />
             </div>
 
@@ -757,15 +743,15 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                   const c2 = user.nameColor2 || user.nameGradientColor2;
                   return c1 && c2 && user.isPremium ? (
                     <span
-                      className="animated-gradient-username-wrapper max-w-[85px] sm:max-w-[120px] md:max-w-[170px]"
+                      className="hidden sm:inline-block animated-gradient-username-wrapper max-w-[120px] md:max-w-[170px]"
                       style={{ "--grad-c1": c1, "--grad-c2": c2 }}
                     >
-                      <span className="animated-gradient-username font-bold text-[13px] sm:text-[14px] md:text-[16px] tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">
+                      <span className="animated-gradient-username font-bold text-[14px] md:text-[16px] tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">
                         {user.username}
                       </span>
                     </span>
                   ) : (
-                    <span className="font-bold text-[var(--text)] text-[13px] sm:text-[14px] md:text-[16px] tracking-wide group-hover:text-[var(--accent)] transition-colors duration-200 whitespace-nowrap overflow-hidden text-ellipsis max-w-[85px] sm:max-w-[120px] md:max-w-[170px]">
+                    <span className="hidden sm:inline-block font-bold text-[var(--text)] text-[14px] md:text-[16px] tracking-wide group-hover:text-[var(--accent)] transition-colors duration-200 whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px] md:max-w-[170px]">
                       {user.username}
                     </span>
                   );
@@ -773,9 +759,8 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
 
                 <ChevronDown
                   strokeWidth={3}
-                  className={`w-5 h-5 sm:w-4.5 sm:h-4.5 min-w-[20px] min-h-[20px] text-[var(--text)] group-hover:text-[var(--accent)] transition-transform duration-200 flex-shrink-0 ${
-                    showMenu ? "rotate-180 text-[var(--accent)]" : ""
-                  }`}
+                  className={`w-5 h-5 sm:w-4.5 sm:h-4.5 min-w-[20px] min-h-[20px] text-[var(--text)] group-hover:text-[var(--accent)] transition-transform duration-200 flex-shrink-0 ${showMenu ? "rotate-180 text-[var(--accent)]" : ""
+                    }`}
                 />
               </button>
 
@@ -843,8 +828,8 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                         onClick={handleCloseMenu}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500/20 group-hover:scale-105 transition-all">
-                            <User size={18} />
+                          <div className={`${isMobile ? "w-10 h-10" : "w-9 h-9"} rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500/20 group-hover:scale-105 transition-all flex-shrink-0`}>
+                            <User size={isMobile ? 22 : 18} />
                           </div>
                           <div className="flex flex-col">
                             <span className="font-bold text-[var(--text)] text-[14px] leading-snug group-hover:text-cyan-500 transition-colors">
@@ -855,7 +840,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                             </span>
                           </div>
                         </div>
-                        <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--text)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                        <ChevronRight size={isMobile ? 18 : 16} className="text-[var(--text-muted)] group-hover:text-[var(--text)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                       </Link>
 
                       {/* Settings */}
@@ -866,8 +851,8 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                         onClick={handleCloseMenu}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 group-hover:bg-sky-500/20 group-hover:scale-105 transition-all">
-                            <Settings size={18} />
+                          <div className={`${isMobile ? "w-10 h-10" : "w-9 h-9"} rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 group-hover:bg-sky-500/20 group-hover:scale-105 transition-all flex-shrink-0`}>
+                            <Settings size={isMobile ? 22 : 18} />
                           </div>
                           <div className="flex flex-col">
                             <span className="font-bold text-[var(--text)] text-[14px] leading-snug group-hover:text-sky-500 transition-colors">
@@ -878,7 +863,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                             </span>
                           </div>
                         </div>
-                        <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--text)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                        <ChevronRight size={isMobile ? 18 : 16} className="text-[var(--text-muted)] group-hover:text-[var(--text)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                       </Link>
 
                       {/* Backup */}
@@ -888,8 +873,8 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                         onClick={handleCloseMenu}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:bg-purple-500/20 group-hover:scale-105 transition-all">
-                            <Database size={18} />
+                          <div className={`${isMobile ? "w-10 h-10" : "w-9 h-9"} rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:bg-purple-500/20 group-hover:scale-105 transition-all flex-shrink-0`}>
+                            <Database size={isMobile ? 22 : 18} />
                           </div>
                           <div className="flex flex-col">
                             <span className="font-bold text-[var(--text)] text-[14px] leading-snug group-hover:text-purple-500 transition-colors">
@@ -900,7 +885,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                             </span>
                           </div>
                         </div>
-                        <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--text)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                        <ChevronRight size={isMobile ? 18 : 16} className="text-[var(--text-muted)] group-hover:text-[var(--text)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                       </Link>
 
                       {/* Admin */}
@@ -911,8 +896,8 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                           onClick={handleCloseMenu}
                         >
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:bg-amber-500/20 group-hover:scale-105 transition-all">
-                              <Shield size={18} />
+                            <div className={`${isMobile ? "w-10 h-10" : "w-9 h-9"} rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:bg-amber-500/20 group-hover:scale-105 transition-all flex-shrink-0`}>
+                              <Shield size={isMobile ? 22 : 18} />
                             </div>
                             <div className="flex flex-col">
                               <span className="font-bold text-[var(--text)] text-[14px] leading-snug group-hover:text-amber-500 transition-colors">
@@ -923,7 +908,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                               </span>
                             </div>
                           </div>
-                          <ChevronRight size={16} className="text-[var(--text-muted)] group-hover:text-[var(--text)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                          <ChevronRight size={isMobile ? 18 : 16} className="text-[var(--text-muted)] group-hover:text-[var(--text)] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                         </Link>
                       )}
 
@@ -952,8 +937,8 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                         }}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 group-hover:bg-rose-500/20 group-hover:scale-105 transition-all">
-                            <LogOut size={18} />
+                          <div className={`${isMobile ? "w-10 h-10" : "w-9 h-9"} rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 group-hover:bg-rose-500/20 group-hover:scale-105 transition-all flex-shrink-0`}>
+                            <LogOut size={isMobile ? 22 : 18} />
                           </div>
                           <div className="flex flex-col">
                             <span className="font-bold text-[var(--text)] text-[14px] leading-snug group-hover:text-rose-400 transition-colors">

@@ -610,7 +610,7 @@ export default function MMOTool({ useHomeSprites = false }) {
   };
 
   return (
-    <div className={`counters-page fade-in-content ${!useHomeSprites ? "using-gen5-sprites" : ""}`}>
+    <div className={`counters-page mmo-page fade-in-content ${!useHomeSprites ? "using-gen5-sprites" : ""}`}>
       {/* ============================================================
           1. HEADER & LIVE QUICK STATS BAR
           ============================================================ */}
@@ -640,7 +640,7 @@ export default function MMOTool({ useHomeSprites = false }) {
         </div>
 
         {/* Top Right Controls: Action Buttons (No Hotkeys) */}
-        <div className="counters-header-actions">
+        <div className="counters-header-actions mmo-header-actions">
           <Tooltip
             content={
               <span>
@@ -651,7 +651,8 @@ export default function MMOTool({ useHomeSprites = false }) {
               </span>
             }
             position="bottom"
-            align="end"
+            align="center"
+            className="mmo-spawn-mode-tooltip"
             maxWidth={280}
             wrap
           >
@@ -660,6 +661,7 @@ export default function MMOTool({ useHomeSprites = false }) {
               size="sm"
               onClick={toggleSpawnCheckMode}
               icon={<Layers size={16} />}
+              className="mmo-spawn-mode-btn"
             >
               Count Each Spawn as a Check
             </Button>

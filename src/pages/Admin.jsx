@@ -1,20 +1,47 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { 
   Users, Bug, Shield, ShieldCheck, Settings, Search, ChevronDown, CheckCircle, 
   XCircle, AlertCircle, Calendar, Mail, UserCheck, Filter, Trash2, Check, 
   ChevronLeft, ChevronRight, ArrowUp, ArrowDown, Video, Youtube, Twitch, 
   Clock, MessageSquare, Crown, UserX, Edit3, MoreHorizontal,
   ExternalLink, Ban, RefreshCw, Send, Radio, AlertTriangle, X, Bell, Home,
-  LogOut, ArrowLeft, Sparkles, Activity, Cpu, Zap, BarChart2, Gauge, Server, TrendingUp, Database, Award
+  LogOut, ArrowLeft, Sparkles, Activity, Cpu, Zap, BarChart2, Gauge, Server, TrendingUp, Database, Award,
+  Gem, Gift, CreditCard, ChevronsLeft, ChevronsRight, TrendingDown, User, UserCircle2,
+  History, Copy, Plus, FileText, Eye, EyeOff, HelpCircle, Inbox, Lock, Paperclip
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useMessage, Modal, ConfirmModal, Button } from '../components/Shared';
-import { SearchField, TextField, TextArea } from '../components/Shared/FormField';
+import { SearchField, TextField, TextArea, DateField, SelectField } from '../components/Shared/FormField';
 import { buildApiUrl } from '../config/api.js';
-import { creatorAPI, authAPI } from '../utils/api.js';
+import { creatorAPI, authAPI, changelogAPI } from '../utils/api.js';
 import { getUserAvatarUrl, getTimeAgo } from '../utils/profileUtils.js';
 import './Admin.css';
+
+const SUSPENSION_PRESETS = [
+  'Violation of Community Guidelines',
+  'Inappropriate Profile or Username',
+  'Cheating or Exploiting',
+  'Spam or Botting Activity',
+  'Harassment or Abusive Behavior',
+];
+
+const CHANGELOG_SECTION_ORDER = {
+  feature: 1,
+  improvement: 2,
+  fix: 3,
+  removed: 4,
+  security: 5
+};
+
+const sortChangelogSections = (sections) => {
+  if (!Array.isArray(sections)) return [];
+  return [...sections].sort((a, b) => {
+    const orderA = CHANGELOG_SECTION_ORDER[(a?.type || '').toLowerCase()] || 99;
+    const orderB = CHANGELOG_SECTION_ORDER[(b?.type || '').toLowerCase()] || 99;
+    return orderA - orderB;
+  });
+};
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -48,55 +75,12 @@ const Admin = () => {
   // User management states
   const [userSearch, setUserSearch] = useState('');
   const [globalSearch, setGlobalSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all'); // 'all', 'admin', 'creator', 'user'
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'suspended'
+  const [roleFilter, setRoleFilter] = useState('all'); // 'all', 'admin', 'creator', 'premium', 'premium_paid', 'premium_admin', 'suspended', 'user'
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const filterDropdownRef = useRef();
 
   const [userPage, setUserPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(12);
-  const tableContainerRef = useRef(null);
-  const resizeObserverRef = useRef(null);
-
-  const calculateFitRows = useCallback(() => {
-    if (!tableContainerRef.current) return;
-    const containerHeight = tableContainerRef.current.clientHeight;
-    const headerHeight = 38;
-    const rowHeight = 50; // accurate table row height
-    const available = containerHeight - headerHeight;
-    if (available > 0) {
-      const count = Math.max(3, Math.floor(available / rowHeight));
-      setRowsPerPage(prev => (prev !== count ? count : prev));
-    }
-  }, []);
-
-  const setTableContainerRef = useCallback((node) => {
-    if (resizeObserverRef.current) {
-      resizeObserverRef.current.disconnect();
-      resizeObserverRef.current = null;
-    }
-    tableContainerRef.current = node;
-    if (node) {
-      // Immediate and next frame calculation
-      calculateFitRows();
-      requestAnimationFrame(calculateFitRows);
-      const observer = new ResizeObserver(() => {
-        calculateFitRows();
-      });
-      observer.observe(node);
-      resizeObserverRef.current = observer;
-    }
-  }, [calculateFitRows]);
-
-  useEffect(() => {
-    window.addEventListener('resize', calculateFitRows);
-    return () => {
-      window.removeEventListener('resize', calculateFitRows);
-      if (resizeObserverRef.current) {
-        resizeObserverRef.current.disconnect();
-      }
-    };
-  }, [calculateFitRows]);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const [userSortField, setUserSortField] = useState('joined'); // 'username', 'admin', 'joined', 'lastActive'
   const [userSortDir, setUserSortDir] = useState('desc'); // 'asc', 'desc'
@@ -122,6 +106,7 @@ const Admin = () => {
   // User edit form
   const [editingBio, setEditingBio] = useState('');
   const [editingUsername, setEditingUsername] = useState('');
+  const [editingEmail, setEditingEmail] = useState('');
   const [editingCreator, setEditingCreator] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState(false);
   const [editingSuspended, setEditingSuspended] = useState(false);
@@ -136,6 +121,70 @@ const Admin = () => {
   // Report Modals
   const [showDeleteReportModal, setShowDeleteReportModal] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
+  const [showHelpChatModal, setShowHelpChatModal] = useState(false);
+  const [activeHelpChatReport, setActiveHelpChatReport] = useState(null);
+  const [adminReplyText, setAdminReplyText] = useState('');
+  const [isSendingAdminReply, setIsSendingAdminReply] = useState(false);
+  const [helpTickets, setHelpTickets] = useState([]);
+  const [helpTicketSearch, setHelpTicketSearch] = useState('');
+
+  // Unified Support Inbox & Workspace States
+  const [supportTickets, setSupportTickets] = useState([]);
+  const [supportMetrics, setSupportMetrics] = useState({
+    openCount: 0,
+    awaitingStaffCount: 0,
+    awaitingUserCount: 0,
+    resolvedCount: 0,
+    totalCount: 0
+  });
+  const [supportTypeFilter, setSupportTypeFilter] = useState('all'); // 'all', 'help', 'bug', 'feature'
+  const [supportStatusFilter, setSupportStatusFilter] = useState('all'); // 'all', 'open', 'awaiting_staff', 'awaiting_user', 'resolved', 'closed'
+  const [supportPriorityFilter, setSupportPriorityFilter] = useState('all'); // 'all', 'low', 'normal', 'high', 'urgent'
+  const [supportSearch, setSupportSearch] = useState('');
+  const [supportLoading, setSupportLoading] = useState(false);
+
+  // Admin Ticket Workspace States
+  const [activeAdminTicket, setActiveAdminTicket] = useState(null);
+  const [adminComposerMode, setAdminComposerMode] = useState('reply'); // 'reply' | 'note'
+  const [adminReplyInput, setAdminReplyInput] = useState('');
+  const [adminTicketDraftStatus, setAdminTicketDraftStatus] = useState('');
+  const [adminTicketDraftPriority, setAdminTicketDraftPriority] = useState('normal');
+  const [adminTicketDraftAssignee, setAdminTicketDraftAssignee] = useState('');
+  const [adminTicketDraftChangelog, setAdminTicketDraftChangelog] = useState('');
+  const [isSavingAdminChanges, setIsSavingAdminChanges] = useState(false);
+  const [isSendingAdminMessage, setIsSendingAdminMessage] = useState(false);
+  const adminMessagesEndRef = useRef(null);
+
+  // Changelog Manager states
+  const [changelogs, setChangelogs] = useState([]);
+  const [changelogsLoading, setChangelogsLoading] = useState(false);
+  const [changelogSearch, setChangelogSearch] = useState('');
+  const [changelogFilter, setChangelogFilter] = useState('all'); // 'all', 'published', 'draft'
+  const [showChangelogModal, setShowChangelogModal] = useState(false);
+  const [editingChangelogId, setEditingChangelogId] = useState(null);
+  const [isSavingChangelog, setIsSavingChangelog] = useState(false);
+  const [showDeleteChangelogModal, setShowDeleteChangelogModal] = useState(false);
+  const [changelogToDelete, setChangelogToDelete] = useState(null);
+
+  const DEFAULT_CHANGELOG_FORM = {
+    version: '',
+    releaseDate: new Date().toISOString().slice(0, 10),
+    published: false,
+    title: '',
+    description: '',
+    sections: [
+      { type: 'feature', items: [''] },
+      { type: 'improvement', items: [''] },
+      { type: 'fix', items: [''] },
+      { type: 'removed', items: [] }
+    ]
+  };
+
+  const [changelogForm, setChangelogForm] = useState(DEFAULT_CHANGELOG_FORM);
+
+  const changelogDraftsCount = useMemo(() => {
+    return changelogs.filter(c => !c.published).length;
+  }, [changelogs]);
 
   // Mobile sidebar state
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -238,7 +287,7 @@ const Admin = () => {
     setLoading(true);
     const startPing = Date.now();
     try {
-      const [usersRes, bugReportsRes, featureRequestsRes, settingsRes, creatorReqsData, statsRes] = await Promise.all([
+      const [usersRes, bugReportsRes, featureRequestsRes, helpTicketsRes, settingsRes, creatorReqsData, statsRes, changelogsData, supportInboxRes] = await Promise.all([
         fetch(buildApiUrl('/admin/users'), {
           headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
           credentials: 'include'
@@ -251,9 +300,18 @@ const Admin = () => {
           headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
           credentials: 'include'
         }),
+        fetch(buildApiUrl('/admin/help-tickets'), {
+          headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
+          credentials: 'include'
+        }),
         fetch(buildApiUrl('/site-settings')),
         creatorAPI.getAll('all').catch(() => ({ requests: [] })),
         fetch(buildApiUrl('/admin/system-stats'), {
+          headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
+          credentials: 'include'
+        }).catch(() => null),
+        changelogAPI.getAdminAll().catch(() => ({ changelogs: [] })),
+        fetch(buildApiUrl('/admin/support/inbox?limit=150'), {
           headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
           credentials: 'include'
         }).catch(() => null)
@@ -276,6 +334,19 @@ const Admin = () => {
         setFeatureRequests(featureRequestsData.featureRequests || []);
       }
 
+      if (helpTicketsRes.ok) {
+        const helpTicketsData = await helpTicketsRes.json();
+        setHelpTickets(helpTicketsData.helpTickets || []);
+      }
+
+      if (supportInboxRes && supportInboxRes.ok) {
+        const supportInboxData = await supportInboxRes.json();
+        setSupportTickets(supportInboxData.tickets || []);
+        if (supportInboxData.metrics) {
+          setSupportMetrics(supportInboxData.metrics);
+        }
+      }
+
       if (settingsRes.ok) {
         const settingsData = await settingsRes.json();
         setMaintenanceMode(settingsData.maintenanceMode || false);
@@ -284,6 +355,10 @@ const Admin = () => {
 
       if (creatorReqsData && creatorReqsData.requests) {
         setCreatorRequests(creatorReqsData.requests);
+      }
+
+      if (changelogsData && Array.isArray(changelogsData.changelogs)) {
+        setChangelogs(changelogsData.changelogs);
       }
 
       if (statsRes && statsRes.ok) {
@@ -299,6 +374,567 @@ const Admin = () => {
       showMessage('Failed to load admin data', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // -------------------------------------------------------------------------
+  // Support Inbox & Workspace Handlers
+  // -------------------------------------------------------------------------
+  const fetchSupportInbox = async (filters = {}, { silent = false } = {}) => {
+    if (!silent) setSupportLoading(true);
+    try {
+      const type = filters.type !== undefined ? filters.type : supportTypeFilter;
+      const status = filters.status !== undefined ? filters.status : supportStatusFilter;
+      const priority = filters.priority !== undefined ? filters.priority : supportPriorityFilter;
+      const search = filters.search !== undefined ? filters.search : supportSearch;
+
+      const params = new URLSearchParams();
+      if (type && type !== 'all') params.set('type', type);
+      if (status && status !== 'all') params.set('status', status);
+      if (priority && priority !== 'all') params.set('priority', priority);
+      if (search && search.trim()) params.set('search', search.trim());
+      params.set('limit', '150');
+
+      const res = await fetch(buildApiUrl(`/admin/support/inbox?${params.toString()}`), {
+        headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSupportTickets(prev => {
+          const next = data.tickets || [];
+          if (
+            prev.length === next.length &&
+            prev.every((t, i) => t._id === next[i]._id && t.status === next[i].status && t.priority === next[i].priority && t.lastActivityAt === next[i].lastActivityAt)
+          ) {
+            return prev;
+          }
+          return next;
+        });
+        if (data.metrics) setSupportMetrics(data.metrics);
+      }
+    } catch (err) {
+      if (!silent) console.error('Failed to load support inbox:', err);
+    } finally {
+      if (!silent) setSupportLoading(false);
+    }
+  };
+
+  const fetchActiveAdminTicket = async (ticketId, { silent = true } = {}) => {
+    if (!ticketId) return;
+    try {
+      const res = await fetch(buildApiUrl(`/bug-reports/${ticketId}`), {
+        headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
+        credentials: 'include'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ticket) {
+          setActiveAdminTicket(prev => {
+            if (!prev || prev._id !== data.ticket._id) return data.ticket;
+            const prevLen = prev.messages?.length || 0;
+            const newLen = data.ticket.messages?.length || 0;
+            const statusChanged = prev.status !== data.ticket.status;
+            const priorityChanged = prev.priority !== data.ticket.priority;
+            const lastActivityChanged = prev.lastActivityAt !== data.ticket.lastActivityAt;
+            if (prevLen !== newLen || statusChanged || priorityChanged || lastActivityChanged) {
+              return data.ticket;
+            }
+            return prev;
+          });
+        }
+      }
+    } catch (e) {
+      if (!silent) console.error('Failed to poll active ticket:', e);
+    }
+  };
+
+  const handleOpenAdminTicket = async (ticket) => {
+    setActiveAdminTicket(ticket);
+    setAdminTicketDraftStatus(ticket.status || 'new');
+    setAdminTicketDraftPriority(ticket.priority || 'normal');
+    setAdminTicketDraftAssignee(ticket.assignedTo || '');
+    setAdminTicketDraftChangelog(ticket.linkedChangelogVersion || '');
+    setAdminComposerMode('reply');
+    setAdminReplyInput('');
+
+    // Fetch full ticket record with latest messages and activity log
+    try {
+      const res = await fetch(buildApiUrl(`/bug-reports/${ticket._id}`), {
+        headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
+        credentials: 'include'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ticket) {
+          setActiveAdminTicket(data.ticket);
+          setAdminTicketDraftStatus(data.ticket.status || 'new');
+          setAdminTicketDraftPriority(data.ticket.priority || 'normal');
+          setAdminTicketDraftAssignee(data.ticket.assignedTo || '');
+          setAdminTicketDraftChangelog(data.ticket.linkedChangelogVersion || '');
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch full ticket record:', e);
+    }
+  };
+
+  const handleSaveAdminTicketFields = async () => {
+    if (!activeAdminTicket) return;
+    setIsSavingAdminChanges(true);
+    try {
+      const payload = {
+        status: adminTicketDraftStatus,
+        priority: adminTicketDraftPriority,
+        assignedTo: adminTicketDraftAssignee.trim(),
+        linkedChangelogVersion: adminTicketDraftChangelog.trim()
+      };
+
+      const res = await fetch(buildApiUrl(`/bug-reports/${activeAdminTicket._id}/admin`), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {})
+        },
+        body: JSON.stringify(payload),
+        credentials: 'include'
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to update ticket');
+      }
+
+      const data = await res.json();
+      if (data.ticket) {
+        setActiveAdminTicket(data.ticket);
+        setSupportTickets(prev => prev.map(t => (t._id === data.ticket._id ? { ...t, ...data.ticket } : t)));
+        showMessage('Ticket changes saved successfully', 'success');
+        fetchSupportInbox();
+      }
+    } catch (err) {
+      showMessage(err.message || 'Failed to save changes', 'error');
+    } finally {
+      setIsSavingAdminChanges(false);
+    }
+  };
+
+  const handleSendAdminMessage = async () => {
+    if (!activeAdminTicket || !adminReplyInput.trim()) return;
+    setIsSendingAdminMessage(true);
+    try {
+      const isInternal = adminComposerMode === 'note';
+      const res = await fetch(buildApiUrl(`/bug-reports/${activeAdminTicket._id}/messages`), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {})
+        },
+        body: JSON.stringify({
+          content: adminReplyInput.trim(),
+          isInternalNote: isInternal
+        }),
+        credentials: 'include'
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to post message');
+      }
+
+      const data = await res.json();
+      if (data.ticket) {
+        setActiveAdminTicket(data.ticket);
+        setAdminReplyInput('');
+        setSupportTickets(prev => prev.map(t => (t._id === data.ticket._id ? { ...t, ...data.ticket } : t)));
+        showMessage(isInternal ? 'Internal note added' : 'Reply sent to user', 'success');
+        fetchSupportInbox();
+      }
+    } catch (err) {
+      showMessage(err.message || 'Failed to send message', 'error');
+    } finally {
+      setIsSendingAdminMessage(false);
+    }
+  };
+
+  const handleQuickResolveTicket = async (ticket) => {
+    try {
+      const resolveStatus = ticket.type === 'bug' ? 'fixed' : ticket.type === 'feature' ? 'completed' : 'resolved';
+      const res = await fetch(buildApiUrl(`/bug-reports/${ticket._id}/admin`), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {})
+        },
+        body: JSON.stringify({ status: resolveStatus }),
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        showMessage(`Ticket #${ticket.reportId || ''} marked as ${resolveStatus}`, 'success');
+        if (activeAdminTicket && activeAdminTicket._id === ticket._id) {
+          setActiveAdminTicket(data.ticket);
+          setAdminTicketDraftStatus(resolveStatus);
+        }
+        setSupportTickets(prev => prev.map(t => (t._id === ticket._id ? { ...t, status: resolveStatus } : t)));
+        fetchSupportInbox();
+      }
+    } catch (err) {
+      showMessage('Failed to resolve ticket', 'error');
+    }
+  };
+
+  const handleQuickCloseTicket = async (ticket) => {
+    try {
+      const res = await fetch(buildApiUrl(`/bug-reports/${ticket._id}/admin`), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {})
+        },
+        body: JSON.stringify({ status: 'closed' }),
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        showMessage(`Ticket #${ticket.reportId || ''} closed`, 'success');
+        if (activeAdminTicket && activeAdminTicket._id === ticket._id) {
+          setActiveAdminTicket(data.ticket);
+          setAdminTicketDraftStatus('closed');
+        }
+        setSupportTickets(prev => prev.map(t => (t._id === ticket._id ? { ...t, status: 'closed' } : t)));
+        fetchSupportInbox();
+      }
+    } catch (err) {
+      showMessage('Failed to close ticket', 'error');
+    }
+  };
+
+  // Live polling effect for Support Inbox & Open Ticket Workspace (paused when tab is hidden)
+  useEffect(() => {
+    let isPolling = false;
+
+    const poll = async () => {
+      if (document.hidden || isPolling) return;
+      isPolling = true;
+      try {
+        if (activeTab === 'support-inbox') {
+          if (activeAdminTicket?._id) {
+            await fetchActiveAdminTicket(activeAdminTicket._id, { silent: true });
+          } else {
+            await fetchSupportInbox({}, { silent: true });
+          }
+        } else {
+          // On other tabs: poll support inbox metrics every 25s so sidebar count stays live
+          await fetchSupportInbox({}, { silent: true });
+        }
+      } finally {
+        isPolling = false;
+      }
+    };
+
+    const intervalMs = activeTab === 'support-inbox'
+      ? (activeAdminTicket?._id ? 4000 : 8000)
+      : 25000;
+
+    const timer = setInterval(poll, intervalMs);
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        poll();
+      }
+    };
+    const handleFocus = () => poll();
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [activeTab, activeAdminTicket?._id, supportTypeFilter, supportStatusFilter, supportPriorityFilter, supportSearch]);
+
+  // Immediately refresh inbox on tab switch
+  useEffect(() => {
+    if (activeTab === 'support-inbox' && !activeAdminTicket) {
+      fetchSupportInbox({}, { silent: true });
+    }
+  }, [activeTab]);
+
+  // Auto-scroll admin thread when new messages are added
+  useEffect(() => {
+    if (activeAdminTicket?.messages?.length) {
+      adminMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [activeAdminTicket?.messages?.length]);
+
+
+  // -------------------------------------------------------------------------
+  // Changelog Management Handlers
+  // -------------------------------------------------------------------------
+  const loadChangelogs = async () => {
+    setChangelogsLoading(true);
+    try {
+      const res = await changelogAPI.getAdminAll();
+      if (res && Array.isArray(res.changelogs)) {
+        setChangelogs(res.changelogs);
+      }
+    } catch (err) {
+      console.error('Failed to load changelogs:', err);
+    } finally {
+      setChangelogsLoading(false);
+    }
+  };
+
+  const handleOpenNewChangelog = (duplicateFrom = null) => {
+    setEditingChangelogId(null);
+    if (duplicateFrom) {
+      const clonedSections = (duplicateFrom.sections && duplicateFrom.sections.length > 0)
+        ? duplicateFrom.sections.map(sec => ({
+            type: sec.type,
+            items: ['']
+          }))
+        : [
+            { type: 'feature', items: [''] },
+            { type: 'improvement', items: [''] },
+            { type: 'fix', items: [''] },
+            { type: 'removed', items: [] }
+          ];
+
+      let nextVersion = '';
+      const match = duplicateFrom.version?.match(/^v?(\d+)\.(\d+)\.(\d+)$/);
+      if (match) {
+        const patch = parseInt(match[3], 10) + 1;
+        nextVersion = `v${match[1]}.${match[2]}.${patch}`;
+      } else {
+        nextVersion = duplicateFrom.version ? `${duplicateFrom.version}-draft` : 'v1.0.0';
+      }
+
+      const today = new Date();
+      const formattedToday = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}-${today.getFullYear()}`;
+
+      setChangelogForm({
+        version: nextVersion,
+        releaseDate: formattedToday,
+        published: false,
+        sections: clonedSections
+      });
+    } else {
+      const today = new Date();
+      const formattedToday = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}-${today.getFullYear()}`;
+
+      setChangelogForm({
+        version: '',
+        releaseDate: formattedToday,
+        published: false,
+        sections: [
+          { type: 'feature', items: [''] },
+          { type: 'improvement', items: [''] },
+          { type: 'fix', items: [''] },
+          { type: 'removed', items: [] }
+        ]
+      });
+    }
+    setShowChangelogModal(true);
+  };
+
+  const handleEditChangelog = (entry) => {
+    setEditingChangelogId(entry._id);
+    let formattedDate = '';
+    if (entry.releaseDate) {
+      try {
+        const d = new Date(entry.releaseDate);
+        if (!isNaN(d.getTime())) {
+          const mo = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          const yr = d.getFullYear();
+          formattedDate = `${mo}-${day}-${yr}`;
+        } else {
+          formattedDate = String(entry.releaseDate);
+        }
+      } catch (e) {
+        formattedDate = String(entry.releaseDate);
+      }
+    } else if (entry.date) {
+      try {
+        const d = new Date(entry.date);
+        if (!isNaN(d.getTime())) {
+          const mo = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          const yr = d.getFullYear();
+          formattedDate = `${mo}-${day}-${yr}`;
+        } else {
+          formattedDate = String(entry.date);
+        }
+      } catch (e) {
+        formattedDate = String(entry.date);
+      }
+    } else {
+      const now = new Date();
+      formattedDate = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getFullYear()}`;
+    }
+
+    let sections = [];
+    if (Array.isArray(entry.sections) && entry.sections.length > 0) {
+      sections = entry.sections.map(s => ({
+        type: s.type,
+        items: s.items && s.items.length > 0 ? [...s.items] : ['']
+      }));
+    } else {
+      if (entry.features?.length) sections.push({ type: 'feature', items: [...entry.features] });
+      if (entry.changes?.length) sections.push({ type: 'improvement', items: [...entry.changes] });
+      if (entry.fixes?.length) sections.push({ type: 'fix', items: [...entry.fixes] });
+      if (entry.removed?.length) sections.push({ type: 'removed', items: [...entry.removed] });
+      if (sections.length === 0) {
+        sections = [
+          { type: 'feature', items: [''] },
+          { type: 'improvement', items: [''] },
+          { type: 'fix', items: [''] }
+        ];
+      }
+    }
+
+    setChangelogForm({
+      version: entry.version || '',
+      releaseDate: formattedDate,
+      published: Boolean(entry.published),
+      sections: sortChangelogSections(sections)
+    });
+    setShowChangelogModal(true);
+  };
+
+  const handleAddSection = (type = 'feature') => {
+    setChangelogForm(prev => {
+      const normalizedType = (type || 'feature').toLowerCase();
+      // Only allow 1 of each section
+      if (prev.sections.some(s => (s.type || '').toLowerCase() === normalizedType)) {
+        showMessage(`A ${normalizedType} section is already added. Only 1 of each section is allowed.`, 'warning');
+        return prev;
+      }
+      const nextSections = [...prev.sections, { type: normalizedType, items: [''] }];
+      return {
+        ...prev,
+        sections: sortChangelogSections(nextSections)
+      };
+    });
+  };
+
+  const handleRemoveSection = (sectionIndex) => {
+    setChangelogForm(prev => ({
+      ...prev,
+      sections: prev.sections.filter((_, idx) => idx !== sectionIndex)
+    }));
+  };
+
+  const handleAddSectionItem = (sectionIndex) => {
+    setChangelogForm(prev => {
+      const nextSections = [...prev.sections];
+      const items = [...(nextSections[sectionIndex].items || []), ''];
+      nextSections[sectionIndex] = { ...nextSections[sectionIndex], items };
+      return { ...prev, sections: nextSections };
+    });
+  };
+
+  const handleSectionItemChange = (sectionIndex, itemIndex, value) => {
+    setChangelogForm(prev => {
+      const nextSections = [...prev.sections];
+      const items = [...(nextSections[sectionIndex].items || [])];
+      items[itemIndex] = value;
+      nextSections[sectionIndex] = { ...nextSections[sectionIndex], items };
+      return { ...prev, sections: nextSections };
+    });
+  };
+
+  const handleRemoveSectionItem = (sectionIndex, itemIndex) => {
+    setChangelogForm(prev => {
+      const nextSections = [...prev.sections];
+      const items = (nextSections[sectionIndex].items || []).filter((_, idx) => idx !== itemIndex);
+      nextSections[sectionIndex] = { ...nextSections[sectionIndex], items };
+      return { ...prev, sections: nextSections };
+    });
+  };
+
+  const handleSaveChangelog = async (forcePublish = null) => {
+    if (!changelogForm.version.trim()) {
+      showMessage('Version is required (e.g. v1.2.3)', 'error');
+      return;
+    }
+
+    setIsSavingChangelog(true);
+    try {
+      const cleanedSections = sortChangelogSections(
+        (changelogForm.sections || [])
+          .map(sec => ({
+            type: (sec.type || 'feature').toLowerCase(),
+            items: (sec.items || []).map(i => i.trim()).filter(Boolean)
+          }))
+          .filter(sec => sec.items.length > 0)
+      );
+
+      const isPublished = forcePublish !== null ? forcePublish : changelogForm.published;
+
+      const payload = {
+        version: changelogForm.version.trim(),
+        releaseDate: changelogForm.releaseDate,
+        published: isPublished,
+        sections: cleanedSections
+      };
+
+      if (editingChangelogId) {
+        await changelogAPI.update(editingChangelogId, payload);
+        showMessage(`Release ${payload.version} updated successfully!`, 'success');
+      } else {
+        await changelogAPI.create(payload);
+        showMessage(`Release ${payload.version} created (${isPublished ? 'Published' : 'Draft'})!`, 'success');
+      }
+
+      setShowChangelogModal(false);
+      loadChangelogs();
+    } catch (err) {
+      showMessage(err.userMessage || 'Failed to save release', 'error');
+    } finally {
+      setIsSavingChangelog(false);
+    }
+  };
+
+  const handleTogglePublishChangelog = async (entry) => {
+    try {
+      const res = await changelogAPI.togglePublish(entry._id);
+      showMessage(`Release ${entry.version} is now ${res.published ? 'Published' : 'Draft'}`, 'success');
+      loadChangelogs();
+    } catch (err) {
+      showMessage(err.userMessage || 'Failed to toggle publish status', 'error');
+    }
+  };
+
+  const handleDuplicateChangelog = async (id) => {
+    try {
+      const res = await changelogAPI.duplicate(id);
+      showMessage(res.message || 'Draft duplicated from release!', 'success');
+      await loadChangelogs();
+      if (res.changelog) {
+        handleEditChangelog(res.changelog);
+      }
+    } catch (err) {
+      showMessage(err.userMessage || 'Failed to duplicate release', 'error');
+    }
+  };
+
+  const handleDeleteChangelogConfirm = async () => {
+    if (!changelogToDelete) return;
+    try {
+      await changelogAPI.delete(changelogToDelete._id);
+      showMessage(`Release ${changelogToDelete.version} deleted successfully`, 'success');
+      setShowDeleteChangelogModal(false);
+      setChangelogToDelete(null);
+      loadChangelogs();
+    } catch (err) {
+      showMessage(err.userMessage || 'Failed to delete release', 'error');
     }
   };
 
@@ -609,6 +1245,7 @@ const Admin = () => {
     setSelectedUser(user);
     setEditingBio(user.bio || '');
     setEditingUsername(user.username || '');
+    setEditingEmail(user.email || '');
     setEditingCreator(!!user.isContentCreator);
     setEditingAdmin(!!user.isAdmin);
     setEditingSuspended(!!user.isSuspended);
@@ -625,6 +1262,7 @@ const Admin = () => {
       const payload = { 
         bio: editingBio,
         username: editingUsername,
+        email: editingEmail,
         isContentCreator: editingCreator
       };
       if (editingAvatarRemoved) {
@@ -659,6 +1297,7 @@ const Admin = () => {
                 ...u, 
                 bio: result.bio, 
                 username: result.username, 
+                email: result.email !== undefined ? result.email : (editingEmail || u.email),
                 isContentCreator: result.isContentCreator, 
                 isAdmin: editingAdmin, 
                 isSuspended: editingSuspended,
@@ -723,6 +1362,69 @@ const Admin = () => {
       }
     } catch (err) {
       showMessage('Failed to update report status', 'error');
+    }
+  };
+
+  const handleAdminSendReply = async () => {
+    if (!activeHelpChatReport || !adminReplyText.trim()) return;
+    setIsSendingAdminReply(true);
+    try {
+      const response = await fetch(buildApiUrl(`/bug-reports/${activeHelpChatReport._id}/messages`), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {})
+        },
+        body: JSON.stringify({ content: adminReplyText.trim() }),
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to send reply');
+      }
+
+      const resData = await response.json();
+      if (resData.ticket) {
+        setActiveHelpChatReport(resData.ticket);
+        setHelpTickets(prev => prev.map(r => (r._id === resData.ticket._id ? resData.ticket : r)));
+        setBugReports(prev => prev.map(r => (r._id === resData.ticket._id ? resData.ticket : r)));
+        setAdminReplyText('');
+        showMessage('Reply sent to user', 'success');
+      }
+    } catch (err) {
+      console.error('Error sending admin reply:', err);
+      showMessage(err.message || 'Failed to send reply', 'error');
+    } finally {
+      setIsSendingAdminReply(false);
+    }
+  };
+
+  const handleAdminToggleStatus = async () => {
+    if (!activeHelpChatReport) return;
+    const newStatus = activeHelpChatReport.status === 'resolved' ? 'open' : 'resolved';
+    try {
+      const response = await fetch(buildApiUrl(`/bug-reports/${activeHelpChatReport._id}/status`), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {})
+        },
+        body: JSON.stringify({ status: newStatus }),
+        credentials: 'include'
+      });
+
+      if (!response.ok) throw new Error('Failed to update status');
+
+      const resData = await response.json();
+      if (resData.ticket) {
+        setActiveHelpChatReport(resData.ticket);
+        setHelpTickets(prev => prev.map(r => (r._id === resData.ticket._id ? resData.ticket : r)));
+        setBugReports(prev => prev.map(r => (r._id === resData.ticket._id ? resData.ticket : r)));
+        showMessage(`Ticket marked as ${newStatus}`, 'success');
+      }
+    } catch (err) {
+      showMessage('Failed to update ticket status', 'error');
     }
   };
 
@@ -791,12 +1493,9 @@ const Admin = () => {
     else if (roleFilter === 'premium_paid') matchesRole = user.premiumSource === 'subscription' || user.premiumSource === 'both';
     else if (roleFilter === 'premium_admin') matchesRole = user.premiumSource === 'admin' || user.premiumSource === 'both';
     else if (roleFilter === 'user') matchesRole = !user.isAdmin && !user.isContentCreator && !user.isPremium;
+    else if (roleFilter === 'suspended') matchesRole = !!user.isSuspended;
 
-    let matchesStatus = true;
-    if (statusFilter === 'active') matchesStatus = !user.isSuspended;
-    else if (statusFilter === 'suspended') matchesStatus = !!user.isSuspended;
-
-    return matchesSearch && matchesRole && matchesStatus;
+    return matchesSearch && matchesRole;
   }).sort((a, b) => {
     let comparison = 0;
     if (userSortField === 'username') {
@@ -823,7 +1522,7 @@ const Admin = () => {
 
   useEffect(() => {
     setUserPage(1);
-  }, [userSearch, globalSearch, roleFilter, statusFilter, rowsPerPage]);
+  }, [userSearch, globalSearch, roleFilter, rowsPerPage]);
 
   const handleUserSort = (field) => {
     if (userSortField === field) {
@@ -851,24 +1550,25 @@ const Admin = () => {
     return d >= startOfLastMonth && d < startOfMonth;
   }).length;
 
-  let monthTrend = { text: '0 new vs last month', type: 'neutral' };
+  let monthTrend = { text: '0 new vs last month', type: 'neutral', icon: null };
   if (newLastMonthCount > 0) {
     const diff = newThisMonthCount - newLastMonthCount;
     const pct = Math.round((diff / newLastMonthCount) * 100);
     if (pct > 0) {
-      monthTrend = { text: `↑ +${pct}% vs last month`, type: 'positive' };
+      monthTrend = { text: `+${pct}% vs last month`, type: 'positive', icon: 'up' };
     } else if (pct < 0) {
-      monthTrend = { text: `↓ ${Math.abs(pct)}% vs last month`, type: 'negative' };
+      monthTrend = { text: `${Math.abs(pct)}% vs last month`, type: 'negative', icon: 'down' };
     } else {
-      monthTrend = { text: `Same as last month (${newLastMonthCount})`, type: 'neutral' };
+      monthTrend = { text: `Same as last month (${newLastMonthCount})`, type: 'neutral', icon: null };
     }
   } else if (newThisMonthCount > 0) {
-    monthTrend = { text: `↑ +${newThisMonthCount} this month`, type: 'positive' };
+    monthTrend = { text: `+${newThisMonthCount} this month`, type: 'positive', icon: 'up' };
   }
 
   const suspendedCount = users.filter(u => u.isSuspended).length;
   const openBugReportsCount = bugReports.filter(r => r.status === 'open' || !r.status).length;
   const openFeatureRequestsCount = featureRequests.filter(r => r.status === 'open' || !r.status).length;
+  const openHelpTicketsCount = helpTickets.filter(r => r.status === 'open' || !r.status).length;
   const pendingCreatorRequestsCount = creatorRequests.filter(r => r.status === 'pending').length;
 
   if (isAdmin === null) {
@@ -937,31 +1637,38 @@ const Admin = () => {
 
               <button
                 type="button"
-                className={`admin-nav-item ${activeTab === 'bug-reports' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('bug-reports'); setMobileSidebarOpen(false); }}
+                className={`admin-nav-item ${activeTab === 'changelog' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('changelog'); setMobileSidebarOpen(false); }}
               >
                 <div className="flex items-center gap-2.5">
-                  <Bug size={17} className="admin-nav-icon" />
-                  <span>Bug Reports</span>
+                  <History size={17} className="admin-nav-icon" />
+                  <span>Changelog</span>
                 </div>
-                <span className={`admin-nav-badge ${openBugReportsCount > 0 ? 'amber' : 'neutral'}`}>
-                  {openBugReportsCount}
-                </span>
+                {changelogDraftsCount > 0 ? (
+                  <span className="admin-nav-badge amber" title={`${changelogDraftsCount} unpublished drafts`}>
+                    {changelogDraftsCount} draft{changelogDraftsCount > 1 ? 's' : ''}
+                  </span>
+                ) : (
+                  <span className="admin-nav-badge neutral">
+                    {changelogs.length}
+                  </span>
+                )}
               </button>
 
               <button
                 type="button"
-                className={`admin-nav-item ${activeTab === 'feature-requests' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('feature-requests'); setMobileSidebarOpen(false); }}
+                className={`admin-nav-item ${activeTab === 'support-inbox' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('support-inbox'); setMobileSidebarOpen(false); }}
               >
                 <div className="flex items-center gap-2.5">
-                  <MessageSquare size={17} className="admin-nav-icon" />
-                  <span>Feature Requests</span>
+                  <Inbox size={17} className="admin-nav-icon" />
+                  <span>Support Inbox</span>
                 </div>
-                <span className="admin-nav-badge neutral">
-                  {openFeatureRequestsCount}
+                <span className={`admin-nav-badge ${(supportMetrics.openCount || supportTickets.filter(t => !['resolved', 'fixed', 'completed', 'closed', 'declined'].includes(t.status)).length) > 0 ? 'amber' : 'neutral'}`}>
+                  {supportMetrics.openCount || supportTickets.filter(t => !['resolved', 'fixed', 'completed', 'closed', 'declined'].includes(t.status)).length}
                 </span>
               </button>
+
 
               <button
                 type="button"
@@ -988,30 +1695,6 @@ const Admin = () => {
                 </div>
               </button>
 
-              <Link
-                to="/achievements"
-                className="admin-nav-item"
-                onClick={() => setMobileSidebarOpen(false)}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Award size={17} className="admin-nav-icon" />
-                  <span>Badges & Achievements</span>
-                </div>
-              </Link>
-
-              <button
-                type="button"
-                className={`admin-nav-item ${activeTab === 'diagnostics' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('diagnostics'); setMobileSidebarOpen(false); }}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Activity size={17} className="admin-nav-icon" />
-                  <span>System Diagnostics</span>
-                </div>
-                <span className="admin-nav-badge emerald">
-                  {systemStats.performance?.avgResponseMs != null ? `${systemStats.performance.avgResponseMs}ms` : 'Live'}
-                </span>
-              </button>
             </div>
           </nav>
         </div>
@@ -1072,7 +1755,7 @@ const Admin = () => {
           {/* Total Users */}
           <div 
             className="admin-stat-card card-cyan"
-            onClick={() => { setActiveTab('users'); setRoleFilter('all'); setStatusFilter('all'); }}
+            onClick={() => { setActiveTab('users'); setRoleFilter('all'); }}
           >
             <div className="admin-stat-icon-box bg-cyan">
               <Users size={20} />
@@ -1081,7 +1764,9 @@ const Admin = () => {
               <span className="stat-label">Total Users</span>
               <span className="stat-value">{totalUsersCount}</span>
               {newThisWeekCount > 0 ? (
-                <span className="stat-trend positive">↑ +{newThisWeekCount} this week</span>
+                <span className="stat-trend positive flex items-center gap-1">
+                  <TrendingUp size={12} className="inline shrink-0" /> +{newThisWeekCount} this week
+                </span>
               ) : (
                 <span className="stat-trend neutral">0 new this week</span>
               )}
@@ -1116,7 +1801,11 @@ const Admin = () => {
             <div className="admin-stat-info">
               <span className="stat-label">New This Month</span>
               <span className="stat-value">{newThisMonthCount}</span>
-              <span className={`stat-trend ${monthTrend.type}`}>{monthTrend.text}</span>
+              <span className={`stat-trend ${monthTrend.type} flex items-center gap-1`}>
+                {monthTrend.icon === 'up' && <TrendingUp size={12} className="inline shrink-0" />}
+                {monthTrend.icon === 'down' && <TrendingDown size={12} className="inline shrink-0" />}
+                <span>{monthTrend.text}</span>
+              </span>
             </div>
             <ChevronRight size={16} className="stat-chevron" />
           </div>
@@ -1124,7 +1813,7 @@ const Admin = () => {
           {/* Suspended Users */}
           <div 
             className="admin-stat-card card-rose"
-            onClick={() => { setActiveTab('users'); setStatusFilter('suspended'); }}
+            onClick={() => { setActiveTab('users'); setRoleFilter('suspended'); }}
           >
             <div className="admin-stat-icon-box bg-rose">
               <UserX size={20} />
@@ -1168,13 +1857,18 @@ const Admin = () => {
                   {/* Filter Dropdown */}
                   <div className="relative flex items-center" ref={filterDropdownRef}>
                     <Button
-                      variant={roleFilter !== 'all' || statusFilter !== 'all' ? 'primary' : 'secondary'}
+                      variant={roleFilter !== 'all' ? 'primary' : 'secondary'}
                       size="md"
                       icon={<Filter size={16} />}
                       iconRight={<ChevronDown size={14} className={`transition-transform duration-150 ${showFilterDropdown ? 'rotate-180' : ''}`} />}
                       onClick={() => setShowFilterDropdown(!showFilterDropdown)}
                     >
                       Filters
+                      {roleFilter !== 'all' && (
+                        <span className="admin-filter-count-badge">
+                          1
+                        </span>
+                      )}
                     </Button>
 
                     <AnimatePresence>
@@ -1187,50 +1881,39 @@ const Admin = () => {
                           className="admin-filter-flyout"
                         >
                           <div className="filter-group">
-                            <span className="filter-group-label">Role & Membership</span>
+                            <span className="filter-group-label">Filter by Role</span>
                             <div className="filter-options-grid">
                               {[
-                                { id: 'all', label: 'All Roles' },
-                                { id: 'admin', label: 'Admins 👑' },
-                                { id: 'creator', label: 'Creators 🎥' },
-                                { id: 'premium', label: 'All Premium 💎' },
-                                { id: 'premium_paid', label: 'Paid Members 💳' },
-                                { id: 'premium_admin', label: 'Admin Granted 🎁' },
-                                { id: 'user', label: 'Users' }
-                              ].map((r) => (
-                                <button
-                                  key={r.id}
-                                  type="button"
-                                  onClick={() => setRoleFilter(r.id)}
-                                  className={`filter-chip ${roleFilter === r.id ? 'selected' : ''}`}
-                                >
-                                  {r.label}
-                                </button>
-                              ))}
+                                { id: 'all', label: 'All Users', icon: null },
+                                { id: 'admin', label: 'Admins', icon: Crown, iconColor: 'text-amber-400' },
+                                { id: 'creator', label: 'Creators', icon: Video, iconColor: 'text-pink-400' },
+                                { id: 'premium', label: 'All Premium', icon: Gem, iconColor: 'text-sky-400' },
+                                { id: 'premium_paid', label: 'Paid Members', icon: CreditCard, iconColor: 'text-emerald-400' },
+                                { id: 'premium_admin', label: 'Admin Granted', icon: Gift, iconColor: 'text-purple-400' },
+                                { id: 'suspended', label: 'Suspended', icon: Ban, iconColor: 'text-rose-400' },
+                                { id: 'user', label: 'Users', icon: User, iconColor: 'text-gray-400' }
+                              ].map((r) => {
+                                const IconComponent = r.icon;
+                                return (
+                                  <button
+                                    key={r.id}
+                                    type="button"
+                                    onClick={() => setRoleFilter(r.id)}
+                                    className={`filter-chip flex items-center gap-1.5 ${roleFilter === r.id ? 'selected' : ''}`}
+                                  >
+                                    {IconComponent && <IconComponent size={12} className={`shrink-0 ${roleFilter === r.id ? 'text-black' : r.iconColor}`} />}
+                                    <span>{r.label}</span>
+                                  </button>
+                                );
+                              })}
                             </div>
                           </div>
 
-                          <div className="filter-group pt-2 border-t border-white/[0.08]">
-                            <span className="filter-group-label">Status</span>
-                            <div className="filter-options-grid">
-                              {['all', 'active', 'suspended'].map((s) => (
-                                <button
-                                  key={s}
-                                  type="button"
-                                  onClick={() => setStatusFilter(s)}
-                                  className={`filter-chip ${statusFilter === s ? 'selected' : ''}`}
-                                >
-                                  {s === 'all' ? 'All Status' : s === 'active' ? '● Active' : '● Suspended'}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-
-                          {(roleFilter !== 'all' || statusFilter !== 'all') && (
+                          {roleFilter !== 'all' && (
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => { setRoleFilter('all'); setStatusFilter('all'); }}
+                              onClick={() => setRoleFilter('all')}
                               className="filter-reset-btn w-full mt-1"
                             >
                               Reset Filters
@@ -1243,37 +1926,61 @@ const Admin = () => {
                 </div>
               </div>
 
+              {/* Active Filter Chips Bar */}
+              {roleFilter !== 'all' && (
+                <div className="admin-active-filters-bar">
+                  <span className="admin-active-filters-label">Active:</span>
+                  <span className="admin-active-chip">
+                    <span>Role: {roleFilter === 'admin' ? 'Admins' : roleFilter === 'creator' ? 'Creators' : roleFilter === 'premium' ? 'All Premium' : roleFilter === 'premium_paid' ? 'Paid Members' : roleFilter === 'premium_admin' ? 'Admin Granted' : roleFilter === 'suspended' ? 'Suspended' : 'Users'}</span>
+                    <button type="button" onClick={() => setRoleFilter('all')} className="admin-active-chip-remove" title="Remove role filter">
+                      <X size={12} />
+                    </button>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setRoleFilter('all')}
+                    className="admin-active-clear-all"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
+
               {/* Table Area (auto-fit to full page) */}
-              <div className="admin-table-scroll-area" ref={setTableContainerRef}>
+              <div className="admin-table-scroll-area">
                 <table className="admin-data-table">
+                  <colgroup>
+                    <col className="col-user" style={{ width: '30%' }} />
+                    <col className="col-role" style={{ width: '28%' }} />
+                    <col className="col-joined" style={{ width: '18%' }} />
+                    <col className="col-active" style={{ width: '14%' }} />
+                    <col className="col-actions" style={{ width: '10%' }} />
+                  </colgroup>
                   <thead>
                     <tr>
                       <th className="col-th-user" onClick={() => handleUserSort('username')}>
                         <div className="th-content-sort">
                           <span>USER</span>
-                          {userSortField === 'username' && (userSortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
+                          {userSortField === 'username' && (userSortDir === 'asc' ? <ArrowUp size={12} className="shrink-0" /> : <ArrowDown size={12} className="shrink-0" />)}
                         </div>
                       </th>
                       <th className="col-th-role" onClick={() => handleUserSort('admin')}>
                         <div className="th-content-sort">
                           <span>ROLE</span>
-                          {userSortField === 'admin' && (userSortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
+                          {userSortField === 'admin' && (userSortDir === 'asc' ? <ArrowUp size={12} className="shrink-0" /> : <ArrowDown size={12} className="shrink-0" />)}
                         </div>
                       </th>
                       <th className="col-th-joined" onClick={() => handleUserSort('joined')}>
                         <div className="th-content-sort">
                           <span>JOINED</span>
-                          {userSortField === 'joined' && (userSortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
+                          {userSortField === 'joined' && (userSortDir === 'asc' ? <ArrowUp size={12} className="shrink-0" /> : <ArrowDown size={12} className="shrink-0" />)}
                         </div>
                       </th>
                       <th className="col-th-active" onClick={() => handleUserSort('lastActive')}>
                         <div className="th-content-sort">
                           <span>LAST ACTIVE</span>
-                          {userSortField === 'lastActive' && (userSortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
+                          {userSortField === 'lastActive' && (userSortDir === 'asc' ? <ArrowUp size={12} className="shrink-0" /> : <ArrowDown size={12} className="shrink-0" />)}
                         </div>
-                      </th>
-                      <th className="col-th-status">
-                        <span>STATUS</span>
                       </th>
                       <th className="col-th-actions text-right">
                         <span>ACTIONS</span>
@@ -1283,16 +1990,16 @@ const Admin = () => {
                   <tbody>
                     {paginatedUsers.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="admin-empty-table">
+                        <td colSpan={5} className="admin-empty-table">
                           <div className="empty-state-box">
                             <div className="empty-state-icon-bubble">
                               <Users size={30} className="text-gray-500" />
                             </div>
                             <span className="font-bold text-gray-200 text-sm mt-3">
-                              {userSearch || roleFilter !== 'all' || statusFilter !== 'all' ? 'No users matching your filters' : 'No users found'}
+                              {userSearch || roleFilter !== 'all' ? 'No users matching your filters' : 'No users found'}
                             </span>
                             <span className="text-xs text-gray-500 mt-1 max-w-xs">
-                              {userSearch || roleFilter !== 'all' || statusFilter !== 'all' ? 'Try adjusting your search query or clearing active filters.' : 'There are currently no registered users in the database.'}
+                              {userSearch || roleFilter !== 'all' ? 'Try adjusting your search query or clearing active filters.' : 'There are currently no registered users in the database.'}
                             </span>
                           </div>
                         </td>
@@ -1304,42 +2011,77 @@ const Admin = () => {
                           <tr key={user._id} className={`admin-row-hover ${userActionMenuOpenId === user._id ? 'relative z-20' : ''}`}>
                             {/* USER */}
                             <td className="col-td-user">
-                              <div className="flex items-center gap-2.5">
-                                <div className="admin-user-avatar-frame-sm">
-                                  <img
-                                    src={getUserAvatarUrl(user)}
-                                    alt={user.username}
-                                    className="admin-user-avatar-img"
-                                    onError={(e) => { e.target.src = '/data/default_profile_pictures/pikachu.png'; }}
-                                  />
-                                </div>
-                                <div className="flex flex-col min-w-0">
-                                  <span className="admin-user-name truncate">{user.username}</span>
-                                  <span className="admin-user-handle truncate">@{user.username.toLowerCase()}</span>
+                              <div className="flex items-center gap-2.5 overflow-hidden">
+                                <Link
+                                  to={`/u/${encodeURIComponent(user.username)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="admin-user-avatar-link shrink-0"
+                                  title={`View ${user.username}'s profile`}
+                                >
+                                  <div className="admin-user-avatar-frame-sm">
+                                    <img
+                                      src={getUserAvatarUrl(user)}
+                                      alt={user.username}
+                                      className="admin-user-avatar-img"
+                                      onError={(e) => { e.target.src = '/data/default_profile_pictures/pikachu.png'; }}
+                                    />
+                                  </div>
+                                </Link>
+                                <div className="min-w-0 overflow-hidden">
+                                  <Link
+                                    to={`/u/${encodeURIComponent(user.username)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="admin-user-name-link truncate block"
+                                    title={`View ${user.username}'s profile`}
+                                  >
+                                    <span className="admin-user-name truncate block">{user.username}</span>
+                                  </Link>
                                 </div>
                               </div>
                             </td>
 
                             {/* ROLE */}
                             <td className="col-td-role">
-                              <div className="flex flex-wrap items-center gap-1">
+                              <div className="flex items-center gap-1 overflow-hidden whitespace-nowrap">
+                                {user.isSuspended && (
+                                  <span className="role-pill suspended shrink-0">
+                                    <Ban size={10} className="inline mr-1" /> Suspended
+                                  </span>
+                                )}
                                 {user.isAdmin && (
-                                  <span className="role-pill admin">
+                                  <span className="role-pill admin shrink-0">
                                     Admin <Crown size={11} className="inline ml-0.5" />
                                   </span>
                                 )}
                                 {user.isContentCreator && (
-                                  <span className="role-pill creator">
+                                  <span className="role-pill creator shrink-0">
                                     Creator <Video size={11} className="inline ml-0.5" />
                                   </span>
                                 )}
                                 {user.isPremium && (
-                                  <span className={`role-pill ${user.premiumSource === 'subscription' || user.premiumSource === 'both' ? 'premium-paid' : 'premium-admin'}`}>
-                                    {user.premiumSource === 'subscription' ? 'Paid 💎' : user.premiumSource === 'admin' ? 'Admin 🎁' : 'Member 💎'}
+                                  <span className={`role-pill shrink-0 ${user.premiumSource === 'subscription' || user.premiumSource === 'both' ? 'premium-paid' : 'premium-admin'}`}>
+                                    {user.premiumSource === 'subscription' ? (
+                                      <>
+                                        <CreditCard size={11} className="inline mr-1" />
+                                        Paid
+                                      </>
+                                    ) : user.premiumSource === 'admin' ? (
+                                      <>
+                                        <Gift size={11} className="inline mr-1" />
+                                        Admin
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Gem size={11} className="inline mr-1" />
+                                        Member
+                                      </>
+                                    )}
                                   </span>
                                 )}
-                                {!user.isAdmin && !user.isContentCreator && !user.isPremium && (
-                                  <span className="role-pill user">
+                                {!user.isAdmin && !user.isContentCreator && !user.isPremium && !user.isSuspended && (
+                                  <span className="role-pill user shrink-0">
                                     User
                                   </span>
                                 )}
@@ -1348,7 +2090,7 @@ const Admin = () => {
 
                             {/* JOINED */}
                             <td className="col-td-joined">
-                              <span className="admin-date-text">
+                              <span className="admin-date-text truncate block">
                                 {formatJoinedDate(user)}
                               </span>
                             </td>
@@ -1358,9 +2100,9 @@ const Admin = () => {
                               {(() => {
                                 const activeInfo = formatLastActive(user);
                                 return (
-                                  <div className="flex items-center gap-1.5">
+                                  <div className="flex items-center gap-1.5 overflow-hidden">
                                     <span 
-                                      className={`w-1.5 h-1.5 rounded-full ${
+                                      className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                                         activeInfo.isOnline 
                                           ? 'bg-emerald-400 animate-pulse' 
                                           : activeInfo.isRecent 
@@ -1368,7 +2110,7 @@ const Admin = () => {
                                             : 'bg-white/20'
                                       }`} 
                                     />
-                                    <span className={`admin-active-text ${activeInfo.isOnline ? 'text-emerald-400 font-semibold' : ''}`}>
+                                    <span className={`admin-active-text truncate ${activeInfo.isOnline ? 'text-emerald-400 font-semibold' : ''}`}>
                                       {activeInfo.text}
                                     </span>
                                   </div>
@@ -1376,25 +2118,12 @@ const Admin = () => {
                               })()}
                             </td>
 
-                            {/* STATUS */}
-                            <td className="col-td-status">
-                              {user.isSuspended ? (
-                                <span className="status-pill suspended">
-                                  ● Suspended
-                                </span>
-                              ) : (
-                                <span className="status-pill active">
-                                  ● Active
-                                </span>
-                              )}
-                            </td>
-
                             {/* ACTIONS */}
                             <td className="col-td-actions text-right">
                               <div className="flex items-center justify-end gap-1 relative">
                                 <button
                                   type="button"
-                                  className="admin-icon-btn-sm edit"
+                                  className="admin-icon-btn-sm edit shrink-0"
                                   onClick={() => handleOpenEditUser(user)}
                                   title="Manage user"
                                 >
@@ -1403,7 +2132,7 @@ const Admin = () => {
 
                                 <button
                                   type="button"
-                                  className="admin-icon-btn-sm more user-more-btn"
+                                  className="admin-icon-btn-sm more user-more-btn shrink-0"
                                   onClick={() => setUserActionMenuOpenId(userActionMenuOpenId === user._id ? null : user._id)}
                                   title="More actions"
                                 >
@@ -1497,232 +2226,1045 @@ const Admin = () => {
                   Showing {filteredUsers.length === 0 ? 0 : (userPage - 1) * rowsPerPage + 1} to {Math.min(userPage * rowsPerPage, filteredUsers.length)} of {filteredUsers.length} users
                 </div>
 
-                <div className="admin-pagination-controls">
+                <div className="flex items-center gap-3">
+                  <div className="admin-rows-per-page">
+                    <span>Rows:</span>
+                    <div style={{ width: '76px' }}>
+                      <SelectField
+                        size="sm"
+                        value={rowsPerPage}
+                        onChange={(val) => {
+                          setRowsPerPage(Number(val));
+                          setUserPage(1);
+                        }}
+                        options={[
+                          { value: 10, label: '10' },
+                          { value: 12, label: '12' },
+                          { value: 15, label: '15' },
+                          { value: 25, label: '25' },
+                          { value: 50, label: '50' }
+                        ]}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="admin-pagination-controls">
+                    <button
+                      type="button"
+                      className="pagination-btn-sm"
+                      onClick={() => setUserPage(1)}
+                      disabled={userPage === 1}
+                      title="First page"
+                    >
+                      <ChevronsLeft size={14} />
+                    </button>
+
+                    <button
+                      type="button"
+                      className="pagination-btn-sm"
+                      onClick={() => setUserPage(prev => Math.max(prev - 1, 1))}
+                      disabled={userPage === 1}
+                      title="Previous page"
+                    >
+                      <ChevronLeft size={14} />
+                    </button>
+
+                    {Array.from({ length: Math.min(5, totalUserPages) }, (_, idx) => {
+                      let pageNum;
+                      if (totalUserPages <= 5) {
+                        pageNum = idx + 1;
+                      } else if (userPage <= 3) {
+                        pageNum = idx + 1;
+                      } else if (userPage >= totalUserPages - 2) {
+                        pageNum = totalUserPages - 4 + idx;
+                      } else {
+                        pageNum = userPage - 2 + idx;
+                      }
+
+                      return (
+                        <button
+                          key={pageNum}
+                          type="button"
+                          className={`pagination-num-btn-sm ${userPage === pageNum ? 'active' : ''}`}
+                          onClick={() => setUserPage(pageNum)}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+
+                    <button
+                      type="button"
+                      className="pagination-btn-sm"
+                      onClick={() => setUserPage(prev => Math.min(prev + 1, totalUserPages))}
+                      disabled={userPage >= totalUserPages}
+                      title="Next page"
+                    >
+                      <ChevronRight size={14} />
+                    </button>
+
+                    <button
+                      type="button"
+                      className="pagination-btn-sm"
+                      onClick={() => setUserPage(totalUserPages)}
+                      disabled={userPage >= totalUserPages}
+                      title="Last page"
+                    >
+                      <ChevronsRight size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 2. CHANGELOG MANAGER TAB */}
+          {activeTab === 'changelog' && (
+            <div className="admin-content-card-fit admin-changelog-viewport">
+              <div className="admin-card-header-compact flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="admin-card-title flex items-center gap-2">
+                    <History size={19} className="text-cyan-400" />
+                    <span>Changelog Manager</span>
+                  </h2>
+                  <p className="admin-card-desc">
+                    Build, draft, and publish releases to your database. Updates appear automatically on the public changelog.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  {changelogs.length > 0 && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleOpenNewChangelog(changelogs[0])}
+                      icon={<Copy size={13} />}
+                      title="Create a new draft with the same section structure as the latest release"
+                    >
+                      Duplicate Latest Release
+                    </Button>
+                  )}
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => handleOpenNewChangelog(null)}
+                    icon={<Plus size={14} />}
+                  >
+                    New Release
+                  </Button>
+                </div>
+              </div>
+
+              {/* Action Toolbar: Filter and Search */}
+              <div className="admin-action-toolbar flex flex-wrap items-center justify-between gap-3 mt-3">
+                <div className="flex items-center gap-2 flex-1 min-w-[240px] max-w-md">
+                  <SearchField
+                    value={changelogSearch}
+                    onChange={(e) => setChangelogSearch(e.target.value)}
+                    onClear={() => setChangelogSearch('')}
+                    placeholder="Search version tags, features, fixes..."
+                    size="sm"
+                    className="admin-search-field-universal"
+                  />
+                </div>
+
+                <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/5 dark:bg-white/[0.04] border border-[var(--border-color)] text-xs">
                   <button
                     type="button"
-                    className="pagination-btn-sm"
-                    onClick={() => setUserPage(1)}
-                    disabled={userPage === 1}
+                    className={`px-3 py-1 rounded-lg font-medium transition-all ${changelogFilter === 'all' ? 'bg-[var(--accent)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-white'}`}
+                    onClick={() => setChangelogFilter('all')}
                   >
-                    «
+                    All ({changelogs.length})
                   </button>
-
                   <button
                     type="button"
-                    className="pagination-btn-sm"
-                    onClick={() => setUserPage(prev => Math.max(prev - 1, 1))}
-                    disabled={userPage === 1}
+                    className={`px-3 py-1 rounded-lg font-medium transition-all ${changelogFilter === 'published' ? 'bg-[var(--accent)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-white'}`}
+                    onClick={() => setChangelogFilter('published')}
                   >
-                    ‹
+                    Published ({changelogs.filter(c => c.published).length})
                   </button>
+                  <button
+                    type="button"
+                    className={`px-3 py-1 rounded-lg font-medium transition-all ${changelogFilter === 'draft' ? 'bg-[var(--accent)] text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-white'}`}
+                    onClick={() => setChangelogFilter('draft')}
+                  >
+                    Drafts ({changelogs.filter(c => !c.published).length})
+                  </button>
+                </div>
+              </div>
 
-                  {Array.from({ length: Math.min(5, totalUserPages) }, (_, idx) => {
-                    let pageNum;
-                    if (totalUserPages <= 5) {
-                      pageNum = idx + 1;
-                    } else if (userPage <= 3) {
-                      pageNum = idx + 1;
-                    } else if (userPage >= totalUserPages - 2) {
-                      pageNum = totalUserPages - 4 + idx;
-                    } else {
-                      pageNum = userPage - 2 + idx;
-                    }
+              {/* Changelog Entries List / Grid */}
+              <div className="admin-changelog-scroll-area mt-3">
+                {(() => {
+                  const filtered = changelogs.filter((entry) => {
+                    if (changelogFilter === 'published' && !entry.published) return false;
+                    if (changelogFilter === 'draft' && entry.published) return false;
 
+                    if (!changelogSearch.trim()) return true;
+                    const q = changelogSearch.toLowerCase();
+                    const inVersion = (entry.version || '').toLowerCase().includes(q);
+                    const inSections = (entry.sections || []).some(s =>
+                      (s.items || []).some(item => item.toLowerCase().includes(q))
+                    );
+                    const inFeatures = (entry.features || []).some(item => item.toLowerCase().includes(q));
+                    const inFixes = (entry.fixes || []).some(item => item.toLowerCase().includes(q));
+                    return inVersion || inSections || inFeatures || inFixes;
+                  });
+
+                  if (changelogsLoading) {
                     return (
-                      <button
-                        key={pageNum}
-                        type="button"
-                        className={`pagination-num-btn-sm ${userPage === pageNum ? 'active' : ''}`}
-                        onClick={() => setUserPage(pageNum)}
+                      <div className="empty-state-box">
+                        <div className="loading-spinner mb-2"></div>
+                        <span className="text-xs text-gray-400">Loading changelogs...</span>
+                      </div>
+                    );
+                  }
+
+                  if (filtered.length === 0) {
+                    return (
+                      <div className="empty-state-box">
+                        <div className="empty-state-icon-bubble">
+                          <History size={30} className="text-gray-500" />
+                        </div>
+                        <span className="font-bold text-gray-200 text-sm mt-3">
+                          {changelogSearch ? 'No matching releases found' : 'No changelog releases found'}
+                        </span>
+                        <span className="text-xs text-gray-500 mt-1 max-w-xs">
+                          {changelogSearch ? 'Try a different search keyword.' : 'Click "New Release" to create your first release note.'}
+                        </span>
+                        {!changelogSearch && (
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            className="mt-3"
+                            onClick={() => handleOpenNewChangelog(null)}
+                            icon={<Plus size={14} />}
+                          >
+                            Create First Release
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="admin-changelog-grid">
+                      {filtered.map((entry) => {
+                        const rawDate = entry.releaseDate || entry.date;
+                        const dateFormatted = rawDate ? new Date(rawDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'No date';
+                        
+                        let featureCount = 0;
+                        let improvementCount = 0;
+                        let fixCount = 0;
+                        let removedCount = 0;
+
+                        if (entry.sections && entry.sections.length > 0) {
+                          entry.sections.forEach(sec => {
+                            const t = (sec.type || '').toLowerCase();
+                            const len = (sec.items || []).length;
+                            if (t.includes('feature')) featureCount += len;
+                            else if (t.includes('improv') || t.includes('change')) improvementCount += len;
+                            else if (t.includes('fix')) fixCount += len;
+                            else if (t.includes('remov')) removedCount += len;
+                          });
+                        } else {
+                          featureCount = (entry.features || []).length;
+                          improvementCount = (entry.changes || []).length;
+                          fixCount = (entry.fixes || []).length;
+                          removedCount = (entry.removed || []).length;
+                        }
+
+                        return (
+                          <div key={entry._id} className="admin-changelog-card">
+                            <div className="flex items-center justify-between gap-2.5">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-bold text-base text-[var(--text)] tracking-wide">
+                                  {entry.version}
+                                </span>
+                                <span className={`changelog-status-pill ${entry.published ? 'published' : 'draft'}`}>
+                                  {entry.published ? (
+                                    <>
+                                      <CheckCircle size={11} />
+                                      <span>Published</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Clock size={11} />
+                                      <span>Draft</span>
+                                    </>
+                                  )}
+                                </span>
+                                <span className="text-xs text-[var(--text-muted)] flex items-center gap-1">
+                                  <Calendar size={12} />
+                                  <span>{dateFormatted}</span>
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-1 shrink-0 flex-wrap justify-end">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleTogglePublishChangelog(entry)}
+                                  icon={entry.published ? <EyeOff size={13} /> : <Eye size={13} />}
+                                  title={entry.published ? 'Unpublish to draft' : 'Publish to live changelog'}
+                                >
+                                  <span className="changelog-btn-text-collapsible">{entry.published ? 'Unpublish' : 'Publish'}</span>
+                                </Button>
+
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDuplicateChangelog(entry._id)}
+                                  icon={<Copy size={13} />}
+                                  title="Duplicate as new draft"
+                                >
+                                  <span className="changelog-btn-text-collapsible">Duplicate</span>
+                                </Button>
+
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  onClick={() => handleEditChangelog(entry)}
+                                  icon={<Edit3 size={13} />}
+                                >
+                                  Edit
+                                </Button>
+
+                                <Button
+                                  variant="danger-soft"
+                                  size="sm"
+                                  onClick={() => {
+                                    setChangelogToDelete(entry);
+                                    setShowDeleteChangelogModal(true);
+                                  }}
+                                  icon={<Trash2 size={13} />}
+                                  title="Delete release"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Section breakdown pills */}
+                            <div className="flex flex-wrap items-center gap-2 pt-2 mt-2 border-t border-[var(--border-color)] text-xs">
+                              {featureCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-md text-[10.5px] font-semibold changelog-badge-feature">
+                                  {featureCount} Feature{featureCount > 1 ? 's' : ''}
+                                </span>
+                              )}
+                              {improvementCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-md text-[10.5px] font-semibold changelog-badge-improvement">
+                                  {improvementCount} Improvement{improvementCount > 1 ? 's' : ''}
+                                </span>
+                              )}
+                              {fixCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-md text-[10.5px] font-semibold changelog-badge-fix">
+                                  {fixCount} Fix{fixCount > 1 ? 'es' : ''}
+                                </span>
+                              )}
+                              {removedCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-md text-[10.5px] font-semibold changelog-badge-removed">
+                                  {removedCount} Removed
+                                </span>
+                              )}
+                              {featureCount === 0 && improvementCount === 0 && fixCount === 0 && removedCount === 0 && (
+                                <span className="text-[11px] text-[var(--text-muted)] italic">
+                                  No entries
+                                </span>
+                              )}
+                              <span className="text-[11px] text-[var(--text-muted)] ml-auto">
+                                Total {featureCount + improvementCount + fixCount + removedCount} items
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
+
+          {/* 3. UNIFIED SUPPORT INBOX & WORKSPACE TAB */}
+          {activeTab === 'support-inbox' && (
+            <div className="admin-content-card-fit overflow-y-auto">
+              {activeAdminTicket ? (
+                /* ============================================================
+                   SUB-VIEW: ADMIN TICKET WORKSPACE
+                   ============================================================ */
+                <div className="admin-workspace-view">
+                  {/* Top Bar */}
+                  <div className="admin-workspace-topbar">
+                    <button
+                      type="button"
+                      className="admin-workspace-back-btn"
+                      onClick={() => {
+                        setActiveAdminTicket(null);
+                        fetchSupportInbox();
+                      }}
+                    >
+                      <ArrowLeft size={15} />
+                      <span>Back to Support Inbox</span>
+                    </button>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-[var(--text-muted)]">
+                        Submitted by <strong>@{activeAdminTicket.username || activeAdminTicket.submittedBy?.username || 'Anonymous'}</strong>
+                        {activeAdminTicket.submittedBy?.email ? ` (${activeAdminTicket.submittedBy.email})` : ''} • {new Date(activeAdminTicket.createdAt).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Header Title */}
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <h2 className="admin-card-title text-base flex items-center gap-2 m-0">
+                      <span className="text-[var(--accent)] font-extrabold">#{activeAdminTicket.reportId}</span>
+                      <span className="text-gray-500">—</span>
+                      <span>{activeAdminTicket.title}</span>
+                    </h2>
+
+                    <div className="flex items-center gap-2">
+                      <span className={`ticket-type-pill ${activeAdminTicket.type}`}>
+                        {activeAdminTicket.type === 'bug' ? 'Bug Report' : activeAdminTicket.type === 'feature' ? 'Feature Request' : 'Help Request'}
+                      </span>
+                      {activeAdminTicket.category && (
+                        <span className="ticket-category-pill">
+                          {activeAdminTicket.category}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Workspace Control Ribbon */}
+                  <div className="admin-workspace-ribbon">
+                    <div className="ribbon-controls-left">
+                      {/* Status Selector (Type-specific) */}
+                      <div className="ribbon-field-item">
+                        <label className="ribbon-field-label">Status</label>
+                        <div style={{ minWidth: '175px' }}>
+                          <SelectField
+                            size="sm"
+                            value={adminTicketDraftStatus}
+                            onChange={(val) => setAdminTicketDraftStatus(val)}
+                            options={
+                              activeAdminTicket.type === 'help' ? [
+                                { value: 'new', label: '🔴 New' },
+                                { value: 'awaiting_staff', label: '🟡 Awaiting Staff' },
+                                { value: 'awaiting_user', label: '🔵 Awaiting User' },
+                                { value: 'resolved', label: '🟢 Resolved' },
+                                { value: 'closed', label: '⚪ Closed' }
+                              ] : activeAdminTicket.type === 'bug' ? [
+                                { value: 'reported', label: '🔴 Reported' },
+                                { value: 'investigating', label: '🟡 Investigating' },
+                                { value: 'confirmed', label: '🟣 Confirmed' },
+                                { value: 'fix_in_progress', label: '🟠 Fix In Progress' },
+                                { value: 'fixed', label: '🟢 Fixed' },
+                                { value: 'closed', label: '⚪ Closed' }
+                              ] : [
+                                { value: 'submitted', label: '🔵 Submitted' },
+                                { value: 'under_review', label: '🟣 Under Review' },
+                                { value: 'planned', label: '🟡 Planned' },
+                                { value: 'in_progress', label: '🟠 In Progress' },
+                                { value: 'completed', label: '🟢 Completed' },
+                                { value: 'declined', label: '⚪ Declined' },
+                                { value: 'duplicate', label: '⚪ Duplicate' }
+                              ]
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      {/* Priority Selector */}
+                      <div className="ribbon-field-item">
+                        <label className="ribbon-field-label">Priority</label>
+                        <div style={{ minWidth: '120px' }}>
+                          <SelectField
+                            size="sm"
+                            value={adminTicketDraftPriority}
+                            onChange={(val) => setAdminTicketDraftPriority(val)}
+                            options={[
+                              { value: 'low', label: 'Low' },
+                              { value: 'normal', label: 'Normal' },
+                              { value: 'high', label: 'High' },
+                              { value: 'urgent', label: 'Urgent' }
+                            ]}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Assignee */}
+                      <div className="ribbon-field-item">
+                        <label className="ribbon-field-label">Assigned To</label>
+                        <input
+                          type="text"
+                          className="ribbon-select text-xs"
+                          placeholder="Unassigned"
+                          value={adminTicketDraftAssignee}
+                          onChange={(e) => setAdminTicketDraftAssignee(e.target.value)}
+                        />
+                      </div>
+
+                      {/* Linked Changelog Version */}
+                      <div className="ribbon-field-item">
+                        <label className="ribbon-field-label">Connect Changelog</label>
+                        <div style={{ minWidth: '180px' }}>
+                          <SelectField
+                            size="sm"
+                            value={adminTicketDraftChangelog}
+                            onChange={(val) => setAdminTicketDraftChangelog(val)}
+                            options={[
+                              { value: '', label: 'None / Unlinked' },
+                              ...changelogs.map(c => ({
+                                value: c.version,
+                                label: `${c.version} (${c.published ? 'Published' : 'Draft'})`
+                              }))
+                            ]}
+                          />
+                        </div>
+                      </div>
+
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        loading={isSavingAdminChanges}
+                        onClick={handleSaveAdminTicketFields}
+                        style={{ marginTop: '14px' }}
                       >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
+                        Save Changes
+                      </Button>
+                    </div>
 
-                  <button
-                    type="button"
-                    className="pagination-btn-sm"
-                    onClick={() => setUserPage(prev => Math.min(prev + 1, totalUserPages))}
-                    disabled={userPage >= totalUserPages}
-                  >
-                    ›
-                  </button>
+                    {/* Ribbon Right Actions */}
+                    <div className="ribbon-actions-right">
+                      {activeAdminTicket.status !== 'resolved' && activeAdminTicket.status !== 'fixed' && activeAdminTicket.status !== 'completed' && (
+                        <Button
+                          variant="success"
+                          size="sm"
+                          icon={<CheckCircle size={14} />}
+                          onClick={() => handleQuickResolveTicket(activeAdminTicket)}
+                        >
+                          Resolve
+                        </Button>
+                      )}
+                      {activeAdminTicket.status !== 'closed' && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleQuickCloseTicket(activeAdminTicket)}
+                        >
+                          Close Ticket
+                        </Button>
+                      )}
+                      <Button
+                        variant="danger-soft"
+                        size="sm"
+                        icon={<Trash2 size={13} />}
+                        onClick={() => {
+                          setSelectedReport({ ...activeAdminTicket, reportType: 'Ticket' });
+                          setShowDeleteReportModal(true);
+                        }}
+                        aria-label="Delete ticket"
+                      />
+                    </div>
+                  </div>
 
-                  <button
-                    type="button"
-                    className="pagination-btn-sm"
-                    onClick={() => setUserPage(totalUserPages)}
-                    disabled={userPage >= totalUserPages}
-                  >
-                    »
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-
-
-          {/* 3. BUG REPORTS TAB */}
-          {activeTab === 'bug-reports' && (
-            <div className="admin-content-card-fit overflow-y-auto">
-              <div className="admin-card-header-compact">
-                <div>
-                  <h2 className="admin-card-title">Bug Reports</h2>
-                  <p className="admin-card-desc">Review and triage issues submitted by trainers.</p>
-                </div>
-                <div className="admin-action-toolbar">
-                  <SearchField
-                    value={bugReportSearch}
-                    onChange={(e) => setBugReportSearch(e.target.value)}
-                    onClear={() => setBugReportSearch('')}
-                    placeholder="Search bug reports..."
-                    size="md"
-                    className="admin-search-field-universal"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col flex-1 min-h-0">
-                {(() => {
-                  const filteredBugs = bugReports.filter(r => !bugReportSearch || (r.title && r.title.toLowerCase().includes(bugReportSearch.toLowerCase())) || (r.description && r.description.toLowerCase().includes(bugReportSearch.toLowerCase())));
-                  if (filteredBugs.length === 0) {
-                    return (
-                      <div className="empty-state-box">
-                        <div className="empty-state-icon-bubble">
-                          <Bug size={30} className="text-gray-500" />
+                  {/* 2-Column Workspace Body */}
+                  <div className="admin-workspace-grid">
+                    {/* Left / Main: Initial request + Conversation + Dual Composer */}
+                    <div className="admin-workspace-main-col">
+                      {/* Initial Request Summary Card */}
+                      <div className="admin-initial-request-card">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                            Initial Submission
+                          </span>
+                          <span className="text-[11px] text-gray-500">
+                            {new Date(activeAdminTicket.createdAt).toLocaleString()}
+                          </span>
                         </div>
-                        <span className="font-bold text-gray-200 text-sm mt-3">
-                          {bugReportSearch ? 'No matching bug reports found' : 'No bug reports filed'}
-                        </span>
-                        <span className="text-xs text-gray-500 mt-1 max-w-xs">
-                          {bugReportSearch ? 'Try adjusting your search query.' : 'All clear! There are currently no bug reports in the system.'}
-                        </span>
-                      </div>
-                    );
-                  }
-                  return (
-                    <div className="flex flex-col gap-2.5 mt-2">
-                      {filteredBugs.map((report) => (
-                        <div key={report._id} className="p-3.5 rounded-xl bg-black/5 dark:bg-black/25 border border-[var(--border-color)] flex items-center justify-between gap-3">
-                          <div className="flex flex-col gap-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-[var(--text)] text-sm truncate">{report.title || 'Untitled Report'}</span>
-                              <span className={`status-pill ${report.status === 'resolved' ? 'active' : 'suspended'} text-[10px]`}>
-                                {report.status === 'resolved' ? 'Resolved' : 'Open'}
-                              </span>
-                            </div>
-                            <p className="text-xs text-gray-300 line-clamp-1">{report.description}</p>
-                            <span className="text-[10px] text-gray-500">Reported by @{report.username || 'Anonymous'} • {getTimeAgo(report.createdAt)}</span>
-                          </div>
+                        <p className="text-xs text-[var(--text)] whitespace-pre-wrap leading-relaxed m-0">
+                          {activeAdminTicket.description}
+                        </p>
 
-                          <div className="flex items-center gap-2 shrink-0">
-                            {report.status !== 'resolved' && (
-                              <Button
-                                variant="success"
-                                size="sm"
-                                onClick={() => confirmResolveReport(report, 'Bug Report')}
-                              >
-                                Resolve
-                              </Button>
-                            )}
-                            <Button
-                              variant="danger-soft"
-                              size="sm"
-                              icon={<Trash2 size={13} />}
-                              onClick={() => { setSelectedReport({ ...report, reportType: 'Bug Report' }); setShowDeleteReportModal(true); }}
-                              aria-label="Delete bug report"
+                        {activeAdminTicket.useCase && (
+                          <div className="pt-2 border-t border-white/5">
+                            <span className="text-[11px] font-bold text-[var(--text-muted)]">Why it's useful:</span>
+                            <p className="text-xs text-gray-300 mt-0.5">{activeAdminTicket.useCase}</p>
+                          </div>
+                        )}
+
+                        {activeAdminTicket.stepsToReproduce && (
+                          <div className="pt-2 border-t border-white/5">
+                            <span className="text-[11px] font-bold text-[var(--text-muted)]">Steps to Reproduce:</span>
+                            <p className="text-xs text-gray-300 mt-0.5 whitespace-pre-wrap">{activeAdminTicket.stepsToReproduce}</p>
+                          </div>
+                        )}
+
+                        {activeAdminTicket.expectedBehavior && (
+                          <div className="pt-2 border-t border-white/5">
+                            <span className="text-[11px] font-bold text-[var(--text-muted)]">Expected Behavior:</span>
+                            <p className="text-xs text-gray-300 mt-0.5">{activeAdminTicket.expectedBehavior}</p>
+                          </div>
+                        )}
+
+                        {activeAdminTicket.attachments?.length > 0 && (
+                          <div className="pt-2 border-t border-white/5">
+                            <span className="text-[11px] font-bold text-[var(--text-muted)]">User Attachments:</span>
+                            <div className="flex items-center gap-2 mt-1">
+                              {activeAdminTicket.attachments.map((att, idx) => (
+                                <a key={idx} href={att} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-lg border border-white/15 overflow-hidden block">
+                                  <img src={att} alt="Attachment" className="w-full h-full object-cover" />
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Conversation Messages */}
+                      <div className="admin-workspace-thread">
+                        <div className="flex items-center gap-2 pb-1 border-b border-white/5 text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                          <MessageSquare size={13} />
+                          <span>Conversation & Notes</span>
+                        </div>
+
+                        {(Array.isArray(activeAdminTicket.messages) && activeAdminTicket.messages.length > 0
+                          ? activeAdminTicket.messages
+                          : [{ senderRole: 'user', senderName: activeAdminTicket.username || 'User', content: activeAdminTicket.description, createdAt: activeAdminTicket.createdAt }]
+                        ).map((msg, idx) => {
+                          const isStaff = msg.senderRole === 'admin';
+                          const isNote = Boolean(msg.isInternalNote);
+
+                          return (
+                            <div
+                              key={idx}
+                              className={`admin-msg-bubble ${isNote ? 'from-internal-note' : isStaff ? 'from-staff-public' : 'from-user'}`}
+                            >
+                              <div className="flex items-center justify-between gap-3 text-[10px]">
+                                <div className="flex items-center gap-1.5 font-bold">
+                                  {isNote ? (
+                                    <span className="admin-internal-note-badge">
+                                      <Lock size={10} />
+                                      <span>INTERNAL NOTE • ONLY VISIBLE TO STAFF</span>
+                                    </span>
+                                  ) : isStaff ? (
+                                    <>
+                                      <ShieldCheck size={12} className="text-[var(--accent)]" />
+                                      <span className="text-[var(--accent)]">{msg.senderName || 'Support Staff'}</span>
+                                      <span className="staff-tag">STAFF</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <UserCircle2 size={12} className="text-gray-400" />
+                                      <span className="text-gray-300">@{msg.senderName || activeAdminTicket.username || 'User'}</span>
+                                    </>
+                                  )}
+                                </div>
+                                <span className="text-gray-400">
+                                  {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(msg.createdAt).toLocaleDateString()}
+                                </span>
+                              </div>
+
+                              <div className="whitespace-pre-wrap text-xs mt-1">{msg.content}</div>
+                            </div>
+                          );
+                        })}
+                        <div ref={adminMessagesEndRef} />
+                      </div>
+
+                      {/* Dual Composer: Public Reply vs Internal Note */}
+                      <div className="admin-workspace-composer">
+                        <div className="admin-composer-mode-tabs">
+                          <button
+                            type="button"
+                            className={`composer-mode-tab ${adminComposerMode === 'reply' ? 'active-reply' : ''}`}
+                            onClick={() => setAdminComposerMode('reply')}
+                          >
+                            <Send size={12} />
+                            <span>Public Reply</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={`composer-mode-tab ${adminComposerMode === 'note' ? 'active-note' : ''}`}
+                            onClick={() => setAdminComposerMode('note')}
+                          >
+                            <Lock size={12} />
+                            <span>Internal Note</span>
+                          </button>
+
+                          <span className={`composer-mode-hint ${adminComposerMode}`}>
+                            {adminComposerMode === 'reply'
+                              ? 'Visible to the user'
+                              : '🔒 Staff only — user will NEVER see this note'}
+                          </span>
+                        </div>
+
+                        <textarea
+                          className={`admin-composer-textarea ${adminComposerMode === 'note' ? 'note-mode' : ''}`}
+                          rows={3}
+                          placeholder={adminComposerMode === 'reply' ? 'Type response to user...' : 'Write an internal note (e.g. Paddle transaction confirmed, entitlement fixed)...'}
+                          value={adminReplyInput}
+                          onChange={(e) => setAdminReplyInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                              e.preventDefault();
+                              handleSendAdminMessage();
+                            }
+                          }}
+                        />
+
+                        <div className="admin-composer-actions">
+                          <span className="text-[11px] text-gray-500">Ctrl+Enter to send</span>
+                          <Button
+                            variant={adminComposerMode === 'note' ? 'secondary' : 'primary'}
+                            size="sm"
+                            loading={isSendingAdminMessage}
+                            disabled={!adminReplyInput.trim() || isSendingAdminMessage}
+                            onClick={handleSendAdminMessage}
+                            icon={adminComposerMode === 'note' ? <Lock size={13} /> : <Send size={13} />}
+                          >
+                            {adminComposerMode === 'note' ? 'Add Internal Note' : 'Send Public Reply'}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right / Sidebar: User details + Diagnostics + Activity Log */}
+                    <div className="admin-workspace-side-col">
+                      {/* User Profile Summary */}
+                      <div className="admin-side-card">
+                        <span className="admin-side-card-title">User Information</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full overflow-hidden bg-black/40 border border-white/10 shrink-0">
+                            <img
+                              src={getUserAvatarUrl(activeAdminTicket.submittedBy)}
+                              alt="Avatar"
+                              className="w-full h-full object-cover"
                             />
                           </div>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-xs font-bold text-[var(--text)] truncate">
+                              @{activeAdminTicket.username || activeAdminTicket.submittedBy?.username || 'Anonymous'}
+                            </span>
+                            {activeAdminTicket.submittedBy?.email && (
+                              <span className="text-[11px] text-gray-400 truncate">
+                                {activeAdminTicket.submittedBy.email}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      ))}
+                      </div>
+
+                      {/* Technical Diagnostics */}
+                      {activeAdminTicket.technicalInfo && (
+                        <div className="admin-side-card">
+                          <span className="admin-side-card-title">Captured Diagnostics</span>
+                          <div className="flex flex-col gap-1 text-[11px] text-gray-300">
+                            <div><strong>OS:</strong> {activeAdminTicket.technicalInfo.os || 'N/A'}</div>
+                            <div><strong>Browser:</strong> {activeAdminTicket.technicalInfo.browser || 'N/A'}</div>
+                            <div><strong>Screen:</strong> {activeAdminTicket.technicalInfo.screen || 'N/A'}</div>
+                            <div><strong>App Version:</strong> {activeAdminTicket.technicalInfo.version || 'v1.2.2'}</div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Activity Log Timeline */}
+                      <div className="admin-side-card">
+                        <span className="admin-side-card-title">Activity Timeline</span>
+                        {activeAdminTicket.activityLog && activeAdminTicket.activityLog.length > 0 ? (
+                          <div className="admin-activity-timeline">
+                            {activeAdminTicket.activityLog.slice().reverse().map((act, aIdx) => (
+                              <div key={aIdx} className="admin-activity-item">
+                                <div className="flex flex-col gap-0.5">
+                                  <span>{act.action}</span>
+                                  <span className="admin-activity-time">
+                                    {act.performedBy ? `@${act.performedBy} • ` : ''}
+                                    {getTimeAgo(act.timestamp)}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-[11px] text-gray-500 italic">No activity recorded yet.</span>
+                        )}
+                      </div>
                     </div>
-                  );
-                })()}
-              </div>
-            </div>
-          )}
-
-          {/* 4. FEATURE REQUESTS TAB */}
-          {activeTab === 'feature-requests' && (
-            <div className="admin-content-card-fit overflow-y-auto">
-              <div className="admin-card-header-compact">
-                <div>
-                  <h2 className="admin-card-title">Feature Requests</h2>
-                  <p className="admin-card-desc">Review community suggestions and feature ideas.</p>
+                  </div>
                 </div>
-                <div className="admin-action-toolbar">
-                  <SearchField
-                    value={featureRequestSearch}
-                    onChange={(e) => setFeatureRequestSearch(e.target.value)}
-                    onClear={() => setFeatureRequestSearch('')}
-                    placeholder="Search feature requests..."
-                    size="md"
-                    className="admin-search-field-universal"
-                  />
-                </div>
-              </div>
+              ) : (
+                /* ============================================================
+                   SUB-VIEW: UNIFIED SUPPORT INBOX LIST & TABLE
+                   ============================================================ */
+                <div className="admin-support-inbox">
+                  {/* Title */}
+                  <div className="admin-card-header-compact">
+                    <div>
+                      <h2 className="admin-card-title">Support Inbox</h2>
+                      <p className="admin-card-desc">Review and triage customer support tickets, bug reports, and feature proposals.</p>
+                    </div>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      icon={<RefreshCw size={13} className={supportLoading ? 'animate-spin' : ''} />}
+                      onClick={() => fetchSupportInbox()}
+                    >
+                      Refresh
+                    </Button>
+                  </div>
 
-              <div className="flex flex-col flex-1 min-h-0">
-                {(() => {
-                  const filteredRequests = featureRequests.filter(r => !featureRequestSearch || (r.title && r.title.toLowerCase().includes(featureRequestSearch.toLowerCase())) || (r.description && r.description.toLowerCase().includes(featureRequestSearch.toLowerCase())));
-                  if (filteredRequests.length === 0) {
-                    return (
+                  {/* Metrics Bar */}
+                  <div className="admin-support-metrics-grid">
+                    <div className="admin-metric-card">
+                      <span className="admin-metric-card-label">Open Tickets</span>
+                      <span className="admin-metric-card-val amber">{supportMetrics.openCount}</span>
+                    </div>
+                    <div className="admin-metric-card">
+                      <span className="admin-metric-card-label">Awaiting Staff</span>
+                      <span className="admin-metric-card-val cyan">{supportMetrics.awaitingStaffCount}</span>
+                    </div>
+                    <div className="admin-metric-card">
+                      <span className="admin-metric-card-label">Awaiting User</span>
+                      <span className="admin-metric-card-val purple">{supportMetrics.awaitingUserCount}</span>
+                    </div>
+                    <div className="admin-metric-card">
+                      <span className="admin-metric-card-label">Resolved / Closed</span>
+                      <span className="admin-metric-card-val emerald">{supportMetrics.resolvedCount}</span>
+                    </div>
+                  </div>
+
+                  {/* Filter Toolbar */}
+                  <div className="admin-support-toolbar">
+                    <div className="admin-support-filters-left">
+                      {/* Type Tabs */}
+                      <div className="admin-type-tab-group">
+                        <button
+                          type="button"
+                          className={`admin-type-tab ${supportTypeFilter === 'all' ? 'active' : ''}`}
+                          onClick={() => {
+                            setSupportTypeFilter('all');
+                            fetchSupportInbox({ type: 'all' });
+                          }}
+                        >
+                          All
+                        </button>
+                        <button
+                          type="button"
+                          className={`admin-type-tab ${supportTypeFilter === 'help' ? 'active' : ''}`}
+                          onClick={() => {
+                            setSupportTypeFilter('help');
+                            fetchSupportInbox({ type: 'help' });
+                          }}
+                        >
+                          Help
+                        </button>
+                        <button
+                          type="button"
+                          className={`admin-type-tab ${supportTypeFilter === 'bug' ? 'active' : ''}`}
+                          onClick={() => {
+                            setSupportTypeFilter('bug');
+                            fetchSupportInbox({ type: 'bug' });
+                          }}
+                        >
+                          Bugs
+                        </button>
+                        <button
+                          type="button"
+                          className={`admin-type-tab ${supportTypeFilter === 'feature' ? 'active' : ''}`}
+                          onClick={() => {
+                            setSupportTypeFilter('feature');
+                            fetchSupportInbox({ type: 'feature' });
+                          }}
+                        >
+                          Features
+                        </button>
+                      </div>
+
+                      {/* Status Dropdown */}
+                      <div style={{ minWidth: '165px' }}>
+                        <SelectField
+                          size="sm"
+                          value={supportStatusFilter}
+                          onChange={(val) => {
+                            setSupportStatusFilter(val);
+                            fetchSupportInbox({ status: val });
+                          }}
+                          options={[
+                            { value: 'all', label: 'All Statuses' },
+                            { value: 'open', label: 'Open (Active)' },
+                            { value: 'awaiting_staff', label: 'Awaiting Staff' },
+                            { value: 'awaiting_user', label: 'Awaiting User' },
+                            { value: 'resolved', label: 'Resolved / Fixed' },
+                            { value: 'closed', label: 'Closed / Declined' }
+                          ]}
+                        />
+                      </div>
+
+                      {/* Priority Dropdown */}
+                      <div style={{ minWidth: '140px' }}>
+                        <SelectField
+                          size="sm"
+                          value={supportPriorityFilter}
+                          onChange={(val) => {
+                            setSupportPriorityFilter(val);
+                            fetchSupportInbox({ priority: val });
+                          }}
+                          options={[
+                            { value: 'all', label: 'All Priorities' },
+                            { value: 'urgent', label: 'Urgent' },
+                            { value: 'high', label: 'High' },
+                            { value: 'normal', label: 'Normal' },
+                            { value: 'low', label: 'Low' }
+                          ]}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Search Field */}
+                    <div className="w-full sm:w-auto">
+                      <SearchField
+                        value={supportSearch}
+                        onChange={(e) => {
+                          setSupportSearch(e.target.value);
+                          fetchSupportInbox({ search: e.target.value });
+                        }}
+                        onClear={() => {
+                          setSupportSearch('');
+                          fetchSupportInbox({ search: '' });
+                        }}
+                        placeholder="Search tickets by #ID, title, user..."
+                        size="md"
+                        className="admin-search-field-universal"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Data Table */}
+                  <div className="admin-support-table-wrap">
+                    {supportLoading && supportTickets.length === 0 ? (
+                      <div className="p-12 text-center text-gray-400 text-sm flex items-center justify-center gap-2">
+                        <RefreshCw size={16} className="animate-spin text-[var(--accent)]" />
+                        <span>Loading support inbox...</span>
+                      </div>
+                    ) : supportTickets.length === 0 ? (
                       <div className="empty-state-box">
                         <div className="empty-state-icon-bubble">
-                          <MessageSquare size={30} className="text-gray-500" />
+                          <Inbox size={30} className="text-gray-500" />
                         </div>
-                        <span className="font-bold text-gray-200 text-sm mt-3">
-                          {featureRequestSearch ? 'No matching feature requests found' : 'No feature requests filed'}
-                        </span>
+                        <span className="font-bold text-gray-200 text-sm mt-3">No tickets found</span>
                         <span className="text-xs text-gray-500 mt-1 max-w-xs">
-                          {featureRequestSearch ? 'Try adjusting your search query.' : 'All clear! There are currently no pending feature requests in the system.'}
+                          {supportSearch ? 'No tickets match your search query.' : 'All clear! There are currently no tickets matching your filters.'}
                         </span>
                       </div>
-                    );
-                  }
-                  return (
-                    <div className="flex flex-col gap-2.5 mt-2">
-                      {filteredRequests.map((req) => (
-                        <div key={req._id} className="p-3.5 rounded-xl bg-black/5 dark:bg-black/25 border border-[var(--border-color)] flex items-center justify-between gap-3">
-                          <div className="flex flex-col gap-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-[var(--text)] text-sm truncate">{req.title || 'Untitled Request'}</span>
-                              <span className={`status-pill ${req.status === 'resolved' ? 'active' : 'suspended'} text-[10px]`}>
-                                {req.status === 'resolved' ? 'Completed' : 'Open'}
-                              </span>
-                            </div>
-                            <p className="text-xs text-gray-300 line-clamp-1">{req.description}</p>
-                            <span className="text-[10px] text-gray-500">Requested by @{req.username || 'Anonymous'} • {getTimeAgo(req.createdAt)}</span>
-                          </div>
-
-                          <div className="flex items-center gap-2 shrink-0">
-                            {req.status !== 'resolved' && (
-                              <Button
-                                variant="success"
-                                size="sm"
-                                onClick={() => confirmResolveReport(req, 'Feature Request')}
+                    ) : (
+                      <table className="admin-support-table">
+                        <thead>
+                          <tr>
+                            <th style={{ width: '40%' }}>Ticket</th>
+                            <th>User</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Last Activity</th>
+                            <th style={{ textAlign: 'right' }}>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {supportTickets.map(ticket => {
+                            const isResolved = ['resolved', 'fixed', 'completed'].includes(ticket.status);
+                            return (
+                              <tr
+                                key={ticket._id}
+                                className="admin-support-row"
+                                onClick={() => handleOpenAdminTicket(ticket)}
                               >
-                                Complete
-                              </Button>
-                            )}
-                            <Button
-                              variant="danger-soft"
-                              size="sm"
-                              icon={<Trash2 size={13} />}
-                              onClick={() => { setSelectedReport({ ...req, reportType: 'Feature Request' }); setShowDeleteReportModal(true); }}
-                              aria-label="Delete feature request"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })()}
-              </div>
+                                <td>
+                                  <div className="flex flex-col min-w-0">
+                                    <div className="flex items-center gap-2">
+                                      <span className="admin-ticket-id-cell">#{ticket.reportId}</span>
+                                      <span className="font-bold text-[var(--text)] text-xs truncate max-w-md">
+                                        {ticket.title}
+                                      </span>
+                                    </div>
+                                    <span className="text-[11px] text-[var(--text-muted)] truncate mt-0.5">
+                                      {ticket.category || 'General'}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td>
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-5 h-5 rounded-full overflow-hidden bg-black/40 border border-white/10 shrink-0">
+                                      <img
+                                        src={getUserAvatarUrl(ticket.submittedBy)}
+                                        alt=""
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                    <span className="text-xs text-gray-300 truncate">
+                                      @{ticket.username || ticket.submittedBy?.username || 'Anonymous'}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td>
+                                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                                    ticket.type === 'bug'
+                                      ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
+                                      : ticket.type === 'feature'
+                                      ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                                      : 'bg-purple-500/10 text-purple-400 border border-purple-500/30'
+                                  }`}>
+                                    {ticket.type === 'bug' ? 'Bug' : ticket.type === 'feature' ? 'Feature' : 'Help'}
+                                  </span>
+                                </td>
+                                <td>
+                                  <span className={`status-pill ${isResolved ? 'active' : ticket.status === 'closed' ? 'suspended' : 'suspended'} text-[10px]`}>
+                                    {ticket.status || 'open'}
+                                  </span>
+                                </td>
+                                <td>
+                                  <span className={`admin-priority-pill ${ticket.priority || 'normal'}`}>
+                                    {ticket.priority || 'normal'}
+                                  </span>
+                                </td>
+                                <td>
+                                  <span className="text-[11px] text-gray-500">
+                                    {getTimeAgo(ticket.lastActivityAt || ticket.updatedAt || ticket.createdAt)}
+                                  </span>
+                                </td>
+                                <td style={{ textAlign: 'right' }} onClick={(e) => e.stopPropagation()}>
+                                  <div className="flex items-center justify-end gap-1.5">
+                                    {!isResolved && (
+                                      <Button
+                                        variant="success"
+                                        size="sm"
+                                        onClick={() => handleQuickResolveTicket(ticket)}
+                                      >
+                                        Resolve
+                                      </Button>
+                                    )}
+                                    <Button
+                                      variant="danger-soft"
+                                      size="sm"
+                                      icon={<Trash2 size={13} />}
+                                      onClick={() => {
+                                        setSelectedReport({ ...ticket, reportType: 'Ticket' });
+                                        setShowDeleteReportModal(true);
+                                      }}
+                                      aria-label="Delete ticket"
+                                    />
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
+
 
           {/* 5. CREATOR REQUESTS TAB */}
           {activeTab === 'creator-requests' && (
@@ -1814,7 +3356,9 @@ const Admin = () => {
                     <span className="font-bold text-[var(--text)] text-sm">Maintenance Mode</span>
                     <span className="text-[11px] text-[var(--text-muted)]">Lock the application immediately for all non-admin visitors.</span>
                     {maintenanceMode && !maintenanceStartTime && (
-                      <span className="text-[11px] text-red-400 mt-0.5 font-semibold">⚠ Currently active</span>
+                      <span className="text-[11px] text-red-400 mt-0.5 font-semibold flex items-center gap-1">
+                        <AlertTriangle size={12} className="inline shrink-0" /> Currently active
+                      </span>
                     )}
                   </div>
                   <Button
@@ -2391,6 +3935,17 @@ const Admin = () => {
             fullWidth
           />
 
+          <TextField
+            label="Email Address"
+            value={editingEmail}
+            onChange={(e) => setEditingEmail(e.target.value)}
+            placeholder="user@example.com"
+            type="email"
+            startIcon={<Mail size={15} />}
+            size="md"
+            fullWidth
+          />
+
           <TextArea
             label="User Bio"
             value={editingBio}
@@ -2409,10 +3964,27 @@ const Admin = () => {
                   <Sparkles size={13} className="text-amber-400 shrink-0" />
                   <span>Ultimate Membership</span>
                 </span>
-                <span className="text-[11px] text-gray-400 truncate mt-0.5">
-                  {selectedUser.isPremium 
-                    ? (selectedUser.premiumSource === 'subscription' ? 'Active Paid Subscription 💎' : selectedUser.premiumSource === 'both' ? 'Paid + Admin Granted 💎' : 'Admin-Granted Member 🎁')
-                    : 'No Active Membership'}
+                <span className="text-[11px] text-gray-400 truncate mt-0.5 flex items-center gap-1">
+                  {selectedUser.isPremium ? (
+                    selectedUser.premiumSource === 'subscription' ? (
+                      <>
+                        <CreditCard size={11} className="inline text-emerald-400 shrink-0" />
+                        <span>Active Paid Subscription</span>
+                      </>
+                    ) : selectedUser.premiumSource === 'both' ? (
+                      <>
+                        <Gem size={11} className="inline text-amber-400 shrink-0" />
+                        <span>Paid + Admin Granted</span>
+                      </>
+                    ) : (
+                      <>
+                        <Gift size={11} className="inline text-sky-400 shrink-0" />
+                        <span>Admin-Granted Member</span>
+                      </>
+                    )
+                  ) : (
+                    'No Active Membership'
+                  )}
                 </span>
               </div>
               <Button
@@ -2456,6 +4028,54 @@ const Admin = () => {
                 <span className="text-[10px] text-[var(--text-muted)]">Verified creator badge</span>
               </div>
             </label>
+          </div>
+
+          <div className="p-3 rounded-xl bg-black/5 dark:bg-white/[0.03] border border-[var(--border-color)] flex flex-col gap-2.5">
+            <label className="checkbox-toggle-card !p-0 !border-0 !bg-transparent">
+              <input
+                type="checkbox"
+                checked={editingSuspended}
+                onChange={(e) => setEditingSuspended(e.target.checked)}
+                className="accent-rose-500 w-4 h-4 cursor-pointer"
+              />
+              <div className="flex flex-col">
+                <span className="font-bold text-xs text-rose-400 flex items-center gap-1">
+                  <Ban size={13} /> Account Suspended
+                </span>
+                <span className="text-[10px] text-[var(--text-muted)]">Block login and hide user site-wide</span>
+              </div>
+            </label>
+            {editingSuspended && (
+              <div className="flex flex-col gap-2 pt-1 border-t border-[var(--border-color)]">
+                <TextField
+                  label="Suspension Reason"
+                  value={suspensionReason}
+                  onChange={(e) => setSuspensionReason(e.target.value)}
+                  placeholder="e.g. Terms of Service violation..."
+                  size="sm"
+                  fullWidth
+                />
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-semibold text-gray-400">Presets:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {SUSPENSION_PRESETS.map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => setSuspensionReason(preset)}
+                        className={`text-[10px] px-2 py-0.5 rounded border transition-all ${
+                          suspensionReason === preset
+                            ? 'bg-rose-500/25 border-rose-500/60 text-rose-300 font-medium'
+                            : 'bg-white/[0.04] border-white/[0.08] text-gray-400 hover:bg-white/[0.08]'
+                        }`}
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </Modal>
@@ -2526,13 +4146,28 @@ const Admin = () => {
                     </span>
                   )}
                 </span>
-                <span className="text-xs text-gray-400">
-                  {premiumTargetUser?.premiumSource === 'subscription' && '💳 Active Paid Subscription'}
-                  {premiumTargetUser?.premiumSource === 'both' && '💎 Active Paid Subscription + Admin Grant'}
+                <span className="text-xs text-gray-400 flex items-center gap-1.5 flex-wrap">
+                  {premiumTargetUser?.premiumSource === 'subscription' && (
+                    <>
+                      <CreditCard size={13} className="text-emerald-400 shrink-0 inline" />
+                      <span>Active Paid Subscription</span>
+                    </>
+                  )}
+                  {premiumTargetUser?.premiumSource === 'both' && (
+                    <>
+                      <Gem size={13} className="text-amber-400 shrink-0 inline" />
+                      <span>Active Paid Subscription + Admin Grant</span>
+                    </>
+                  )}
                   {premiumTargetUser?.premiumSource === 'admin' && (
-                    premiumTargetUser?.premiumExpiresAt 
-                      ? `🎁 Admin Granted (Expires: ${new Date(premiumTargetUser.premiumExpiresAt).toLocaleDateString()})`
-                      : '🎁 Admin Granted (Permanent Lifetime)'
+                    <>
+                      <Gift size={13} className="text-sky-400 shrink-0 inline" />
+                      <span>
+                        {premiumTargetUser?.premiumExpiresAt 
+                          ? `Admin Granted (Expires: ${new Date(premiumTargetUser.premiumExpiresAt).toLocaleDateString()})`
+                          : 'Admin Granted (Permanent Lifetime)'}
+                      </span>
+                    </>
                   )}
                   {(!premiumTargetUser?.isPremium || premiumTargetUser?.premiumSource === 'none') && 'Standard Free Member'}
                 </span>
@@ -2767,14 +4402,35 @@ const Admin = () => {
               : `Suspending @${selectedUser?.username} will immediately block them from logging in and hide their public activity.`}
           </p>
           {!selectedUser?.isSuspended && (
-            <TextField
-              label="Suspension Reason (Optional)"
-              placeholder="e.g. Terms of Service violation..."
-              value={suspensionReason}
-              onChange={(e) => setSuspensionReason(e.target.value)}
-              size="md"
-              fullWidth
-            />
+            <div className="flex flex-col gap-2">
+              <TextField
+                label="Suspension Reason (Optional)"
+                placeholder="e.g. Terms of Service violation..."
+                value={suspensionReason}
+                onChange={(e) => setSuspensionReason(e.target.value)}
+                size="md"
+                fullWidth
+              />
+              <div className="flex flex-col gap-1 mt-1">
+                <span className="text-[11px] font-semibold text-gray-400">Quick Presets:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {SUSPENSION_PRESETS.map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setSuspensionReason(preset)}
+                      className={`text-[11px] px-2.5 py-1 rounded-md border transition-all ${
+                        suspensionReason === preset
+                          ? 'bg-rose-500/25 border-rose-500/60 text-rose-300 font-medium'
+                          : 'bg-white/[0.04] border-white/[0.08] text-gray-300 hover:bg-white/[0.08]'
+                      }`}
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </Modal>
@@ -2790,6 +4446,393 @@ const Admin = () => {
         title={`Delete ${selectedReport?.reportType || 'Report'}`}
         message={`Are you sure you want to permanently delete this ${selectedReport?.reportType || 'report'}?`}
         confirmText="Delete Report"
+        cancelText="Cancel"
+        variant="danger"
+      />
+
+      {/* UNIVERSAL MODAL: HELP TICKET MESSAGING CONVERSATION */}
+      <Modal
+        isOpen={Boolean(showHelpChatModal && activeHelpChatReport)}
+        onClose={() => {
+          if (!isSendingAdminReply) {
+            setShowHelpChatModal(false);
+            setActiveHelpChatReport(null);
+            setAdminReplyText('');
+          }
+        }}
+        title={`Help Ticket #${activeHelpChatReport?.reportId || activeHelpChatReport?._id?.slice(-5)}`}
+        subtitle={activeHelpChatReport?.title || 'User Support Request'}
+        size="lg"
+        footer={({ close }) => (
+          <div className="flex items-center justify-between w-full">
+            <Button
+              variant={activeHelpChatReport?.status === 'resolved' ? 'primary' : 'success'}
+              size="sm"
+              icon={<CheckCircle size={14} />}
+              onClick={handleAdminToggleStatus}
+            >
+              {activeHelpChatReport?.status === 'resolved' ? 'Reopen Ticket' : 'Mark as Resolved'}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={close}
+            >
+              Close
+            </Button>
+          </div>
+        )}
+      >
+        {activeHelpChatReport && (
+          <div className="flex flex-col gap-4">
+            {/* Ticket Metadata Header */}
+            <div className="p-3.5 rounded-xl bg-black/20 border border-[var(--border-color)] flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">User:</span>
+                <span className="font-bold text-[var(--text)]">
+                  @{activeHelpChatReport.username || activeHelpChatReport.submittedBy?.username || 'Anonymous'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">Category:</span>
+                <span className="px-2 py-0.5 rounded bg-white/5 text-gray-300 font-medium">
+                  {activeHelpChatReport.category || 'General'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">Status:</span>
+                <span className={`status-pill ${activeHelpChatReport.status === 'resolved' ? 'active' : 'suspended'} text-[10px]`}>
+                  {activeHelpChatReport.status === 'resolved' ? 'Resolved' : 'Open'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">Date:</span>
+                <span className="text-gray-300">
+                  {new Date(activeHelpChatReport.createdAt).toLocaleString()}
+                </span>
+              </div>
+            </div>
+
+            {/* Conversation Messages Thread */}
+            <div className="flex flex-col gap-3 max-h-[360px] overflow-y-auto p-3 rounded-xl bg-black/30 border border-[var(--border-color)]">
+              {(activeHelpChatReport.messages && activeHelpChatReport.messages.length > 0 ? activeHelpChatReport.messages : [
+                {
+                  senderRole: 'user',
+                  senderName: activeHelpChatReport.username || activeHelpChatReport.submittedBy?.username || 'User',
+                  content: activeHelpChatReport.description,
+                  createdAt: activeHelpChatReport.createdAt
+                }
+              ]).map((msg, idx) => {
+                const isAdminMsg = msg.senderRole === 'admin';
+                return (
+                  <div
+                    key={idx}
+                    className={`p-3 rounded-xl text-xs leading-relaxed max-w-[88%] ${
+                      isAdminMsg
+                        ? 'self-end bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[var(--text)]'
+                        : 'self-start bg-white/5 border border-white/10 text-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3 mb-1.5 text-[10px]">
+                      <span className={`font-bold ${isAdminMsg ? 'text-[var(--accent)]' : 'text-gray-300'}`}>
+                        {isAdminMsg ? 'You (Support Admin)' : `@${msg.senderName || 'User'}`}
+                      </span>
+                      <span className="text-gray-500">
+                        {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(msg.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Attachments if any */}
+            {activeHelpChatReport.attachments && activeHelpChatReport.attachments.length > 0 && (
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-semibold text-gray-400">User Attachments:</span>
+                <div className="flex items-center gap-2">
+                  {activeHelpChatReport.attachments.map((att, attIdx) => (
+                    <a key={attIdx} href={att} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-lg border border-white/15 overflow-hidden block">
+                      <img src={att} alt="Attachment" className="w-full h-full object-cover" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Admin Reply Composer */}
+            <div className="flex flex-col gap-2 pt-2 border-t border-[var(--border-color)]">
+              <label className="text-xs font-bold text-[var(--text)]">Send Reply to User</label>
+              <textarea
+                className="w-full p-2.5 rounded-lg bg-black/20 border border-[var(--border-color)] text-xs text-[var(--text)] resize-none outline-none focus:border-[var(--accent)] transition-all"
+                placeholder="Type your response to the user..."
+                rows={3}
+                value={adminReplyText}
+                onChange={(e) => setAdminReplyText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    handleAdminSendReply();
+                  }
+                }}
+              />
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-gray-500">Press Ctrl+Enter to send reply</span>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  icon={isSendingAdminReply ? <RefreshCw size={13} className="animate-spin" /> : <Send size={13} />}
+                  disabled={!adminReplyText.trim() || isSendingAdminReply}
+                  onClick={handleAdminSendReply}
+                >
+                  Send Reply
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* UNIVERSAL MODAL: EDIT / CREATE CHANGELOG RELEASE */}
+      <Modal
+        isOpen={showChangelogModal}
+        onClose={() => {
+          if (!isSavingChangelog) setShowChangelogModal(false);
+        }}
+        title={editingChangelogId ? `Edit Release ${changelogForm.version}` : 'New Release'}
+        subtitle="Manage version, release date, section entries, and publish status"
+        size="lg"
+        footer={({ close }) => (
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                onClick={close}
+                disabled={isSavingChangelog}
+              >
+                Cancel
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => handleSaveChangelog(false)}
+                loading={isSavingChangelog}
+                icon={<Clock size={13} />}
+                title="Save as draft without publishing to live users"
+              >
+                Save Draft
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => handleSaveChangelog(true)}
+                loading={isSavingChangelog}
+                icon={<CheckCircle size={14} />}
+                title="Publish release update immediately"
+              >
+                Publish Update
+              </Button>
+            </div>
+          </div>
+        )}
+      >
+        <div className="flex flex-col gap-4 py-1 max-h-[70vh] overflow-y-auto pr-1">
+          {/* Top Row: Version, Release Date, Status */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <TextField
+              label="Version Tag"
+              placeholder="v1.2.3"
+              value={changelogForm.version}
+              onChange={(e) => setChangelogForm(prev => ({ ...prev, version: e.target.value }))}
+              size="md"
+              fullWidth
+              required
+            />
+
+            <DateField
+              id="changelog-release-date"
+              name="releaseDate"
+              label="Release Date"
+              value={changelogForm.releaseDate}
+              onChange={(e) => setChangelogForm(prev => ({ ...prev, releaseDate: e.target.value }))}
+              placeholder="MM-DD-YYYY"
+              size="md"
+              fullWidth
+              clearable={false}
+              required
+            />
+
+            <div className="udt-form-field udt-form-field--md udt-form-field--full-width">
+              <div className="udt-field-header">
+                <span className="udt-field-label">Status</span>
+              </div>
+              <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/10 dark:bg-white/[0.04] border border-[var(--border-color)] h-[42px]">
+                <button
+                  type="button"
+                  className={`flex-1 h-full rounded-lg text-xs font-bold transition-all ${!changelogForm.published ? 'bg-amber-500/25 text-amber-300 border border-amber-500/40' : 'text-gray-400 hover:text-white'}`}
+                  onClick={() => setChangelogForm(prev => ({ ...prev, published: false }))}
+                >
+                  Draft
+                </button>
+                <button
+                  type="button"
+                  className={`flex-1 h-full rounded-lg text-xs font-bold transition-all ${changelogForm.published ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/40' : 'text-gray-400 hover:text-white'}`}
+                  onClick={() => setChangelogForm(prev => ({ ...prev, published: true }))}
+                >
+                  Published
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Repeatable Sections */}
+          <div className="flex flex-col gap-3 pt-2 border-t border-[var(--border-color)]">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-bold text-sm text-[var(--text)]">Release Sections</span>
+                <p className="text-[11px] text-[var(--text-muted)]">
+                  Add entries under Features, Improvements, Fixes, Removed, or Security.
+                </p>
+              </div>
+
+              {/* Quick Add Section buttons */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {[
+                  { type: 'feature', label: 'Feature', color: 'emerald' },
+                  { type: 'improvement', label: 'Improvement', color: 'sky' },
+                  { type: 'fix', label: 'Fix', color: 'rose' },
+                  { type: 'removed', label: 'Removed', color: 'amber' }
+                ].map(({ type, label, color }) => {
+                  const isAdded = changelogForm.sections.some(
+                    s => (s.type || '').toLowerCase() === type
+                  );
+                  return (
+                    <button
+                      key={type}
+                      type="button"
+                      disabled={isAdded}
+                      onClick={() => handleAddSection(type)}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1.5 ${
+                        isAdded
+                          ? 'opacity-40 cursor-not-allowed bg-black/10 dark:bg-white/[0.04] text-gray-500 border border-[var(--border-color)]'
+                          : color === 'emerald'
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20'
+                          : color === 'sky'
+                          ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30 hover:bg-sky-500/20'
+                          : color === 'rose'
+                          ? 'bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20'
+                          : 'bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20'
+                      }`}
+                      title={isAdded ? `${label} section already added (only 1 allowed)` : `Add ${label} section`}
+                    >
+                      {isAdded ? <Check size={11} /> : <Plus size={11} />}
+                      <span>{label}</span>
+                      {isAdded && <span className="text-[10px] opacity-75 font-normal">(Added)</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {changelogForm.sections.length === 0 ? (
+              <div className="p-4 rounded-xl border border-dashed border-[var(--border-color)] text-center text-xs text-[var(--text-muted)]">
+                No sections added yet. Click one of the buttons above to add a section.
+              </div>
+            ) : (
+              changelogForm.sections.map((sec, secIdx) => {
+                const secType = (sec.type || '').toLowerCase();
+                const badgeClass = secType.includes('feature')
+                  ? 'changelog-badge-feature'
+                  : secType.includes('improv') || secType.includes('change')
+                  ? 'changelog-badge-improvement'
+                  : secType.includes('fix')
+                  ? 'changelog-badge-fix'
+                  : secType.includes('remov')
+                  ? 'changelog-badge-removed'
+                  : 'changelog-badge-security';
+
+                return (
+                  <div key={secIdx} className="changelog-form-section-card">
+                    <div className="changelog-form-section-header">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md select-none ${badgeClass}`}>
+                          {secType.charAt(0).toUpperCase() + secType.slice(1)}
+                        </span>
+                        <span className="text-[11px] text-[var(--text-muted)]">
+                          {(sec.items || []).filter(Boolean).length} entries
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSection(secIdx)}
+                        className="text-gray-400 hover:text-rose-400 p-1 transition-colors"
+                        title="Delete this section"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+
+                    {/* Repeatable entry list */}
+                    <div className="flex flex-col gap-2">
+                      {(sec.items || []).map((item, itemIdx) => (
+                        <div key={itemIdx} className="changelog-form-entry-row">
+                          <span className="text-gray-500 text-xs select-none">•</span>
+                          <input
+                            type="text"
+                            className="entry-input"
+                            placeholder={
+                              secType.includes('feature')
+                                ? 'Added achievement rarity percentages...'
+                                : secType.includes('improv')
+                                ? 'Improved load time for heavy Pokédex lists...'
+                                : secType.includes('fix')
+                                ? 'Fixed missing Poké Balls in FireRed & LeafGreen...'
+                                : 'Removed deprecated feature...'
+                            }
+                            value={item}
+                            onChange={(e) => handleSectionItemChange(secIdx, itemIdx, e.target.value)}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSectionItem(secIdx, itemIdx)}
+                            className="text-gray-400 hover:text-rose-400 p-1 transition-colors"
+                            title="Remove entry"
+                          >
+                            <X size={13} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleAddSectionItem(secIdx)}
+                      className="changelog-add-entry-btn mt-1"
+                    >
+                      <Plus size={12} />
+                      <span>Add entry</span>
+                    </button>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </Modal>
+
+      {/* UNIVERSAL MODAL: DELETE CHANGELOG RELEASE */}
+      <ConfirmModal
+        isOpen={Boolean(showDeleteChangelogModal && changelogToDelete)}
+        onClose={() => {
+          setShowDeleteChangelogModal(false);
+          setChangelogToDelete(null);
+        }}
+        onConfirm={handleDeleteChangelogConfirm}
+        title={`Delete Release ${changelogToDelete?.version}`}
+        subtitle="Permanent release removal"
+        message={`Are you sure you want to permanently delete release ${changelogToDelete?.version}? It will be removed from your database and no longer appear in the changelog.`}
+        confirmText="Delete Release"
         cancelText="Cancel"
         variant="danger"
       />

@@ -294,11 +294,6 @@ export default function Footer() {
             </span>
           </div>
         </div>
-
-        {/* Disclaimer Bar */}
-        <div className="footer-disclaimer-bar">
-          <p>Ultimate Dex Tracker is an unofficial fan project and is not affiliated with, endorsed by, or sponsored by Nintendo, GAME FREAK, or The Pokémon Company. Pokémon is a registered trademark of Nintendo.</p>
-        </div>
       </div>
     </footer>
   );

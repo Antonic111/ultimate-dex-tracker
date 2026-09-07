@@ -25,7 +25,7 @@ import { MessageProvider } from "./components/Shared/MessageContext";
 import { UserContext } from "./components/Shared/UserContext";
 import HeaderWithConditionalAuth from "./Header";
 import { ThemeProvider, useTheme } from "./components/Shared/ThemeContext";
-import { ConfirmModal } from "./components/Shared/Modal";
+import { ConfirmModal, Modal } from "./components/Shared/Modal";
 import './css/theme.css';
 // import './css/pageAnimations.css'; // Moved to backup folder
 
@@ -48,6 +48,7 @@ const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 const Counters = lazy(() => import("./pages/Counters"));
 const ViewDex = lazy(() => import("./pages/ViewDex.jsx"));
 const Changelog = lazy(() => import("./pages/Changelog"));
+const Support = lazy(() => import("./pages/Support"));
 const Feedback = lazy(() => import("./pages/Feedback"));
 const PrivacyPolicy = lazy(() => import("./pages/LegalPrivacy.jsx"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
@@ -72,7 +73,8 @@ import {
   LoadingSpinner,
   PageTransition,
   SectionLoader,
-  BackgroundFetchIndicator
+  BackgroundFetchIndicator,
+  Button
 } from "./components/Shared";
 import Footer from "./components/Shared/Footer";
 import CustomScrollbar from "./components/Shared/CustomScrollbar";
@@ -83,7 +85,7 @@ import { buildApiUrl } from "./config/api.js";
 import { getFilteredFormsData, getDexPreferences } from "./utils/dexPreferences";
 import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "./data/blockedShinies";
 import { createPortal } from "react-dom";
-import { RotateCcw, TriangleAlert, Sparkles, X } from "lucide-react";
+import { RotateCcw, TriangleAlert, Sparkles, X, Ban } from "lucide-react";
 import { getAvailableGamesForPokemonSidebar, normalizeGameName } from "./utils/pokemonAvailability";
 
 // Mobile Keyboard Handler Hook
@@ -212,7 +214,8 @@ const isStandaloneRoute = (pathname) => {
     pathname.startsWith('/hunt-popout') ||
     pathname.startsWith('/admin') ||
     pathname.startsWith('/overlay/hunt') ||
-    pathname.startsWith('/streamer-tools/overlay')
+    pathname.startsWith('/streamer-tools/overlay') ||
+    pathname.startsWith('/loading')
   );
 };
 
@@ -245,6 +248,7 @@ export const isPublicExemptMaintenanceRoute = (pathname, user) => {
     cleanPath === '/membership' ||
     cleanPath === '/membership/checkout' ||
     cleanPath === '/complete-signup' ||
+    cleanPath.startsWith('/loading') ||
     cleanPath.startsWith('/oauth') ||
     cleanPath.startsWith('/overlay/hunt') ||
     cleanPath.startsWith('/admin')
@@ -581,11 +585,35 @@ export default function App() {
   });
   const [justLoggedIn, setJustLoggedIn] = useState(false); // Add flag to track recent login
   const [authTimeout, setAuthTimeout] = useState(false); // Timeout flag for bots/crawlers
+  const [bootProgress, setBootProgress] = useState(25);
+  const [bootStageText, setBootStageText] = useState("Initializing Pokémon database...");
   const [dexSections, setDexSections] = useState(() => createDexSections());
   const [currentDexPreferences, setCurrentDexPreferences] = useState(() => getDexPreferences());
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceStartTime, setMaintenanceStartTime] = useState(null);
   const [dismissedMaintenanceBanner, setDismissedMaintenanceBanner] = useState(false);
+  const [suspensionNotice, setSuspensionNotice] = useState(null);
+
+  useEffect(() => {
+    const onAccountSuspended = (e) => {
+      const detail = e?.detail;
+      setSuspensionNotice(detail?.reason || "Violation of community guidelines or terms of service.");
+      setUser({
+        username: null,
+        email: null,
+        createdAt: null,
+        profileTrainer: null,
+        nameColor1: null,
+        nameColor2: null,
+        avatar: null,
+        verified: false,
+        progressBars: [],
+        onboarding: null,
+      });
+    };
+    window.addEventListener('account-suspended', onAccountSuspended);
+    return () => window.removeEventListener('account-suspended', onAccountSuspended);
+  }, []);
 
   const [isTutorialActive, setIsTutorialActive] = useState(false);
   const [tutorialBulbasaurCaught, setTutorialBulbasaurCaught] = useState(false);
@@ -642,11 +670,21 @@ export default function App() {
       return;
     }
 
+    if (!silent) {
+      setBootProgress(35);
+      setBootStageText("Checking trainer session...");
+    }
+
     try {
       // Mobile-specific: Add retry logic for initial auth check
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       let userData = null;
       let authError = null;
+
+      if (!silent) {
+        setBootProgress(58);
+        setBootStageText("Connecting to server & verifying trainer...");
+      }
 
       if (isMobile) {
         // Try up to 3 times on mobile with delays
@@ -696,8 +734,35 @@ export default function App() {
         }
       }
 
+      // Check if user is suspended
+      if (userData?.isSuspended) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('mobileUserBackup');
+        localStorage.removeItem('bingo-grid-state-v1');
+        sessionStorage.removeItem('iosUserBackup');
+        setSuspensionNotice(userData.suspendedReason || "Violation of community guidelines or terms of service.");
+        setUser({
+          username: null,
+          email: null,
+          createdAt: null,
+          profileTrainer: null,
+          nameColor1: null,
+          nameColor2: null,
+          avatar: null,
+          verified: false,
+          progressBars: [],
+          onboarding: null,
+        });
+        return;
+      }
+
       // Check if user is authenticated
       if (userData && userData.username) {
+        if (!silent) {
+          setBootProgress(86);
+          setBootStageText("Loading Pokédex data & preferences...");
+        }
+
         // Preserve existing progress bars if the server response doesn't include them
         const existingProgressBars = user.progressBars || [];
         const serverProgressBars = userData.progressBars || [];
@@ -784,13 +849,22 @@ export default function App() {
         // Clear user data if not authenticated
         setUser(null);
       }
+
+      if (!silent) {
+        setBootProgress(100);
+        setBootStageText("Ready! Welcome back.");
+      }
     } catch (error) {
       console.error('Auth check error:', error);
     } finally {
       if (!silent) {
-        setLoading(false);
+        setTimeout(() => {
+          setLoading(false);
+          setAuthReady(true);
+        }, 220);
+      } else {
+        setAuthReady(true);
       }
-      setAuthReady(true);
     }
   };
 
@@ -2032,6 +2106,7 @@ export default function App() {
 
     const isCaughtBool = Boolean(cleanedInfo && cleanedInfo.caught !== false && (cleanedInfo.entries?.length > 0 || cleanedInfo.caught === true));
     const newEntriesCount = cleanedInfo?.entries?.length || (isCaughtBool ? 1 : 0);
+    const prevEntriesCount = caughtInfoMap[key]?.entries?.length || (wasAlreadyCaught ? 1 : 0);
 
     setCaughtInfoMap(prev => {
       const updated = { ...prev };
@@ -2528,7 +2603,7 @@ export default function App() {
                         element={
                           // Only show loading spinner if we haven't timed out and auth isn't ready
                           (!authTimeout && (loading || !authReady)) ? (
-                            <LoadingSpinner fullScreen />
+                            <LoadingSpinner fullScreen progress={bootProgress} text={bootStageText} />
                           ) : user?.needsProfileSetup ? (
                             <Navigate to="/complete-signup" replace />
                           ) : user?.username ? (
@@ -2826,6 +2901,14 @@ export default function App() {
                         }
                       />
                       <Route
+                        path="/loading-preview"
+                        element={<LoadingSpinner fullScreen isPreview={true} />}
+                      />
+                      <Route
+                        path="/loading-test"
+                        element={<LoadingSpinner fullScreen isPreview={true} />}
+                      />
+                      <Route
                         path="/privacy"
                         element={
                           <Suspense fallback={<SectionLoader minHeight="60vh" />}>
@@ -2935,16 +3018,18 @@ export default function App() {
                         }
                       />
                       <Route
-                        path="/feedback"
+                        path="/support"
                         element={
-                          <RequireAuth loading={loading} authReady={authReady} user={user}>
-                            <Suspense fallback={<SectionLoader minHeight="60vh" />}>
-                              <PageTransition>
-                                <Feedback />
-                              </PageTransition>
-                            </Suspense>
-                          </RequireAuth>
+                          <Suspense fallback={<SectionLoader minHeight="60vh" />}>
+                            <PageTransition>
+                              <Support />
+                            </PageTransition>
+                          </Suspense>
                         }
+                      />
+                      <Route
+                        path="/feedback"
+                        element={<Navigate to="/support" replace />}
                       />
                       <Route
                         path="/membership"
@@ -3151,7 +3236,7 @@ export default function App() {
                       {/* Temporary route to preview loading screen */}
                       <Route
                         path="/loading"
-                        element={<LoadingSpinner fullScreen />}
+                        element={<LoadingSpinner fullScreen isPreview={true} />}
                       />
 
                     </Routes>
@@ -3195,6 +3280,46 @@ export default function App() {
                 cancelText="Cancel"
                 variant="danger"
               />
+
+              {/* Suspended Account Notice Modal */}
+              <Modal
+                isOpen={Boolean(suspensionNotice)}
+                onClose={() => setSuspensionNotice(null)}
+                title="Account Suspended"
+                size="sm"
+                footer={({ close }) => (
+                  <Button
+                    variant="danger"
+                    fullWidth
+                    onClick={() => {
+                      close();
+                      window.location.href = '/';
+                    }}
+                  >
+                    Acknowledge & Close
+                  </Button>
+                )}
+              >
+                <div className="flex flex-col items-center text-center p-2 gap-3">
+                  <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shadow-lg">
+                    <Ban size={28} />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-lg text-white mb-1">Access Restricted</h3>
+                    <p className="text-xs text-gray-400 leading-relaxed">
+                      Your Ultimate Dex Tracker account has been suspended by an administrator.
+                    </p>
+                  </div>
+                  <div className="w-full p-3 rounded-xl bg-black/40 border border-rose-500/20 text-left">
+                    <span className="text-[11px] font-bold text-rose-400 block mb-1 uppercase tracking-wider">
+                      Reason for Suspension
+                    </span>
+                    <p className="text-xs text-gray-300 font-medium whitespace-pre-wrap">
+                      {suspensionNotice}
+                    </p>
+                  </div>
+                </div>
+              </Modal>
               <AppThemeSync username={user?.username} />
             </MessageProvider>
           </EntitlementProvider>

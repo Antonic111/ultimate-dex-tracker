@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { User, Lock, LogIn, ArrowRight, ShieldCheck } from "lucide-react";
+import { User, Lock, LogIn, ArrowRight, ShieldCheck, Ban } from "lucide-react";
 import { useMessage } from "../components/Shared/MessageContext";
 import { authAPI, progressAPI, profileAPI } from "../utils/api.js";
 import TextField from "../components/Shared/FormField/TextField.jsx";
@@ -11,6 +11,7 @@ import "../css/Login.css";
 export default function Login({ onLogin }) {
   const [form, setForm] = useState({ usernameOrEmail: "", password: "", rememberMe: false });
   const [loading, setLoading] = useState(false);
+  const [suspensionError, setSuspensionError] = useState(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { showMessage } = useMessage();
@@ -19,6 +20,17 @@ export default function Login({ onLogin }) {
   const showVerifiedMessage = searchParams.get("verified") === "1";
   const isAdminMode = searchParams.get("admin") === "true";
   const redirectTarget = searchParams.get("redirect");
+  const urlError = searchParams.get("error");
+
+  useEffect(() => {
+    if (urlError) {
+      if (urlError.toLowerCase().includes("suspended")) {
+        setSuspensionError({ reason: urlError.replace(/^This account has been suspended:\s*/i, '') });
+      } else {
+        showMessage(urlError, "error");
+      }
+    }
+  }, [urlError, showMessage]);
 
   useEffect(() => {
     if (showVerifiedMessage) {
@@ -116,7 +128,11 @@ export default function Login({ onLogin }) {
         navigate(redirectTarget || "/");
       }
     } catch (err) {
-      if (err.message && err.message.includes("Account not verified")) {
+      if (err.data?.error === 'ACCOUNT_SUSPENDED' || (err.message && err.message.toLowerCase().includes("suspended"))) {
+        setSuspensionError({
+          reason: err.data?.reason || err.userMessage || "Violation of community guidelines or terms of service."
+        });
+      } else if (err.message && err.message.includes("Account not verified")) {
         if (err.data && err.data.email) {
           showMessage("Account not verified. Redirecting to verification page...", "info");
           setTimeout(() => {
@@ -147,6 +163,22 @@ export default function Login({ onLogin }) {
   return (
     <div className={`login-page-container ${loading ? "is-submitting" : ""}`}>
       <div className="login-card">
+        {suspensionError && (
+          <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs mb-4 flex items-start gap-2.5 text-left">
+            <Ban size={20} className="text-rose-400 shrink-0 mt-0.5" />
+            <div className="flex flex-col gap-1 min-w-0 flex-1">
+              <span className="font-extrabold text-sm text-rose-200">Account Suspended</span>
+              <p className="text-xs text-rose-300/90 leading-relaxed">
+                Your account has been suspended by an administrator.
+              </p>
+              {suspensionError.reason && (
+                <div className="mt-1 p-2 rounded-lg bg-black/40 border border-rose-500/20 text-[11px] text-gray-200 font-medium">
+                  <strong>Reason:</strong> {suspensionError.reason}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         {isAdminMode && (
           <div
             style={{

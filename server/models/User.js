@@ -81,6 +81,15 @@ const userSchema = new mongoose.Schema({
   // PROFILE STUFF ----------------------------------------- //
   location: String,
   gender: String,
+  birthday: {
+    type: {
+      month: { type: Number, min: 1, max: 12 },
+      day: { type: Number, min: 1, max: 31 },
+      year: { type: Number }
+    },
+    default: null,
+    _id: false
+  },
   bio: String,
   favoriteGames: [String],
   favoritePokemon: [String],
@@ -160,7 +169,7 @@ const userSchema = new mongoose.Schema({
   shinyCharmGames: { type: [String], default: [] },
   // HUNT SETTINGS ----------------------------------------- //
   huntHotkey: { type: String, default: "a" },
-  // BINGO GRID ----------------------------------------- //
+  // BINGO GRID & YEARLY ARCHIVES ----------------------------------------- //
   bingoGrid: {
     type: [{
       id: Number,
@@ -168,9 +177,33 @@ const userSchema = new mongoose.Schema({
       completed: Boolean,
       pokemon: Object,
       pokemonList: [Object],
-      game: String
+      game: String,
+      completedAt: Date
     }],
     default: []
+  },
+  bingoQuote: {
+    text: { type: String, default: "2026 is my year for shiny hunting!" },
+    author: { type: String, default: "" }
+  },
+  bingoYears: {
+    type: Map,
+    of: {
+      grid: [{
+        id: Number,
+        text: String,
+        completed: Boolean,
+        pokemon: Object,
+        pokemonList: [Object],
+        game: String,
+        completedAt: Date
+      }],
+      quote: {
+        text: { type: String, default: "" },
+        author: { type: String, default: "" }
+      }
+    },
+    default: () => new Map()
   },
   // ADMIN STATUS ----------------------------------------- //
   isAdmin: { type: Boolean, default: false },
@@ -312,6 +345,7 @@ userSchema.index({ isAdmin: 1 });
 userSchema.index({ isSuspended: 1 });
 userSchema.index({ stripeCustomerId: 1 }, { sparse: true });
 userSchema.index({ hasPurchasedStripePremium: 1 });
+userSchema.index({ "birthday.month": 1, "birthday.day": 1 }, { sparse: true });
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {

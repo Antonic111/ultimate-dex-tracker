@@ -335,3 +335,34 @@
   background-color: rgba(0, 0, 0, 0.05);
   color: var(--text, #0f172a);
 }
+
+/* ==========================================================================
+   RESPONSIVE BUTTON GROUPS
+   Use .udt-btn-group on a flex container of buttons.
+   On mobile, wraps to new line; on very narrow screens, stacks fully.
+   ========================================================================== */
+.udt-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.udt-btn-group--stack-mobile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .udt-btn-group--stack-mobile {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .udt-btn-group--stack-mobile .udt-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+

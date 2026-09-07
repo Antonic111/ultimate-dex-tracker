@@ -261,6 +261,7 @@ export default function Profile() {
                     bio: data.bio && data.bio.length > 150 ? data.bio.substring(0, 150) : (data.bio ?? prev.bio),
                     location: data.location ?? prev.location,
                     gender: data.gender ?? prev.gender,
+                    birthday: data.birthday ?? prev.birthday ?? null,
                     profileTrainer: data.profileTrainer ?? prev.profileTrainer,
                     favoriteGames: Array.isArray(data.favoriteGames) ? [...data.favoriteGames] : prev.favoriteGames,
                     favoritePokemon: Array.isArray(data.favoritePokemon) ? [...data.favoritePokemon] : prev.favoritePokemon,

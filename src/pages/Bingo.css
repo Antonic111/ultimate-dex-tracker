@@ -1,6 +1,12 @@
+/* ==========================================================================
+   BINGO PAGE STYLES
+   Universal theme support, standard site suite & modern responsive design
+   ========================================================================== */
+
 .bingo-page {
     min-height: 100vh;
-    padding: 28px 0 2rem 0;
+    padding: 24px 0 3rem 0;
+    color: var(--text, #f8fafc);
 }
 
 @media (max-width: 768px) {
@@ -10,148 +16,481 @@
 }
 
 .bingo-container {
-    max-width: 1300px !important;
+    max-width: 1320px !important;
     width: 100% !important;
     margin: 0 auto !important;
-    padding: 0;
+    padding: 0 1.25rem;
+    box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
     .bingo-container {
-        padding: 0 16px;
+        padding: 0 1rem;
     }
 }
 
-.bingo-header-row {
-    margin-bottom: 0.75rem;
+/* --------------------------------------------------------------------------
+   PAGE HEADER (Matches Achievements, Trainers, Support)
+   -------------------------------------------------------------------------- */
+.bingo-header-wrap {
+    margin-bottom: 0.5rem;
+}
+
+.bingo-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.bingo-main-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0 0 0.25rem 0;
+    color: var(--text, #ffffff);
+    letter-spacing: -0.02em;
+}
+
+.bingo-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-muted, #94a3b8);
+    margin: 0;
+    font-weight: 500;
+}
+
+.bingo-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+    .bingo-main-title {
+        font-size: 1.75rem;
+    }
+    .bingo-header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   STATS & PROGRESS BANNER
+   -------------------------------------------------------------------------- */
+.bingo-stats-banner {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1.6fr;
+    gap: 1rem;
+    margin: 1.5rem 0 2rem 0;
+}
+
+@media (max-width: 1024px) {
+    .bingo-stats-banner {
+        grid-template-columns: 1fr 1fr;
+    }
+    .bingo-stat-card.quote-card {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 640px) {
+    .bingo-stats-banner {
+        grid-template-columns: 1fr;
+    }
+}
+
+.bingo-stat-card {
+    background: var(--pokemon-box-bg, #13171e);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: 14px;
+    padding: 1.2rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.bingo-stat-card:hover {
+    border-color: color-mix(in srgb, var(--accent, #ffe76a) 30%, var(--border-color, rgba(255, 255, 255, 0.15)));
+}
+
+.bingo-stat-icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--accent, #ffe76a) 15%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.bingo-stat-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.bingo-stat-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted, #94a3b8);
+    margin-bottom: 0.25rem;
+}
+
+.bingo-stat-val-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.bingo-stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text, #ffffff);
+    line-height: 1.1;
+}
+
+.bingo-stat-pct {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent, #ffe76a);
+}
+
+.bingo-stat-sub {
+    font-size: 0.85rem;
+    color: var(--text-muted, #94a3b8);
+    margin-top: 0.2rem;
+}
+
+/* Progress Bar */
+.bingo-progress-track {
+    width: 100%;
+    height: 8px;
+    background: color-mix(in srgb, var(--text, #ffffff) 10%, transparent);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.bingo-progress-fill {
+    height: 100%;
+    background: var(--accent, #ffe76a);
+    border-radius: 999px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accent, #ffe76a) 50%, transparent);
+}
+
+/* Annual Quote Card */
+.bingo-stat-card.quote-card {
+    justify-content: space-between;
+    cursor: default;
+    background: radial-gradient(ellipse at top right, color-mix(in srgb, var(--accent, #ffe76a) 5%, transparent), transparent 70%),
+                var(--pokemon-box-bg, #13171e);
+}
+
+.bingo-stat-card.quote-card.editable {
+    cursor: pointer;
+}
+
+.bingo-quote-content {
+    flex: 1;
+    min-width: 0;
+    padding-right: 0.75rem;
+}
+
+.bingo-quote-text {
+    font-size: 0.95rem;
+    font-style: italic;
+    font-weight: 600;
+    color: var(--text, #ffffff);
+    line-height: 1.45;
+    margin-bottom: 0.35rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.bingo-quote-author {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent, #ffe76a);
+    letter-spacing: 0.02em;
+}
+
+.bingo-quote-edit-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--accent, #ffe76a) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent, #ffe76a) 25%, transparent);
+    color: var(--accent, #ffe76a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.bingo-quote-edit-btn:hover {
+    background: var(--accent, #ffe76a);
+    color: #000000;
+    transform: scale(1.05);
+}
+
+/* --------------------------------------------------------------------------
+   MAIN WORKSPACE LAYOUT (2 COLUMNS: BOARD + RECENT ACTIVITY)
+   -------------------------------------------------------------------------- */
+.bingo-workspace-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 350px;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+@media (max-width: 1080px) {
+    .bingo-workspace-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   LEFT COLUMN: BINGO BOARD
+   -------------------------------------------------------------------------- */
+.bingo-board-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.bingo-board-footer-hint {
+    font-size: 0.82rem;
+    color: var(--text-muted, #94a3b8);
+    font-weight: 500;
+    text-align: center;
+    padding: 0.25rem 0.5rem;
+}
+
+.bingo-board-wrapper {
+    background: var(--pokemon-box-bg, #13171e);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16);
 }
 
 @media (max-width: 768px) {
-    .bingo-header-row {
-        margin-bottom: 0.5rem;
+    .bingo-board-wrapper {
+        padding: 0.75rem;
+        border-radius: 12px;
     }
 }
 
-.bingo-info-box {
-    display: none;
-}
-
+/* The 5x5 Grid */
 .bingo-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 1rem;
-    margin: 2rem auto;
-    background: var(--pokemon-box-bg);
-    padding: 2rem;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    max-width: 700px;
+    gap: 0.85rem;
+    width: 100%;
 }
 
+@media (max-width: 768px) {
+    .bingo-grid {
+        gap: 0.35rem;
+    }
+}
+
+/* B-I-N-G-O Header Tiles */
 .bingo-header-cell {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--accent);
-    color: #000000;
-    font-size: 2rem;
-    font-weight: 800;
-    border-radius: 8px;
-    padding: 0.25rem;
+    background: var(--accent, #ffe76a);
+    color: #0c1017;
+    font-size: 1.85rem;
+    font-weight: 900;
+    border-radius: 10px;
+    height: 52px;
     user-select: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    height: 60px;
-    /* Fixed height for consistency */
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--accent, #ffe76a) 30%, transparent);
+    letter-spacing: 0.05em;
+    border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
+@media (max-width: 768px) {
+    .bingo-header-cell {
+        height: 38px;
+        font-size: 1.25rem;
+        border-radius: 6px;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   BINGO CELL ITEMS
+   -------------------------------------------------------------------------- */
 .bingo-cell-wrapper {
     position: relative;
-    aspect-ratio: 1;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+}
+
+.bingo-cell-wrapper:hover {
+    z-index: 60;
 }
 
 .bingo-cell {
     width: 100%;
     height: 100%;
-    background: var(--pokemon-box-bg2);
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
+    background: var(--pokemon-box-bg2, #1a2230);
+    border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: 12px;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    font-size: 1rem;
-    color: var(--text-color);
-    color: var(--text-color);
-    cursor: default;
-    transition: all 0.2s ease;
-    padding: 0.25rem;
-    text-align: center;
-    user-select: none;
     position: relative;
-    /* overflow: hidden; Removed to allow tooltips */
+    user-select: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+    overflow: visible;
+}
+
+@media (max-width: 768px) {
+    .bingo-cell {
+        border-radius: 8px;
+        border-width: 1px;
+    }
 }
 
 .bingo-cell:hover {
-    border-color: var(--accent);
-    border-color: var(--accent);
-    /* transform removed */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: var(--accent, #ffe76a);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25), 0 0 12px color-mix(in srgb, var(--accent, #ffe76a) 25%, transparent);
+    z-index: 60;
 }
 
+/* Completed Cell State */
 .bingo-cell.completed {
-    background: var(--accent);
-    color: var(--main-bg);
-    border-color: var(--accent);
+    border-color: #22c55e;
+    background: color-mix(in srgb, #22c55e 8%, var(--pokemon-box-bg2, #1a2230));
+    box-shadow: 0 0 14px rgba(34, 197, 94, 0.2);
 }
 
-.bingo-cell.completed .bingo-pokemon-name {
-    color: var(--main-bg);
+.bingo-cell.completed:hover {
+    border-color: #4ade80;
+    box-shadow: 0 0 18px rgba(74, 222, 128, 0.35);
 }
 
-/* Removed .bingo-cell.completed .edit-cell-btn styles to prevent box on hover */
-
-.bingo-cell.center {
-    background: var(--accent);
-    color: var(--main-bg);
-    font-size: 1.2rem;
-    font-weight: 800;
-    border-color: var(--accent);
+/* Empty Cell State */
+.bingo-cell.empty {
+    border-style: dashed;
+    border-color: color-mix(in srgb, var(--text-muted, #94a3b8) 25%, transparent);
 }
 
-.bingo-content {
+.bingo-cell.empty:hover {
+    border-color: var(--accent, #ffe76a);
+    border-style: solid;
+    background: color-mix(in srgb, var(--accent, #ffe76a) 5%, var(--pokemon-box-bg2, #1a2230));
+}
+
+.bingo-empty-placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
-    height: 100%;
     justify-content: center;
-    position: relative;
-    /* Context for absolute positioning of overlay */
+    gap: 0.35rem;
+    color: var(--text-muted, #94a3b8);
+    pointer-events: none;
+    padding: 0.25rem;
+    text-align: center;
 }
 
-.bingo-pokemon-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    image-rendering: pixelated;
-    padding: 2px;
-    /* Slight buffer from edge */
-}
-
-/* Removed bingo-pokemon-name styles */
-
-.bingo-game-icon-container {
-    position: absolute;
-    bottom: 0;
-    right: 0;
+.bingo-empty-plus {
     width: 32px;
     height: 32px;
-    z-index: 2;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--text, #ffffff) 8%, transparent);
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.bingo-cell.empty:hover .bingo-empty-plus {
+    background: var(--accent, #ffe76a);
+    color: #000000;
+    transform: scale(1.1);
+}
+
+.bingo-placeholder-text {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted, #94a3b8);
+}
+
+@media (max-width: 640px) {
+    .bingo-placeholder-text {
+        display: none;
+    }
+    .bingo-empty-plus {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+/* Pokemon Content Wrap */
+.bingo-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bingo-pokemon-img {
+    width: 86%;
+    height: 86%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    transition: transform 0.2s ease;
+}
+
+.bingo-cell:hover .bingo-pokemon-img {
+    transform: scale(1.06);
+}
+
+/* Corner Badges */
+.udt-tooltip-wrapper.bingo-game-tooltip-wrap,
+span.bingo-game-tooltip-wrap,
+.bingo-game-tooltip-wrap {
+    position: absolute !important;
+    bottom: 4px !important;
+    right: 4px !important;
+    width: 26px !important;
+    height: 26px !important;
+    z-index: 20 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.bingo-game-icon-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+    cursor: default;
 }
 
 .bingo-game-overlay-icon {
@@ -160,34 +499,18 @@
     object-fit: contain;
 }
 
-.bingo-game-icon-container .game-tooltip {
-    @apply hidden absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-95 text-white text-[0.7rem] font-medium px-2 py-1 rounded whitespace-nowrap z-50;
-    pointer-events: none;
-}
-
-.bingo-game-icon-container:hover .game-tooltip {
-    @apply block;
-}
-
-.bingo-game-icon-container .game-tooltip::after {
-    content: '';
-    @apply absolute top-full left-1/2 transform -translate-x-1/2;
-    border: 4px solid transparent;
-    border-top-color: rgba(0, 0, 0, 0.95);
-}
-
 .bingo-form-overlay-icon {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 24px;
-    height: 24px;
+    bottom: 4px;
+    left: 4px;
+    width: 20px;
+    height: 20px;
     z-index: 5;
     pointer-events: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Removed circle background/border to match game icon style */
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
 }
 
 .bingo-form-overlay-icon img {
@@ -196,61 +519,69 @@
     object-fit: contain;
 }
 
-/* Removed bingo-game-badge styles */
+@media (max-width: 640px) {
+    .udt-tooltip-wrapper.bingo-game-tooltip-wrap,
+    span.bingo-game-tooltip-wrap,
+    .bingo-game-tooltip-wrap {
+        bottom: 2px !important;
+        right: 2px !important;
+        width: 18px !important;
+        height: 18px !important;
+    }
+    .bingo-form-overlay-icon {
+        width: 14px;
+        height: 14px;
+        bottom: 2px;
+        left: 2px;
+    }
+}
 
+/* Action Triggers on Cell */
 .edit-cell-btn {
     position: absolute;
-    top: 0;
-    right: 0;
-    width: 50%;
-    /* Large clickable area in top right */
-    height: 50%;
-    padding: 6px;
-    background: transparent;
+    top: 3px;
+    right: 3px;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.45);
     border: none;
     cursor: pointer;
     opacity: 0;
-    transition: opacity 0.2s;
-    color: var(--text-color);
+    color: var(--text, #ffffff);
     z-index: 10;
     display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;
-    border-top-right-radius: 8px;
-    /* Match cell border radius */
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
 
 .bingo-cell-wrapper:hover .edit-cell-btn {
     opacity: 1;
 }
 
-/* No background change on hover for filled cells */
-/* No background change on hover for filled cells */
 .edit-cell-btn:hover {
-    background: transparent;
-    color: var(--text-color);
+    background: var(--accent, #ffe76a);
+    color: #000000;
 }
 
 .bingo-check-btn {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 50%;
-    height: 50%;
-    padding: 6px;
-    background: transparent;
+    top: 3px;
+    left: 3px;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.45);
     border: none;
     cursor: pointer;
     opacity: 0;
-    transition: opacity 0.2s;
-    transition: opacity 0.2s;
-    /* Default color when incomplete */
+    color: #22c55e;
     z-index: 10;
     display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    border-top-left-radius: 8px;
-    color: #4ade80;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
 
 .bingo-cell-wrapper:hover .bingo-check-btn {
@@ -259,232 +590,700 @@
 
 .bingo-check-btn.completed {
     opacity: 1;
-    /* Always show if completed? or just on hover? Stick to hover behavior or maybe show active state */
-    color: #4ade80;
-    /* Green checkmark when active */
+    background: #22c55e;
+    color: #ffffff;
 }
 
 .bingo-check-btn:hover {
-    /* Preview green on hover */
-}
-
-.bingo-completed-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    /* Grey out */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    /* Match cell radius minus borders */
-    z-index: 30;
-    /* Below buttons but above content */
-    color: #4ade80;
-    /* Green big checkmark */
-    pointer-events: none;
-    /* Let clicks pass through to buttons */
-}
-
-.bingo-cell.empty .edit-cell-btn {
-    top: 50%;
-    left: 50%;
-    right: auto;
-    transform: translate(-50%, -50%);
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-hover);
-}
-
-.bingo-cell.empty .edit-cell-btn:hover {
-    background: var(--bg-hover);
-    color: var(--text-color);
-}
-
-.bingo-cell.empty .edit-cell-btn svg {
-    width: 20px;
-    height: 20px;
-}
-
-/* Ensure input styling matches if missing */
-.pokemon-modal-search-row input.search-input {
-    background-color: var(--sidebar-edit-inputs);
-    color: var(--text-color);
-    border: 1px solid var(--sidebar-edit-inputs);
-    padding: 0 12px;
-    height: 42px;
-    border-radius: 8px;
-}
-
-/* Fix for Bingo Game Dropdown input background */
-#bingo-game-dropdown {
-    background-color: transparent !important;
-}
-
-/* Ensure the container matches the requested style if not handled by inline props */
-.mobile-dropdown-field {
-    cursor: pointer;
+    background: #22c55e;
+    color: #ffffff;
+    transform: scale(1.08);
 }
 
 @media (max-width: 768px) {
-    .bingo-container {
-        padding: 0 1rem;
-    }
-
-    .bingo-grid {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 0.25rem;
-        padding: 0.5rem;
-        width: 100%;
-    }
-
-    .bingo-cell {
-        font-size: 0.7rem;
-        border-width: 1px;
-        border-radius: 4px;
-        padding: 0.1rem;
-    }
-
-    .bingo-content {
-        gap: 0;
-    }
-
-    /* Mobile adjustments for overlay/image */
-    .bingo-pokemon-img {
-        width: 100%;
-        height: 100%;
-    }
-
-    .bingo-game-overlay-icon {
-        width: 20px;
-        height: 20px;
-        bottom: 0;
-        right: 0;
-    }
-
-    .bingo-form-overlay-icon {
-        width: 20px;
-        height: 20px;
-        bottom: 0;
-        left: 0;
-    }
-
-    .edit-cell-btn {
-        width: 50%;
-        height: 50%;
-        padding: 2px;
-        top: 0;
-        right: 0;
-    }
-
+    .edit-cell-btn,
     .bingo-check-btn {
-        width: 50%;
-        height: 50%;
-        padding: 2px;
-        top: 0;
-        left: 0;
-    }
-
-    .bingo-completed-overlay svg {
-        width: 32px;
-        height: 32px;
-    }
-
-
-    .bingo-header-cell {
-        font-size: 1.2rem;
-        height: 40px;
-        border-radius: 4px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .bingo-info-box {
-        display: block;
-        background-color: var(--pokemon-box-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        margin: 0 0 1.5rem 0;
-        color: var(--text);
-        font-size: 0.85rem;
-        text-align: left;
-        line-height: 1.5;
-    }
-
-    .bingo-info-box ul {
-        list-style-type: disc;
-        padding-left: 1.25rem;
-        margin: 0;
-    }
-
-    .bingo-info-box li {
-        margin-bottom: 0.25rem;
-    }
-
-    .bingo-page-title {
-        @apply text-3xl my-8;
+        width: 22px;
+        height: 22px;
+        opacity: 0.85;
     }
 }
 
-/* Custom modal override to remove padding around header */
-.bingo-custom-modal {
-    padding: 0 !important;
+/* --------------------------------------------------------------------------
+   RIGHT COLUMN: RECENT ACTIVITY
+   -------------------------------------------------------------------------- */
+.bingo-activity-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
 }
 
-.bingo-custom-modal .pokemon-modal-header {
+.bingo-activity-card {
+    background: var(--pokemon-box-bg, #13171e);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: 16px;
+    padding: 1.15rem 1.25rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16);
+    height: 285px;
+    min-height: 285px;
+    max-height: 285px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.bingo-activity-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem 1rem 0rem 1rem !important;
-    margin-bottom: 0;
+    margin-bottom: 0.65rem;
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    flex-shrink: 0;
 }
 
-.bingo-custom-modal .pokemon-modal-header h2 {
+.bingo-activity-title {
+    font-size: 1.05rem;
+    font-weight: 800;
     margin: 0;
-    line-height: 1;
+    color: var(--text, #ffffff);
 }
 
-.bingo-custom-modal .pokemon-modal-header .close-btn {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    position: static !important;
-    padding: 0 !important;
-    background: transparent !important;
-    border: none !important;
-    margin: 0 !important;
+.bingo-activity-pill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--accent, #ffe76a) 15%, transparent);
+    color: var(--accent, #ffe76a);
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--accent, #ffe76a) 25%, transparent);
 }
 
-.bingo-custom-modal .pokemon-modal-content {
-    padding: 0 1rem 1rem 1rem;
+.bingo-activity-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
-/* Copy link button tooltip - mirrored from Profile.css */
-.bingo-copy-btn {
+.bingo-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    flex-shrink: 0;
+}
+
+.bingo-activity-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.35rem 0.6rem;
+    height: 46px;
+    box-sizing: border-box;
+    background: var(--pokemon-box-bg2, #1a2230);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
+    border-radius: 10px;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+    flex-shrink: 0;
+}
+
+.bingo-activity-item:hover {
+    border-color: color-mix(in srgb, var(--accent, #ffe76a) 35%, transparent);
+    transform: translateX(2px);
+}
+
+.bingo-activity-thumb {
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
     position: relative;
-    /* Other styles are applied by inline classes in JSX */
+    overflow: visible;
 }
 
-.bingo-copy-btn .copy-tooltip {
-    @apply hidden absolute left-1/2 bottom-full mb-2 transform -translate-x-1/2 bg-black bg-opacity-95 text-white text-xs font-medium px-2 py-1 rounded whitespace-nowrap z-50;
-    pointer-events: none;
+.bingo-activity-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
 }
 
-.bingo-copy-btn:hover .copy-tooltip {
-    @apply block;
+.bingo-activity-check-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #22c55e;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
-.bingo-copy-btn .copy-tooltip::after {
-    content: '';
-    @apply absolute top-full left-1/2 transform -translate-x-1/2;
-    border: 4px solid transparent;
-    border-top-color: rgba(0, 0, 0, 0.95);
+.bingo-activity-details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.bingo-activity-name {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text, #ffffff);
+    line-height: 1.2;
+    margin-bottom: 0.15rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bingo-activity-date {
+    font-size: 0.72rem;
+    color: var(--text-muted, #94a3b8);
+    font-weight: 500;
+    line-height: 1.1;
+}
+
+/* Pagination Controls */
+.bingo-activity-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    flex-shrink: 0;
+    height: 38px;
+    box-sizing: border-box;
+}
+
+.bingo-page-nav-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: color-mix(in srgb, var(--text, #ffffff) 6%, transparent);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    color: var(--text, #ffffff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.bingo-page-nav-btn:hover:not(:disabled) {
+    background: var(--accent, #ffe76a);
+    color: #000000;
+    border-color: var(--accent, #ffe76a);
+}
+
+.bingo-page-nav-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+}
+
+.bingo-page-indicator {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--text-muted, #94a3b8);
+}
+
+/* Empty State */
+.bingo-activity-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.5rem 0.75rem;
+}
+
+.bingo-empty-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text, #ffffff);
+    margin: 0 0 0.35rem 0;
+}
+
+.bingo-empty-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted, #94a3b8);
+    margin: 0;
+    line-height: 1.45;
+    max-width: 230px;
+}
+
+/* --------------------------------------------------------------------------
+   YEARLY SHEETS ARCHIVE BOX
+   -------------------------------------------------------------------------- */
+.bingo-years-card {
+    background: var(--pokemon-box-bg, #13171e);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: 16px;
+    padding: 1.15rem 1.25rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16);
+    display: flex;
+    flex-direction: column;
+}
+
+.bingo-years-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+}
+
+.bingo-years-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--text, #ffffff);
+}
+
+.bingo-years-pill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--accent, #ffe76a) 15%, transparent);
+    color: var(--accent, #ffe76a);
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--accent, #ffe76a) 25%, transparent);
+}
+
+.bingo-years-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.bingo-year-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 0.85rem;
+    background: var(--pokemon-box-bg2, #1a2230);
+    border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.06));
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    width: 100%;
+}
+
+.bingo-year-btn:hover {
+    border-color: color-mix(in srgb, var(--accent, #ffe76a) 40%, transparent);
+    background: color-mix(in srgb, var(--accent, #ffe76a) 4%, var(--pokemon-box-bg2, #1a2230));
+    transform: translateX(2px);
+}
+
+.bingo-year-btn.active {
+    border-color: var(--accent, #ffe76a);
+    background: color-mix(in srgb, var(--accent, #ffe76a) 10%, var(--pokemon-box-bg2, #1a2230));
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent, #ffe76a) 20%, transparent);
+}
+
+.bingo-year-btn-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.bingo-year-name {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--text, #ffffff);
+}
+
+.bingo-year-btn.active .bingo-year-name {
+    color: var(--accent, #ffe76a);
+}
+
+.bingo-year-status-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.bingo-year-status-badge.current {
+    background: color-mix(in srgb, #22c55e 15%, transparent);
+    color: #22c55e;
+    border: 1px solid color-mix(in srgb, #22c55e 30%, transparent);
+}
+
+.bingo-year-status-badge.archived {
+    background: color-mix(in srgb, var(--text-muted, #94a3b8) 12%, transparent);
+    color: var(--text-muted, #94a3b8);
+    border: 1px solid color-mix(in srgb, var(--text-muted, #94a3b8) 20%, transparent);
+}
+
+.bingo-year-btn-right {
+    display: flex;
+    align-items: center;
+}
+
+.bingo-year-caught-count {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted, #94a3b8);
+}
+
+.bingo-year-btn.active .bingo-year-caught-count {
+    color: var(--text, #ffffff);
+}
+
+/* Header Archive Indicator */
+.bingo-archive-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent, #ffe76a) 15%, transparent);
+    color: var(--accent, #ffe76a);
+    border: 1px solid color-mix(in srgb, var(--accent, #ffe76a) 30%, transparent);
+    margin-left: 0.75rem;
+    vertical-align: middle;
+}
+
+/* ==========================================================================
+   REVAMPED BINGO GAME & POKÉMON SELECTOR MODAL
+   ========================================================================== */
+.bingo-picker-top-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    align-items: flex-start;
+}
+
+@media (max-width: 640px) {
+    .bingo-picker-top-controls {
+        grid-template-columns: 1fr;
+        gap: 0.65rem;
+    }
+}
+
+.bingo-picker-game-col,
+.bingo-picker-search-col {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Selected Pokémon Tray */
+.bingo-selected-tray {
+    background: color-mix(in srgb, var(--accent, #ffe76a) 6%, var(--pokemon-box-bg2, #1a2230));
+    border: 1px solid color-mix(in srgb, var(--accent, #ffe76a) 25%, var(--border-color, rgba(255, 255, 255, 0.08)));
+    border-radius: 12px;
+    padding: 0.65rem 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.bingo-selected-tray-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.bingo-selected-tray-title {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--text, #ffffff);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.bingo-selected-clear-btn {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent, #ffe76a);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.2s ease;
+}
+
+.bingo-selected-clear-btn:hover {
+    text-decoration: underline;
+    opacity: 0.85;
+}
+
+.bingo-selected-chips-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 2px;
+}
+
+.bingo-selected-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 3px 8px 3px 4px;
+    background: var(--card-bg, #111827);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+    border-radius: 999px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.bingo-selected-chip-sprite {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.bingo-selected-chip-info {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.bingo-selected-chip-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text, #ffffff);
+}
+
+.bingo-selected-chip-form {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--accent, #ffe76a);
+    background: color-mix(in srgb, var(--accent, #ffe76a) 12%, transparent);
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+.bingo-selected-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--text, #ffffff) 10%, transparent);
+    color: var(--text-muted, #94a3b8);
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-left: 2px;
+}
+
+.bingo-selected-chip-remove:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+/* Form Tabs */
+.bingo-picker-tabs-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding-bottom: 2px;
+}
+
+.bingo-picker-tab-btn {
+    padding: 0.3rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--text, #ffffff) 5%, transparent);
+    color: var(--text-muted, #94a3b8);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.bingo-picker-tab-btn:hover {
+    background: color-mix(in srgb, var(--text, #ffffff) 10%, transparent);
+    color: var(--text, #ffffff);
+}
+
+.bingo-picker-tab-btn.is-active {
+    background: var(--accent, #ffe76a);
+    color: #000000;
+    border-color: var(--accent, #ffe76a);
+    box-shadow: 0 1px 4px color-mix(in srgb, var(--accent, #ffe76a) 25%, transparent);
+}
+
+/* Grid Meta Header */
+.bingo-picker-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-muted, #94a3b8);
+    padding: 0 0.15rem;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.bingo-picker-meta-row strong {
+    color: var(--text, #ffffff);
+}
+
+.bingo-picker-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted, #94a3b8);
+    opacity: 0.8;
+}
+
+/* Pokemon Picker Grid */
+.bingo-pokemon-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+    gap: 0.5rem;
+    max-height: 360px;
+    min-height: 200px;
+    overflow-y: auto;
+    padding: 6px 0.35rem 0.5rem 3px;
+}
+
+@media (max-width: 640px) {
+    .bingo-pokemon-picker-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        max-height: 300px;
+        padding-top: 4px;
+    }
+}
+
+.bingo-picker-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.45rem 0.35rem 0.55rem;
+    background: color-mix(in srgb, var(--text, #ffffff) 3%, var(--pokemon-box-bg2, #1a2230));
+    border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    user-select: none;
+}
+
+.bingo-picker-card:hover {
+    border-color: color-mix(in srgb, var(--accent, #ffe76a) 50%, transparent);
+    background: color-mix(in srgb, var(--accent, #ffe76a) 9%, var(--pokemon-box-bg2, #1a2230));
+}
+
+.bingo-picker-card.is-selected {
+    border-color: var(--accent, #ffe76a);
+    background: color-mix(in srgb, var(--accent, #ffe76a) 14%, var(--pokemon-box-bg2, #1a2230));
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accent, #ffe76a) 25%, transparent);
+}
+
+.bingo-picker-sprite-wrap {
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.25rem;
+}
+
+.bingo-picker-sprite {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.18s ease;
+}
+
+.bingo-picker-card:hover .bingo-picker-sprite {
+    transform: scale(1.08);
+}
+
+.bingo-picker-card-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 0.15rem;
+}
+
+.bingo-picker-card-name {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--text, #ffffff);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 95%;
+}
+
+.bingo-picker-card-sub {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    max-width: 95%;
+    overflow: hidden;
+}
+
+.bingo-picker-card-dex {
+    font-family: monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted, #94a3b8);
+    font-weight: 600;
+}
+
+.bingo-picker-card-form {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: var(--accent, #ffe76a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bingo-picker-check-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent, #ffe76a);
+    color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    z-index: 5;
+}
+
+.bingo-picker-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.85rem;
+    font-weight: 600;
 }

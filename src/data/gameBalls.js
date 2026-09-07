@@ -65,10 +65,10 @@ export const GAME_BALLS = {
     "Dive Ball", "Luxury Ball", "Nest Ball", "Net Ball", "Premier Ball", "Repeat Ball", "Timer Ball"
   ],
   "Fire Red": [
-    "Poké Ball", "Great Ball", "Ultra Ball", "Master Ball", "Safari Ball"
+    "Poké Ball", "Great Ball", "Ultra Ball", "Master Ball", "Safari Ball", "Dive Ball", "Luxury Ball", "Nest Ball", "Net Ball", "Premier Ball", "Repeat Ball", "Timer Ball"
   ],
   "Leaf Green": [
-    "Poké Ball", "Great Ball", "Ultra Ball", "Master Ball", "Safari Ball"
+    "Poké Ball", "Great Ball", "Ultra Ball", "Master Ball", "Safari Ball", "Dive Ball", "Luxury Ball", "Nest Ball", "Net Ball", "Premier Ball", "Repeat Ball", "Timer Ball"
   ],
 
   // Gen 4

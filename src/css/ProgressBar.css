@@ -577,8 +577,8 @@ html.modal-open {
 .bar-settings-group {
   background-color: var(--progressbar-bg);
   border: 1px solid var(--border-color);
-  border-radius: 14px;
-  padding: 10px 14px;
+  border-radius: 12px;
+  padding: 8px 12px;
   transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   position: relative;
@@ -597,7 +597,7 @@ html.modal-open {
 .bar-settings-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 /* Arrow controls for reordering */
@@ -605,22 +605,25 @@ html.modal-open {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  width: 22px;
   flex-shrink: 0;
+  justify-content: center;
 }
 
 .arrow-btn {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-color);
-  border-radius: 5px;
+  border-radius: 4px;
   width: 22px;
-  height: 19px;
+  height: 15px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
-  color: var(--text);
+  color: var(--text-muted, #a1a1aa);
   padding: 0;
+  flex-shrink: 0;
 }
 
 .arrow-btn:hover:not(:disabled) {
@@ -637,17 +640,18 @@ html.modal-open {
 /* Bar Name Input / Preset layout */
 .bar-input-wrap {
   flex: 1;
+  min-width: 0;
 }
 
 .bar-name-input {
   width: 100%;
-  height: 40px;
-  padding: 0 14px;
+  height: 34px;
+  padding: 0 10px;
   background-color: var(--udt-field-bg, var(--searchbar-inputs, #242428));
   color: var(--udt-field-text, var(--text, #ffffff));
   border: 1px solid var(--udt-field-border, var(--border-color, rgba(255, 255, 255, 0.12)));
-  border-radius: 10px;
-  font-size: 0.875rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
   font-weight: 500;
   font-family: inherit;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -666,6 +670,7 @@ html.modal-open {
 
 .bar-template-layout {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
 }
@@ -673,49 +678,55 @@ html.modal-open {
 .bar-name-wrap {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
+  min-width: 0;
 }
 
 .bar-preset-pill {
   background: color-mix(in srgb, var(--accent) 15%, transparent);
   color: var(--accent);
   border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 800;
-  padding: 2px 7px;
-  border-radius: 6px;
+  padding: 2px 6px;
+  border-radius: 5px;
   letter-spacing: 0.05em;
+  flex-shrink: 0;
 }
 
 .bar-name-label {
-  font-size: 0.92rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-ellipsis: true;
 }
 
 /* Bar Action Buttons */
 .bar-controls {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   flex-shrink: 0;
 }
 
 .eye-toggle-btn,
 .filter-toggle-btn,
 .delete-bar-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-color);
-  color: var(--progress-icons);
+  color: var(--text-muted, #a1a1aa);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
   padding: 0;
+  flex-shrink: 0;
 }
 
 .eye-toggle-btn:hover:not(:disabled),
@@ -1067,63 +1078,113 @@ html.modal-open {
 @media (max-width: 768px) {
   .progress-modal-panel {
     max-width: 96vw;
-    max-height: 85vh;
+    max-height: 88vh;
     border-radius: 16px;
   }
 
-  .modal-header {
-    padding: 14px 16px 12px 16px;
-  }
-
-  .modal-header h3 {
-    font-size: 1.15rem;
-  }
-
-  .modal-subtitle {
-    font-size: 0.72rem;
-  }
-
-  .modal-actions {
+  .drag-container {
+    padding: 6px 8px;
+    max-height: 48vh;
     gap: 6px;
   }
 
-  .modal-save-btn,
-  .modal-cancel-btn {
-    padding: 6px 10px;
-    font-size: 0.75rem;
-    border-radius: 7px;
-  }
-
-  .drag-container {
-    padding: 12px 14px;
-    max-height: 48vh;
-  }
-
   .bar-settings-group {
-    padding: 8px 10px;
+    padding: 6px 8px;
     border-radius: 10px;
+    margin-bottom: 6px;
   }
 
+  .bar-settings-row {
+    gap: 6px;
+  }
+
+  /* Compact Arrow Controls */
+  .arrow-controls {
+    gap: 2px;
+    width: 20px;
+    min-width: 20px;
+  }
+
+  .arrow-btn {
+    width: 20px !important;
+    height: 15px !important;
+    min-width: 20px !important;
+    min-height: 15px !important;
+    border-radius: 4px;
+  }
+
+  .arrow-btn svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  /* Compact Name Input & Preset Labels */
   .bar-name-input {
-    padding: 6px 8px;
-    font-size: 0.82rem;
+    height: 32px !important;
+    padding: 0 8px !important;
+    font-size: 0.78rem !important;
+    border-radius: 6px !important;
+  }
+
+  .bar-name-wrap {
+    gap: 5px;
+  }
+
+  .bar-preset-pill {
+    font-size: 0.58rem !important;
+    font-weight: 800;
+    padding: 1px 5px !important;
+    border-radius: 4px !important;
+  }
+
+  .bar-name-label {
+    font-size: 0.8rem !important;
+  }
+
+  /* Compact Action Buttons */
+  .bar-controls {
+    gap: 3px;
   }
 
   .eye-toggle-btn,
   .filter-toggle-btn,
   .delete-bar-btn {
-    width: 30px;
-    height: 30px;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    border-radius: 6px !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .eye-toggle-btn svg,
+  .filter-toggle-btn svg,
+  .delete-bar-btn svg {
+    width: 14px !important;
+    height: 14px !important;
   }
 
   .modal-footer-section {
-    padding: 12px 14px 14px 14px;
+    padding: 8px 10px 10px 10px;
+    gap: 6px;
+  }
+
+  .add-bar-row button {
+    height: 34px !important;
+    font-size: 0.78rem !important;
   }
 
   .template-presets-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
+    gap: 5px;
+  }
+
+  .template-preset-btn {
+    padding: 4px 8px !important;
+    font-size: 0.7rem !important;
+    border-radius: 6px !important;
   }
 }
 

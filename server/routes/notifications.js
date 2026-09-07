@@ -25,13 +25,23 @@ router.get("/", authenticateUser, async (req, res) => {
       .limit(50)
       .lean();
 
+    // Fetch live author profile info for announcements
+    const creatorUsernames = [...new Set(allNotifs.map(n => n.createdBy).filter(Boolean))];
+    const creators = await User.find({ username: { $in: creatorUsernames } }).select("username avatar profileTrainer").lean();
+    const creatorMap = new Map(creators.map(c => [c.username.toLowerCase(), c]));
+
     const userNotifs = allNotifs
       .filter(n => !deletedIds.has(String(n._id)))
-      .map(n => ({
-        ...n,
-        id: String(n._id),
-        read: readIds.has(String(n._id))
-      }));
+      .map(n => {
+        const creator = n.createdBy ? creatorMap.get(n.createdBy.toLowerCase()) : null;
+        return {
+          ...n,
+          id: String(n._id),
+          read: readIds.has(String(n._id)),
+          creatorAvatar: n.creatorAvatar || creator?.avatar || null,
+          creatorTrainer: n.creatorTrainer || creator?.profileTrainer || null
+        };
+      });
 
     const unreadCount = userNotifs.filter(n => !n.read).length;
 

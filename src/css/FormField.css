@@ -709,6 +709,8 @@ input[type="number"].udt-field-input {
   padding: 6px;
   box-sizing: border-box;
   transform-origin: top center;
+  /* Clamp to viewport width on narrow screens */
+  max-width: min(360px, calc(100vw - 16px));
 }
 
 /* placement-top handled via inline style (bottom instead of top) */
@@ -865,3 +867,279 @@ input[type="number"].udt-field-input {
   color: var(--udt-field-helper);
   opacity: 0.7;
 }
+
+/* ==========================================================================
+   DATEFIELD — Custom Calendar Popover
+   ========================================================================== */
+
+.udt-datepicker-pop {
+  position: fixed;
+  z-index: 20050;
+  background: var(--progress-bg, #1a1a1e);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 14px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.75), 0 0 1px rgba(255, 255, 255, 0.08);
+  padding: 14px;
+  width: 280px;
+  box-sizing: border-box;
+  user-select: none;
+  animation: udtPopIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes udtPopIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Header row */
+.udt-datepicker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.udt-datepicker-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-muted, #9ca3af);
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+.udt-datepicker-nav:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text, #ffffff);
+}
+
+.udt-datepicker-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  justify-content: center;
+}
+
+.udt-datepicker-title-btn {
+  background: transparent;
+  border: none;
+  color: var(--text, #ffffff);
+  font-weight: 700;
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  line-height: 1;
+}
+.udt-datepicker-title-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent, #ffe76a);
+}
+
+/* Day grid */
+.udt-datepicker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.udt-datepicker-weekday {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted, #9ca3af);
+  letter-spacing: 0.03em;
+}
+
+.udt-datepicker-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text, #e5e7eb);
+  font-size: 0.84rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  line-height: 1;
+}
+.udt-datepicker-day:hover:not(.selected) {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text, #ffffff);
+}
+.udt-datepicker-day.today {
+  border-color: var(--accent, #ffe76a);
+  color: var(--accent, #ffe76a);
+  font-weight: 700;
+}
+.udt-datepicker-day.selected {
+  background: var(--accent, #ffe76a);
+  color: #121216;
+  font-weight: 800;
+  border-color: var(--accent, #ffe76a);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent, #ffe76a) 40%, transparent);
+}
+
+/* Month grid */
+.udt-datepicker-month-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.udt-datepicker-month-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text, #e5e7eb);
+  font-size: 0.83rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+.udt-datepicker-month-btn:hover:not(.selected) {
+  background: rgba(255, 255, 255, 0.1);
+}
+.udt-datepicker-month-btn.selected {
+  background: var(--accent, #ffe76a);
+  color: #121216;
+  font-weight: 700;
+  border-color: var(--accent, #ffe76a);
+}
+
+/* Year grid */
+.udt-datepicker-year-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.udt-datepicker-year-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text, #e5e7eb);
+  font-size: 0.83rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+.udt-datepicker-year-btn:hover:not(.selected) {
+  background: rgba(255, 255, 255, 0.1);
+}
+.udt-datepicker-year-btn.selected {
+  background: var(--accent, #ffe76a);
+  color: #121216;
+  font-weight: 700;
+  border-color: var(--accent, #ffe76a);
+}
+
+/* Light theme overrides */
+[data-theme="light"] .udt-datepicker-pop {
+  background: #ffffff;
+  border-color: var(--border-color, #e2e8f0);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+[data-theme="light"] .udt-datepicker-day,
+[data-theme="light"] .udt-datepicker-month-btn,
+[data-theme="light"] .udt-datepicker-year-btn {
+  color: #0f172a;
+}
+[data-theme="light"] .udt-datepicker-day:hover:not(.selected),
+[data-theme="light"] .udt-datepicker-month-btn:hover:not(.selected),
+[data-theme="light"] .udt-datepicker-year-btn:hover:not(.selected) {
+  background: rgba(0, 0, 0, 0.07);
+}
+[data-theme="light"] .udt-datepicker-weekday {
+  color: #64748b;
+}
+[data-theme="light"] .udt-datepicker-title-btn {
+  color: #0f172a;
+}
+[data-theme="light"] .udt-datepicker-nav:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #0f172a;
+}
+
+/* Today Button Footer */
+.udt-datepicker-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+}
+
+.udt-datepicker-today-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  color: var(--accent, #ffe76a);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.udt-datepicker-today-btn:hover {
+  background: color-mix(in srgb, var(--accent, #ffe76a) 15%, transparent);
+  border-color: var(--accent, #ffe76a);
+  color: var(--accent, #ffe76a);
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .udt-datepicker-footer {
+  border-top-color: #e2e8f0;
+}
+
+[data-theme="light"] .udt-datepicker-today-btn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: #e2e8f0;
+  color: #0f172a;
+}
+
+[data-theme="light"] .udt-datepicker-today-btn:hover {
+  background: color-mix(in srgb, var(--accent, #ffe76a) 20%, transparent);
+  border-color: var(--accent, #ffe76a);
+  color: #0f172a;
+}
+

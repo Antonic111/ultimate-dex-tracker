@@ -55,8 +55,8 @@ export default function RefundPolicy() {
             All orders, transactions, billing, tax calculation, and payment processing are fulfilled by our authorized Merchant of Record, <strong>Stripe</strong> (via Stripe Managed Payments). Stripe acts as the legal Merchant of Record for all our membership transactions and provides customer billing support in partnership with us.
           </p>
           <div className="legal-callout">
-            <div className="legal-callout-title">Digital Fan-Made Service</div>
-            Ultimate Dex Tracker is an independent fan project. Paid memberships provide access to digital cloud features, streamer overlays, custom profile badges, and enhanced organization tools.
+            <div className="legal-callout-title">Digital Fan-Made Service & Trademark Notice</div>
+            Ultimate Dex Tracker is an unofficial fan project and is <strong>not</strong> affiliated with, endorsed by, or sponsored by Nintendo, GAME FREAK, or The Pokémon Company. Pokémon is a registered trademark of Nintendo. Paid memberships provide access to digital cloud features, streamer overlays, custom profile badges, and enhanced organization tools.
           </div>
         </section>
 
@@ -126,7 +126,7 @@ export default function RefundPolicy() {
               <tbody>
                 <tr>
                   <td><strong>Feedback & Support Form</strong></td>
-                  <td>Submit a ticket via our <Link to="/feedback">Feedback & Support</Link> page with your account username to request an immediate review.</td>
+                  <td>Submit a ticket via our <Link to="/support">Support</Link> page with your account username to request an immediate review.</td>
                   <td>Within 24 hours</td>
                 </tr>
                 <tr>
@@ -156,7 +156,7 @@ export default function RefundPolicy() {
             <span className="section-number">6</span> Chargebacks & Inquiries
           </h2>
           <p className="legal-paragraph">
-            If you do not recognize a charge or have a question about your bill, please inspect your invoices via the Stripe Customer Portal in your <Link to="/membership">Membership Settings</Link> or submit a message through the <Link to="/feedback">Feedback & Support</Link> page before initiating a bank dispute or chargeback. We can quickly look up receipts, cancel subscriptions, and issue eligible refunds directly.
+            If you do not recognize a charge or have a question about your bill, please inspect your invoices via the Stripe Customer Portal in your <Link to="/membership">Membership Settings</Link> or submit a message through the <Link to="/support">Support</Link> page before initiating a bank dispute or chargeback. We can quickly look up receipts, cancel subscriptions, and issue eligible refunds directly.
           </p>
         </section>
 
@@ -169,7 +169,7 @@ export default function RefundPolicy() {
             For all questions regarding memberships, transactions, receipts, cancellations, or refunds:
           </p>
           <ul className="legal-list">
-            <li><strong>Support & Bug Reports:</strong> Available through the on-site <Link to="/feedback">Feedback & Support Form</Link></li>
+            <li><strong>Support & Bug Reports:</strong> Available through the on-site <Link to="/support">Support Form</Link></li>
             <li><strong>Self-Service Billing Portal:</strong> Accessible via <Link to="/membership">Membership Settings</Link></li>
             <li><strong>Website:</strong> <a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a></li>
           </ul>

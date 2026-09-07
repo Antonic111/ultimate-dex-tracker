@@ -86,7 +86,7 @@ export default function TermsOfService() {
           </h2>
           <div className="legal-callout">
             <div className="legal-callout-title">Important Intellectual Property Notice</div>
-            <strong>Ultimate Dex Tracker is an unofficial, fan-made companion website.</strong> We are <strong>not</strong> affiliated with, sponsored by, authorized by, or endorsed by Nintendo Co., Ltd., GAME FREAK inc., Creatures Inc., or The Pokémon Company.
+            <strong>Ultimate Dex Tracker is an unofficial fan project</strong> and is <strong>not</strong> affiliated with, endorsed by, or sponsored by Nintendo Co., Ltd., GAME FREAK inc., Creatures Inc., or The Pokémon Company. Pokémon is a registered trademark of Nintendo. All Pokémon trademarks, names, and sprite representations are property of their respective owners.
           </div>
           <p className="legal-paragraph">
             Pokémon, Pokémon character names, Nintendo Switch, video game artwork, sprite imagery, game mechanics, and related trademarks are registered trademarks and copyrighted intellectual property of their respective owners (Nintendo, GAME FREAK, and Creatures Inc.).
@@ -306,7 +306,7 @@ export default function TermsOfService() {
             If you have questions regarding these Terms of Service, customer support, or billing, please use the appropriate channel:
           </p>
           <ul className="legal-list">
-            <li><strong>Customer & Technical Support:</strong> Available through our on-site <Link to="/feedback">Feedback & Support form</Link></li>
+            <li><strong>Customer & Technical Support:</strong> Available through our on-site <Link to="/support">Support form</Link></li>
             <li><strong>Billing, Receipts & Invoices:</strong> Handled securely via the Stripe Customer Portal accessible in your Membership settings</li>
             <li><strong>Developer & Creator:</strong> Antonic (Solo Developer)</li>
             <li><strong>Developer Portfolio:</strong> <a href="https://antonic.ca" target="_blank" rel="noopener noreferrer">antonic.ca</a></li>

@@ -12,6 +12,8 @@ import notificationsRoutes from "./routes/notifications.js";
 import streamerToolsRoutes from "./routes/streamerTools.js";
 import monetizationRoutes from "./routes/monetization.js";
 import stripeRoutes from "./routes/stripe.js";
+import achievementsRoutes from "./routes/achievements.js";
+import changelogRoutes from "./routes/changelog.js";
 import { recordRequestMetric } from "./utils/metricsCollector.js";
 import compression from "compression";
 
@@ -143,6 +145,8 @@ app.use("/api/notifications", notificationsRoutes);
 app.use("/api", streamerToolsRoutes);
 app.use("/api/monetization", monetizationRoutes);
 app.use("/api/stripe", stripeRoutes);
+app.use("/api/achievements", achievementsRoutes);
+app.use("/api", changelogRoutes);
 
 // Global error handler for oversized payloads and other errors
 app.use((err, req, res, next) => {

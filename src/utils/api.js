@@ -29,6 +29,22 @@ const mobileRetry = async (fn, maxRetries = 2) => {
   }
 };
 
+// Automatic suspension detection and session cleanup for the logged-in user
+const handleSuspensionResponse = (errorData) => {
+  if (
+    typeof window !== 'undefined' &&
+    (errorData?.error === 'ACCOUNT_SUSPENDED' || errorData?.code === 'ACCOUNT_SUSPENDED') &&
+    errorData?.code !== 'TARGET_USER_SUSPENDED' &&
+    errorData?.error !== 'TARGET_USER_SUSPENDED'
+  ) {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('mobileUserBackup');
+    localStorage.removeItem('bingo-grid-state-v1');
+    sessionStorage.removeItem('iosUserBackup');
+    window.dispatchEvent(new CustomEvent('account-suspended', { detail: errorData }));
+  }
+};
+
 // Centralized API utility for making authenticated requests
 export const api = {
   // GET request
@@ -58,6 +74,7 @@ export const api = {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
+          handleSuspensionResponse(errorData);
           const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
           error.status = response.status;
           error.data = errorData;
@@ -119,6 +136,7 @@ export const api = {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
+          handleSuspensionResponse(errorData);
           const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
           error.status = response.status;
           error.data = errorData;
@@ -181,6 +199,7 @@ export const api = {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
+          handleSuspensionResponse(errorData);
           const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
           error.status = response.status;
           error.data = errorData;
@@ -242,6 +261,7 @@ export const api = {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
+          handleSuspensionResponse(errorData);
           const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
           error.status = response.status;
           error.data = errorData;
@@ -301,6 +321,7 @@ export const api = {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
+          handleSuspensionResponse(errorData);
           const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
           error.status = response.status;
           error.data = errorData;
@@ -436,6 +457,14 @@ export const caughtAPI = {
   },
 };
 
+export const achievementsAPI = {
+  // Get global achievement badge rarities across eligible users
+  async getRarity(forceRefresh = false) {
+    const query = forceRefresh ? '?refresh=true' : '';
+    return api.get(`/achievements/rarity${query}`);
+  },
+};
+
 export const progressAPI = {
   // Get progress bars
   async getProgressBars() {
@@ -484,18 +513,18 @@ export const streamerOverlayAPI = {
 
 export const bingoAPI = {
   // Get bingo data
-  async getBingo() {
-    return api.get('/bingo');
+  async getBingo(year) {
+    return api.get(year ? `/bingo?year=${encodeURIComponent(year)}` : '/bingo');
   },
 
   // Update bingo data
-  async updateBingo(bingoData) {
-    return api.put('/bingo', { bingoData });
+  async updateBingo(bingoData, bingoQuote, year) {
+    return api.put('/bingo', { bingoData, bingoQuote, year });
   },
 
   // Get public bingo data
-  async getPublicBingo(username) {
-    return api.get(`/public/bingo/${encodeURIComponent(username)}`);
+  async getPublicBingo(username, year) {
+    return api.get(`/public/bingo/${encodeURIComponent(username)}${year ? `?year=${encodeURIComponent(year)}` : ''}`);
   },
 };
 
@@ -765,10 +794,58 @@ export const notificationsAPI = {
   async sendAnnouncement(data) {
     return api.post('/notifications/announcement', data);
   },
+  async postAdminAnnouncement(data) {
+    return api.post('/notifications/announcement', data);
+  },
 
   // Admin: Permanently delete an announcement
   async deleteAnnouncementAdmin(id) {
     return api.delete(`/notifications/admin/${encodeURIComponent(id)}`);
+  },
+  async adminDeleteNotification(id) {
+    return api.delete(`/notifications/admin/${encodeURIComponent(id)}`);
+  }
+};
+
+export const changelogAPI = {
+  // Public: Get published changelog entries
+  async getPublic() {
+    return api.get('/changelog');
+  },
+
+  // Admin: Get all changelog releases (including drafts)
+  async getAdminAll() {
+    return api.get('/admin/changelog');
+  },
+
+  // Admin: Create a new release
+  async create(data) {
+    return api.post('/admin/changelog', data);
+  },
+
+  // Admin: Update release
+  async update(id, data) {
+    return api.put(`/admin/changelog/${encodeURIComponent(id)}`, data);
+  },
+
+  // Admin: Delete release
+  async delete(id) {
+    return api.delete(`/admin/changelog/${encodeURIComponent(id)}`);
+  },
+
+  // Admin: Toggle publish status
+  async togglePublish(id) {
+    return api.patch(`/admin/changelog/${encodeURIComponent(id)}/publish`);
+  },
+
+  // Admin: Duplicate previous release into a fresh draft
+  async duplicate(id) {
+    return api.post(`/admin/changelog/duplicate/${encodeURIComponent(id)}`);
+  },
+
+  // Admin: Quick add bullet entry to active draft
+  async quickEntry(data) {
+    return api.post('/admin/changelog/quick-entry', data);
   }
 };
 

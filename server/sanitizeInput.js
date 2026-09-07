@@ -235,6 +235,29 @@ export function sanitizeProfileData(profileData) {
   let isValid = true;
 
   for (const [fieldName, value] of Object.entries(profileData)) {
+    // Handle birthday object or null
+    if (fieldName === 'birthday') {
+      if (value === null || value === '' || value === undefined) {
+        sanitized[fieldName] = null;
+      } else if (typeof value === 'object') {
+        const month = Number(value.month);
+        const day = Number(value.day);
+        const year = value.year ? Number(value.year) : null;
+        if (Number.isInteger(month) && Number.isInteger(day) && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+          sanitized[fieldName] = {
+            month,
+            day,
+            ...(year && Number.isInteger(year) && year >= 1900 && year <= 2100 ? { year } : {})
+          };
+        } else {
+          sanitized[fieldName] = null;
+        }
+      } else {
+        sanitized[fieldName] = null;
+      }
+      continue;
+    }
+
     // Handle arrays (favoriteGames, favoritePokemon)
     if (Array.isArray(value)) {
       sanitized[fieldName] = value.map(item => {

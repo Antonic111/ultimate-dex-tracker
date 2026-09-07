@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import "../css/Profile.css";
-import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight, Video } from "lucide-react";
+import { Mars, Venus, VenusAndMars, Trophy, ArrowBigLeft, Link as LinkIcon, Heart, Sparkles, Crown, ChevronLeft, ChevronRight, Video, Ban } from "lucide-react";
 import PremiumIcon from "../components/Shared/PremiumIcon";
 import { AdminIcon, ContentCreatorIcon } from "../components/Shared/BadgeIcons";
 import { YoutubeIcon, TwitchIcon } from "../components/Shared/SocialIcons";
@@ -15,7 +15,7 @@ import { LoadingSpinner, SectionLoader, useMessage } from "../components/Shared"
 import { profileAPI } from "../utils/api";
 import { UserContext } from "../components/Shared/UserContext";
 import { getSpriteUrl } from "../utils/spriteUtils";
-import { getUserAvatarUrl } from "../utils/profileUtils";
+import { getUserAvatarUrl, formatBirthday } from "../utils/profileUtils";
 
 
 // Move createPokemonLookup and POKEMON_OPTIONS inside the component
@@ -142,6 +142,7 @@ export default function PublicProfile() {
     const [data, setData] = useState(null);
     const [stats, setStats] = useState({ regularCaught: 0, regularCompletion: 0, shinyCaught: 0, shinyCompletion: 0, gamesPlayed: 0, topBall: null, topMark: null, topGame: null, allBalls: [], allMarks: [], allGames: [] });
     const [loading, setLoading] = useState(true);
+    const [isUserSuspended, setIsUserSuspended] = useState(false);
     const [recentAdded, setRecentAdded] = useState([]);
     const [refreshKey, setRefreshKey] = useState(0);
     const [likeCount, setLikeCount] = useState(0);
@@ -196,7 +197,7 @@ export default function PublicProfile() {
     const [statPage, setStatPage] = useState({ games: 0, balls: 0, marks: 0 });
     const STAT_PAGE_SIZE = 8;
     const { showMessage } = useMessage();
-    const { username: currentUsername, loading: userLoading } = useContext(UserContext);
+    const { username: currentUsername, loading: userLoading, isAdmin } = useContext(UserContext);
 
     const handleCopyLink = async () => {
         const url = `${window.location.origin}/u/${encodeURIComponent(username)}`;
@@ -303,6 +304,7 @@ export default function PublicProfile() {
                 const j = await profileAPI.getPublicProfile(username);
                 if (!ignore) {
                     setData(j);
+                    setIsUserSuspended(Boolean(j?.isSuspended));
 
 
                     // Store the profile owner's dex preferences
@@ -327,8 +329,16 @@ export default function PublicProfile() {
                         });
                     }
                 }
-            } catch {
+            } catch (err) {
                 if (!ignore) {
+                    if (
+                        err?.status === 403 ||
+                        err?.data?.isSuspended ||
+                        err?.data?.code === 'TARGET_USER_SUSPENDED' ||
+                        err?.data?.error === 'TARGET_USER_SUSPENDED'
+                    ) {
+                        setIsUserSuspended(true);
+                    }
                     setData(null);
                     // Set default preferences on error
                     setProfileOwnerPreferences({
@@ -640,6 +650,50 @@ export default function PublicProfile() {
         </div>
     );
     if (!data) {
+        if (isUserSuspended) {
+            return (
+                <div className="profile-wrapper">
+                    <div style={{
+                        maxWidth: '600px',
+                        width: '100%',
+                        margin: '60px auto',
+                        padding: '36px 24px',
+                        textAlign: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '16px',
+                        background: 'rgba(239, 68, 68, 0.08)',
+                        border: '1px solid rgba(239, 68, 68, 0.25)',
+                        borderRadius: '16px',
+                        backdropFilter: 'blur(10px)'
+                    }}>
+                        <div style={{
+                            width: '64px',
+                            height: '64px',
+                            borderRadius: '50%',
+                            background: 'rgba(239, 68, 68, 0.15)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#ef4444'
+                        }}>
+                            <Ban size={36} />
+                        </div>
+                        <h1 style={{ margin: 0, fontSize: '1.75rem', color: '#f87171', fontWeight: 700 }}>
+                            Account Suspended
+                        </h1>
+                        <p style={{ margin: 0, color: 'var(--text-secondary)', maxWidth: '440px', lineHeight: 1.5, fontSize: '0.95rem' }}>
+                            This trainer's account has been suspended for violating community guidelines and terms of service.
+                        </p>
+                        <Link to="/trainers" className="profile-edit-btn" style={{ textDecoration: 'none', marginTop: '8px' }}>
+                            ← Back to Trainers
+                        </Link>
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <div className="profile-wrapper">
                 <div style={{
@@ -666,6 +720,30 @@ export default function PublicProfile() {
 
     return (
         <div className="profile-wrapper page-container profile-page">
+            {data?.isSuspended && (
+                <div style={{
+                    background: 'rgba(239, 68, 68, 0.12)',
+                    border: '1px solid rgba(239, 68, 68, 0.35)',
+                    borderRadius: '12px',
+                    padding: '12px 18px',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    color: '#fca5a5',
+                    fontSize: '0.9rem'
+                }}>
+                    <Ban size={20} style={{ color: '#ef4444', flexShrink: 0 }} />
+                    <div>
+                        <strong style={{ color: '#f87171' }}>Suspended Account (Admin View):</strong> This trainer is currently banned and hidden from the public.
+                        {data.suspendedReason && (
+                            <span style={{ marginLeft: '8px', color: 'var(--text-secondary)' }}>
+                                Reason: <em style={{ color: 'var(--text)' }}>"{data.suspendedReason}"</em>
+                            </span>
+                        )}
+                    </div>
+                </div>
+            )}
             {/* ===== header bar (same layout, no edit buttons) ===== */}
             <div className="profile-header-bar">
                 <div className="profile-header-left">
@@ -838,6 +916,16 @@ export default function PublicProfile() {
                                 {data.gender === "Other" ? "Female" : (data.gender || "N/A")}
                             </div>
                         </div>
+
+                        {data.birthday && data.birthday.month && data.birthday.day && (
+                            <div className="profile-field">
+                                <label>Birthday</label>
+                                <div className="field-display">
+                                    <img src="/svgs/birthday_cake.svg" alt="Birthday" className="w-4 h-4 object-contain" style={{ marginRight: 6 }} />
+                                    <span>{formatBirthday(data.birthday)}</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="profile-row-split">

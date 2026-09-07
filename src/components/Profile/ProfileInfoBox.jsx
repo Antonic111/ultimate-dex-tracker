@@ -2,8 +2,8 @@ import React from 'react';
 import { Mars, Venus, VenusAndMars, User, Globe } from "lucide-react";
 import { YoutubeIcon, TwitchIcon } from "../Shared/SocialIcons";
 import { COUNTRY_OPTIONS } from "../../data/countries";
-import { InputField, SelectField } from "../Shared/FormField";
-import { normalizeYoutubeUrl, normalizeTwitchUrl, extractYoutubeHandle, extractTwitchHandle } from "../../utils/profileUtils";
+import { InputField, SelectField, DateField } from "../Shared/FormField";
+import { normalizeYoutubeUrl, normalizeTwitchUrl, extractYoutubeHandle, extractTwitchHandle, formatBirthday } from "../../utils/profileUtils";
 import "flag-icons/css/flag-icons.min.css";
 
 function formatSwitchFCInput(value) {
@@ -118,6 +118,63 @@ export default function ProfileInfoBox({ isOwner, isEditing, form, setForm, isCo
                         </div>
                     )}
                 </div>
+
+                {/* Birthday */}
+                {(form.birthday && form.birthday.month && form.birthday.day) && (
+                    <div className="profile-info-row">
+                        <div className="info-label">Birthday</div>
+                        {isOwner && isEditing ? (
+                            <div className="info-edit-wrapper">
+                                <DateField
+                                    id="profile-info-birthday"
+                                    value={
+                                        form.birthday && form.birthday.month && form.birthday.day
+                                            ? `${String(form.birthday.month).padStart(2, "0")}-${String(form.birthday.day).padStart(2, "0")}-${String(form.birthday.year || 2000)}`
+                                            : ""
+                                    }
+                                    onChange={(e) => {
+                                        const val = e.target?.value || "";
+                                        if (!val) {
+                                            setForm({ ...form, birthday: null });
+                                            return;
+                                        }
+                                        const parts = val.split(/[-/]/).map(Number);
+                                        if (parts.length === 3) {
+                                            let mo, d, y;
+                                            if (parts[0] > 1000) {
+                                                // YYYY-MM-DD
+                                                [y, mo, d] = parts;
+                                            } else {
+                                                // MM-DD-YYYY
+                                                [mo, d, y] = parts;
+                                            }
+                                            if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
+                                                setForm({
+                                                    ...form,
+                                                    birthday: {
+                                                        month: mo,
+                                                        day: d,
+                                                        ...(y ? { year: y } : {})
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }}
+                                    onClear={() => setForm({ ...form, birthday: null })}
+                                    startIcon={<img src="/svgs/birthday_cake.svg" alt="Birthday" className="w-4 h-4 object-contain" />}
+                                    size="sm"
+                                    fullWidth
+                                    clearable
+                                />
+                            </div>
+                        ) : (
+                            <div className="info-value flex items-center gap-1.5">
+                                <img src="/svgs/birthday_cake.svg" alt="Birthday" className="w-4 h-4 object-contain" />
+                                <span>{formatBirthday(form.birthday)}</span>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Switch FC */}
                 {(isEditing || form.switchFriendCode) && (

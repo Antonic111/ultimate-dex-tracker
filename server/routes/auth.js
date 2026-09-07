@@ -13,7 +13,7 @@ import { sendCodeEmail } from "../utils/sendCodeEmail.js";
 import { authLimiter } from "../middleware/rateLimit.js";
 import { validateContent } from "../contentFilter.js";
 import { sanitizeProfileData, sanitizeInput, sanitizeEntryData } from "../sanitizeInput.js";
-import { authenticateUser } from "../middleware/authenticateUser.js";
+import { authenticateUser, markUserSuspended, unmarkUserSuspended } from "../middleware/authenticateUser.js";
 import CreatorRequest from "../models/CreatorRequest.js";
 import RecentCatch from "../models/RecentCatch.js";
 import LinkedProvider from "../models/LinkedProvider.js";
@@ -292,6 +292,15 @@ router.post("/login", authLimiter, async (req, res) => {
 
     if (!isMatch) return res.status(400).json({ error: "Invalid password" });
 
+    // Block suspended accounts from logging in
+    if (user.isSuspended) {
+      return res.status(403).json({
+        error: "ACCOUNT_SUSPENDED",
+        message: "Your account has been suspended.",
+        reason: user.suspendedReason || "Violation of community guidelines or terms of service."
+      });
+    }
+
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: rememberMe ? "30d" : "2h",
     });
@@ -379,6 +388,27 @@ router.get("/me", async (req, res) => {
       getMembershipBadgeInfo(userId),
     ]);
     if (!user) return res.status(200).json({ authenticated: false });
+
+    // If account has been suspended, clear session cookies and return suspension notice
+    if (user.isSuspended) {
+      const isIOS = req.headers['user-agent'] && /iPhone|iPad|iPod/i.test(req.headers['user-agent']);
+      const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? (isIOS ? "none" : "lax") : "lax",
+        path: "/",
+      };
+      if (process.env.NODE_ENV === 'production' && !isIOS) {
+        cookieOptions.domain = '.ultimatedextracker.com';
+      }
+      res.clearCookie("token", cookieOptions);
+
+      return res.status(200).json({
+        authenticated: false,
+        isSuspended: true,
+        suspendedReason: user.suspendedReason || "Violation of community guidelines or terms of service."
+      });
+    }
 
     res.json({
       username: user.username,
@@ -744,6 +774,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
 
     if (req.body.location !== undefined) user.location = sanitizedData.location;
     if (req.body.gender !== undefined) user.gender = sanitizedData.gender;
+    if (req.body.birthday !== undefined) user.birthday = sanitizedData.birthday;
     if (req.body.favoriteGames !== undefined) user.favoriteGames = sanitizedData.favoriteGames;
     if (req.body.favoritePokemon !== undefined) user.favoritePokemon = sanitizedData.favoritePokemon;
     if (req.body.favoritePokemonShiny !== undefined) user.favoritePokemonShiny = req.body.favoritePokemonShiny;
@@ -1066,7 +1097,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
 
   try {
     const [user, membershipInfo] = await Promise.all([
-      User.findById(req.userId).select("bio location gender favoriteGames favoritePokemon favoritePokemonShiny favoriteBalls favoriteTrainers favoriteCategoryOrder profileTrainer nameColor1 nameColor2 nameGradientColor1 nameGradientColor2 avatar switchFriendCode goFriendCode isProfilePublic isGlobalFeedPublic isLeaderboardPublic isFriendCodesPublic isStatsPublic likes dexPreferences externalLinkPreference shinyCharmGames huntHotkey isAdmin accentColor siteTheme isContentCreator youtubeUrl twitchUrl lastActiveAt"),
+      User.findById(req.userId).select("bio location gender birthday favoriteGames favoritePokemon favoritePokemonShiny favoriteBalls favoriteTrainers favoriteCategoryOrder profileTrainer nameColor1 nameColor2 nameGradientColor1 nameGradientColor2 avatar switchFriendCode goFriendCode isProfilePublic isGlobalFeedPublic isLeaderboardPublic isFriendCodesPublic isStatsPublic likes dexPreferences externalLinkPreference shinyCharmGames huntHotkey isAdmin accentColor siteTheme isContentCreator youtubeUrl twitchUrl lastActiveAt"),
       getMembershipBadgeInfo(req.userId),
     ]);
 
@@ -1076,6 +1107,7 @@ router.get("/profile", authenticateUser, async (req, res) => {
       bio: user.bio,
       location: user.location,
       gender: user.gender,
+      birthday: user.birthday || null,
       favoriteGames: user.favoriteGames,
       favoritePokemon: user.favoritePokemon,
       favoritePokemonShiny: user.favoritePokemonShiny,
@@ -1236,15 +1268,95 @@ router.patch("/caught", authenticateUser, async (req, res) => {
   }
 });
 
+const START_BINGO_YEAR = 2026;
+
+function getBingoYearsData(user) {
+  const currentYear = new Date().getFullYear();
+  if (!user.bingoYears) {
+    user.bingoYears = new Map();
+  }
+
+  // Ensure map format if stored as plain object
+  const yearsMap = user.bingoYears instanceof Map
+    ? user.bingoYears
+    : new Map(Object.entries(user.bingoYears || {}));
+
+  // Migration: If 2026 is not yet in bingoYears, initialize it from legacy bingoGrid / bingoQuote
+  if (!yearsMap.has(String(START_BINGO_YEAR))) {
+    const quoteText = user.bingoQuote?.text && user.bingoQuote.text !== "Good luck and happy hunting!"
+      ? user.bingoQuote.text
+      : `${START_BINGO_YEAR} is my year for shiny hunting!`;
+    yearsMap.set(String(START_BINGO_YEAR), {
+      grid: user.bingoGrid && user.bingoGrid.length > 0 ? user.bingoGrid : [],
+      quote: {
+        text: quoteText,
+        author: user.bingoQuote?.author || ""
+      }
+    });
+  }
+
+  // Check if currentYear is beyond START_BINGO_YEAR (e.g. 2027+) and not yet initialized
+  if (currentYear > START_BINGO_YEAR && !yearsMap.has(String(currentYear))) {
+    yearsMap.set(String(currentYear), {
+      grid: [],
+      quote: {
+        text: `${currentYear} is my year for shiny hunting!`,
+        author: ""
+      }
+    });
+  }
+
+  // Convert to plain object for JSON response and easily extract available years
+  const yearsObj = {};
+  for (const [y, data] of yearsMap.entries()) {
+    yearsObj[y] = {
+      grid: Array.isArray(data.grid) ? data.grid : [],
+      quote: {
+        text: data.quote?.text || `${y} is my year for shiny hunting!`,
+        author: data.quote?.author || ""
+      }
+    };
+  }
+
+  // Available years: sorted descending (e.g. [2027, 2026])
+  const yearNumbers = Object.keys(yearsObj).map(Number);
+  if (!yearNumbers.includes(START_BINGO_YEAR)) yearNumbers.push(START_BINGO_YEAR);
+  if (!yearNumbers.includes(currentYear)) yearNumbers.push(currentYear);
+  const availableYears = Array.from(new Set(yearNumbers)).sort((a, b) => b - a);
+
+  // Sync back to user.bingoYears
+  user.bingoYears = yearsMap;
+
+  return { currentYear, availableYears, yearsObj };
+}
+
 // GET /api/bingo
 router.get("/bingo", authenticateUser, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // Fallback if field doesn't exist yet
-    const grid = user.bingoGrid || [];
-    res.json({ grid });
+    const { currentYear, availableYears, yearsObj } = getBingoYearsData(user);
+
+    if (user.isModified('bingoYears')) {
+      await user.save();
+    }
+
+    const requestedYear = req.query.year ? parseInt(req.query.year, 10) : currentYear;
+    const selectedYear = availableYears.includes(requestedYear) ? requestedYear : currentYear;
+    const activeData = yearsObj[String(selectedYear)] || {
+      grid: [],
+      quote: { text: `${selectedYear} is my year for shiny hunting!`, author: "" }
+    };
+
+    res.json({
+      currentYear,
+      selectedYear,
+      availableYears,
+      years: yearsObj,
+      grid: activeData.grid,
+      bingoQuote: activeData.quote
+    });
   } catch (err) {
     console.error('Error getting bingo data:', err);
     res.status(500).json({ error: "Server error" });
@@ -1254,22 +1366,70 @@ router.get("/bingo", authenticateUser, async (req, res) => {
 // PUT /api/bingo
 router.put("/bingo", authenticateUser, async (req, res) => {
   try {
-    const { bingoData } = req.body;
-    if (!Array.isArray(bingoData)) {
+    const { bingoData, bingoQuote, year } = req.body;
+    if (bingoData && !Array.isArray(bingoData)) {
       return res.status(400).json({ error: "Invalid bingo data format" });
     }
 
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // Basic sanitization/validation could go here if needed
-    // But since it's a fixed grid of objects, we can trust the schema validation mostly
-    // We just ensure we save it.
+    const { currentYear, availableYears, yearsObj } = getBingoYearsData(user);
 
-    user.bingoGrid = bingoData;
+    const targetYear = year ? parseInt(year, 10) : currentYear;
+    const yearKey = String(targetYear);
+
+    // Get existing year data
+    const existingYearData = yearsObj[yearKey] || {
+      grid: [],
+      quote: { text: `${targetYear} is my year for shiny hunting!`, author: "" }
+    };
+
+    const newGrid = Array.isArray(bingoData) ? bingoData : existingYearData.grid;
+    let newQuote = existingYearData.quote;
+    if (bingoQuote && typeof bingoQuote === 'object') {
+      newQuote = {
+        text: String(bingoQuote.text || `${targetYear} is my year for shiny hunting!`).slice(0, 200),
+        author: String(bingoQuote.author || '').slice(0, 50)
+      };
+    }
+
+    // Save to user.bingoYears
+    if (!user.bingoYears) user.bingoYears = new Map();
+    user.bingoYears.set(yearKey, {
+      grid: newGrid,
+      quote: newQuote
+    });
+
+    // If updating current active year, keep top-level bingoGrid & bingoQuote updated for compatibility
+    if (targetYear === currentYear) {
+      user.bingoGrid = newGrid;
+      user.bingoQuote = newQuote;
+    }
+
     await user.save();
 
-    res.json({ success: true });
+    // Re-serialize updated years
+    const updatedYearsObj = {};
+    for (const [y, data] of user.bingoYears.entries()) {
+      updatedYearsObj[y] = {
+        grid: Array.isArray(data.grid) ? data.grid : [],
+        quote: {
+          text: data.quote?.text || `${y} is my year for shiny hunting!`,
+          author: data.quote?.author || ""
+        }
+      };
+    }
+
+    res.json({
+      success: true,
+      currentYear,
+      selectedYear: targetYear,
+      availableYears,
+      years: updatedYearsObj,
+      grid: newGrid,
+      bingoQuote: newQuote
+    });
   } catch (err) {
     console.error('Error updating bingo data:', err);
     res.status(500).json({ error: "Server error" });
@@ -1824,7 +1984,8 @@ router.get("/caught/:username/public", async (req, res) => {
 
   const u = await User.findOne({
     username: req.params.username,
-    isProfilePublic: { $ne: false }
+    isProfilePublic: { $ne: false },
+    isSuspended: { $ne: true }
   })
     .select("_id")
     .lean();
@@ -1860,9 +2021,9 @@ router.get("/users/public", async (req, res) => {
 
   let match;
   if (scope === "leaderboard") {
-    match = { isLeaderboardPublic: { $ne: false } };
+    match = { isLeaderboardPublic: { $ne: false }, isSuspended: { $ne: true } };
   } else {
-    match = { isProfilePublic: { $ne: false } };
+    match = { isProfilePublic: { $ne: false }, isSuspended: { $ne: true } };
   }
 
   // Escape regex special characters to prevent regex injection
@@ -2005,7 +2166,7 @@ router.get("/users/:username/public", async (req, res) => {
     const u = await User.findOne({
       username: req.params.username
     })
-      .select("username bio location gender favoriteGames favoritePokemon favoritePokemonShiny favoriteBalls favoriteTrainers favoriteCategoryOrder profileTrainer nameColor1 nameColor2 nameGradientColor1 nameGradientColor2 avatar createdAt switchFriendCode goFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin bingoGrid isContentCreator youtubeUrl twitchUrl lastActiveAt isProfilePublic isGlobalFeedPublic isLeaderboardPublic isStatsPublic")
+      .select("username bio location gender birthday favoriteGames favoritePokemon favoritePokemonShiny favoriteBalls favoriteTrainers favoriteCategoryOrder profileTrainer nameColor1 nameColor2 nameGradientColor1 nameGradientColor2 avatar createdAt switchFriendCode goFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin bingoGrid isContentCreator youtubeUrl twitchUrl lastActiveAt isProfilePublic isGlobalFeedPublic isLeaderboardPublic isStatsPublic isSuspended suspendedReason")
       .lean();
 
     if (!u) return res.status(404).json({ error: "User not found" });
@@ -2014,6 +2175,18 @@ router.get("/users/:username/public", async (req, res) => {
       checkRequesterIsAdmin(req),
       getMembershipBadgeInfo(u._id),
     ]);
+
+    // Handle suspended profiles: admins can view for moderation, regular users receive 403
+    if (u.isSuspended) {
+      if (!requesterIsAdmin) {
+        return res.status(403).json({
+          error: "TARGET_USER_SUSPENDED",
+          code: "TARGET_USER_SUSPENDED",
+          message: "This trainer's account has been suspended.",
+          isSuspended: true
+        });
+      }
+    }
 
     if (u.isProfilePublic === false && !requesterIsAdmin) {
       return res.status(200).json({
@@ -2222,18 +2395,40 @@ router.get("/public/dex/:username", async (req, res) => {
 
 // GET /public/bingo/:username
 router.get("/public/bingo/:username", async (req, res) => {
-  const user = await User.findOne({ username: req.params.username });
-  if (!user) return res.status(404).json({ error: "User not found" });
+  try {
+    const user = await User.findOne({ username: req.params.username });
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-  const requesterIsAdmin = await checkRequesterIsAdmin(req);
-  if (user.isProfilePublic === false && !requesterIsAdmin) {
-    return res.status(403).json({ error: "This profile is private." });
+    const requesterIsAdmin = await checkRequesterIsAdmin(req);
+    if (user.isProfilePublic === false && !requesterIsAdmin) {
+      return res.status(403).json({ error: "This profile is private." });
+    }
+
+    const { currentYear, availableYears, yearsObj } = getBingoYearsData(user);
+    if (user.isModified('bingoYears')) {
+      await user.save();
+    }
+
+    const requestedYear = req.query.year ? parseInt(req.query.year, 10) : currentYear;
+    const selectedYear = availableYears.includes(requestedYear) ? requestedYear : currentYear;
+    const activeData = yearsObj[String(selectedYear)] || {
+      grid: [],
+      quote: { text: `${selectedYear} is my year for shiny hunting!`, author: "" }
+    };
+
+    res.json({
+      username: user.username,
+      currentYear,
+      selectedYear,
+      availableYears,
+      years: yearsObj,
+      grid: activeData.grid,
+      bingoQuote: activeData.quote
+    });
+  } catch (err) {
+    console.error('Error getting public bingo data:', err);
+    res.status(500).json({ error: "Server error" });
   }
-
-  res.json({
-    username: user.username,
-    grid: user.bingoGrid || []
-  });
 });
 
 // GET /api/hunts
@@ -2542,6 +2737,13 @@ router.post("/admin/users/:id/suspend", authenticateUser, requireAdmin, async (r
       return res.status(404).json({ error: "User not found" });
     }
 
+    // Synchronize real-time in-memory suspension cache
+    if (isSuspended) {
+      markUserSuspended(id, reason || 'Suspended by administrator');
+    } else {
+      unmarkUserSuspended(id);
+    }
+
     res.json({ 
       message: `User ${user.username} is now ${user.isSuspended ? 'suspended' : 'active'}`, 
       user 
@@ -2594,7 +2796,7 @@ router.get("/admin/system-stats", authenticateUser, requireAdmin, async (req, re
 router.patch("/admin/users/:id/profile", authenticateUser, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { bio, username, isContentCreator, avatar } = req.body;
+    const { bio, username, isContentCreator, avatar, email } = req.body;
     const updates = {};
 
     if (typeof bio === 'string') {
@@ -2626,6 +2828,25 @@ router.patch("/admin/users/:id/profile", authenticateUser, requireAdmin, async (
       updates.username = trimmedUsername;
     }
 
+    if (typeof email === 'string' && email.trim() !== '') {
+      const trimmedEmail = email.trim().toLowerCase();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(trimmedEmail)) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
+
+      // Check if another user already has this email (case-insensitive)
+      const existingEmailUser = await User.findOne({ 
+        email: { $regex: new RegExp(`^${trimmedEmail}$`, 'i') }, 
+        _id: { $ne: id } 
+      });
+
+      if (existingEmailUser) {
+        return res.status(400).json({ error: "Email is already in use by another user" });
+      }
+      updates.email = trimmedEmail;
+    }
+
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: "No valid fields to update" });
     }
@@ -2644,6 +2865,7 @@ router.patch("/admin/users/:id/profile", authenticateUser, requireAdmin, async (
       message: "Profile updated successfully",
       bio: updatedUser.bio,
       username: updatedUser.username,
+      email: updatedUser.email,
       isContentCreator: updatedUser.isContentCreator,
       avatar: updatedUser.avatar
     });
@@ -2674,6 +2896,22 @@ router.get("/admin/bug-reports", authenticateUser, requireAdmin, async (req, res
   }
 });
 
+// GET /api/admin/help-tickets - Get all customer support / help tickets (admin only)
+router.get("/admin/help-tickets", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const BugReport = (await import('../models/BugReport.js')).default;
+    const helpTickets = await BugReport.find({ type: 'help' })
+      .populate('submittedBy', 'username')
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .limit(50); // Limit to prevent large responses
+
+    res.json({ helpTickets });
+  } catch (error) {
+    console.error('Error fetching help tickets:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 router.get("/admin/feature-requests", authenticateUser, requireAdmin, async (req, res) => {
   try {
     const BugReport = (await import('../models/BugReport.js')).default;
@@ -2688,8 +2926,108 @@ router.get("/admin/feature-requests", authenticateUser, requireAdmin, async (req
     res.status(500).json({ error: "Server error" });
   }
 });
+// GET /api/admin/support/inbox - Unified Support Inbox for all ticket types (admin only)
+router.get("/admin/support/inbox", authenticateUser, requireAdmin, async (req, res) => {
+  try {
+    const BugReport = (await import('../models/BugReport.js')).default;
+    const { type, status, priority, search, limit = 100, page = 1 } = req.query;
 
-// PATCH /api/admin/update-report-status/:id - Update report status (admin only)
+    const query = {};
+
+    // Filter by type
+    if (type && type !== 'all') {
+      query.type = type;
+    }
+
+    // Filter by priority
+    if (priority && priority !== 'all') {
+      query.priority = priority;
+    }
+
+    // Filter by status
+    if (status && status !== 'all') {
+      if (status === 'open') {
+        // Tickets that are still active/in progress
+        query.status = { $nin: ['resolved', 'fixed', 'completed', 'closed', 'declined'] };
+      } else if (status === 'awaiting_user') {
+        query.status = 'awaiting_user';
+      } else if (status === 'awaiting_staff') {
+        query.status = { $in: ['awaiting_staff', 'reported', 'submitted', 'new', 'investigating', 'under_review'] };
+      } else if (status === 'resolved') {
+        query.status = { $in: ['resolved', 'fixed', 'completed'] };
+      } else if (status === 'closed') {
+        query.status = { $in: ['closed', 'declined'] };
+      } else {
+        query.status = status;
+      }
+    }
+
+    // Search
+    if (search && search.trim()) {
+      const s = search.trim();
+      const num = parseInt(s.replace(/^#/, ''), 10);
+      const searchConditions = [
+        { title: { $regex: s, $options: 'i' } },
+        { description: { $regex: s, $options: 'i' } },
+        { category: { $regex: s, $options: 'i' } },
+      ];
+      if (!isNaN(num)) {
+        searchConditions.push({ reportId: num });
+      }
+      query.$or = searchConditions;
+    }
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(200, Math.max(1, parseInt(limit, 10) || 100));
+    const skip = (pageNum - 1) * limitNum;
+
+    const [tickets, totalCount, openCount, awaitingStaffCount, awaitingUserCount, resolvedCount] = await Promise.all([
+      BugReport.find(query)
+        .populate('submittedBy', 'username avatar email')
+        .sort({ lastActivityAt: -1, updatedAt: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum),
+      BugReport.countDocuments({}),
+      BugReport.countDocuments({ status: { $nin: ['resolved', 'fixed', 'completed', 'closed', 'declined'] } }),
+      BugReport.countDocuments({ status: { $in: ['awaiting_staff', 'reported', 'submitted', 'new', 'investigating', 'under_review'] } }),
+      BugReport.countDocuments({ status: 'awaiting_user' }),
+      BugReport.countDocuments({ status: { $in: ['resolved', 'fixed', 'completed'] } }),
+    ]);
+
+    const processedTickets = tickets.map(t => {
+      const obj = typeof t.toObject === 'function' ? t.toObject() : { ...t };
+      let realLastActivity = obj.lastActivityAt;
+      if (Array.isArray(obj.messages) && obj.messages.length > 0) {
+        const lastMsg = obj.messages[obj.messages.length - 1];
+        if (lastMsg && lastMsg.createdAt) {
+          realLastActivity = lastMsg.createdAt;
+        }
+      } else if (!realLastActivity) {
+        realLastActivity = obj.updatedAt || obj.createdAt;
+      }
+      obj.lastActivityAt = realLastActivity;
+      return obj;
+    });
+
+    res.json({
+      tickets: processedTickets,
+      metrics: {
+        totalCount,
+        openCount,
+        awaitingStaffCount,
+        awaitingUserCount,
+        resolvedCount
+      },
+      page: pageNum,
+      limit: limitNum
+    });
+  } catch (error) {
+    console.error('Error fetching support inbox:', error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
 router.patch("/admin/update-report-status/:id", authenticateUser, requireAdmin, async (req, res) => {
   try {
     const BugReport = (await import('../models/BugReport.js')).default;

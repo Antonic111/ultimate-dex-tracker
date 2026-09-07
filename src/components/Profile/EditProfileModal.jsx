@@ -9,7 +9,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { Modal, ConfirmModal } from "../Shared/Modal";
 import { Button } from "../Shared/Button";
-import { InputField, TextAreaField, SelectField } from "../Shared/FormField";
+import { InputField, TextAreaField, SelectField, DateField } from "../Shared/FormField";
 import { useMessage } from "../Shared/MessageContext";
 import { useUser } from "../Shared";
 import FavoriteSelectionModal from "../Shared/FavoriteSelectionModal";
@@ -132,6 +132,9 @@ export default function EditProfileModal({
         bio: f?.bio || "",
         location: f?.location || "",
         gender: f?.gender || "",
+        birthday: f?.birthday && f.birthday.month && f.birthday.day
+            ? { month: Number(f.birthday.month), day: Number(f.birthday.day), ...(f.birthday.year ? { year: Number(f.birthday.year) } : {}) }
+            : null,
         avatar: f?.avatar || null,
         pendingAvatarFile: Boolean(f?.pendingAvatarFile),
         pendingAvatarRemoved: Boolean(f?.pendingAvatarRemoved),
@@ -307,6 +310,13 @@ export default function EditProfileModal({
                 bio:              form.bio,
                 location:         form.location,
                 gender:           form.gender,
+                birthday:         form.birthday && form.birthday.month && form.birthday.day
+                                    ? {
+                                        month: Number(form.birthday.month),
+                                        day: Number(form.birthday.day),
+                                        ...(form.birthday.year ? { year: Number(form.birthday.year) } : {})
+                                      }
+                                    : null,
                 avatar:           finalAvatar,
                 nameColor1:       form.nameColor1 || null,
                 nameColor2:       form.nameColor2 || null,
@@ -327,6 +337,13 @@ export default function EditProfileModal({
             // Update parent form state so page reflects changes immediately
             const savedForm = {
                 ...form,
+                birthday:         form.birthday && form.birthday.month && form.birthday.day
+                                    ? {
+                                        month: Number(form.birthday.month),
+                                        day: Number(form.birthday.day),
+                                        ...(form.birthday.year ? { year: Number(form.birthday.year) } : {})
+                                      }
+                                    : null,
                 avatar:           finalAvatar,
                 pendingAvatarFile: null,
                 pendingAvatarRemoved: false,
@@ -492,6 +509,48 @@ export default function EditProfileModal({
                     }
                 />
             </div>
+
+            {/* Birthday (Full Modal Width) */}
+            <DateField
+                id="epm-birthday"
+                label="Birthday"
+                value={
+                    form.birthday && form.birthday.month && form.birthday.day
+                        ? `${String(form.birthday.month).padStart(2, "0")}-${String(form.birthday.day).padStart(2, "0")}-${String(form.birthday.year || 2000)}`
+                        : ""
+                }
+                onChange={(e) => {
+                    const val = e.target?.value || "";
+                    if (!val) {
+                        setForm(prev => ({ ...prev, birthday: null }));
+                        return;
+                    }
+                    // Parse MM-DD-YYYY (from calendar) or typed input
+                    const parts = val.split(/[-/]/);
+                    if (parts.length === 3) {
+                        let mo, d, y;
+                        if (parts[0].length === 4) {
+                            // YYYY-MM-DD
+                            [y, mo, d] = parts.map(Number);
+                        } else {
+                            // MM-DD-YYYY
+                            [mo, d, y] = parts.map(Number);
+                        }
+                        if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
+                            setForm(prev => ({
+                                ...prev,
+                                birthday: { month: mo, day: d, ...(y ? { year: y } : {}) }
+                            }));
+                        }
+                    }
+                }}
+                onClear={() => setForm(prev => ({ ...prev, birthday: null }))}
+                startIcon={<img src="/svgs/birthday_cake.svg" alt="Birthday" style={{ width: 16, height: 16, objectFit: "contain" }} />}
+                size="md"
+                fullWidth
+                clearable
+            />
+
 
             {/* Friend Codes */}
             <div className="epm-section-header">

@@ -3,24 +3,39 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
-  Lock, Image as ImageIcon, Trophy, Unlock, Layers, Sparkles, X, Check
+  Lock, Image as ImageIcon, Trophy, Unlock, Layers, Sparkles, X, Check, ShieldAlert
 } from 'lucide-react';
 import {
-  SearchField, SectionLoader, NoResults
+  SearchField, SectionLoader, InlineLoader, NoResults, Tooltip
 } from '../components/Shared';
+import { useUser } from '../components/Shared/UserContext';
 import { buildApiUrl } from '../config/api';
+import { profileAPI, caughtAPI, achievementsAPI } from '../utils/api';
 import {
   ACHIEVEMENT_CATEGORIES,
-  INITIAL_ACHIEVEMENTS
+  INITIAL_ACHIEVEMENTS,
+  isBadgeShinyToggleable,
+  getBadgeArtwork,
+  calculateAchievementProgress
 } from '../data/achievementsData';
 import '../css/Achievements.css';
 
 export default function Achievements() {
   const navigate = useNavigate();
 
-  // Auth / Admin verification
-  const [isAdmin, setIsAdmin] = useState(null);
+  // Auth / Admin verification from UserContext
+  const { user, isAdmin: contextIsAdmin, loading: userLoading } = useUser();
+  const [isAdmin, setIsAdmin] = useState(() => {
+    if (contextIsAdmin || user?.isAdmin) return true;
+    try {
+      if (localStorage.getItem('isAdmin') === 'true') return true;
+    } catch {}
+    return null;
+  });
   const [loading, setLoading] = useState(true);
+
+  // Admin Preview State (Admins Only)
+  const [adminUnlockAll, setAdminUnlockAll] = useState(false);
 
   // Data & Filters
   const [achievements, setAchievements] = useState(INITIAL_ACHIEVEMENTS);
@@ -29,9 +44,113 @@ export default function Achievements() {
   const [floatingBadge, setFloatingBadge] = useState(null);
   const [originRect, setOriginRect] = useState(null);
 
-  const handleSelectBadge = (ach, event) => {
+  // Badge Rarity Data across eligible accounts
+  const [rarityMap, setRarityMap] = useState({});
+  const [totalEligibleUsers, setTotalEligibleUsers] = useState(0);
+
+  // Load caught records for the current user only
+  const getUserCaughtMap = () => {
+    try {
+      const u = localStorage.getItem('username');
+      if (u) {
+        const userRaw = localStorage.getItem(`caughtInfoMap:${u}`);
+        if (userRaw) {
+          const parsed = JSON.parse(userRaw);
+          if (parsed && typeof parsed === 'object') return parsed;
+        }
+      }
+      const genericRaw = localStorage.getItem('caughtPokemon') || localStorage.getItem('caughtInfoMap');
+      if (genericRaw) {
+        const parsed = JSON.parse(genericRaw);
+        if (parsed && typeof parsed === 'object') return parsed;
+      }
+    } catch {}
+    return {};
+  };
+
+  // User caught map from localStorage and caughtAPI
+  const [caughtMap, setCaughtMap] = useState(() => getUserCaughtMap());
+
+  // Preload all badge artworks and composite borders for instant responsiveness
+  useEffect(() => {
+    const urls = new Set([
+      '/badges/borders-and-background/background.png',
+      '/badges/borders-and-background/front-border-bronze.png?v=3',
+      '/badges/borders-and-background/front-border-silver.png?v=4',
+      '/badges/borders-and-background/front-border-gold.png?v=3',
+      '/badges/borders-and-background/front-border-diamond.png?v=3',
+      '/badges/borders-and-background/back-border-bronze.png?v=3',
+      '/badges/borders-and-background/back-border-silver.png?v=4',
+      '/badges/borders-and-background/back-border-gold.png?v=3',
+      '/badges/borders-and-background/back-border-diamond.png?v=3'
+    ]);
+
+    achievements.forEach(a => {
+      if (a.artwork) urls.add(a.artwork);
+      if (a.shinyArtwork) urls.add(a.shinyArtwork);
+      a.tiers?.forEach(t => {
+        if (t.artworkUrl) urls.add(t.artworkUrl);
+        if (t.shinyArtworkUrl) urls.add(t.shinyArtworkUrl);
+      });
+    });
+
+    urls.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, [achievements]);
+
+  // Sync caught data and fetch global rarity in parallel
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncCaught = () => {
+      if (isMounted) {
+        setCaughtMap(getUserCaughtMap());
+      }
+    };
+
+    window.addEventListener('storage', syncCaught);
+
+    const loadData = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        const [caughtRes, rarityRes] = await Promise.allSettled([
+          token ? caughtAPI.getCaughtData() : Promise.resolve(null),
+          achievementsAPI.getRarity()
+        ]);
+
+        if (isMounted) {
+          if (caughtRes.status === 'fulfilled' && caughtRes.value && typeof caughtRes.value === 'object') {
+            setCaughtMap(caughtRes.value);
+          }
+          if (rarityRes.status === 'fulfilled' && rarityRes.value) {
+            if (rarityRes.value.rarity) setRarityMap(rarityRes.value.rarity);
+            if (rarityRes.value.totalEligibleUsers != null) setTotalEligibleUsers(rarityRes.value.totalEligibleUsers);
+          }
+        }
+      } catch (err) {
+        console.warn('Could not load achievement data:', err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('storage', syncCaught);
+    };
+  }, []);
+
+  const handleSelectBadge = (ach, event, isShiny = false, activeTier = null, progressData = null) => {
     if (event?.currentTarget) {
-      const frame = event.currentTarget.querySelector('.achievement-badge-frame') || event.currentTarget;
+      const frame = event.currentTarget.classList?.contains('achievement-badge-frame')
+        ? event.currentTarget
+        : (event.currentTarget.querySelector?.('.achievement-badge-frame') || event.currentTarget);
       const rect = frame.getBoundingClientRect();
       setOriginRect({
         x: rect.left + rect.width / 2,
@@ -42,11 +161,27 @@ export default function Achievements() {
     } else {
       setOriginRect(null);
     }
-    setFloatingBadge(ach);
+    setFloatingBadge({
+      ...ach,
+      initialIsShiny: isShiny,
+      initialActiveTier: activeTier,
+      initialProgressData: progressData
+    });
   };
 
   // Check admin access (currently unreleased to general public)
   useEffect(() => {
+    if (contextIsAdmin || user?.isAdmin) {
+      setIsAdmin(true);
+      return;
+    }
+
+    if (!userLoading && user && !user.isAdmin && !contextIsAdmin) {
+      setIsAdmin(false);
+      navigate('/', { replace: true });
+      return;
+    }
+
     let isMounted = true;
     const checkAdmin = async () => {
       try {
@@ -61,10 +196,7 @@ export default function Achievements() {
           if (contentType && contentType.includes('application/json')) {
             const data = await response.json();
             if (data?.isAdmin) {
-              if (isMounted) {
-                setIsAdmin(true);
-                setLoading(false);
-              }
+              if (isMounted) setIsAdmin(true);
               return;
             }
           }
@@ -81,9 +213,11 @@ export default function Achievements() {
       }
     };
 
-    checkAdmin();
+    if (isAdmin === null) {
+      checkAdmin();
+    }
     return () => { isMounted = false; };
-  }, [navigate]);
+  }, [contextIsAdmin, user, userLoading, isAdmin, navigate]);
 
   // Filtered achievements
   const filteredAchievements = useMemo(() => {
@@ -117,17 +251,29 @@ export default function Achievements() {
     })).filter(g => g.items.length > 0);
   }, [filteredAchievements, selectedCategory]);
 
-  // Calculate badge stats for cards (counting tiers for total badges)
+  // Calculate badge stats for cards (counting tiers for total badges and dynamic unlocked counts)
   const stats = useMemo(() => {
     const total = achievements.reduce((acc, a) => acc + (a.tiers?.length || 1), 0);
-    const unlocked = achievements.reduce((acc, a) => acc + (a.unlockedTiersCount || (a.unlocked ? (a.tiers?.length || 1) : 0)), 0);
+    const unlocked = achievements.reduce((acc, a) => {
+      const progress = calculateAchievementProgress(a, caughtMap, false);
+      return acc + (progress.tierOrder || (progress.unlocked ? 1 : 0));
+    }, 0);
     const tiered = achievements.filter(a => a.type === 'tiered').length;
     const secret = achievements.filter(a => a.isSecret || a.type === 'secret').length;
     return { total, unlocked, tiered, secret };
-  }, [achievements]);
+  }, [achievements, caughtMap]);
 
-  if (isAdmin === null || (loading && achievements.length === 0)) {
-    return <SectionLoader minHeight="70vh" />;
+  if (isAdmin === null && userLoading) {
+    return (
+      <div className="achievements-page fade-in-up">
+        <div className="achievements-header-wrap">
+          <div className="achievements-title-row">
+            <h1 className="achievements-main-title">Achievements & Badges</h1>
+          </div>
+        </div>
+        <SectionLoader minHeight="350px" message="Loading achievements & badges..." />
+      </div>
+    );
   }
 
   if (isAdmin === false) {
@@ -141,9 +287,6 @@ export default function Achievements() {
         <div className="achievements-title-row">
           <h1 className="achievements-main-title">Achievements & Badges</h1>
         </div>
-        <p className="achievements-header-desc">
-          Track your accomplishments, unlock prestige badges, and showcase your collection mastery.
-        </p>
       </div>
 
       <div className="app-divider" />
@@ -195,6 +338,24 @@ export default function Achievements() {
         </div>
       </div>
 
+      {/* ── OVERALL ACHIEVEMENTS PROGRESS BAR (ACCENT COLORED) ───────────────── */}
+      <div className="achievements-progress-wrapper">
+        <div className="achievements-progress-labels">
+          <span className="achievements-progress-title">Achievements Progress</span>
+          <span className="achievements-progress-stats">
+            {stats.unlocked} / {stats.total} · {stats.total === 0 ? 0 : Math.round((stats.unlocked / stats.total) * 100)}% done! · {Math.max(0, stats.total - stats.unlocked)} to go!
+          </span>
+        </div>
+        <div className="achievements-progress-track">
+          <div
+            className="achievements-progress-fill"
+            style={{
+              width: `${stats.total === 0 ? 0 : Math.min(100, Math.round((stats.unlocked / stats.total) * 100))}%`
+            }}
+          />
+        </div>
+      </div>
+
       {/* ── TOOLBAR / SEARCH & CATEGORIES ────────────────────────────────────── */}
       <div className="achievements-toolbar">
         <div className="achievements-toolbar-top">
@@ -206,6 +367,7 @@ export default function Achievements() {
               onClear={() => setSearchQuery('')}
             />
           </div>
+          {loading && <InlineLoader className="achievements-search-loader" />}
         </div>
 
         {/* Category Chips Bar */}
@@ -231,7 +393,9 @@ export default function Achievements() {
       </div>
 
       {/* ── ACHIEVEMENTS SECTIONS ────────────────────────────────────────────── */}
-      {groupedAchievements.length === 0 ? (
+      {loading && achievements.length === 0 ? (
+        <SectionLoader minHeight="350px" message="Loading achievements & badges..." />
+      ) : groupedAchievements.length === 0 ? (
         <NoResults
           title="No achievements match your search"
           message="Try clearing your search query or selecting another category."
@@ -259,7 +423,11 @@ export default function Achievements() {
                 <AchievementCard
                   key={ach.id}
                   achievement={ach}
-                  onSelect={(e) => handleSelectBadge(ach, e)}
+                  caughtMap={caughtMap}
+                  adminUnlockAll={adminUnlockAll}
+                  rarityMap={rarityMap}
+                  totalEligibleUsers={totalEligibleUsers}
+                  onSelect={(e, isShiny, tier, prog) => handleSelectBadge(ach, e, isShiny, tier, prog)}
                 />
               ))}
             </div>
@@ -273,7 +441,13 @@ export default function Achievements() {
           {floatingBadge && (
             <FloatingBadgeViewer
               badge={floatingBadge}
+              caughtMap={caughtMap}
               originRect={originRect}
+              isAdmin={isAdmin}
+              adminUnlockAll={adminUnlockAll}
+              setAdminUnlockAll={setAdminUnlockAll}
+              rarityMap={rarityMap}
+              totalEligibleUsers={totalEligibleUsers}
               onClose={() => setFloatingBadge(null)}
             />
           )}
@@ -335,55 +509,111 @@ export function getBadgeTierConfig(badge) {
 /**
  * Clean Badge Card:
  * Image for the badge (locked or not), Name, and Description
- * Clicking triggers center floating 3D viewer
+ * Top-right type badge (Tiered / Single / Secret)
+ * Bottom-right switch toggles between regular and shiny variant
+ * Clicking triggers center floating 3D viewer with the selected variant
  */
-function AchievementCard({ achievement, onSelect }) {
-  const isLocked = !achievement.unlocked; // default locked state for preview
+function AchievementCard({ achievement, caughtMap = {}, onSelect, adminUnlockAll = false, rarityMap = {}, totalEligibleUsers = 0 }) {
+  const [isShiny, setIsShiny] = useState(false);
   const isSecret = achievement.isSecret || achievement.type === 'secret';
 
+  const progressData = useMemo(
+    () => calculateAchievementProgress(achievement, caughtMap, isShiny),
+    [achievement, caughtMap, isShiny]
+  );
+  const isLocked = !progressData.unlocked && !adminUnlockAll;
+
   const displayName = isSecret && isLocked ? '???' : achievement.name;
-  const displayDesc = isSecret && isLocked ? 'Secret achievement.' : achievement.description;
-  const tierConfig = getBadgeTierConfig(achievement);
+  const displayDesc = isSecret && isLocked ? 'Secret achievement.' : progressData.displayGoal;
+
+  // Use highest unlocked tier border, or fallback to first tier (Bronze)
+  const activeTier = progressData.unlockedTier || (achievement.tier || 'bronze').toLowerCase();
+  const tierConfig = getBadgeTierConfig({ ...achievement, tier: activeTier });
+  const canToggleShiny = isBadgeShinyToggleable(achievement);
+  const currentArtwork = getBadgeArtwork(achievement, isShiny, activeTier);
+
+  // Resolve independent tier rarity
+  const badgeSlug = achievement.slug || achievement.id;
+  const badgeRarityData = rarityMap[badgeSlug] || rarityMap[achievement.id];
+  const tierRarity = (isShiny && badgeRarityData?.shiny?.[activeTier])
+    || badgeRarityData?.[activeTier]
+    || { count: 0, percentage: 0, display: '0%' };
+
+  const isTiered = achievement.type === 'tiered';
+  const typeLabel = isTiered ? 'Tiered' : isSecret ? 'Secret' : 'Single';
+  const typeClass = isTiered ? 'type-tiered' : isSecret ? 'type-secret' : 'type-single';
 
   return (
-    <div
-      className={`achievement-card ${isLocked ? 'is-locked' : ''}`}
-      onClick={(e) => onSelect(e)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSelect(e);
-        }
-      }}
-      title={`Click to preview ${displayName} in 3D`}
-    >
-      {/* Badge Image: 3-layer composite with background, badge, and tier border */}
-      <div className={`achievement-badge-frame ${achievement.artwork ? 'has-artwork' : ''} ${isLocked ? 'is-locked' : ''}`}>
-        {achievement.artwork ? (
+    <div className={`achievement-card ${isLocked ? 'is-locked' : ''}`}>
+      {/* Top-Right Badge: Tiered / Single / Secret */}
+      <span className={`achievement-type-pill ${typeClass}`} title={typeLabel}>
+        {typeLabel}
+      </span>
+
+      {/* Badge Image: Clickable to view in 3D only when unlocked */}
+      {isLocked ? (
+        <div className="achievement-badge-frame is-locked" title="Locked">
+          <div className="achievement-locked-placeholder">
+            <Lock size={26} className="locked-badge-lock-icon" />
+          </div>
+        </div>
+      ) : (
+        <div
+          className="achievement-badge-frame is-unlocked has-artwork"
+          onClick={(e) => onSelect(e, isShiny, activeTier, progressData)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onSelect(e, isShiny, activeTier, progressData);
+            }
+          }}
+          title={`Click to view ${displayName} in 3D`}
+        >
           <div className="achievement-badge-composite">
             <img src="/badges/borders-and-background/background.png" alt="" className="composite-bg" draggable={false} />
-            <img src={achievement.artwork} alt={displayName} className="composite-badge" draggable={false} />
+            {currentArtwork && (
+              <img
+                key={currentArtwork}
+                src={currentArtwork}
+                alt={displayName}
+                className="composite-badge"
+                loading="eager"
+                decoding="async"
+                draggable={false}
+              />
+            )}
             <img src={tierConfig.borderUrl} alt="" className="composite-border" draggable={false} />
           </div>
-        ) : (
-          <>
-            <ImageIcon size={26} style={{ opacity: 0.45, marginBottom: 3 }} />
-            <span style={{ fontSize: '0.55rem', fontWeight: 600, textTransform: 'uppercase', opacity: 0.7, lineHeight: 1.1 }}>
-              No artwork uploaded
-            </span>
-          </>
-        )}
+        </div>
+      )}
 
-        {isLocked && (
-          <div className="achievement-lock-pill" title="Locked">
-            <Lock size={12} />
-          </div>
-        )}
+      {/* Rarity Number Pill Box - Horizontally aligned with shiny toggle at bottom */}
+      <div className="achievement-badge-rarity-wrap">
+        <Tooltip
+          content={
+            <span>
+              <strong>{tierRarity.display}</strong> of all registered trainers have achieved this <strong>{tierConfig.name}</strong> badge.
+              {totalEligibleUsers > 0 && tierRarity.count > 0 && (
+                <span style={{ display: 'block', opacity: 0.78, fontSize: '0.72rem', marginTop: '2px' }}>
+                  ({tierRarity.count.toLocaleString()} of {totalEligibleUsers.toLocaleString()} eligible trainers)
+                </span>
+              )}
+            </span>
+          }
+          position="top"
+          align="start"
+          maxWidth={280}
+          wrap
+        >
+          <span className="achievement-badge-rarity-pill">
+            {tierRarity.display}
+          </span>
+        </Tooltip>
       </div>
 
-      {/* Name and Description */}
+      {/* Name, Description, and Progress */}
       <div className="achievement-card-info">
         <h3 className="achievement-title" title={displayName}>
           {displayName}
@@ -391,7 +621,44 @@ function AchievementCard({ achievement, onSelect }) {
         <p className="achievement-desc" title={displayDesc}>
           {displayDesc}
         </p>
+
+        {progressData.totalCount > 1 && (
+          <div className="achievement-card-progress-wrap">
+            <div className="achievement-card-progress-bar">
+              <div
+                className="achievement-card-progress-fill"
+                style={{
+                  width: `${Math.min(100, Math.round((progressData.currentCount / (progressData.nextTier?.threshold || progressData.totalCount)) * 100))}%`
+                }}
+              />
+            </div>
+            <span className="achievement-card-progress-count">
+              {progressData.currentCount} / {progressData.nextTier?.threshold || progressData.totalCount} Forms
+            </span>
+          </div>
+        )}
       </div>
+
+      {/* Shiny Switch in Bottom Right of Card */}
+      {canToggleShiny && (
+        <button
+          type="button"
+          role="switch"
+          aria-checked={isShiny}
+          aria-label={isShiny ? 'Switch to regular badge' : 'Switch to shiny badge'}
+          className={`achievement-shiny-switch card-bottom-right ${isShiny ? 'is-shiny' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsShiny(prev => !prev);
+          }}
+          title={isShiny ? 'Showing Shiny Variant (Click for Regular)' : 'Showing Regular Variant (Click for Shiny)'}
+        >
+          <span className="shiny-switch-label">Shiny</span>
+          <span className="shiny-switch-slider">
+            <span className="shiny-switch-knob" />
+          </span>
+        </button>
+      )}
     </div>
   );
 }
@@ -404,7 +671,7 @@ const COIN_SEGMENTS = Array.from({ length: 32 }, (_, i) => i * 11.25);
  * - Real 3D Coin with 32-segment reeded cylinder edges and metallic collector back
  * - Interactive physics: slow drag to inspect at any 3D angle, fast drag/flick in ANY direction to flip!
  */
-function FloatingBadgeViewer({ badge, originRect, onClose }) {
+function FloatingBadgeViewer({ badge, caughtMap = {}, originRect, onClose, isAdmin = false, adminUnlockAll = false, setAdminUnlockAll, rarityMap = {}, totalEligibleUsers = 0 }) {
   const cardRef = useRef(null);
   const isDragging = useRef(false);
   const isFlipping = useRef(false);
@@ -434,13 +701,20 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
 
   const [draggingState, setDraggingState] = useState(false);
 
-  const [activeTier, setActiveTier] = useState(() => (badge.tier || 'bronze').toLowerCase());
+  const [isShiny, setIsShiny] = useState(() => !!badge.initialIsShiny);
+  const progressData = calculateAchievementProgress(badge, caughtMap, isShiny);
 
-  const isLocked = !badge.unlocked;
+  const [activeTier, setActiveTier] = useState(() => (
+    badge.initialActiveTier || progressData.unlockedTier || (badge.tier || 'bronze').toLowerCase()
+  ));
+
+  const isLocked = !progressData.unlocked && !adminUnlockAll;
   const isSecret = badge.isSecret || badge.type === 'secret';
   const displayName = isSecret && isLocked ? '???' : badge.name;
-  const displayDesc = isSecret && isLocked ? 'Secret achievement.' : badge.description;
+  const displayDesc = isSecret && isLocked ? 'Secret achievement.' : progressData.displayGoal;
   const tierConfig = getBadgeTierConfig({ ...badge, tier: activeTier });
+  const canToggleShiny = isBadgeShinyToggleable(badge);
+  const displayArtwork = getBadgeArtwork(badge, isShiny, activeTier);
 
   // Prevent background scrolling without touching body overflow
   useEffect(() => {
@@ -695,7 +969,7 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
         <h2 className="floating-badge-name">{displayName}</h2>
         <p className="floating-badge-desc">{displayDesc}</p>
 
-        <div className="floating-badge-tag-row">
+        <div className="floating-badge-chips-row">
           {isLocked ? (
             <span className="floating-badge-status-chip locked">
               <Lock size={12} />
@@ -707,27 +981,83 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
               Unlocked
             </span>
           )}
-          {/* Interactive Tier Switcher (Replaces category tag) */}
-          <div className="floating-badge-tier-selector" role="tablist" aria-label="Select Badge Tier">
-            {['bronze', 'silver', 'gold', 'diamond'].map((tierKey) => {
-              const cfg = TIER_CONFIG[tierKey];
-              const isSelected = activeTier === tierKey;
-              return (
-                <button
-                  key={tierKey}
-                  type="button"
-                  role="tab"
-                  aria-selected={isSelected}
-                  className={`floating-badge-tier-pill tier-${tierKey} ${isSelected ? 'is-active' : ''}`}
-                  onClick={() => setActiveTier(tierKey)}
-                  title={`View ${cfg.name} Medal`}
-                >
-                  <span className="tier-dot" />
-                  {cfg.name}
-                </button>
-              );
-            })}
-          </div>
+
+          {/* Rarity chip for current tier */}
+          {(() => {
+            const badgeSlug = badge.slug || badge.id;
+            const badgeRarityData = rarityMap[badgeSlug] || rarityMap[badge.id];
+            const currentTierRarity = (isShiny && badgeRarityData?.shiny?.[activeTier])
+              || badgeRarityData?.[activeTier]
+              || { count: 0, percentage: 0, display: '0%' };
+
+            return (
+              <span
+                className="floating-badge-status-chip rarity"
+                title={
+                  totalEligibleUsers > 0 && currentTierRarity.count > 0
+                    ? `${currentTierRarity.display} of eligible users earned this ${tierConfig.name} badge (${currentTierRarity.count.toLocaleString()} of ${totalEligibleUsers.toLocaleString()} trainers)`
+                    : `${currentTierRarity.display} of eligible users earned this ${tierConfig.name} badge`
+                }
+              >
+                {currentTierRarity.display} Rarity
+              </span>
+            );
+          })()}
+
+          {/* Shiny Switch in 3D Viewer */}
+          {canToggleShiny && (
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isShiny}
+              className={`floating-badge-shiny-switch ${isShiny ? 'is-shiny' : ''}`}
+              onClick={() => setIsShiny(prev => !prev)}
+              title={isShiny ? 'Showing Shiny Variant (Click for Regular)' : 'Showing Regular Variant (Click for Shiny)'}
+            >
+              <span className="shiny-switch-label">Shiny</span>
+              <span className="shiny-switch-slider">
+                <span className="shiny-switch-knob" />
+              </span>
+            </button>
+          )}
+        </div>
+
+        {/* Interactive Tier Switcher 2x2 Grid */}
+        <div className="floating-badge-tier-grid" role="tablist" aria-label="Select Badge Tier">
+          {['bronze', 'silver', 'gold', 'diamond'].map((tierKey) => {
+            const cfg = TIER_CONFIG[tierKey];
+            const isSelected = activeTier === tierKey;
+            const tierOrderMap = { bronze: 1, silver: 2, gold: 3, diamond: 4 };
+            const currentOrder = progressData?.tierOrder || (progressData?.unlocked ? 1 : 0);
+            const isTierUnlocked = adminUnlockAll || (currentOrder >= (tierOrderMap[tierKey] || 1));
+
+            const badgeSlug = badge.slug || badge.id;
+            const badgeRarityData = rarityMap[badgeSlug] || rarityMap[badge.id];
+            const btnTierRarity = (isShiny && badgeRarityData?.shiny?.[tierKey])
+              || badgeRarityData?.[tierKey]
+              || { count: 0, percentage: 0, display: '0%' };
+
+            return (
+              <button
+                key={tierKey}
+                type="button"
+                role="tab"
+                aria-selected={isSelected}
+                disabled={!isTierUnlocked}
+                className={`floating-badge-tier-btn tier-${tierKey} ${isSelected ? 'is-active' : ''} ${!isTierUnlocked ? 'is-locked-tier' : ''}`}
+                onClick={isTierUnlocked ? () => setActiveTier(tierKey) : undefined}
+                title={
+                  isTierUnlocked
+                    ? `View ${cfg.name} Medal (${btnTierRarity.display} of users)`
+                    : `${cfg.name} (Locked - ${btnTierRarity.display} of users)`
+                }
+              >
+                <span className="tier-dot" />
+                <span className="tier-btn-label">{cfg.name}</span>
+                <span className="tier-btn-rarity">{btnTierRarity.display}</span>
+              </button>
+            );
+          })}
         </div>
       </motion.div>
 
@@ -789,33 +1119,29 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
                 draggable={false}
               />
 
-              {/* 2. Overlapping Solid 3D Extruded Badge Emblem (Seamless 0.5px Slices) */}
-              {badge.artwork ? (
-                <div className="coin-3d-badge-layer">
-                  <img src={badge.artwork} alt="" className="badge-slice slice-1" draggable={false} />
-                  <img src={badge.artwork} alt="" className="badge-slice slice-2" draggable={false} />
-                  <img src={badge.artwork} alt="" className="badge-slice slice-3" draggable={false} />
-                  <img src={badge.artwork} alt="" className="badge-slice slice-4" draggable={false} />
-                  <img src={badge.artwork} alt="" className="badge-slice slice-5" draggable={false} />
-                  <img src={badge.artwork} alt="" className="badge-slice slice-6" draggable={false} />
-                  <img src={badge.artwork} alt="" className="badge-slice slice-7" draggable={false} />
-                  <img src={badge.artwork} alt="" className="badge-slice slice-8" draggable={false} />
+              {/* 2. Overlapping Solid 3D Extruded Badge Emblem (Only visible when unlocked) */}
+              {!isLocked && displayArtwork ? (
+                <div className="coin-3d-badge-layer" key={`${displayArtwork}-${isShiny ? 'shiny' : 'reg'}`}>
+                  <img src={displayArtwork} alt="" className="badge-slice slice-1" loading="eager" decoding="async" draggable={false} />
+                  <img src={displayArtwork} alt="" className="badge-slice slice-2" loading="eager" decoding="async" draggable={false} />
+                  <img src={displayArtwork} alt="" className="badge-slice slice-3" loading="eager" decoding="async" draggable={false} />
+                  <img src={displayArtwork} alt="" className="badge-slice slice-4" loading="eager" decoding="async" draggable={false} />
+                  <img src={displayArtwork} alt="" className="badge-slice slice-5" loading="eager" decoding="async" draggable={false} />
+                  <img src={displayArtwork} alt="" className="badge-slice slice-6" loading="eager" decoding="async" draggable={false} />
+                  <img src={displayArtwork} alt="" className="badge-slice slice-7" loading="eager" decoding="async" draggable={false} />
+                  <img src={displayArtwork} alt="" className="badge-slice slice-8" loading="eager" decoding="async" draggable={false} />
                   <img
-                    src={badge.artwork}
+                    src={displayArtwork}
                     alt={displayName}
-                    className={`badge-slice slice-top ${isLocked ? 'is-locked' : ''}`}
+                    className="badge-slice slice-top"
+                    loading="eager"
+                    decoding="async"
                     draggable={false}
                   />
-                  {/* Subtle Specular Glisten strictly on the badge emblem itself */}
-                  {!isLocked && (
-                    <div
-                      className="badge-emblem-glisten"
-                      style={{
-                        WebkitMaskImage: `url("${badge.artwork}")`,
-                        maskImage: `url("${badge.artwork}")`
-                      }}
-                    />
-                  )}
+                </div>
+              ) : isLocked ? (
+                <div className="coin-locked-center-icon">
+                  <Lock size={46} className="coin-locked-lock" />
                 </div>
               ) : (
                 <div className="floating-badge-placeholder">
@@ -908,6 +1234,24 @@ function FloatingBadgeViewer({ badge, originRect, onClose }) {
           <div className="coin-floor-shadow" />
         </div>
       </motion.div>
+
+      {/* Admin Tools Dock (Admins Only) */}
+      {isAdmin && (
+        <div className="floating-badge-admin-dock" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            className={`floating-badge-admin-toggle ${adminUnlockAll ? 'is-active' : ''}`}
+            onClick={() => setAdminUnlockAll && setAdminUnlockAll(prev => !prev)}
+            title="Admin Preview: Toggle all badges and tiers unlocked"
+          >
+            <ShieldAlert size={15} className="admin-toggle-icon" />
+            <span className="admin-toggle-text">Unlock All (Admin)</span>
+            <div className={`admin-switch-slider ${adminUnlockAll ? 'is-on' : ''}`}>
+              <div className="admin-switch-knob" />
+            </div>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

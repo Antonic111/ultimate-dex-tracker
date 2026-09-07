@@ -2,8 +2,8 @@ import React from 'react';
 import { PencilLine, Mars, Venus, VenusAndMars, Globe } from "lucide-react";
 import { YoutubeIcon, TwitchIcon } from "../Shared/SocialIcons";
 import { COUNTRY_OPTIONS } from "../../data/countries";
-import { InputField, SelectField, TextAreaField } from "../Shared/FormField";
-import { getUserAvatarUrl } from "../../utils/profileUtils";
+import { InputField, SelectField, TextAreaField, DateField } from "../Shared/FormField";
+import { getUserAvatarUrl, formatBirthday } from "../../utils/profileUtils";
 import "flag-icons/css/flag-icons.min.css";
 
 function formatSwitchFCInput(value) {
@@ -147,6 +147,16 @@ export default function ProfileCard({ isOwner, isEditing, form, setForm, setShow
                         </div>
                     )}
                 </div>
+
+                {form.birthday && form.birthday.month && form.birthday.day && (
+                    <div className="profile-field">
+                        <label>Birthday</label>
+                        <div className="field-display">
+                            <img src="/svgs/birthday_cake.svg" alt="Birthday" className="w-4 h-4 object-contain" style={{ marginRight: "6px" }} />
+                            <span>{formatBirthday(form.birthday)}</span>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="profile-row-split">

@@ -5,7 +5,6 @@ html {
   background-color: var(--main-bg);
   overscroll-behavior: none;
   min-height: 100%;
-  /* Only hide horizontal overflow on html - keeps vertical scroll working */
   overflow-x: hidden;
   width: 100%;
   max-width: 100vw;
@@ -15,7 +14,11 @@ body {
   background-color: var(--main-bg);
   overscroll-behavior: none;
   min-height: 100%;
-  /* Do NOT set overflow on body - it breaks vertical scroll in many browsers */
+  width: 100%;
+  max-width: 100vw;
+}
+
+#root {
   width: 100%;
   max-width: 100vw;
 }
@@ -88,20 +91,12 @@ body {
   /* Make navigation more compact but readable */
   header nav {
     gap: 0.375rem !important;
-    margin-left: 0.75rem !important;
-    margin-right: 0.75rem !important;
   }
 
   /* Scale down navigation buttons but keep them readable */
   header nav a {
     padding: 0.25rem 0.5rem !important;
     font-size: 0.7rem !important;
-  }
-
-  /* Override global SVG rules for dropdown icons */
-  header nav svg:not(.lucide-chevron-down) {
-    width: 8px !important;
-    height: 8px !important;
   }
 
   /* Right-side container for profile and help buttons */
@@ -115,26 +110,10 @@ body {
     font-size: 0.7rem !important;
   }
 
-  .header-right-buttons svg {
-    width: 8px !important;
-    height: 8px !important;
-  }
-
   /* Scale down profile dropdown on mobile */
   .header-right-buttons .profile-dropdown-btn {
     padding: 0.25rem 0.5rem !important;
     font-size: 0.7rem !important;
-  }
-
-  .header-right-buttons .profile-dropdown-btn svg {
-    width: 8px !important;
-    height: 8px !important;
-  }
-
-  /* Dropdown icon shouldn't be shrunk as much */
-  .header-right-buttons .lucide-chevron-down {
-    width: 10px !important;
-    height: 10px !important;
   }
 
   /* Override global SVG rules for dropdown icons */
@@ -237,8 +216,6 @@ body {
   /* Tighter navigation but still usable */
   header nav {
     gap: 0.25rem !important;
-    margin-left: 0.5rem !important;
-    margin-right: 0.5rem !important;
   }
 
   /* Smaller navigation buttons but readable */
@@ -246,12 +223,6 @@ body {
     padding: 0.125rem 0.375rem !important;
     font-size: 0.65rem !important;
     transform: translateY(-3px) !important;
-  }
-
-  /* Smaller navigation icons */
-  header nav svg {
-    width: 6px !important;
-    height: 6px !important;
   }
 
   /* Smaller user text but readable */
@@ -492,32 +463,20 @@ body {
     transition: padding-bottom 0.3s ease-out;
   }
 
-  /* Ensure inputs are easily tappable on mobile */
+  /* Prevent iOS zoom on focus — set font-size only, do NOT reset border-radius
+     (that override was breaking all FormField border-radii on mobile) */
   input,
   textarea,
   select {
-    font-size: 16px;
+    font-size: 16px !important;
     /* Prevents iOS zoom on focus */
-    -webkit-appearance: none;
-    appearance: none;
-    border-radius: 0;
   }
 
-  /* Improve touch targets */
-  button,
-  [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
-  }
-
-  /* Prevent scrolling when sidebar is open on mobile */
   /* Prevent scrolling when sidebar is open on mobile */
   html.sidebar-open,
   body.sidebar-open {
-    /* Only prevent scrolling of the main page, not the sidebar */
     overflow: hidden !important;
     overscroll-behavior: none !important;
-    /* Don't use touch-action: none as it's too aggressive */
   }
 
   /* Smooth scrolling for keyboard adjustments */
@@ -857,4 +816,60 @@ body {
 [data-theme="light"] .membership-page [class*="border"],
 [data-theme="light"] .membership-checkout-page [class*="border"] {
   border-color: #e2e8f0 !important;
+}
+
+/* ==========================================================================
+   UNIVERSAL PAGE WRAPPER — consistent max-width + responsive gutters
+   Pages can use .udt-page-wrapper instead of custom per-page spacing.
+   ========================================================================== */
+.udt-page-wrapper {
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 28px 0 80px 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .udt-page-wrapper {
+    padding: 16px 16px 80px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .udt-page-wrapper {
+    padding: 12px 12px 64px 12px;
+  }
+}
+
+/* ==========================================================================
+   UNIVERSAL TOUCH TARGETS — applied to CTA buttons only, not icon buttons
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* Only primary/secondary/danger text buttons need enforced 44px targets */
+  .udt-btn--md,
+  .udt-btn--lg {
+    min-height: 44px;
+  }
+
+  /* Standalone icon buttons: keep their defined size, don't stretch */
+  .udt-btn--icon {
+    min-height: unset;
+    min-width: unset;
+  }
+
+  /* Touch tap highlight removal for a native feel */
+  button,
+  a,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ==========================================================================
+   IMAGES & SPRITES — prevent overflow on all screens
+   ========================================================================== */
+img {
+  max-width: 100%;
+  height: auto;
 }

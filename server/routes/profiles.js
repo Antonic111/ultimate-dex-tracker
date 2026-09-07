@@ -63,6 +63,10 @@ router.post('/:username/like', authenticateUser, async (req, res) => {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
+    if (profileOwner.isSuspended) {
+      return res.status(400).json({ error: 'Cannot interact with a suspended account' });
+    }
+
     // Toggle like (now allows self-liking)
     const hasLiked = profileOwner.likes && profileOwner.likes.includes(currentUserId);
     

@@ -7,6 +7,7 @@ import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLU
 import { isLegendary, isSubLegendary, isMythical, isUltraBeast, isPseudoLegendary, isPseudoLegendaryEvo, isParadox, isStarter, isStarterEvo, isFossil, isFossilEvo, isBaby, isBabyEvo, getPokemonCategories } from "../../utils/pokemonCategories";
 import SelectField from "../Shared/FormField/SelectField";
 import ProgressBar from "./ProgressBar";
+import "../../css/ProgressBar.css";
 // Removed SortableItem import - using arrow controls instead
 import { UserContext, useUser } from "../Shared/UserContext";
 import { useMessage } from "../Shared/MessageContext";
@@ -665,7 +666,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                                                 disabled={index === 0}
                                                 title="Move up"
                                             >
-                                                <ChevronUp size={16} />
+                                                <ChevronUp size={13} />
                                             </button>
                                             <button
                                                 className="arrow-btn"
@@ -673,7 +674,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                                                 disabled={index === editingBars.length - 1}
                                                 title="Move down"
                                             >
-                                                <ChevronDown size={16} />
+                                                <ChevronDown size={13} />
                                             </button>
                                         </div>
 
@@ -710,7 +711,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                                                         disabled={isLastVisible}
                                                         title={isLastVisible ? "You must keep at least 1 visible bar" : (bar.visible ? "Hide progress bar" : "Show progress bar")}
                                                     >
-                                                        {bar.visible ? <Eye size={18} /> : <EyeOff size={18} />}
+                                                        {bar.visible ? <Eye size={14} /> : <EyeOff size={14} />}
                                                     </button>
 
                                                     <button
@@ -722,7 +723,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                                                         }}
                                                         title="Configure filters"
                                                     >
-                                                        <Pencil size={17} />
+                                                        <Pencil size={13} />
                                                     </button>
                                                 </>
                                             )}
@@ -740,7 +741,7 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
                                                 disabled={editingBars.length <= 1}
                                                 title={editingBars.length <= 1 ? "You must keep at least 1 progress bar" : "Delete progress bar"}
                                             >
-                                                <Trash2 size={18} />
+                                                <Trash2 size={14} />
                                             </button>
                                         </div>
                                     </div>

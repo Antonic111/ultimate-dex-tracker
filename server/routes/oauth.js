@@ -148,6 +148,9 @@ async function resolveOAuthUser({ provider, providerAccountId, providerEmail, em
       // Orphaned link (e.g. user document was deleted) - clean up and continue
       await LinkedProvider.deleteOne({ _id: existing._id });
     } else {
+      if (user.isSuspended) {
+        return { error: `This account has been suspended: ${user.suspendedReason || 'Violation of terms of service.'}` };
+      }
       if (providerEmail && existing.providerEmail !== providerEmail) {
         existing.providerEmail = providerEmail;
         existing.displayName = displayName || existing.displayName;
@@ -162,6 +165,9 @@ async function resolveOAuthUser({ provider, providerAccountId, providerEmail, em
   if (emailVerified && providerEmail) {
     const emailUser = await User.findOne({ email: providerEmail.toLowerCase() });
     if (emailUser) {
+      if (emailUser.isSuspended) {
+        return { error: `This account has been suspended: ${emailUser.suspendedReason || 'Violation of terms of service.'}` };
+      }
       await LinkedProvider.create({
         userId: emailUser._id,
         provider,
@@ -195,6 +201,9 @@ async function resolveOAuthUser({ provider, providerAccountId, providerEmail, em
 
   const emailConflict = await User.findOne({ email });
   if (emailConflict) {
+    if (emailConflict.isSuspended) {
+      return { error: `This account has been suspended: ${emailConflict.suspendedReason || 'Violation of terms of service.'}` };
+    }
     await LinkedProvider.create({
       userId: emailConflict._id,
       provider,

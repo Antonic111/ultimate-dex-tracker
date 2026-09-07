@@ -14,6 +14,18 @@
   }
 }
 
+@media (max-width: 640px) {
+  .leaderboard-main-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaderboard-main-title {
+    font-size: 1.7rem;
+  }
+}
+
 /* Header Section */
 .leaderboard-header-section {
   margin-bottom: 2rem;
@@ -1002,6 +1014,102 @@
   .leaderboard-dropdown-wrap.limit-wrap {
     width: auto;
     margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Convert grid-based table rows into stacked cards */
+  .leaderboard-table-card.no-metric-col .leaderboard-table-head,
+  .leaderboard-table-card.has-metric-col .leaderboard-table-head {
+    display: none !important; /* Hide desktop table headers */
+  }
+
+  .leaderboard-table-card.no-metric-col .leaderboard-row,
+  .leaderboard-table-card.has-metric-col .leaderboard-row {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    position: relative;
+    column-gap: unset;
+    grid-template-columns: unset;
+  }
+
+  /* Rank pill: stay left, compact */
+  .leaderboard-row .col-rank {
+    flex-shrink: 0;
+    min-width: 42px;
+    justify-content: flex-start;
+  }
+
+  /* Trainer section: fills center */
+  .leaderboard-row .col-trainer {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .leaderboard-row .col-trainer .table-trainer-name {
+    font-size: 0.85rem;
+  }
+
+  /* Hide non-essential columns on phone */
+  .leaderboard-row .col-country,
+  .leaderboard-row .col-progress,
+  .leaderboard-row .col-metric {
+    display: none !important;
+  }
+
+  /* Action button: right side */
+  .leaderboard-row .col-action {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  /* Tighten avatar size */
+  .table-trainer-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .rank-pill {
+    font-size: 0.75rem;
+    padding: 2px 7px;
+  }
+
+  /* Current user highlight stays clear */
+  .leaderboard-row.is-current-user {
+    border-left: 3px solid var(--accent);
+    padding-left: 9px;
+  }
+
+  /* Podium: compact on very narrow */
+  .leaderboard-podium-section {
+    max-width: 100%;
+    margin: 0.5rem 0 1.5rem 0;
+  }
+
+  .podium-card.rank-1 {
+    padding: 1.1rem 0.65rem 0.75rem 0.65rem;
+  }
+
+  .podium-card.rank-2,
+  .podium-card.rank-3 {
+    padding: 0.85rem 0.35rem 0.65rem 0.35rem;
+  }
+
+  .podium-card.rank-1 .podium-avatar-wrap {
+    width: 64px;
+    height: 64px;
+  }
+
+  .podium-username {
+    font-size: 0.82rem;
+  }
+
+  .podium-score-num {
+    font-size: 0.95rem;
   }
 }
 

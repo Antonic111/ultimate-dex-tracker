@@ -1078,11 +1078,12 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       nickname: entry.nickname || "",
       date: (function(d) {
         if (!d) return "";
-        if (/^\d{2}-\d{2}-\d{4}$/.test(d)) {
-          const [m, day, y] = d.split('-');
-          return `${y}-${m}-${day}`;
+        const s = String(d).trim();
+        const m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+        if (m) {
+          return `${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}-${m[1]}`;
         }
-        return d;
+        return s;
       })(entry.date),
       ball: isOriginBall ? "Origin Ball" : (entry.ball || BALL_OPTIONS[0].value),
       marks: marks,
@@ -1293,16 +1294,23 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       return;
     }
 
+    let finalSavedDate = "";
     if (editData.date) {
       const dateStr = String(editData.date).trim();
-      const mmddyyyyRegex = /^\d{2}-\d{2}-\d{4}$/;
-      const yyyymmddRegex = /^\d{4}-\d{2}-\d{2}$/;
+      const mmddyyyyRegex = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/;
+      const yyyymmddRegex = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/;
       
       let year, month, day;
       if (mmddyyyyRegex.test(dateStr)) {
-        [month, day, year] = dateStr.split('-').map(Number);
+        const parts = dateStr.split(/[-/]/).map(Number);
+        month = parts[0];
+        day = parts[1];
+        year = parts[2];
       } else if (yyyymmddRegex.test(dateStr)) {
-        [year, month, day] = dateStr.split('-').map(Number);
+        const parts = dateStr.split(/[-/]/).map(Number);
+        year = parts[0];
+        month = parts[1];
+        day = parts[2];
       } else {
         showMessage('Please enter a full date in MM-DD-YYYY format (e.g. 08-18-2024)', 'error');
         return;
@@ -1313,6 +1321,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
         showMessage('Please enter a valid calendar date', 'error');
         return;
       }
+      finalSavedDate = `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}-${year}`;
     }
 
     // Check if we're updating an existing entry or creating a new one
@@ -1339,7 +1348,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       // Update existing entry at the current index
       const cleaned = {
         nickname: editData.nickname || "",
-        date: editData.date || "",
+        date: finalSavedDate,
         ball: validBall,
         marks: marks,
         mark: marks[0] || "",
@@ -1366,7 +1375,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       // Add new entry - select the new entry
       const cleaned = {
         nickname: editData.nickname || "",
-        date: editData.date || "",
+        date: finalSavedDate,
         ball: validBall,
         marks: marks,
         mark: marks[0] || "",
@@ -1420,21 +1429,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
 
   function handleCancelEdit() {
     setEditing(false);
-    const firstEntry = localEntries[0] || {};
-    setEditData({
-      nickname: firstEntry.nickname || "",
-      date: firstEntry.date || "",
-      ball: firstEntry.ball || "",
-      mark: firstEntry.mark || "",
-      method: firstEntry.method || "",
-      evolvedFromMethod: firstEntry.evolvedFromMethod || undefined,
-      game: firstEntry.game || "",
-      checks: firstEntry.checks || "",
-      time: firstEntry.time || "",
-      notes: firstEntry.notes || "",
-      entryId: firstEntry.entryId || Math.random().toString(36).substr(2, 9),
-      modifiers: firstEntry.modifiers || defaultEditData.modifiers
-    });
+    const targetEntry = localEntries[selectedEntryIndex] || localEntries[0];
+    setEditData(targetEntry ? formatEntryToEditData(targetEntry) : defaultEditData);
   }
 
 

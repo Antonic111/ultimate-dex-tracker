@@ -64,7 +64,7 @@ export default function LegalPrivacy() {
           </p>
           <div className="legal-callout">
             <div className="legal-callout-title">Pokémon & Nintendo Trademark Notice</div>
-            Ultimate Dex Tracker is an unofficial fan project and is <strong>not</strong> affiliated with, endorsed by, sponsored by, or associated with Nintendo Co., Ltd., GAME FREAK inc., Creatures Inc., or The Pokémon Company. All Pokémon trademarks, names, and sprite representations are property of their respective owners.
+            Ultimate Dex Tracker is an unofficial fan project and is <strong>not</strong> affiliated with, endorsed by, sponsored by, or associated with Nintendo Co., Ltd., GAME FREAK inc., Creatures Inc., or The Pokémon Company. Pokémon is a registered trademark of Nintendo. All Pokémon trademarks, names, and sprite representations are property of their respective owners.
           </div>
         </section>
 
@@ -386,7 +386,7 @@ export default function LegalPrivacy() {
             If you have questions regarding this Privacy Policy, your personal data, or billing inquiries, please use the appropriate channel:
           </p>
           <ul className="legal-list">
-            <li><strong>Privacy & Data Inquiries:</strong> Available through our on-site <Link to="/feedback">Feedback & Support form</Link></li>
+            <li><strong>Privacy & Data Inquiries:</strong> Available through our on-site <Link to="/support">Support form</Link></li>
             <li><strong>Billing & Payment Privacy:</strong> Handled securely via the Stripe Customer Portal accessible in your Membership settings</li>
             <li><strong>Developer & Creator:</strong> Antonic (Solo Developer)</li>
             <li><strong>Developer Portfolio:</strong> <a href="https://antonic.ca" target="_blank" rel="noopener noreferrer">antonic.ca</a></li>

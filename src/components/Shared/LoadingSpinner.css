@@ -221,13 +221,32 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--site-background);
+  background: var(--site-background, #0f0f13);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 9999;
   gap: 16px;
+  overflow: hidden;
+}
+
+/* Background image centered behind everything with low opacity - static, no opacity shift */
+.loading-fullscreen::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(85vw, 760px);
+  height: min(85vw, 760px);
+  background-image: url('/loading_page_background.png');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ===== LOGO LOADER STYLES ===== */
@@ -237,62 +256,211 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  z-index: 1;
+}
+
+/* Subtle glow halo behind the Pokéball */
+.logo-ball-glow {
+  position: absolute;
+  top: 15px;
+  width: 190px;
+  height: 190px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent, #ffd700) 25%, transparent) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(16px);
+  pointer-events: none;
+  z-index: 1;
+  animation: glow-pulse 2.2s ease-in-out infinite;
 }
 
 .logo-loader img.logo-bounce {
-  width: 120px;
-  height: 120px;
-  animation: logo-float 1.5s ease-in-out infinite;
-  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.4));
+  width: 175px;
+  height: 175px;
+  animation: logo-float 2.2s ease-in-out infinite;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 20px color-mix(in srgb, var(--accent, #ffd700) 22%, transparent));
   position: relative;
   z-index: 2;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .logo-loader img.logo-bounce {
+    width: 135px;
+    height: 135px;
+  }
+  .logo-ball-glow {
+    width: 150px;
+    height: 150px;
+  }
 }
 
 .logo-loader-text {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 24px;
-  gap: 8px;
+  margin-top: 26px;
+  gap: 6px;
+  text-align: center;
 }
 
 .logo-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--accent);
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--accent, #ffd700);
+  text-shadow: 0 0 24px color-mix(in srgb, var(--accent, #ffd700) 30%, transparent);
 }
 
 .logo-subtitle {
-  font-size: 1rem;
-  color: var(--text);
-  opacity: 0.7;
-  animation: fade-pulse 2s ease-in-out infinite;
+  font-size: 1.05rem;
+  color: var(--text, #ffffff);
+  opacity: 0.75;
+  animation: fade-pulse 2.2s ease-in-out infinite;
+  font-weight: 500;
 }
 
-.loading-dots-row {
+/* Accent-colored loading progress bar with smooth transitions & real progress stages */
+.loading-bar-wrapper {
   display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.loading-bar-track {
+  width: 240px;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.loading-bar-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--accent, #ffd700) 0%,
+    color-mix(in srgb, var(--accent, #ffd700) 75%, #ffffff) 100%
+  );
+  border-radius: 999px;
+  box-shadow: 0 0 14px var(--accent, #ffd700), 0 0 4px #ffffff;
+  transition: width 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+  position: relative;
+  will-change: width;
+}
+
+.loading-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.8) 50%, transparent 100%);
+  border-radius: 999px;
+  filter: blur(1px);
+}
+
+.loading-bar-percent {
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: var(--accent, #ffd700);
+  min-width: 38px;
+  text-align: right;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--accent, #ffd700) 35%, transparent);
+}
+
+/* ===== PREVIEW TOOLBAR ===== */
+.loading-preview-toolbar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(18, 18, 24, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(16px);
+  padding: 8px 14px;
+  border-radius: 999px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  z-index: 10000;
+  animation: fadeInContent 0.3s ease-out;
+}
+
+.loading-preview-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent, #ffd700);
+  padding-right: 8px;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  white-space: nowrap;
+}
+
+.loading-preview-controls {
+  display: flex;
+  align-items: center;
   gap: 8px;
-  margin-top: 20px;
 }
 
-.loading-dot {
-  width: 10px;
-  height: 10px;
-  background: var(--accent);
-  border-radius: 50%;
-  animation: dot-bounce 1.4s ease-in-out infinite;
+.loading-preview-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.loading-dot:nth-child(1) {
-  animation-delay: 0s;
+.loading-preview-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
 }
 
-.loading-dot:nth-child(2) {
-  animation-delay: 0.2s;
+.loading-preview-btn.exit {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
 }
 
-.loading-dot:nth-child(3) {
-  animation-delay: 0.4s;
+.loading-preview-btn.exit:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .loading-preview-toolbar {
+    flex-direction: column;
+    border-radius: 16px;
+    bottom: 16px;
+    width: 90%;
+    max-width: 360px;
+    padding: 10px;
+  }
+  .loading-preview-badge {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding-bottom: 6px;
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* ===== LOGO LOADER ANIMATIONS ===== */

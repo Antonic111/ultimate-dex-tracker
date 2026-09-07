@@ -358,28 +358,114 @@ html, body {
 @media (max-width: 768px) {
   .udt-modal-panel {
     max-width: 96vw;
+    width: 96vw;
     border-radius: 16px;
-    max-height: 88vh;
+    max-height: 90vh;
   }
 
   .udt-modal-header {
-    padding: 14px 16px 12px 16px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 14px 10px 14px;
+    gap: 8px;
+  }
+
+  .udt-modal-title-area {
+    width: 100%;
+    padding-right: 36px;
+  }
+
+  .udt-modal-title-row {
+    gap: 8px;
   }
 
   .udt-modal-title {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
+    line-height: 1.25;
   }
 
   .udt-modal-subtitle {
-    font-size: 0.72rem;
+    font-size: 0.74rem;
+    line-height: 1.35;
+    margin-top: 2px;
+    white-space: normal;
+  }
+
+  .udt-modal-header-actions {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 4px;
+  }
+
+  .udt-modal-header-actions:empty {
+    display: none;
+  }
+
+  .udt-modal-header .udt-modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    margin: 0;
+  }
+
+  .pokeball-close-icon {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .pokeball-close-icon img {
+    width: 28px !important;
+    height: 28px !important;
   }
 
   .udt-modal-body {
-    padding: 14px 16px;
+    padding: 12px 14px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .udt-modal-footer {
-    padding: 12px 16px 14px 16px;
+    padding: 12px 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+/* Very narrow phones (320px–390px): near-fullscreen modal */
+@media (max-width: 480px) {
+  .udt-modal-overlay {
+    padding: 8px;
+    align-items: flex-end;
+  }
+
+  .udt-modal-panel {
+    max-width: calc(100% - 16px);
+    width: calc(100% - 16px);
+    border-radius: 20px 20px 12px 12px;
+    max-height: 94vh;
+  }
+
+  .udt-modal-title {
+    font-size: 1rem;
+  }
+
+  .udt-modal-body {
+    padding: 10px 12px;
+  }
+
+  .udt-modal-footer {
+    padding: 10px 12px;
+  }
+
+  /* Stack footer buttons on very narrow screens */
+  .udt-modal-footer--stack,
+  .udt-modal-footer > .udt-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
@@ -397,3 +483,4 @@ html, body {
 [data-theme="light"] .udt-modal-footer {
   background: #f8fafc;
 }
+

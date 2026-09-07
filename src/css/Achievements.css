@@ -143,6 +143,60 @@
   text-overflow: ellipsis;
 }
 
+/* ── Overall Achievements Progress Bar ───────────────────────────────────── */
+.achievements-progress-wrapper {
+  margin: 0 0 20px 0;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background-color: var(--pokemon-box-bg, #181818);
+  border: 1px solid var(--border-color, #333333);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.achievements-progress-wrapper:hover {
+  border-color: var(--accent);
+}
+
+.achievements-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 9px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.achievements-progress-title {
+  color: var(--accent, #ffe76a);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.achievements-progress-stats {
+  font-size: 0.86rem;
+  color: var(--progressbar-info, #a1a1aa);
+  font-weight: 500;
+}
+
+.achievements-progress-track {
+  height: 14px;
+  width: 100%;
+  background-color: var(--progressbar-track, #27272a);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.achievements-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent, #ffe76a), var(--accent-hover, #facc15));
+  border-radius: 999px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent, #ffe76a) 40%, transparent);
+}
+
 /* ── Filter Toolbar ──────────────────────────────────────────────────────── */
 .achievements-toolbar {
   background: var(--pokemon-box-bg, #181818);
@@ -239,6 +293,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: 16px;
+  align-items: stretch;
 }
 
 @media (max-width: 640px) {
@@ -253,27 +308,66 @@
   background: var(--pokemon-box-bg, #181818);
   border: 1px solid var(--border-color, #333333);
   border-radius: 14px;
-  padding: 16px;
+  padding: 16px 16px 42px 16px;
+  min-height: 142px;
+  height: 100%;
+  box-sizing: border-box;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.16);
   display: flex;
   align-items: flex-start;
   gap: 16px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   text-decoration: none;
   color: inherit;
-  cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease;
 }
 
 .achievement-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent, #facc15);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border-color: #444444;
 }
 
-.achievement-card.is-locked {
-  opacity: 0.88;
+/* Badge Rarity Pill Wrapper - Horizontally aligned with shiny toggle at bottom: 12px */
+.achievement-badge-rarity-wrap {
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  width: 78px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 4;
+}
+
+/* Rarity Number Pill Box */
+.achievement-badge-rarity-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5px 8px;
+  background: var(--pokemon-box-bg2, #202020);
+  border: 1px solid var(--border-color, #333333);
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--text-muted, #a1a1aa);
+  text-align: center;
+  white-space: nowrap;
+  user-select: none;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  line-height: 1.2;
+  cursor: default;
+  box-sizing: border-box;
+  font-variant-numeric: tabular-nums;
+  min-width: 46px;
+}
+
+.achievement-badge-rarity-pill:hover,
+.achievement-card:hover .achievement-badge-rarity-pill {
+  border-color: #555555;
+  color: var(--text, #ffffff);
+  background: #242424;
 }
 
 /* Badge Artwork Frame */
@@ -282,21 +376,47 @@
   height: 78px;
   min-width: 78px;
   min-height: 78px;
-  border-radius: 12px;
-  border: 1.5px dashed var(--border-color, #444);
-  background: var(--pokemon-box-bg2, #202020);
+  border-radius: 50%;
+  background: transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 6px;
+  padding: 0;
   box-sizing: border-box;
   color: var(--text-muted, #777);
   position: relative;
   overflow: hidden;
   user-select: none;
   flex-shrink: 0;
+}
+
+.achievement-badge-frame.is-unlocked {
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.achievement-badge-frame.is-unlocked:hover {
+  transform: scale(1.06);
+}
+
+.achievement-badge-frame.is-locked {
+  cursor: default;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.achievement-locked-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.locked-badge-lock-icon {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .achievement-badge-frame img {
@@ -342,28 +462,29 @@
   filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
 }
 
-.achievement-badge-frame.has-artwork {
-  border: none;
-  background: transparent;
-  padding: 0;
-}
-
-.achievement-badge-frame.is-locked {
-  filter: grayscale(1) opacity(0.55);
-}
-
-.achievement-lock-pill {
+.composite-lock-overlay {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  background: rgba(0, 0, 0, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  padding: 3px;
-  color: #ffffff;
+  inset: 0;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
+}
+
+.composite-lock-icon {
+  color: rgba(255, 255, 255, 0.78);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+}
+
+.composite-empty-placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted, #777);
 }
 
 .achievement-card-info {
@@ -372,8 +493,10 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  justify-content: center;
-  min-height: 78px;
+  justify-content: flex-start;
+  min-height: 84px;
+  padding-right: 56px;
+  padding-bottom: 2px;
 }
 
 .achievement-title {
@@ -382,6 +505,10 @@
   color: var(--text, #ffffff);
   margin: 0;
   line-height: 1.3;
+  min-height: 1.3em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .achievement-desc {
@@ -389,6 +516,45 @@
   color: var(--text-muted, #999999);
   line-height: 1.45;
   margin: 0;
+  min-height: 2.9em;
+  max-height: 2.9em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.achievement-card-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  height: 18px;
+  min-height: 18px;
+}
+
+.achievement-card-progress-bar {
+  flex: 1;
+  max-width: 140px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.achievement-card-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 9999px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.achievement-card-progress-count {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted, #888888);
+  white-space: nowrap;
 }
 
 /* ── Floating 3D Badge Overlay (Center Float + Blur + 3D Tilt) ───────────── */
@@ -1081,10 +1247,10 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-radius: 20px;
-  padding: 16px 28px;
+  padding: 16px 24px;
   text-align: center;
-  width: fit-content;
-  max-width: min(520px, calc(100vw - 120px));
+  width: min(480px, calc(100vw - 32px));
+  box-sizing: border-box;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5),
     0 0 20px rgba(0, 0, 0, 0.2);
   display: flex;
@@ -1098,8 +1264,30 @@
 @media (max-width: 680px) {
   .floating-badge-static-info {
     top: 20px;
-    max-width: calc(100vw - 80px);
-    padding: 12px 18px;
+    width: calc(100vw - 28px);
+    max-width: 440px;
+    padding: 12px 14px;
+  }
+
+  .floating-badge-chips-row {
+    gap: 6px;
+  }
+
+  .floating-badge-status-chip {
+    min-width: 82px;
+    padding: 3px 8px;
+    font-size: 0.68rem;
+  }
+
+  .floating-badge-status-chip.rarity {
+    min-width: 90px;
+    padding: 3px 8px;
+    font-size: 0.68rem;
+  }
+
+  .floating-badge-shiny-switch {
+    min-width: 68px;
+    padding: 2.5px 8px;
   }
 }
 
@@ -1109,6 +1297,10 @@
   color: var(--text, #ffffff);
   letter-spacing: -0.01em;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .floating-badge-desc {
@@ -1116,6 +1308,15 @@
   color: var(--text-muted, #b3b3b3);
   line-height: 1.45;
   margin: 0;
+  min-height: 2.9em;
+  max-height: 2.9em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  width: 100%;
 }
 
 .floating-badge-tag-row {
@@ -1128,6 +1329,7 @@
 .floating-badge-status-chip {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   padding: 4px 12px;
   border-radius: 9999px;
@@ -1135,6 +1337,8 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  min-width: 96px;
+  box-sizing: border-box;
 }
 
 .floating-badge-status-chip.unlocked {
@@ -1149,27 +1353,67 @@
   border: 1px solid rgba(239, 68, 68, 0.35);
 }
 
-/* Interactive Tier Switcher Pills */
-.floating-badge-tier-selector {
-  display: inline-flex;
+.floating-badge-chips-row {
+  display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 9999px;
-  padding: 2px 3px;
-  gap: 3px;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 2px;
+  flex-wrap: nowrap;
+  min-height: 30px;
 }
 
-.floating-badge-tier-pill {
+.floating-badge-status-chip.rarity {
+  background: rgba(250, 204, 21, 0.12);
+  color: #fde047;
+  border: 1px solid rgba(250, 204, 21, 0.3);
+  min-width: 105px;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+  box-sizing: border-box;
+}
+
+.floating-badge-status-chip.rarity .rarity-diamond {
+  font-size: 0.6rem;
+  color: #facc15;
+  filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.6));
+}
+
+.floating-badge-tier-btn .tier-btn-rarity {
+  font-size: 0.64rem;
+  font-weight: 600;
+  opacity: 0.75;
+  margin-left: 2px;
+  display: inline-block;
+  min-width: 36px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Interactive Tier Switcher 2x2 Grid */
+.floating-badge-tier-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.floating-badge-tier-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 9px;
-  border-radius: 9999px;
-  font-size: 0.70rem;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.72rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.6);
-  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.18s ease;
@@ -1177,12 +1421,12 @@
   user-select: none;
 }
 
-.floating-badge-tier-pill:hover {
+.floating-badge-tier-btn:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.floating-badge-tier-pill .tier-dot {
+.floating-badge-tier-btn .tier-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -1190,48 +1434,347 @@
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-.floating-badge-tier-pill.tier-bronze .tier-dot {
+.floating-badge-tier-btn.tier-bronze .tier-dot {
   background: #d97736;
   box-shadow: 0 0 5px rgba(217, 119, 54, 0.6);
 }
-.floating-badge-tier-pill.tier-silver .tier-dot {
+.floating-badge-tier-btn.tier-silver .tier-dot {
   background: #94a3b8;
   box-shadow: 0 0 5px rgba(148, 163, 184, 0.7);
 }
-.floating-badge-tier-pill.tier-gold .tier-dot {
+.floating-badge-tier-btn.tier-gold .tier-dot {
   background: #f59e0b;
   box-shadow: 0 0 6px rgba(245, 158, 11, 0.7);
 }
-.floating-badge-tier-pill.tier-diamond .tier-dot {
+.floating-badge-tier-btn.tier-diamond .tier-dot {
   background: #38bdf8;
   box-shadow: 0 0 5px rgba(56, 189, 248, 0.7);
 }
 
 /* Active Selected State */
-.floating-badge-tier-pill.is-active {
+.floating-badge-tier-btn.is-active {
   color: #ffffff;
 }
 
-.floating-badge-tier-pill.tier-bronze.is-active {
-  background: rgba(183, 112, 44, 0.28);
+.floating-badge-tier-btn.tier-bronze.is-active {
+  background: rgba(183, 112, 44, 0.3);
   border-color: rgba(217, 119, 54, 0.55);
-  box-shadow: 0 0 10px rgba(183, 112, 44, 0.35);
 }
 
-.floating-badge-tier-pill.tier-silver.is-active {
-  background: rgba(148, 163, 184, 0.25);
-  border-color: rgba(226, 232, 240, 0.55);
-  box-shadow: 0 0 10px rgba(226, 232, 240, 0.35);
+.floating-badge-tier-btn.tier-silver.is-active {
+  background: rgba(148, 163, 184, 0.28);
+  border-color: rgba(148, 163, 184, 0.55);
 }
 
-.floating-badge-tier-pill.tier-gold.is-active {
-  background: rgba(245, 158, 11, 0.25);
-  border-color: rgba(251, 191, 36, 0.65);
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+.floating-badge-tier-btn.tier-gold.is-active {
+  background: rgba(245, 158, 11, 0.28);
+  border-color: rgba(245, 158, 11, 0.55);
 }
 
-.floating-badge-tier-pill.tier-diamond.is-active {
-  background: rgba(56, 189, 248, 0.25);
-  border-color: rgba(56, 189, 248, 0.65);
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+.floating-badge-tier-btn.tier-diamond.is-active {
+  background: rgba(56, 189, 248, 0.28);
+  border-color: rgba(56, 189, 248, 0.55);
+}
+
+/* Locked Tier State: Non-clickable, greyed out, line-through */
+.floating-badge-tier-btn.is-locked-tier {
+  opacity: 0.35;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.02);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.floating-badge-tier-btn.is-locked-tier .tier-btn-label {
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.floating-badge-tier-btn.is-locked-tier .tier-dot {
+  filter: grayscale(1);
+  opacity: 0.35;
+  box-shadow: none !important;
+}
+
+/* ── Top Right Type Badge ────────────────────────────────────────────────── */
+.achievement-type-pill {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7.5px;
+  border-radius: 9999px;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  user-select: none;
+  pointer-events: none;
+}
+
+.achievement-type-pill.type-tiered {
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+}
+
+.achievement-type-pill.type-single {
+  background: rgba(250, 204, 21, 0.1);
+  color: #facc15;
+  border: 1px solid rgba(250, 204, 21, 0.25);
+}
+
+.achievement-type-pill.type-secret {
+  background: rgba(168, 85, 247, 0.1);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.28);
+}
+
+/* ── Card Bottom-Right Shiny Switch (Clean & Subtle) ────────────────────── */
+.achievement-shiny-switch.card-bottom-right {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2.5px 7px;
+  background: var(--pokemon-box-bg2, #202020);
+  border: 1px solid var(--border-color, #333333);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.achievement-shiny-switch.card-bottom-right:hover {
+  border-color: #555555;
+  background: #262626;
+}
+
+.achievement-shiny-switch.card-bottom-right.is-shiny {
+  border-color: rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.achievement-shiny-switch.card-bottom-right .shiny-switch-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-muted, #777777);
+  transition: color 0.15s ease;
+  user-select: none;
+}
+
+.achievement-shiny-switch.card-bottom-right.is-shiny .shiny-switch-label {
+  color: #f59e0b;
+}
+
+.achievement-shiny-switch.card-bottom-right .shiny-switch-slider {
+  width: 20px;
+  height: 11px;
+  background: #333333;
+  border-radius: 9999px;
+  padding: 1px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  transition: background 0.15s ease;
+}
+
+.achievement-shiny-switch.card-bottom-right.is-shiny .shiny-switch-slider {
+  background: rgba(245, 158, 11, 0.35);
+}
+
+.achievement-shiny-switch.card-bottom-right .shiny-switch-knob {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #666666;
+  transform: translateX(0);
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), background 0.18s ease;
+}
+
+.achievement-shiny-switch.card-bottom-right.is-shiny .shiny-switch-knob {
+  transform: translateX(9px);
+  background: #f59e0b;
+}
+
+.coin-locked-center-icon {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transform: translateZ(14px);
+}
+
+.coin-locked-lock {
+  color: rgba(255, 255, 255, 0.8);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.9));
+}
+
+/* ── Floating Badge Admin Dock (Bottom Right) ───────────────────────────── */
+.floating-badge-admin-dock {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 50;
+  pointer-events: auto;
+}
+
+.floating-badge-admin-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: rgba(18, 18, 22, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(239, 68, 68, 0.15);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.floating-badge-admin-toggle:hover {
+  background: rgba(26, 26, 32, 0.95);
+  border-color: rgba(239, 68, 68, 0.6);
+  transform: translateY(-1px);
+}
+
+.floating-badge-admin-toggle.is-active {
+  border-color: rgba(34, 197, 94, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(34, 197, 94, 0.25);
+}
+
+.floating-badge-admin-toggle .admin-toggle-icon {
+  color: #f87171;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.floating-badge-admin-toggle.is-active .admin-toggle-icon {
+  color: #4ade80;
+  transform: scale(1.1);
+}
+
+.floating-badge-admin-toggle .admin-toggle-text {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+}
+
+.floating-badge-admin-toggle .admin-switch-slider {
+  width: 28px;
+  height: 16px;
+  background: #333338;
+  border-radius: 9999px;
+  padding: 2px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s ease;
+}
+
+.floating-badge-admin-toggle .admin-switch-slider.is-on {
+  background: #22c55e;
+}
+
+.floating-badge-admin-toggle .admin-switch-knob {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  transform: translateX(0);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-badge-admin-toggle .admin-switch-slider.is-on .admin-switch-knob {
+  transform: translateX(12px);
+}
+
+/* ── Floating 3D Badge Viewer Shiny Switch ───────────────────────────────── */
+.floating-badge-shiny-switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: var(--pokemon-box-bg2, #202020);
+  border: 1px solid var(--border-color, #333333);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  vertical-align: middle;
+  min-width: 76px;
+  box-sizing: border-box;
+}
+
+.floating-badge-shiny-switch:hover {
+  border-color: #555555;
+  background: #262626;
+}
+
+.floating-badge-shiny-switch.is-shiny {
+  border-color: rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.floating-badge-shiny-switch .shiny-switch-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-muted, #888888);
+  transition: color 0.15s ease;
+  user-select: none;
+}
+
+.floating-badge-shiny-switch.is-shiny .shiny-switch-label {
+  color: #f59e0b;
+}
+
+.floating-badge-shiny-switch .shiny-switch-slider {
+  width: 22px;
+  height: 12px;
+  background: #333333;
+  border-radius: 9999px;
+  padding: 1px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  transition: background 0.15s ease;
+}
+
+.floating-badge-shiny-switch.is-shiny .shiny-switch-slider {
+  background: rgba(245, 158, 11, 0.35);
+}
+
+.floating-badge-shiny-switch .shiny-switch-knob {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #666666;
+  transform: translateX(0);
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), background 0.18s ease;
+}
+
+.floating-badge-shiny-switch.is-shiny .shiny-switch-knob {
+  transform: translateX(10px);
+  background: #f59e0b;
+}
+
+/* ── Achievements Search Loader ─────────────────────────────────────────── */
+.achievements-search-loader {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
 }

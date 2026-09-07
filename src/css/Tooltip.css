@@ -218,3 +218,30 @@
 .udt-tooltip.is-visible.udt-tooltip--right:not(.is-dismissed) {
   transform: translateY(-50%) translateX(0);
 }
+
+/* ==========================================================================
+   MOBILE: Clamp tooltips to viewport, reduce max-width
+   ========================================================================== */
+@media (max-width: 768px) {
+  .udt-tooltip {
+    /* Clamp to viewport so tooltips don't bleed off screen edges */
+    max-width: min(280px, calc(100vw - 24px));
+    white-space: normal;
+    text-align: center;
+    word-break: normal;
+  }
+
+  /* Prevent tooltip overflow on left-aligned tooltips */
+  .udt-tooltip--top.udt-tooltip--start,
+  .udt-tooltip--bottom.udt-tooltip--start {
+    left: 0;
+    right: auto;
+  }
+
+  /* Prevent tooltip overflow on right-aligned tooltips */
+  .udt-tooltip--top.udt-tooltip--end,
+  .udt-tooltip--bottom.udt-tooltip--end {
+    right: 0;
+    left: auto;
+  }
+}

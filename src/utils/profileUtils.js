@@ -494,3 +494,36 @@ export function getUserAvatarUrl(userOrAvatar) {
     return getDefaultAvatarUrl(seed);
 }
 
+const MONTH_NAMES = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+];
+
+/**
+ * Formats a user's birthday { month, day } into a clean human-readable string:
+ * e.g. { month: 8, day: 24 } -> "August 24"
+ * Does NOT display birth year or age.
+ */
+export function formatBirthday(birthday) {
+    if (!birthday || typeof birthday !== "object") return "";
+    const m = Number(birthday.month);
+    const d = Number(birthday.day);
+    if (!Number.isInteger(m) || !Number.isInteger(d) || m < 1 || m > 12 || d < 1 || d > 31) {
+        return "";
+    }
+    return `${MONTH_NAMES[m - 1]} ${d}`;
+}
+
+/**
+ * Checks if today is the user's birthday based on current local month and day.
+ * Designed for future birthday-related achievements.
+ */
+export function isUserBirthdayToday(birthday) {
+    if (!birthday || typeof birthday !== "object") return false;
+    const m = Number(birthday.month);
+    const d = Number(birthday.day);
+    if (!m || !d) return false;
+    const now = new Date();
+    return (now.getMonth() + 1) === m && now.getDate() === d;
+}
+
