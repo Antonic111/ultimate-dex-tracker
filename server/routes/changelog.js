@@ -181,6 +181,7 @@ function formatChangelogDoc(doc) {
  */
 router.get('/changelog', async (req, res) => {
   try {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     await ensureHistoricalSeeded();
 
     const docs = await Changelog.find({ published: true })

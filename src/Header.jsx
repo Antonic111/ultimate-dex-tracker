@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { LogOut, User, Settings, Users, Database, Tally5, FileText, Shield, ShieldUser, Crown, Menu, X, Grid3x3, MessageCircleWarning, MessageSquare, ListChecks, Heart, ChevronDown, ChevronRight, Sparkles, Tv, ShoppingBag, ArrowRight, Award } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { authAPI } from './utils/api';
+import { authAPI, changelogAPI } from './utils/api';
 import { useTheme } from "./components/Shared/ThemeContext";
 import changelogData from "./data/changelog.json";
 import NotificationDropdown from "./components/Notifications/NotificationDropdown";
@@ -228,18 +228,34 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
     };
   }, []);
 
+  const [latestChangelogVersion, setLatestChangelogVersion] = useState(() => (changelogData && changelogData.length > 0) ? changelogData[0].version : 'v1.2.2');
+
   useEffect(() => {
-    if (!changelogData || changelogData.length === 0) return;
-    const latestVersion = changelogData[0].version;
+    let isMounted = true;
+    changelogAPI.getPublic()
+      .then((data) => {
+        const list = Array.isArray(data) ? data : (Array.isArray(data?.changelogs) ? data.changelogs : []);
+        if (isMounted && list.length > 0 && list[0].version) {
+          setLatestChangelogVersion(list[0].version);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!latestChangelogVersion) return;
     const viewedVersion = localStorage.getItem("lastViewedChangelogVersion");
 
     if (location.pathname === '/changelog') {
-      localStorage.setItem("lastViewedChangelogVersion", latestVersion);
+      localStorage.setItem("lastViewedChangelogVersion", latestChangelogVersion);
       setHasNewUpdate(false);
-    } else if (viewedVersion !== latestVersion) {
+    } else if (viewedVersion !== latestChangelogVersion) {
       setHasNewUpdate(true);
     }
-  }, [location.pathname]);
+  }, [location.pathname, latestChangelogVersion]);
 
   // Close menus on navigation
   useEffect(() => {

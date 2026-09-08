@@ -65,9 +65,11 @@ function buildCalendarGrid(y, mo) {
  *  - Respects Backspace (isDelete flag) so editing/deleting doesn't get trapped
  *  - Supports typing with separators ("-" or "/") or pure digits
  */
-function autoFormatDate(raw, isDelete = false) {
+function autoFormatDate(raw, isDelete = false, maxYear = CURRENT_YEAR + 10) {
     if (!raw) return "";
     if (isDelete) return raw;
+
+    const maxY = typeof maxYear === 'number' ? maxYear : CURRENT_YEAR + 10;
 
     // Normalize multiple dashes/slashes
     const sanitized = raw.replace(/[/]+/g, "-").replace(/-+/g, "-");
@@ -116,7 +118,7 @@ function autoFormatDate(raw, isDelete = false) {
         if (y.length === 4) {
             let yv = parseInt(y, 10);
             if (yv < 1900) yv = 1900;
-            if (yv > CURRENT_YEAR) yv = CURRENT_YEAR;
+            if (yv > maxY) yv = maxY;
             y = String(yv);
         }
 
@@ -160,7 +162,7 @@ function autoFormatDate(raw, isDelete = false) {
     if (y.length === 4) {
         let yv = parseInt(y, 10);
         if (yv < 1900) yv = 1900;
-        if (yv > CURRENT_YEAR) yv = CURRENT_YEAR;
+        if (yv > maxY) yv = maxY;
         y = String(yv);
     }
     return m + "-" + d + "-" + y;
@@ -417,6 +419,7 @@ const DateField = forwardRef(function DateField(
         fullWidth = false,
         startIcon = null,
         clearable = true,
+        maxYear = CURRENT_YEAR + 10,
         className = "",
         inputClassName = "",
         onFocus,
@@ -458,7 +461,7 @@ const DateField = forwardRef(function DateField(
 
     const handleInputChange = (e) => {
         const isDelete = e.nativeEvent?.inputType?.startsWith("delete");
-        const formatted = autoFormatDate(e.target.value, isDelete);
+        const formatted = autoFormatDate(e.target.value, isDelete, maxYear);
         suppressSyncRef.current = true;
         setDisplayValue(formatted);
         emitChange(formatted);

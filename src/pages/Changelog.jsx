@@ -169,9 +169,18 @@ const Changelog = () => {
     let isMounted = true;
     changelogAPI.getPublic()
       .then((data) => {
-        if (isMounted && Array.isArray(data) && data.length > 0) {
-          setEntriesData(data);
-          setOpenVersion(prev => prev || data[0].version);
+        const list = Array.isArray(data)
+          ? data
+          : (Array.isArray(data?.changelogs) ? data.changelogs : []);
+
+        if (isMounted && list.length > 0) {
+          setEntriesData(list);
+          setOpenVersion(prev => (prev && prev !== changelogData?.[0]?.version ? prev : list[0].version));
+          try {
+            localStorage.setItem("lastViewedChangelogVersion", list[0].version);
+          } catch {
+            // Ignore storage errors
+          }
         }
       })
       .catch((err) => {

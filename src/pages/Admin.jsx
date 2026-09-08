@@ -57,8 +57,29 @@ const Admin = () => {
   const [isAdmin, setIsAdmin] = useState(null);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceStartTime, setMaintenanceStartTime] = useState(null);
-  const [scheduledTime, setScheduledTime] = useState(''); // local datetime-local input value
   const [maintenanceCountdown, setMaintenanceCountdown] = useState('');
+  const [currentTimestamp, setCurrentTimestamp] = useState(Date.now());
+  const [schedulePreset, setSchedulePreset] = useState('5m'); // '5m', '15m', '30m', '1h', 'custom'
+  const [customScheduleDate, setCustomScheduleDate] = useState(() => {
+    const d = new Date();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${m}-${day}-${d.getFullYear()}`;
+  });
+  const [customScheduleHour, setCustomScheduleHour] = useState(() => {
+    const d = new Date(Date.now() + 30 * 60 * 1000);
+    let h = d.getHours() % 12;
+    return String(h === 0 ? 12 : h);
+  });
+  const [customScheduleMinute, setCustomScheduleMinute] = useState(() => {
+    const d = new Date(Date.now() + 30 * 60 * 1000);
+    const m = Math.ceil(d.getMinutes() / 5) * 5;
+    return String(m >= 60 ? 0 : m).padStart(2, '0');
+  });
+  const [customScheduleAmPm, setCustomScheduleAmPm] = useState(() => {
+    const d = new Date(Date.now() + 30 * 60 * 1000);
+    return d.getHours() >= 12 ? 'PM' : 'AM';
+  });
   const [systemStats, setSystemStats] = useState({
     uptimePercent: '99.98%',
     apiLatency: '24ms',
@@ -1145,7 +1166,6 @@ const Admin = () => {
         const result = await response.json();
         setMaintenanceMode(result.settings.maintenanceMode);
         setMaintenanceStartTime(null);
-        setScheduledTime('');
         setMaintenanceCountdown('');
         showMessage(`Maintenance mode ${result.settings.maintenanceMode ? 'enabled' : 'disabled'}`, 'success');
       } else {
@@ -1157,13 +1177,57 @@ const Admin = () => {
     }
   };
 
+  // Helper to compute target Date based on active preset or custom picker
+  const computedScheduledTarget = useMemo(() => {
+    if (schedulePreset === '5m') {
+      return new Date(currentTimestamp + 5 * 60 * 1000);
+    }
+    if (schedulePreset === '15m') {
+      return new Date(currentTimestamp + 15 * 60 * 1000);
+    }
+    if (schedulePreset === '30m') {
+      return new Date(currentTimestamp + 30 * 60 * 1000);
+    }
+    if (schedulePreset === '1h') {
+      return new Date(currentTimestamp + 60 * 60 * 1000);
+    }
+    if (schedulePreset === 'custom') {
+      if (!customScheduleDate) return null;
+      const parts = customScheduleDate.split(/[-/]/);
+      if (parts.length < 3) return null;
+      let year, month, day;
+      if (parts[0].length === 4) {
+        year = parseInt(parts[0], 10);
+        month = parseInt(parts[1], 10);
+        day = parseInt(parts[2], 10);
+      } else {
+        month = parseInt(parts[0], 10);
+        day = parseInt(parts[1], 10);
+        year = parseInt(parts[2], 10);
+      }
+      if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
+
+      let h = parseInt(customScheduleHour, 10);
+      if (isNaN(h)) h = 12;
+      if (customScheduleAmPm === 'PM' && h < 12) h += 12;
+      if (customScheduleAmPm === 'AM' && h === 12) h = 0;
+
+      let min = parseInt(customScheduleMinute, 10);
+      if (isNaN(min)) min = 0;
+
+      const target = new Date(year, month - 1, day, h, min, 0, 0);
+      return target;
+    }
+    return null;
+  }, [schedulePreset, currentTimestamp, customScheduleDate, customScheduleHour, customScheduleMinute, customScheduleAmPm]);
+
   const handleScheduleMaintenance = async () => {
-    if (!scheduledTime) {
-      showMessage('Please pick a date and time first', 'error');
+    const target = computedScheduledTarget;
+    if (!target || isNaN(target.getTime())) {
+      showMessage('Please pick a valid date and time first', 'error');
       return;
     }
-    const isoTime = new Date(scheduledTime).toISOString();
-    if (new Date(isoTime) <= new Date()) {
+    if (target.getTime() <= Date.now()) {
       showMessage('Scheduled time must be in the future', 'error');
       return;
     }
@@ -1174,7 +1238,7 @@ const Admin = () => {
           'Content-Type': 'application/json',
           ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {})
         },
-        body: JSON.stringify({ maintenanceStartTime: isoTime }),
+        body: JSON.stringify({ maintenanceStartTime: target.toISOString() }),
         credentials: 'include'
       });
       if (response.ok) {
@@ -1205,7 +1269,6 @@ const Admin = () => {
       if (response.ok) {
         setMaintenanceStartTime(null);
         setMaintenanceMode(false);
-        setScheduledTime('');
         setMaintenanceCountdown('');
         showMessage('Maintenance schedule cancelled', 'success');
       } else {
@@ -1217,16 +1280,19 @@ const Admin = () => {
     }
   };
 
-  // Live countdown ticker for scheduled maintenance
+  // Live countdown ticker & timestamp updater for maintenance states
   useEffect(() => {
-    if (!maintenanceStartTime) {
-      setMaintenanceCountdown('');
-      return;
-    }
     const tick = () => {
-      const diff = new Date(maintenanceStartTime) - Date.now();
+      const now = Date.now();
+      setCurrentTimestamp(now);
+
+      if (!maintenanceStartTime) {
+        setMaintenanceCountdown('');
+        return;
+      }
+      const diff = new Date(maintenanceStartTime).getTime() - now;
       if (diff <= 0) {
-        setMaintenanceCountdown('Starting now...');
+        setMaintenanceCountdown('');
         return;
       }
       const h = Math.floor(diff / 3600000);
@@ -1240,6 +1306,14 @@ const Admin = () => {
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, [maintenanceStartTime]);
+
+  // Reactive state derived from live timestamp:
+  const isScheduledPending = Boolean(
+    maintenanceStartTime && new Date(maintenanceStartTime).getTime() > currentTimestamp
+  );
+  const isMaintenanceActive = Boolean(
+    maintenanceMode && (!maintenanceStartTime || new Date(maintenanceStartTime).getTime() <= currentTimestamp)
+  );
 
   const handleOpenEditUser = (user) => {
     setSelectedUser(user);
@@ -3354,19 +3428,34 @@ const Admin = () => {
                 <div className="p-4 rounded-xl bg-black/5 dark:bg-black/25 border border-[var(--border-color)] flex items-center justify-between">
                   <div className="flex flex-col">
                     <span className="font-bold text-[var(--text)] text-sm">Maintenance Mode</span>
-                    <span className="text-[11px] text-[var(--text-muted)]">Lock the application immediately for all non-admin visitors.</span>
-                    {maintenanceMode && !maintenanceStartTime && (
-                      <span className="text-[11px] text-red-400 mt-0.5 font-semibold flex items-center gap-1">
-                        <AlertTriangle size={12} className="inline shrink-0" /> Currently active
+                    <span className="text-[11px] text-[var(--text-muted)]">
+                      {isMaintenanceActive
+                        ? 'The application is currently locked for all non-admin visitors.'
+                        : isScheduledPending
+                        ? `Maintenance is scheduled to start at ${new Date(maintenanceStartTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`
+                        : 'Lock the application immediately for all non-admin visitors.'}
+                    </span>
+                    {isMaintenanceActive && (
+                      <span className="text-[11px] text-red-400 mt-1 font-semibold flex items-center gap-1.5">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                        </span>
+                        <AlertTriangle size={12} className="inline shrink-0" /> Currently active across site
+                      </span>
+                    )}
+                    {isScheduledPending && !isMaintenanceActive && (
+                      <span className="text-[11px] text-amber-400 mt-1 font-semibold flex items-center gap-1.5">
+                        <Clock size={12} className="inline shrink-0" /> Scheduled — live countdown active ({maintenanceCountdown})
                       </span>
                     )}
                   </div>
                   <Button
-                    variant={maintenanceMode && !maintenanceStartTime ? 'danger' : 'secondary'}
+                    variant={isMaintenanceActive ? 'danger' : 'secondary'}
                     size="md"
-                    onClick={() => handleToggleMaintenance(!maintenanceMode)}
+                    onClick={() => handleToggleMaintenance(!isMaintenanceActive)}
                   >
-                    {maintenanceMode && !maintenanceStartTime ? 'Active — Disable' : 'Enable Now'}
+                    {isMaintenanceActive ? 'Active — Disable' : 'Enable Now'}
                   </Button>
                 </div>
 
@@ -3374,18 +3463,25 @@ const Admin = () => {
                 <div className="p-4 rounded-xl bg-black/5 dark:bg-black/25 border border-[var(--border-color)] flex flex-col gap-3">
                   <div>
                     <span className="font-bold text-[var(--text)] text-sm">Schedule Maintenance</span>
-                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">Set a future time — users will see a live countdown banner so they can save their work before maintenance begins.</p>
+                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
+                      Set a future time — users will see a live countdown banner so they can save their work before maintenance begins.
+                    </p>
                   </div>
 
-                  {maintenanceStartTime ? (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                        <Clock size={15} className="text-amber-400 shrink-0" />
-                        <div className="flex-1">
-                          <p className="text-[11px] text-amber-300 font-semibold">Scheduled for {new Date(maintenanceStartTime).toLocaleString()}</p>
-                          {maintenanceCountdown && (
-                            <p className="text-[13px] text-[var(--text)] font-bold tabular-nums">{maintenanceCountdown} remaining</p>
-                          )}
+                  {isScheduledPending ? (
+                    /* Currently in the timer towards maintenance */
+                    <div className="flex flex-col gap-2.5">
+                      <div className="flex items-center gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                        <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center shrink-0">
+                          <Clock size={16} className="text-amber-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[11px] text-amber-300 font-semibold">
+                            Scheduled for {new Date(maintenanceStartTime).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                          </p>
+                          <p className="text-[14px] text-[var(--text)] font-bold tabular-nums tracking-wide mt-0.5">
+                            {maintenanceCountdown ? `${maintenanceCountdown} remaining` : 'Starting very soon...'}
+                          </p>
                         </div>
                       </div>
                       <Button
@@ -3396,35 +3492,167 @@ const Admin = () => {
                         Cancel Schedule
                       </Button>
                     </div>
+                  ) : isMaintenanceActive ? (
+                    /* Timer has expired and maintenance is currently running */
+                    <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/25 flex items-center gap-3">
+                      <AlertTriangle size={18} className="text-red-400 shrink-0" />
+                      <div className="flex-1 text-[12px] text-[var(--text)]">
+                        <span className="font-semibold text-red-400">Maintenance is currently active.</span>
+                        <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
+                          Non-admin users are blocked. To end maintenance and reopen the site, click <strong>"Active — Disable"</strong> above.
+                        </p>
+                      </div>
+                    </div>
                   ) : (
-                    <div className="flex flex-col gap-2">
-                      <input
-                        id="maintenance-datetime"
-                        type="datetime-local"
-                        value={scheduledTime}
-                        onChange={e => setScheduledTime(e.target.value)}
-                        min={new Date(Date.now() + 60000).toISOString().slice(0, 16)}
-                        style={{
-                          background: 'rgba(255,255,255,0.04)',
-                          border: '1px solid rgba(255,255,255,0.12)',
-                          borderRadius: '8px',
-                          padding: '8px 10px',
-                          color: '#fff',
-                          fontSize: '13px',
-                          outline: 'none',
-                          colorScheme: 'dark',
-                          width: '100%',
-                        }}
-                      />
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={handleScheduleMaintenance}
-                        disabled={!scheduledTime}
-                      >
-                        <Clock size={13} />
-                        Schedule Maintenance
-                      </Button>
+                    /* Not active and not scheduled — show presets and custom picker */
+                    <div className="flex flex-col gap-3">
+                      {/* Presets Row */}
+                      <div className="flex flex-col gap-1.5">
+                        <span className="text-[12px] font-semibold text-[var(--text-muted)]">Quick Presets</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {[
+                            { id: '5m', label: '5 min' },
+                            { id: '15m', label: '15 min' },
+                            { id: '30m', label: '30 min' },
+                            { id: '1h', label: '1 hour' },
+                            { id: 'custom', label: 'Custom' }
+                          ].map(preset => {
+                            const isSelected = schedulePreset === preset.id;
+                            return (
+                              <button
+                                key={preset.id}
+                                type="button"
+                                onClick={() => setSchedulePreset(preset.id)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-[var(--accent)] text-white shadow-sm'
+                                    : 'bg-black/10 dark:bg-white/[0.06] hover:bg-black/15 dark:hover:bg-white/[0.1] text-[var(--text)] border border-[var(--border-color)]'
+                                }`}
+                              >
+                                {preset.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Custom Picker view if 'custom' is selected */}
+                      {schedulePreset === 'custom' && (
+                        <div className="p-3 rounded-xl bg-black/10 dark:bg-white/[0.03] border border-[var(--border-color)] flex flex-col gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+                            {/* Custom DateField */}
+                            <DateField
+                              id="maintenance-custom-date"
+                              name="customDate"
+                              label="Date"
+                              value={customScheduleDate}
+                              onChange={(e) => setCustomScheduleDate(e.target.value)}
+                              placeholder="MM-DD-YYYY"
+                              size="md"
+                              fullWidth
+                              clearable={false}
+                            />
+
+                            {/* Custom Time Selector */}
+                            <div className="udt-form-field udt-form-field--md udt-form-field--full-width">
+                              <div className="udt-field-header">
+                                <span className="udt-field-label">Time</span>
+                              </div>
+                              <div className="flex items-center gap-1.5 h-[42px]">
+                                {/* Hour */}
+                                <select
+                                  value={customScheduleHour}
+                                  onChange={(e) => setCustomScheduleHour(e.target.value)}
+                                  className="h-full px-2.5 rounded-xl bg-black/5 dark:bg-white/[0.05] border border-[var(--border-color)] text-[var(--text)] text-xs font-semibold outline-none cursor-pointer focus:border-[var(--accent)]"
+                                >
+                                  {Array.from({ length: 12 }, (_, i) => String(i + 1)).map(h => (
+                                    <option key={h} value={h} className="bg-[var(--card-bg)] text-[var(--text)]">
+                                      {h}
+                                    </option>
+                                  ))}
+                                </select>
+
+                                <span className="text-[var(--text-muted)] font-bold">:</span>
+
+                                {/* Minute */}
+                                <select
+                                  value={customScheduleMinute}
+                                  onChange={(e) => setCustomScheduleMinute(e.target.value)}
+                                  className="h-full px-2.5 rounded-xl bg-black/5 dark:bg-white/[0.05] border border-[var(--border-color)] text-[var(--text)] text-xs font-semibold outline-none cursor-pointer focus:border-[var(--accent)]"
+                                >
+                                  {['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'].map(m => (
+                                    <option key={m} value={m} className="bg-[var(--card-bg)] text-[var(--text)]">
+                                      {m}
+                                    </option>
+                                  ))}
+                                </select>
+
+                                {/* AM / PM */}
+                                <div className="flex items-center rounded-xl bg-black/5 dark:bg-white/[0.05] border border-[var(--border-color)] p-0.5 h-full">
+                                  {['AM', 'PM'].map(period => (
+                                    <button
+                                      key={period}
+                                      type="button"
+                                      onClick={() => setCustomScheduleAmPm(period)}
+                                      className={`px-2.5 h-full rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                                        customScheduleAmPm === period
+                                          ? 'bg-[var(--accent)] text-white shadow-xs'
+                                          : 'text-[var(--text-muted)] hover:text-[var(--text)]'
+                                      }`}
+                                    >
+                                      {period}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Scheduled Time Preview & Schedule Button */}
+                      {(() => {
+                        const target = computedScheduledTarget;
+                        const isValid = target && !isNaN(target.getTime());
+                        const isFuture = isValid && target.getTime() > currentTimestamp;
+                        const diffMins = isFuture ? Math.max(1, Math.round((target.getTime() - currentTimestamp) / 60000)) : 0;
+
+                        return (
+                          <div className="flex flex-col gap-2">
+                            {isValid && (
+                              <div className="text-[12px] flex items-center gap-1.5">
+                                {isFuture ? (
+                                  <span className="text-[var(--text-muted)]">
+                                    Will start at <strong className="text-[var(--text)]">{target.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</strong> ({diffMins < 60 ? `in ${diffMins} min${diffMins === 1 ? '' : 's'}` : `in ${Math.floor(diffMins / 60)}h ${diffMins % 60}m`})
+                                  </span>
+                                ) : (
+                                  <span className="text-red-400 font-semibold flex items-center gap-1">
+                                    <AlertCircle size={13} /> Selected time must be in the future
+                                  </span>
+                                )}
+                              </div>
+                            )}
+
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={handleScheduleMaintenance}
+                              disabled={!isFuture}
+                            >
+                              <Clock size={13} />
+                              {schedulePreset === '5m'
+                                ? 'Schedule in 5 Minutes'
+                                : schedulePreset === '15m'
+                                ? 'Schedule in 15 Minutes'
+                                : schedulePreset === '30m'
+                                ? 'Schedule in 30 Minutes'
+                                : schedulePreset === '1h'
+                                ? 'Schedule in 1 Hour'
+                                : 'Schedule Maintenance'}
+                            </Button>
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
                 </div>
