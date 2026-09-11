@@ -14,7 +14,7 @@ import ContentFilterInput from "../Shared/ContentFilterInput";
 import { useMessage } from "../Shared/MessageContext";
 import { validateContent } from "../../../shared/contentFilter";
 import { getMergedGameName } from "../../utils/gameMapping";
-import { getAvailableGamesForPokemonSidebar } from "../../utils/pokemonAvailability";
+import { getAvailableGamesForPokemonSidebar, isNonPartnerCapPikachu, isCapPikachu } from "../../utils/pokemonAvailability";
 import { getMethodsForGame, getCurrentHuntOdds, getModifiersForGame } from "../../utils/huntSystem";
 import { profileAPI } from "../../utils/api";
 import { UserContext } from "../Shared/UserContext";
@@ -32,6 +32,8 @@ import { Button } from "../Shared/Button";
 import { Modal, ConfirmModal, PokeballCloseIcon } from "../Shared/Modal";
 import { InputField, NumberField, DateField, SelectField, SearchField, TextAreaField } from "../Shared/FormField";
 import "../../css/Sidebar.css";
+
+const MAX_ENTRIES_PER_POKEMON = 200;
 
 
 
@@ -315,9 +317,9 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     return Boolean(mods && mods["Shiny Charm"] > 0);
   }, []);
 
-  // Mighty Pokemon cannot be shiny under any circumstances - auto close if switching to shiny mode
+  // Mighty Pokemon, Origin Ball, and non-partner Cap Pikachu cannot be shiny under any circumstances - auto close if switching to shiny mode
   useEffect(() => {
-    if (showShiny && pokemon?.formType === "mighty") {
+    if (showShiny && (pokemon?.formType === "mighty" || pokemon?.stableId?.startsWith("origin-ball-") || isNonPartnerCapPikachu(pokemon))) {
       onClose?.();
     }
   }, [showShiny, pokemon, onClose]);
@@ -1239,7 +1241,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   }
 
   function handleSetCaught() {
-    if (showShiny && pokemon?.formType === "mighty") return;
+    if (showShiny && (pokemon?.formType === "mighty" || isOriginBall || isNonPartnerCapPikachu(pokemon))) return;
 
     // Create a fresh default entry
     const newEntry = {
@@ -1279,7 +1281,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   }
 
   function handleSaveEdit() {
-    if (showShiny && pokemon?.formType === "mighty") return;
+    if (showShiny && (pokemon?.formType === "mighty" || isOriginBall || isNonPartnerCapPikachu(pokemon))) return;
 
     // Save-time validation for notes and nickname
     const notesValidation = validateContent(String(editData.notes || ''), 'notes');
@@ -1478,9 +1480,9 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     });
 
     let combinedEntries = [...existingEntries, ...duplicatedEntries];
-    if (combinedEntries.length > 30) {
-      combinedEntries = combinedEntries.slice(0, 30);
-      showMessage(`Data evolved to ${formatPokemonName(nextPokemon.name)}! Max 30 entries kept.`, "success");
+    if (combinedEntries.length > MAX_ENTRIES_PER_POKEMON) {
+      combinedEntries = combinedEntries.slice(0, MAX_ENTRIES_PER_POKEMON);
+      showMessage(`Data evolved to ${formatPokemonName(nextPokemon.name)}! Max ${MAX_ENTRIES_PER_POKEMON} entries kept.`, "success");
     } else {
       showMessage(`Data evolved to ${formatPokemonName(nextPokemon.name)}!`, "success");
     }
@@ -1499,7 +1501,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   };
 
   const handleEvolve = () => {
-    if (!pokemon) return;
+    if (!pokemon || isCapPikachu(pokemon)) return;
 
     let evoSource = pokemon;
     if (
@@ -1539,7 +1541,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   };
 
   const hasEvolution = () => {
-    if (!pokemon) return false;
+    if (!pokemon || isCapPikachu(pokemon)) return false;
     
     // Only allow Evolve button for Main Living Dex and Alpha Forms
     const isValidFormType = !pokemon.formType || 
@@ -1566,8 +1568,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
 
   const handleDuplicateEntry = () => {
     if (!caughtInfo || !localEntries || localEntries.length === 0) return;
-    if (localEntries.length >= 30) {
-      showMessage("Maximum limit of 30 entries reached.", "error");
+    if (localEntries.length >= MAX_ENTRIES_PER_POKEMON) {
+      showMessage(`Maximum limit of ${MAX_ENTRIES_PER_POKEMON} entries reached.`, "error");
       return;
     }
 
@@ -1822,8 +1824,8 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
 
   if (!open && !closing) return null;
 
-  // Safety check for pokemon (Mighty Pokemon can never exist in shiny mode)
-  if (!pokemon || (showShiny && pokemon.formType === "mighty")) return null;
+  // Safety check for pokemon (Mighty Pokemon, Origin Ball, and non-partner Cap Pikachu can never exist in shiny mode)
+  if (!pokemon || (showShiny && (pokemon.formType === "mighty" || isOriginBall || isNonPartnerCapPikachu(pokemon)))) return null;
 
   // Look up objects for display by value
   const ballObj = BALL_OPTIONS.find(opt => opt.value === (editData?.ball ?? ""));
@@ -2251,7 +2253,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
   };
 
   const handleAddEntry = () => {
-    if (localEntries.length >= 30 || readOnly) return;
+    if (localEntries.length >= MAX_ENTRIES_PER_POKEMON || readOnly) return;
 
     const newEntry = {
       nickname: "",
@@ -2320,7 +2322,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       relatedForms = filterFormsByPreferences(relatedForms, dexPreferences);
 
       if (showShiny) {
-        relatedForms = relatedForms.filter(form => form.formType !== "mighty");
+        relatedForms = relatedForms.filter(form => form.formType !== "mighty" && !form.stableId?.startsWith("origin-ball-") && !isNonPartnerCapPikachu(form));
 
         const {
           blockUnobtainableShinies,
@@ -2619,9 +2621,9 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                 size="sm"
                 className="!w-7 !h-7 !p-0 !min-h-0 !rounded-md"
                 onClick={handleAddEntry}
-                disabled={localEntries.length >= 30}
+                disabled={localEntries.length >= MAX_ENTRIES_PER_POKEMON}
                 icon={<Plus size={14} strokeWidth={2.5} />}
-                title={localEntries.length >= 30 ? "Maximum entries reached (30)" : "Add another entry (max 30)"}
+                title={localEntries.length >= MAX_ENTRIES_PER_POKEMON ? `Maximum entries reached (${MAX_ENTRIES_PER_POKEMON})` : `Add another entry (max ${MAX_ENTRIES_PER_POKEMON})`}
               />
             )}
           </div>

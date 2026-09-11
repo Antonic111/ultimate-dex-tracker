@@ -31,7 +31,7 @@ import { UserContext } from "../components/Shared/UserContext";
 import { useMessage } from "../components/Shared/MessageContext";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
-import { getAvailableGamesForPokemonSidebar } from "../utils/pokemonAvailability";
+import { getAvailableGamesForPokemonSidebar, isNonPartnerCapPikachu } from "../utils/pokemonAvailability";
 import PermutationTable from "../components/MMO/PermutationTable";
 import { Modal, ConfirmModal } from "../components/Shared/Modal";
 import { Button } from "../components/Shared/Button";
@@ -255,7 +255,7 @@ export default function MMOTool({ useHomeSprites = false }) {
     }));
 
     const formsList = formsData
-      .filter(f => f.formType !== "mighty")
+      .filter(f => f.formType !== "mighty" && !f.stableId?.startsWith("origin-ball-") && !f.name?.startsWith("origin-ball-") && !isNonPartnerCapPikachu(f))
       .map(f => ({
         ...f,
         stableId: f.stableId || `${f.name}-${f.formType}-${String(f.id).padStart(4, '0')}`

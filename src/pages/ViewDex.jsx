@@ -14,7 +14,7 @@ import { isLegendary, isMythical, isUltraBeast, isPseudoLegendary, isPseudoLegen
 import { getEvolutionChainIds, findPokemon } from "../utils";
 import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "../data/blockedShinies";
 import { getFilteredFormsData } from "../utils/dexPreferences";
-import { getAvailableGamesForPokemonSidebar, normalizeGameName } from "../utils/pokemonAvailability";
+import { getAvailableGamesForPokemonSidebar, normalizeGameName, isNonPartnerCapPikachu } from "../utils/pokemonAvailability";
 
 
 // Helper function to load the viewer's own dex toggle preferences
@@ -55,7 +55,7 @@ export default function ViewDex() {
     const [isPrivate, setIsPrivate] = useState(false);
 
     const setShowShiny = useCallback(val => {
-        if (val && (selectedPokemon?.formType === "mighty" || selectedPokemon?.stableId === "origin-ball-dialga-483" || selectedPokemon?.stableId === "origin-ball-palkia-484" || selectedPokemon?.stableId?.startsWith("origin-ball-"))) {
+        if (val && (selectedPokemon?.formType === "mighty" || selectedPokemon?.stableId === "origin-ball-dialga-483" || selectedPokemon?.stableId === "origin-ball-palkia-484" || selectedPokemon?.stableId?.startsWith("origin-ball-") || isNonPartnerCapPikachu(selectedPokemon))) {
             setSelectedPokemon(null);
             setSidebarOpen(false);
         }
@@ -102,9 +102,9 @@ export default function ViewDex() {
         };
     }, []);
 
-    // Auto-close sidebar on mighty or origin ball pokemon if switched to shiny
+    // Auto-close sidebar on mighty, origin ball, or non-partner cap pikachu if switched to shiny
     useEffect(() => {
-        if (showShiny && (selectedPokemon?.formType === "mighty" || selectedPokemon?.stableId === "origin-ball-dialga-483" || selectedPokemon?.stableId === "origin-ball-palkia-484" || selectedPokemon?.stableId?.startsWith("origin-ball-"))) {
+        if (showShiny && (selectedPokemon?.formType === "mighty" || selectedPokemon?.stableId === "origin-ball-dialga-483" || selectedPokemon?.stableId === "origin-ball-palkia-484" || selectedPokemon?.stableId?.startsWith("origin-ball-") || isNonPartnerCapPikachu(selectedPokemon))) {
             setSelectedPokemon(null);
             setSidebarOpen(false);
         }
@@ -383,8 +383,8 @@ export default function ViewDex() {
                 }
             }
 
-            // Mighty forms and Origin Ball forms cannot be shiny
-            if (showShiny && (pokemon.formType === "mighty" || pokemon.stableId === "origin-ball-dialga-483" || pokemon.stableId === "origin-ball-palkia-484" || pokemon.stableId?.startsWith("origin-ball-"))) {
+            // Mighty forms, Origin Ball forms, and non-partner Cap Pikachu cannot be shiny
+            if (showShiny && (pokemon.formType === "mighty" || pokemon.stableId === "origin-ball-dialga-483" || pokemon.stableId === "origin-ball-palkia-484" || pokemon.stableId?.startsWith("origin-ball-") || isNonPartnerCapPikachu(pokemon))) {
                 return { match: false, isSearchMatch: false };
             }
 

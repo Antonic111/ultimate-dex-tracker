@@ -80,7 +80,7 @@ import { getValidBallNamesForGame } from "../data/gameBalls";
 import gamePokemonData from "../data/gamePokemon.json";
 import { getAvailableGamesForPokemon } from "../utils/gameMapping";
 import { getFilteredFormsData, getDexPreferences } from "../utils/dexPreferences";
-import { getAvailableGamesForPokemonSidebar, normalizeGameName } from "../utils/pokemonAvailability";
+import { getAvailableGamesForPokemonSidebar, normalizeGameName, isNonPartnerCapPikachu } from "../utils/pokemonAvailability";
 import { Modal, ConfirmModal } from "../components/Shared/Modal";
 import { Button } from "../components/Shared/Button";
 import { TextField, SelectField, NumberField, TextArea, SearchField } from "../components/Shared/FormField";
@@ -952,7 +952,7 @@ export default function Counters() {
     }));
 
     const formsList = getFilteredFormsData(formsData, currentPrefs)
-      .filter(f => f.formType !== "mighty" && !f.stableId?.startsWith("origin-ball-") && !f.name?.startsWith("origin-ball-"))
+      .filter(f => f.formType !== "mighty" && !f.stableId?.startsWith("origin-ball-") && !f.name?.startsWith("origin-ball-") && !isNonPartnerCapPikachu(f))
       .map(f => ({
         ...f,
         stableId: f.stableId || `${f.name}-${f.formType}-${String(f.id).padStart(4, "0")}`

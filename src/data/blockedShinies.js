@@ -22,6 +22,8 @@ export const UNOBTAINABLE_SHINY_DEX_NUMBERS = [
     "0896",
     "0897",
     "0898",
+    "1007",
+    "1008",
     "1009",
     "1010",
     "1014",
@@ -41,7 +43,21 @@ export const UNOBTAINABLE_SHINY_FORM_NAMES = [
     "vivillon-pokeball",
     "floette-eternal",
     "origin-ball-dialga-483",
-    "origin-ball-palkia-484"
+    "origin-ball-palkia-484",
+    "pikachu-original-cap",
+    "pikachu-kalos-cap",
+    "pikachu-sinnoh-cap",
+    "pikachu-unova-cap",
+    "pikachu-world-cap",
+    "pikachu-alola-cap",
+    "pikachu-hoenn-cap",
+    "pikachu-original-cap-0025",
+    "pikachu-kalos-cap-0025",
+    "pikachu-sinnoh-cap-0025",
+    "pikachu-unova-cap-0025",
+    "pikachu-world-cap-0025",
+    "pikachu-alola-cap-0025",
+    "pikachu-hoenn-cap-0025"
 ];
 
 // Pokemon dex numbers that are GO exclusive shinies (only obtainable through Pokemon GO)

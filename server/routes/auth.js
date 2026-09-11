@@ -755,6 +755,7 @@ router.put("/profile", authenticateUser, async (req, res) => {
     const sanitizationResult = sanitizeProfileData(req.body);
 
     if (!sanitizationResult.isValid) {
+      console.warn(`[PUT /api/profile] Validation failed for user ${req.userId}:`, sanitizationResult.errors);
       return res.status(400).json({
         error: "Invalid input data",
         details: sanitizationResult.errors

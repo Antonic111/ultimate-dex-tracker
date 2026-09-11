@@ -51,6 +51,7 @@ import otherForms from "../data/forms/other.json";
 import alcremieForms from "../data/forms/alcremie.json";
 import vivillonForms from "../data/forms/vivillon.json";
 import alphaForms from "../data/forms/alpha.json";
+import { TOTAL_TRACKER_POKEMON_COUNT, isFormShinyLocked, isUnobtainableShiny } from "../data/achievementsData";
 
 import Footer from "../components/Shared/Footer";
 import { formatPokemonName } from "../utils";
@@ -398,13 +399,20 @@ export default function PublicHome() {
   const animFrameRef = useRef(null);
 
   // Total dex forms calculation
-  // When shiny mode is on, exclude mighty forms (54 entries) as they cannot be shiny
-  const mightyFormsCount = useMemo(() => formsData.filter(f => f.formType === 'mighty').length, []);
+  // When shiny mode is on, exclude base Pokémon and forms that cannot be shiny
+  const shinyLockedBaseCount = useMemo(
+    () => pokemonData.filter(p => isUnobtainableShiny(p)).length,
+    []
+  );
+  const shinyLockedFormsCount = useMemo(
+    () => formsData.filter(f => isFormShinyLocked(f)).length,
+    []
+  );
   const totalDexCount = useMemo(
     () => isHeroShiny
-      ? pokemonData.length + formsData.length - mightyFormsCount
+      ? (pokemonData.length - shinyLockedBaseCount) + (formsData.length - shinyLockedFormsCount)
       : pokemonData.length + formsData.length,
-    [isHeroShiny, mightyFormsCount]
+    [isHeroShiny, shinyLockedBaseCount, shinyLockedFormsCount]
   );
 
   // Active Category Data & Boxes
@@ -843,7 +851,7 @@ export default function PublicHome() {
                   />
                 </div>
                 <div className="stat-pill-text">
-                  <span className="stat-pill-num">{((pokemonData.length + formsData.length) * 2).toLocaleString()}</span>
+                  <span className="stat-pill-num">{TOTAL_TRACKER_POKEMON_COUNT.toLocaleString()}</span>
                   <span className="stat-pill-desc">Pokémon Forms &amp; Variants</span>
                 </div>
               </div>

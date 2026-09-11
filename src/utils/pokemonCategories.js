@@ -465,6 +465,8 @@ const PARADOX_POKEMON_IDS = new Set([
   995, // Iron Thorns
   1005, // Roaring Moon
   1006, // Iron Valiant
+  1007, // Koraidon
+  1008, // Miraidon
   1009, // Walking Wake
   1010, // Iron Leaves
   1020, // Gouging Fire

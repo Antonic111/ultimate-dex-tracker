@@ -45,6 +45,24 @@ const handleSuspensionResponse = (errorData) => {
   }
 };
 
+// Format detailed error messages from API response
+const extractErrorMessage = (errorData) => {
+  let baseMsg = errorData?.error || errorData?.message || 'An error occurred';
+  if (errorData?.details) {
+    if (typeof errorData.details === 'object') {
+      const details = Object.entries(errorData.details)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join(', ');
+      if (details) {
+        return `${baseMsg} (${details})`;
+      }
+    } else if (typeof errorData.details === 'string') {
+      return `${baseMsg} (${errorData.details})`;
+    }
+  }
+  return baseMsg;
+};
+
 // Centralized API utility for making authenticated requests
 export const api = {
   // GET request
@@ -75,10 +93,11 @@ export const api = {
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
           handleSuspensionResponse(errorData);
-          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
+          const userMessage = extractErrorMessage(errorData);
+          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${userMessage}`);
           error.status = response.status;
           error.data = errorData;
-          error.userMessage = errorData?.error || 'An error occurred';
+          error.userMessage = userMessage;
           throw error;
         } else {
           const errorText = await response.text();
@@ -137,10 +156,11 @@ export const api = {
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
           handleSuspensionResponse(errorData);
-          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
+          const userMessage = extractErrorMessage(errorData);
+          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${userMessage}`);
           error.status = response.status;
           error.data = errorData;
-          error.userMessage = errorData?.error || 'An error occurred';
+          error.userMessage = userMessage;
           throw error;
         } else {
           const errorText = await response.text();
@@ -200,10 +220,11 @@ export const api = {
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
           handleSuspensionResponse(errorData);
-          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
+          const userMessage = extractErrorMessage(errorData);
+          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${userMessage}`);
           error.status = response.status;
           error.data = errorData;
-          error.userMessage = errorData?.error || 'An error occurred';
+          error.userMessage = userMessage;
           throw error;
         } else {
           const errorText = await response.text();
@@ -262,10 +283,11 @@ export const api = {
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
           handleSuspensionResponse(errorData);
-          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
+          const userMessage = extractErrorMessage(errorData);
+          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${userMessage}`);
           error.status = response.status;
           error.data = errorData;
-          error.userMessage = errorData?.error || 'An error occurred';
+          error.userMessage = userMessage;
           throw error;
         } else {
           const errorText = await response.text();
@@ -322,10 +344,11 @@ export const api = {
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json();
           handleSuspensionResponse(errorData);
-          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
+          const userMessage = extractErrorMessage(errorData);
+          const error = new Error(`API Error: ${response.status} ${response.statusText} - ${userMessage}`);
           error.status = response.status;
           error.data = errorData;
-          error.userMessage = errorData?.error || 'An error occurred';
+          error.userMessage = userMessage;
           throw error;
         } else {
           const errorText = await response.text();

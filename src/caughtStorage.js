@@ -164,7 +164,7 @@ export function migrateOldCaughtData(oldCaughtMap) {
             checks: info.checks || "",
             date: info.date || "",
             notes: info.notes || "",
-            entryId: Math.random().toString(36).substr(2, 9)
+            entryId: info.entryId || "entry-migrated-1"
           }]
         };
         // Clear the old fields from the root level
@@ -192,7 +192,7 @@ export function migrateOldCaughtData(oldCaughtMap) {
               checks: "",
               date: "",
               notes: "",
-              entryId: Math.random().toString(36).substr(2, 9)
+              entryId: info.entryId || "entry-migrated-1"
             }]
           };
           newCaughtMap[key] = defaultEntry;
@@ -214,7 +214,7 @@ export function migrateOldCaughtData(oldCaughtMap) {
           checks: "",
           date: "",
           notes: "",
-          entryId: Math.random().toString(36).substr(2, 9)
+          entryId: info.entryId || "entry-migrated-1"
         }]
       };
       newCaughtMap[key] = defaultEntry;
@@ -256,7 +256,7 @@ function migrateToEntriesFormat(oldInfo) {
         checks: oldInfo.checks || "",
         date: oldInfo.date || "",
         notes: oldInfo.notes || "",
-        entryId: Math.random().toString(36).substr(2, 9)
+        entryId: oldInfo.entryId || "entry-migrated-1"
       }]
     };
     return newFormat;
@@ -274,7 +274,7 @@ function migrateToEntriesFormat(oldInfo) {
         checks: "",
         date: "",
         notes: "",
-        entryId: Math.random().toString(36).substr(2, 9)
+        entryId: oldInfo.entryId || "entry-migrated-1"
       }]
     };
     return defaultFormat;

@@ -86,7 +86,7 @@ import { getFilteredFormsData, getDexPreferences } from "./utils/dexPreferences"
 import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "./data/blockedShinies";
 import { createPortal } from "react-dom";
 import { RotateCcw, TriangleAlert, Sparkles, X, Ban } from "lucide-react";
-import { getAvailableGamesForPokemonSidebar, normalizeGameName } from "./utils/pokemonAvailability";
+import { getAvailableGamesForPokemonSidebar, normalizeGameName, isNonPartnerCapPikachu } from "./utils/pokemonAvailability";
 
 // Mobile Keyboard Handler Hook
 const useMobileKeyboardHandler = () => {
@@ -1085,7 +1085,7 @@ export default function App() {
   }, [isTutorialActive]);
 
   const setShowShiny = val => {
-    if (val && selectedPokemon?.formType === "mighty") {
+    if (val && (selectedPokemon?.formType === "mighty" || selectedPokemon?.stableId?.startsWith("origin-ball-") || isNonPartnerCapPikachu(selectedPokemon))) {
       setSelectedPokemon(null);
       setSidebarOpen(false);
     }
@@ -1100,9 +1100,9 @@ export default function App() {
     });
   };
 
-  // Close sidebar immediately if switching to shiny mode while on a Mighty Pokemon
+  // Close sidebar immediately if switching to shiny mode while on a Mighty, Origin Ball, or non-partner Cap Pikachu
   useEffect(() => {
-    if (showShiny && selectedPokemon?.formType === "mighty") {
+    if (showShiny && (selectedPokemon?.formType === "mighty" || selectedPokemon?.stableId?.startsWith("origin-ball-") || isNonPartnerCapPikachu(selectedPokemon))) {
       setSelectedPokemon(null);
       setSidebarOpen(false);
     }
@@ -1322,16 +1322,6 @@ export default function App() {
     return () => window.removeEventListener("dexDataReset", handleDexDataReset);
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
-        setShowMenu(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
 
   // Function to get all keys for main + form Pokémon
   // Use currentDexPreferences from state to ensure consistency with ProgressManager
@@ -1442,9 +1432,17 @@ export default function App() {
     caughtInfoMapRef.current = caughtInfoMap;
   }, [caughtInfoMap]);
 
-  // Migration: Convert old caught data to new format when component mounts
+  const hasMigratedRef = useRef(false);
+
   useEffect(() => {
+    hasMigratedRef.current = false;
+  }, [user?.username]);
+
+  // Migration: Convert old caught data to new format once on initial data load
+  useEffect(() => {
+    if (hasMigratedRef.current) return;
     if (Object.keys(caughtInfoMap).length > 0 && user?.username) {
+      hasMigratedRef.current = true;
       const migratedData = migrateOldCaughtData(caughtInfoMap);
 
       if (JSON.stringify(migratedData) !== JSON.stringify(caughtInfoMap)) {
@@ -1577,8 +1575,8 @@ export default function App() {
         return { match: false, poke, isSearchMatch: false };
       }
 
-      // Mighty Pokemon and Origin Ball Pokemon cannot be shiny
-      if (isShiny && (poke.formType === "mighty" || poke.stableId === "origin-ball-dialga-483" || poke.stableId === "origin-ball-palkia-484" || poke.stableId?.startsWith("origin-ball-"))) {
+      // Mighty Pokemon, Origin Ball Pokemon, and non-partner Cap Pikachu cannot be shiny
+      if (isShiny && (poke.formType === "mighty" || poke.stableId === "origin-ball-dialga-483" || poke.stableId === "origin-ball-palkia-484" || poke.stableId?.startsWith("origin-ball-") || isNonPartnerCapPikachu(poke))) {
         return { match: false, poke, isSearchMatch: false };
       }
 
@@ -1798,8 +1796,8 @@ export default function App() {
 
   // --- Catch / Form Toggles ---
   const handleToggleCaught = useCallback(async (poke, isShiny = false) => {
-    // Mighty Pokemon cannot be caught as shiny under any circumstances
-    if (isShiny && poke?.formType === "mighty") {
+    // Mighty Pokemon, Origin Ball, and non-partner Cap Pikachu cannot be caught as shiny under any circumstances
+    if (isShiny && (poke?.formType === "mighty" || poke?.stableId?.startsWith("origin-ball-") || isNonPartnerCapPikachu(poke))) {
       return;
     }
 
@@ -2057,8 +2055,8 @@ export default function App() {
 
 
   const updateCaughtInfo = useCallback((poke, info, isShiny = false, isNewEntryArg = false, isDeleteEntryArg = false) => {
-    // Mighty Pokemon cannot be caught as shiny under any circumstances
-    if (isShiny && poke?.formType === "mighty") {
+    // Mighty Pokemon, Origin Ball, and non-partner Cap Pikachu cannot be caught as shiny under any circumstances
+    if (isShiny && (poke?.formType === "mighty" || poke?.stableId?.startsWith("origin-ball-") || isNonPartnerCapPikachu(poke))) {
       return;
     }
 
@@ -2190,7 +2188,7 @@ export default function App() {
   }, [user?.username, sidebarOpen, selectedPokemon]);
 
   const handleSelectPokemon = useCallback((poke) => {
-    if (showShiny && poke?.formType === "mighty") {
+    if (showShiny && (poke?.formType === "mighty" || poke?.stableId?.startsWith("origin-ball-") || isNonPartnerCapPikachu(poke))) {
       return;
     }
     setSidebarOpen(true);

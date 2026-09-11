@@ -2,6 +2,9 @@ import { genderForms, specialCases, specialFormLabels } from "./Constants";
 import formsData from './utils/loadFormsData';
 import pokemonData from './data/pokemon.json';
 import { getFilteredFormsData } from './utils/dexPreferences';
+import { isNonPartnerCapPikachu, isCapPikachu } from './utils/pokemonAvailability';
+
+export { isNonPartnerCapPikachu, isCapPikachu };
 
 
 // utils.js or at the top of App.jsx for now:
@@ -107,6 +110,11 @@ export function getRelatedForms(pokemon) {
 // Get all pokemon IDs in an evolution chain (including pre and next evolutions)
 export function getEvolutionChainIds(pokemon) {
   if (!pokemon) return [];
+
+  // Cap Pikachus cannot evolve or be evolved into
+  if (isCapPikachu(pokemon)) {
+    return [pokemon.id].filter(Boolean);
+  }
 
   // Use the pokemon itself, or fallback to the base form if current form lacks evolution data
   // This helps with cosmetic forms (like Shellos East) that share the base form's evolution

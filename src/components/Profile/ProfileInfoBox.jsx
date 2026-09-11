@@ -21,6 +21,27 @@ function formatGoFCInput(value) {
 }
 
 export default function ProfileInfoBox({ isOwner, isEditing, form, setForm, isContentCreator = false, isAdmin = false }) {
+    const hasLocation = Boolean(form?.location && form.location.trim() !== "" && form.location !== "Earth");
+    const hasGender = Boolean(form?.gender && form.gender.trim() !== "" && form.gender !== "Unknown");
+    const hasBirthday = Boolean(form?.birthday && form.birthday.month && form.birthday.day);
+    const hasSwitchFC = Boolean(form?.switchFriendCode && form.switchFriendCode.trim() !== "");
+    const hasGoFC = Boolean(form?.goFriendCode && form.goFriendCode.trim() !== "");
+
+    const hasAnyInfo = hasLocation || hasGender || hasBirthday || hasSwitchFC || hasGoFC;
+
+    if (!isEditing && !hasAnyInfo) {
+        return (
+            <div className="profile-info-box-container">
+                <h3 className="profile-section-title">
+                    <User size={18} className="text-gray-400" /> PROFILE INFO
+                </h3>
+                <p className="profile-info-empty-state">
+                    No profile information yet.
+                </p>
+            </div>
+        );
+    }
+
     return (
         <div className="profile-info-box-container">
             <h3 className="profile-section-title">
@@ -34,90 +55,94 @@ export default function ProfileInfoBox({ isOwner, isEditing, form, setForm, isCo
             <div className="profile-info-grid">
                 
                 {/* Location */}
-                <div className="profile-info-row">
-                    <div className="info-label">Location</div>
-                    {isOwner && isEditing ? (
-                        <div className="info-edit-wrapper">
-                            <SelectField
-                                id="profile-info-location"
-                                options={COUNTRY_OPTIONS.map(country => ({
-                                    label: country.name,
-                                    value: country.name,
-                                    icon: <span className={`fi fi-${country.code.toLowerCase()}`} />
-                                }))}
-                                value={form.location || ""}
-                                onChange={(value) => setForm({ ...form, location: value })}
-                                placeholder="Select location"
-                                searchable
-                                searchPlaceholder="Search country..."
-                                clearable
-                                size="sm"
-                                fullWidth
-                                startIcon={
-                                    (() => {
-                                        const selected = COUNTRY_OPTIONS.find(c => c.name === form.location || c.value === form.location);
-                                        if (selected) {
-                                            return <span className={`fi fi-${selected.code.toLowerCase()}`} />;
-                                        }
-                                        return <Globe size={15} />;
-                                    })()
-                                }
-                            />
-                        </div>
-                    ) : (
-                        <div className="info-value flex items-center gap-1.5">
-                            {(() => {
-                                const selected = COUNTRY_OPTIONS.find(c => c.name === form.location || c.value === form.location);
-                                return selected ? (
-                                    <>
-                                        <span className={`fi fi-${selected.code.toLowerCase()} rounded-[2px]`} style={{ marginRight: "4px" }} />
-                                        {selected.name}
-                                    </>
-                                ) : (
-                                    form.location || "Earth"
-                                );
-                            })()}
-                        </div>
-                    )}
-                </div>
+                {(isEditing || hasLocation) && (
+                    <div className="profile-info-row">
+                        <div className="info-label">Location</div>
+                        {isOwner && isEditing ? (
+                            <div className="info-edit-wrapper">
+                                <SelectField
+                                    id="profile-info-location"
+                                    options={COUNTRY_OPTIONS.map(country => ({
+                                        label: country.name,
+                                        value: country.name,
+                                        icon: <span className={`fi fi-${country.code.toLowerCase()}`} />
+                                    }))}
+                                    value={form.location || ""}
+                                    onChange={(value) => setForm({ ...form, location: value })}
+                                    placeholder="Select location"
+                                    searchable
+                                    searchPlaceholder="Search country..."
+                                    clearable
+                                    size="sm"
+                                    fullWidth
+                                    startIcon={
+                                        (() => {
+                                            const selected = COUNTRY_OPTIONS.find(c => c.name === form.location || c.value === form.location);
+                                            if (selected) {
+                                                return <span className={`fi fi-${selected.code.toLowerCase()}`} />;
+                                            }
+                                            return <Globe size={15} />;
+                                        })()
+                                    }
+                                />
+                            </div>
+                        ) : (
+                            <div className="info-value flex items-center gap-1.5">
+                                {(() => {
+                                    const selected = COUNTRY_OPTIONS.find(c => c.name === form.location || c.value === form.location);
+                                    return selected ? (
+                                        <>
+                                            <span className={`fi fi-${selected.code.toLowerCase()} rounded-[2px]`} style={{ marginRight: "4px" }} />
+                                            {selected.name}
+                                        </>
+                                    ) : (
+                                        form.location
+                                    );
+                                })()}
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Gender */}
-                <div className="profile-info-row">
-                    <div className="info-label">Gender</div>
-                    {isOwner && isEditing ? (
-                        <div className="info-edit-wrapper">
-                            <SelectField
-                                id="profile-info-gender"
-                                options={[
-                                    { label: "Male", value: "Male", icon: <Mars size={16} color="#4aaaff" /> },
-                                    { label: "Female", value: "Female", icon: <Venus size={16} color="#ff6ec7" /> },
-                                    { label: "Other", value: "Other", icon: <VenusAndMars size={16} color="#ffffff" /> },
-                                ]}
-                                value={form.gender || ""}
-                                onChange={(value) => setForm({ ...form, gender: value })}
-                                placeholder="Select gender"
-                                clearable
-                                size="sm"
-                                fullWidth
-                                startIcon={
-                                    (() => {
-                                        if (form.gender === "Male") return <Mars size={15} color="#4aaaff" />;
-                                        if (form.gender === "Female") return <Venus size={15} color="#ff6ec7" />;
-                                        if (form.gender === "Other") return <VenusAndMars size={15} color="#ffffff" />;
-                                        return <VenusAndMars size={15} />;
-                                    })()
-                                }
-                            />
-                        </div>
-                    ) : (
-                        <div className="info-value flex items-center gap-1.5">
-                            {form.gender === "Male" && <Mars size={16} color="#4aaaff" />}
-                            {form.gender === "Female" && <Venus size={16} color="#ff6ec7" />}
-                            {form.gender === "Other" && <VenusAndMars size={16} color="#ffffff" />}
-                            {form.gender || "Unknown"}
-                        </div>
-                    )}
-                </div>
+                {(isEditing || hasGender) && (
+                    <div className="profile-info-row">
+                        <div className="info-label">Gender</div>
+                        {isOwner && isEditing ? (
+                            <div className="info-edit-wrapper">
+                                <SelectField
+                                    id="profile-info-gender"
+                                    options={[
+                                        { label: "Male", value: "Male", icon: <Mars size={16} color="#4aaaff" /> },
+                                        { label: "Female", value: "Female", icon: <Venus size={16} color="#ff6ec7" /> },
+                                        { label: "Other", value: "Other", icon: <VenusAndMars size={16} color="#ffffff" /> },
+                                    ]}
+                                    value={form.gender || ""}
+                                    onChange={(value) => setForm({ ...form, gender: value })}
+                                    placeholder="Select gender"
+                                    clearable
+                                    size="sm"
+                                    fullWidth
+                                    startIcon={
+                                        (() => {
+                                            if (form.gender === "Male") return <Mars size={15} color="#4aaaff" />;
+                                            if (form.gender === "Female") return <Venus size={15} color="#ff6ec7" />;
+                                            if (form.gender === "Other") return <VenusAndMars size={15} color="#ffffff" />;
+                                            return <VenusAndMars size={15} />;
+                                        })()
+                                    }
+                                />
+                            </div>
+                        ) : (
+                            <div className="info-value flex items-center gap-1.5">
+                                {form.gender === "Male" && <Mars size={16} color="#4aaaff" />}
+                                {form.gender === "Female" && <Venus size={16} color="#ff6ec7" />}
+                                {form.gender === "Other" && <VenusAndMars size={16} color="#ffffff" />}
+                                {form.gender}
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Birthday */}
                 {(form.birthday && form.birthday.month && form.birthday.day) && (

@@ -102,6 +102,36 @@ export const isPLAShinyLocked = (pokemon) => {
   return PLA_SHINY_LOCKED_NAMES.some(locked => name.includes(locked));
 };
 
+export const isNonPartnerCapPikachu = (pokemon) => {
+  if (!pokemon) return false;
+  const name = (pokemon.name || "").toLowerCase();
+  const stableId = (pokemon.stableId || "").toLowerCase();
+  if (name === "pikachu-partner-cap" || stableId === "pikachu-partner-cap-0025") return false;
+  return (
+    name.endsWith("-cap") ||
+    stableId.includes("-cap-") ||
+    name === "pikachu-original-cap" ||
+    name === "pikachu-kalos-cap" ||
+    name === "pikachu-sinnoh-cap" ||
+    name === "pikachu-unova-cap" ||
+    name === "pikachu-world-cap" ||
+    name === "pikachu-alola-cap" ||
+    name === "pikachu-hoenn-cap"
+  );
+};
+
+export const isCapPikachu = (pokemon) => {
+  if (!pokemon) return false;
+  const name = (pokemon.name || "").toLowerCase();
+  const stableId = (pokemon.stableId || "").toLowerCase();
+  return (
+    name.endsWith("-cap") ||
+    stableId.includes("-cap-") ||
+    name.includes("partner-cap") ||
+    stableId.includes("partner-cap")
+  );
+};
+
 // Get games where a Pokemon can be caught, ordered by release date.
 // This mirrors the sidebar "Obtainable In" logic for 1:1 matching.
 export const getAvailableGamesForPokemonSidebar = (pokemon, isShiny = true) => {
@@ -114,6 +144,11 @@ export const getAvailableGamesForPokemonSidebar = (pokemon, isShiny = true) => {
   // 1. Determine base availability (Hardcoded Forms vs Default)
   if (pokemon.stableId === "origin-ball-dialga-483" || pokemon.stableId === "origin-ball-palkia-484" || pokemon.stableId?.startsWith("origin-ball-") || pokemonName.startsWith("origin-ball-")) {
     return isShiny ? [] : ["Legends Arceus"];
+  }
+
+  // Non-partner Cap Pikachus (Sword & Shield only, cannot be shiny)
+  if (isNonPartnerCapPikachu(pokemon)) {
+    return isShiny ? [] : ["Sword", "Shield"];
   }
 
   if (formType === "mighty" && Number(pokemon.id) !== 151 && pokemonName !== "mew") {

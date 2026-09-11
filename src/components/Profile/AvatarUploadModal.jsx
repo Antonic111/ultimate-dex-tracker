@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
     Upload, Trash2, CheckCircle2, AlertCircle, ShieldCheck,
     Camera, ZoomIn, ZoomOut, RotateCw, RotateCcw, RefreshCw, Move,
-    Image as ImageIcon, Sparkles, Check, Crown, ArrowRight
+    Image as ImageIcon, Sparkles, Check, Crown, ArrowRight, Minimize2
 } from "lucide-react";
 import { Modal } from "../Shared/Modal";
 import { Button } from "../Shared/Button";
@@ -16,6 +16,7 @@ const MAX_GIF_FILE_SIZE = 8 * 1024 * 1024;    // 8MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const CANVAS_SIZE = 280; // Preview canvas dimension in px
 const EXPORT_SIZE = 256; // Standard 256x256 max resolution for processed avatars
+const CROP_RADIUS = 130; // 260px diameter circular crop aperture inside 280px canvas
 
 export const DEFAULT_AVATARS = [
     { id: "butterfree", name: "Butterfree", url: "/data/default_profile_pictures/butterfree.png" },
@@ -201,37 +202,44 @@ export default function AvatarUploadModal({
 
         ctx.clearRect(0, 0, size, size);
 
-        // 1. Draw image transformed
+        // 1. Draw image transformed (center + pan, rotated, scaled)
         ctx.save();
         ctx.translate(size / 2 + pan.x, size / 2 + pan.y);
         ctx.rotate((rotation * Math.PI) / 180);
         ctx.scale(zoom, zoom);
 
-        const baseScale = Math.max(size / rawImage.width, size / rawImage.height) * 1.05;
+        const baseScale = (CROP_RADIUS * 2) / Math.min(rawImage.width, rawImage.height);
         const drawW = rawImage.width * baseScale;
         const drawH = rawImage.height * baseScale;
 
         ctx.drawImage(rawImage, -drawW / 2, -drawH / 2, drawW, drawH);
         ctx.restore();
 
-        // 2. Draw clean circular crop guide ring and center crosshair
+        // 2. Semi-transparent dark overlay outside the circular crop aperture
         ctx.save();
+        ctx.fillStyle = "rgba(0, 0, 0, 0.58)";
         ctx.beginPath();
-        ctx.arc(size / 2, size / 2, size / 2 - 6, 0, Math.PI * 2);
-        ctx.lineWidth = 2;
+        ctx.rect(0, 0, size, size);
+        ctx.arc(size / 2, size / 2, CROP_RADIUS, 0, Math.PI * 2, true);
+        ctx.fill();
+
+        // 3. Crisp circular crop guide ring
+        ctx.beginPath();
+        ctx.arc(size / 2, size / 2, CROP_RADIUS, 0, Math.PI * 2);
+        ctx.lineWidth = 2.5;
         ctx.strokeStyle = "var(--accent, #eab308)";
-        ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
-        ctx.shadowBlur = 4;
+        ctx.shadowColor = "rgba(0, 0, 0, 0.7)";
+        ctx.shadowBlur = 6;
         ctx.stroke();
 
-        // Simple center guide crosshair
+        // 4. Subtle center guide crosshair lines
         ctx.beginPath();
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
-        ctx.lineWidth = 1.5;
-        ctx.moveTo(size / 2 - 12, size / 2);
-        ctx.lineTo(size / 2 + 12, size / 2);
-        ctx.moveTo(size / 2, size / 2 - 12);
-        ctx.lineTo(size / 2 + 12, size / 2);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
+        ctx.lineWidth = 1;
+        ctx.moveTo(size / 2 - 10, size / 2);
+        ctx.lineTo(size / 2 + 10, size / 2);
+        ctx.moveTo(size / 2, size / 2 - 10);
+        ctx.lineTo(size / 2, size / 2 + 10);
         ctx.stroke();
 
         ctx.restore();
@@ -241,23 +249,21 @@ export default function AvatarUploadModal({
         drawCanvas();
     }, [drawCanvas]);
 
-    // Calculate clamped pan to ensure the image always 100% covers the circular crop zone with safety padding
+    // Calculate clamped pan to allow smooth panning without losing the image
     const getClampedPan = useCallback((targetPan, currentZoom = zoom, currentRot = rotation) => {
         if (!rawImage) return targetPan;
 
-        const size = CANVAS_SIZE;
-        const safeCropRadius = (size / 2 - 6) + 8;
-
-        const baseScale = Math.max(size / rawImage.width, size / rawImage.height) * 1.05;
+        const isRotated90 = (Math.round(currentRot / 90) % 2) !== 0;
+        const baseScale = (CROP_RADIUS * 2) / Math.min(rawImage.width, rawImage.height);
         const drawW = rawImage.width * baseScale * currentZoom;
         const drawH = rawImage.height * baseScale * currentZoom;
 
-        const isRotated90 = (Math.round(currentRot / 90) % 2) !== 0;
         const effectiveW = isRotated90 ? drawH : drawW;
         const effectiveH = isRotated90 ? drawW : drawH;
 
-        const maxPanX = Math.max(0, (effectiveW / 2) - safeCropRadius);
-        const maxPanY = Math.max(0, (effectiveH / 2) - safeCropRadius);
+        // Allow generous, smooth panning so user can reposition image freely
+        const maxPanX = Math.max(CROP_RADIUS * 0.9, effectiveW / 2);
+        const maxPanY = Math.max(CROP_RADIUS * 0.9, effectiveH / 2);
 
         return {
             x: Math.min(Math.max(targetPan.x, -maxPanX), maxPanX),
@@ -266,9 +272,16 @@ export default function AvatarUploadModal({
     }, [rawImage, zoom, rotation]);
 
     const handleZoomChange = (newZoom) => {
-        const clampedZoom = Math.min(Math.max(Number(newZoom.toFixed(2)), 1), 3);
+        const clampedZoom = Math.min(Math.max(Number(newZoom.toFixed(2)), 0.5), 3);
         setZoom(clampedZoom);
         setPan((prev) => getClampedPan(prev, clampedZoom, rotation));
+    };
+
+    const handleFitSquare = () => {
+        // 1 / sqrt(2) ≈ 0.707 to make a square fit completely inside the circle
+        const fitZoom = 0.71;
+        setZoom(fitZoom);
+        setPan({ x: 0, y: 0 });
     };
 
     const handleRotationChange = (deltaRot) => {
@@ -325,14 +338,14 @@ export default function AvatarUploadModal({
         const ctx = expCanvas.getContext("2d");
         if (!ctx) return null;
 
-        const scaleFactor = EXPORT_SIZE / CANVAS_SIZE;
+        const exportScale = EXPORT_SIZE / (CROP_RADIUS * 2);
 
         ctx.save();
-        ctx.translate(EXPORT_SIZE / 2 + pan.x * scaleFactor, EXPORT_SIZE / 2 + pan.y * scaleFactor);
+        ctx.translate(EXPORT_SIZE / 2 + pan.x * exportScale, EXPORT_SIZE / 2 + pan.y * exportScale);
         ctx.rotate((rotation * Math.PI) / 180);
         ctx.scale(zoom, zoom);
 
-        const baseScale = Math.max(EXPORT_SIZE / rawImage.width, EXPORT_SIZE / rawImage.height) * 1.05;
+        const baseScale = EXPORT_SIZE / Math.min(rawImage.width, rawImage.height);
         const drawW = rawImage.width * baseScale;
         const drawH = rawImage.height * baseScale;
 
@@ -666,14 +679,14 @@ export default function AvatarUploadModal({
                                     variant="secondary"
                                     size="sm"
                                     onClick={() => handleZoomChange(zoom - 0.1)}
-                                    disabled={zoom <= 1 || isProcessing}
+                                    disabled={zoom <= 0.5 || isProcessing}
                                     title="Zoom Out"
                                     icon={<ZoomOut size={15} />}
                                 />
                                 <div className="avatar-zoom-slider-wrap">
                                     <input
                                         type="range"
-                                        min="1"
+                                        min="0.5"
                                         max="3"
                                         step="0.02"
                                         value={zoom}
@@ -694,7 +707,7 @@ export default function AvatarUploadModal({
                                 />
                             </div>
 
-                            {/* Rotation & Reset Buttons */}
+                            {/* Rotation, Fit & Reset Buttons */}
                             <div className="avatar-cropper-extra-actions">
                                 <Button
                                     variant="secondary"
@@ -713,6 +726,16 @@ export default function AvatarUploadModal({
                                     icon={<RotateCw size={14} />}
                                 >
                                     Rotate Right
+                                </Button>
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={handleFitSquare}
+                                    disabled={isProcessing}
+                                    icon={<Minimize2 size={14} />}
+                                    title="Fit entire square image inside circle"
+                                >
+                                    Fit Square
                                 </Button>
                                 <Button
                                     variant="secondary"

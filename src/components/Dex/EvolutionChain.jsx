@@ -2,10 +2,15 @@ import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import "../../css/EvolutionChain.css";
 import { Dna, Check } from "lucide-react";
-import { findPokemon, getRelatedForms } from "../../utils";
+import { findPokemon, getRelatedForms, isCapPikachu } from "../../utils";
 import { getSpriteUrl } from "../../utils/spriteUtils";
 
 export default function EvolutionChain({ pokemon, showShiny = false, onPokemonSelect = null, dexPreferences = null }) {
+
+  // Cap Pikachus cannot evolve or be evolved into - remove evolution chain entirely
+  if (isCapPikachu(pokemon)) {
+    return null;
+  }
 
   // --- MAIN LOGIC TO INHERIT CHAIN FROM BASE FORM ---
   // If the current Pokémon has no evolution chain, try to use the "main" one with same id

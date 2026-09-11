@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Trophy, 
   Sparkles, 
@@ -38,7 +38,8 @@ export default function ProfileFavorites({
   const [activeRank, setActiveRank] = useState(0); // 0 to 4
   const [isPaused, setIsPaused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [progress, setProgress] = useState(0); // 0 to 100
+  const progressRef = useRef(0);
+  const progressBarRef = useRef(null);
 
   const DURATION = 6000; // 6 seconds
 
@@ -78,14 +79,19 @@ export default function ProfileFavorites({
       const delta = currentTime - lastTime;
       lastTime = currentTime;
 
-      setProgress((prev) => {
-        const next = prev + (delta / DURATION) * 100;
-        if (next >= 100) {
-          setActiveRank((r) => (r + 1) % numRanks);
-          return 0;
+      progressRef.current += (delta / DURATION) * 100;
+
+      if (progressRef.current >= 100) {
+        progressRef.current = 0;
+        if (progressBarRef.current) {
+          progressBarRef.current.style.transform = 'scaleX(0)';
         }
-        return next;
-      });
+        setActiveRank((r) => (r + 1) % numRanks);
+      } else {
+        if (progressBarRef.current) {
+          progressBarRef.current.style.transform = `scaleX(${Math.min(progressRef.current / 100, 1)})`;
+        }
+      }
 
       animId = requestAnimationFrame(loop);
     };
@@ -95,17 +101,26 @@ export default function ProfileFavorites({
   }, [isPaused, isHovered, isEditing, numRanks]);
 
   const handlePrev = () => {
-    setProgress(0);
+    progressRef.current = 0;
+    if (progressBarRef.current) {
+      progressBarRef.current.style.transform = 'scaleX(0)';
+    }
     setActiveRank((prev) => (prev === 0 ? numRanks - 1 : prev - 1));
   };
 
   const handleNext = () => {
-    setProgress(0);
+    progressRef.current = 0;
+    if (progressBarRef.current) {
+      progressBarRef.current.style.transform = 'scaleX(0)';
+    }
     setActiveRank((prev) => (prev + 1) % numRanks);
   };
 
   const handleSelectRank = (index) => {
-    setProgress(0);
+    progressRef.current = 0;
+    if (progressBarRef.current) {
+      progressBarRef.current.style.transform = 'scaleX(0)';
+    }
     setActiveRank(index);
   };
 
@@ -420,8 +435,9 @@ export default function ProfileFavorites({
               ) : (
                 <div className="favorites-progress-track">
                   <div 
+                    ref={progressBarRef}
                     className="favorites-progress-fill" 
-                    style={{ transform: `scaleX(${progress / 100})` }} 
+                    style={{ transform: `scaleX(${Math.min(progressRef.current / 100, 1)})` }} 
                   />
                 </div>
               )}

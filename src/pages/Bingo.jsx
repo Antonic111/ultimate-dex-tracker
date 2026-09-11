@@ -10,7 +10,7 @@ import { GAME_OPTIONS, genderForms } from "../Constants";
 import pokemonData from "../data/pokemon.json";
 import formsData from "../utils/loadFormsData";
 import { getFilteredFormsData } from "../utils/dexPreferences";
-import { getAvailableGamesForPokemonSidebar, normalizeGameName, GAME_COUNTERPARTS } from "../utils/pokemonAvailability";
+import { getAvailableGamesForPokemonSidebar, normalizeGameName, GAME_COUNTERPARTS, isNonPartnerCapPikachu } from "../utils/pokemonAvailability";
 import versionExclusives from "../data/versionExclusives.json";
 import { formatPokemonName, getFormDisplayName } from "../utils";
 import { getSpriteUrl } from "../utils/spriteUtils";
@@ -23,6 +23,7 @@ import { Modal, ConfirmModal } from "../components/Shared/Modal";
 import { Button } from "../components/Shared/Button";
 import { Tooltip } from "../components/Shared/Tooltip";
 import { getTimeAgo } from "../utils/profileUtils";
+import { checkUserHasCompletedBingo } from "../data/achievementsData";
 import './Bingo.css';
 import '../css/Counters.css';
 
@@ -232,6 +233,10 @@ const Bingo = () => {
 
         if (STORAGE_KEY) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(grid));
+            if (checkUserHasCompletedBingo(grid)) {
+                localStorage.setItem('hasCompletedBingo', 'true');
+                window.dispatchEvent(new Event('bingoCompleted'));
+            }
         }
 
         const timeoutId = setTimeout(async () => {
@@ -313,7 +318,7 @@ const Bingo = () => {
         }));
 
         const formsList = getFilteredFormsData(formsData, currentPrefs)
-            .filter(f => f.formType !== "mighty" && !f.stableId?.startsWith("origin-ball-") && !f.name?.startsWith("origin-ball-"))
+            .filter(f => f.formType !== "mighty" && !f.stableId?.startsWith("origin-ball-") && !f.name?.startsWith("origin-ball-") && !isNonPartnerCapPikachu(f))
             .map(f => ({
                 ...f,
                 stableId: f.stableId || `${f.name}-${f.formType}-${String(f.id).padStart(4, "0")}`

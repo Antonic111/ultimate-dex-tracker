@@ -97,7 +97,7 @@ export const FILTER_CONFIGS = {
   },
   bio: {
     minLength: 0,
-    maxLength: 150,
+    maxLength: 250,
     allowedChars: null,
     charDescription: null,
     checkBadWords: true,

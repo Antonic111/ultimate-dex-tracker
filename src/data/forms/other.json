@@ -14,21 +14,175 @@
       "home_shiny": "/Sprites/Home/partner-cap-pikachu-shiny.png"
     },
     "gen": 1,
-    "evolution": {
-      "pre": null,
-      "next": []
-    },
+    "evolution": null,
     "recommended_balls": {
       "default": [
-        "Level Ball",
-        "Ultra Ball",
-        "Fast Ball"
+        "Poké Ball"
       ],
       "shiny": [
-        "Level Ball",
-        "Ultra Ball",
-        "Fast Ball"
+        "Poké Ball"
       ]
+    }
+  },
+  {
+    "id": 25,
+    "name": "pikachu-original-cap",
+    "formType": "other",
+    "stableId": "pikachu-original-cap-0025",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/trimmed/pokemon/pikachu-original.png",
+      "front_shiny": "",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/pikachu-original.png",
+      "home_shiny": ""
+    },
+    "gen": 1,
+    "evolution": null,
+    "recommended_balls": {
+      "default": [
+        "Poké Ball"
+      ],
+      "shiny": []
+    }
+  },
+  {
+    "id": 25,
+    "name": "pikachu-kalos-cap",
+    "formType": "other",
+    "stableId": "pikachu-kalos-cap-0025",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/trimmed/pokemon/pikachu-kalos.png",
+      "front_shiny": "",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/pikachu-kalos.png",
+      "home_shiny": ""
+    },
+    "gen": 1,
+    "evolution": null,
+    "recommended_balls": {
+      "default": [
+        "Poké Ball"
+      ],
+      "shiny": []
+    }
+  },
+  {
+    "id": 25,
+    "name": "pikachu-sinnoh-cap",
+    "formType": "other",
+    "stableId": "pikachu-sinnoh-cap-0025",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/trimmed/pokemon/pikachu-sinnoh.png",
+      "front_shiny": "",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/pikachu-sinnoh.png",
+      "home_shiny": ""
+    },
+    "gen": 1,
+    "evolution": null,
+    "recommended_balls": {
+      "default": [
+        "Poké Ball"
+      ],
+      "shiny": []
+    }
+  },
+  {
+    "id": 25,
+    "name": "pikachu-unova-cap",
+    "formType": "other",
+    "stableId": "pikachu-unova-cap-0025",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/trimmed/pokemon/pikachu-unova.png",
+      "front_shiny": "",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/pikachu-unova.png",
+      "home_shiny": ""
+    },
+    "gen": 1,
+    "evolution": null,
+    "recommended_balls": {
+      "default": [
+        "Poké Ball"
+      ],
+      "shiny": []
+    }
+  },
+  {
+    "id": 25,
+    "name": "pikachu-world-cap",
+    "formType": "other",
+    "stableId": "pikachu-world-cap-0025",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/trimmed/pokemon/pikachu-world.png",
+      "front_shiny": "",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/pikachu-world.png",
+      "home_shiny": ""
+    },
+    "gen": 1,
+    "evolution": null,
+    "recommended_balls": {
+      "default": [
+        "Poké Ball"
+      ],
+      "shiny": []
+    }
+  },
+  {
+    "id": 25,
+    "name": "pikachu-alola-cap",
+    "formType": "other",
+    "stableId": "pikachu-alola-cap-0025",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/trimmed/pokemon/pikachu-alola.png",
+      "front_shiny": "",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/pikachu-alola.png",
+      "home_shiny": ""
+    },
+    "gen": 1,
+    "evolution": null,
+    "recommended_balls": {
+      "default": [
+        "Poké Ball"
+      ],
+      "shiny": []
+    }
+  },
+  {
+    "id": 25,
+    "name": "pikachu-hoenn-cap",
+    "formType": "other",
+    "stableId": "pikachu-hoenn-cap-0025",
+    "types": [
+      "electric"
+    ],
+    "sprites": {
+      "front_default": "/Sprites/trimmed/pokemon/pikachu-hoenn.png",
+      "front_shiny": "",
+      "home_default": "/Sprites/trimmed/pokemon/other/home/pikachu-hoenn.png",
+      "home_shiny": ""
+    },
+    "gen": 1,
+    "evolution": null,
+    "recommended_balls": {
+      "default": [
+        "Poké Ball"
+      ],
+      "shiny": []
     }
   },
   {

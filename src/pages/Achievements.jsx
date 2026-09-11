@@ -3,22 +3,55 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
-  Lock, Image as ImageIcon, Trophy, Unlock, Layers, Sparkles, X, Check, ShieldAlert
+  Lock, Image as ImageIcon, Trophy, Unlock, Layers, Sparkles, X, Check, ShieldAlert, Info
 } from 'lucide-react';
 import {
   SearchField, SectionLoader, InlineLoader, NoResults, Tooltip
 } from '../components/Shared';
 import { useUser } from '../components/Shared/UserContext';
 import { buildApiUrl } from '../config/api';
-import { profileAPI, caughtAPI, achievementsAPI } from '../utils/api';
+import { profileAPI, caughtAPI, achievementsAPI, bingoAPI } from '../utils/api';
 import {
   ACHIEVEMENT_CATEGORIES,
   INITIAL_ACHIEVEMENTS,
   isBadgeShinyToggleable,
   getBadgeArtwork,
-  calculateAchievementProgress
+  calculateAchievementProgress,
+  SPECIAL_BALLS_LIST
 } from '../data/achievementsData';
 import '../css/Achievements.css';
+
+function SpecialBallsTooltipContent({ usedBalls = [], isShiny = false }) {
+  const usedCount = usedBalls.length;
+  return (
+    <div className="special-balls-tooltip-content">
+      <div className="special-balls-tooltip-header">
+        <div className="special-balls-tooltip-title-row">
+          <strong>Eligible Special Balls</strong>
+          <span className="special-balls-tooltip-count">{usedCount} / 16</span>
+        </div>
+        <span className="special-balls-tooltip-sub">
+          {isShiny ? 'Shiny catches registered in eligible balls:' : 'Regular catches registered in eligible balls:'}
+        </span>
+      </div>
+      <div className="special-balls-tooltip-grid">
+        {SPECIAL_BALLS_LIST.map((ball) => {
+          const isUsed = usedBalls.includes(ball.name);
+          return (
+            <div
+              key={ball.name}
+              className={`special-ball-tooltip-item ${isUsed ? 'is-used' : ''}`}
+            >
+              <img src={ball.image} alt="" className="special-ball-tooltip-img" draggable={false} />
+              <span className="special-ball-tooltip-name">{ball.name}</span>
+              {isUsed && <Check size={11} className="special-ball-check" />}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function Achievements() {
   const navigate = useNavigate();
@@ -111,13 +144,15 @@ export default function Achievements() {
     };
 
     window.addEventListener('storage', syncCaught);
+    window.addEventListener('bingoCompleted', syncCaught);
 
     const loadData = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        const [caughtRes, rarityRes] = await Promise.allSettled([
+        const [caughtRes, rarityRes, bingoRes] = await Promise.allSettled([
           token ? caughtAPI.getCaughtData() : Promise.resolve(null),
-          achievementsAPI.getRarity()
+          achievementsAPI.getRarity(),
+          token ? bingoAPI.getBingo() : Promise.resolve(null)
         ]);
 
         if (isMounted) {
@@ -127,6 +162,24 @@ export default function Achievements() {
           if (rarityRes.status === 'fulfilled' && rarityRes.value) {
             if (rarityRes.value.rarity) setRarityMap(rarityRes.value.rarity);
             if (rarityRes.value.totalEligibleUsers != null) setTotalEligibleUsers(rarityRes.value.totalEligibleUsers);
+          }
+          if (bingoRes.status === 'fulfilled' && bingoRes.value) {
+            const bData = bingoRes.value;
+            const u = localStorage.getItem('username') || '';
+            if (bData.years && typeof bData.years === 'object') {
+              Object.entries(bData.years).forEach(([yr, yrData]) => {
+                if (yrData && Array.isArray(yrData.grid) && yrData.grid.length > 0 && u) {
+                  try {
+                    localStorage.setItem(`bingo-grid-state-v1:${u}:${yr}`, JSON.stringify(yrData.grid));
+                  } catch {}
+                }
+              });
+            } else if (Array.isArray(bData.grid) && bData.grid.length > 0 && u) {
+              const yr = bData.selectedYear || new Date().getFullYear();
+              try {
+                localStorage.setItem(`bingo-grid-state-v1:${u}:${yr}`, JSON.stringify(bData.grid));
+              } catch {}
+            }
           }
         }
       } catch (err) {
@@ -143,6 +196,7 @@ export default function Achievements() {
     return () => {
       isMounted = false;
       window.removeEventListener('storage', syncCaught);
+      window.removeEventListener('bingoCompleted', syncCaught);
     };
   }, []);
 
@@ -502,7 +556,8 @@ export const TIER_CONFIG = {
 };
 
 export function getBadgeTierConfig(badge) {
-  const rawTier = (badge?.tier || 'bronze').toLowerCase();
+  const isSingle = badge?.type === 'single' || badge?.type === 'secret' || (badge?.tiers && badge.tiers.length === 1);
+  const rawTier = (badge?.tier || (isSingle ? 'diamond' : 'bronze')).toLowerCase();
   return TIER_CONFIG[rawTier] || TIER_CONFIG.bronze;
 }
 
@@ -526,8 +581,11 @@ function AchievementCard({ achievement, caughtMap = {}, onSelect, adminUnlockAll
   const displayName = isSecret && isLocked ? '???' : achievement.name;
   const displayDesc = isSecret && isLocked ? 'Secret achievement.' : progressData.displayGoal;
 
-  // Use highest unlocked tier border, or fallback to first tier (Bronze)
-  const activeTier = progressData.unlockedTier || (achievement.tier || 'bronze').toLowerCase();
+  // For single/secret badges, always resolve tier to Diamond; otherwise use highest unlocked tier or Bronze
+  const isSingle = achievement.type === 'single' || achievement.type === 'secret' || (achievement.tiers && achievement.tiers.length === 1);
+  const activeTier = isSingle
+    ? (achievement.tier ? achievement.tier.toLowerCase() : 'diamond')
+    : (progressData.unlockedTier || (achievement.tier || 'bronze').toLowerCase());
   const tierConfig = getBadgeTierConfig({ ...achievement, tier: activeTier });
   const canToggleShiny = isBadgeShinyToggleable(achievement);
   const currentArtwork = getBadgeArtwork(achievement, isShiny, activeTier);
@@ -615,9 +673,34 @@ function AchievementCard({ achievement, caughtMap = {}, onSelect, adminUnlockAll
 
       {/* Name, Description, and Progress */}
       <div className="achievement-card-info">
-        <h3 className="achievement-title" title={displayName}>
-          {displayName}
-        </h3>
+        <div className="achievement-title-row">
+          <h3 className="achievement-title" title={displayName}>
+            {displayName}
+          </h3>
+          {(badgeSlug === 'ball-connoisseur' || badgeSlug === 'apriball-artisan') && (
+            <Tooltip
+              content={
+                <SpecialBallsTooltipContent
+                  usedBalls={progressData.usedSpecialBalls || []}
+                  isShiny={isShiny}
+                />
+              }
+              position="top"
+              align="center"
+              maxWidth={350}
+              wrap
+            >
+              <button
+                type="button"
+                className="achievement-info-trigger-btn"
+                onClick={(e) => e.stopPropagation()}
+                aria-label="Eligible Special Balls"
+              >
+                <Info size={11} />
+              </button>
+            </Tooltip>
+          )}
+        </div>
         <p className="achievement-desc" title={displayDesc}>
           {displayDesc}
         </p>
@@ -633,7 +716,7 @@ function AchievementCard({ achievement, caughtMap = {}, onSelect, adminUnlockAll
               />
             </div>
             <span className="achievement-card-progress-count">
-              {progressData.currentCount} / {progressData.nextTier?.threshold || progressData.totalCount} Forms
+              {progressData.currentCount} / {progressData.nextTier?.threshold || progressData.totalCount}
             </span>
           </div>
         )}
@@ -704,8 +787,12 @@ function FloatingBadgeViewer({ badge, caughtMap = {}, originRect, onClose, isAdm
   const [isShiny, setIsShiny] = useState(() => !!badge.initialIsShiny);
   const progressData = calculateAchievementProgress(badge, caughtMap, isShiny);
 
+  const isSingle = badge.type === 'single' || badge.type === 'secret' || (badge.tiers && badge.tiers.length === 1);
+
   const [activeTier, setActiveTier] = useState(() => (
-    badge.initialActiveTier || progressData.unlockedTier || (badge.tier || 'bronze').toLowerCase()
+    isSingle
+      ? (badge.tier ? badge.tier.toLowerCase() : 'diamond')
+      : (badge.initialActiveTier || progressData.unlockedTier || (badge.tier || 'bronze').toLowerCase())
   ));
 
   const isLocked = !progressData.unlocked && !adminUnlockAll;
@@ -966,7 +1053,32 @@ function FloatingBadgeViewer({ badge, caughtMap = {}, originRect, onClose, isAdm
         exit={{ opacity: 0, y: -16 }}
         transition={{ delay: 0.1, duration: 0.25 }}
       >
-        <h2 className="floating-badge-name">{displayName}</h2>
+        <div className="floating-badge-name-row">
+          <h2 className="floating-badge-name">{displayName}</h2>
+          {(badge.slug === 'ball-connoisseur' || badge.slug === 'apriball-artisan' || badge.id === 'ach-bal-01') && (
+            <Tooltip
+              content={
+                <SpecialBallsTooltipContent
+                  usedBalls={progressData.usedSpecialBalls || []}
+                  isShiny={isShiny}
+                />
+              }
+              position="bottom"
+              align="center"
+              maxWidth={350}
+              wrap
+            >
+              <button
+                type="button"
+                className="achievement-info-trigger-btn floating-info-trigger"
+                onClick={(e) => e.stopPropagation()}
+                aria-label="Eligible Special Balls"
+              >
+                <Info size={13} />
+              </button>
+            </Tooltip>
+          )}
+        </div>
         <p className="floating-badge-desc">{displayDesc}</p>
 
         <div className="floating-badge-chips-row">
@@ -1022,43 +1134,45 @@ function FloatingBadgeViewer({ badge, caughtMap = {}, originRect, onClose, isAdm
           )}
         </div>
 
-        {/* Interactive Tier Switcher 2x2 Grid */}
-        <div className="floating-badge-tier-grid" role="tablist" aria-label="Select Badge Tier">
-          {['bronze', 'silver', 'gold', 'diamond'].map((tierKey) => {
-            const cfg = TIER_CONFIG[tierKey];
-            const isSelected = activeTier === tierKey;
-            const tierOrderMap = { bronze: 1, silver: 2, gold: 3, diamond: 4 };
-            const currentOrder = progressData?.tierOrder || (progressData?.unlocked ? 1 : 0);
-            const isTierUnlocked = adminUnlockAll || (currentOrder >= (tierOrderMap[tierKey] || 1));
+        {/* Interactive Tier Switcher 2x2 Grid (Tiered badges only) */}
+        {!isSingle && (badge.type === 'tiered' || (badge.tiers && badge.tiers.length > 1)) && (
+          <div className="floating-badge-tier-grid" role="tablist" aria-label="Select Badge Tier">
+            {['bronze', 'silver', 'gold', 'diamond'].map((tierKey) => {
+              const cfg = TIER_CONFIG[tierKey];
+              const isSelected = activeTier === tierKey;
+              const tierOrderMap = { bronze: 1, silver: 2, gold: 3, diamond: 4 };
+              const currentOrder = progressData?.tierOrder || (progressData?.unlocked ? 1 : 0);
+              const isTierUnlocked = adminUnlockAll || (currentOrder >= (tierOrderMap[tierKey] || 1));
 
-            const badgeSlug = badge.slug || badge.id;
-            const badgeRarityData = rarityMap[badgeSlug] || rarityMap[badge.id];
-            const btnTierRarity = (isShiny && badgeRarityData?.shiny?.[tierKey])
-              || badgeRarityData?.[tierKey]
-              || { count: 0, percentage: 0, display: '0%' };
+              const badgeSlug = badge.slug || badge.id;
+              const badgeRarityData = rarityMap[badgeSlug] || rarityMap[badge.id];
+              const btnTierRarity = (isShiny && badgeRarityData?.shiny?.[tierKey])
+                || badgeRarityData?.[tierKey]
+                || { count: 0, percentage: 0, display: '0%' };
 
-            return (
-              <button
-                key={tierKey}
-                type="button"
-                role="tab"
-                aria-selected={isSelected}
-                disabled={!isTierUnlocked}
-                className={`floating-badge-tier-btn tier-${tierKey} ${isSelected ? 'is-active' : ''} ${!isTierUnlocked ? 'is-locked-tier' : ''}`}
-                onClick={isTierUnlocked ? () => setActiveTier(tierKey) : undefined}
-                title={
-                  isTierUnlocked
-                    ? `View ${cfg.name} Medal (${btnTierRarity.display} of users)`
-                    : `${cfg.name} (Locked - ${btnTierRarity.display} of users)`
-                }
-              >
-                <span className="tier-dot" />
-                <span className="tier-btn-label">{cfg.name}</span>
-                <span className="tier-btn-rarity">{btnTierRarity.display}</span>
-              </button>
-            );
-          })}
-        </div>
+              return (
+                <button
+                  key={tierKey}
+                  type="button"
+                  role="tab"
+                  aria-selected={isSelected}
+                  disabled={!isTierUnlocked}
+                  className={`floating-badge-tier-btn tier-${tierKey} ${isSelected ? 'is-active' : ''} ${!isTierUnlocked ? 'is-locked-tier' : ''}`}
+                  onClick={isTierUnlocked ? () => setActiveTier(tierKey) : undefined}
+                  title={
+                    isTierUnlocked
+                      ? `View ${cfg.name} Medal (${btnTierRarity.display} of users)`
+                      : `${cfg.name} (Locked - ${btnTierRarity.display} of users)`
+                  }
+                >
+                  <span className="tier-dot" />
+                  <span className="tier-btn-label">{cfg.name}</span>
+                  <span className="tier-btn-rarity">{btnTierRarity.display}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </motion.div>
 
       {/* Close button at top right */}

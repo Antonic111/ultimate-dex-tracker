@@ -408,21 +408,36 @@
   @apply text-[10px] text-gray-400 font-medium;
 }
 
-/* 3. Columns */
+/* 3. Columns - Equal Height Unified Profile Layout */
 .profile-columns-container {
-  @apply w-full max-w-[1300px] flex gap-6;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  gap: 24px;
+  width: 100%;
+  max-width: 1300px;
 }
 
 .profile-left-col {
-  @apply w-[650px] flex flex-col flex-shrink-0 bg-[var(--profile-card-bg)] rounded-xl border border-[var(--border-color)] overflow-hidden;
-  height: auto;
-  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  width: 100%;
+  background: var(--profile-card-bg);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .profile-right-col {
-  @apply flex-1 flex flex-col gap-6 flex-shrink-0;
-  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Info Box */
@@ -438,6 +453,13 @@
   color: var(--accent) !important;
   width: 20px !important;
   height: 20px !important;
+}
+
+.profile-info-empty-state {
+  font-size: 0.85rem;
+  color: var(--text-muted, #9ca3af);
+  margin: 0;
+  padding: 2px 0 6px 0;
 }
 
 .profile-info-grid {
@@ -486,8 +508,8 @@
   flex-direction: column;
   justify-content: flex-start;
   gap: 1.25rem;
-  flex: 1;
-  height: auto;
+  height: 100%;
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -548,6 +570,13 @@
   width: 76px;
   height: 76px;
   transform: scale(1.1);
+}
+
+.recent-field .pokemon-img.pixelated,
+.recent-pokemon-box .pokemon-img.pixelated {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
 .recent-field .rank-label,
@@ -715,11 +744,16 @@
   }
 
   .profile-columns-container {
-    @apply flex-col;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
   }
 
-  .profile-left-col {
-    @apply w-full;
+  .profile-left-col,
+  .profile-right-col,
+  .profile-stats-grid {
+    height: auto !important;
+    width: 100% !important;
   }
 
   .top-stat-card {

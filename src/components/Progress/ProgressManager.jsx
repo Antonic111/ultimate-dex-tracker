@@ -4,6 +4,7 @@ import { getCaughtKey } from "../../caughtStorage";
 
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS } from "../../Constants";
 import { UNOBTAINABLE_SHINY_DEX_NUMBERS, UNOBTAINABLE_SHINY_FORM_NAMES, GO_EXCLUSIVE_SHINY_DEX_NUMBERS, GO_EXCLUSIVE_SHINY_FORM_NAMES, NO_OT_EXCLUSIVE_SHINY_DEX_NUMBERS, NO_OT_EXCLUSIVE_SHINY_FORM_NAMES } from "../../data/blockedShinies";
+import { isNonPartnerCapPikachu } from "../../utils/pokemonAvailability";
 import { isLegendary, isSubLegendary, isMythical, isUltraBeast, isPseudoLegendary, isPseudoLegendaryEvo, isParadox, isStarter, isStarterEvo, isFossil, isFossilEvo, isBaby, isBabyEvo, getPokemonCategories } from "../../utils/pokemonCategories";
 import SelectField from "../Shared/FormField/SelectField";
 import ProgressBar from "./ProgressBar";
@@ -466,8 +467,8 @@ export default function ProgressManager({ allMons, caughtInfoMap, readOnly = fal
         const filtered = visibleMons.filter((mon) => {
             const formType = mon.formType || "main";
 
-            // Mighty Pokemon and Origin Ball Pokemon cannot be shiny
-            if (isShinyMode && (formType === "mighty" || mon.stableId === "origin-ball-dialga-483" || mon.stableId === "origin-ball-palkia-484" || mon.stableId?.startsWith("origin-ball-"))) {
+            // Mighty Pokemon, Origin Ball Pokemon, and non-partner Cap Pikachu cannot be shiny
+            if (isShinyMode && (formType === "mighty" || mon.stableId === "origin-ball-dialga-483" || mon.stableId === "origin-ball-palkia-484" || mon.stableId?.startsWith("origin-ball-") || isNonPartnerCapPikachu(mon))) {
                 return false;
             }
 

@@ -46,10 +46,10 @@ export const BALL_OPTIONS_TWO = BALL_OPTIONS.filter(b => b.value !== "");
 
 export const TRAINER_OPTIONS = Array.isArray(trainerData)
   ? trainerData.map(t => ({
-      name: t.name,
-      value: t.filename,
-      image: `/data/trainer_sprites/${t.filename}`
-    }))
+    name: t.name,
+    value: t.filename,
+    image: `/data/trainer_sprites/${t.filename}`
+  }))
   : [];
 
 // GAMES (Standard box art for site-wide counters, sidebar, bingo, search, etc.)
@@ -463,6 +463,13 @@ export const genderForms = [
 
 export const specialFormLabels = {
   "pikachu-partner-cap": "Partner Cap",
+  "pikachu-original-cap": "Original Cap",
+  "pikachu-kalos-cap": "Kalos Cap",
+  "pikachu-sinnoh-cap": "Sinnoh Cap",
+  "pikachu-unova-cap": "Unova Cap",
+  "pikachu-world-cap": "World Cap",
+  "pikachu-alola-cap": "Alola Cap",
+  "pikachu-hoenn-cap": "Hoenn Cap",
   "deoxys-attack": "Attack Forme",
   "deoxys-defense": "Defense Forme",
   "deoxys-speed": "Speed Forme",
@@ -798,6 +805,13 @@ export const specialCases = {
 
   "OTHER!!!": "OTHER!!!",
   "pikachu-partner-cap": "Pikachu",
+  "pikachu-original-cap": "Pikachu",
+  "pikachu-kalos-cap": "Pikachu",
+  "pikachu-sinnoh-cap": "Pikachu",
+  "pikachu-unova-cap": "Pikachu",
+  "pikachu-world-cap": "Pikachu",
+  "pikachu-alola-cap": "Pikachu",
+  "pikachu-hoenn-cap": "Pikachu",
   "deoxys-attack": "Deoxys",
   "deoxys-defense": "Deoxys",
   "deoxys-speed": "Deoxys",

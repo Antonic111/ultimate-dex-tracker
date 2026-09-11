@@ -26,7 +26,7 @@ export const SANITIZATION_RULES = {
   bio: {
     maxLength: 500,
     minLength: 0,
-    allowedChars: /^[a-zA-Z0-9\s.,!?@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/~`]+$/,
+    allowedChars: null,
     trim: true,
     normalize: true,
     allowHtml: false,
@@ -34,27 +34,27 @@ export const SANITIZATION_RULES = {
   location: {
     maxLength: 100,
     minLength: 0,
-    allowedChars: /^[a-zA-Z0-9\s.,\-'()]+$/,
+    allowedChars: /^[\p{L}\p{N}\s.,\-'()/#&]+$/u,
     trim: true,
     normalize: true,
   },
   gender: {
-    maxLength: 20,
+    maxLength: 30,
     minLength: 0,
-    allowedChars: /^[a-zA-Z\s\-]+$/,
+    allowedChars: /^[\p{L}\s\-\/]+$/u,
     trim: true,
     normalize: true,
   },
   switchFriendCode: {
     maxLength: 20,
     minLength: 0,
-    allowedChars: /^[a-zA-Z0-9\-]+$/,
+    allowedChars: /^[a-zA-Z0-9\-\s]+$/,
     trim: true,
   },
   goFriendCode: {
-    maxLength: 14,
+    maxLength: 16,
     minLength: 0,
-    allowedChars: /^[0-9\s]+$/,
+    allowedChars: /^[0-9\s\-]+$/,
     trim: true,
   },
   profileTrainer: {
@@ -73,6 +73,12 @@ export const SANITIZATION_RULES = {
     trim: false,
     normalize: false,
   },
+  url: {
+    maxLength: 500,
+    minLength: 0,
+    allowedChars: /^https?:\/\/[a-zA-Z0-9\-._~:\/?#\[\]@!$&'()*+,;=]+$/i,
+    trim: true,
+  },
   huntHotkey: {
     maxLength: 20,
     minLength: 1,
@@ -83,7 +89,7 @@ export const SANITIZATION_RULES = {
   notes: {
     maxLength: 200,
     minLength: 0,
-    allowedChars: /^[a-zA-Z0-9\s.,!?@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/~`]+$/,
+    allowedChars: null,
     trim: true,
     normalize: true,
     allowHtml: false,
@@ -91,7 +97,7 @@ export const SANITIZATION_RULES = {
   general: {
     maxLength: 1000,
     minLength: 0,
-    allowedChars: /^[a-zA-Z0-9\s.,!?@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/~`]+$/,
+    allowedChars: null,
     trim: true,
     normalize: true,
     allowHtml: false,
@@ -277,6 +283,7 @@ export function sanitizeProfileData(profileData) {
       else if (fieldName === 'switchFriendCode') fieldType = 'switchFriendCode';
       else if (fieldName === 'goFriendCode') fieldType = 'goFriendCode';
       else if (fieldName === 'profileTrainer') fieldType = 'profileTrainer';
+      else if (fieldName === 'youtubeUrl' || fieldName === 'twitchUrl') fieldType = 'url';
       else if (fieldName === 'avatar') {
         // Avatar is set only by the moderated upload endpoint — skip sanitization,
         // just pass it through to avoid rejecting base64 data URIs or long paths.

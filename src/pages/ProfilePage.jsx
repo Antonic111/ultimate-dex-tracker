@@ -180,7 +180,7 @@ export default function ProfilePage() {
                     setProfileData(data);
                     setForm(prev => ({
                         ...prev,
-                        bio: data.bio && data.bio.length > 150 ? data.bio.substring(0, 150) : (data.bio ?? prev.bio),
+                        bio: data.bio && data.bio.length > 250 ? data.bio.substring(0, 250) : (data.bio ?? prev.bio),
                         location: data.location ?? prev.location,
                         gender: data.gender ?? prev.gender,
                         birthday: data.birthday ?? prev.birthday ?? null,

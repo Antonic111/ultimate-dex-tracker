@@ -499,6 +499,13 @@
   padding-bottom: 2px;
 }
 
+.achievement-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .achievement-title {
   font-size: 1.05rem;
   font-weight: 800;
@@ -509,6 +516,150 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.achievement-info-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  color: var(--text-muted, #888888);
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  transition: color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.achievement-info-trigger-btn:hover {
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  color: var(--text, #ffffff);
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.achievement-info-trigger-btn:focus,
+.achievement-info-trigger-btn:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.achievement-info-trigger-btn.floating-info-trigger {
+  opacity: 0.75;
+}
+
+.achievement-info-trigger-btn.floating-info-trigger:hover {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.floating-badge-name-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 100%;
+}
+
+/* Special Balls Tooltip */
+.special-balls-tooltip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 3px 2px;
+  text-align: left;
+  min-width: 260px;
+}
+
+.special-balls-tooltip-header {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 7px;
+}
+
+.special-balls-tooltip-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.special-balls-tooltip-title-row strong {
+  font-size: 0.82rem;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.special-balls-tooltip-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1.5px 7px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #f4f4f5;
+  font-variant-numeric: tabular-nums;
+}
+
+.special-balls-tooltip-sub {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.35;
+}
+
+.special-balls-tooltip-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 10px;
+}
+
+.special-ball-tooltip-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.72);
+  transition: background 0.15s ease, color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.special-ball-tooltip-item.is-used {
+  background: rgba(34, 197, 94, 0.14);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.special-ball-tooltip-img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.special-ball-tooltip-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.special-ball-check {
+  color: #22c55e;
+  flex-shrink: 0;
 }
 
 .achievement-desc {
@@ -700,6 +851,9 @@
   object-fit: contain;
   pointer-events: none;
   user-select: none;
+  border-radius: 50%;
+  -webkit-clip-path: circle(50% at 50% 50%);
+  clip-path: circle(50% at 50% 50%);
 }
 
 .badge-slice.slice-1 {
@@ -747,7 +901,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) translateZ(0.1px);
+  transform: translate(-50%, -50%) translateZ(1.45px);
   width: calc(var(--coin-size, 280px) * 0.875);
   height: calc(var(--coin-size, 280px) * 0.875);
   border-radius: 50%;
@@ -769,6 +923,9 @@
   transform: translateZ(1.8px);
   pointer-events: none;
   overflow: hidden;
+  border-radius: 50%;
+  -webkit-clip-path: circle(50% at 50% 50%);
+  clip-path: circle(50% at 50% 50%);
   -webkit-mask-size: contain;
   mask-size: contain;
   -webkit-mask-repeat: no-repeat;
@@ -820,7 +977,7 @@
   animation-play-state: paused;
 }
 
-/* 3. Bronze Border: Sits flush at Z = 0px directly connecting to the cylinder edge */
+/* 3. Bronze Border: Sits flush at Z = 1.4px framing the cavity and directly connecting to the cylinder edge */
 .coin-flat-border {
   position: absolute;
   inset: 0;
@@ -829,7 +986,7 @@
   object-fit: contain;
   pointer-events: none;
   user-select: none;
-  transform: translateZ(0px);
+  transform: translateZ(1.4px);
   z-index: 10;
 }
 
@@ -839,7 +996,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  transform: translateZ(0.6px);
+  transform: translateZ(1.5px);
   pointer-events: none;
   border-radius: 50%;
   -webkit-mask-image: radial-gradient(circle closest-side at center, transparent 0% 86.2%, #000 87.2%, #000 99.5%, transparent 100%);

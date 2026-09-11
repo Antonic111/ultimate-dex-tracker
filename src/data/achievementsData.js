@@ -6,12 +6,143 @@ import alphaForms from './forms/alpha.json';
 import alphaotherForms from './forms/alphaother.json';
 import gmaxForms from './forms/gmax.json';
 import mightyForms from './forms/mighty.json';
+import alolanForms from './forms/alolan.json';
 import galarianForms from './forms/galarian.json';
-import { isMythical, isLegendary, isSubLegendary, isUltraBeast } from '../utils/pokemonCategories';
+import hisuianForms from './forms/hisuian.json';
+import paldeanForms from './forms/paldean.json';
+import genderForms from './forms/gender.json';
+import vivillonForms from './forms/vivillon.json';
+import { isStarter, isFossil, isBaby, isParadox, isMythical, isLegendary, isSubLegendary, isUltraBeast } from '../utils/pokemonCategories';
 import {
   UNOBTAINABLE_SHINY_DEX_NUMBERS,
   UNOBTAINABLE_SHINY_FORM_NAMES
 } from './blockedShinies';
+import { isNonPartnerCapPikachu } from '../utils/pokemonAvailability';
+
+/**
+ * All Pokémon forms available on UltimateDexTracker
+ */
+export const ALL_FORMS_LIST = [
+  ...(Array.isArray(genderForms) ? genderForms : []),
+  ...(Array.isArray(alolanForms) ? alolanForms : []),
+  ...(Array.isArray(galarianForms) ? galarianForms : []),
+  ...(Array.isArray(hisuianForms) ? hisuianForms : []),
+  ...(Array.isArray(paldeanForms) ? paldeanForms : []),
+  ...(Array.isArray(gmaxForms) ? gmaxForms : []),
+  ...(Array.isArray(unownForms) ? unownForms : []),
+  ...(Array.isArray(otherForms) ? otherForms : []),
+  ...(Array.isArray(alcremieForms) ? alcremieForms : []),
+  ...(Array.isArray(vivillonForms) ? vivillonForms : []),
+  ...(Array.isArray(alphaForms) ? alphaForms : []),
+  ...(Array.isArray(alphaotherForms) ? alphaotherForms : []),
+  ...(Array.isArray(mightyForms) ? mightyForms : []),
+];
+
+export function isUnobtainableShiny(poke) {
+  if (!poke) return false;
+  if (poke.formType === 'mighty') return true;
+  if (
+    poke.stableId === 'origin-ball-dialga-483' ||
+    poke.stableId === 'origin-ball-palkia-484' ||
+    poke.stableId?.startsWith('origin-ball-') ||
+    poke.name?.startsWith('origin-ball-')
+  ) return true;
+  if (isNonPartnerCapPikachu(poke)) return true;
+
+  const padId = String(poke.id).padStart(4, '0');
+  if (UNOBTAINABLE_SHINY_DEX_NUMBERS.includes(padId)) {
+    return true;
+  }
+  const name = (poke.name || '').toLowerCase();
+  const sId = (poke.stableId || '').toLowerCase();
+  if (UNOBTAINABLE_SHINY_FORM_NAMES.includes(name) || UNOBTAINABLE_SHINY_FORM_NAMES.includes(sId)) {
+    return true;
+  }
+  return false;
+}
+
+export function isFormShinyLocked(p) {
+  return isUnobtainableShiny(p);
+}
+
+/**
+ * Dynamically computes the total number of regular + obtainable shiny Pokémon across the site
+ */
+export function getTotalTrackerPokemonCount() {
+  const regularBaseCount = Array.isArray(pokemonData) ? pokemonData.length : 0;
+  const regularFormsCount = ALL_FORMS_LIST.length;
+  const regularCount = regularBaseCount + regularFormsCount;
+
+  const shinyBaseCount = Array.isArray(pokemonData) ? pokemonData.filter(p => !isUnobtainableShiny(p)).length : 0;
+  const shinyFormsCount = ALL_FORMS_LIST.filter(f => !isUnobtainableShiny(f)).length;
+  const shinyCount = shinyBaseCount + shinyFormsCount;
+
+  return regularCount + shinyCount;
+}
+
+export const TOTAL_TRACKER_POKEMON_COUNT = getTotalTrackerPokemonCount();
+
+/**
+ * 57 unique Regional Forms across Alola (18), Galar (19), Hisui (16), and Paldea (4)
+ */
+export const REGIONAL_FORMS_LIST = [
+  ...(Array.isArray(alolanForms) ? alolanForms : []),
+  ...(Array.isArray(galarianForms) ? galarianForms : []),
+  ...(Array.isArray(hisuianForms) ? hisuianForms : []),
+  ...(Array.isArray(paldeanForms) ? paldeanForms : [])
+];
+
+export const REGIONAL_SHINY_LOCKED_NAMES = new Set([
+  'articuno-galar',
+  'zapdos-galar',
+  'moltres-galar'
+]);
+
+export function isRegionalShinyLocked(poke) {
+  if (!poke) return false;
+  return REGIONAL_SHINY_LOCKED_NAMES.has(poke.name) ||
+         REGIONAL_SHINY_LOCKED_NAMES.has(poke.stableId) ||
+         ((poke.id === 144 || poke.id === 145 || poke.id === 146) && (poke.formType === 'galarian' || poke.name?.includes('galar')));
+}
+
+/**
+ * 16 eligible Special Balls for Ball Connoisseur
+ */
+export const SPECIAL_BALLS_LIST = [
+  { name: 'Dream Ball', image: '/data/balls/dream-ball.png' },
+  { name: 'Fast Ball', image: '/data/balls/fast-ball.png' },
+  { name: 'Friend Ball', image: '/data/balls/friend-ball.png' },
+  { name: 'Heavy Ball', image: '/data/balls/heavy-ball.png' },
+  { name: 'Level Ball', image: '/data/balls/level-ball.png' },
+  { name: 'Love Ball', image: '/data/balls/love-ball.png' },
+  { name: 'Lure Ball', image: '/data/balls/lure-ball.png' },
+  { name: 'Moon Ball', image: '/data/balls/moon-ball.png' },
+  { name: 'Safari Ball', image: '/data/balls/safari-ball.png' },
+  { name: 'Sport Ball', image: '/data/balls/sport-ball.png' },
+  { name: 'Luxury Ball', image: '/data/balls/luxury-ball.png' },
+  { name: 'Dive Ball', image: '/data/balls/dive-ball.png' },
+  { name: 'Nest Ball', image: '/data/balls/nest-ball.png' },
+  { name: 'Net Ball', image: '/data/balls/net-ball.png' },
+  { name: 'Repeat Ball', image: '/data/balls/repeat-ball.png' },
+  { name: 'Timer Ball', image: '/data/balls/timer-ball.png' }
+];
+
+export function normalizeSpecialBall(rawBall) {
+  if (!rawBall || typeof rawBall !== 'string') return null;
+  const clean = rawBall.toLowerCase().trim().replace(/[-_]/g, ' ');
+  const withoutBall = clean.replace(/\s*ball\s*$/, '').trim();
+  const withBall = `${withoutBall} ball`;
+
+  const match = SPECIAL_BALLS_LIST.find(
+    b => b.name.toLowerCase() === clean || b.name.toLowerCase() === withBall
+  );
+  return match ? match.name : null;
+}
+
+/**
+ * 103 unique female gender forms
+ */
+export const GENDER_FORMS_LIST = Array.isArray(genderForms) ? genderForms : [];
 
 /**
  * 33 unique Gigantamax forms
@@ -75,7 +206,38 @@ export const MYTHICAL_POKEMON_LIST = [
 export const ULTRA_BEASTS_LIST = pokemonData.filter(p => isUltraBeast(p));
 
 /**
- * All 80 official Legendary Pokémon and forms for Titan Slayer:
+ * 11 unique Pseudo-Legendary Pokémon and forms for Near Legendary:
+ * - 10 main living dex pseudos: Dragonite (#149), Tyranitar (#248), Salamence (#373), Metagross (#376),
+ *   Garchomp (#445), Hydreigon (#635), Goodra (#706), Kommo-o (#784), Dragapult (#887), Baxcalibur (#998)
+ * - 1 Hisuian regional form: Goodra-Hisui (#706)
+ */
+export const PSEUDO_LEGENDARY_LIST = [
+  ...pokemonData.filter(p => [149, 248, 373, 376, 445, 635, 706, 784, 887, 998].includes(p.id)),
+  ...(Array.isArray(hisuianForms) ? hisuianForms.filter(f => f.name === 'goodra-hisui' || f.stableId === 'goodra-hisui-0706') : [])
+];
+
+/**
+ * 27 unique Starter Pokémon in National Living Dex (Gen 1 to Gen 9)
+ */
+export const STARTER_POKEMON_LIST = pokemonData.filter(p => isStarter(p));
+
+/**
+ * 15 unique Fossil Pokémon in National Living Dex
+ */
+export const FOSSIL_POKEMON_LIST = pokemonData.filter(p => isFossil(p));
+
+/**
+ * 19 unique Baby Pokémon in National Living Dex
+ */
+export const BABY_POKEMON_LIST = pokemonData.filter(p => isBaby(p));
+
+/**
+ * 22 unique Paradox Pokémon in National Living Dex (Gen 9)
+ */
+export const PARADOX_POKEMON_LIST = pokemonData.filter(p => isParadox(p));
+
+/**
+ * All 80 official Legendary Pokémon and forms for Master of Legends:
  * - 71 Legendaries and Sub-Legendaries in National Living Dex (pokemon.json)
  * - 3 Galarian Legendary Birds (Articuno, Zapdos, Moltres)
  * - 6 Legendary forms in Other Forms tab (excluding Origin Ball Dialga and Palkia)
@@ -113,6 +275,7 @@ const TITAN_SLAYER_SHINY_LOCKED_FORM_NAMES = new Set([
   'enamorus-therian'
 ]);
 
+export const isMasterOfLegendsShinyLocked = isTitanSlayerShinyLocked;
 export function isTitanSlayerShinyLocked(poke) {
   if (!poke) return false;
   if (TITAN_SLAYER_SHINY_LOCKED_IDS.has(Number(poke.id))) return true;
@@ -121,20 +284,7 @@ export function isTitanSlayerShinyLocked(poke) {
   return false;
 }
 
-/**
- * Helper to check if a Pokémon / form shiny is unobtainable / shiny-locked
- */
-export function isUnobtainableShiny(poke) {
-  if (!poke) return false;
-  const padId = String(poke.id).padStart(4, '0');
-  if (UNOBTAINABLE_SHINY_DEX_NUMBERS.includes(padId)) {
-    return true;
-  }
-  if (poke.name && UNOBTAINABLE_SHINY_FORM_NAMES.includes(poke.name)) {
-    return true;
-  }
-  return false;
-}
+// (isUnobtainableShiny is exported at top of file)
 
 export const ACHIEVEMENT_CATEGORIES = [
   'Collection',
@@ -188,9 +338,9 @@ export const INITIAL_ACHIEVEMENTS = [
   // ==========================================
   {
     id: 'ach-col-01',
-    slug: 'living-legends',
-    name: 'Living Legends',
-    description: 'Catch 100 Pokémon to unlock Bronze.',
+    slug: 'master-collector',
+    name: 'Master Collector',
+    description: 'Catch 100 Pokémon.',
     category: 'Collection',
     type: 'tiered',
     trackingScope: 'regular_shiny_separate',
@@ -198,13 +348,13 @@ export const INITIAL_ACHIEVEMENTS = [
     enabled: true,
     unlocked: false,
     sortOrder: 1,
-    artwork: '/badges/living-legends/living-legends.png',
-    shinyArtwork: '/badges/living-legends/living-legends-shiny.png',
+    artwork: '/badges/master-collector/master-collector.png',
+    shinyArtwork: '/badges/master-collector/master-collector-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: 100, requirementDescription: 'Register 100 Pokémon in the Living Dex', artworkUrl: '/badges/living-legends/living-legends.png', shinyArtworkUrl: '/badges/living-legends/living-legends-shiny.png' },
-      { id: 't2', name: 'Silver', order: 2, threshold: 300, requirementDescription: 'Register 300 Pokémon in the Living Dex', artworkUrl: '/badges/living-legends/living-legends.png', shinyArtworkUrl: '/badges/living-legends/living-legends-shiny.png' },
-      { id: 't3', name: 'Gold', order: 3, threshold: 600, requirementDescription: 'Register 600 Pokémon in the Living Dex', artworkUrl: '/badges/living-legends/living-legends.png', shinyArtworkUrl: '/badges/living-legends/living-legends-shiny.png' },
-      { id: 't4', name: 'Diamond', order: 4, threshold: 1025, requirementDescription: 'Register all 1,025 Pokémon in the Living Dex', artworkUrl: '/badges/living-legends/living-legends.png', shinyArtworkUrl: '/badges/living-legends/living-legends-shiny.png' }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 100, requirementDescription: 'Register 100 Pokémon in the Living Dex', artworkUrl: '/badges/master-collector/master-collector.png', shinyArtworkUrl: '/badges/master-collector/master-collector-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 300, requirementDescription: 'Register 300 Pokémon in the Living Dex', artworkUrl: '/badges/master-collector/master-collector.png', shinyArtworkUrl: '/badges/master-collector/master-collector-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 600, requirementDescription: 'Register 600 Pokémon in the Living Dex', artworkUrl: '/badges/master-collector/master-collector.png', shinyArtworkUrl: '/badges/master-collector/master-collector-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 1025, requirementDescription: 'Register all 1,025 Pokémon in the Living Dex', artworkUrl: '/badges/master-collector/master-collector.png', shinyArtworkUrl: '/badges/master-collector/master-collector-shiny.png' }
     ],
     requirements: {
       type: 'pokemon_registered',
@@ -222,6 +372,7 @@ export const INITIAL_ACHIEVEMENTS = [
     description: 'Complete regular AND shiny entries for ALL species.',
     category: 'Collection',
     type: 'single',
+    tier: 'diamond',
     trackingScope: 'shared',
     isSecret: false,
     enabled: true,
@@ -239,15 +390,44 @@ export const INITIAL_ACHIEVEMENTS = [
       instantDiamond: true
     }
   },
+  {
+    id: 'ach-col-03',
+    slug: 'gotta-catch-em-all',
+    name: 'Gotta Catch ’Em All!',
+    description: 'Register every Pokémon on UltimateDexTracker.com',
+    category: 'Collection',
+    type: 'single',
+    tier: 'diamond',
+    trackingScope: 'shared',
+    hasShinySwitch: false,
+    hasShiny: false,
+    isSecret: false,
+    enabled: true,
+    sortOrder: 3,
+    artwork: '/badges/gotta-catch-em-all/gotta-catch-em-all.png',
+    shinyArtwork: null,
+    tiers: [
+      { id: 't1', name: 'Diamond', order: 1, threshold: TOTAL_TRACKER_POKEMON_COUNT, requirementDescription: 'Register every Pokémon on UltimateDexTracker.com', artworkUrl: '/badges/gotta-catch-em-all/gotta-catch-em-all.png' }
+    ],
+    requirements: {
+      type: 'pokemon_registered',
+      target: 'all_pokemon_and_forms_regular_and_shiny',
+      details: 'Register every Pokémon on UltimateDexTracker.com'
+    },
+    metadata: {
+      instantDiamond: true,
+      totalCount: TOTAL_TRACKER_POKEMON_COUNT
+    }
+  },
 
   // ==========================================
   // POKÉMON GROUPS
   // ==========================================
   {
     id: 'ach-grp-01',
-    slug: 'mythical-enigma',
-    name: 'Mythical Enigma',
-    description: 'Catch 3 unique Mythical Pokémon to unlock Bronze.',
+    slug: 'mythical-pursuit',
+    name: 'Mythical Pursuit',
+    description: 'Catch 3 unique Mythical Pokémon.',
     category: 'Pokémon Groups',
     type: 'tiered',
     trackingScope: 'regular_shiny_separate',
@@ -255,13 +435,13 @@ export const INITIAL_ACHIEVEMENTS = [
     enabled: true,
     unlocked: false,
     sortOrder: 10,
-    artwork: '/badges/mythical-enigma/mythical-enigma.png',
-    shinyArtwork: '/badges/mythical-enigma/mythical-enigma-shiny.png',
+    artwork: '/badges/mythical-pursuit/mythical-pursuit.png',
+    shinyArtwork: '/badges/mythical-pursuit/mythical-pursuit-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: 3, requirementDescription: 'Register 3 Mythical Pokémon in the Living Dex', artworkUrl: '/badges/mythical-enigma/mythical-enigma.png', shinyArtworkUrl: '/badges/mythical-enigma/mythical-enigma-shiny.png' },
-      { id: 't2', name: 'Silver', order: 2, threshold: 8, requirementDescription: 'Register 8 Mythical Pokémon in the Living Dex', artworkUrl: '/badges/mythical-enigma/mythical-enigma.png', shinyArtworkUrl: '/badges/mythical-enigma/mythical-enigma-shiny.png' },
-      { id: 't3', name: 'Gold', order: 3, threshold: 16, requirementDescription: 'Register 16 Mythical Pokémon in the Living Dex', artworkUrl: '/badges/mythical-enigma/mythical-enigma.png', shinyArtworkUrl: '/badges/mythical-enigma/mythical-enigma-shiny.png' },
-      { id: 't4', name: 'Diamond', order: 4, threshold: 28, requirementDescription: 'Register all 28 Mythical Pokémon and forms in the Living Dex', artworkUrl: '/badges/mythical-enigma/mythical-enigma.png', shinyArtworkUrl: '/badges/mythical-enigma/mythical-enigma-shiny.png' }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 3, requirementDescription: 'Register 3 Mythical Pokémon in the Living Dex', artworkUrl: '/badges/mythical-pursuit/mythical-pursuit.png', shinyArtworkUrl: '/badges/mythical-pursuit/mythical-pursuit-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 8, requirementDescription: 'Register 8 Mythical Pokémon in the Living Dex', artworkUrl: '/badges/mythical-pursuit/mythical-pursuit.png', shinyArtworkUrl: '/badges/mythical-pursuit/mythical-pursuit-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 16, requirementDescription: 'Register 16 Mythical Pokémon in the Living Dex', artworkUrl: '/badges/mythical-pursuit/mythical-pursuit.png', shinyArtworkUrl: '/badges/mythical-pursuit/mythical-pursuit-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 28, requirementDescription: 'Register all 28 Mythical Pokémon and forms in the Living Dex', artworkUrl: '/badges/mythical-pursuit/mythical-pursuit.png', shinyArtworkUrl: '/badges/mythical-pursuit/mythical-pursuit-shiny.png' }
     ],
     requirements: {
       type: 'group_completed',
@@ -274,8 +454,8 @@ export const INITIAL_ACHIEVEMENTS = [
   },
   {
     id: 'ach-grp-02',
-    slug: 'titan-slayer',
-    name: 'Titan Slayer',
+    slug: 'master-of-legends',
+    name: 'Master of Legends',
     description: 'Register Legendary Pokémon across the Living Dex, Galar forms, and Other forms.',
     category: 'Pokémon Groups',
     type: 'tiered',
@@ -284,13 +464,13 @@ export const INITIAL_ACHIEVEMENTS = [
     enabled: true,
     unlocked: false,
     sortOrder: 11,
-    artwork: '/badges/titan-slayer/titan-slayer.png',
-    shinyArtwork: '/badges/titan-slayer/titan-slayer-shiny.png',
+    artwork: '/badges/master-of-legends/master-of-legends.png',
+    shinyArtwork: '/badges/master-of-legends/master-of-legends-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: 8, requirementDescription: 'Register 8 Legendary Pokémon in the Living Dex', artworkUrl: '/badges/titan-slayer/titan-slayer.png', shinyArtworkUrl: '/badges/titan-slayer/titan-slayer-shiny.png' },
-      { id: 't2', name: 'Silver', order: 2, threshold: 24, requirementDescription: 'Register 24 Legendary Pokémon in the Living Dex', artworkUrl: '/badges/titan-slayer/titan-slayer.png', shinyArtworkUrl: '/badges/titan-slayer/titan-slayer-shiny.png' },
-      { id: 't3', name: 'Gold', order: 3, threshold: 45, requirementDescription: 'Register 45 Legendary Pokémon in the Living Dex', artworkUrl: '/badges/titan-slayer/titan-slayer.png', shinyArtworkUrl: '/badges/titan-slayer/titan-slayer-shiny.png' },
-      { id: 't4', name: 'Diamond', order: 4, threshold: 80, requirementDescription: 'Register all 80 Legendary Pokémon and forms in the Living Dex', artworkUrl: '/badges/titan-slayer/titan-slayer.png', shinyArtworkUrl: '/badges/titan-slayer/titan-slayer-shiny.png' }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 8, requirementDescription: 'Register 8 Legendary Pokémon in the Living Dex', artworkUrl: '/badges/master-of-legends/master-of-legends.png', shinyArtworkUrl: '/badges/master-of-legends/master-of-legends-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 24, requirementDescription: 'Register 24 Legendary Pokémon in the Living Dex', artworkUrl: '/badges/master-of-legends/master-of-legends.png', shinyArtworkUrl: '/badges/master-of-legends/master-of-legends-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 45, requirementDescription: 'Register 45 Legendary Pokémon in the Living Dex', artworkUrl: '/badges/master-of-legends/master-of-legends.png', shinyArtworkUrl: '/badges/master-of-legends/master-of-legends-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 80, requirementDescription: 'Register all 80 Legendary Pokémon and forms in the Living Dex', artworkUrl: '/badges/master-of-legends/master-of-legends.png', shinyArtworkUrl: '/badges/master-of-legends/master-of-legends-shiny.png' }
     ],
     requirements: {
       type: 'group_completed',
@@ -304,8 +484,8 @@ export const INITIAL_ACHIEVEMENTS = [
   },
   {
     id: 'ach-grp-03',
-    slug: 'extradimensional-encounter',
-    name: 'Extradimensional Encounter',
+    slug: 'otherworldly-beasts',
+    name: 'Otherworldly Beasts',
     description: 'Catch all Ultra Beasts in the Living Dex.',
     category: 'Pokémon Groups',
     type: 'tiered',
@@ -314,13 +494,13 @@ export const INITIAL_ACHIEVEMENTS = [
     enabled: true,
     unlocked: false,
     sortOrder: 12,
-    artwork: '/badges/extradimensional-encounter/extradimensional-encounter.png',
-    shinyArtwork: '/badges/extradimensional-encounter/extradimensional-encounter-shiny.png',
+    artwork: '/badges/otherworldly-beasts/otherworldly-beasts.png',
+    shinyArtwork: '/badges/otherworldly-beasts/otherworldly-beasts-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: 2, requirementDescription: 'Register 2 Ultra Beasts in the Living Dex', artworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter.png', shinyArtworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter-shiny.png' },
-      { id: 't2', name: 'Silver', order: 2, threshold: 4, requirementDescription: 'Register 4 Ultra Beasts in the Living Dex', artworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter.png', shinyArtworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter-shiny.png' },
-      { id: 't3', name: 'Gold', order: 3, threshold: 7, requirementDescription: 'Register 7 Ultra Beasts in the Living Dex', artworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter.png', shinyArtworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter-shiny.png' },
-      { id: 't4', name: 'Diamond', order: 4, threshold: 11, requirementDescription: 'Register all 11 Ultra Beasts in the Living Dex', artworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter.png', shinyArtworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter-shiny.png' }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 2, requirementDescription: 'Register 2 Ultra Beasts in the Living Dex', artworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts.png', shinyArtworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 4, requirementDescription: 'Register 4 Ultra Beasts in the Living Dex', artworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts.png', shinyArtworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 7, requirementDescription: 'Register 7 Ultra Beasts in the Living Dex', artworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts.png', shinyArtworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 11, requirementDescription: 'Register all 11 Ultra Beasts in the Living Dex', artworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts.png', shinyArtworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts-shiny.png' }
     ],
     requirements: {
       type: 'group_completed',
@@ -333,128 +513,149 @@ export const INITIAL_ACHIEVEMENTS = [
   },
   {
     id: 'ach-grp-04',
-    slug: 'anomalies-of-time',
-    name: 'Anomalies of Time',
-    description: 'Catch all Paradox Pokémon.',
+    slug: 'past-and-future',
+    name: 'Past & Future',
+    description: 'Catch 3 unique Paradox Pokémon.',
     category: 'Pokémon Groups',
     type: 'tiered',
     trackingScope: 'regular_shiny_separate',
     isSecret: false,
     enabled: true,
+    unlocked: false,
     sortOrder: 13,
-    artwork: null,
+    artwork: '/badges/past-and-future/past-and-future.png',
+    shinyArtwork: '/badges/past-and-future/past-and-future-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't2', name: 'Silver', order: 2, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't3', name: 'Gold', order: 3, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't4', name: 'Diamond', order: 4, threshold: null, requirementDescription: 'Not configured', artworkUrl: null }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 3, requirementDescription: 'Register 3 Paradox Pokémon in the Living Dex', artworkUrl: '/badges/past-and-future/past-and-future.png', shinyArtworkUrl: '/badges/past-and-future/past-and-future-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 7, requirementDescription: 'Register 7 Paradox Pokémon in the Living Dex', artworkUrl: '/badges/past-and-future/past-and-future.png', shinyArtworkUrl: '/badges/past-and-future/past-and-future-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 13, requirementDescription: 'Register 13 Paradox Pokémon in the Living Dex', artworkUrl: '/badges/past-and-future/past-and-future.png', shinyArtworkUrl: '/badges/past-and-future/past-and-future-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 22, requirementDescription: 'Register all 22 Paradox Pokémon in the Living Dex', artworkUrl: '/badges/past-and-future/past-and-future.png', shinyArtworkUrl: '/badges/past-and-future/past-and-future-shiny.png' }
     ],
     requirements: {
       type: 'group_completed',
       target: 'paradox',
-      details: 'All Paradox Pokémon'
+      details: 'All 22 Paradox Pokémon in National Living Dex (14 for shiny)'
     },
-    metadata: {}
+    metadata: {
+      totalParadox: 22,
+      totalShinyParadox: 14
+    }
   },
   {
     id: 'ach-grp-05',
-    slug: 'draconic-nobility',
-    name: 'Draconic Nobility',
-    description: 'Catch all Pseudo Legendary Pokémon.',
+    slug: 'near-legendary',
+    name: 'Near Legendary',
+    description: 'Catch 2 unique Pseudo-Legendary Pokémon.',
     category: 'Pokémon Groups',
     type: 'tiered',
     trackingScope: 'regular_shiny_separate',
     isSecret: false,
     enabled: true,
+    unlocked: false,
     sortOrder: 14,
-    artwork: null,
+    artwork: '/badges/near-legendary/near-legendary.png',
+    shinyArtwork: '/badges/near-legendary/near-legendary-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't2', name: 'Silver', order: 2, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't3', name: 'Gold', order: 3, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't4', name: 'Diamond', order: 4, threshold: null, requirementDescription: 'Not configured', artworkUrl: null }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 2, requirementDescription: 'Register 2 Pseudo-Legendary Pokémon in the Living Dex', artworkUrl: '/badges/near-legendary/near-legendary.png', shinyArtworkUrl: '/badges/near-legendary/near-legendary-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 4, requirementDescription: 'Register 4 Pseudo-Legendary Pokémon in the Living Dex', artworkUrl: '/badges/near-legendary/near-legendary.png', shinyArtworkUrl: '/badges/near-legendary/near-legendary-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 7, requirementDescription: 'Register 7 Pseudo-Legendary Pokémon in the Living Dex', artworkUrl: '/badges/near-legendary/near-legendary.png', shinyArtworkUrl: '/badges/near-legendary/near-legendary-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 11, requirementDescription: 'Register all 11 Pseudo-Legendary Pokémon in the Living Dex', artworkUrl: '/badges/near-legendary/near-legendary.png', shinyArtworkUrl: '/badges/near-legendary/near-legendary-shiny.png' }
     ],
     requirements: {
       type: 'group_completed',
       target: 'pseudo_legendaries',
-      details: 'All Pseudo Legendary Pokémon'
+      details: 'All 11 Pseudo-Legendary Pokémon across Living Dex and Hisuian form'
     },
-    metadata: {}
+    metadata: {
+      totalPseudoLegendaries: 11
+    }
   },
   {
     id: 'ach-grp-06',
-    slug: 'first-partner-hall-of-fame',
-    name: 'First Partner Hall of Fame',
-    description: 'Catch all Starter Pokémon and evolutions.',
+    slug: 'where-it-all-began',
+    name: 'Where It All Began',
+    description: 'Catch 3 unique Starter Pokémon.',
     category: 'Pokémon Groups',
     type: 'tiered',
     trackingScope: 'regular_shiny_separate',
     isSecret: false,
     enabled: true,
+    unlocked: false,
     sortOrder: 15,
-    artwork: null,
+    artwork: '/badges/where-it-all-began/where-it-all-began.png',
+    shinyArtwork: '/badges/where-it-all-began/where-it-all-began-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't2', name: 'Silver', order: 2, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't3', name: 'Gold', order: 3, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't4', name: 'Diamond', order: 4, threshold: null, requirementDescription: 'Not configured', artworkUrl: null }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 3, requirementDescription: 'Register 3 Starter Pokémon in the Living Dex', artworkUrl: '/badges/where-it-all-began/where-it-all-began.png', shinyArtworkUrl: '/badges/where-it-all-began/where-it-all-began-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 8, requirementDescription: 'Register 8 Starter Pokémon in the Living Dex', artworkUrl: '/badges/where-it-all-began/where-it-all-began.png', shinyArtworkUrl: '/badges/where-it-all-began/where-it-all-began-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 15, requirementDescription: 'Register 15 Starter Pokémon in the Living Dex', artworkUrl: '/badges/where-it-all-began/where-it-all-began.png', shinyArtworkUrl: '/badges/where-it-all-began/where-it-all-began-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 27, requirementDescription: 'Register all 27 Starter Pokémon in the Living Dex', artworkUrl: '/badges/where-it-all-began/where-it-all-began.png', shinyArtworkUrl: '/badges/where-it-all-began/where-it-all-began-shiny.png' }
     ],
     requirements: {
       type: 'group_completed',
       target: 'starters',
-      details: 'All Starter Pokémon and evolutions'
+      details: 'All 27 Starter Pokémon in National Living Dex'
     },
-    metadata: {}
+    metadata: {
+      totalStarters: 27
+    }
   },
   {
     id: 'ach-grp-07',
     slug: 'paleontologist',
     name: 'Paleontologist',
-    description: 'Catch all Fossil Pokémon.',
+    description: 'Catch 2 unique Fossil Pokémon.',
     category: 'Pokémon Groups',
     type: 'tiered',
     trackingScope: 'regular_shiny_separate',
     isSecret: false,
     enabled: true,
+    unlocked: false,
     sortOrder: 16,
-    artwork: null,
+    artwork: '/badges/paleontologist/paleontologist.png',
+    shinyArtwork: '/badges/paleontologist/paleontologist-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't2', name: 'Silver', order: 2, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't3', name: 'Gold', order: 3, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't4', name: 'Diamond', order: 4, threshold: null, requirementDescription: 'Not configured', artworkUrl: null }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 2, requirementDescription: 'Register 2 Fossil Pokémon in the Living Dex', artworkUrl: '/badges/paleontologist/paleontologist.png', shinyArtworkUrl: '/badges/paleontologist/paleontologist-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 5, requirementDescription: 'Register 5 Fossil Pokémon in the Living Dex', artworkUrl: '/badges/paleontologist/paleontologist.png', shinyArtworkUrl: '/badges/paleontologist/paleontologist-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 9, requirementDescription: 'Register 9 Fossil Pokémon in the Living Dex', artworkUrl: '/badges/paleontologist/paleontologist.png', shinyArtworkUrl: '/badges/paleontologist/paleontologist-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 15, requirementDescription: 'Register all 15 Fossil Pokémon in the Living Dex', artworkUrl: '/badges/paleontologist/paleontologist.png', shinyArtworkUrl: '/badges/paleontologist/paleontologist-shiny.png' }
     ],
     requirements: {
       type: 'group_completed',
       target: 'fossils',
-      details: 'All Fossil Pokémon'
+      details: 'All 15 Fossil Pokémon in National Living Dex'
     },
-    metadata: {}
+    metadata: {
+      totalFossils: 15
+    }
   },
   {
     id: 'ach-grp-08',
-    slug: 'daycare-maestro',
-    name: 'Daycare Maestro',
-    description: 'Catch all Baby Pokémon and evolutions.',
+    slug: 'small-beginnings',
+    name: 'Small Beginnings',
+    description: 'Catch 2 unique Baby Pokémon.',
     category: 'Pokémon Groups',
     type: 'tiered',
     trackingScope: 'regular_shiny_separate',
     isSecret: false,
     enabled: true,
+    unlocked: false,
     sortOrder: 17,
-    artwork: null,
+    artwork: '/badges/small-beginnings/small-beginnings.png',
+    shinyArtwork: '/badges/small-beginnings/small-beginnings-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't2', name: 'Silver', order: 2, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't3', name: 'Gold', order: 3, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't4', name: 'Diamond', order: 4, threshold: null, requirementDescription: 'Not configured', artworkUrl: null }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 2, requirementDescription: 'Register 2 Baby Pokémon in the Living Dex', artworkUrl: '/badges/small-beginnings/small-beginnings.png', shinyArtworkUrl: '/badges/small-beginnings/small-beginnings-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 6, requirementDescription: 'Register 6 Baby Pokémon in the Living Dex', artworkUrl: '/badges/small-beginnings/small-beginnings.png', shinyArtworkUrl: '/badges/small-beginnings/small-beginnings-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 11, requirementDescription: 'Register 11 Baby Pokémon in the Living Dex', artworkUrl: '/badges/small-beginnings/small-beginnings.png', shinyArtworkUrl: '/badges/small-beginnings/small-beginnings-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 19, requirementDescription: 'Register all 19 Baby Pokémon in the Living Dex', artworkUrl: '/badges/small-beginnings/small-beginnings.png', shinyArtworkUrl: '/badges/small-beginnings/small-beginnings-shiny.png' }
     ],
     requirements: {
       type: 'group_completed',
       target: 'babies',
-      details: 'All Baby Pokémon and evolutions'
+      details: 'All 19 Baby Pokémon in National Living Dex'
     },
-    metadata: {}
+    metadata: {
+      totalBabies: 19
+    }
   },
 
   // ==========================================
@@ -462,9 +663,9 @@ export const INITIAL_ACHIEVEMENTS = [
   // ==========================================
   {
     id: 'ach-var-01',
-    slug: 'patisserie-chef',
-    name: 'Patisserie Chef',
-    description: 'Catch 7 unique Alcremie forms to unlock Bronze.',
+    slug: 'sweet-perfection',
+    name: 'Sweet Perfection',
+    description: 'Catch 7 unique Alcremie forms.',
     category: 'Forms & Variants',
     type: 'tiered',
     trackingScope: 'regular_shiny_separate',
@@ -472,13 +673,13 @@ export const INITIAL_ACHIEVEMENTS = [
     enabled: true,
     unlocked: false,
     sortOrder: 20,
-    artwork: '/badges/patisserie-chef/patisserie-chef.png',
-    shinyArtwork: '/badges/patisserie-chef/patisserie-chef-shiny.png',
+    artwork: '/badges/sweet-perfection/sweet-perfection.png',
+    shinyArtwork: '/badges/sweet-perfection/sweet-perfection-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: 7, requirementDescription: 'Catch 7 unique Alcremie forms', artworkUrl: '/badges/patisserie-chef/patisserie-chef.png', shinyArtworkUrl: '/badges/patisserie-chef/patisserie-chef-shiny.png' },
-      { id: 't2', name: 'Silver', order: 2, threshold: 21, requirementDescription: 'Catch 21 unique Alcremie forms', artworkUrl: '/badges/patisserie-chef/patisserie-chef.png', shinyArtworkUrl: '/badges/patisserie-chef/patisserie-chef-shiny.png' },
-      { id: 't3', name: 'Gold', order: 3, threshold: 42, requirementDescription: 'Catch 42 unique Alcremie forms', artworkUrl: '/badges/patisserie-chef/patisserie-chef.png', shinyArtworkUrl: '/badges/patisserie-chef/patisserie-chef-shiny.png' },
-      { id: 't4', name: 'Diamond', order: 4, threshold: 63, requirementDescription: 'Catch all 63 unique Alcremie forms', artworkUrl: '/badges/patisserie-chef/patisserie-chef.png', shinyArtworkUrl: '/badges/patisserie-chef/patisserie-chef-shiny.png' }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 7, requirementDescription: 'Catch 7 unique Alcremie forms', artworkUrl: '/badges/sweet-perfection/sweet-perfection.png', shinyArtworkUrl: '/badges/sweet-perfection/sweet-perfection-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 21, requirementDescription: 'Catch 21 unique Alcremie forms', artworkUrl: '/badges/sweet-perfection/sweet-perfection.png', shinyArtworkUrl: '/badges/sweet-perfection/sweet-perfection-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 42, requirementDescription: 'Catch 42 unique Alcremie forms', artworkUrl: '/badges/sweet-perfection/sweet-perfection.png', shinyArtworkUrl: '/badges/sweet-perfection/sweet-perfection-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 63, requirementDescription: 'Catch all 63 unique Alcremie forms', artworkUrl: '/badges/sweet-perfection/sweet-perfection.png', shinyArtworkUrl: '/badges/sweet-perfection/sweet-perfection-shiny.png' }
     ],
     requirements: {
       type: 'group_completed',
@@ -493,7 +694,7 @@ export const INITIAL_ACHIEVEMENTS = [
     id: 'ach-var-02',
     slug: 'ancient-alphabet',
     name: 'Ancient Alphabet',
-    description: 'Catch 3 unique Unown forms to unlock Bronze.',
+    description: 'Catch 3 unique Unown forms.',
     category: 'Forms & Variants',
     type: 'tiered',
     trackingScope: 'regular_shiny_separate',
@@ -522,7 +723,7 @@ export const INITIAL_ACHIEVEMENTS = [
     id: 'ach-var-03',
     slug: 'apex-predator',
     name: 'Apex Predator',
-    description: 'Catch 50 Alpha Pokémon to unlock Bronze.',
+    description: 'Catch 50 Alpha Pokémon.',
     category: 'Forms & Variants',
     type: 'tiered',
     trackingScope: 'regular_shiny_separate',
@@ -549,9 +750,9 @@ export const INITIAL_ACHIEVEMENTS = [
   },
   {
     id: 'ach-var-04',
-    slug: 'gigantamax-phenom',
-    name: 'Gigantamax Phenom',
-    description: 'Catch 4 unique Gigantamax forms to unlock Bronze.',
+    slug: 'gigantic-potential',
+    name: 'Gigantic Potential',
+    description: 'Catch 4 unique Gigantamax forms.',
     category: 'Forms & Variants',
     type: 'tiered',
     trackingScope: 'regular_shiny_separate',
@@ -559,13 +760,13 @@ export const INITIAL_ACHIEVEMENTS = [
     enabled: true,
     unlocked: false,
     sortOrder: 23,
-    artwork: '/badges/gigantamax-phenom/gigantamax-phenom.png',
-    shinyArtwork: '/badges/gigantamax-phenom/gigantamax-phenom-shiny.png',
+    artwork: '/badges/gigantic-potential/gigantic-potential.png',
+    shinyArtwork: '/badges/gigantic-potential/gigantic-potential-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: 4, requirementDescription: 'Register 4 unique Gigantamax forms in the Living Dex', artworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom.png', shinyArtworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom-shiny.png' },
-      { id: 't2', name: 'Silver', order: 2, threshold: 10, requirementDescription: 'Register 10 unique Gigantamax forms in the Living Dex', artworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom.png', shinyArtworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom-shiny.png' },
-      { id: 't3', name: 'Gold', order: 3, threshold: 20, requirementDescription: 'Register 20 unique Gigantamax forms in the Living Dex', artworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom.png', shinyArtworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom-shiny.png' },
-      { id: 't4', name: 'Diamond', order: 4, threshold: 33, requirementDescription: 'Register all 33 unique Gigantamax forms in the Living Dex', artworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom.png', shinyArtworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom-shiny.png' }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 4, requirementDescription: 'Register 4 unique Gigantamax forms in the Living Dex', artworkUrl: '/badges/gigantic-potential/gigantic-potential.png', shinyArtworkUrl: '/badges/gigantic-potential/gigantic-potential-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 10, requirementDescription: 'Register 10 unique Gigantamax forms in the Living Dex', artworkUrl: '/badges/gigantic-potential/gigantic-potential.png', shinyArtworkUrl: '/badges/gigantic-potential/gigantic-potential-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 20, requirementDescription: 'Register 20 unique Gigantamax forms in the Living Dex', artworkUrl: '/badges/gigantic-potential/gigantic-potential.png', shinyArtworkUrl: '/badges/gigantic-potential/gigantic-potential-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 33, requirementDescription: 'Register all 33 unique Gigantamax forms in the Living Dex', artworkUrl: '/badges/gigantic-potential/gigantic-potential.png', shinyArtworkUrl: '/badges/gigantic-potential/gigantic-potential-shiny.png' }
     ],
     requirements: {
       type: 'group_completed',
@@ -578,34 +779,39 @@ export const INITIAL_ACHIEVEMENTS = [
   },
   {
     id: 'ach-var-05',
-    slug: 'global-phenotype',
-    name: 'Global Phenotype',
-    description: 'Catch all Regional Forms.',
+    slug: 'across-the-regions',
+    name: 'Across the Regions',
+    description: 'Catch 5 Regional Forms.',
     category: 'Forms & Variants',
     type: 'tiered',
     trackingScope: 'regular_shiny_separate',
     isSecret: false,
     enabled: true,
+    unlocked: false,
     sortOrder: 24,
-    artwork: null,
+    artwork: '/badges/across-the-regions/across-the-regions.png',
+    shinyArtwork: '/badges/across-the-regions/across-the-regions-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't2', name: 'Silver', order: 2, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't3', name: 'Gold', order: 3, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't4', name: 'Diamond', order: 4, threshold: null, requirementDescription: 'Not configured', artworkUrl: null }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 5, requirementDescription: 'Register 5 unique Regional Forms in the Living Dex', artworkUrl: '/badges/across-the-regions/across-the-regions.png', shinyArtworkUrl: '/badges/across-the-regions/across-the-regions-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 16, requirementDescription: 'Register 16 unique Regional Forms in the Living Dex', artworkUrl: '/badges/across-the-regions/across-the-regions.png', shinyArtworkUrl: '/badges/across-the-regions/across-the-regions-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 32, requirementDescription: 'Register 32 unique Regional Forms in the Living Dex', artworkUrl: '/badges/across-the-regions/across-the-regions.png', shinyArtworkUrl: '/badges/across-the-regions/across-the-regions-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 57, requirementDescription: 'Register all 57 unique Regional Forms in the Living Dex', artworkUrl: '/badges/across-the-regions/across-the-regions.png', shinyArtworkUrl: '/badges/across-the-regions/across-the-regions-shiny.png' }
     ],
     requirements: {
       type: 'group_completed',
       target: 'regional_forms',
       details: 'Alolan, Galarian, Hisuian, and Paldean forms'
     },
-    metadata: {}
+    metadata: {
+      totalForms: 57,
+      totalShinyForms: 54
+    }
   },
   {
     id: 'ach-var-06',
-    slug: 'mighty-champion',
-    name: 'Mighty Champion',
-    description: 'Catch 5 Mighty Mark Pokémon to unlock Bronze.',
+    slug: 'mightiest-of-them-all',
+    name: 'Mightiest of Them All',
+    description: 'Catch 5 Mighty Mark Pokémon.',
     category: 'Forms & Variants',
     type: 'tiered',
     trackingScope: 'shared',
@@ -616,13 +822,13 @@ export const INITIAL_ACHIEVEMENTS = [
     enabled: true,
     unlocked: false,
     sortOrder: 25,
-    artwork: '/badges/mighty-champion/mighty-champion.png',
+    artwork: '/badges/mightiest-of-them-all/mightiest-of-them-all.png',
     shinyArtwork: null,
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: 5, requirementDescription: 'Register 5 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mighty-champion/mighty-champion.png', shinyArtworkUrl: null },
-      { id: 't2', name: 'Silver', order: 2, threshold: 15, requirementDescription: 'Register 15 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mighty-champion/mighty-champion.png', shinyArtworkUrl: null },
-      { id: 't3', name: 'Gold', order: 3, threshold: 30, requirementDescription: 'Register 30 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mighty-champion/mighty-champion.png', shinyArtworkUrl: null },
-      { id: 't4', name: 'Diamond', order: 4, threshold: 54, requirementDescription: 'Register all 54 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mighty-champion/mighty-champion.png', shinyArtworkUrl: null }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 5, requirementDescription: 'Register 5 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mightiest-of-them-all/mightiest-of-them-all.png', shinyArtworkUrl: null },
+      { id: 't2', name: 'Silver', order: 2, threshold: 15, requirementDescription: 'Register 15 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mightiest-of-them-all/mightiest-of-them-all.png', shinyArtworkUrl: null },
+      { id: 't3', name: 'Gold', order: 3, threshold: 30, requirementDescription: 'Register 30 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mightiest-of-them-all/mightiest-of-them-all.png', shinyArtworkUrl: null },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 54, requirementDescription: 'Register all 54 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mightiest-of-them-all/mightiest-of-them-all.png', shinyArtworkUrl: null }
     ],
     requirements: {
       type: 'marks_collected',
@@ -635,28 +841,31 @@ export const INITIAL_ACHIEVEMENTS = [
   },
   {
     id: 'ach-var-07',
-    slug: 'dimorphic-discovery',
-    name: 'Dimorphic Discovery',
-    description: 'Catch all female gender forms.',
+    slug: 'ladies-first',
+    name: 'Ladies First',
+    description: 'Catch 10 female gender forms.',
     category: 'Forms & Variants',
     type: 'tiered',
     trackingScope: 'regular_shiny_separate',
     isSecret: false,
     enabled: true,
     sortOrder: 26,
-    artwork: null,
+    artwork: '/badges/ladies-first/ladies-first.png',
+    shinyArtwork: '/badges/ladies-first/ladies-first-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't2', name: 'Silver', order: 2, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't3', name: 'Gold', order: 3, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't4', name: 'Diamond', order: 4, threshold: null, requirementDescription: 'Not configured', artworkUrl: null }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 10, requirementDescription: 'Register 10 female gender forms in the Living Dex', artworkUrl: '/badges/ladies-first/ladies-first.png', shinyArtworkUrl: '/badges/ladies-first/ladies-first-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 30, requirementDescription: 'Register 30 female gender forms in the Living Dex', artworkUrl: '/badges/ladies-first/ladies-first.png', shinyArtworkUrl: '/badges/ladies-first/ladies-first-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 60, requirementDescription: 'Register 60 female gender forms in the Living Dex', artworkUrl: '/badges/ladies-first/ladies-first.png', shinyArtworkUrl: '/badges/ladies-first/ladies-first-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 103, requirementDescription: 'Register all 103 female gender forms in the Living Dex', artworkUrl: '/badges/ladies-first/ladies-first.png', shinyArtworkUrl: '/badges/ladies-first/ladies-first-shiny.png' }
     ],
     requirements: {
       type: 'group_completed',
       target: 'gender_forms',
-      details: 'All distinct female visual form differences'
+      details: 'All 103 distinct female visual form differences'
     },
-    metadata: {}
+    metadata: {
+      totalGenderForms: 103
+    }
   },
 
   // ==========================================
@@ -689,8 +898,8 @@ export const INITIAL_ACHIEVEMENTS = [
   },
   {
     id: 'ach-hnt-02',
-    slug: 'roll-the-dice',
-    name: 'Roll the Dice',
+    slug: 'one-more-encounter',
+    name: 'One More Encounter',
     description: 'Total encounter milestones.',
     category: 'Hunting',
     type: 'tiered',
@@ -744,6 +953,7 @@ export const INITIAL_ACHIEVEMENTS = [
     description: 'Find a shiny within less than 10% of odds.',
     category: 'Hunting',
     type: 'single',
+    tier: 'diamond',
     trackingScope: 'shared',
     isSecret: false,
     enabled: true,
@@ -813,11 +1023,12 @@ export const INITIAL_ACHIEVEMENTS = [
   },
   {
     id: 'ach-hnt-07',
-    slug: 'phoenix-feather',
-    name: 'Phoenix Feather',
+    slug: 'redemption-arc',
+    name: 'Redemption Arc',
     description: 'Catch a shiny target after previously logging a failed encounter.',
     category: 'Hunting',
     type: 'single',
+    tier: 'diamond',
     trackingScope: 'shared',
     isSecret: false,
     enabled: true,
@@ -841,53 +1052,67 @@ export const INITIAL_ACHIEVEMENTS = [
   // ==========================================
   {
     id: 'ach-bal-01',
-    slug: 'apriball-artisan',
-    name: 'Apriball Artisan',
-    description: 'Catch shinies in rare Apricorn Balls.',
+    slug: 'ball-connoisseur',
+    legacySlug: 'apriball-artisan',
+    name: 'Ball Connoisseur',
+    description: 'Catch a Pokémon in every eligible Special Ball.',
     category: 'Poké Balls',
     type: 'tiered',
-    trackingScope: 'shiny',
+    trackingScope: 'regular_shiny_separate',
     isSecret: false,
     enabled: true,
+    unlocked: false,
     sortOrder: 40,
-    artwork: null,
+    artwork: '/badges/ball-connoisseur/ball-connoisseur.png',
+    shinyArtwork: '/badges/ball-connoisseur/ball-connoisseur-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't2', name: 'Silver', order: 2, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't3', name: 'Gold', order: 3, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't4', name: 'Diamond', order: 4, threshold: null, requirementDescription: 'Not configured', artworkUrl: null }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 3, requirementDescription: 'Register catches in 3 unique Special Ball types', artworkUrl: '/badges/ball-connoisseur/ball-connoisseur.png', shinyArtworkUrl: '/badges/ball-connoisseur/ball-connoisseur-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 6, requirementDescription: 'Register catches in 6 unique Special Ball types', artworkUrl: '/badges/ball-connoisseur/ball-connoisseur.png', shinyArtworkUrl: '/badges/ball-connoisseur/ball-connoisseur-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 10, requirementDescription: 'Register catches in 10 unique Special Ball types', artworkUrl: '/badges/ball-connoisseur/ball-connoisseur.png', shinyArtworkUrl: '/badges/ball-connoisseur/ball-connoisseur-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 16, requirementDescription: 'Catch a Pokémon in every eligible Special Ball', artworkUrl: '/badges/ball-connoisseur/ball-connoisseur.png', shinyArtworkUrl: '/badges/ball-connoisseur/ball-connoisseur-shiny.png' }
     ],
     requirements: {
       type: 'ball_catches',
-      target: 'apriballs',
-      details: 'Fast, Friend, Heavy, Level, Love, Lure, Moon Balls'
+      target: 'special_balls',
+      details: 'Dream, Fast, Friend, Heavy, Level, Love, Lure, Moon, Safari, Sport, Luxury, Dive, Nest, Net, Repeat, and Timer Balls'
     },
-    metadata: {}
+    metadata: {
+      totalBalls: 16,
+      eligibleBalls: [
+        'Dream Ball', 'Fast Ball', 'Friend Ball', 'Heavy Ball',
+        'Level Ball', 'Love Ball', 'Lure Ball', 'Moon Ball',
+        'Safari Ball', 'Sport Ball', 'Luxury Ball', 'Dive Ball',
+        'Nest Ball', 'Net Ball', 'Repeat Ball', 'Timer Ball'
+      ]
+    }
   },
   {
     id: 'ach-bal-02',
-    slug: 'beast-tamer',
-    name: 'Beast Tamer',
-    description: 'Catch shinies in Beast Balls.',
+    slug: 'beast-ballin',
+    name: 'Beast Ballin',
+    description: 'Catch unique Pokémon in Beast Balls.',
     category: 'Poké Balls',
     type: 'tiered',
-    trackingScope: 'shiny',
+    trackingScope: 'regular_shiny_separate',
     isSecret: false,
     enabled: true,
     sortOrder: 41,
-    artwork: null,
+    artwork: '/badges/beast-ballin/beast-ballin.png',
+    shinyArtwork: '/badges/beast-ballin/beast-ballin-shiny.png',
     tiers: [
-      { id: 't1', name: 'Bronze', order: 1, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't2', name: 'Silver', order: 2, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't3', name: 'Gold', order: 3, threshold: null, requirementDescription: 'Not configured', artworkUrl: null },
-      { id: 't4', name: 'Diamond', order: 4, threshold: null, requirementDescription: 'Not configured', artworkUrl: null }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 1, requirementDescription: 'Register 1 unique Pokémon caught in a Beast Ball', artworkUrl: '/badges/beast-ballin/beast-ballin.png', shinyArtworkUrl: '/badges/beast-ballin/beast-ballin-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 3, requirementDescription: 'Register 3 unique Pokémon caught in Beast Balls', artworkUrl: '/badges/beast-ballin/beast-ballin.png', shinyArtworkUrl: '/badges/beast-ballin/beast-ballin-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 7, requirementDescription: 'Register 7 unique Pokémon caught in Beast Balls', artworkUrl: '/badges/beast-ballin/beast-ballin.png', shinyArtworkUrl: '/badges/beast-ballin/beast-ballin-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 15, requirementDescription: 'Register 15 unique Pokémon caught in Beast Balls', artworkUrl: '/badges/beast-ballin/beast-ballin.png', shinyArtworkUrl: '/badges/beast-ballin/beast-ballin-shiny.png' }
     ],
     requirements: {
       type: 'ball_catches',
       target: 'beast_ball',
-      details: 'Shinies caught in Beast Balls'
+      details: 'Unique Pokémon caught in Beast Balls'
     },
-    metadata: {}
+    metadata: {
+      totalCount: 15
+    }
   },
   {
     id: 'ach-bal-03',
@@ -970,23 +1195,27 @@ export const INITIAL_ACHIEVEMENTS = [
   // ==========================================
   {
     id: 'ach-eve-01',
-    slug: 'bingo-sheet',
-    name: 'Bingo Sheet',
-    description: 'Complete a BINGO sheet.',
+    slug: 'bingo',
+    name: 'BINGO!',
+    description: 'Complete a BINGO sheet from any year.',
     category: 'Events',
     type: 'single',
+    tier: 'diamond',
     trackingScope: 'shared',
+    hasShinySwitch: false,
+    hasShiny: false,
     isSecret: false,
     enabled: true,
     sortOrder: 50,
-    artwork: null,
+    artwork: '/badges/bingo!/bingo!.png',
+    shinyArtwork: null,
     tiers: [
-      { id: 't1', name: 'Diamond', order: 1, threshold: null, requirementDescription: 'Complete an entire 5x5 BINGO event board', artworkUrl: null }
+      { id: 't1', name: 'Diamond', order: 1, threshold: 1, requirementDescription: 'Complete a BINGO from any year', artworkUrl: '/badges/bingo!/bingo!.png' }
     ],
     requirements: {
       type: 'bingo_completed',
-      target: 'full_board',
-      details: 'Complete 25 tiles on a Dex BINGO board'
+      target: 'any_year',
+      details: 'Complete a BINGO from any annual board'
     },
     metadata: {
       instantDiamond: true
@@ -998,8 +1227,8 @@ export const INITIAL_ACHIEVEMENTS = [
   // ==========================================
   {
     id: 'ach-com-01',
-    slug: 'charter-member',
-    name: 'Charter Member',
+    slug: 'pokeveteran',
+    name: 'PokéVeteran',
     description: 'Account age milestones.',
     category: 'Account & Community',
     type: 'tiered',
@@ -1023,8 +1252,8 @@ export const INITIAL_ACHIEVEMENTS = [
   },
   {
     id: 'ach-com-02',
-    slug: 'dex-patron',
-    name: 'Dex Patron',
+    slug: 'dex-supporter',
+    name: 'Dex Supporter',
     description: 'Membership month milestones.',
     category: 'Account & Community',
     type: 'tiered',
@@ -1073,8 +1302,8 @@ export const INITIAL_ACHIEVEMENTS = [
   },
   {
     id: 'ach-com-04',
-    slug: 'hall-of-fame-inductee',
-    name: 'Hall of Fame Inductee',
+    slug: 'among-the-elite',
+    name: 'Among the Elite',
     description: 'Reach configured top percentile milestones on leaderboards.',
     category: 'Account & Community',
     type: 'tiered',
@@ -1102,11 +1331,12 @@ export const INITIAL_ACHIEVEMENTS = [
   // ==========================================
   {
     id: 'ach-sec-01',
-    slug: 'sub-1-percent-miracle',
-    name: 'Sub-1% Miracle',
+    slug: 'arceus-chosen',
+    name: 'Arceus Chosen',
     description: 'Internal concept: Extremely rare achievement for completing a hunt in less than 1% of odds.',
     category: 'Secret',
     type: 'secret',
+    tier: 'diamond',
     trackingScope: 'shared',
     isSecret: true,
     enabled: true,
@@ -1128,11 +1358,12 @@ export const INITIAL_ACHIEVEMENTS = [
   },
   {
     id: 'ach-sec-02',
-    slug: 'one-in-8192',
-    name: 'One in 8,192',
+    slug: '1-8192-logo',
+    name: '1/8192 Logo',
     description: 'Internal concept: Extremely rare hidden badge related to the site\'s 1/8192 logo concept.',
     category: 'Secret',
     type: 'secret',
+    tier: 'diamond',
     trackingScope: 'shared',
     isSecret: true,
     enabled: true,
@@ -1201,6 +1432,7 @@ export function getBadgeArtwork(achievement, isShiny = false, activeTier = null)
   if (isShiny) {
     if (achievement.shinyArtwork) return achievement.shinyArtwork;
     if (achievement.artworkShiny) return achievement.artworkShiny;
+    if (achievement.shinyArtwork === null) return achievement.artwork || null;
     if (achievement.artwork && typeof achievement.artwork === 'string') {
       const shinyGuess = achievement.artwork.replace(/(\.png|\.jpg|\.jpeg|\.webp)$/i, '-shiny$1');
       if (shinyGuess !== achievement.artwork) {
@@ -1210,6 +1442,108 @@ export function getBadgeArtwork(achievement, isShiny = false, activeTier = null)
   }
 
   return achievement.artwork || null;
+}
+
+/**
+ * Checks if the user has completed a BINGO (5 in a row/column/diagonal or full 25 board) from any year.
+ */
+export function checkUserHasCompletedBingo(extraGrids = null) {
+  const isGridBingoComplete = (grid) => {
+    if (!Array.isArray(grid) || grid.length < 25) return false;
+
+    const isCellCompleted = (index) => Boolean(grid[index]?.completed);
+
+    // 5 Rows (Horizontal)
+    for (let r = 0; r < 5; r++) {
+      const start = r * 5;
+      if (
+        isCellCompleted(start) &&
+        isCellCompleted(start + 1) &&
+        isCellCompleted(start + 2) &&
+        isCellCompleted(start + 3) &&
+        isCellCompleted(start + 4)
+      ) {
+        return true;
+      }
+    }
+
+    // 5 Columns (Vertical)
+    for (let c = 0; c < 5; c++) {
+      if (
+        isCellCompleted(c) &&
+        isCellCompleted(c + 5) &&
+        isCellCompleted(c + 10) &&
+        isCellCompleted(c + 15) &&
+        isCellCompleted(c + 20)
+      ) {
+        return true;
+      }
+    }
+
+    // 2 Diagonals
+    if (
+      isCellCompleted(0) &&
+      isCellCompleted(6) &&
+      isCellCompleted(12) &&
+      isCellCompleted(18) &&
+      isCellCompleted(24)
+    ) {
+      return true;
+    }
+
+    if (
+      isCellCompleted(4) &&
+      isCellCompleted(8) &&
+      isCellCompleted(12) &&
+      isCellCompleted(16) &&
+      isCellCompleted(20)
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
+  // 1. Explicit flag in localStorage
+  try {
+    if (typeof localStorage !== 'undefined') {
+      if (localStorage.getItem('hasCompletedBingo') === 'true') {
+        return true;
+      }
+    }
+  } catch {}
+
+  // 2. Extra grids passed in (e.g. from server API or memory)
+  if (extraGrids) {
+    if (Array.isArray(extraGrids)) {
+      if (isGridBingoComplete(extraGrids)) return true;
+    } else if (typeof extraGrids === 'object') {
+      for (const val of Object.values(extraGrids)) {
+        if (Array.isArray(val) && isGridBingoComplete(val)) return true;
+        if (val && Array.isArray(val.grid) && isGridBingoComplete(val.grid)) return true;
+      }
+    }
+  }
+
+  // 3. Scan all localStorage keys for bingo grids
+  try {
+    if (typeof localStorage !== 'undefined') {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('bingo-grid-state') || key.includes('bingo-grid'))) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            try {
+              const parsed = JSON.parse(raw);
+              if (isGridBingoComplete(parsed)) return true;
+            } catch {}
+          }
+        }
+      }
+    }
+  } catch {}
+
+  return false;
 }
 
 /**
@@ -1243,8 +1577,8 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
     return false;
   };
 
-  // 1. Patisserie Chef: 63 unique Alcremie combinations (excluding G-Max)
-  if (achievement.slug === 'patisserie-chef' || achievement.requirements?.target === 'alcremie_forms') {
+  // 1. Sweet Perfection: 63 unique Alcremie combinations (excluding G-Max)
+  if (achievement.slug === 'sweet-perfection' || achievement.slug === 'patisserie-chef' || achievement.requirements?.target === 'alcremie_forms') {
     const totalCount = 63;
     let currentCount = 0;
 
@@ -1297,11 +1631,10 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
 
     let displayGoal = '';
     if (!unlocked) {
-      // Starts with a lock; text says first goal to unlock bronze
-      displayGoal = `Catch 7 unique ${shinyLabel}Alcremie forms to unlock Bronze.`;
+      displayGoal = `Catch 7 unique ${shinyLabel}Alcremie forms.`;
     } else if (nextTier) {
       const targetStr = nextTier.threshold === 63 ? 'all 63' : nextTier.threshold;
-      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Alcremie forms to unlock ${nextTier.name}.`;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Alcremie forms.`;
     } else {
       displayGoal = `All 63 unique ${shinyLabel}Alcremie forms registered!`;
     }
@@ -1319,12 +1652,13 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
     };
   }
 
-  // 2. Living Legends: 1,025 mainline Pokémon in the Living Dex
-  if (achievement.slug === 'living-legends' || achievement.requirements?.target === 'national_dex_all') {
-    const totalCount = 1025;
+  // 2. Master Collector: 1,025 mainline Pokémon in the Living Dex (997 for shiny excluding locked)
+  if (achievement.slug === 'master-collector' || achievement.slug === 'living-legends' || achievement.requirements?.target === 'national_dex_all') {
+    const targetPokemon = isShiny ? pokemonData.filter(p => !isUnobtainableShiny(p)) : pokemonData;
+    const totalCount = targetPokemon.length || (isShiny ? 997 : 1025);
     let currentCount = 0;
 
-    pokemonData.forEach(poke => {
+    targetPokemon.forEach(poke => {
       const stableKey = isShiny ? `${poke.stableId}_shiny` : poke.stableId;
       const idKey = isShiny ? `${poke.id}_shiny` : `${poke.id}`;
       const paddedIdKey = isShiny ? `${String(poke.id).padStart(4, '0')}_shiny` : `${String(poke.id).padStart(4, '0')}`;
@@ -1343,11 +1677,12 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
       }
     });
 
-    const tiers = achievement.tiers || [
-      { id: 't1', name: 'Bronze', order: 1, threshold: 100, requirementDescription: 'Register 100 Pokémon in the Living Dex', artworkUrl: '/badges/living-legends/living-legends.png', shinyArtworkUrl: '/badges/living-legends/living-legends-shiny.png' },
-      { id: 't2', name: 'Silver', order: 2, threshold: 300, requirementDescription: 'Register 300 Pokémon in the Living Dex', artworkUrl: '/badges/living-legends/living-legends.png', shinyArtworkUrl: '/badges/living-legends/living-legends-shiny.png' },
-      { id: 't3', name: 'Gold', order: 3, threshold: 600, requirementDescription: 'Register 600 Pokémon in the Living Dex', artworkUrl: '/badges/living-legends/living-legends.png', shinyArtworkUrl: '/badges/living-legends/living-legends-shiny.png' },
-      { id: 't4', name: 'Diamond', order: 4, threshold: 1025, requirementDescription: 'Register all 1,025 Pokémon in the Living Dex', artworkUrl: '/badges/living-legends/living-legends.png', shinyArtworkUrl: '/badges/living-legends/living-legends-shiny.png' }
+    const diamondThresh = totalCount;
+    const tiers = [
+      { id: 't1', name: 'Bronze', order: 1, threshold: 100, requirementDescription: `Register 100 ${isShiny ? 'shiny ' : ''}Pokémon in the Living Dex`, artworkUrl: '/badges/master-collector/master-collector.png', shinyArtworkUrl: '/badges/master-collector/master-collector-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 300, requirementDescription: `Register 300 ${isShiny ? 'shiny ' : ''}Pokémon in the Living Dex`, artworkUrl: '/badges/master-collector/master-collector.png', shinyArtworkUrl: '/badges/master-collector/master-collector-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 600, requirementDescription: `Register 600 ${isShiny ? 'shiny ' : ''}Pokémon in the Living Dex`, artworkUrl: '/badges/master-collector/master-collector.png', shinyArtworkUrl: '/badges/master-collector/master-collector-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: diamondThresh, requirementDescription: `Register all ${diamondThresh.toLocaleString()} ${isShiny ? 'shiny ' : ''}Pokémon in the Living Dex`, artworkUrl: '/badges/master-collector/master-collector.png', shinyArtworkUrl: '/badges/master-collector/master-collector-shiny.png' }
     ];
 
     let unlockedTier = null;
@@ -1374,12 +1709,12 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
 
     let displayGoal = '';
     if (!unlocked) {
-      displayGoal = `Catch 100 ${shinyLabel}Pokémon to unlock Bronze.`;
+      displayGoal = `Catch 100 ${shinyLabel}Pokémon.`;
     } else if (nextTier) {
-      const targetStr = nextTier.threshold === 1025 ? 'all 1,025' : nextTier.threshold;
-      displayGoal = `Catch ${targetStr} ${shinyLabel}Pokémon to unlock ${nextTier.name}.`;
+      const targetStr = nextTier.threshold === totalCount ? `all ${totalCount.toLocaleString()}` : nextTier.threshold.toLocaleString();
+      displayGoal = `Catch ${targetStr} ${shinyLabel}Pokémon.`;
     } else {
-      displayGoal = `All 1,025 ${shinyLabel}Pokémon registered!`;
+      displayGoal = `All ${totalCount.toLocaleString()} ${shinyLabel}Pokémon registered!`;
     }
 
     return {
@@ -1395,8 +1730,8 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
     };
   }
 
-  // 3. Mythical Enigma: All 28 Mythical Pokémon & Forms (excluding unobtainable locked shinies for shiny tracking)
-  if (achievement.slug === 'mythical-enigma' || achievement.requirements?.target === 'mythicals') {
+  // 3. Mythical Pursuit: All 28 Mythical Pokémon & Forms (excluding unobtainable locked shinies for shiny tracking)
+  if (achievement.slug === 'mythical-pursuit' || achievement.slug === 'mythical-enigma' || achievement.requirements?.target === 'mythicals') {
     const allMythicals = MYTHICAL_POKEMON_LIST;
     const targetMythicals = isShiny ? allMythicals.filter(p => !isUnobtainableShiny(p)) : allMythicals;
     const totalCount = targetMythicals.length || (isShiny ? 20 : 28);
@@ -1429,10 +1764,10 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
     const dThresh = totalCount;
 
     const tiers = [
-      { id: 't1', name: 'Bronze', order: 1, threshold: bThresh, requirementDescription: `Register ${bThresh} ${isShiny ? 'shiny ' : ''}Mythical Pokémon in the Living Dex`, artworkUrl: '/badges/mythical-enigma/mythical-enigma.png', shinyArtworkUrl: '/badges/mythical-enigma/mythical-enigma-shiny.png' },
-      { id: 't2', name: 'Silver', order: 2, threshold: sThresh, requirementDescription: `Register ${sThresh} ${isShiny ? 'shiny ' : ''}Mythical Pokémon in the Living Dex`, artworkUrl: '/badges/mythical-enigma/mythical-enigma.png', shinyArtworkUrl: '/badges/mythical-enigma/mythical-enigma-shiny.png' },
-      { id: 't3', name: 'Gold', order: 3, threshold: gThresh, requirementDescription: `Register ${gThresh} ${isShiny ? 'shiny ' : ''}Mythical Pokémon in the Living Dex`, artworkUrl: '/badges/mythical-enigma/mythical-enigma.png', shinyArtworkUrl: '/badges/mythical-enigma/mythical-enigma-shiny.png' },
-      { id: 't4', name: 'Diamond', order: 4, threshold: dThresh, requirementDescription: `Register all ${dThresh} ${isShiny ? 'shiny ' : ''}Mythical Pokémon and forms in the Living Dex`, artworkUrl: '/badges/mythical-enigma/mythical-enigma.png', shinyArtworkUrl: '/badges/mythical-enigma/mythical-enigma-shiny.png' }
+      { id: 't1', name: 'Bronze', order: 1, threshold: bThresh, requirementDescription: `Register ${bThresh} ${isShiny ? 'shiny ' : ''}Mythical Pokémon in the Living Dex`, artworkUrl: '/badges/mythical-pursuit/mythical-pursuit.png', shinyArtworkUrl: '/badges/mythical-pursuit/mythical-pursuit-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: sThresh, requirementDescription: `Register ${sThresh} ${isShiny ? 'shiny ' : ''}Mythical Pokémon in the Living Dex`, artworkUrl: '/badges/mythical-pursuit/mythical-pursuit.png', shinyArtworkUrl: '/badges/mythical-pursuit/mythical-pursuit-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: gThresh, requirementDescription: `Register ${gThresh} ${isShiny ? 'shiny ' : ''}Mythical Pokémon in the Living Dex`, artworkUrl: '/badges/mythical-pursuit/mythical-pursuit.png', shinyArtworkUrl: '/badges/mythical-pursuit/mythical-pursuit-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: dThresh, requirementDescription: `Register all ${dThresh} ${isShiny ? 'shiny ' : ''}Mythical Pokémon and forms in the Living Dex`, artworkUrl: '/badges/mythical-pursuit/mythical-pursuit.png', shinyArtworkUrl: '/badges/mythical-pursuit/mythical-pursuit-shiny.png' }
     ];
 
     let unlockedTier = null;
@@ -1459,10 +1794,10 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
 
     let displayGoal = '';
     if (!unlocked) {
-      displayGoal = `Catch ${tiers[0].threshold} unique ${shinyLabel}Mythical Pokémon to unlock Bronze.`;
+      displayGoal = `Catch ${tiers[0].threshold} unique ${shinyLabel}Mythical Pokémon.`;
     } else if (nextTier) {
       const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
-      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Mythical Pokémon to unlock ${nextTier.name}.`;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Mythical Pokémon.`;
     } else {
       displayGoal = `All ${totalCount} unique ${shinyLabel}Mythical Pokémon registered!`;
     }
@@ -1480,8 +1815,8 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
     };
   }
 
-  // Titan Slayer: 80 Legendary Pokémon & Forms (55 for shiny excluding shiny-locked)
-  if (achievement.slug === 'titan-slayer' || achievement.requirements?.target === 'legendaries') {
+  // Master of Legends: 80 Legendary Pokémon & Forms (55 for shiny excluding shiny-locked)
+  if (achievement.slug === 'master-of-legends' || achievement.slug === 'titan-slayer' || achievement.requirements?.target === 'legendaries') {
     const allLegendaries = LEGENDARY_ACHIEVEMENT_LIST;
     const targetLegendaries = isShiny
       ? allLegendaries.filter(p => !isTitanSlayerShinyLocked(p))
@@ -1516,10 +1851,10 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
     const dThresh = isShiny ? 55 : 80;
 
     const tiers = [
-      { id: 't1', name: 'Bronze', order: 1, threshold: bThresh, requirementDescription: `Register ${bThresh} ${isShiny ? 'shiny ' : ''}Legendary Pokémon in the Living Dex`, artworkUrl: '/badges/titan-slayer/titan-slayer.png', shinyArtworkUrl: '/badges/titan-slayer/titan-slayer-shiny.png' },
-      { id: 't2', name: 'Silver', order: 2, threshold: sThresh, requirementDescription: `Register ${sThresh} ${isShiny ? 'shiny ' : ''}Legendary Pokémon in the Living Dex`, artworkUrl: '/badges/titan-slayer/titan-slayer.png', shinyArtworkUrl: '/badges/titan-slayer/titan-slayer-shiny.png' },
-      { id: 't3', name: 'Gold', order: 3, threshold: gThresh, requirementDescription: `Register ${gThresh} ${isShiny ? 'shiny ' : ''}Legendary Pokémon in the Living Dex`, artworkUrl: '/badges/titan-slayer/titan-slayer.png', shinyArtworkUrl: '/badges/titan-slayer/titan-slayer-shiny.png' },
-      { id: 't4', name: 'Diamond', order: 4, threshold: dThresh, requirementDescription: `Register all ${dThresh} ${isShiny ? 'shiny ' : ''}Legendary Pokémon and forms in the Living Dex`, artworkUrl: '/badges/titan-slayer/titan-slayer.png', shinyArtworkUrl: '/badges/titan-slayer/titan-slayer-shiny.png' }
+      { id: 't1', name: 'Bronze', order: 1, threshold: bThresh, requirementDescription: `Register ${bThresh} ${isShiny ? 'shiny ' : ''}Legendary Pokémon in the Living Dex`, artworkUrl: '/badges/master-of-legends/master-of-legends.png', shinyArtworkUrl: '/badges/master-of-legends/master-of-legends-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: sThresh, requirementDescription: `Register ${sThresh} ${isShiny ? 'shiny ' : ''}Legendary Pokémon in the Living Dex`, artworkUrl: '/badges/master-of-legends/master-of-legends.png', shinyArtworkUrl: '/badges/master-of-legends/master-of-legends-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: gThresh, requirementDescription: `Register ${gThresh} ${isShiny ? 'shiny ' : ''}Legendary Pokémon in the Living Dex`, artworkUrl: '/badges/master-of-legends/master-of-legends.png', shinyArtworkUrl: '/badges/master-of-legends/master-of-legends-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: dThresh, requirementDescription: `Register all ${dThresh} ${isShiny ? 'shiny ' : ''}Legendary Pokémon and forms in the Living Dex`, artworkUrl: '/badges/master-of-legends/master-of-legends.png', shinyArtworkUrl: '/badges/master-of-legends/master-of-legends-shiny.png' }
     ];
 
     let unlockedTier = null;
@@ -1546,10 +1881,10 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
 
     let displayGoal = '';
     if (!unlocked) {
-      displayGoal = `Catch ${tiers[0].threshold} unique ${shinyLabel}Legendary Pokémon to unlock Bronze.`;
+      displayGoal = `Catch ${tiers[0].threshold} unique ${shinyLabel}Legendary Pokémon.`;
     } else if (nextTier) {
       const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
-      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Legendary Pokémon to unlock ${nextTier.name}.`;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Legendary Pokémon.`;
     } else {
       displayGoal = `All ${totalCount} unique ${shinyLabel}Legendary Pokémon registered!`;
     }
@@ -1567,8 +1902,8 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
     };
   }
 
-  // Extradimensional Encounter: 11 Ultra Beasts (Bronze: 2, Silver: 4, Gold: 7, Diamond: 11)
-  if (achievement.slug === 'extradimensional-encounter' || achievement.requirements?.target === 'ultra_beasts') {
+  // Otherworldly Beasts: 11 Ultra Beasts (Bronze: 2, Silver: 4, Gold: 7, Diamond: 11)
+  if (achievement.slug === 'otherworldly-beasts' || achievement.slug === 'extradimensional-encounter' || achievement.requirements?.target === 'ultra_beasts') {
     const ubList = ULTRA_BEASTS_LIST;
     const totalCount = ubList.length || 11;
     let currentCount = 0;
@@ -1593,10 +1928,10 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
     });
 
     const tiers = [
-      { id: 't1', name: 'Bronze', order: 1, threshold: 2, requirementDescription: `Register 2 ${isShiny ? 'shiny ' : ''}Ultra Beasts in the Living Dex`, artworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter.png', shinyArtworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter-shiny.png' },
-      { id: 't2', name: 'Silver', order: 2, threshold: 4, requirementDescription: `Register 4 ${isShiny ? 'shiny ' : ''}Ultra Beasts in the Living Dex`, artworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter.png', shinyArtworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter-shiny.png' },
-      { id: 't3', name: 'Gold', order: 3, threshold: 7, requirementDescription: `Register 7 ${isShiny ? 'shiny ' : ''}Ultra Beasts in the Living Dex`, artworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter.png', shinyArtworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter-shiny.png' },
-      { id: 't4', name: 'Diamond', order: 4, threshold: 11, requirementDescription: `Register all 11 ${isShiny ? 'shiny ' : ''}Ultra Beasts in the Living Dex`, artworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter.png', shinyArtworkUrl: '/badges/extradimensional-encounter/extradimensional-encounter-shiny.png' }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 2, requirementDescription: `Register 2 ${isShiny ? 'shiny ' : ''}Ultra Beasts in the Living Dex`, artworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts.png', shinyArtworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 4, requirementDescription: `Register 4 ${isShiny ? 'shiny ' : ''}Ultra Beasts in the Living Dex`, artworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts.png', shinyArtworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 7, requirementDescription: `Register 7 ${isShiny ? 'shiny ' : ''}Ultra Beasts in the Living Dex`, artworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts.png', shinyArtworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 11, requirementDescription: `Register all 11 ${isShiny ? 'shiny ' : ''}Ultra Beasts in the Living Dex`, artworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts.png', shinyArtworkUrl: '/badges/otherworldly-beasts/otherworldly-beasts-shiny.png' }
     ];
 
     let unlockedTier = null;
@@ -1623,12 +1958,420 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
 
     let displayGoal = '';
     if (!unlocked) {
-      displayGoal = `Catch ${tiers[0].threshold} unique ${shinyLabel}Ultra Beasts to unlock Bronze.`;
+      displayGoal = `Catch ${tiers[0].threshold} unique ${shinyLabel}Ultra Beasts.`;
     } else if (nextTier) {
       const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
-      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Ultra Beasts to unlock ${nextTier.name}.`;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Ultra Beasts.`;
     } else {
       displayGoal = `All ${totalCount} unique ${shinyLabel}Ultra Beasts registered!`;
+    }
+
+    return {
+      currentCount,
+      totalCount,
+      unlocked,
+      unlockedTier,
+      highestTierName,
+      nextTier,
+      displayGoal,
+      tierOrder,
+      tiers
+    };
+  }
+
+  // Near Legendary: 11 Pseudo-Legendary Pokémon (Bronze: 2, Silver: 4, Gold: 7, Diamond: 11)
+  if (achievement.slug === 'near-legendary' || achievement.slug === 'draconic-nobility' || achievement.requirements?.target === 'pseudo_legendaries') {
+    const pseudoList = PSEUDO_LEGENDARY_LIST;
+    const totalCount = pseudoList.length || 11;
+    let currentCount = 0;
+
+    pseudoList.forEach(poke => {
+      if (poke.name === 'goodra-hisui' || poke.formType === 'hisuian') {
+        const stableKey = isShiny ? `${poke.stableId}_shiny` : poke.stableId;
+        const nameKey = isShiny ? `${poke.name}_shiny` : poke.name;
+        const altKey = isShiny ? 'goodra-hisui-706_shiny' : 'goodra-hisui-706';
+        if (
+          isEntryCaught(caughtMap[stableKey]) ||
+          isEntryCaught(caughtMap[nameKey]) ||
+          isEntryCaught(caughtMap[altKey])
+        ) {
+          currentCount++;
+        }
+        return;
+      }
+      const stableKey = isShiny ? `${poke.stableId}_shiny` : poke.stableId;
+      const idKey = isShiny ? `${poke.id}_shiny` : `${poke.id}`;
+      const paddedIdKey = isShiny ? `${String(poke.id).padStart(4, '0')}_shiny` : `${String(poke.id).padStart(4, '0')}`;
+      const nameKey = isShiny ? `${poke.name}_shiny` : poke.name;
+      const nameIdKey = isShiny ? `${poke.name}-${poke.id}_shiny` : `${poke.name}-${poke.id}`;
+
+      const isCaught =
+        isEntryCaught(caughtMap[stableKey]) ||
+        isEntryCaught(caughtMap[idKey]) ||
+        isEntryCaught(caughtMap[paddedIdKey]) ||
+        isEntryCaught(caughtMap[nameKey]) ||
+        isEntryCaught(caughtMap[nameIdKey]);
+
+      if (isCaught) {
+        currentCount++;
+      }
+    });
+
+    const tiers = [
+      { id: 't1', name: 'Bronze', order: 1, threshold: 2, requirementDescription: `Register 2 ${isShiny ? 'shiny ' : ''}Pseudo-Legendary Pokémon in the Living Dex`, artworkUrl: '/badges/near-legendary/near-legendary.png', shinyArtworkUrl: '/badges/near-legendary/near-legendary-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 4, requirementDescription: `Register 4 ${isShiny ? 'shiny ' : ''}Pseudo-Legendary Pokémon in the Living Dex`, artworkUrl: '/badges/near-legendary/near-legendary.png', shinyArtworkUrl: '/badges/near-legendary/near-legendary-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 7, requirementDescription: `Register 7 ${isShiny ? 'shiny ' : ''}Pseudo-Legendary Pokémon in the Living Dex`, artworkUrl: '/badges/near-legendary/near-legendary.png', shinyArtworkUrl: '/badges/near-legendary/near-legendary-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 11, requirementDescription: `Register all 11 ${isShiny ? 'shiny ' : ''}Pseudo-Legendary Pokémon in the Living Dex`, artworkUrl: '/badges/near-legendary/near-legendary.png', shinyArtworkUrl: '/badges/near-legendary/near-legendary-shiny.png' }
+    ];
+
+    let unlockedTier = null;
+    let highestTierName = null;
+    let tierOrder = 0;
+    let nextTier = null;
+
+    for (let i = 0; i < tiers.length; i++) {
+      const tier = tiers[i];
+      const thresh = tier.threshold || 0;
+      if (currentCount >= thresh) {
+        unlockedTier = (tier.name || '').toLowerCase();
+        highestTierName = tier.name;
+        tierOrder = tier.order || (i + 1);
+      } else {
+        if (!nextTier) {
+          nextTier = tier;
+        }
+      }
+    }
+
+    const unlocked = unlockedTier !== null;
+    const shinyLabel = isShiny ? 'shiny ' : '';
+
+    let displayGoal = '';
+    if (!unlocked) {
+      displayGoal = `Catch 2 unique ${shinyLabel}Pseudo-Legendary Pokémon.`;
+    } else if (nextTier) {
+      const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Pseudo-Legendary Pokémon.`;
+    } else {
+      displayGoal = `All ${totalCount} unique ${shinyLabel}Pseudo-Legendary Pokémon registered!`;
+    }
+
+    return {
+      currentCount,
+      totalCount,
+      unlocked,
+      unlockedTier,
+      highestTierName,
+      nextTier,
+      displayGoal,
+      tierOrder,
+      tiers
+    };
+  }
+
+  // Past & Future: 22 Paradox Pokémon (14 for shiny)
+  // Regular: Bronze: 3, Silver: 7, Gold: 13, Diamond: 22
+  // Shiny: Bronze: 2, Silver: 5, Gold: 9, Diamond: 14
+  if (achievement.slug === 'past-and-future' || achievement.slug === 'anomalies-of-time' || achievement.requirements?.target === 'paradox') {
+    const rawParadoxList = PARADOX_POKEMON_LIST;
+    const paradoxList = isShiny
+      ? rawParadoxList.filter(p => !isUnobtainableShiny(p))
+      : rawParadoxList;
+    const totalCount = paradoxList.length || (isShiny ? 14 : 22);
+    let currentCount = 0;
+
+    paradoxList.forEach(poke => {
+      const stableKey = isShiny ? `${poke.stableId}_shiny` : poke.stableId;
+      const idKey = isShiny ? `${poke.id}_shiny` : `${poke.id}`;
+      const paddedIdKey = isShiny ? `${String(poke.id).padStart(4, '0')}_shiny` : `${String(poke.id).padStart(4, '0')}`;
+      const nameKey = isShiny ? `${poke.name}_shiny` : poke.name;
+      const nameIdKey = isShiny ? `${poke.name}-${poke.id}_shiny` : `${poke.name}-${poke.id}`;
+
+      const isCaught =
+        isEntryCaught(caughtMap[stableKey]) ||
+        isEntryCaught(caughtMap[idKey]) ||
+        isEntryCaught(caughtMap[paddedIdKey]) ||
+        isEntryCaught(caughtMap[nameKey]) ||
+        isEntryCaught(caughtMap[nameIdKey]);
+
+      if (isCaught) {
+        currentCount++;
+      }
+    });
+
+    const bThresh = isShiny ? 2 : 3;
+    const sThresh = isShiny ? 5 : 7;
+    const gThresh = isShiny ? 9 : 13;
+    const dThresh = isShiny ? 14 : 22;
+
+    const tiers = [
+      { id: 't1', name: 'Bronze', order: 1, threshold: bThresh, requirementDescription: `Register ${bThresh} ${isShiny ? 'shiny ' : ''}Paradox Pokémon in the Living Dex`, artworkUrl: '/badges/past-and-future/past-and-future.png', shinyArtworkUrl: '/badges/past-and-future/past-and-future-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: sThresh, requirementDescription: `Register ${sThresh} ${isShiny ? 'shiny ' : ''}Paradox Pokémon in the Living Dex`, artworkUrl: '/badges/past-and-future/past-and-future.png', shinyArtworkUrl: '/badges/past-and-future/past-and-future-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: gThresh, requirementDescription: `Register ${gThresh} ${isShiny ? 'shiny ' : ''}Paradox Pokémon in the Living Dex`, artworkUrl: '/badges/past-and-future/past-and-future.png', shinyArtworkUrl: '/badges/past-and-future/past-and-future-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: dThresh, requirementDescription: `Register all ${dThresh} ${isShiny ? 'shiny ' : ''}Paradox Pokémon in the Living Dex`, artworkUrl: '/badges/past-and-future/past-and-future.png', shinyArtworkUrl: '/badges/past-and-future/past-and-future-shiny.png' }
+    ];
+
+    let unlockedTier = null;
+    let highestTierName = null;
+    let tierOrder = 0;
+    let nextTier = null;
+
+    for (let i = 0; i < tiers.length; i++) {
+      const tier = tiers[i];
+      const thresh = tier.threshold || 0;
+      if (currentCount >= thresh) {
+        unlockedTier = (tier.name || '').toLowerCase();
+        highestTierName = tier.name;
+        tierOrder = tier.order || (i + 1);
+      } else {
+        if (!nextTier) {
+          nextTier = tier;
+        }
+      }
+    }
+
+    const unlocked = unlockedTier !== null;
+    const shinyLabel = isShiny ? 'shiny ' : '';
+
+    let displayGoal = '';
+    if (!unlocked) {
+      displayGoal = `Catch ${bThresh} unique ${shinyLabel}Paradox Pokémon.`;
+    } else if (nextTier) {
+      const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Paradox Pokémon.`;
+    } else {
+      displayGoal = `All ${totalCount} unique ${shinyLabel}Paradox Pokémon registered!`;
+    }
+
+    return {
+      currentCount,
+      totalCount,
+      unlocked,
+      unlockedTier,
+      highestTierName,
+      nextTier,
+      displayGoal,
+      tierOrder,
+      tiers
+    };
+  }
+
+  // Where It All Began: 27 Starter Pokémon (Bronze: 3, Silver: 8, Gold: 15, Diamond: 27)
+  if (achievement.slug === 'where-it-all-began' || achievement.slug === 'first-partner-hall-of-fame' || achievement.requirements?.target === 'starters') {
+    const starterList = STARTER_POKEMON_LIST;
+    const totalCount = starterList.length || 27;
+    let currentCount = 0;
+
+    starterList.forEach(poke => {
+      const stableKey = isShiny ? `${poke.stableId}_shiny` : poke.stableId;
+      const idKey = isShiny ? `${poke.id}_shiny` : `${poke.id}`;
+      const paddedIdKey = isShiny ? `${String(poke.id).padStart(4, '0')}_shiny` : `${String(poke.id).padStart(4, '0')}`;
+      const nameKey = isShiny ? `${poke.name}_shiny` : poke.name;
+      const nameIdKey = isShiny ? `${poke.name}-${poke.id}_shiny` : `${poke.name}-${poke.id}`;
+
+      const isCaught =
+        isEntryCaught(caughtMap[stableKey]) ||
+        isEntryCaught(caughtMap[idKey]) ||
+        isEntryCaught(caughtMap[paddedIdKey]) ||
+        isEntryCaught(caughtMap[nameKey]) ||
+        isEntryCaught(caughtMap[nameIdKey]);
+
+      if (isCaught) {
+        currentCount++;
+      }
+    });
+
+    const tiers = [
+      { id: 't1', name: 'Bronze', order: 1, threshold: 3, requirementDescription: `Register 3 ${isShiny ? 'shiny ' : ''}Starter Pokémon in the Living Dex`, artworkUrl: '/badges/where-it-all-began/where-it-all-began.png', shinyArtworkUrl: '/badges/where-it-all-began/where-it-all-began-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 8, requirementDescription: `Register 8 ${isShiny ? 'shiny ' : ''}Starter Pokémon in the Living Dex`, artworkUrl: '/badges/where-it-all-began/where-it-all-began.png', shinyArtworkUrl: '/badges/where-it-all-began/where-it-all-began-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 15, requirementDescription: `Register 15 ${isShiny ? 'shiny ' : ''}Starter Pokémon in the Living Dex`, artworkUrl: '/badges/where-it-all-began/where-it-all-began.png', shinyArtworkUrl: '/badges/where-it-all-began/where-it-all-began-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 27, requirementDescription: `Register all 27 ${isShiny ? 'shiny ' : ''}Starter Pokémon in the Living Dex`, artworkUrl: '/badges/where-it-all-began/where-it-all-began.png', shinyArtworkUrl: '/badges/where-it-all-began/where-it-all-began-shiny.png' }
+    ];
+
+    let unlockedTier = null;
+    let highestTierName = null;
+    let tierOrder = 0;
+    let nextTier = null;
+
+    for (let i = 0; i < tiers.length; i++) {
+      const tier = tiers[i];
+      const thresh = tier.threshold || 0;
+      if (currentCount >= thresh) {
+        unlockedTier = (tier.name || '').toLowerCase();
+        highestTierName = tier.name;
+        tierOrder = tier.order || (i + 1);
+      } else {
+        if (!nextTier) {
+          nextTier = tier;
+        }
+      }
+    }
+
+    const unlocked = unlockedTier !== null;
+    const shinyLabel = isShiny ? 'shiny ' : '';
+
+    let displayGoal = '';
+    if (!unlocked) {
+      displayGoal = `Catch 3 unique ${shinyLabel}Starter Pokémon.`;
+    } else if (nextTier) {
+      const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Starter Pokémon.`;
+    } else {
+      displayGoal = `All ${totalCount} unique ${shinyLabel}Starter Pokémon registered!`;
+    }
+
+    return {
+      currentCount,
+      totalCount,
+      unlocked,
+      unlockedTier,
+      highestTierName,
+      nextTier,
+      displayGoal,
+      tierOrder,
+      tiers
+    };
+  }
+
+  // Paleontologist: 15 Fossil Pokémon (Bronze: 2, Silver: 5, Gold: 9, Diamond: 15)
+  if (achievement.slug === 'paleontologist' || achievement.requirements?.target === 'fossils') {
+    const fossilList = FOSSIL_POKEMON_LIST;
+    const totalCount = fossilList.length || 15;
+    let currentCount = 0;
+
+    fossilList.forEach(poke => {
+      const stableKey = isShiny ? `${poke.stableId}_shiny` : poke.stableId;
+      const idKey = isShiny ? `${poke.id}_shiny` : `${poke.id}`;
+      const paddedIdKey = isShiny ? `${String(poke.id).padStart(4, '0')}_shiny` : `${String(poke.id).padStart(4, '0')}`;
+      const nameKey = isShiny ? `${poke.name}_shiny` : poke.name;
+      const nameIdKey = isShiny ? `${poke.name}-${poke.id}_shiny` : `${poke.name}-${poke.id}`;
+
+      const isCaught =
+        isEntryCaught(caughtMap[stableKey]) ||
+        isEntryCaught(caughtMap[idKey]) ||
+        isEntryCaught(caughtMap[paddedIdKey]) ||
+        isEntryCaught(caughtMap[nameKey]) ||
+        isEntryCaught(caughtMap[nameIdKey]);
+
+      if (isCaught) {
+        currentCount++;
+      }
+    });
+
+    const tiers = [
+      { id: 't1', name: 'Bronze', order: 1, threshold: 2, requirementDescription: `Register 2 ${isShiny ? 'shiny ' : ''}Fossil Pokémon in the Living Dex`, artworkUrl: '/badges/paleontologist/paleontologist.png', shinyArtworkUrl: '/badges/paleontologist/paleontologist-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 5, requirementDescription: `Register 5 ${isShiny ? 'shiny ' : ''}Fossil Pokémon in the Living Dex`, artworkUrl: '/badges/paleontologist/paleontologist.png', shinyArtworkUrl: '/badges/paleontologist/paleontologist-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 9, requirementDescription: `Register 9 ${isShiny ? 'shiny ' : ''}Fossil Pokémon in the Living Dex`, artworkUrl: '/badges/paleontologist/paleontologist.png', shinyArtworkUrl: '/badges/paleontologist/paleontologist-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 15, requirementDescription: `Register all 15 ${isShiny ? 'shiny ' : ''}Fossil Pokémon in the Living Dex`, artworkUrl: '/badges/paleontologist/paleontologist.png', shinyArtworkUrl: '/badges/paleontologist/paleontologist-shiny.png' }
+    ];
+
+    let unlockedTier = null;
+    let highestTierName = null;
+    let tierOrder = 0;
+    let nextTier = null;
+
+    for (let i = 0; i < tiers.length; i++) {
+      const tier = tiers[i];
+      const thresh = tier.threshold || 0;
+      if (currentCount >= thresh) {
+        unlockedTier = (tier.name || '').toLowerCase();
+        highestTierName = tier.name;
+        tierOrder = tier.order || (i + 1);
+      } else {
+        if (!nextTier) {
+          nextTier = tier;
+        }
+      }
+    }
+
+    const unlocked = unlockedTier !== null;
+    const shinyLabel = isShiny ? 'shiny ' : '';
+
+    let displayGoal = '';
+    if (!unlocked) {
+      displayGoal = `Catch 2 unique ${shinyLabel}Fossil Pokémon.`;
+    } else if (nextTier) {
+      const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Fossil Pokémon.`;
+    } else {
+      displayGoal = `All ${totalCount} unique ${shinyLabel}Fossil Pokémon registered!`;
+    }
+
+    return {
+      currentCount,
+      totalCount,
+      unlocked,
+      unlockedTier,
+      highestTierName,
+      nextTier,
+      displayGoal,
+      tierOrder,
+      tiers
+    };
+  }
+
+  // Small Beginnings: 19 Baby Pokémon (Bronze: 2, Silver: 6, Gold: 11, Diamond: 19)
+  if (achievement.slug === 'small-beginnings' || achievement.slug === 'daycare-maestro' || achievement.requirements?.target === 'babies') {
+    const babyList = BABY_POKEMON_LIST;
+    const totalCount = babyList.length || 19;
+    let currentCount = 0;
+
+    babyList.forEach(poke => {
+      const stableKey = isShiny ? `${poke.stableId}_shiny` : poke.stableId;
+      const idKey = isShiny ? `${poke.id}_shiny` : `${poke.id}`;
+      const paddedIdKey = isShiny ? `${String(poke.id).padStart(4, '0')}_shiny` : `${String(poke.id).padStart(4, '0')}`;
+      const nameKey = isShiny ? `${poke.name}_shiny` : poke.name;
+      const nameIdKey = isShiny ? `${poke.name}-${poke.id}_shiny` : `${poke.name}-${poke.id}`;
+
+      const isCaught =
+        isEntryCaught(caughtMap[stableKey]) ||
+        isEntryCaught(caughtMap[idKey]) ||
+        isEntryCaught(caughtMap[paddedIdKey]) ||
+        isEntryCaught(caughtMap[nameKey]) ||
+        isEntryCaught(caughtMap[nameIdKey]);
+
+      if (isCaught) {
+        currentCount++;
+      }
+    });
+
+    const tiers = [
+      { id: 't1', name: 'Bronze', order: 1, threshold: 2, requirementDescription: `Register 2 ${isShiny ? 'shiny ' : ''}Baby Pokémon in the Living Dex`, artworkUrl: '/badges/small-beginnings/small-beginnings.png', shinyArtworkUrl: '/badges/small-beginnings/small-beginnings-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 6, requirementDescription: `Register 6 ${isShiny ? 'shiny ' : ''}Baby Pokémon in the Living Dex`, artworkUrl: '/badges/small-beginnings/small-beginnings.png', shinyArtworkUrl: '/badges/small-beginnings/small-beginnings-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 11, requirementDescription: `Register 11 ${isShiny ? 'shiny ' : ''}Baby Pokémon in the Living Dex`, artworkUrl: '/badges/small-beginnings/small-beginnings.png', shinyArtworkUrl: '/badges/small-beginnings/small-beginnings-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 19, requirementDescription: `Register all 19 ${isShiny ? 'shiny ' : ''}Baby Pokémon in the Living Dex`, artworkUrl: '/badges/small-beginnings/small-beginnings.png', shinyArtworkUrl: '/badges/small-beginnings/small-beginnings-shiny.png' }
+    ];
+
+    let unlockedTier = null;
+    let highestTierName = null;
+    let tierOrder = 0;
+    let nextTier = null;
+
+    for (let i = 0; i < tiers.length; i++) {
+      const tier = tiers[i];
+      const thresh = tier.threshold || 0;
+      if (currentCount >= thresh) {
+        unlockedTier = (tier.name || '').toLowerCase();
+        highestTierName = tier.name;
+        tierOrder = tier.order || (i + 1);
+      } else {
+        if (!nextTier) {
+          nextTier = tier;
+        }
+      }
+    }
+
+    const unlocked = unlockedTier !== null;
+    const shinyLabel = isShiny ? 'shiny ' : '';
+
+    let displayGoal = '';
+    if (!unlocked) {
+      displayGoal = `Catch 2 unique ${shinyLabel}Baby Pokémon.`;
+    } else if (nextTier) {
+      const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Baby Pokémon.`;
+    } else {
+      displayGoal = `All ${totalCount} unique ${shinyLabel}Baby Pokémon registered!`;
     }
 
     return {
@@ -1698,10 +2441,10 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
 
     let displayGoal = '';
     if (!unlocked) {
-      displayGoal = `Catch 3 unique ${shinyLabel}Unown forms to unlock Bronze.`;
+      displayGoal = `Catch 3 unique ${shinyLabel}Unown forms.`;
     } else if (nextTier) {
       const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
-      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Unown forms to unlock ${nextTier.name}.`;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Unown forms.`;
     } else {
       displayGoal = `All ${totalCount} unique ${shinyLabel}Unown forms registered!`;
     }
@@ -1771,10 +2514,10 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
 
     let displayGoal = '';
     if (!unlocked) {
-      displayGoal = `Catch 50 unique ${shinyLabel}Alpha Pokémon to unlock Bronze.`;
+      displayGoal = `Catch 50 unique ${shinyLabel}Alpha Pokémon.`;
     } else if (nextTier) {
       const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
-      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Alpha Pokémon to unlock ${nextTier.name}.`;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Alpha Pokémon.`;
     } else {
       displayGoal = `All ${totalCount} unique ${shinyLabel}Alpha Pokémon registered!`;
     }
@@ -1792,8 +2535,8 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
     };
   }
 
-  // 6. Gigantamax Phenom: 33 GMAX forms (31 for shiny due to locked Urshifus)
-  if (achievement.slug === 'gigantamax-phenom' || achievement.requirements?.target === 'gmax_forms') {
+  // 6. Gigantic Potential: 33 GMAX forms (31 for shiny due to locked Urshifus)
+  if (achievement.slug === 'gigantic-potential' || achievement.slug === 'gigantamax-phenom' || achievement.requirements?.target === 'gmax_forms') {
     const rawGmaxList = GMAX_FORMS_LIST;
     const gmaxList = isShiny
       ? rawGmaxList.filter(p => !isUnobtainableShiny(p))
@@ -1818,10 +2561,10 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
 
     const diamondThresh = isShiny ? 31 : 33;
     const tiers = [
-      { id: 't1', name: 'Bronze', order: 1, threshold: 4, requirementDescription: `Register 4 unique ${isShiny ? 'shiny ' : ''}Gigantamax forms in the Living Dex`, artworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom.png', shinyArtworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom-shiny.png' },
-      { id: 't2', name: 'Silver', order: 2, threshold: 10, requirementDescription: `Register 10 unique ${isShiny ? 'shiny ' : ''}Gigantamax forms in the Living Dex`, artworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom.png', shinyArtworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom-shiny.png' },
-      { id: 't3', name: 'Gold', order: 3, threshold: 20, requirementDescription: `Register 20 unique ${isShiny ? 'shiny ' : ''}Gigantamax forms in the Living Dex`, artworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom.png', shinyArtworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom-shiny.png' },
-      { id: 't4', name: 'Diamond', order: 4, threshold: diamondThresh, requirementDescription: `Register all ${diamondThresh} unique ${isShiny ? 'shiny ' : ''}Gigantamax forms in the Living Dex`, artworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom.png', shinyArtworkUrl: '/badges/gigantamax-phenom/gigantamax-phenom-shiny.png' }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 4, requirementDescription: `Register 4 unique ${isShiny ? 'shiny ' : ''}Gigantamax forms in the Living Dex`, artworkUrl: '/badges/gigantic-potential/gigantic-potential.png', shinyArtworkUrl: '/badges/gigantic-potential/gigantic-potential-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 10, requirementDescription: `Register 10 unique ${isShiny ? 'shiny ' : ''}Gigantamax forms in the Living Dex`, artworkUrl: '/badges/gigantic-potential/gigantic-potential.png', shinyArtworkUrl: '/badges/gigantic-potential/gigantic-potential-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 20, requirementDescription: `Register 20 unique ${isShiny ? 'shiny ' : ''}Gigantamax forms in the Living Dex`, artworkUrl: '/badges/gigantic-potential/gigantic-potential.png', shinyArtworkUrl: '/badges/gigantic-potential/gigantic-potential-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: diamondThresh, requirementDescription: `Register all ${diamondThresh} unique ${isShiny ? 'shiny ' : ''}Gigantamax forms in the Living Dex`, artworkUrl: '/badges/gigantic-potential/gigantic-potential.png', shinyArtworkUrl: '/badges/gigantic-potential/gigantic-potential-shiny.png' }
     ];
 
     let unlockedTier = null;
@@ -1848,10 +2591,10 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
 
     let displayGoal = '';
     if (!unlocked) {
-      displayGoal = `Catch 4 unique ${shinyLabel}Gigantamax forms to unlock Bronze.`;
+      displayGoal = `Catch 4 unique ${shinyLabel}Gigantamax forms.`;
     } else if (nextTier) {
       const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
-      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Gigantamax forms to unlock ${nextTier.name}.`;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Gigantamax forms.`;
     } else {
       displayGoal = `All ${totalCount} unique ${shinyLabel}Gigantamax forms registered!`;
     }
@@ -1869,8 +2612,91 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
     };
   }
 
-  // 7. Mighty Champion: 54 Mighty Mark Pokémon (Regular only)
-  if (achievement.slug === 'mighty-champion' || achievement.requirements?.target === 'mightiest_mark') {
+  // Across the Regions: 57 Regional Forms (54 for shiny due to locked Galarian birds)
+  if (achievement.slug === 'across-the-regions' || achievement.slug === 'global-phenotype' || achievement.requirements?.target === 'regional_forms') {
+    const rawRegionalList = REGIONAL_FORMS_LIST;
+    const regionalList = isShiny
+      ? rawRegionalList.filter(p => !isRegionalShinyLocked(p))
+      : rawRegionalList;
+    const totalCount = regionalList.length || (isShiny ? 54 : 57);
+    let currentCount = 0;
+
+    regionalList.forEach(poke => {
+      const stableKey = isShiny ? `${poke.stableId}_shiny` : poke.stableId;
+      const formKey = isShiny ? `${poke.name}_${poke.formType}_shiny` : `${poke.name}_${poke.formType}`;
+      const nameKey = isShiny ? `${poke.name}_shiny` : poke.name;
+      const nameIdKey = isShiny ? `${poke.name}-${poke.id}_shiny` : `${poke.name}-${poke.id}`;
+
+      const isCaught =
+        isEntryCaught(caughtMap[stableKey]) ||
+        isEntryCaught(caughtMap[formKey]) ||
+        isEntryCaught(caughtMap[nameKey]) ||
+        isEntryCaught(caughtMap[nameIdKey]);
+
+      if (isCaught) {
+        currentCount++;
+      }
+    });
+
+    const bronzeThresh = 5;
+    const silverThresh = isShiny ? 15 : 16;
+    const goldThresh = isShiny ? 30 : 32;
+    const diamondThresh = isShiny ? 54 : 57;
+
+    const tiers = [
+      { id: 't1', name: 'Bronze', order: 1, threshold: bronzeThresh, requirementDescription: `Register ${bronzeThresh} unique ${isShiny ? 'shiny ' : ''}Regional Forms in the Living Dex`, artworkUrl: '/badges/across-the-regions/across-the-regions.png', shinyArtworkUrl: '/badges/across-the-regions/across-the-regions-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: silverThresh, requirementDescription: `Register ${silverThresh} unique ${isShiny ? 'shiny ' : ''}Regional Forms in the Living Dex`, artworkUrl: '/badges/across-the-regions/across-the-regions.png', shinyArtworkUrl: '/badges/across-the-regions/across-the-regions-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: goldThresh, requirementDescription: `Register ${goldThresh} unique ${isShiny ? 'shiny ' : ''}Regional Forms in the Living Dex`, artworkUrl: '/badges/across-the-regions/across-the-regions.png', shinyArtworkUrl: '/badges/across-the-regions/across-the-regions-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: diamondThresh, requirementDescription: `Register all ${diamondThresh} unique ${isShiny ? 'shiny ' : ''}Regional Forms in the Living Dex`, artworkUrl: '/badges/across-the-regions/across-the-regions.png', shinyArtworkUrl: '/badges/across-the-regions/across-the-regions-shiny.png' }
+    ];
+
+    let unlockedTier = null;
+    let highestTierName = null;
+    let tierOrder = 0;
+    let nextTier = null;
+
+    for (let i = 0; i < tiers.length; i++) {
+      const tier = tiers[i];
+      const thresh = tier.threshold || 0;
+      if (currentCount >= thresh) {
+        unlockedTier = (tier.name || '').toLowerCase();
+        highestTierName = tier.name;
+        tierOrder = tier.order || (i + 1);
+      } else {
+        if (!nextTier) {
+          nextTier = tier;
+        }
+      }
+    }
+
+    const unlocked = unlockedTier !== null;
+    const shinyLabel = isShiny ? 'shiny ' : '';
+
+    let displayGoal = '';
+    if (!unlocked) {
+      displayGoal = `Catch ${bronzeThresh} unique ${shinyLabel}Regional Forms.`;
+    } else if (nextTier) {
+      const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}Regional Forms.`;
+    } else {
+      displayGoal = `All ${totalCount} unique ${shinyLabel}Regional Forms registered!`;
+    }
+
+    return {
+      currentCount,
+      totalCount,
+      unlocked,
+      unlockedTier,
+      highestTierName,
+      nextTier,
+      displayGoal,
+      tierOrder,
+      tiers
+    };
+  }
+
+  // 7. Mightiest of Them All: 54 Mighty Mark Pokémon (Regular only)
+  if (achievement.slug === 'mightiest-of-them-all' || achievement.slug === 'mighty-champion' || achievement.requirements?.target === 'mightiest_mark') {
     const mightyList = MIGHTY_POKEMON_LIST;
     const totalCount = mightyList.length || 54;
     let currentCount = 0;
@@ -1891,10 +2717,10 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
     });
 
     const tiers = achievement.tiers || [
-      { id: 't1', name: 'Bronze', order: 1, threshold: 5, requirementDescription: 'Register 5 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mighty-champion/mighty-champion.png', shinyArtworkUrl: null },
-      { id: 't2', name: 'Silver', order: 2, threshold: 15, requirementDescription: 'Register 15 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mighty-champion/mighty-champion.png', shinyArtworkUrl: null },
-      { id: 't3', name: 'Gold', order: 3, threshold: 30, requirementDescription: 'Register 30 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mighty-champion/mighty-champion.png', shinyArtworkUrl: null },
-      { id: 't4', name: 'Diamond', order: 4, threshold: 54, requirementDescription: 'Register all 54 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mighty-champion/mighty-champion.png', shinyArtworkUrl: null }
+      { id: 't1', name: 'Bronze', order: 1, threshold: 5, requirementDescription: 'Register 5 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mightiest-of-them-all/mightiest-of-them-all.png', shinyArtworkUrl: null },
+      { id: 't2', name: 'Silver', order: 2, threshold: 15, requirementDescription: 'Register 15 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mightiest-of-them-all/mightiest-of-them-all.png', shinyArtworkUrl: null },
+      { id: 't3', name: 'Gold', order: 3, threshold: 30, requirementDescription: 'Register 30 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mightiest-of-them-all/mightiest-of-them-all.png', shinyArtworkUrl: null },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 54, requirementDescription: 'Register all 54 Mighty Mark Pokémon in the Living Dex', artworkUrl: '/badges/mightiest-of-them-all/mightiest-of-them-all.png', shinyArtworkUrl: null }
     ];
 
     let unlockedTier = null;
@@ -1920,10 +2746,10 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
 
     let displayGoal = '';
     if (!unlocked) {
-      displayGoal = 'Catch 5 Mighty Mark Pokémon to unlock Bronze.';
+      displayGoal = 'Catch 5 Mighty Mark Pokémon.';
     } else if (nextTier) {
       const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
-      displayGoal = `Catch ${targetStr} Mighty Mark Pokémon to unlock ${nextTier.name}.`;
+      displayGoal = `Catch ${targetStr} Mighty Mark Pokémon.`;
     } else {
       displayGoal = `All ${totalCount} Mighty Mark Pokémon registered!`;
     }
@@ -1938,6 +2764,395 @@ export function calculateAchievementProgress(achievement, caughtMap = {}, isShin
       displayGoal,
       tierOrder,
       tiers
+    };
+  }
+
+  // Ladies First: 103 Female Gender Forms (Bronze: 10, Silver: 30, Gold: 60, Diamond: 103)
+  if (achievement.slug === 'ladies-first' || achievement.slug === 'dimorphic-discovery' || achievement.requirements?.target === 'gender_forms') {
+    const genderList = GENDER_FORMS_LIST;
+    const totalCount = genderList.length || 103;
+    let currentCount = 0;
+
+    genderList.forEach(poke => {
+      const stableKey = isShiny ? `${poke.stableId}_shiny` : poke.stableId;
+      const formKey = isShiny ? `${poke.name}_gender_shiny` : `${poke.name}_gender`;
+      const nameKey = isShiny ? `${poke.name}_shiny` : poke.name;
+      const nameIdKey = isShiny ? `${poke.name}-${poke.id}_shiny` : `${poke.name}-${poke.id}`;
+
+      const isCaught =
+        isEntryCaught(caughtMap[stableKey]) ||
+        isEntryCaught(caughtMap[formKey]) ||
+        isEntryCaught(caughtMap[nameKey]) ||
+        isEntryCaught(caughtMap[nameIdKey]);
+
+      if (isCaught) {
+        currentCount++;
+      }
+    });
+
+    const tiers = [
+      { id: 't1', name: 'Bronze', order: 1, threshold: 10, requirementDescription: `Register 10 ${isShiny ? 'shiny ' : ''}female gender forms in the Living Dex`, artworkUrl: '/badges/ladies-first/ladies-first.png', shinyArtworkUrl: '/badges/ladies-first/ladies-first-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 30, requirementDescription: `Register 30 ${isShiny ? 'shiny ' : ''}female gender forms in the Living Dex`, artworkUrl: '/badges/ladies-first/ladies-first.png', shinyArtworkUrl: '/badges/ladies-first/ladies-first-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 60, requirementDescription: `Register 60 ${isShiny ? 'shiny ' : ''}female gender forms in the Living Dex`, artworkUrl: '/badges/ladies-first/ladies-first.png', shinyArtworkUrl: '/badges/ladies-first/ladies-first-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 103, requirementDescription: `Register all 103 ${isShiny ? 'shiny ' : ''}female gender forms in the Living Dex`, artworkUrl: '/badges/ladies-first/ladies-first.png', shinyArtworkUrl: '/badges/ladies-first/ladies-first-shiny.png' }
+    ];
+
+    let unlockedTier = null;
+    let highestTierName = null;
+    let tierOrder = 0;
+    let nextTier = null;
+
+    for (let i = 0; i < tiers.length; i++) {
+      const tier = tiers[i];
+      const thresh = tier.threshold || 0;
+      if (currentCount >= thresh) {
+        unlockedTier = (tier.name || '').toLowerCase();
+        highestTierName = tier.name;
+        tierOrder = tier.order || (i + 1);
+      } else {
+        if (!nextTier) {
+          nextTier = tier;
+        }
+      }
+    }
+
+    const unlocked = unlockedTier !== null;
+    const shinyLabel = isShiny ? 'shiny ' : '';
+
+    let displayGoal = '';
+    if (!unlocked) {
+      displayGoal = `Catch 10 unique ${shinyLabel}female gender forms.`;
+    } else if (nextTier) {
+      const targetStr = nextTier.threshold === totalCount ? `all ${totalCount}` : nextTier.threshold;
+      displayGoal = `Catch ${targetStr} unique ${shinyLabel}female gender forms.`;
+    } else {
+      displayGoal = `All ${totalCount} unique ${shinyLabel}female gender forms registered!`;
+    }
+
+    return {
+      currentCount,
+      totalCount,
+      unlocked,
+      unlockedTier,
+      highestTierName,
+      nextTier,
+      displayGoal,
+      tierOrder,
+      tiers
+    };
+  }
+
+  // Gotta Catch ’Em All!: All regular and obtainable shiny Pokémon and forms across the site
+  if (achievement.slug === 'gotta-catch-em-all' || achievement.requirements?.target === 'all_pokemon_and_forms_regular_and_shiny') {
+    const totalCount = getTotalTrackerPokemonCount();
+    let currentCount = 0;
+
+    // 1. Regular Base Pokémon (1,025)
+    (pokemonData || []).forEach(poke => {
+      const stableKey = poke.stableId;
+      const idKey = `${poke.id}`;
+      const paddedIdKey = String(poke.id).padStart(4, '0');
+      const nameKey = poke.name;
+      const nameIdKey = `${poke.name}-${poke.id}`;
+      if (
+        isEntryCaught(caughtMap[stableKey]) ||
+        isEntryCaught(caughtMap[idKey]) ||
+        isEntryCaught(caughtMap[paddedIdKey]) ||
+        isEntryCaught(caughtMap[nameKey]) ||
+        isEntryCaught(caughtMap[nameIdKey])
+      ) {
+        currentCount++;
+      }
+    });
+
+    // 2. Regular Forms (1,105)
+    ALL_FORMS_LIST.forEach(form => {
+      const stableKey = form.stableId;
+      const nameKey = form.name;
+      const formKey = form.formType ? `${form.name}_${form.formType}` : form.name;
+      if (
+        isEntryCaught(caughtMap[stableKey]) ||
+        isEntryCaught(caughtMap[nameKey]) ||
+        isEntryCaught(caughtMap[formKey])
+      ) {
+        currentCount++;
+      }
+    });
+
+    // 3. Obtainable Shiny Base Pokémon (997)
+    (pokemonData || []).forEach(poke => {
+      if (isUnobtainableShiny(poke)) return;
+      const stableKey = `${poke.stableId}_shiny`;
+      const idKey = `${poke.id}_shiny`;
+      const paddedIdKey = `${String(poke.id).padStart(4, '0')}_shiny`;
+      const nameKey = `${poke.name}_shiny`;
+      const nameIdKey = `${poke.name}-${poke.id}_shiny`;
+      if (
+        isEntryCaught(caughtMap[stableKey]) ||
+        isEntryCaught(caughtMap[idKey]) ||
+        isEntryCaught(caughtMap[paddedIdKey]) ||
+        isEntryCaught(caughtMap[nameKey]) ||
+        isEntryCaught(caughtMap[nameIdKey])
+      ) {
+        currentCount++;
+      }
+    });
+
+    // 4. Obtainable Shiny Forms (1,037)
+    ALL_FORMS_LIST.forEach(form => {
+      if (isUnobtainableShiny(form)) return;
+      const stableKey = `${form.stableId}_shiny`;
+      const nameKey = `${form.name}_shiny`;
+      const formKey = form.formType ? `${form.name}_${form.formType}_shiny` : `${form.name}_shiny`;
+      if (
+        isEntryCaught(caughtMap[stableKey]) ||
+        isEntryCaught(caughtMap[nameKey]) ||
+        isEntryCaught(caughtMap[formKey])
+      ) {
+        currentCount++;
+      }
+    });
+
+    const displayCount = Math.min(currentCount, totalCount);
+    const unlocked = displayCount >= totalCount;
+    const displayGoal = unlocked
+      ? 'Every obtainable Pokémon on UltimateDexTracker.com registered!'
+      : 'Register every obtainable Pokémon on UltimateDexTracker.com';
+
+    const diamondTier = {
+      ...(achievement.tiers?.[0] || {
+        id: 't1',
+        name: 'Diamond',
+        order: 1,
+        requirementDescription: 'Register every obtainable Pokémon on UltimateDexTracker.com',
+        artworkUrl: '/badges/gotta-catch-em-all/gotta-catch-em-all.png'
+      }),
+      threshold: totalCount
+    };
+
+    return {
+      currentCount: displayCount,
+      totalCount,
+      unlocked,
+      unlockedTier: unlocked ? 'diamond' : null,
+      highestTierName: unlocked ? 'Diamond' : null,
+      nextTier: diamondTier,
+      displayGoal,
+      tierOrder: unlocked ? 1 : 0,
+      tiers: [diamondTier]
+    };
+  }
+
+  // Ball Connoisseur (formerly Apriball Artisan): 16 Special Ball types
+  // Bronze: 3, Silver: 6, Gold: 10, Diamond: 16
+  if (
+    achievement.slug === 'ball-connoisseur' ||
+    achievement.slug === 'apriball-artisan' ||
+    achievement.requirements?.target === 'special_balls' ||
+    achievement.requirements?.target === 'apriballs'
+  ) {
+    const usedBallsSet = new Set();
+
+    Object.entries(caughtMap || {}).forEach(([key, info]) => {
+      if (!isEntryCaught(info)) return;
+
+      const isEntryShiny = key.endsWith('_shiny') || Boolean(info?.isShiny);
+
+      if (Array.isArray(info?.entries) && info.entries.length > 0) {
+        info.entries.forEach(sub => {
+          if (!sub || !sub.ball) return;
+          const subShiny = sub.isShiny !== undefined ? Boolean(sub.isShiny) : isEntryShiny;
+          if (subShiny === isShiny) {
+            const matched = normalizeSpecialBall(sub.ball);
+            if (matched) usedBallsSet.add(matched);
+          }
+        });
+      } else if (info?.ball) {
+        if (isEntryShiny === isShiny) {
+          const matched = normalizeSpecialBall(info.ball);
+          if (matched) usedBallsSet.add(matched);
+        }
+      }
+    });
+
+    const currentCount = usedBallsSet.size;
+    const totalCount = 16;
+    const usedSpecialBalls = Array.from(usedBallsSet);
+
+    const tiers = [
+      { id: 't1', name: 'Bronze', order: 1, threshold: 3, requirementDescription: `Register ${isShiny ? 'shiny ' : ''}catches in 3 unique Special Ball types`, artworkUrl: '/badges/ball-connoisseur/ball-connoisseur.png', shinyArtworkUrl: '/badges/ball-connoisseur/ball-connoisseur-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 6, requirementDescription: `Register ${isShiny ? 'shiny ' : ''}catches in 6 unique Special Ball types`, artworkUrl: '/badges/ball-connoisseur/ball-connoisseur.png', shinyArtworkUrl: '/badges/ball-connoisseur/ball-connoisseur-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 10, requirementDescription: `Register ${isShiny ? 'shiny ' : ''}catches in 10 unique Special Ball types`, artworkUrl: '/badges/ball-connoisseur/ball-connoisseur.png', shinyArtworkUrl: '/badges/ball-connoisseur/ball-connoisseur-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 16, requirementDescription: `Use every eligible ${isShiny ? 'shiny ' : ''}Special Ball`, artworkUrl: '/badges/ball-connoisseur/ball-connoisseur.png', shinyArtworkUrl: '/badges/ball-connoisseur/ball-connoisseur-shiny.png' }
+    ];
+
+    let unlockedTier = null;
+    let highestTierName = null;
+    let tierOrder = 0;
+    let nextTier = null;
+
+    for (let i = 0; i < tiers.length; i++) {
+      const tier = tiers[i];
+      const thresh = tier.threshold || 0;
+      if (currentCount >= thresh) {
+        unlockedTier = (tier.name || '').toLowerCase();
+        highestTierName = tier.name;
+        tierOrder = tier.order || (i + 1);
+      } else {
+        if (!nextTier) {
+          nextTier = tier;
+        }
+      }
+    }
+
+    const unlocked = unlockedTier !== null;
+    const shinyLabel = isShiny ? 'shiny ' : '';
+
+    let displayGoal = '';
+    if (!unlocked) {
+      displayGoal = `Catch Pokémon in 3 unique ${shinyLabel}Special Ball types.`;
+    } else if (nextTier) {
+      if (nextTier.name === 'Diamond') {
+        displayGoal = isShiny
+          ? 'Catch a shiny Pokémon in every eligible Special Ball.'
+          : 'Catch a Pokémon in every eligible Special Ball.';
+      } else {
+        displayGoal = `Catch Pokémon in ${nextTier.threshold} unique ${shinyLabel}Special Ball types.`;
+      }
+    } else {
+      displayGoal = `All 16 eligible ${shinyLabel}Special Ball types registered!`;
+    }
+
+    return {
+      currentCount,
+      totalCount,
+      unlocked,
+      unlockedTier,
+      highestTierName,
+      nextTier,
+      displayGoal,
+      tierOrder,
+      tiers,
+      usedSpecialBalls
+    };
+  }
+
+  // Beast Ballin: Unique Pokémon caught in Beast Balls
+  // Bronze: 1, Silver: 3, Gold: 7, Diamond: 15
+  if (
+    achievement.slug === 'beast-ballin' ||
+    achievement.requirements?.target === 'beast_ball' ||
+    achievement.id === 'ach-bal-02'
+  ) {
+    const isBeastBall = (ball) => {
+      if (!ball || typeof ball !== 'string') return false;
+      const b = ball.trim().toLowerCase().replace(/[-_]/g, ' ');
+      return b === 'beast ball';
+    };
+
+    const uniquePokemonSet = new Set();
+
+    Object.entries(caughtMap || {}).forEach(([key, info]) => {
+      if (!isEntryCaught(info)) return;
+
+      const isEntryShiny = key.endsWith('_shiny') || Boolean(info?.isShiny);
+      const baseMonId = (info?.stableId || key).replace(/_shiny$/, '');
+
+      if (Array.isArray(info?.entries) && info.entries.length > 0) {
+        info.entries.forEach(sub => {
+          if (!sub || !sub.ball) return;
+          const subShiny = sub.isShiny !== undefined ? Boolean(sub.isShiny) : isEntryShiny;
+          if (subShiny === isShiny && isBeastBall(sub.ball)) {
+            uniquePokemonSet.add(baseMonId);
+          }
+        });
+      } else if (info?.ball) {
+        if (isEntryShiny === isShiny && isBeastBall(info.ball)) {
+          uniquePokemonSet.add(baseMonId);
+        }
+      }
+    });
+
+    const currentCount = uniquePokemonSet.size;
+    const totalCount = 15;
+
+    const tiers = [
+      { id: 't1', name: 'Bronze', order: 1, threshold: 1, requirementDescription: `Register 1 unique ${isShiny ? 'shiny ' : ''}Pokémon in a Beast Ball`, artworkUrl: '/badges/beast-ballin/beast-ballin.png', shinyArtworkUrl: '/badges/beast-ballin/beast-ballin-shiny.png' },
+      { id: 't2', name: 'Silver', order: 2, threshold: 3, requirementDescription: `Register 3 unique ${isShiny ? 'shiny ' : ''}Pokémon in Beast Balls`, artworkUrl: '/badges/beast-ballin/beast-ballin.png', shinyArtworkUrl: '/badges/beast-ballin/beast-ballin-shiny.png' },
+      { id: 't3', name: 'Gold', order: 3, threshold: 7, requirementDescription: `Register 7 unique ${isShiny ? 'shiny ' : ''}Pokémon in Beast Balls`, artworkUrl: '/badges/beast-ballin/beast-ballin.png', shinyArtworkUrl: '/badges/beast-ballin/beast-ballin-shiny.png' },
+      { id: 't4', name: 'Diamond', order: 4, threshold: 15, requirementDescription: `Register 15 unique ${isShiny ? 'shiny ' : ''}Pokémon in Beast Balls`, artworkUrl: '/badges/beast-ballin/beast-ballin.png', shinyArtworkUrl: '/badges/beast-ballin/beast-ballin-shiny.png' }
+    ];
+
+    let unlockedTier = null;
+    let highestTierName = null;
+    let tierOrder = 0;
+    let nextTier = null;
+
+    for (let i = 0; i < tiers.length; i++) {
+      const tier = tiers[i];
+      const thresh = tier.threshold || 0;
+      if (currentCount >= thresh) {
+        unlockedTier = (tier.name || '').toLowerCase();
+        highestTierName = tier.name;
+        tierOrder = tier.order || (i + 1);
+      } else {
+        if (!nextTier) {
+          nextTier = tier;
+        }
+      }
+    }
+
+    const unlocked = unlockedTier !== null;
+    const shinyLabel = isShiny ? 'shiny ' : '';
+
+    let displayGoal = '';
+    if (!unlocked) {
+      displayGoal = `Catch a unique ${shinyLabel}Pokémon in a Beast Ball.`;
+    } else if (nextTier) {
+      displayGoal = `Catch ${nextTier.threshold} unique ${shinyLabel}Pokémon in Beast Balls.`;
+    } else {
+      displayGoal = `All 15 unique ${shinyLabel}Pokémon registered in Beast Balls!`;
+    }
+
+    return {
+      currentCount,
+      totalCount,
+      unlocked,
+      unlockedTier,
+      highestTierName,
+      nextTier,
+      displayGoal,
+      tierOrder,
+      tiers
+    };
+  }
+
+  // BINGO!: Complete a BINGO from any year
+  if (
+    achievement.slug === 'bingo' ||
+    achievement.id === 'ach-eve-01' ||
+    achievement.requirements?.type === 'bingo_completed'
+  ) {
+    const isCompleted = checkUserHasCompletedBingo();
+    const diamondTier = achievement.tiers?.[0] || {
+      id: 't1',
+      name: 'Diamond',
+      order: 1,
+      threshold: 1,
+      requirementDescription: 'Complete a BINGO from any year',
+      artworkUrl: '/badges/bingo!/bingo!.png'
+    };
+
+    return {
+      currentCount: isCompleted ? 1 : 0,
+      totalCount: 1,
+      unlocked: isCompleted,
+      unlockedTier: isCompleted ? 'diamond' : null,
+      highestTierName: isCompleted ? 'Diamond' : null,
+      nextTier: isCompleted ? null : diamondTier,
+      displayGoal: isCompleted ? 'BINGO completed!' : 'Complete a BINGO from any year.',
+      tierOrder: isCompleted ? 1 : 0,
+      tiers: [diamondTier]
     };
   }
 
