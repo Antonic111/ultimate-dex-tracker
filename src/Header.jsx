@@ -303,29 +303,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
     return () => window.removeEventListener('tutorialStepChange', handleTutorialStep);
   }, []);
 
-  // Prevent body scroll when mobile nav is open
-  useEffect(() => {
-    if (showMobileNav) {
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = 'unset';
-      };
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-  }, [showMobileNav]);
 
-  // Prevent body scroll when profile menu is open on small screens
-  useEffect(() => {
-    if (showMenu && window.innerWidth < 640) {
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = 'unset';
-      };
-    } else if (!showMobileNav) {
-      document.body.style.overflow = 'unset';
-    }
-  }, [showMenu, showMobileNav]);
 
   // Handle clicking or tapping outside any dropdown to close it
   useEffect(() => {
@@ -628,10 +606,13 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.96 }}
               transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-              className="mobile-nav-dropdown xl:hidden fixed top-[92px] left-3 right-3 bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-2xl py-2 px-1 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow),0_20px_40px_rgba(0,0,0,0.6)] z-50 backdrop-blur-[16px] max-h-[calc(100dvh-110px)] max-h-[calc(100vh-110px)] overflow-y-auto overscroll-contain"
-              style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+              className="mobile-nav-dropdown xl:hidden fixed top-[92px] left-3 right-3 bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-2xl py-2 px-1 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow),0_20px_40px_rgba(0,0,0,0.6)] z-50 backdrop-blur-[16px] overflow-y-auto overscroll-contain"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                maxHeight: 'calc(100dvh - 108px)'
+              }}
             >
-              <div className="flex flex-col gap-2 p-1">
+              <div className="flex flex-col gap-2 p-1 pb-8">
                 {NAV_DROPDOWNS
                   .filter((category) => {
                     if (category.requiresAuth && !user?.username) return false;
@@ -717,14 +698,14 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
 
 
         {user?.username && !['/login', '/register', '/email-sent', '/forgot-password', '/enter-reset-code', '/reset-password', '/complete-signup'].includes(location.pathname) && !user?.needsProfileSetup && (
-          <nav className="ml-auto pr-1 md:pr-4 flex items-center gap-2 sm:gap-3 md:gap-4.5 flex-shrink-0">
+          <nav className="ml-auto pr-2 sm:pr-3 md:pr-4 flex items-center gap-3 sm:gap-3.5 md:gap-4.5 flex-shrink-0">
             {/* Notification Bell */}
             <div className="flex items-center flex-shrink-0">
               <NotificationDropdown user={user} />
             </div>
 
             {/* Subtle Vertical Divider */}
-            <div className="h-6 md:h-7 w-[1px] bg-[var(--border-color)] flex-shrink-0" />
+            <div className="h-6 md:h-7 w-[1px] bg-[var(--border-color)] flex-shrink-0 mx-1 sm:mx-0.5 md:mx-0" />
 
             {/* Profile Dropdown Trigger */}
             <div className="relative flex items-center" ref={userMenuRef}>
@@ -759,7 +740,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                   const c2 = user.nameColor2 || user.nameGradientColor2;
                   return c1 && c2 && user.isPremium ? (
                     <span
-                      className="hidden sm:inline-block animated-gradient-username-wrapper max-w-[120px] md:max-w-[170px]"
+                      className="header-user-name hidden md:inline-flex animated-gradient-username-wrapper max-w-[120px] md:max-w-[170px]"
                       style={{ "--grad-c1": c1, "--grad-c2": c2 }}
                     >
                       <span className="animated-gradient-username font-bold text-[14px] md:text-[16px] tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">
@@ -767,7 +748,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                       </span>
                     </span>
                   ) : (
-                    <span className="hidden sm:inline-block font-bold text-[var(--text)] text-[14px] md:text-[16px] tracking-wide group-hover:text-[var(--accent)] transition-colors duration-200 whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px] md:max-w-[170px]">
+                    <span className="header-user-name hidden md:inline-block font-bold text-[var(--text)] text-[14px] md:text-[16px] tracking-wide group-hover:text-[var(--accent)] transition-colors duration-200 whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px] md:max-w-[170px]">
                       {user.username}
                     </span>
                   );
@@ -775,7 +756,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
 
                 <ChevronDown
                   strokeWidth={3}
-                  className={`w-5 h-5 sm:w-4.5 sm:h-4.5 min-w-[20px] min-h-[20px] text-[var(--text)] group-hover:text-[var(--accent)] transition-transform duration-200 flex-shrink-0 ${showMenu ? "rotate-180 text-[var(--accent)]" : ""
+                  className={`header-user-chevron hidden md:block w-5 h-5 md:w-4.5 md:h-4.5 min-w-[20px] min-h-[20px] text-[var(--text)] group-hover:text-[var(--accent)] transition-transform duration-200 flex-shrink-0 ${showMenu ? "rotate-180 text-[var(--accent)]" : ""
                     }`}
                 />
               </button>
@@ -788,7 +769,11 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.96 }}
                     transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                    className="fixed top-[92px] right-3 w-[calc(100vw-24px)] max-w-[310px] sm:absolute sm:top-[calc(100%+16px)] sm:right-0 sm:w-[310px] bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-2xl p-3 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow),0_20px_45px_rgba(0,0,0,0.7)] z-50 backdrop-blur-[16px] overflow-hidden flex flex-col"
+                    className="fixed top-[92px] right-3 w-[calc(100vw-24px)] max-w-[310px] sm:absolute sm:top-[calc(100%+16px)] sm:right-0 sm:w-[310px] bg-[var(--dropdown-bg)] border border-[var(--dropdown-border)] rounded-2xl p-3 shadow-[var(--dropdown-shadow),var(--dropdown-inset-shadow),0_20px_45px_rgba(0,0,0,0.7)] z-50 backdrop-blur-[16px] overflow-y-auto overscroll-contain flex flex-col"
+                    style={{
+                      WebkitOverflowScrolling: 'touch',
+                      maxHeight: 'calc(100dvh - 108px)'
+                    }}
                   >
                     {/* User Header Section */}
                     <div className="relative flex items-center justify-between gap-3 p-2.5 pb-3.5 border-b border-[var(--border-color)] mb-2">
@@ -835,7 +820,7 @@ export default function HeaderWithConditionalAuth({ user, setUser, showMenu, set
                     </div>
 
                     {/* Menu items */}
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col gap-1 pb-4">
                       {/* Profile */}
                       <Link
                         data-tutorial-id="nav-profile"

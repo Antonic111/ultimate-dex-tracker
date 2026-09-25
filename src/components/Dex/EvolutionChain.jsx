@@ -96,7 +96,7 @@ function EvoSprite({ mon, size = 44, showShiny = false, onPokemonSelect = null, 
     <div
       className={`evo-sprite ${isClickable ? 'evo-sprite-clickable' : ''} ${isSelected ? 'evo-sprite-selected' : ''}`}
       onClick={handleClick}
-      style={{ cursor: isClickable ? 'pointer' : 'default' }}
+      style={{ cursor: isClickable ? 'pointer' : 'default', width: size, height: size }}
       title={mon.name}
     >
       <img

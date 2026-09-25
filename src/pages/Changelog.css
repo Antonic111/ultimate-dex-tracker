@@ -12,7 +12,7 @@
 
 @media (max-width: 768px) {
   .changelog-page {
-    padding: 16px 16px 2rem 16px;
+    padding: 16px var(--page-mobile-gutter, 16px) 2rem var(--page-mobile-gutter, 16px);
   }
 }
 

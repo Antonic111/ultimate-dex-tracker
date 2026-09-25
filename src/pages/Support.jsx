@@ -38,7 +38,7 @@ const FEATURE_CATEGORIES = [
 ];
 
 const HELP_CATEGORIES = [
-  { value: 'Billing & Membership', label: 'Billing & Membership (Paddle, Subscriptions, Access)' },
+  { value: 'Billing & Membership', label: 'Billing & Membership (Stripe, Subscriptions, Access)' },
   { value: 'Account & Login', label: 'Account & Login (Password, Email, 2FA, Access)' },
   { value: 'Data & Dex Tracking', label: 'Data & Dex Tracking (Lost progress, Cloud sync)' },
   { value: 'General Support', label: 'General Support & Feedback' },
@@ -1504,7 +1504,7 @@ const Support = () => {
             </div>
             <textarea
               className="support-textarea"
-              placeholder="Provide full details of your request. If related to payments, mention when you subscribed so we can verify your Paddle transaction..."
+              placeholder="Provide full details of your request. If related to payments, mention when you subscribed so we can verify your Stripe transaction..."
               value={helpForm.description}
               onChange={(e) => setHelpForm(prev => ({ ...prev, description: e.target.value.slice(0, 1000) }))}
               rows={4}

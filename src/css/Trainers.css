@@ -65,7 +65,7 @@
 
 @media (max-width: 768px) {
   .trainers-page {
-    padding: 16px 16px 32px 16px;
+    padding: 16px var(--page-mobile-gutter, 16px) 32px var(--page-mobile-gutter, 16px);
   }
 }
 

@@ -1,25 +1,37 @@
 import express from "express";
 import crypto from "crypto";
-import { EventEmitter } from "events";
 import StreamerOverlay from "../models/StreamerOverlay.js";
 import User from "../models/User.js";
 import { authenticateUser } from "../middleware/authenticateUser.js";
 import { hasUserEntitlement } from "../utils/entitlementService.js";
+import { broadcastToOverlay } from "../utils/supabaseBroadcast.js";
 
 const router = express.Router();
-export const overlayEventEmitter = new EventEmitter();
-overlayEventEmitter.setMaxListeners(200);
 
 /**
- * Helper to emit SSE events to all connected overlay streams for a user
+ * Helper to broadcast realtime notification events to connected OBS overlay streams for a user.
  */
-export const notifyOverlayStream = (userId, eventType, data = {}) => {
+export const notifyOverlayStream = async (userId, eventType, data = {}) => {
   if (!userId) return;
-  overlayEventEmitter.emit(`user:${String(userId)}`, {
-    type: eventType,
-    data,
-    timestamp: Date.now(),
-  });
+
+  try {
+    let overlayToken = data?.overlayToken || data?.overlay?.overlayToken;
+    if (!overlayToken) {
+      const overlay = await StreamerOverlay.findOne({ userId }).select("overlayToken").lean();
+      overlayToken = overlay?.overlayToken;
+    }
+
+    if (overlayToken) {
+      await broadcastToOverlay(overlayToken, {
+        type: eventType,
+        ...data,
+      });
+    }
+  } catch (err) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("[StreamerTools] Error in notifyOverlayStream:", err.message);
+    }
+  }
 };
 
 // ── Authenticated Routes ───────────────────────────────────────────────────
@@ -148,6 +160,25 @@ router.post("/streamer-tools/overlay/regenerate-token", authenticateUser, async 
  */
 function extractOverlayHunt(hunt) {
   if (!hunt) return null;
+  const checks = Number(hunt.checks || 0);
+  const phases = Array.isArray(hunt.phases) ? hunt.phases : [];
+
+  let totalOverallChecks = checks;
+  if (phases.length > 0) {
+    const lastPhase = phases[phases.length - 1];
+    const lastTotal = lastPhase?.totalChecks !== undefined && lastPhase?.totalChecks !== null
+      ? Number(lastPhase.totalChecks)
+      : phases.reduce((acc, p) => acc + Number(p.phaseChecks || p.checks || 0), 0);
+
+    if (checks >= lastTotal && lastTotal > 0) {
+      totalOverallChecks = checks;
+    } else {
+      totalOverallChecks = lastTotal + checks;
+    }
+  } else if (hunt.totalChecks !== undefined && Number(hunt.totalChecks) > 0) {
+    totalOverallChecks = Number(hunt.totalChecks);
+  }
+
   return {
     id: hunt.id,
     huntId: hunt.huntId || hunt.id,
@@ -158,7 +189,9 @@ function extractOverlayHunt(hunt) {
     ball: hunt.ball || "",
     mark: hunt.mark || "",
     notes: hunt.notes || "",
-    checks: Number(hunt.checks || 0),
+    checks,
+    totalChecks: totalOverallChecks,
+    metricMode: hunt.metricMode || "phase",
     increment: Number(hunt.increment || 1),
     status: hunt.status || "running",
     isPaused: Boolean(hunt.isPaused || hunt.status === "paused"),
@@ -167,7 +200,7 @@ function extractOverlayHunt(hunt) {
     pausedAt: hunt.pausedAt ? Number(hunt.pausedAt) : null,
     totalPausedMs: Number(hunt.totalPausedMs || 0),
     lastCheckAt: hunt.lastCheckAt ? Number(hunt.lastCheckAt) : null,
-    phases: Array.isArray(hunt.phases) ? hunt.phases : [],
+    phases,
     fails: Array.isArray(hunt.fails) ? hunt.fails : [],
     odds: hunt.odds || null,
     stats: hunt.stats || {},
@@ -226,87 +259,12 @@ router.get("/overlay/public/:token", async (req, res) => {
 
 /**
  * GET /api/overlay/stream/:token
- * Server-Sent Events (SSE) stream for realtime push updates to OBS.
+ * Deprecated: Overlay updates now use push notifications via Supabase Realtime Broadcast.
  */
-router.get("/overlay/stream/:token", async (req, res) => {
-  const { token } = req.params;
-
-  try {
-    const overlay = await StreamerOverlay.findOne({ overlayToken: token }).lean();
-    if (!overlay) {
-      return res.status(404).json({ error: "Overlay not found" });
-    }
-
-    // Set headers for Server-Sent Events with no buffering
-    res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
-    res.setHeader("Cache-Control", "no-cache, no-transform, no-store");
-    res.setHeader("Connection", "keep-alive");
-    res.setHeader("X-Accel-Buffering", "no"); // Prevent Nginx/proxy buffering
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.flushHeaders?.();
-
-    // Send initial comment to establish socket stream immediately
-    res.write(": connected\n\n");
-    if (typeof res.flush === "function") res.flush();
-
-    const userChannel = `user:${String(overlay.userId)}`;
-
-    const sendSSE = (eventName, payload) => {
-      try {
-        res.write(`event: ${eventName}\ndata: ${JSON.stringify(payload)}\n\n`);
-        if (typeof res.flush === "function") {
-          res.flush();
-        }
-      } catch (err) {
-        console.error("SSE write error:", err);
-      }
-    };
-
-    // Initial snapshot message
-    const initialData = await getPublicOverlayData(token);
-    sendSSE("snapshot", initialData);
-
-    // Handler for realtime updates
-    const onUserUpdate = async (event) => {
-      try {
-        if (event.type === "HUNT_DATA_CHANGED" || event.type === "CURRENT_HUNT_CHANGED") {
-          const freshData = await getPublicOverlayData(token);
-          sendSSE("update", { ...event, snapshot: freshData });
-        } else if (event.type === "CONFIG_UPDATED") {
-          sendSSE("config", event.data);
-        } else {
-          sendSSE("action", event);
-        }
-      } catch (err) {
-        console.error("SSE user update error:", err);
-      }
-    };
-
-    overlayEventEmitter.on(userChannel, onUserUpdate);
-
-    // Keep-alive heartbeat ping every 20 seconds
-    const pingInterval = setInterval(() => {
-      try {
-        res.write(`: ping\n\n`);
-        if (typeof res.flush === "function") {
-          res.flush();
-        }
-      } catch {
-        clearInterval(pingInterval);
-      }
-    }, 20000);
-
-    // Cleanup when connection closes
-    req.on("close", () => {
-      clearInterval(pingInterval);
-      overlayEventEmitter.removeListener(userChannel, onUserUpdate);
-    });
-  } catch (err) {
-    console.error("Error setting up overlay SSE stream:", err);
-    if (!res.headersSent) {
-      res.status(500).json({ error: "Failed to establish stream" });
-    }
-  }
+router.get("/overlay/stream/:token", (req, res) => {
+  res.status(410).json({
+    error: "SSE stream deprecated. Streamer overlay updates now use Supabase Realtime Broadcast.",
+  });
 });
 
 export default router;

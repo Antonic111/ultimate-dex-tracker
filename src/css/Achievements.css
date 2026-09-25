@@ -14,7 +14,7 @@
 
 @media (max-width: 1340px) {
   .achievements-page {
-    padding: 28px 16px 80px 16px;
+    padding: 28px var(--page-mobile-gutter, 16px) 80px var(--page-mobile-gutter, 16px);
   }
 }
 

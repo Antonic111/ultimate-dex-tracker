@@ -1,28 +1,35 @@
 import express from "express";
 import { Router } from "express";
 import User from "../models/User.js";
-import { authenticateUser } from "../middleware/authenticateUser.js";
+import { authenticateUser, optionalAuthenticateUser } from "../middleware/authenticateUser.js";
 
 const router = Router();
+const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // Get profile likes
-router.get('/:username/likes', authenticateUser, async (req, res) => {
+router.get('/:username/likes', optionalAuthenticateUser, async (req, res) => {
   try {
     const { username } = req.params;
-    const currentUserId = req.userId;
+    const currentUserId = req.userId ? String(req.userId) : null;
 
-    // Find the profile owner
-    const profileOwner = await User.findOne({ username });
+    // Find the profile owner (case-insensitive)
+    const profileOwner = await User.findOne({
+      username: { $regex: new RegExp(`^${escapeRegex(username)}$`, 'i') }
+    }).select('likes');
+
     if (!profileOwner) {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    // Check if current user has liked this profile
-    const hasLiked = profileOwner.likes && profileOwner.likes.includes(currentUserId);
+    const uniqueLikes = Array.isArray(profileOwner.likes)
+      ? Array.from(new Set(profileOwner.likes.filter(Boolean).map(id => id.toString())))
+      : [];
+
+    const hasLiked = currentUserId ? uniqueLikes.includes(currentUserId) : false;
 
     res.json({ 
       hasLiked, 
-      likeCount: profileOwner.likes ? profileOwner.likes.length : 0 
+      likeCount: uniqueLikes.length 
     });
   } catch (error) {
     console.error('Error getting profile likes:', error);
@@ -35,16 +42,20 @@ router.get('/:username/likes/public', async (req, res) => {
   try {
     const { username } = req.params;
 
-    // Find the profile owner
-    const profileOwner = await User.findOne({ username });
+    // Find the profile owner (case-insensitive)
+    const profileOwner = await User.findOne({
+      username: { $regex: new RegExp(`^${escapeRegex(username)}$`, 'i') }
+    }).select('likes');
+
     if (!profileOwner) {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    // Get like count only
-    const likeCount = profileOwner.likes ? profileOwner.likes.length : 0;
+    const uniqueLikes = Array.isArray(profileOwner.likes)
+      ? Array.from(new Set(profileOwner.likes.filter(Boolean).map(id => id.toString())))
+      : [];
 
-    res.json({ count: likeCount });
+    res.json({ count: uniqueLikes.length });
   } catch (error) {
     console.error('Error getting public profile likes:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -55,10 +66,13 @@ router.get('/:username/likes/public', async (req, res) => {
 router.post('/:username/like', authenticateUser, async (req, res) => {
   try {
     const { username } = req.params;
-    const currentUserId = req.userId;
+    const currentUserId = String(req.userId);
 
-    // Find the profile owner
-    const profileOwner = await User.findOne({ username });
+    // Find the profile owner (case-insensitive)
+    const profileOwner = await User.findOne({
+      username: { $regex: new RegExp(`^${escapeRegex(username)}$`, 'i') }
+    });
+
     if (!profileOwner) {
       return res.status(404).json({ error: 'Profile not found' });
     }
@@ -67,23 +81,28 @@ router.post('/:username/like', authenticateUser, async (req, res) => {
       return res.status(400).json({ error: 'Cannot interact with a suspended account' });
     }
 
-    // Toggle like (now allows self-liking)
-    const hasLiked = profileOwner.likes && profileOwner.likes.includes(currentUserId);
-    
-    if (hasLiked) {
-      // Remove like
-      profileOwner.likes = profileOwner.likes.filter(id => !id.equals(currentUserId));
+    // Clean and normalize existing likes to unique string IDs
+    const existingLikes = Array.isArray(profileOwner.likes)
+      ? Array.from(new Set(profileOwner.likes.filter(Boolean).map(id => id.toString())))
+      : [];
+
+    const alreadyLiked = existingLikes.includes(currentUserId);
+    let updatedLikes;
+
+    if (alreadyLiked) {
+      // Remove like (unlike)
+      updatedLikes = existingLikes.filter(id => id !== currentUserId);
     } else {
       // Add like
-      if (!profileOwner.likes) profileOwner.likes = [];
-      profileOwner.likes.push(currentUserId);
+      updatedLikes = [...existingLikes, currentUserId];
     }
 
+    profileOwner.likes = updatedLikes;
     await profileOwner.save();
 
     res.json({ 
-      hasLiked: !hasLiked, 
-      likeCount: profileOwner.likes ? profileOwner.likes.length : 0 
+      hasLiked: !alreadyLiked, 
+      likeCount: updatedLikes.length 
     });
   } catch (error) {
     console.error('Error toggling profile like:', error);

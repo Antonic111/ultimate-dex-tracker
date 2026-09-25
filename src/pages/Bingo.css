@@ -25,7 +25,7 @@
 
 @media (max-width: 768px) {
     .bingo-container {
-        padding: 0 1rem;
+        padding: 0 var(--page-mobile-gutter, 16px);
     }
 }
 

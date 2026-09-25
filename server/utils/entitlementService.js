@@ -326,11 +326,11 @@ export async function getAdminUserEntitlementDetails(userIds) {
       entitlement: "premium",
       isActive: true,
       $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }],
-    }).lean(),
+    }).select("userId source expiresAt grantedAt metadata").lean(),
     Subscription.find({
       userId: { $in: userIds },
       status: { $in: ["active", "trialing", "past_due"] },
-    }).lean(),
+    }).select("userId status currentPeriodEnd").lean(),
   ]);
 
   const subMap = new Map();

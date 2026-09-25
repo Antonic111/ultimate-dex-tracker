@@ -13,7 +13,23 @@
   justify-content: center;
   width: 100%;
   overflow-x: auto;
-  padding: 4px 0 8px 0;
+  overflow-y: hidden;
+  padding: 8px 6px 10px 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.evo-chain-table::-webkit-scrollbar {
+  height: 4px;
+}
+
+.evo-chain-table::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.evo-chain-table::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
 }
 
 .evo-chain-row {
@@ -69,11 +85,17 @@
   position: relative;
   width: 44px;
   height: 44px;
+  flex-shrink: 0;
 }
 
 .evo-img {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   pointer-events: none;
+  image-rendering: pixelated;
 }
 
 .evo-sprite.blank {

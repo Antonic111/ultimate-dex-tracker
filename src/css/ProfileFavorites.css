@@ -529,3 +529,66 @@
   animation: trophyFadeInOut 0.5s ease-out forwards;
 }
 
+/* ==========================================================================
+   MOBILE RESPONSIVENESS FOR FAVORITES SYNC BAR & PILLS
+   ========================================================================== */
+@media (max-width: 640px) {
+  .profile-favorites-container {
+    padding: 0.875rem;
+    gap: 0.65rem;
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+
+  .favorites-sync-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.55rem;
+    padding: 0.55rem;
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+
+  .favorites-sync-left {
+    width: 100%;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+
+  .favorites-timer-pill {
+    flex: 1;
+    max-width: 130px;
+  }
+
+  .favorites-sync-steps {
+    width: 100%;
+    justify-content: center;
+    gap: 0.35rem;
+    flex-wrap: nowrap;
+  }
+
+  .favorites-step-pill {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+    max-width: 54px;
+    height: 34px;
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .profile-favorites-container {
+    padding: 0.75rem;
+  }
+
+  .favorites-sync-steps {
+    gap: 0.25rem;
+  }
+
+  .favorites-step-pill {
+    height: 32px;
+    font-size: 0.72rem;
+  }
+}
+

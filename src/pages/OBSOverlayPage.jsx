@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import HuntOverlayRenderer from "../components/StreamerTools/HuntOverlayRenderer";
 import { streamerOverlayAPI } from "../utils/api";
 import { createHuntChannel, normalizeHunt } from "../utils/huntSync";
-import { buildApiUrl } from "../config/api";
+import { subscribeToOverlayRealtime } from "../services/supabaseOverlayRealtime";
+import { getRecommendedObsDimensions } from "../utils/overlaySnapping";
 
 export default function OBSOverlayPage() {
   const { token } = useParams();
-  const [overlayData, setOverlayData] = useState(null);
+  const [, setOverlayData] = useState(null);
   const [currentHunt, setCurrentHunt] = useState(null);
   const [overlayConfig, setOverlayConfig] = useState(null);
   const [accentColor, setAccentColor] = useState("cyan");
@@ -15,8 +16,11 @@ export default function OBSOverlayPage() {
   const [triggerAnim, setTriggerAnim] = useState(null);
   const [error, setError] = useState(null);
 
-  const eventSourceRef = useRef(null);
   const channelRef = useRef(null);
+  const lastRequestIdRef = useRef(0);
+  const debounceTimerRef = useRef(null);
+
+  const obsDimensions = useMemo(() => getRecommendedObsDimensions(overlayConfig), [overlayConfig]);
 
   // Ensure body and html are completely transparent for OBS alpha blending and remove external widgets / scrollbar rails
   useEffect(() => {
@@ -108,14 +112,21 @@ export default function OBSOverlayPage() {
       const norm = normalizeHunt(data.currentHunt);
       setCurrentHunt((prev) => {
         if (!prev) return norm;
+        const totalPausedDiff = Math.abs((Number(prev.totalPausedMs) || 0) - (Number(norm.totalPausedMs) || 0));
+        const pausedAtDiff = Math.abs((Number(prev.pausedAt) || 0) - (Number(norm.pausedAt) || 0));
+        const isPausedStateIdentical =
+          prev.status === norm.status &&
+          Boolean(prev.isPaused) === Boolean(norm.isPaused) &&
+          totalPausedDiff < 1500 &&
+          pausedAtDiff < 1500;
+
         if (
           String(prev.id) === String(norm.id) &&
           prev.checks === norm.checks &&
-          prev.status === norm.status &&
-          prev.isPaused === norm.isPaused &&
+          prev.totalChecks === norm.totalChecks &&
+          prev.metricMode === norm.metricMode &&
+          isPausedStateIdentical &&
           prev.startedAt === norm.startedAt &&
-          prev.totalPausedMs === norm.totalPausedMs &&
-          prev.pausedAt === norm.pausedAt &&
           prev.increment === norm.increment &&
           prev.pokemonName === norm.pokemonName &&
           prev.game === norm.game &&
@@ -138,134 +149,80 @@ export default function OBSOverlayPage() {
     setError(null);
   }, []);
 
-  // 1. Initial snapshot fetch
+  // 1. Authoritative snapshot fetch with race-condition prevention
   const fetchSnapshot = useCallback(async () => {
     if (!token) return;
+    const currentRequestId = ++lastRequestIdRef.current;
+    if (import.meta.env.DEV) {
+      console.log("[Overlay Realtime] fetching snapshot");
+    }
     try {
       const data = await streamerOverlayAPI.getPublicOverlayData(token);
-      if (data) {
+      // Guarantee out-of-order responses do not overwrite newer state
+      if (currentRequestId === lastRequestIdRef.current && data) {
         applySnapshot(data);
       }
-    } catch (err) {
-      if (!overlayConfig) {
+    } catch {
+      if (currentRequestId === lastRequestIdRef.current && !overlayConfig) {
         setError("Invalid overlay token or overlay disabled.");
       }
     }
   }, [token, overlayConfig, applySnapshot]);
 
-  // 2. High-Efficiency Sync Lifecycle:
-  // - SSE Connected: 0 polling (pure realtime push)
-  // - SSE Disconnected: Immediate 1-second fallback polling
-  // - SSE Reconnect: Automatic exponential backoff (1s -> 2s -> 5s -> 10s)
+  // 2. Debounced snapshot fetch to coalesce bursts of events
+  const debouncedFetchSnapshot = useCallback((delay = 100) => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      fetchSnapshot();
+      debounceTimerRef.current = null;
+    }, delay);
+  }, [fetchSnapshot]);
+
+  // 3. High-Efficiency Push Lifecycle via Supabase Realtime Broadcast:
+  // - Push Events: Zero continuous polling on Vercel
+  // - Instant Animations: Triggered immediately on broadcast receipt
+  // - Authoritative State: Snapshot fetched with debounce
+  // - Reconnect: One-time authoritative refresh when connection recovers
   useEffect(() => {
     if (!token) return;
 
-    let sse = null;
-    let reconnectTimeout = null;
-    let pollInterval = null;
-    let backoffDelay = 1000;
-
-    const stopPolling = () => {
-      if (pollInterval) {
-        clearInterval(pollInterval);
-        pollInterval = null;
-      }
-    };
-
-    const startPolling = () => {
-      if (pollInterval) return;
-      fetchSnapshot();
-      pollInterval = setInterval(fetchSnapshot, 1000);
-    };
-
-    const connectSSE = () => {
-      try {
-        const streamUrl = buildApiUrl(`/overlay/stream/${encodeURIComponent(token)}`);
-        sse = new EventSource(streamUrl);
-        eventSourceRef.current = sse;
-
-        sse.onopen = () => {
-          // SSE connected: Zero polling overhead on the server
-          stopPolling();
-          backoffDelay = 1000;
-        };
-
-        sse.addEventListener("snapshot", (e) => {
-          try {
-            const data = JSON.parse(e.data);
-            applySnapshot(data);
-          } catch (err) {
-            console.error("SSE snapshot parse error:", err);
-          }
-        });
-
-        sse.addEventListener("update", (e) => {
-          try {
-            const parsed = JSON.parse(e.data);
-            if (parsed.snapshot) {
-              applySnapshot(parsed.snapshot);
-            }
-          } catch (err) {
-            console.error("SSE update parse error:", err);
-          }
-        });
-
-        sse.addEventListener("config", (e) => {
-          try {
-            const parsed = JSON.parse(e.data);
-            if (parsed.overlay) {
-              setOverlayConfig((prev) => (JSON.stringify(prev) === JSON.stringify(parsed.overlay) ? prev : parsed.overlay));
-            }
-          } catch (_) {}
-        });
-
-        sse.addEventListener("action", (e) => {
-          try {
-            const actionEvent = JSON.parse(e.data);
-            if (actionEvent.type === "INCREMENT") {
-              setTriggerAnim({ type: "INCREMENT", id: Date.now() });
-            } else if (actionEvent.type === "LOG_SHINY_PHASE") {
-              setTriggerAnim({ type: "PHASE", id: Date.now() });
-            } else if (actionEvent.type === "SHINY_COMPLETED") {
-              setTriggerAnim({ type: "SHINY", id: Date.now() });
-            }
-          } catch (_) {}
-        });
-
-        sse.onmessage = (e) => {
-          try {
-            const data = JSON.parse(e.data);
-            if (data?.snapshot) {
-              applySnapshot(data.snapshot);
-            }
-          } catch (_) {}
-        };
-
-        sse.onerror = () => {
-          sse.close();
-          // SSE dropped: immediately start 1-second fallback polling so overlay never stalls
-          startPolling();
-
-          // Schedule reconnect with gentle exponential backoff: 1s -> 2s -> 5s -> 10s
-          const currentDelay = backoffDelay;
-          if (backoffDelay === 1000) backoffDelay = 2000;
-          else if (backoffDelay === 2000) backoffDelay = 5000;
-          else backoffDelay = 10000;
-
-          if (reconnectTimeout) clearTimeout(reconnectTimeout);
-          reconnectTimeout = setTimeout(connectSSE, currentDelay);
-        };
-      } catch (err) {
-        console.warn("SSE initialization error:", err);
-        startPolling();
-      }
-    };
-
-    // Initial snapshot fetch & start SSE
+    // A. Initial snapshot fetch
     fetchSnapshot();
-    connectSSE();
 
-    // 3. Local BroadcastChannel for instant same-browser updates
+    // B. Subscribe to Supabase Realtime push notifications
+    const unsubscribeRealtime = subscribeToOverlayRealtime(token, {
+      onEvent: (payload) => {
+        // Trigger immediate micro-animations if action metadata is present
+        const actionType = payload?.action?.type || payload?.type;
+        if (actionType === "INCREMENT") {
+          setTriggerAnim({ type: "INCREMENT", id: Date.now() });
+        } else if (actionType === "LOG_SHINY_PHASE" || actionType === "PHASE") {
+          setTriggerAnim({ type: "PHASE", id: Date.now() });
+        } else if (actionType === "SHINY_COMPLETED" || actionType === "SHINY") {
+          setTriggerAnim({ type: "SHINY", id: Date.now() });
+        } else if (actionType === "FAIL") {
+          setTriggerAnim({ type: "FAIL", id: Date.now() });
+        }
+
+        // Apply config changes directly if provided in payload
+        if (payload?.overlay) {
+          setOverlayConfig((prev) =>
+            JSON.stringify(prev) === JSON.stringify(payload.overlay) ? prev : payload.overlay
+          );
+        }
+
+        // Coalesce rapid events and fetch authoritative snapshot
+        debouncedFetchSnapshot(100);
+      },
+      onReconnect: () => {
+        // Authoritative refresh when connection recovers
+        fetchSnapshot();
+      },
+    });
+
+    // C. Local BroadcastChannel for instant same-browser updates (0ms latency tab sync)
     const channel = createHuntChannel((msg) => {
       if (!msg) return;
 
@@ -273,7 +230,7 @@ export default function OBSOverlayPage() {
         if (msg.hunt) {
           setCurrentHunt(normalizeHunt(msg.hunt));
         } else {
-          fetchSnapshot();
+          debouncedFetchSnapshot(50);
         }
       } else if (msg.type === "HUNTS_SYNC" && msg.hunts) {
         setCurrentHunt((prev) => {
@@ -286,6 +243,15 @@ export default function OBSOverlayPage() {
           setTriggerAnim({ type: "INCREMENT", id: Date.now() });
         } else if (msg.action.type === "LOG_SHINY_PHASE") {
           setTriggerAnim({ type: "PHASE", id: Date.now() });
+        } else if (msg.action.type === "TOGGLE_METRIC_MODE" && msg.action.metricMode) {
+          setCurrentHunt((prev) => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              metricMode: msg.action.metricMode,
+              updatedAt: Date.now()
+            };
+          });
         }
         if (msg.hunts) {
           setCurrentHunt((prev) => {
@@ -294,23 +260,41 @@ export default function OBSOverlayPage() {
             return updated ? normalizeHunt(updated) : prev;
           });
         } else {
-          fetchSnapshot();
+          debouncedFetchSnapshot(50);
         }
       } else if (msg.type === "HUNT_UPDATED") {
-        fetchSnapshot();
+        if (msg.hunt) {
+          setCurrentHunt((prev) => {
+            if (prev && (String(prev.id) === String(msg.hunt.id) || String(prev.huntId) === String(msg.hunt.id))) {
+              return normalizeHunt(msg.hunt);
+            }
+            return prev;
+          });
+        }
+        debouncedFetchSnapshot(50);
       }
     });
 
     channelRef.current = channel;
 
-    return () => {
-      if (reconnectTimeout) clearTimeout(reconnectTimeout);
-      stopPolling();
-      if (eventSourceRef.current) eventSourceRef.current.close();
-      if (sse) sse.close();
-      if (channel) channel.close();
+    // D. Low-frequency safety: refresh snapshot once when document becomes visible again
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchSnapshot();
+      }
     };
-  }, [token, fetchSnapshot, applySnapshot]);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
+      unsubscribeRealtime();
+      if (channel) channel.close();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [token, fetchSnapshot, debouncedFetchSnapshot]);
 
   if (error && !overlayConfig) {
     return (
@@ -324,89 +308,31 @@ export default function OBSOverlayPage() {
     return null;
   }
 
-  // Positioning calculations
-  const position = overlayConfig.position || {};
-  const preset = position.alignmentPreset || "bottom-left";
-  const xPercent = position.xPercent ?? 2;
-  const yPercent = position.yPercent ?? 85;
-  const isTrimMode = preset === "trim" || overlayConfig.canvasWidth === 0 || overlayConfig.canvasHeight === 0;
-
-  if (isTrimMode) {
-    return (
-      <div
-        className="obs-overlay-viewport trim-mode"
-        style={{
-          display: "inline-block",
-          position: "relative",
-          overflow: "visible",
-          backgroundColor: "transparent",
-        }}
-      >
-        <HuntOverlayRenderer
-          hunt={currentHunt}
-          overlayConfig={overlayConfig}
-          accentColor={accentColor}
-          useHomeSprites={useHomeSprites}
-          triggerAnim={triggerAnim}
-          previewMode={false}
-        />
-      </div>
-    );
-  }
-
-  let containerStyle = {
-    position: "absolute",
-    zIndex: 100,
-  };
-
-  if (preset === "top-left") {
-    containerStyle = { ...containerStyle, top: "24px", left: "24px" };
-  } else if (preset === "top-center") {
-    containerStyle = { ...containerStyle, top: "24px", left: "50%", transform: "translateX(-50%)" };
-  } else if (preset === "top-right") {
-    containerStyle = { ...containerStyle, top: "24px", right: "24px" };
-  } else if (preset === "center-left") {
-    containerStyle = { ...containerStyle, top: "50%", left: "24px", transform: "translateY(-50%)" };
-  } else if (preset === "center") {
-    containerStyle = { ...containerStyle, top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
-  } else if (preset === "center-right") {
-    containerStyle = { ...containerStyle, top: "50%", right: "24px", transform: "translateY(-50%)" };
-  } else if (preset === "bottom-left") {
-    containerStyle = { ...containerStyle, bottom: "24px", left: "24px" };
-  } else if (preset === "bottom-center") {
-    containerStyle = { ...containerStyle, bottom: "24px", left: "50%", transform: "translateX(-50%)" };
-  } else if (preset === "bottom-right") {
-    containerStyle = { ...containerStyle, bottom: "24px", right: "24px" };
-  } else {
-    // Custom normalized percentage coordinates
-    containerStyle = {
-      ...containerStyle,
-      left: `${xPercent}%`,
-      top: `${yPercent}%`,
-    };
-  }
-
   return (
     <div
-      className="obs-overlay-viewport"
+      className="obs-overlay-viewport trim-mode"
       style={{
+        position: "fixed",
+        inset: 0,
         width: "100vw",
         height: "100vh",
-        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         overflow: "hidden",
         backgroundColor: "transparent",
+        userSelect: "none",
+        pointerEvents: "none",
       }}
     >
-      <div style={containerStyle}>
-        <HuntOverlayRenderer
-          hunt={currentHunt}
-          overlayConfig={overlayConfig}
-          accentColor={accentColor}
-          useHomeSprites={useHomeSprites}
-          triggerAnim={triggerAnim}
-          previewMode={false}
-        />
-      </div>
+      <HuntOverlayRenderer
+        hunt={currentHunt}
+        overlayConfig={overlayConfig}
+        accentColor={accentColor}
+        useHomeSprites={useHomeSprites}
+        triggerAnim={triggerAnim}
+        previewMode={false}
+      />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import {
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useMessage, Modal, ConfirmModal, Button } from '../components/Shared';
+import { useUser } from '../components/Shared/UserContext';
 import { SearchField, TextField, TextArea, DateField, SelectField } from '../components/Shared/FormField';
 import { buildApiUrl } from '../config/api.js';
 import { creatorAPI, authAPI, changelogAPI } from '../utils/api.js';
@@ -48,13 +49,29 @@ const Admin = () => {
   const { showMessage } = useMessage();
   const [activeTab, setActiveTab] = useState('users'); // 'dashboard', 'users', 'bug-reports', 'feature-requests', 'creator-requests', 'settings'
   
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) return JSON.parse(stored);
+    } catch {}
+    return null;
+  });
   const [users, setUsers] = useState([]);
   const [bugReports, setBugReports] = useState([]);
   const [featureRequests, setFeatureRequests] = useState([]);
   const [creatorRequests, setCreatorRequests] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(() => {
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.isAdmin) return true;
+      }
+    } catch {}
+    return null;
+  });
+  const dataLoadedRef = useRef(false);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceStartTime, setMaintenanceStartTime] = useState(null);
   const [maintenanceCountdown, setMaintenanceCountdown] = useState('');
@@ -211,8 +228,11 @@ const Admin = () => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
-    checkAdminStatus();
     document.body.classList.add('admin-page');
+    if (isAdmin === true && !dataLoadedRef.current) {
+      loadData();
+    }
+    checkAdminStatus();
     return () => {
       document.body.classList.remove('admin-page');
     };
@@ -256,7 +276,9 @@ const Admin = () => {
           setCurrentUser(userData);
           if (userData.isAdmin) {
             setIsAdmin(true);
-            loadData();
+            if (!dataLoadedRef.current) {
+              loadData();
+            }
           } else {
             setIsAdmin(false);
           }
@@ -297,6 +319,7 @@ const Admin = () => {
 
   useEffect(() => {
     if (activeTab === 'diagnostics' && autoRefreshDiagnostics && isAdmin) {
+      fetchSystemStats();
       const interval = setInterval(() => {
         fetchSystemStats();
       }, 10000);
@@ -304,34 +327,38 @@ const Admin = () => {
     }
   }, [activeTab, autoRefreshDiagnostics, isAdmin]);
 
+  const loadChangelogs = async () => {
+    setChangelogsLoading(true);
+    try {
+      const res = await changelogAPI.getAdminAll();
+      if (res && Array.isArray(res.changelogs)) {
+        setChangelogs(res.changelogs);
+      }
+    } catch (err) {
+      console.error('Failed to load changelogs:', err);
+    } finally {
+      setChangelogsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'changelog' && changelogs.length === 0 && !changelogsLoading) {
+      loadChangelogs();
+    }
+  }, [activeTab, changelogs.length, changelogsLoading]);
+
   const loadData = async () => {
     setLoading(true);
+    dataLoadedRef.current = true;
     const startPing = Date.now();
     try {
-      const [usersRes, bugReportsRes, featureRequestsRes, helpTicketsRes, settingsRes, creatorReqsData, statsRes, changelogsData, supportInboxRes] = await Promise.all([
+      const [usersRes, settingsRes, creatorReqsData, supportInboxRes] = await Promise.all([
         fetch(buildApiUrl('/admin/users'), {
-          headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
-          credentials: 'include'
-        }),
-        fetch(buildApiUrl('/admin/bug-reports'), {
-          headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
-          credentials: 'include'
-        }),
-        fetch(buildApiUrl('/admin/feature-requests'), {
-          headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
-          credentials: 'include'
-        }),
-        fetch(buildApiUrl('/admin/help-tickets'), {
           headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
           credentials: 'include'
         }),
         fetch(buildApiUrl('/site-settings')),
         creatorAPI.getAll('all').catch(() => ({ requests: [] })),
-        fetch(buildApiUrl('/admin/system-stats'), {
-          headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
-          credentials: 'include'
-        }).catch(() => null),
-        changelogAPI.getAdminAll().catch(() => ({ changelogs: [] })),
         fetch(buildApiUrl('/admin/support/inbox?limit=150'), {
           headers: { ...(localStorage.getItem('authToken') ? { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` } : {}) },
           credentials: 'include'
@@ -345,29 +372,6 @@ const Admin = () => {
         setUsers(usersData.users || []);
       }
 
-      if (bugReportsRes.ok) {
-        const bugReportsData = await bugReportsRes.json();
-        setBugReports(bugReportsData.bugReports || []);
-      }
-
-      if (featureRequestsRes.ok) {
-        const featureRequestsData = await featureRequestsRes.json();
-        setFeatureRequests(featureRequestsData.featureRequests || []);
-      }
-
-      if (helpTicketsRes.ok) {
-        const helpTicketsData = await helpTicketsRes.json();
-        setHelpTickets(helpTicketsData.helpTickets || []);
-      }
-
-      if (supportInboxRes && supportInboxRes.ok) {
-        const supportInboxData = await supportInboxRes.json();
-        setSupportTickets(supportInboxData.tickets || []);
-        if (supportInboxData.metrics) {
-          setSupportMetrics(supportInboxData.metrics);
-        }
-      }
-
       if (settingsRes.ok) {
         const settingsData = await settingsRes.json();
         setMaintenanceMode(settingsData.maintenanceMode || false);
@@ -378,19 +382,17 @@ const Admin = () => {
         setCreatorRequests(creatorReqsData.requests);
       }
 
-      if (changelogsData && Array.isArray(changelogsData.changelogs)) {
-        setChangelogs(changelogsData.changelogs);
+      if (supportInboxRes && supportInboxRes.ok) {
+        const supportInboxData = await supportInboxRes.json();
+        setSupportTickets(supportInboxData.tickets || []);
+        if (supportInboxData.metrics) {
+          setSupportMetrics(supportInboxData.metrics);
+        }
       }
 
-      if (statsRes && statsRes.ok) {
-        const statsData = await statsRes.json();
-        setSystemStats({
-          ...statsData,
-          apiLatency: `${pingDuration}ms`
-        });
-      } else {
-        setSystemStats(prev => ({ ...prev, apiLatency: `${pingDuration}ms` }));
-      }
+      // Background fetch non-essential telemetry and changelogs without blocking the initial UI
+      fetchSystemStats().catch(() => {});
+      loadChangelogs().catch(() => {});
     } catch (err) {
       showMessage('Failed to load admin data', 'error');
     } finally {
@@ -636,20 +638,16 @@ const Admin = () => {
 
   // Live polling effect for Support Inbox & Open Ticket Workspace (paused when tab is hidden)
   useEffect(() => {
+    if (activeTab !== 'support-inbox') return;
     let isPolling = false;
 
     const poll = async () => {
       if (document.hidden || isPolling) return;
       isPolling = true;
       try {
-        if (activeTab === 'support-inbox') {
-          if (activeAdminTicket?._id) {
-            await fetchActiveAdminTicket(activeAdminTicket._id, { silent: true });
-          } else {
-            await fetchSupportInbox({}, { silent: true });
-          }
+        if (activeAdminTicket?._id) {
+          await fetchActiveAdminTicket(activeAdminTicket._id, { silent: true });
         } else {
-          // On other tabs: poll support inbox metrics every 25s so sidebar count stays live
           await fetchSupportInbox({}, { silent: true });
         }
       } finally {
@@ -657,10 +655,7 @@ const Admin = () => {
       }
     };
 
-    const intervalMs = activeTab === 'support-inbox'
-      ? (activeAdminTicket?._id ? 4000 : 8000)
-      : 25000;
-
+    const intervalMs = activeAdminTicket?._id ? 4000 : 8000;
     const timer = setInterval(poll, intervalMs);
 
     const handleVisibilityChange = () => {
@@ -698,20 +693,6 @@ const Admin = () => {
   // -------------------------------------------------------------------------
   // Changelog Management Handlers
   // -------------------------------------------------------------------------
-  const loadChangelogs = async () => {
-    setChangelogsLoading(true);
-    try {
-      const res = await changelogAPI.getAdminAll();
-      if (res && Array.isArray(res.changelogs)) {
-        setChangelogs(res.changelogs);
-      }
-    } catch (err) {
-      console.error('Failed to load changelogs:', err);
-    } finally {
-      setChangelogsLoading(false);
-    }
-  };
-
   const handleOpenNewChangelog = (duplicateFrom = null) => {
     setEditingChangelogId(null);
     if (duplicateFrom) {
@@ -1282,17 +1263,17 @@ const Admin = () => {
 
   // Live countdown ticker & timestamp updater for maintenance states
   useEffect(() => {
+    if (!maintenanceStartTime) {
+      setMaintenanceCountdown('');
+      return;
+    }
+
     const tick = () => {
       const now = Date.now();
-      setCurrentTimestamp(now);
-
-      if (!maintenanceStartTime) {
-        setMaintenanceCountdown('');
-        return;
-      }
       const diff = new Date(maintenanceStartTime).getTime() - now;
       if (diff <= 0) {
         setMaintenanceCountdown('');
+        setCurrentTimestamp(now);
         return;
       }
       const h = Math.floor(diff / 3600000);
@@ -1302,17 +1283,18 @@ const Admin = () => {
         `${h > 0 ? `${h}h ` : ''}${m}m ${s}s`
       );
     };
+
     tick();
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, [maintenanceStartTime]);
 
-  // Reactive state derived from live timestamp:
+  // Reactive state derived from maintenance schedule:
   const isScheduledPending = Boolean(
-    maintenanceStartTime && new Date(maintenanceStartTime).getTime() > currentTimestamp
+    maintenanceStartTime && new Date(maintenanceStartTime).getTime() > Date.now()
   );
   const isMaintenanceActive = Boolean(
-    maintenanceMode && (!maintenanceStartTime || new Date(maintenanceStartTime).getTime() <= currentTimestamp)
+    maintenanceMode && (!maintenanceStartTime || new Date(maintenanceStartTime).getTime() <= Date.now())
   );
 
   const handleOpenEditUser = (user) => {
@@ -1552,47 +1534,54 @@ const Admin = () => {
     };
   };
 
-  // Filtering & search
+  // Filtering & search (memoized for instantaneous response)
   const effectiveSearch = (userSearch || globalSearch).toLowerCase().trim();
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = !effectiveSearch || 
-      (user.username && user.username.toLowerCase().includes(effectiveSearch)) ||
-      (user.email && user.email.toLowerCase().includes(effectiveSearch)) ||
-      (user.bio && user.bio.toLowerCase().includes(effectiveSearch));
-    
-    let matchesRole = true;
-    if (roleFilter === 'admin') matchesRole = !!user.isAdmin;
-    else if (roleFilter === 'creator') matchesRole = !!user.isContentCreator;
-    else if (roleFilter === 'premium') matchesRole = !!user.isPremium;
-    else if (roleFilter === 'premium_paid') matchesRole = user.premiumSource === 'subscription' || user.premiumSource === 'both';
-    else if (roleFilter === 'premium_admin') matchesRole = user.premiumSource === 'admin' || user.premiumSource === 'both';
-    else if (roleFilter === 'user') matchesRole = !user.isAdmin && !user.isContentCreator && !user.isPremium;
-    else if (roleFilter === 'suspended') matchesRole = !!user.isSuspended;
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const matchesSearch = !effectiveSearch || 
+        (user.username && user.username.toLowerCase().includes(effectiveSearch)) ||
+        (user.email && user.email.toLowerCase().includes(effectiveSearch)) ||
+        (user.bio && user.bio.toLowerCase().includes(effectiveSearch));
+      
+      let matchesRole = true;
+      if (roleFilter === 'admin') matchesRole = !!user.isAdmin;
+      else if (roleFilter === 'creator') matchesRole = !!user.isContentCreator;
+      else if (roleFilter === 'premium') matchesRole = !!user.isPremium;
+      else if (roleFilter === 'premium_paid') matchesRole = user.premiumSource === 'subscription' || user.premiumSource === 'both';
+      else if (roleFilter === 'premium_admin') matchesRole = user.premiumSource === 'admin' || user.premiumSource === 'both';
+      else if (roleFilter === 'user') matchesRole = !user.isAdmin && !user.isContentCreator && !user.isPremium;
+      else if (roleFilter === 'suspended') matchesRole = !!user.isSuspended;
 
-    return matchesSearch && matchesRole;
-  }).sort((a, b) => {
-    let comparison = 0;
-    if (userSortField === 'username') {
-      comparison = (a.username || '').localeCompare(b.username || '');
-    } else if (userSortField === 'admin' || userSortField === 'role') {
-      const getRoleWeight = (u) => {
-        if (u.isAdmin) return 5;
-        if (u.isContentCreator) return 4;
-        if (u.premiumSource === 'subscription' || u.premiumSource === 'both') return 3;
-        if (u.premiumSource === 'admin') return 2;
-        return 1;
-      };
-      comparison = getRoleWeight(a) - getRoleWeight(b);
-    } else if (userSortField === 'joined') {
-      comparison = getUserCreatedAt(a).getTime() - getUserCreatedAt(b).getTime();
-    } else if (userSortField === 'lastActive') {
-      comparison = getUserLastActiveAt(a).getTime() - getUserLastActiveAt(b).getTime();
-    }
-    return userSortDir === 'desc' ? -comparison : comparison;
-  });
+      return matchesSearch && matchesRole;
+    }).sort((a, b) => {
+      let comparison = 0;
+      if (userSortField === 'username') {
+        comparison = (a.username || '').localeCompare(b.username || '');
+      } else if (userSortField === 'admin' || userSortField === 'role') {
+        const getRoleWeight = (u) => {
+          if (u.isAdmin) return 5;
+          if (u.isContentCreator) return 4;
+          if (u.premiumSource === 'subscription' || u.premiumSource === 'both') return 3;
+          if (u.premiumSource === 'admin') return 2;
+          return 1;
+        };
+        comparison = getRoleWeight(a) - getRoleWeight(b);
+      } else if (userSortField === 'joined') {
+        comparison = getUserCreatedAt(a).getTime() - getUserCreatedAt(b).getTime();
+      } else if (userSortField === 'lastActive') {
+        comparison = getUserLastActiveAt(a).getTime() - getUserLastActiveAt(b).getTime();
+      }
+      return userSortDir === 'desc' ? -comparison : comparison;
+    });
+  }, [users, effectiveSearch, roleFilter, userSortField, userSortDir]);
 
-  const paginatedUsers = filteredUsers.slice((userPage - 1) * rowsPerPage, userPage * rowsPerPage);
-  const totalUserPages = Math.max(1, Math.ceil(filteredUsers.length / rowsPerPage));
+  const paginatedUsers = useMemo(() => {
+    return filteredUsers.slice((userPage - 1) * rowsPerPage, userPage * rowsPerPage);
+  }, [filteredUsers, userPage, rowsPerPage]);
+
+  const totalUserPages = useMemo(() => {
+    return Math.max(1, Math.ceil(filteredUsers.length / rowsPerPage));
+  }, [filteredUsers.length, rowsPerPage]);
 
   useEffect(() => {
     setUserPage(1);
@@ -1607,43 +1596,67 @@ const Admin = () => {
     }
   };
 
-  // Counts & Dynamic Trends
-  const totalUsersCount = users.length;
-  const adminCount = users.filter(u => u.isAdmin).length;
-  
-  const now = new Date();
-  const startOfWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const newThisWeekCount = users.filter(u => getUserCreatedAt(u) >= startOfWeek).length;
+  // Counts & Dynamic Trends (computed in a single pass and memoized)
+  const {
+    totalUsersCount,
+    adminCount,
+    newThisWeekCount,
+    newThisMonthCount,
+    newLastMonthCount,
+    monthTrend,
+    suspendedCount
+  } = useMemo(() => {
+    const totalUsers = users.length;
+    let admins = 0;
+    let suspended = 0;
+    let thisWeek = 0;
+    let thisMonth = 0;
+    let lastMonth = 0;
 
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const newThisMonthCount = users.filter(u => getUserCreatedAt(u) >= startOfMonth).length;
+    const n = new Date();
+    const weekStart = new Date(n.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const monthStart = new Date(n.getFullYear(), n.getMonth(), 1);
+    const prevMonthStart = new Date(n.getFullYear(), n.getMonth() - 1, 1);
 
-  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const newLastMonthCount = users.filter(u => {
-    const d = getUserCreatedAt(u);
-    return d >= startOfLastMonth && d < startOfMonth;
-  }).length;
-
-  let monthTrend = { text: '0 new vs last month', type: 'neutral', icon: null };
-  if (newLastMonthCount > 0) {
-    const diff = newThisMonthCount - newLastMonthCount;
-    const pct = Math.round((diff / newLastMonthCount) * 100);
-    if (pct > 0) {
-      monthTrend = { text: `+${pct}% vs last month`, type: 'positive', icon: 'up' };
-    } else if (pct < 0) {
-      monthTrend = { text: `${Math.abs(pct)}% vs last month`, type: 'negative', icon: 'down' };
-    } else {
-      monthTrend = { text: `Same as last month (${newLastMonthCount})`, type: 'neutral', icon: null };
+    for (let i = 0; i < users.length; i++) {
+      const u = users[i];
+      if (u.isAdmin) admins++;
+      if (u.isSuspended) suspended++;
+      const ca = getUserCreatedAt(u);
+      if (ca >= weekStart) thisWeek++;
+      if (ca >= monthStart) thisMonth++;
+      else if (ca >= prevMonthStart && ca < monthStart) lastMonth++;
     }
-  } else if (newThisMonthCount > 0) {
-    monthTrend = { text: `+${newThisMonthCount} this month`, type: 'positive', icon: 'up' };
-  }
 
-  const suspendedCount = users.filter(u => u.isSuspended).length;
-  const openBugReportsCount = bugReports.filter(r => r.status === 'open' || !r.status).length;
-  const openFeatureRequestsCount = featureRequests.filter(r => r.status === 'open' || !r.status).length;
-  const openHelpTicketsCount = helpTickets.filter(r => r.status === 'open' || !r.status).length;
-  const pendingCreatorRequestsCount = creatorRequests.filter(r => r.status === 'pending').length;
+    let trend = { text: '0 new vs last month', type: 'neutral', icon: null };
+    if (lastMonth > 0) {
+      const diff = thisMonth - lastMonth;
+      const pct = Math.round((diff / lastMonth) * 100);
+      if (pct > 0) {
+        trend = { text: `+${pct}% vs last month`, type: 'positive', icon: 'up' };
+      } else if (pct < 0) {
+        trend = { text: `${Math.abs(pct)}% vs last month`, type: 'negative', icon: 'down' };
+      } else {
+        trend = { text: `Same as last month (${lastMonth})`, type: 'neutral', icon: null };
+      }
+    } else if (thisMonth > 0) {
+      trend = { text: `+${thisMonth} this month`, type: 'positive', icon: 'up' };
+    }
+
+    return {
+      totalUsersCount: totalUsers,
+      adminCount: admins,
+      newThisWeekCount: thisWeek,
+      newThisMonthCount: thisMonth,
+      newLastMonthCount: lastMonth,
+      monthTrend: trend,
+      suspendedCount: suspended
+    };
+  }, [users]);
+
+  const pendingCreatorRequestsCount = useMemo(() => {
+    return creatorRequests.filter(r => r.status === 'pending').length;
+  }, [creatorRequests]);
 
   if (isAdmin === null) {
     return (
@@ -2975,7 +2988,7 @@ const Admin = () => {
                         <textarea
                           className={`admin-composer-textarea ${adminComposerMode === 'note' ? 'note-mode' : ''}`}
                           rows={3}
-                          placeholder={adminComposerMode === 'reply' ? 'Type response to user...' : 'Write an internal note (e.g. Paddle transaction confirmed, entitlement fixed)...'}
+                          placeholder={adminComposerMode === 'reply' ? 'Type response to user...' : 'Write an internal note (e.g. Stripe transaction confirmed, entitlement fixed)...'}
                           value={adminReplyInput}
                           onChange={(e) => setAdminReplyInput(e.target.value)}
                           onKeyDown={(e) => {

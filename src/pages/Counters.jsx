@@ -928,15 +928,7 @@ export default function Counters() {
     } catch { }
   }, [showMessage]);
 
-  const toggleMetricMode = useCallback(() => {
-    setMetricMode(prev => {
-      const next = prev === "total" ? "phase" : "total";
-      try {
-        localStorage.setItem("dex_hunt_metric_mode", next);
-      } catch { }
-      return next;
-    });
-  }, []);
+
 
   // ── All Pokemon List ──────────────────────────────────────────────────────
   const allPokemon = useMemo(() => {
@@ -1208,6 +1200,64 @@ export default function Counters() {
     });
   }, [debouncedSave]);
 
+  const toggleMetricMode = useCallback(() => {
+    setMetricMode(prev => {
+      const next = prev === "total" ? "phase" : "total";
+      try {
+        localStorage.setItem("dex_hunt_metric_mode", next);
+      } catch { }
+
+      const targetId = currentHuntId != null ? currentHuntId : (currentHunt?.id || null);
+
+      if (targetId != null) {
+        try {
+          const mapRaw = localStorage.getItem("dex_hunt_metric_mode_map");
+          const modeMap = mapRaw ? JSON.parse(mapRaw) : {};
+          modeMap[targetId] = next;
+          modeMap[String(targetId)] = next;
+          localStorage.setItem("dex_hunt_metric_mode_map", JSON.stringify(modeMap));
+        } catch { }
+
+        let updatedHuntsList = null;
+        setAllActiveHunts(currentList => {
+          const updated = currentList.map(h => {
+            if (String(h.id) === String(targetId) || String(h.huntId) === String(targetId)) {
+              return { ...h, metricMode: next, version: (h.version || 1) + 1, updatedAt: Date.now() };
+            }
+            return h;
+          });
+          updatedHuntsList = updated;
+          setCachedHuntsData({ activeHunts: updated });
+          debouncedSave(updated);
+          return updated;
+        });
+
+        if (channelRef.current) {
+          channelRef.current.broadcast({
+            type: "HUNT_ACTION",
+            huntId: targetId,
+            action: {
+              type: "TOGGLE_METRIC_MODE",
+              metricMode: next,
+              timestamp: Date.now()
+            }
+          });
+          if (updatedHuntsList) {
+            const updatedHunt = updatedHuntsList.find(h => String(h.id) === String(targetId) || String(h.huntId) === String(targetId));
+            if (updatedHunt) {
+              channelRef.current.broadcast({
+                type: "HUNT_UPDATED",
+                hunt: updatedHunt
+              });
+            }
+          }
+        }
+      }
+
+      return next;
+    });
+  }, [currentHuntId, currentHunt, debouncedSave]);
+
   useEffect(() => {
     const channel = createHuntChannel((msg) => {
       if (!msg) return;
@@ -1221,11 +1271,20 @@ export default function Counters() {
       }
 
       if (msg.type === "HUNT_ACTION" && msg.action) {
+        if (msg.action.type === "TOGGLE_METRIC_MODE" && msg.action.metricMode) {
+          setMetricMode(msg.action.metricMode);
+        }
         setAllActiveHunts(prev => {
           const next = applyHuntActionToState(prev, msg.action, msg.action.timestamp || Date.now());
           setCachedHuntsData({ activeHunts: next });
           return next;
         });
+        return;
+      }
+
+      if (msg.type === "HUNTS_SYNC" && Array.isArray(msg.hunts)) {
+        setAllActiveHunts(msg.hunts.map(h => normalizeHunt(h)));
+        setCachedHuntsData({ activeHunts: msg.hunts });
         return;
       }
 
@@ -1718,17 +1777,54 @@ export default function Counters() {
       setAllActiveHunts(prevHunts => {
         let anyPhaseRemoved = false;
         const nextHunts = prevHunts.map(h => {
-          if (!Array.isArray(h.phases)) return h;
+          if (!Array.isArray(h.phases) || h.phases.length === 0) return h;
           const prevPhaseCount = h.phases.length;
-          const filteredPhases = h.phases.filter(p => {
+          let removedChecks = 0;
+          const filteredPhases = [];
+
+          h.phases.forEach(p => {
             const pId = p.entryId || p.id;
-            if (entryId && pId === entryId) return false;
-            if (entryTimestamp && (p.timestamp === entryTimestamp || (p.date && new Date(p.date).getTime() === entryTimestamp))) return false;
-            return true;
+            const matchesId = entryId && (pId === entryId || String(pId) === String(entryId));
+            const matchesTs = entryTimestamp && (
+              p.timestamp === entryTimestamp ||
+              (p.date && new Date(p.date).getTime() === Number(entryTimestamp))
+            );
+            if (matchesId || matchesTs) {
+              removedChecks += Number(p.phaseChecks ?? p.checks ?? p.count ?? 0) || 0;
+            } else {
+              filteredPhases.push(p);
+            }
           });
+
           if (filteredPhases.length !== prevPhaseCount) {
             anyPhaseRemoved = true;
-            return { ...h, phases: filteredPhases };
+            let cumulative = 0;
+            const reindexedPhases = filteredPhases.map((p, idx) => {
+              const pChecks = Number(p.phaseChecks ?? p.checks ?? p.count ?? 0) || 0;
+              cumulative += pChecks;
+              return {
+                ...p,
+                phaseNumber: idx + 1,
+                checks: pChecks,
+                phaseChecks: pChecks,
+                totalChecks: cumulative
+              };
+            });
+
+            const currentChecks = Number(h.checks ?? 0) || 0;
+            const nextChecks = currentChecks + removedChecks;
+            const nextTotalChecks = reindexedPhases.length > 0
+              ? cumulative + nextChecks
+              : Math.max(nextChecks, Number(h.totalChecks ?? 0) || 0);
+
+            return {
+              ...h,
+              phases: reindexedPhases,
+              currentPhase: reindexedPhases.length + 1,
+              checks: nextChecks,
+              totalChecks: nextTotalChecks,
+              metricMode: reindexedPhases.length === 0 ? "total" : (h.metricMode || "phase")
+            };
           }
           return h;
         });
@@ -1736,6 +1832,11 @@ export default function Counters() {
         if (anyPhaseRemoved) {
           setCachedHuntsData({ activeHunts: nextHunts });
           debouncedSave(nextHunts);
+          try {
+            if (channelRef.current) {
+              channelRef.current.broadcast({ type: "HUNTS_SYNC", hunts: nextHunts });
+            }
+          } catch {}
         }
         return nextHunts;
       });
@@ -2460,6 +2561,12 @@ export default function Counters() {
       checks: phaseRecord.phaseChecks || 0,
       totalChecks: phaseRecord.totalChecks || 0,
       time: phaseRecord.elapsedMs || 0,
+      odds: (phaseRecord.odds && phaseRecord.odds !== 4096)
+        || (hunt.odds && hunt.odds !== 4096)
+        || calculateOdds(hunt.game, hunt.method, hunt.modifiers || {})
+        || phaseRecord.odds
+        || hunt.odds
+        || 4096,
       phases: hunt.phases || [],
       fails: [
         ...((hunt.phases || []).filter(p => p.outcome === "failed")),
@@ -2469,6 +2576,8 @@ export default function Counters() {
       notes: phaseRecord.notes || shinyEncounterModal.notes || "",
       entryId: Math.random().toString(36).substr(2, 9),
       modifiers: hunt.modifiers || {},
+      chartData: hunt.chartData || phaseRecord.chartData || {},
+      chartConfig: hunt.chartConfig || phaseRecord.chartConfig || {},
       isHuntTracker: true
     };
 
@@ -2604,6 +2713,8 @@ export default function Counters() {
       phaseNumber: phaseRecord.phaseNumber,
       id: phaseRecord.id || Date.now(),
       entryId: phaseRecord.entryId || phaseRecord.id || Math.random().toString(36).substr(2, 9),
+      chartData: hunt.chartData || phaseRecord.chartData || {},
+      chartConfig: hunt.chartConfig || phaseRecord.chartConfig || {},
       isHuntTracker: true
     };
 
@@ -2701,6 +2812,14 @@ export default function Counters() {
     setAllActiveHunts(updatedHunts);
     setCachedHuntsData({ activeHunts: updatedHunts });
 
+    const effectiveModifiers = hunt.modifiers || phaseRecord.modifiers || {};
+    const resolvedOdds = (phaseRecord.odds && phaseRecord.odds !== 4096)
+      || (hunt.odds && hunt.odds !== 4096)
+      || calculateOdds(hunt.game, hunt.method, effectiveModifiers)
+      || phaseRecord.odds
+      || hunt.odds
+      || 4096;
+
     if (phaseRecord.outcome === "failed") {
       const failEntry = {
         id: phaseRecord.id || now,
@@ -2713,13 +2832,16 @@ export default function Counters() {
         totalChecks: phaseRecord.totalChecks || hunt.checks || 0,
         elapsedMs: phaseRecord.elapsedMs || 0,
         time: phaseRecord.elapsedMs || 0,
-        odds: phaseRecord.odds || hunt.odds || null,
+        odds: resolvedOdds,
+        modifiers: effectiveModifiers,
         reason: phaseRecord.reason || (phaseRecord.notes || "").trim() || "Failed Encounter",
         notes: phaseRecord.notes || (phaseRecord.notes || "").trim() || "",
         date: phaseRecord.date || new Date().toISOString(),
         timestamp: now,
         outcome: "failed",
         isFail: true,
+        chartData: hunt.chartData || phaseRecord.chartData || {},
+        chartConfig: hunt.chartConfig || phaseRecord.chartConfig || {},
         isHuntTracker: true,
         addedToLivingDex: Boolean(phaseRecord.addedToCollection)
       };
@@ -2747,8 +2869,8 @@ export default function Counters() {
         totalChecks: phaseRecord.totalChecks || hunt.checks || 0,
         elapsedMs: phaseRecord.elapsedMs || 0,
         time: phaseRecord.elapsedMs || 0,
-        odds: phaseRecord.odds || hunt.odds || null,
-        modifiers: hunt.modifiers || {},
+        odds: resolvedOdds,
+        modifiers: effectiveModifiers,
         nickname: phaseRecord.nickname || "",
         ball: phaseRecord.ball || "",
         mark: phaseRecord.mark || "",
@@ -2759,6 +2881,8 @@ export default function Counters() {
         isFail: false,
         isPhase: true,
         targetPokemon: hunt.pokemon,
+        chartData: hunt.chartData || phaseRecord.chartData || {},
+        chartConfig: hunt.chartConfig || phaseRecord.chartConfig || {},
         isHuntTracker: true,
         addedToLivingDex: Boolean(phaseRecord.addedToCollection)
       };
@@ -2818,7 +2942,13 @@ export default function Counters() {
     const workingPokemon = phaseRecord?.pokemon || hunt.pokemon;
     const huntId = hunt.id;
 
-    const calculatedOdds = phaseRecord.odds || hunt.odds || calculateOdds(hunt.game, hunt.method, hunt.modifiers || {}) || 4096;
+    const effectiveModifiers = hunt.modifiers || phaseRecord.modifiers || {};
+    const calculatedOdds = (phaseRecord.odds && phaseRecord.odds !== 4096)
+      || (hunt.odds && hunt.odds !== 4096)
+      || calculateOdds(hunt.game, hunt.method, effectiveModifiers)
+      || phaseRecord.odds
+      || hunt.odds
+      || 4096;
 
     const isFail = phaseRecord.outcome === "failed";
 
@@ -2835,7 +2965,7 @@ export default function Counters() {
       elapsedMs: phaseRecord.elapsedMs || hunt.elapsedMs || 0,
       time: phaseRecord.elapsedMs || hunt.elapsedMs || 0,
       odds: calculatedOdds,
-      modifiers: hunt.modifiers || {},
+      modifiers: effectiveModifiers,
       phases: hunt.phases || [],
       phaseCount: (hunt.phases ? hunt.phases.length + 1 : 1),
       nickname: (phaseRecord.nickname || shinyEncounterModal.nickname || "").trim(),
@@ -2847,6 +2977,8 @@ export default function Counters() {
       outcome: isFail ? "failed" : "caught",
       isFail,
       addedToLivingDex: Boolean(shinyEncounterModal.addedToCollection),
+      chartData: hunt.chartData || phaseRecord.chartData || {},
+      chartConfig: hunt.chartConfig || phaseRecord.chartConfig || {},
       isHuntTracker: true
     };
 

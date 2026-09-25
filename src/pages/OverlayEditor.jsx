@@ -68,7 +68,8 @@ import {
   toSnapRect,
   alignElements,
   distributeElements,
-  calculateAltMeasurements
+  calculateAltMeasurements,
+  getRecommendedObsDimensions
 } from "../utils/overlaySnapping";
 import "../css/StreamerOverlay.css";
 
@@ -882,7 +883,8 @@ export default function OverlayEditor() {
   const { showMessage } = useMessage();
   const { accent } = useTheme();
   const { user } = useUser();
-  const isMember = Boolean(isPremium || user?.isPremium);
+  const { isPremium } = useEntitlements();
+  const isMember = Boolean(isPremium || user?.isPremium || user?.isAdmin || user?.role === "admin");
   const themeAccentHex = ACCENT_COLOR_MAP[accent] || accent || "#facc15";
 
   // Overlay state from backend
@@ -973,41 +975,9 @@ export default function OverlayEditor() {
   const overlayHeight = config?.layout?.height || 220;
 
   // Compute OBS-recommended canvas size with accurate per-direction padding.
-  // Glow and shadow are independent box-shadows — take the max reach per side, not additive.
   const obsCanvasDimensions = useMemo(() => {
-    const style = config?.styleSettings || {};
-    const hasGlow = Boolean(style.glow);
-    const hasShadow = style.shadow !== false;
-    const SAFETY = 8; // px safety buffer beyond the visible effect edge
-
-    // Glow: box-shadow `0 0 gRadius gSpread` — extends equally all sides
-    const glowExtent = hasGlow ? (style.glowRadius ?? 14) + (style.glowSpread ?? 2) : 0;
-
-    // Shadow: box-shadow `0 sDist sBlur` — directional
-    const sDist = hasShadow ? (style.shadowDistance ?? 10) : 0;
-    const sBlur = hasShadow ? (style.shadowBlur ?? 25) : 0;
-    const shadowTop    = hasShadow ? Math.max(0, sBlur - sDist) : 0;
-    const shadowBottom = hasShadow ? sDist + sBlur : 0;
-    const shadowSides  = hasShadow ? sBlur : 0;
-
-    // Final per-side padding = max reach of either effect + safety
-    const hasPad = hasGlow || hasShadow;
-    const padLeft   = hasPad ? Math.ceil(Math.max(glowExtent, shadowSides)) + SAFETY : 0;
-    const padRight  = hasPad ? Math.ceil(Math.max(glowExtent, shadowSides)) + SAFETY : 0;
-    const padTop    = hasPad ? Math.ceil(Math.max(glowExtent, shadowTop))   + SAFETY : 0;
-    const padBottom = hasPad ? Math.ceil(Math.max(glowExtent, shadowBottom)) + SAFETY : 0;
-
-    const roundUp10 = (n) => Math.ceil(n / 10) * 10;
-    return {
-      width:  roundUp10(overlayWidth  + padLeft + padRight),
-      height: roundUp10(overlayHeight + padTop  + padBottom),
-      padLeft,
-      padRight,
-      padTop,
-      padBottom,
-      hasPadding: hasPad,
-    };
-  }, [overlayWidth, overlayHeight, config?.styleSettings]);
+    return getRecommendedObsDimensions(config);
+  }, [config]);
 
   // Dragging interaction state
   const canvasRef = useRef(null);

@@ -218,12 +218,64 @@ export default function MMOTool({ useHomeSprites = false }) {
   });
 
   const toggleSpawnCheckMode = () => {
-    setSpawnCheckMode(prev => {
-      const next = prev === "spawn" ? "permutation" : "spawn";
-      try { localStorage.setItem("mmo_spawn_check_mode", next); } catch {}
-      return next;
-    });
+    const currentMode = currentHunt?.chartConfig?.spawnCheckMode || spawnCheckMode;
+    const nextMode = currentMode === "spawn" ? "permutation" : "spawn";
+
+    setSpawnCheckMode(nextMode);
+    try { localStorage.setItem("mmo_spawn_check_mode", nextMode); } catch {}
+
+    if (currentHunt) {
+      const huntId = currentHunt.id;
+      const multiplier = currentHunt.chartConfig?.secondSpawn ?? 6;
+      const currentChecks = Number(currentHunt.checks) || 0;
+
+      let updatedChecks = currentChecks;
+      if (currentChecks > 0 && multiplier > 1) {
+        if (nextMode === "spawn") {
+          // Turning ON -> multiply checks by secondSpawn
+          updatedChecks = Math.round(currentChecks * multiplier);
+        } else {
+          // Turning OFF -> divide checks by secondSpawn
+          updatedChecks = Math.max(0, Math.round(currentChecks / multiplier));
+        }
+      }
+
+      setAllActiveHunts(allHunts => {
+        const existingHunt = allHunts.find(h => String(h.id) === String(huntId));
+        if (!existingHunt) return allHunts;
+
+        const updated = {
+          ...existingHunt,
+          checks: updatedChecks,
+          totalChecks: updatedChecks,
+          chartConfig: {
+            firstSpawn: existingHunt.chartConfig?.firstSpawn ?? 8,
+            secondSpawn: existingHunt.chartConfig?.secondSpawn ?? 6,
+            isAdvanced: existingHunt.chartConfig?.isAdvanced ?? false,
+            isSaveOrder: existingHunt.chartConfig?.isSaveOrder ?? false,
+            showSecondWave: existingHunt.chartConfig?.showSecondWave ?? false,
+            showGhostChecks: existingHunt.chartConfig?.showGhostChecks ?? false,
+            ...(existingHunt.chartConfig || {}),
+            spawnCheckMode: nextMode
+          },
+          version: (existingHunt.version || 0) + 1,
+          updatedAt: Date.now()
+        };
+
+        const nextList = allHunts.map(h => String(h.id) === String(huntId) ? updated : h);
+        setCachedHuntsData({ activeHunts: nextList });
+        debouncedSave(nextList);
+        return nextList;
+      });
+    }
   };
+
+  // Sync spawnCheckMode when switching active hunts if the hunt has a saved preference
+  useEffect(() => {
+    if (currentHunt?.chartConfig?.spawnCheckMode) {
+      setSpawnCheckMode(currentHunt.chartConfig.spawnCheckMode);
+    }
+  }, [currentHunt?.id]);
 
   const [legendColors, setLegendColors] = useState(() => {
     try {
@@ -408,8 +460,23 @@ export default function MMOTool({ useHomeSprites = false }) {
     setAllActiveHunts(prev => {
       const existingHunt = prev.find(h => String(h.id) === String(huntId));
       if (!existingHunt) return prev;
+
+      const oldSecondSpawn = existingHunt.chartConfig?.secondSpawn ?? 6;
+      const newSecondSpawn = config.secondSpawn !== undefined ? config.secondSpawn : oldSecondSpawn;
+      const currentMode = existingHunt.chartConfig?.spawnCheckMode || spawnCheckMode;
+
+      let updatedChecks = Number(existingHunt.checks) || 0;
+      // If currently in spawn mode and the second wave spawn count changed (e.g. 6 -> 7 or 7 -> 6),
+      // re-scale existing checks so total completed permutations are preserved.
+      if (currentMode === "spawn" && newSecondSpawn !== oldSecondSpawn && updatedChecks > 0 && oldSecondSpawn > 0) {
+        const perms = updatedChecks / oldSecondSpawn;
+        updatedChecks = Math.max(0, Math.round(perms * newSecondSpawn));
+      }
+
       const updated = {
         ...existingHunt,
+        checks: updatedChecks,
+        totalChecks: updatedChecks,
         chartConfig: {
           firstSpawn: existingHunt.chartConfig?.firstSpawn ?? 8,
           secondSpawn: existingHunt.chartConfig?.secondSpawn ?? 6,
@@ -420,7 +487,8 @@ export default function MMOTool({ useHomeSprites = false }) {
           ...(existingHunt.chartConfig || {}),
           ...config
         },
-        version: (existingHunt.version || 0) + 1
+        version: (existingHunt.version || 0) + 1,
+        updatedAt: Date.now()
       };
       const next = prev.map(h => String(h.id) === String(huntId) ? updated : h);
       setCachedHuntsData({ activeHunts: next });
@@ -533,8 +601,8 @@ export default function MMOTool({ useHomeSprites = false }) {
         isMenuOpen={activeMenuHuntId === hunt.id}
         onToggleMenu={() => setActiveMenuHuntId(prev => prev === hunt.id ? null : hunt.id)}
         onCloseMenu={() => setActiveMenuHuntId(null)}
-        onAddCheck={() => handleAddCheck(hunt.id)}
-        onDecreaseCheck={() => handleDecreaseCheck(hunt.id)}
+        onAddCheck={(huntId, delta) => handleAddCheck(hunt.id, delta)}
+        onDecreaseCheck={(huntId, delta) => handleDecreaseCheck(hunt.id, delta)}
         onTogglePause={() => handleTogglePause(hunt.id)}
         onReset={(h) => setResetModal({ show: true, hunt: h })}
         onLogShiny={handleOpenShinyEncounterModal}
@@ -864,7 +932,10 @@ export default function MMOTool({ useHomeSprites = false }) {
                   onChartConfigUpdate={handleChartConfigUpdate}
                   onChartCheck={(isChecked) => {
                     if (currentHunt) {
-                      const spawnDelta = spawnCheckMode === "spawn"
+                      const isSpawnMode = currentHunt.chartConfig?.spawnCheckMode
+                        ? currentHunt.chartConfig.spawnCheckMode === "spawn"
+                        : spawnCheckMode === "spawn";
+                      const spawnDelta = isSpawnMode
                         ? (currentHunt.chartConfig?.secondSpawn ?? 6)
                         : 1;
                       if (isChecked) {
@@ -924,7 +995,17 @@ export default function MMOTool({ useHomeSprites = false }) {
               <Button
                 variant="primary"
                 size="md"
-                onClick={huntWizard.step === 4 ? () => handleStartWizardHunt() : () => setHuntWizard(prev => ({ ...prev, step: prev.step + 1 }))}
+                onClick={huntWizard.step === 4 ? () => handleStartWizardHunt({
+                  chartConfig: {
+                    firstSpawn: 8,
+                    secondSpawn: 6,
+                    isAdvanced: false,
+                    isSaveOrder: false,
+                    showSecondWave: false,
+                    showGhostChecks: false,
+                    spawnCheckMode
+                  }
+                }) : () => setHuntWizard(prev => ({ ...prev, step: prev.step + 1 }))}
                 disabled={
                   (huntWizard.step === 1 && !huntWizard.selectedPokemon)
                 }

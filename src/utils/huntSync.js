@@ -120,7 +120,17 @@ export const normalizeHunt = (hunt, now = Date.now(), legacyTotals = {}, legacyL
   }
 
   // Normalize checks
-  const checks = Number(hunt.checks ?? hunt.currentChecks ?? hunt.rolls ?? hunt.count ?? hunt.totalChecks ?? 0) || 0;
+  const hasExplicitChecks = hunt.checks !== undefined && hunt.checks !== null;
+  let checks = hasExplicitChecks
+    ? (Number(hunt.checks) || 0)
+    : (Number(hunt.currentChecks ?? hunt.rolls ?? hunt.count ?? hunt.totalChecks ?? 0) || 0);
+  const rawTotalChecks = Number(hunt.totalChecks ?? 0) || 0;
+  const rawPhases = Array.isArray(hunt.phases) ? hunt.phases : [];
+
+  // Self-heal: only for legacy hunts with no explicit checks property defined
+  if (!hasExplicitChecks && rawPhases.length === 0 && rawTotalChecks > 0) {
+    checks = rawTotalChecks;
+  }
 
   // Normalize increment
   let localIncrements = {};
@@ -155,7 +165,6 @@ export const normalizeHunt = (hunt, now = Date.now(), legacyTotals = {}, legacyL
   if (method === "Egg Hatching") method = "Breeding";
 
   // Normalize phases
-  const rawPhases = Array.isArray(hunt.phases) ? hunt.phases : [];
   const phases = rawPhases.map((p, idx) => {
     if (!p || typeof p !== "object") {
       return {
@@ -228,6 +237,40 @@ export const normalizeHunt = (hunt, now = Date.now(), legacyTotals = {}, legacyL
 
   const currentElapsedMs = Math.max(0, (isPaused ? (pausedAt || now) : now) - startedAt - totalPausedMs);
 
+  let totalOverallChecks = checks;
+  if (phases.length > 0) {
+    const lastPhase = phases[phases.length - 1];
+    const lastTotal = lastPhase?.totalChecks !== undefined && lastPhase?.totalChecks !== null
+      ? Number(lastPhase.totalChecks)
+      : phases.reduce((acc, p) => acc + Number(p.phaseChecks || p.checks || 0), 0);
+
+    if (checks >= lastTotal && lastTotal > 0) {
+      totalOverallChecks = checks;
+    } else {
+      totalOverallChecks = lastTotal + checks;
+    }
+  } else {
+    totalOverallChecks = checks;
+  }
+
+  let fallbackMetricMode = "phase";
+  try {
+    const savedMap = localStorage.getItem("dex_hunt_metric_mode_map");
+    if (savedMap) {
+      const parsed = JSON.parse(savedMap);
+      if (parsed[huntId]) fallbackMetricMode = parsed[huntId];
+    }
+    if (fallbackMetricMode === "phase") {
+      const savedGlobal = localStorage.getItem("dex_hunt_metric_mode");
+      if (savedGlobal) fallbackMetricMode = savedGlobal;
+    }
+  } catch {}
+
+  let metricMode = hunt.metricMode || fallbackMetricMode;
+  if (phases.length === 0 && metricMode === "phase") {
+    metricMode = "total";
+  }
+
   return {
     ...hunt,
     id: huntId,
@@ -238,6 +281,8 @@ export const normalizeHunt = (hunt, now = Date.now(), legacyTotals = {}, legacyL
     game,
     method,
     checks,
+    totalChecks: totalOverallChecks,
+    metricMode,
     increment: huntIncrement,
     status: isPaused ? "paused" : "running",
     isPaused,
@@ -308,9 +353,18 @@ export const updateHuntWithAction = (hunt, action, now = Date.now()) => {
         }
       }
 
+      const phases = Array.isArray(current.phases) ? current.phases : [];
+      let newTotalChecks = current.totalChecks;
+      if (phases.length === 0) {
+        newTotalChecks = newChecks;
+      } else if (newTotalChecks !== undefined && newTotalChecks !== null) {
+        newTotalChecks = Number(newTotalChecks) + amount;
+      }
+
       return {
         ...current,
         checks: newChecks,
+        ...(newTotalChecks !== undefined ? { totalChecks: newTotalChecks } : {}),
         status,
         isPaused: status === "paused",
         pausedAt,
@@ -325,9 +379,18 @@ export const updateHuntWithAction = (hunt, action, now = Date.now()) => {
     case "DECREMENT": {
       const amount = action.amount || 1;
       const newChecks = Math.max(0, current.checks - amount);
+      const phases = Array.isArray(current.phases) ? current.phases : [];
+      let newTotalChecks = current.totalChecks;
+      if (phases.length === 0) {
+        newTotalChecks = newChecks;
+      } else if (newTotalChecks !== undefined && newTotalChecks !== null) {
+        newTotalChecks = Math.max(0, Number(newTotalChecks) - amount);
+      }
+
       return {
         ...current,
         checks: newChecks,
+        ...(newTotalChecks !== undefined ? { totalChecks: newTotalChecks } : {}),
         version,
         updatedAt: now
       };
@@ -395,6 +458,68 @@ export const updateHuntWithAction = (hunt, action, now = Date.now()) => {
         status: "paused",
         isPaused: true,
         pausedAt: now,
+        version,
+        updatedAt: now
+      };
+    }
+
+    case "DELETE_PHASE": {
+      const entryId = action.entryId;
+      const entryTimestamp = action.entryTimestamp;
+      const phases = Array.isArray(current.phases) ? current.phases : [];
+      let removedChecks = 0;
+      const remainingPhases = [];
+
+      phases.forEach(p => {
+        const pId = p.entryId || p.id;
+        const matchesId = entryId && (pId === entryId || String(pId) === String(entryId));
+        const matchesTs = entryTimestamp && (
+          p.timestamp === entryTimestamp ||
+          (p.date && new Date(p.date).getTime() === Number(entryTimestamp))
+        );
+        if (matchesId || matchesTs) {
+          removedChecks += Number(p.phaseChecks ?? p.checks ?? p.count ?? 0) || 0;
+        } else {
+          remainingPhases.push(p);
+        }
+      });
+
+      let cumulative = 0;
+      const reindexedPhases = remainingPhases.map((p, idx) => {
+        const pChecks = Number(p.phaseChecks ?? p.checks ?? p.count ?? 0) || 0;
+        cumulative += pChecks;
+        return {
+          ...p,
+          phaseNumber: idx + 1,
+          checks: pChecks,
+          phaseChecks: pChecks,
+          totalChecks: cumulative
+        };
+      });
+
+      const currentChecks = Number(current.checks ?? 0) || 0;
+      const nextChecks = currentChecks + removedChecks;
+      const nextTotalChecks = reindexedPhases.length > 0
+        ? cumulative + nextChecks
+        : Math.max(nextChecks, Number(current.totalChecks ?? 0) || 0);
+
+      return {
+        ...current,
+        phases: reindexedPhases,
+        currentPhase: reindexedPhases.length + 1,
+        checks: nextChecks,
+        totalChecks: nextTotalChecks,
+        metricMode: reindexedPhases.length === 0 ? "total" : (current.metricMode || "phase"),
+        version,
+        updatedAt: now
+      };
+    }
+
+    case "TOGGLE_METRIC_MODE": {
+      const nextMode = action.metricMode || (current.metricMode === "total" ? "phase" : "total");
+      return {
+        ...current,
+        metricMode: nextMode,
         version,
         updatedAt: now
       };

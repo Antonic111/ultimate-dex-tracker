@@ -250,6 +250,37 @@ export default function ProfilePage() {
         return () => { ignore = true; };
     }, [targetUsername, isOwner, userLoading, refreshKey]);
 
+    // Sync likes when user context settles or tab regains focus
+    useEffect(() => {
+        if (!targetUsername || userLoading) return;
+        let ignore = false;
+
+        const syncLikes = async () => {
+            if (document.hidden) return;
+            try {
+                const res = await profileAPI.getProfileLikes(targetUsername);
+                if (!ignore && res) {
+                    if (typeof res.likeCount === 'number') setLikeCount(res.likeCount);
+                    if (typeof res.hasLiked === 'boolean') setHasLiked(res.hasLiked);
+                }
+            } catch (err) {
+                // Silently ignore sync failures
+            }
+        };
+
+        syncLikes();
+
+        const handleFocus = () => syncLikes();
+        window.addEventListener('focus', handleFocus);
+        window.addEventListener('visibilitychange', handleFocus);
+
+        return () => {
+            ignore = true;
+            window.removeEventListener('focus', handleFocus);
+            window.removeEventListener('visibilitychange', handleFocus);
+        };
+    }, [targetUsername, currentUsername, userLoading]);
+
     // Fetch stats
     useEffect(() => {
         if (!targetUsername) return;

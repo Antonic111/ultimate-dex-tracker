@@ -23,7 +23,7 @@ export default function RefundPolicy() {
           </span>
           <span className="legal-meta-item">•</span>
           <span className="legal-meta-item">
-            <strong>Last Updated:</strong> August 29, 2026
+            <strong>Last Updated:</strong> September 25, 2026
           </span>
         </div>
       </div>
@@ -126,8 +126,8 @@ export default function RefundPolicy() {
               <tbody>
                 <tr>
                   <td><strong>Feedback & Support Form</strong></td>
-                  <td>Submit a ticket via our <Link to="/support">Support</Link> page with your account username to request an immediate review.</td>
-                  <td>Within 24 hours</td>
+                  <td>Submit a ticket via our <Link to="/support">Support</Link> page with your account username to request a review.</td>
+                  <td>Typically within 1–3 business days</td>
                 </tr>
                 <tr>
                   <td><strong>Stripe Billing Portal / Receipt Link</strong></td>
@@ -169,9 +169,12 @@ export default function RefundPolicy() {
             For all questions regarding memberships, transactions, receipts, cancellations, or refunds:
           </p>
           <ul className="legal-list">
-            <li><strong>Support & Bug Reports:</strong> Available through the on-site <Link to="/support">Support Form</Link></li>
+            <li><strong>Support & Billing Assistance:</strong> Available through the on-site <Link to="/support">Support Form</Link> (typical response time within 1–3 business days)</li>
             <li><strong>Self-Service Billing Portal:</strong> Accessible via <Link to="/membership">Membership Settings</Link></li>
+            <li><strong>Terms of Service:</strong> Review full terms and service rules in our <Link to="/terms">Terms of Service</Link></li>
+            <li><strong>Privacy Policy:</strong> Review how personal and billing data is handled in our <Link to="/privacy">Privacy Policy</Link></li>
             <li><strong>Website:</strong> <a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a></li>
+            <li><strong>Governing Jurisdiction:</strong> Province of Ontario, Canada</li>
           </ul>
         </section>
 

@@ -356,8 +356,10 @@ export default function NotificationDropdown({ user, showMessage }) {
             style={{
               backgroundColor: 'var(--dropdown-bg, rgba(20, 20, 23, 0.98))',
               borderColor: 'var(--dropdown-border, rgba(255, 255, 255, 0.12))',
+              maxHeight: 'calc(100dvh - 100px)',
+              WebkitOverflowScrolling: 'touch'
             }}
-            className="fixed top-[84px] left-3 right-3 sm:absolute sm:top-[calc(100%+14px)] sm:left-auto sm:right-0 sm:w-[420px] max-h-[82vh] sm:max-h-[620px] rounded-2xl border shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl z-[9999] flex flex-col overflow-hidden text-left"
+            className="fixed top-[84px] left-3 right-3 sm:absolute sm:top-[calc(100%+14px)] sm:left-auto sm:right-0 sm:w-[420px] sm:max-h-[620px] rounded-2xl border shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl z-[9999] flex flex-col overflow-hidden text-left"
           >
             {/* Top Glow Accent Line */}
             <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-75 shrink-0" />

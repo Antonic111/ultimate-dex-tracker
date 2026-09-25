@@ -32,7 +32,7 @@ import ResetCollectionModal from "../components/Shared/ResetCollectionModal";
 import PasswordVerificationModal from "../components/Shared/PasswordVerificationModal";
 import EmailVerificationModal from "../components/Shared/EmailVerificationModal";
 import { validateContent } from "../../shared/contentFilter";
-import { profileAPI, userAPI, oauthAPI } from "../utils/api";
+import { profileAPI, userAPI, oauthAPI, clearAccountBrowserStorage } from "../utils/api";
 import { buildApiUrl } from "../config/api";
 import { useUsernameAvailability } from "../hooks/useUsernameAvailability";
 import { useUsernameCooldown } from "../hooks/useUsernameCooldown";
@@ -1740,6 +1740,7 @@ export default function Settings() {
           username={username}
           onClose={() => setShowDeleteModal(false)}
           onDeleted={() => {
+            clearAccountBrowserStorage(username);
             setUser({
               username: null,
               email: null,

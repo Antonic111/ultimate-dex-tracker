@@ -164,7 +164,13 @@ export function migrateOldCaughtData(oldCaughtMap) {
             checks: info.checks || "",
             date: info.date || "",
             notes: info.notes || "",
-            entryId: info.entryId || "entry-migrated-1"
+            entryId: info.entryId || "entry-migrated-1",
+            chartData: info.chartData,
+            chartConfig: info.chartConfig,
+            time: info.time,
+            phases: info.phases,
+            fails: info.fails,
+            modifiers: info.modifiers
           }]
         };
         // Clear the old fields from the root level
@@ -247,6 +253,8 @@ function migrateToEntriesFormat(oldInfo) {
       : (markVal ? [markVal] : []);
     const newFormat = {
       caught: true,
+      chartData: oldInfo.chartData,
+      chartConfig: oldInfo.chartConfig,
       entries: [{
         ball: oldInfo.ball || "",
         marks: marksVal,
@@ -256,7 +264,13 @@ function migrateToEntriesFormat(oldInfo) {
         checks: oldInfo.checks || "",
         date: oldInfo.date || "",
         notes: oldInfo.notes || "",
-        entryId: oldInfo.entryId || "entry-migrated-1"
+        entryId: oldInfo.entryId || "entry-migrated-1",
+        chartData: oldInfo.chartData,
+        chartConfig: oldInfo.chartConfig,
+        time: oldInfo.time,
+        phases: oldInfo.phases,
+        fails: oldInfo.fails,
+        modifiers: oldInfo.modifiers
       }]
     };
     return newFormat;

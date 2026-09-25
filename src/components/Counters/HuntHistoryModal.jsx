@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Modal, ConfirmModal, Button } from "../Shared";
+import { Modal, ConfirmModal, Button, Tooltip } from "../Shared";
 import {
   History,
   Trophy,
@@ -14,9 +14,10 @@ import {
   Flag,
   Calendar
 } from "lucide-react";
-import { GAME_OPTIONS } from "../../Constants";
+import { GAME_OPTIONS, BALL_OPTIONS, MARK_OPTIONS } from "../../Constants";
 import { getSpriteUrl, resolvePokemon, cleanPokemonNameOrKey } from "../../utils/spriteUtils";
 import { formatDigitalTime } from "../../utils/huntSync";
+import { calculateOdds, getCurrentHuntOdds } from "../../utils/huntSystem";
 import pokemonData from "../../data/pokemon.json";
 import formsDataDefault from "../../utils/loadFormsData";
 
@@ -28,10 +29,104 @@ const getGameImage = (gameName) => {
   return match?.image || "";
 };
 
+const getBallData = (ballName) => {
+  if (!ballName || ballName.toLowerCase() === "none") return null;
+  const match = BALL_OPTIONS.find(
+    b => b.value && (b.name?.toLowerCase() === ballName.toLowerCase() || b.value?.toLowerCase() === ballName.toLowerCase())
+  );
+  return match || { name: ballName, image: "/data/balls/poke-ball.png" };
+};
+
+const getMarkData = (markVal) => {
+  if (!markVal || markVal.toLowerCase() === "none") return null;
+  const match = MARK_OPTIONS.find(
+    m => m.value && (m.value?.toLowerCase() === markVal.toLowerCase() || m.name?.toLowerCase() === markVal.toLowerCase())
+  );
+  return match || null;
+};
+
+const getEntryModifiersList = (modifiers) => {
+  if (!modifiers) return [];
+  const list = [];
+  if (modifiers.shinyCharm) {
+    list.push({ label: "Shiny Charm", image: "/modifier_images/shinycharm.png", type: "charm" });
+  }
+  if (modifiers.sparklingLv3 || modifiers.sparklingPower === 3) {
+    list.push({ label: "Sparkling Power Lv 3", image: "/modifier_images/sandwich.png", type: "sandwich" });
+  } else if (modifiers.sparklingLv2 || modifiers.sparklingPower === 2) {
+    list.push({ label: "Sparkling Power Lv 2", image: "/modifier_images/sandwich.png", type: "sandwich" });
+  } else if (modifiers.sparklingLv1 || modifiers.sparklingPower === 1) {
+    list.push({ label: "Sparkling Power Lv 1", image: "/modifier_images/sandwich.png", type: "sandwich" });
+  }
+  if (modifiers.lureActive) {
+    list.push({ label: "Lure", image: "/modifier_images/lure.png", type: "lure" });
+  }
+  if (modifiers.eventBoosted) {
+    list.push({ label: "Event Boosted", image: "/modifier_images/eventboosted.png", type: "event" });
+  }
+  if (modifiers.shinyParents) {
+    list.push({ label: "Masuda Method", image: "/modifier_images/shinyparents.png", type: "parents" });
+  }
+  if (modifiers.perfectResearch) {
+    list.push({ label: "Perfect Research", image: "/modifier_images/perfectresearch.png", type: "perfect" });
+  } else if (modifiers.researchLv10) {
+    list.push({ label: "Research Lv 10", image: "/modifier_images/research.png", type: "research" });
+  }
+  return list;
+};
+
 const formatPokemonName = (name) => {
   if (!name) return "";
   const clean = cleanPokemonNameOrKey(name);
   return clean.charAt(0).toUpperCase() + clean.slice(1);
+};
+
+// Calculate accurate odds for an entry, dynamically recalculating when base odds or missing
+const getEntryOdds = (entry, isMMOMode) => {
+  const isPLA = entry.game === "Legends Arceus" || isMMOMode;
+  const isMMOHunt = isMMOMode ||
+    (isPLA && (
+      entry.method === "Permutations" ||
+      entry.method === "Permutation" ||
+      entry.method === "Massive Mass Outbreak" ||
+      entry.method === "Massive Mass Outbreaks" ||
+      entry.method === "MMO"
+    )) ||
+    entry.method === "Permutations" ||
+    entry.isMMO;
+
+  const game = entry.game || (isMMOHunt ? "Legends Arceus" : "");
+  const method = entry.method || (isMMOHunt ? "Permutations" : "");
+  const modifiers = entry.modifiers || {};
+  const hasActiveModifiers = Object.values(modifiers).some(Boolean);
+
+  if (isMMOHunt) {
+    const calculatedMMO = calculateOdds("Legends Arceus", method || "Permutations", modifiers);
+    // If entry has a non-4096 stored odds
+    if (entry.odds && Number(entry.odds) > 0 && Number(entry.odds) !== 4096) {
+      // If entry has active modifiers but stored odds was unboosted base rate (>= 315), return boosted odds
+      if (hasActiveModifiers && calculatedMMO && Number(entry.odds) >= 315 && calculatedMMO < Number(entry.odds)) {
+        return calculatedMMO;
+      }
+      return Number(entry.odds);
+    }
+    return calculatedMMO || 315;
+  }
+
+  if (game && method) {
+    try {
+      const dynamicCalc = getCurrentHuntOdds(game, method, modifiers, entry.totalChecks || entry.checks || 0);
+      if (dynamicCalc && (hasActiveModifiers || !entry.odds || Number(entry.odds) === 4096)) {
+        return dynamicCalc;
+      }
+    } catch {}
+  }
+
+  if (entry.odds && Number(entry.odds) > 0) {
+    return Number(entry.odds);
+  }
+
+  return 4096;
 };
 
 export default function HuntHistoryModal({
@@ -55,12 +150,12 @@ export default function HuntHistoryModal({
     if (!Array.isArray(huntHistory)) return [];
     if (mode === "mmo") {
       return huntHistory.filter(
-        h => h.game === "Legends Arceus" && (h.method === "Permutations" || h.method === "Massive Mass Outbreak" || h.method === "Massive Mass Outbreaks")
+        h => (h.game === "Legends Arceus" && (h.method === "Permutations" || h.method === "Massive Mass Outbreak" || h.method === "Massive Mass Outbreaks" || h.method === "MMO")) || h.method === "Permutations" || h.isMMO
       );
     }
     // "counters" mode: exclude PLA Permutation hunts
     return huntHistory.filter(
-      h => !(h.game === "Legends Arceus" && (h.method === "Permutations" || h.method === "Massive Mass Outbreak" || h.method === "Massive Mass Outbreaks"))
+      h => !((h.game === "Legends Arceus" && (h.method === "Permutations" || h.method === "Massive Mass Outbreak" || h.method === "Massive Mass Outbreaks" || h.method === "MMO")) || h.method === "Permutations" || h.isMMO)
     );
   }, [huntHistory, mode]);
 
@@ -136,23 +231,18 @@ export default function HuntHistoryModal({
         icon={<History size={22} className="text-[var(--accent)]" />}
         size="lg"
         className="!max-w-[760px]"
-        footer={({ close }) => (
-          <div className="flex items-center justify-between w-full">
-            {scopedHistory.length > 0 ? (
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={() => setClearAllModal(true)}
-                icon={<Trash2 size={14} />}
-              >
-                Clear History
-              </Button>
-            ) : <div />}
-            <Button variant="secondary" size="md" onClick={close}>
-              Close
+        footer={scopedHistory.length > 0 ? () => (
+          <div className="flex items-center justify-start w-full">
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => setClearAllModal(true)}
+              icon={<Trash2 size={14} />}
+            >
+              Clear History
             </Button>
           </div>
-        )}
+        ) : undefined}
       >
         <div className="history-modal-container">
           {scopedHistory.length > 0 && (
@@ -202,44 +292,38 @@ export default function HuntHistoryModal({
 
               {/* View Switcher Tabs & Search Row */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-3">
-                <div className="flex items-center bg-black/40 border border-white/10 rounded-xl p-1 gap-1">
+                <div className="history-filter-tabs">
                   <button
                     type="button"
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                      historyTab === "all"
-                        ? "bg-white/15 text-white shadow-sm"
-                        : "text-gray-400 hover:text-white"
+                    className={`history-filter-tab ${
+                      historyTab === "all" ? "is-active-all" : ""
                     }`}
                     onClick={() => setHistoryTab("all")}
                   >
                     <span>All</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/10">{scopedHistory.length}</span>
+                    <span className="history-filter-count">{scopedHistory.length}</span>
                   </button>
                   <button
                     type="button"
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                      historyTab === "completed"
-                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm"
-                        : "text-gray-400 hover:text-white"
+                    className={`history-filter-tab ${
+                      historyTab === "completed" ? "is-active-completed" : ""
                     }`}
                     onClick={() => setHistoryTab("completed")}
                   >
-                    <Trophy size={12} />
+                    <Trophy size={13} className="shrink-0" />
                     <span>Completed</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/10">{completedList.length}</span>
+                    <span className="history-filter-count">{completedList.length}</span>
                   </button>
                   <button
                     type="button"
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                      historyTab === "fails"
-                        ? "bg-rose-500/20 text-rose-300 border border-rose-500/30 shadow-sm"
-                        : "text-gray-400 hover:text-white"
+                    className={`history-filter-tab ${
+                      historyTab === "fails" ? "is-active-fails" : ""
                     }`}
                     onClick={() => setHistoryTab("fails")}
                   >
-                    <XCircle size={12} />
+                    <XCircle size={13} className="shrink-0" />
                     <span>Fails</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-300">{failsList.length}</span>
+                    <span className="history-filter-count">{failsList.length}</span>
                   </button>
                 </div>
 
@@ -323,10 +407,17 @@ export default function HuntHistoryModal({
                   : "Recorded";
                 const totalChecks = entry.totalChecks || entry.checks || 0;
                 const elapsedMs = entry.elapsedMs || entry.time || 0;
-                const calculatedOdds = entry.odds || 4096;
+                const isMMOMode = mode === "mmo";
+                const calculatedOdds = getEntryOdds(entry, isMMOMode);
+                const entryGame = entry.game || (isMMOMode ? "Legends Arceus" : "");
+                const entryMethod = entry.method || (isMMOMode ? "Permutations" : "");
                 const phaseVal = isFail
                   ? `Phase ${entry.phaseNumber || 1}`
                   : (entry.phaseCount || (entry.phases ? entry.phases.length + 1 : 1));
+                const ballData = getBallData(entry.ball);
+                const rawMarks = Array.isArray(entry.marks) ? entry.marks : (entry.mark ? [entry.mark] : []);
+                const markList = rawMarks.map(getMarkData).filter(Boolean);
+                const activeModifiers = getEntryModifiersList(entry.modifiers);
 
                 return (
                   <div
@@ -337,7 +428,7 @@ export default function HuntHistoryModal({
                     <div className="history-entry-sprite-box">
                       <Sparkles
                         size={14}
-                        className={`history-entry-corner-sparkle ${isFail ? "text-rose-400" : "text-emerald-400"}`}
+                        className="history-entry-corner-sparkle text-[#FFB800]"
                       />
                       <img
                         src={getSpriteUrl(fullPokemon, true, useHomeSprites)}
@@ -356,13 +447,19 @@ export default function HuntHistoryModal({
                           <h4 className="history-entry-pokemon-name">
                             {formatPokemonName(fullPokemon?.name || entry.pokemonName)}
                           </h4>
-                          <Sparkles
-                            size={14}
-                            className={`shrink-0 ${isFail ? "text-rose-400" : "text-emerald-400"}`}
-                          />
-                          {fullPokemon?.id != null && (
-                            <span className="history-entry-dex-num">
-                              #{String(fullPokemon.id).padStart(4, "0")}
+                          {(fullPokemon?.id != null || entryDateStr) && (
+                            <span className="history-entry-meta-tag">
+                              {fullPokemon?.id != null && (
+                                <span className="history-entry-dex-num">
+                                  #{String(fullPokemon.id).padStart(4, "0")}
+                                </span>
+                              )}
+                              {fullPokemon?.id != null && entryDateStr && (
+                                <span className="history-entry-dot-divider">•</span>
+                              )}
+                              {entryDateStr && (
+                                <span className="history-entry-date-text">{entryDateStr}</span>
+                              )}
                             </span>
                           )}
                           {entry.nickname && (
@@ -384,6 +481,11 @@ export default function HuntHistoryModal({
                               <span>CAUGHT</span>
                             </span>
                           )}
+                          {entry.addedToLivingDex && (
+                            <span className="history-status-badge living-dex">
+                              <span>Living Dex ✓</span>
+                            </span>
+                          )}
                           <button
                             type="button"
                             className="history-action-btn"
@@ -398,36 +500,51 @@ export default function HuntHistoryModal({
 
                       {/* Middle Badges Row */}
                       <div className="history-entry-meta-row">
-                        {entry.game && (
+                        {entryGame && (
                           <span className="history-meta-pill">
-                            {getGameImage(entry.game) ? (
-                              <img src={getGameImage(entry.game)} alt="" className="w-3.5 h-3.5 object-contain" />
+                            {getGameImage(entryGame) ? (
+                              <img src={getGameImage(entryGame)} alt="" className="w-3.5 h-3.5 object-contain" />
                             ) : (
                               <span>🎮</span>
                             )}
-                            <span>{entry.game}</span>
+                            <span>{entryGame}</span>
                           </span>
                         )}
-                        {entry.method && (
+                        {entryMethod && (
                           <span className="history-meta-pill">
-                            <span className="text-[var(--accent)]">✦</span>
-                            <span>{entry.method}</span>
+                            <span>{entryMethod}</span>
                           </span>
                         )}
-                        <span className="history-meta-pill text-gray-400">
-                          <Calendar size={12} className="text-gray-500" />
-                          <span>{entryDateStr}</span>
-                        </span>
-                        {entry.ball && (
-                          <span className="history-meta-pill text-gray-300">
-                            <span>{entry.ball}</span>
-                          </span>
+                        {ballData && (
+                          <Tooltip content={ballData.name} position="top">
+                            <span
+                              className="history-meta-icon-badge"
+                              aria-label={ballData.name}
+                            >
+                              <img src={ballData.image} alt={ballData.name} />
+                            </span>
+                          </Tooltip>
                         )}
-                        {entry.addedToLivingDex && (
-                          <span className="history-meta-pill !bg-emerald-500/10 !border-emerald-500/25 !text-emerald-300 font-bold">
-                            <span>Living Dex ✓</span>
-                          </span>
-                        )}
+                        {markList.map((mObj, idx) => (
+                          <Tooltip key={idx} content={mObj.name} position="top">
+                            <span
+                              className="history-meta-icon-badge"
+                              aria-label={mObj.name}
+                            >
+                              <img src={mObj.image} alt={mObj.name} />
+                            </span>
+                          </Tooltip>
+                        ))}
+                        {activeModifiers.map((mod, idx) => (
+                          <Tooltip key={idx} content={mod.label} position="top">
+                            <span
+                              className="history-meta-icon-badge"
+                              aria-label={mod.label}
+                            >
+                              <img src={mod.image} alt={mod.label} />
+                            </span>
+                          </Tooltip>
+                        ))}
                       </div>
 
                       {/* Bottom 4-Column Stats Grid */}

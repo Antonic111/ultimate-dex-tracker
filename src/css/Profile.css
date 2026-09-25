@@ -804,22 +804,58 @@ button:focus {
   }
 
   .field-display.stat-icon-row {
-    padding: 8px 10px;
-    min-height: 52px;
+    padding: 6px 8px;
+    min-height: 48px;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    gap: 4px;
+    box-sizing: border-box;
+  }
+
+  .field-display.stat-icon-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .field-display.stat-icon-row.stat-icon-row--full {
+    justify-content: space-between;
+    gap: 0;
   }
 
   .stat-icon-item {
-    width: 32px;
-    gap: 3px;
+    width: 26px;
+    min-width: 24px;
+    max-width: 28px;
+    gap: 2px;
+    flex-shrink: 0;
   }
 
   .stat-icon-img {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
   }
 
   .stat-icon-count {
-    font-size: 0.55rem;
+    font-size: 0.6rem;
+    line-height: 1;
+  }
+
+  .stat-icon-text {
+    max-width: 26px;
+    font-size: 0.5rem;
+    padding: 1px 2px;
+  }
+
+  .stat-section-header {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .stat-section-header label {
+    font-size: 0.75rem;
   }
 
   .profile-stats-grid {

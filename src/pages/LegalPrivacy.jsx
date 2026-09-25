@@ -23,7 +23,7 @@ export default function LegalPrivacy() {
           </span>
           <span className="legal-meta-item">•</span>
           <span className="legal-meta-item">
-            <strong>Last Updated:</strong> August 29, 2026
+            <strong>Last Updated:</strong> September 25, 2026
           </span>
         </div>
       </div>
@@ -39,7 +39,7 @@ export default function LegalPrivacy() {
             <li><a href="#tracker-data" className="legal-toc-link">4. Pokémon & Tracker Data</a></li>
             <li><a href="#streamer-tools-privacy" className="legal-toc-link">5. Streamer Tools & Overlays</a></li>
             <li><a href="#payments-billing" className="legal-toc-link">6. Payments & Billing (Stripe)</a></li>
-            <li><a href="#cookies-storage" className="legal-toc-link">7. Cookies & Local Storage</a></li>
+            <li><a href="#cookies-storage" className="legal-toc-link">7. Cookies, Local Storage & Session Storage</a></li>
             <li><a href="#how-we-use" className="legal-toc-link">8. How We Use Information</a></li>
             <li><a href="#third-parties" className="legal-toc-link">9. Third-Party Service Providers</a></li>
             <li><a href="#retention-deletion" className="legal-toc-link">10. Data Retention, Reset & Deletion</a></li>
@@ -83,7 +83,8 @@ export default function LegalPrivacy() {
             <li><strong>Email Address:</strong> Used for account creation, email verification, password reset codes, transactional receipts, and important account notices.</li>
             <li><strong>Password:</strong> If you register via email and password, your password is encrypted using a one-way cryptographic hash (bcrypt with salt factor 10). Plaintext passwords are never saved or accessible to us.</li>
             <li><strong>Profile Customizations (Optional):</strong> Bio, location, gender identifier, Switch friend code, Pokémon GO friend code, favorite games, favorite Pokémon, favorite balls, favorite trainers, avatar trainer sprite, custom gradient colors, and external database link preferences.</li>
-            <li><strong>Custom Avatars & GIFs (Optional):</strong> If you upload a custom avatar or animated GIF (available with Membership), the image file is uploaded and processed through our media storage infrastructure.</li>
+            <li><strong>Birthday (Optional):</strong> You may optionally choose to provide your birth month and day (and optionally year) in your profile settings. When provided, your birthday is displayed on your public trainer profile (with a celebration indicator) and enables community birthday features. Providing this information is strictly optional; birth year is optional and is not displayed publicly.</li>
+            <li><strong>Custom Avatars & GIFs (Optional):</strong> If you upload a custom profile avatar or animated GIF (available with Membership), the image is transmitted to Sightengine for automated content moderation to ensure it complies with our community guidelines. Once verified, the image is optimized and stored in an encoded format directly within our database (MongoDB Atlas).</li>
             <li><strong>Social Media Links (Optional):</strong> YouTube channel or Twitch channel URLs submitted for content creator badges or public profiles.</li>
           </ul>
 
@@ -165,6 +166,7 @@ export default function LegalPrivacy() {
           </p>
           <ul className="legal-list">
             <li><strong>Read-Only Access Tokens:</strong> Overlay links use a cryptographically generated, read-only token. Accessing the overlay URL allows the browser source to retrieve only the public data necessary to display the overlay (such as your current hunt target, counter number, and living Dex progress). It does <strong>not</strong> provide access to your email address, password, billing records, or account management settings.</li>
+            <li><strong>Realtime Overlay Updates (Supabase):</strong> To deliver instantaneous hunt counter and catch updates to your streaming overlay browser source without requiring constant page reloads, our overlay service communicates with Supabase infrastructure. When you log a catch or increment a counter, live event broadcasts are delivered via secure WebSockets to synchronize your OBS or Streamlabs display in real time.</li>
             <li><strong>Token Invalidation:</strong> If you accidentally display your overlay URL on stream, you can regenerate a new token at any time in <em>Streamer Tools</em>, which instantly invalidates all previous overlay URLs.</li>
           </ul>
         </section>
@@ -187,24 +189,38 @@ export default function LegalPrivacy() {
         {/* Section 7 */}
         <section id="cookies-storage" className="legal-section">
           <h2 className="legal-section-title">
-            <span className="section-number">7</span> Cookies & Local Storage
+            <span className="section-number">7</span> Cookies, Local Storage & Session Storage
           </h2>
           <p className="legal-paragraph">
-            We use browser cookies and local storage exclusively for essential operational and preference purposes. We do <strong>not</strong> use third-party advertising tracking cookies.
+            We use browser cookies, local storage, and session storage exclusively for essential authentication, gameplay state preservation, and user interface preferences. We do <strong>not</strong> deploy third-party advertising or commercial cross-site tracking cookies.
           </p>
           
           <h3 className="legal-subsection-title">A. Cookies</h3>
           <ul className="legal-list">
-            <li><code>token</code> (Authentication Cookie): An <code>HttpOnly</code>, <code>Secure</code> (HTTPS in production), <code>SameSite</code> cookie containing a signed JSON Web Token (JWT). This maintains your login session securely across pages and expires after 30 days.</li>
+            <li><code>token</code> (Authentication Cookie): An <code>HttpOnly</code>, <code>Secure</code> (transmitted only over HTTPS in production), <code>SameSite</code> cookie containing a cryptographically signed JSON Web Token (JWT). This maintains your login session securely across pages without exposing credentials to client-side scripts and expires after 30 days.</li>
           </ul>
 
           <h3 className="legal-subsection-title">B. Browser Local Storage</h3>
+          <p className="legal-paragraph">
+            Local storage provides persistent client-side key-value caching so your settings and gameplay tools remain fast, responsive, and available across browser sessions. Data stored in your browser's local storage may include:
+          </p>
           <ul className="legal-list">
-            <li><code>authToken</code>: Stored locally as a client-side backup for API authorization headers across cross-origin requests and mobile browsers.</li>
-            <li><code>dexPreferences</code> & <code>dexToggles</code>: Stores your UI filter toggles, active sprite styles (regular vs. Pokémon HOME), and collapsed section states for instant page rendering.</li>
-            <li><code>caughtInfoMap:[username]</code>: Client-side cache of your caught records enabling responsive, optimistic UI updates while offline or navigating pages.</li>
-            <li><code>theme</code> & <code>accent</code>: Stores your preferred color theme (Dark/Light/System) and UI accent color choice.</li>
-            <li><code>externalLinkPreference</code>: Stores your choice of external reference database (Serebii, Bulbapedia, PokémonDB, or Smogon).</li>
+            <li><strong>Authentication & Session Continuity:</strong> Temporary authentication token backups used to authorize API requests across cross-origin contexts or mobile browsers.</li>
+            <li><strong>Account & Profile Caching:</strong> Cached username, display preferences, and account status indicators for instant interface rendering.</li>
+            <li><strong>User & UI Preferences:</strong> Interface display theme (Dark, Light, or System), accent color choices, and preferred external Pokédex reference database (such as Serebii, Bulbapedia, or PokémonDB).</li>
+            <li><strong>Pokédex Preferences & Filter State:</strong> Active generation and regional form filters, view modes (all vs. categorized), active tabs, and section collapse states.</li>
+            <li><strong>Hunt & Counter State:</strong> Active shiny hunts, encounter tallies, phase history, timer configurations, pause states, and custom counter increment values.</li>
+            <li><strong>BINGO State:</strong> Grid cell completion states and card configurations for active BINGO challenges.</li>
+            <li><strong>Streamer Tools & Overlay Configuration:</strong> Selected overlay presets, custom positioning settings, snap grid options, and cached overlay layout preferences.</li>
+            <li><strong>Migration & Client Recovery Information:</strong> Client data migration flags and synchronization markers that ensure offline or cached progress reconciles cleanly with the database.</li>
+          </ul>
+
+          <h3 className="legal-subsection-title">C. Session Storage</h3>
+          <p className="legal-paragraph">
+            Session storage is temporary browser memory scoped strictly to your current browser tab. Unlike local storage, data in session storage is automatically cleared by your browser as soon as the tab or window is closed.
+          </p>
+          <ul className="legal-list">
+            <li><strong>Session Continuity & Mobile Compatibility:</strong> We temporarily store session-scoped account continuity information to prevent accidental logouts or authentication loss on mobile browsers (specifically Safari on iOS) where strict third-party cookie partitioning can otherwise interrupt active sessions. This information is session-only and is cleared immediately upon manual sign-out or when closing the tab.</li>
           </ul>
         </section>
 
@@ -220,7 +236,8 @@ export default function LegalPrivacy() {
             <li><strong>Providing the Service:</strong> Authenticating your identity, syncing your collection across devices, saving counters, rendering overlays, and provisioning membership perks.</li>
             <li><strong>Account Security & Verification:</strong> Dispatching 6-digit verification codes for registration, email address updates, password resets, and account deletion confirmation.</li>
             <li><strong>Abuse Prevention & Rate Limiting:</strong> Enforcing rate limits on authentication and API routes to protect our community against brute force attacks and denial-of-service attempts.</li>
-            <li><strong>Service Performance:</strong> Monitoring page load performance and aggregate runtime metrics through Vercel Speed Insights.</li>
+            <li><strong>Service Performance & Edge Analytics:</strong> Monitoring page load performance, Core Web Vitals, and aggregate runtime metrics through Vercel Analytics and Vercel Speed Insights.</li>
+            <li><strong>Internal Server Health & Route Metrics:</strong> Our backend server maintains a temporary in-memory rolling buffer of recent HTTP API requests (recording general API route paths, HTTP methods, response status codes, and request durations). This data is kept strictly in volatile server memory (not written to persistent database storage) and aggregated into short-term hourly buckets for administrative system health, diagnostic troubleshooting, and route performance monitoring.</li>
           </ul>
         </section>
 
@@ -261,6 +278,18 @@ export default function LegalPrivacy() {
                   <td>Cloud Database Hosting (MongoDB Atlas)</td>
                   <td>Hashed passwords, account credentials, tracker data, hunt timers</td>
                   <td><a href="https://www.mongodb.com/legal/privacy/privacy-policy" target="_blank" rel="noopener noreferrer">MongoDB Privacy Policy</a></td>
+                </tr>
+                <tr>
+                  <td><strong>Sightengine SAS</strong></td>
+                  <td>Automated Content Moderation (Avatar Uploads)</td>
+                  <td>Uploaded image file buffer during custom profile avatar submission</td>
+                  <td><a href="https://sightengine.com/privacy-policy" target="_blank" rel="noopener noreferrer">Sightengine Privacy Policy</a></td>
+                </tr>
+                <tr>
+                  <td><strong>Supabase, Inc.</strong></td>
+                  <td>Realtime Event Broadcasting (Streamer Tools & Overlays)</td>
+                  <td>Live hunt counter updates, catch event broadcasts, and overlay synchronization metadata</td>
+                  <td><a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase Privacy Policy</a></td>
                 </tr>
                 <tr>
                   <td><strong>Resend Inc.</strong></td>
@@ -318,8 +347,13 @@ export default function LegalPrivacy() {
             <li><strong>Community Catches Feed:</strong> All public broadcast entries associated with your username in <code>RecentCatch</code> are permanently removed from the live feed.</li>
             <li><strong>Bug Reports & Feedback:</strong> Any bug reports you submitted are fully anonymized by detaching your user ID, preserving system stability history without retaining personal data.</li>
             <li><strong>Social Connections:</strong> Your user reference is removed from all other trainers' profile like lists.</li>
-            <li><strong>Session Termination:</strong> Authentication cookies and local storage tokens are wiped immediately.</li>
+            <li><strong>Session Termination & Browser Cache Purge:</strong> Authentication cookies are cleared server-side, and account-specific credentials, cached profile records, and personal gameplay data stored in your browser's local storage and session storage are purged from your active device upon deletion. Harmless non-personal device preferences (such as your chosen UI theme) may remain saved on the device.</li>
           </ul>
+
+          <h3 className="legal-subsection-title">C. Retention of Billing, Subscription & Tax Records</h3>
+          <p className="legal-paragraph">
+            While your public profile, login credentials, and all Pokémon tracking data are permanently deleted from active databases upon confirmed account deletion, limited transaction and subscription records (such as Stripe customer identifiers, subscription history, payment event logs, and invoice receipts) may be retained for the period necessary to comply with legitimate business, accounting, tax, fraud prevention, chargeback defense, and statutory legal obligations. These records are not attached to an active public profile or gameplay account and are maintained in accordance with applicable financial record-keeping standards.
+          </p>
         </section>
 
         {/* Section 11 */}
@@ -391,6 +425,8 @@ export default function LegalPrivacy() {
             <li><strong>Developer & Creator:</strong> Antonic (Solo Developer)</li>
             <li><strong>Developer Portfolio:</strong> <a href="https://antonic.ca" target="_blank" rel="noopener noreferrer">antonic.ca</a></li>
             <li><strong>Website:</strong> <a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a></li>
+            <li><strong>Terms of Service:</strong> Review full terms and service rules in our <Link to="/terms">Terms of Service</Link></li>
+            <li><strong>Refunds & Cancellations:</strong> Review subscription cancellation and refund terms in our <Link to="/refund-policy">Refund & Cancellation Policy</Link></li>
             <li><strong>Governing Jurisdiction:</strong> Province of Ontario, Canada</li>
           </ul>
         </section>

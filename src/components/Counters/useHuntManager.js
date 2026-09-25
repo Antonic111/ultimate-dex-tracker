@@ -298,6 +298,9 @@ export function useHuntManager({
       if (!msg) return;
 
       if (msg.type === "HUNT_ACTION" && msg.action) {
+        if (msg.action.type === "TOGGLE_METRIC_MODE" && msg.action.metricMode) {
+          setMetricMode(msg.action.metricMode);
+        }
         setAllActiveHunts(prev => {
           const next = applyHuntActionToState(prev, msg.action, msg.action.timestamp || Date.now());
           setCachedHuntsData({ activeHunts: next });
@@ -596,10 +599,11 @@ export function useHuntManager({
   }, []);
 
   const handleToggleMetricMode = useCallback((huntId) => {
+    let nextMode = "total";
     if (huntId) {
       setMetricModeMap(prev => {
         const current = prev[huntId] || "phase";
-        const nextMode = current === "phase" ? "total" : "phase";
+        nextMode = current === "phase" ? "total" : "phase";
         const next = { ...prev, [huntId]: nextMode };
         try {
           localStorage.setItem("dex_hunt_metric_mode_map", JSON.stringify(next));
@@ -614,7 +618,45 @@ export function useHuntManager({
       } catch {}
       return next;
     });
-  }, []);
+
+    const targetId = huntId || currentHuntId;
+    if (targetId) {
+      let updatedHuntsList = null;
+      setAllActiveHunts(currentList => {
+        const updated = currentList.map(h => {
+          if (String(h.id) === String(targetId) || String(h.huntId) === String(targetId)) {
+            return { ...h, metricMode: nextMode, version: (h.version || 1) + 1, updatedAt: Date.now() };
+          }
+          return h;
+        });
+        updatedHuntsList = updated;
+        setCachedHuntsData({ activeHunts: updated });
+        debouncedSave(updated);
+        return updated;
+      });
+
+      if (channelRef.current) {
+        channelRef.current.broadcast({
+          type: "HUNT_ACTION",
+          huntId: targetId,
+          action: {
+            type: "TOGGLE_METRIC_MODE",
+            metricMode: nextMode,
+            timestamp: Date.now()
+          }
+        });
+        if (updatedHuntsList) {
+          const updatedHunt = updatedHuntsList.find(h => String(h.id) === String(targetId) || String(h.huntId) === String(targetId));
+          if (updatedHunt) {
+            channelRef.current.broadcast({
+              type: "HUNT_UPDATED",
+              hunt: updatedHunt
+            });
+          }
+        }
+      }
+    }
+  }, [currentHuntId, debouncedSave]);
 
   const handleSaveAdjustValues = useCallback((hunt, values) => {
     if (!hunt) return;
@@ -746,12 +788,20 @@ export function useHuntManager({
       checks: phaseRecord.phaseChecks || 0,
       totalChecks: phaseRecord.totalChecks || 0,
       time: phaseRecord.elapsedMs || 0,
+      odds: (phaseRecord.odds && phaseRecord.odds !== 4096)
+        || (hunt.odds && hunt.odds !== 4096)
+        || calculateOdds(hunt.game, hunt.method, hunt.modifiers || {})
+        || phaseRecord.odds
+        || hunt.odds
+        || 4096,
       phases: hunt.phases || [],
       fails: (hunt.phases || []).filter(p => p.outcome === "failed"),
       phaseCount: phaseRecord.phaseNumber || (hunt.phases ? hunt.phases.length + 1 : 1),
       notes: phaseRecord.notes || (shinyEncounterModal.notes || "").trim() || "",
       entryId: phaseRecord.entryId || Math.random().toString(36).substr(2, 9),
       modifiers: hunt.modifiers || {},
+      chartData: hunt.chartData || phaseRecord.chartData || {},
+      chartConfig: hunt.chartConfig || phaseRecord.chartConfig || {},
       isHuntTracker: true
     };
 
@@ -856,6 +906,8 @@ export function useHuntManager({
       phaseNumber: phaseRecord.phaseNumber,
       id: phaseRecord.id || Date.now(),
       entryId: phaseRecord.entryId || Math.random().toString(36).substr(2, 9),
+      chartData: hunt.chartData || phaseRecord.chartData || {},
+      chartConfig: hunt.chartConfig || phaseRecord.chartConfig || {},
       isHuntTracker: true
     };
 
@@ -934,6 +986,13 @@ export function useHuntManager({
 
     const phasePokemon = phaseRecord.pokemon || hunt.pokemon;
     const phasePokemonName = phasePokemon?.name || phaseRecord.pokemonName || "Unknown";
+    const effectiveModifiers = hunt.modifiers || phaseRecord.modifiers || {};
+    const resolvedOdds = (phaseRecord.odds && phaseRecord.odds !== 4096)
+      || (hunt.odds && hunt.odds !== 4096)
+      || calculateOdds(hunt.game, hunt.method, effectiveModifiers)
+      || phaseRecord.odds
+      || hunt.odds
+      || 4096;
 
     if (phaseRecord.outcome === "failed") {
       const failEntry = {
@@ -947,13 +1006,16 @@ export function useHuntManager({
         totalChecks: phaseRecord.totalChecks || hunt.checks || 0,
         elapsedMs: phaseRecord.elapsedMs || 0,
         time: phaseRecord.elapsedMs || 0,
-        odds: phaseRecord.odds || hunt.odds || null,
+        odds: resolvedOdds,
+        modifiers: effectiveModifiers,
         reason: phaseRecord.reason || (phaseRecord.notes || "").trim() || "Failed Encounter",
         notes: phaseRecord.notes || (phaseRecord.notes || "").trim() || "",
         date: phaseRecord.date || new Date().toISOString(),
         timestamp: now,
         outcome: "failed",
         isFail: true,
+        chartData: hunt.chartData || phaseRecord.chartData || {},
+        chartConfig: hunt.chartConfig || phaseRecord.chartConfig || {},
         isHuntTracker: true,
         addedToLivingDex: Boolean(phaseRecord.addedToCollection)
       };
@@ -979,8 +1041,8 @@ export function useHuntManager({
         totalChecks: phaseRecord.totalChecks || hunt.checks || 0,
         elapsedMs: phaseRecord.elapsedMs || 0,
         time: phaseRecord.elapsedMs || 0,
-        odds: phaseRecord.odds || hunt.odds || null,
-        modifiers: hunt.modifiers || {},
+        odds: resolvedOdds,
+        modifiers: effectiveModifiers,
         nickname: phaseRecord.nickname || "",
         ball: phaseRecord.ball || "",
         mark: phaseRecord.mark || "",
@@ -991,6 +1053,8 @@ export function useHuntManager({
         isFail: false,
         isPhase: true,
         targetPokemon: hunt.pokemon,
+        chartData: hunt.chartData || phaseRecord.chartData || {},
+        chartConfig: hunt.chartConfig || phaseRecord.chartConfig || {},
         isHuntTracker: true,
         addedToLivingDex: Boolean(phaseRecord.addedToCollection)
       };
@@ -1050,7 +1114,13 @@ export function useHuntManager({
     const huntId = hunt.id;
     const now = Date.now();
 
-    const calculatedOdds = phaseRecord.odds || hunt.odds || calculateOdds(hunt.game, hunt.method, hunt.modifiers || {}) || 4096;
+    const effectiveModifiers = hunt.modifiers || phaseRecord.modifiers || {};
+    const calculatedOdds = (phaseRecord.odds && phaseRecord.odds !== 4096)
+      || (hunt.odds && hunt.odds !== 4096)
+      || calculateOdds(hunt.game, hunt.method, effectiveModifiers)
+      || phaseRecord.odds
+      || hunt.odds
+      || 4096;
     const isFail = phaseRecord.outcome === "failed";
 
     const completedEntry = {
@@ -1065,7 +1135,7 @@ export function useHuntManager({
       elapsedMs: phaseRecord.elapsedMs || hunt.elapsedMs || 0,
       time: phaseRecord.elapsedMs || hunt.elapsedMs || 0,
       odds: calculatedOdds,
-      modifiers: hunt.modifiers || {},
+      modifiers: effectiveModifiers,
       phases: hunt.phases || [],
       phaseCount: (hunt.phases ? hunt.phases.length + 1 : 1),
       nickname: (phaseRecord.nickname || shinyEncounterModal.nickname || "").trim(),
@@ -1077,6 +1147,8 @@ export function useHuntManager({
       outcome: isFail ? "failed" : "caught",
       isFail,
       addedToLivingDex: Boolean(shinyEncounterModal.addedToCollection),
+      chartData: hunt.chartData || phaseRecord.chartData || {},
+      chartConfig: hunt.chartConfig || phaseRecord.chartConfig || {},
       isHuntTracker: true
     };
 
@@ -1621,8 +1693,81 @@ export function useHuntManager({
       filterStorage(`completedFails:${username}`);
     }
 
+    // Clean from active hunts phases
+    try {
+      setAllActiveHunts(prevHunts => {
+        let anyPhaseRemoved = false;
+        const nextHunts = prevHunts.map(h => {
+          if (!Array.isArray(h.phases) || h.phases.length === 0) return h;
+          const prevPhaseCount = h.phases.length;
+          let removedChecks = 0;
+          const filteredPhases = [];
+
+          h.phases.forEach(p => {
+            const pId = p.entryId || p.id;
+            const matchesId = (targetEntryId && (pId === targetEntryId || String(pId) === String(targetEntryId))) ||
+                              (targetId && (pId === targetId || String(pId) === String(targetId)));
+            const matchesTs = targetTimestamp && (
+              p.timestamp === targetTimestamp ||
+              (p.date && new Date(p.date).getTime() === Number(targetTimestamp))
+            );
+            if (matchesId || matchesTs) {
+              removedChecks += Number(p.phaseChecks ?? p.checks ?? p.count ?? 0) || 0;
+            } else {
+              filteredPhases.push(p);
+            }
+          });
+
+          if (filteredPhases.length !== prevPhaseCount) {
+            anyPhaseRemoved = true;
+            let cumulative = 0;
+            const reindexedPhases = filteredPhases.map((p, idx) => {
+              const pChecks = Number(p.phaseChecks ?? p.checks ?? p.count ?? 0) || 0;
+              cumulative += pChecks;
+              return {
+                ...p,
+                phaseNumber: idx + 1,
+                checks: pChecks,
+                phaseChecks: pChecks,
+                totalChecks: cumulative
+              };
+            });
+
+            const currentChecks = Number(h.checks ?? 0) || 0;
+            const nextChecks = currentChecks + removedChecks;
+            const nextTotalChecks = reindexedPhases.length > 0
+              ? cumulative + nextChecks
+              : Math.max(nextChecks, Number(h.totalChecks ?? 0) || 0);
+
+            return {
+              ...h,
+              phases: reindexedPhases,
+              currentPhase: reindexedPhases.length + 1,
+              checks: nextChecks,
+              totalChecks: nextTotalChecks,
+              metricMode: reindexedPhases.length === 0 ? "total" : (h.metricMode || "phase")
+            };
+          }
+          return h;
+        });
+
+        if (anyPhaseRemoved) {
+          setCachedHuntsData({ activeHunts: nextHunts });
+          if (username) {
+            huntAPI.updateHuntData({ activeHunts: nextHunts, currentHuntId }).catch(() => {});
+          }
+          try {
+            if (channelRef.current) {
+              channelRef.current.broadcast({ type: "HUNTS_SYNC", hunts: nextHunts });
+            }
+          } catch {}
+        }
+        return nextHunts;
+      });
+    } catch {}
+
     showMessage("Entry permanently removed from history", "success");
-  }, [username, showMessage]);
+  }, [username, showMessage, currentHuntId]);
 
   const handleClearAllHistory = useCallback((clearMode = "counters") => {
     const storageKey = username ? `completedHunts:${username}` : "completedHunts";

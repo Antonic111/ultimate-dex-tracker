@@ -280,6 +280,39 @@ export default function HuntOverlayRenderer({
   // Check if hunt is paused
   const huntIsPaused = hunt ? (hunt.status === "paused" || hunt.isPaused || isPaused) : false;
 
+  const phases = hunt?.phases || [];
+  const hasPhases = phases.length > 0;
+  const lastPhase = hasPhases ? phases[phases.length - 1] : null;
+  const isLastFail = lastPhase?.outcome === "failed";
+  const nonTargetPhasesCount = phases.filter((p) => !p.isTarget && p.outcome === "caught").length;
+  const phaseCount = nonTargetPhasesCount + 1;
+  const failCount = phases.filter((p) => p.outcome === "failed" || p.isFail).length || (hunt?.fails?.length || 0);
+
+  let totalOverallChecks = Number(hunt?.checks || 0);
+  let currentIntervalChecks = Number(hunt?.checks || 0);
+
+  if (hasPhases && lastPhase) {
+    const lastTotal = lastPhase.totalChecks !== undefined && lastPhase.totalChecks !== null
+      ? Number(lastPhase.totalChecks)
+      : phases.reduce((acc, p) => acc + Number(p.phaseChecks || p.checks || 0), 0);
+
+    if (Number(hunt?.checks || 0) >= lastTotal && lastTotal > 0) {
+      totalOverallChecks = Number(hunt?.checks || 0);
+      currentIntervalChecks = Number(hunt?.checks || 0) - lastTotal;
+    } else {
+      totalOverallChecks = lastTotal + Number(hunt?.checks || 0);
+      currentIntervalChecks = Number(hunt?.checks || 0);
+    }
+  } else if (hunt?.totalChecks !== undefined && Number(hunt?.totalChecks) > 0) {
+    totalOverallChecks = Number(hunt?.totalChecks);
+    if (!hunt?.checks) {
+      currentIntervalChecks = totalOverallChecks;
+    }
+  }
+
+  const isTotalMode = hunt?.metricMode === "total" || !hasPhases;
+  const checksCount = isTotalMode ? Math.max(totalOverallChecks, currentIntervalChecks) : currentIntervalChecks;
+
   // Realtime clock tick for elapsed time
   useEffect(() => {
     if (huntIsPaused || !hunt) return;
@@ -339,16 +372,16 @@ export default function HuntOverlayRenderer({
     if (isInitialMountRef.current) {
       isInitialMountRef.current = false;
       prevHuntKeyRef.current = huntKey;
-      prevChecksRef.current = hunt?.checks ?? 0;
+      prevChecksRef.current = checksCount;
       return;
     }
 
     if (huntKey !== prevHuntKeyRef.current) {
       prevHuntKeyRef.current = huntKey;
-      prevChecksRef.current = hunt?.checks ?? 0;
+      prevChecksRef.current = checksCount;
       setCounterAnimClass(""); // Clear any false counter animations on hunt switch
     }
-  }, [huntKey]);
+  }, [huntKey, checksCount]);
 
   // Handle counter increment animations (runs ONLY when checks count changes on the SAME hunt)
   useEffect(() => {
@@ -357,19 +390,19 @@ export default function HuntOverlayRenderer({
     }
 
     if (animationSettings.enableAnimations === false || animationSettings.counterIncrement === "none") {
-      prevChecksRef.current = hunt?.checks ?? 0;
+      prevChecksRef.current = checksCount;
       setCounterAnimClass("");
       return;
     }
 
-    if (hunt && hunt.checks !== prevChecksRef.current) {
-      prevChecksRef.current = hunt.checks;
+    if (hunt && checksCount !== prevChecksRef.current) {
+      prevChecksRef.current = checksCount;
       const anim = animationSettings.counterIncrement === "pulse" ? "counter-pulse-anim" : "counter-pop-anim";
       setCounterAnimClass(anim);
       const timer = setTimeout(() => setCounterAnimClass(""), 500);
       return () => clearTimeout(timer);
     }
-  }, [huntKey, hunt?.checks, animationSettings.enableAnimations, animationSettings.counterIncrement]);
+  }, [huntKey, checksCount, animationSettings.enableAnimations, animationSettings.counterIncrement]);
 
   // Handle one-shot alert popup triggers (Phase, Fail, Shiny)
   useEffect(() => {
@@ -443,7 +476,6 @@ export default function HuntOverlayRenderer({
 
   const elapsedMs = getHuntElapsedTime(hunt, now);
   const formattedTime = formatDigitalTime(elapsedMs);
-  const checksCount = Number(hunt?.checks || 0);
   const formattedPace = useMemo(() => {
     if (checksCount > 0 && elapsedMs > 0) {
       return `${formatIntervalTime(elapsedMs / 1000 / checksCount)} / check`;
@@ -611,17 +643,17 @@ export default function HuntOverlayRenderer({
   const activeModifierIcons = hunt?.modifiers ? getActiveModifierIcons(hunt.modifiers) : [];
   const cardPadding = Number(layout.padding ?? 16);
   // Counter labels (allow empty string if user clears it)
+  const defaultLabel = isTotalMode
+    ? "Total Checks"
+    : (isLastFail ? "Checks Since Fail" : (nonTargetPhasesCount > 0 ? `Phase ${phaseCount} Checks` : "Encounters"));
+
   const counterLabel =
     typeof counterSettings.customLabel === "string"
       ? counterSettings.customLabel
-      : (counterSettings.customLabel ?? "Encounters");
+      : (counterSettings.customLabel ?? defaultLabel);
 
   // Odds calculation
   const oddsRatio = hunt?.odds ? `1/${hunt.odds.toLocaleString()}` : null;
-  const phaseCount = (hunt?.phases?.length || 0) + 1;
-  const failCount = hunt?.phases
-    ? hunt.phases.filter((p) => p.outcome === "failed" || p.isFail).length
-    : (hunt?.fails?.length || 0);
 
   const hasSprite = pokemonSettings.showSprite !== false;
   const hasEncounters = counterSettings.showEncounters !== false;
@@ -804,17 +836,23 @@ export default function HuntOverlayRenderer({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.35 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
             className="hunt-overlay-paused-backdrop"
           >
-            <div className="hunt-overlay-paused-center-content">
+            <motion.div
+              initial={{ scale: 0.88, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.92, opacity: 0 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              className="hunt-overlay-paused-center-content"
+            >
               <div className="hunt-overlay-paused-icon-wrap" style={{ color: resolvedAccent }}>
                 <Pause size={24} strokeWidth={3} />
               </div>
               <span className="hunt-overlay-paused-text" style={{ color: resolvedAccent }}>
                 {eventSettings.pauseText || "PAUSED"}
               </span>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

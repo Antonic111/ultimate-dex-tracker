@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Tv,
@@ -23,6 +23,7 @@ import { ConfirmModal } from "../components/Shared/Modal";
 import { SectionLoader } from "../components/Shared";
 import { useMessage } from "../components/Shared/MessageContext";
 import { streamerOverlayAPI } from "../utils/api";
+import { getRecommendedObsDimensions } from "../utils/overlaySnapping";
 import "../css/StreamerOverlay.css";
 
 export default function StreamerTools() {
@@ -65,23 +66,20 @@ export default function StreamerTools() {
     ? `${window.location.origin}/overlay/hunt/${overlay.overlayToken}`
     : "";
 
-  const displayWidth = overlay?.canvasWidth || (() => {
+  const effectiveConfig = overlay || (() => {
     try {
-      const cached = JSON.parse(localStorage.getItem("hunt_overlay_config_cache"));
-      return cached?.canvasWidth || 1920;
+      return JSON.parse(localStorage.getItem("hunt_overlay_config_cache"));
     } catch {
-      return 1920;
+      return null;
     }
   })();
 
-  const displayHeight = overlay?.canvasHeight || (() => {
-    try {
-      const cached = JSON.parse(localStorage.getItem("hunt_overlay_config_cache"));
-      return cached?.canvasHeight || 1080;
-    } catch {
-      return 1080;
-    }
-  })();
+  const obsDimensions = useMemo(() => {
+    return getRecommendedObsDimensions(effectiveConfig);
+  }, [effectiveConfig]);
+
+  const displayWidth = obsDimensions.width;
+  const displayHeight = obsDimensions.height;
 
   const handleCopyUrl = async () => {
     if (!obsUrl) return;
@@ -287,7 +285,7 @@ export default function StreamerTools() {
             <div className="streamer-guide-step">
               <span className="streamer-guide-step-num">3</span>
               <div>
-                Set the <strong className="streamer-kbd">Width</strong> to <strong className="streamer-kbd">{displayWidth}</strong> and <strong className="streamer-kbd">Height</strong> to <strong className="streamer-kbd">{displayHeight}</strong> (or your stream canvas size).
+                Set the <strong className="streamer-kbd">Width</strong> to <strong className="streamer-kbd">{displayWidth}</strong> and <strong className="streamer-kbd">Height</strong> to <strong className="streamer-kbd">{displayHeight}</strong> (matches your overlay dimensions in the editor).
               </div>
             </div>
 
@@ -303,7 +301,7 @@ export default function StreamerTools() {
               <div className="text-[var(--accent)] font-semibold flex items-start gap-1.5">
                 <Check size={16} className="flex-shrink-0 mt-0.5" />
                 <span>
-                  <strong>Done!</strong> The overlay automatically follows whichever hunt you focus in counter page without any OBS refreshes.
+                  <strong>Done!</strong> Position the overlay anywhere on your stream scene. It automatically follows whichever hunt is active without any OBS refreshes.
                 </span>
               </div>
             </div>

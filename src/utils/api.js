@@ -721,14 +721,88 @@ export const userAPI = {
 
   // Confirm delete account
   async confirmDeleteAccount(code, username) {
-    return api.post('/account/delete/confirm', { code, confirm: username });
+    const res = await api.post('/account/delete/confirm', { code, confirm: username });
+    clearAccountBrowserStorage(username);
+    return res;
   },
 
   // Delete account
   async deleteAccount() {
-    return api.delete('/account');
+    const res = await api.delete('/account');
+    clearAccountBrowserStorage();
+    return res;
   },
 };
+
+/**
+ * Purges account-specific credentials, cached profiles, and gameplay data from
+ * browser storage upon account deletion while preserving device-level UI preferences
+ * such as theme and accent color.
+ */
+export function clearAccountBrowserStorage(deletedUsername = null) {
+  try {
+    sessionStorage.removeItem('iosUserBackup');
+
+    const accountKeys = [
+      'authToken',
+      'mobileUserBackup',
+      'user',
+      'username',
+      'isAdmin',
+      'bingo-grid-state-v1',
+      'hasCompletedBingo',
+      'activeHunts',
+      'currentHuntId',
+      'completedHunts',
+      'completedFails',
+      'huntHistory',
+      'dex_hunt_increments',
+      'dex_hunt_metric_mode',
+      'dex_hunt_metric_mode_map',
+      'dex_hunt_collapsed_phases',
+      'dex_hunt_auto_paused',
+      'huntTimers',
+      'lastCheckTimes',
+      'totalCheckTimes',
+      'pausedHunts',
+      'huntIncrements',
+      'huntHotkey',
+      'huntDecrementHotkey',
+      'hunt_overlay_active_preset_id',
+      'hunt_overlay_config_cache',
+      'hunt_overlay_custom_presets',
+      'hunt_overlay_snap_settings',
+      'deleted_hunt_history_ids:global',
+      'dex-caught-pokemon',
+      'caughtPokemon',
+      'customProgressBars',
+      'hideRecentCatches',
+    ];
+
+    accountKeys.forEach((k) => localStorage.removeItem(k));
+
+    Object.keys(localStorage).forEach((key) => {
+      if (
+        key.startsWith('caughtInfo_') ||
+        key.startsWith('caughtInfoMap:') ||
+        key.startsWith('migration_completed_') ||
+        key.startsWith('deleted_hunt_history_ids:') ||
+        key.startsWith('hunt_') ||
+        key.startsWith('counter_')
+      ) {
+        localStorage.removeItem(key);
+      }
+      if (deletedUsername && key.toLowerCase().includes(deletedUsername.toLowerCase())) {
+        localStorage.removeItem(key);
+      }
+    });
+
+    window.dispatchEvent(new CustomEvent('dexDataReset'));
+    window.dispatchEvent(new Event('storage'));
+  } catch (err) {
+    console.warn('Error clearing account browser storage:', err);
+  }
+}
 
 // Debug API utility
 export const debugAPI = {

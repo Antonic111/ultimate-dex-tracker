@@ -103,6 +103,8 @@ select:autofill:active {
 /* Default site background (dark theme) */
 :root {
   --site-background: linear-gradient(to right, #0a0a0a 0%, #0d0d0d 5%, #0f0f0f 10%, #111 15%, #111 85%, #0f0f0f 90%, #0d0d0d 95%, #0a0a0a 100%);
+  /* Universal Page Gutter System (left & right spacing on mobile and responsive screens) */
+  --page-mobile-gutter: 16px;
 }
 
 html {
@@ -412,6 +414,55 @@ html.modal-open .settings-page {
   width: 100%;
   min-height: 0;
 }
+
+/* ============================================================
+   UNIVERSAL MOBILE & RESPONSIVE PAGE GUTTER SYSTEM
+   Centralizes left & right edge spacing for all full-page views.
+   Modify --page-mobile-gutter in :root to change mobile spacing site-wide.
+   ============================================================ */
+.shop-page,
+.membership-page,
+.trainers-page,
+.leaderboard-page,
+.achievements-page,
+.changelog-page,
+.backup-page,
+.support-page,
+.settings-page,
+.mmo-page,
+.counters-page,
+.profile-page,
+.stats-page-container,
+.legal-page-container,
+.bingo-container,
+.universal-page-container,
+.page-mobile-gutter {
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 1340px) {
+  .shop-page,
+  .membership-page,
+  .trainers-page,
+  .leaderboard-page,
+  .achievements-page,
+  .changelog-page,
+  .backup-page,
+  .support-page,
+  .settings-page,
+  .mmo-page,
+  .counters-page,
+  .profile-page,
+  .stats-page-container,
+  .legal-page-container,
+  .bingo-container,
+  .universal-page-container,
+  .page-mobile-gutter {
+    padding-left: var(--page-mobile-gutter, 16px) !important;
+    padding-right: var(--page-mobile-gutter, 16px) !important;
+  }
+}
+
 
 /* ── Standalone OBS Browser Source Overlay Rules ────────────────────────── */
 html.obs-overlay-mode,

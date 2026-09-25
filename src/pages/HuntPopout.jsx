@@ -36,16 +36,6 @@ export default function HuntPopout() {
     }
   });
 
-  const toggleMetricMode = useCallback(() => {
-    setMetricMode((prev) => {
-      const next = prev === "total" ? "phase" : "total";
-      try {
-        localStorage.setItem("dex_hunt_metric_mode", next);
-      } catch {}
-      return next;
-    });
-  }, []);
-
   const [useHomeSprites] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("dexPreferences"))?.useHomeSprites || false;
@@ -90,6 +80,54 @@ export default function HuntPopout() {
       }
     }, 450);
   }, []);
+
+  const toggleMetricMode = useCallback(() => {
+    setMetricMode((prev) => {
+      const next = prev === "total" ? "phase" : "total";
+      try {
+        localStorage.setItem("dex_hunt_metric_mode", next);
+      } catch {}
+
+      if (resolvedHuntId) {
+        try {
+          const mapRaw = localStorage.getItem("dex_hunt_metric_mode_map");
+          const modeMap = mapRaw ? JSON.parse(mapRaw) : {};
+          modeMap[resolvedHuntId] = next;
+          modeMap[String(resolvedHuntId)] = next;
+          localStorage.setItem("dex_hunt_metric_mode_map", JSON.stringify(modeMap));
+        } catch {}
+      }
+
+      if (huntRef.current) {
+        const updated = {
+          ...huntRef.current,
+          metricMode: next,
+          version: (huntRef.current.version || 1) + 1,
+          updatedAt: Date.now()
+        };
+        setHunt(updated);
+        debouncedServerSave(updated);
+
+        if (channelRef.current) {
+          channelRef.current.broadcast({
+            type: "HUNT_ACTION",
+            huntId: resolvedHuntId,
+            action: {
+              type: "TOGGLE_METRIC_MODE",
+              metricMode: next,
+              timestamp: Date.now()
+            }
+          });
+          channelRef.current.broadcast({
+            type: "HUNT_UPDATED",
+            hunt: updated
+          });
+        }
+      }
+
+      return next;
+    });
+  }, [resolvedHuntId, debouncedServerSave]);
 
   // Load initial hunt & user preferences
   const loadData = useCallback(async () => {
@@ -219,6 +257,9 @@ export default function HuntPopout() {
           setHunt(null);
           setError("This hunt was deleted in the main window.");
           return;
+        }
+        if (msg.action?.type === "TOGGLE_METRIC_MODE" && msg.action.metricMode) {
+          setMetricMode(msg.action.metricMode);
         }
         setHunt((prev) => {
           if (!prev) return prev;

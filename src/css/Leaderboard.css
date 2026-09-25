@@ -10,7 +10,7 @@
 
 @media (max-width: 768px) {
   .leaderboard-page {
-    padding: 16px 16px 64px 16px;
+    padding: 16px var(--page-mobile-gutter, 16px) 64px var(--page-mobile-gutter, 16px);
   }
 }
 

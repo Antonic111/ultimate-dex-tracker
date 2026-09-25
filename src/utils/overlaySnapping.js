@@ -361,3 +361,45 @@ export function distributeElements(selectedIds, currentStyles = {}, axis = 'hori
 // Legacy export alias so old import { calculateSmartSnaps } still works without breaking the build
 export function calculateSmartSnaps() { return { deltaX: 0, deltaY: 0, guides: [] }; }
 export function calculateAltMeasurements() { return []; }
+
+/**
+ * Calculates the exact recommended OBS Browser Source width and height
+ * based on the overlay's editor layout dimensions and glow/shadow effect padding.
+ */
+export function getRecommendedObsDimensions(config) {
+  const layout = config?.layout || {};
+  const style = config?.styleSettings || {};
+  const isVertical = layout.style === "vertical";
+  const overlayWidth = Number(layout.width) || (isVertical ? 340 : 665);
+  const overlayHeight = Number(layout.height) || (isVertical ? 480 : 220);
+
+  const hasGlow = Boolean(style.glow);
+  const hasShadow = style.shadow !== false;
+  const SAFETY = 8; // px safety buffer beyond the visible effect edge
+
+  const glowExtent = hasGlow ? (style.glowRadius ?? 14) + (style.glowSpread ?? 2) : 0;
+  const sDist = hasShadow ? (style.shadowDistance ?? 10) : 0;
+  const sBlur = hasShadow ? (style.shadowBlur ?? 25) : 0;
+  const shadowTop = hasShadow ? Math.max(0, sBlur - sDist) : 0;
+  const shadowBottom = hasShadow ? sDist + sBlur : 0;
+  const shadowSides = hasShadow ? sBlur : 0;
+
+  const hasPad = hasGlow || hasShadow;
+  const padLeft = hasPad ? Math.ceil(Math.max(glowExtent, shadowSides)) + SAFETY : 0;
+  const padRight = hasPad ? Math.ceil(Math.max(glowExtent, shadowSides)) + SAFETY : 0;
+  const padTop = hasPad ? Math.ceil(Math.max(glowExtent, shadowTop)) + SAFETY : 0;
+  const padBottom = hasPad ? Math.ceil(Math.max(glowExtent, shadowBottom)) + SAFETY : 0;
+
+  const roundUp10 = (n) => Math.ceil(n / 10) * 10;
+  return {
+    width: roundUp10(overlayWidth + padLeft + padRight),
+    height: roundUp10(overlayHeight + padTop + padBottom),
+    rawWidth: overlayWidth,
+    rawHeight: overlayHeight,
+    padLeft,
+    padRight,
+    padTop,
+    padBottom,
+    hasPadding: hasPad,
+  };
+}

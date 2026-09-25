@@ -23,7 +23,7 @@ export default function TermsOfService() {
           </span>
           <span className="legal-meta-item">•</span>
           <span className="legal-meta-item">
-            <strong>Last Updated:</strong> August 29, 2026
+            <strong>Last Updated:</strong> September 25, 2026
           </span>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function TermsOfService() {
             Pokémon, Pokémon character names, Nintendo Switch, video game artwork, sprite imagery, game mechanics, and related trademarks are registered trademarks and copyrighted intellectual property of their respective owners (Nintendo, GAME FREAK, and Creatures Inc.).
           </p>
           <p className="legal-paragraph">
-            Character names, reference numbers, game categories, and sprite artwork displayed on this site are utilized strictly for informational, cataloging, and fan-companion purposes under fair use principles. No ownership or commercial claim is made over Pokémon trademarks or copyrighted characters. Paid memberships grant access solely to original web software features, database synchronization services, and custom overlay rendering developed independently by Ultimate Dex Tracker.
+            Ultimate Dex Tracker is an independent, fan-made companion and tracking service. It is not affiliated with, endorsed by, sponsored by, or operated by Nintendo Co., Ltd., The Pokémon Company, Game Freak Inc., or Creatures Inc. Pokémon character names, reference numbers, game titles, sprite artwork, and related intellectual property belong to their respective owners. Ultimate Dex Tracker does not claim ownership of or proprietary rights to any third-party intellectual property. Character references and sprite imagery displayed across the site are utilized solely for informational, cataloging, and fan-companion purposes. Paid memberships grant access solely to original web software features, database synchronization services, and custom streamer overlay rendering developed independently by Ultimate Dex Tracker.
           </p>
         </section>
 
@@ -310,7 +310,8 @@ export default function TermsOfService() {
             <li><strong>Billing, Receipts & Invoices:</strong> Handled securely via the Stripe Customer Portal accessible in your Membership settings</li>
             <li><strong>Developer & Creator:</strong> Antonic (Solo Developer)</li>
             <li><strong>Developer Portfolio:</strong> <a href="https://antonic.ca" target="_blank" rel="noopener noreferrer">antonic.ca</a></li>
-            <li><strong>Website:</strong> <a href="https://www.ultimatedextracker.com" target="_blank" rel="noopener noreferrer">ultimatedextracker.com</a></li>
+            <li><strong>Privacy Policy:</strong> Learn how we collect, store, and protect your information in our <Link to="/privacy">Privacy Policy</Link></li>
+            <li><strong>Refunds & Cancellations:</strong> Review terms for cancellations, billing adjustments, and refunds in our <Link to="/refund-policy">Refund & Cancellation Policy</Link></li>
             <li><strong>Governing Jurisdiction:</strong> Province of Ontario, Canada</li>
           </ul>
         </section>

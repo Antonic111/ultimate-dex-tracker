@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { RotateCcw } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { RotateCcw, Check } from "lucide-react";
 import { PERMUTATION_DATA, ADVANCED_PERMUTATION_DATA, GHOST_PERMUTATION_DATA } from "../../data/permutations";
 import { ConfirmModal } from "../Shared/Modal";
 import { Button } from "../Shared/Button";
@@ -79,9 +79,19 @@ function PermutationGrid({
     return baseRows;
   }, [spawnCount, isAdvanced, isSaveOrder, dataObj, advancedDataObj, supportsAdvanced]);
 
+  const isRowDone = (rowArray) => {
+    const rowKey = rowArray.join('-');
+    return Boolean(
+      globalChartData[`${title}-${rowKey}`] ||
+      globalChartData[rowKey]
+    );
+  };
+
   const toggleComplete = (rowKey) => {
+    if (readOnly) return;
     const globalKey = `${title}-${rowKey}`;
-    const isNowDone = !globalChartData[globalKey];
+    const currentlyDone = Boolean(globalChartData[globalKey] || globalChartData[rowKey]);
+    const isNowDone = !currentlyDone;
     if (onChartCheck) onChartCheck(isNowDone);
     if (onChartUpdate) onChartUpdate({ ...globalChartData, [globalKey]: isNowDone });
   };
@@ -94,7 +104,7 @@ function PermutationGrid({
   const lockedCatchCount = useMemo(() => {
     if (!isSaveOrder) return 0;
     
-    const uncompletedRows = rows.filter(r => !globalChartData[`${title}-${r.join('-')}`]);
+    const uncompletedRows = rows.filter(r => !isRowDone(r));
     if (uncompletedRows.length === 0) return 0;
 
     let count = 0;
@@ -126,7 +136,7 @@ function PermutationGrid({
   };
 
   return (
-    <div className="perm-table-outer" style={{ marginBottom: '2rem' }}>
+    <div className="perm-table-outer">
       <div className="perm-section-header">
         <span className="perm-section-label">{title}</span>
         <span className="perm-section-count">{rows.length} Total</span>
@@ -149,7 +159,7 @@ function PermutationGrid({
           <tbody>
             {rows.map((row, rowIdx) => {
               const rowKey = row.join('-');
-              const isDone = !!globalChartData[`${title}-${rowKey}`];
+              const isDone = isRowDone(row);
               return (
                 <tr
                   key={rowKey}
@@ -167,10 +177,12 @@ function PermutationGrid({
                   <td 
                     className="perm-td-complete"
                     onClick={() => !readOnly && toggleComplete(rowKey)}
+                    style={readOnly ? { cursor: 'default' } : undefined}
                   >
                     <button
+                      type="button"
                       className={`perm-check-btn${isDone ? " perm-check-btn-done" : ""}`}
-                      title={isDone ? "Mark incomplete" : "Mark complete"}
+                      title={isDone ? (readOnly ? "Completed" : "Mark incomplete") : (readOnly ? "Incomplete" : "Mark complete")}
                       aria-label={`Row ${rowIdx + 1} ${isDone ? "done" : "not done"}`}
                       style={{ pointerEvents: 'none' }}
                     >
@@ -202,8 +214,8 @@ function PermutationGrid({
         </table>
       </div>
 
-      <div className="perm-reset-wrap">
-        {!readOnly && (
+      {!readOnly && (
+        <div className="perm-reset-wrap">
           <Button
             variant="secondary"
             size="sm"
@@ -212,8 +224,8 @@ function PermutationGrid({
           >
             Reset Chart
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       <ConfirmModal
         isOpen={showResetModal}
@@ -232,38 +244,146 @@ function PermutationGrid({
 }
 
 /* ─── main component ──────────────────────────────────────────────────────── */
-export default function PermutationTable({
+export default function PermutationTable({ 
   readOnly, 
   chartData = {}, 
   chartConfig = {}, 
-  legendColors = {},
+  legendColors = {}, 
   setLegendColors,
   onChartUpdate, 
   onChartConfigUpdate, 
   onChartCheck 
 }) {
-  const firstSpawn = chartConfig.firstSpawn ?? 8;
-  const secondSpawn = chartConfig.secondSpawn ?? 6;
-  const isAdvanced = chartConfig.isAdvanced ?? false;
-  const isSaveOrder = chartConfig.isSaveOrder ?? false;
-  const showSecondWave = chartConfig.showSecondWave ?? false;
-  const showGhostChecks = chartConfig.showGhostChecks ?? false;
+  const stripPrefix = (k) => {
+    if (!k || typeof k !== 'string') return k;
+    if (k.startsWith('Main Permutations-')) return k.substring(18);
+    if (k.startsWith('Second Wave Permutations-')) return k.substring(25);
+    if (k.startsWith('Ghost Checks-')) return k.substring(13);
+    return k;
+  };
+
+  // Normalize chartData to a clean lookup dictionary
+  const normalizedChartData = useMemo(() => {
+    const result = {};
+    if (!chartData) return result;
+    if (Array.isArray(chartData)) {
+      chartData.forEach(item => {
+        if (typeof item === 'string') {
+          result[item] = true;
+          const stripped = stripPrefix(item);
+          if (stripped !== item) result[stripped] = true;
+        } else if (item && typeof item === 'object') {
+          const k = item.key || item.rowKey || item.id;
+          if (k) {
+            result[k] = true;
+            const stripped = stripPrefix(k);
+            if (stripped !== k) result[stripped] = true;
+          }
+        }
+      });
+    } else if (typeof chartData === 'object') {
+      Object.entries(chartData).forEach(([k, v]) => {
+        if (v === true || v === 'true' || v === 1 || v === '1') {
+          result[k] = true;
+          const stripped = stripPrefix(k);
+          if (stripped !== k) result[stripped] = true;
+        }
+      });
+    }
+    return result;
+  }, [chartData]);
+
+  // Smart configuration detection from chart data
+  const inferredConfig = useMemo(() => {
+    const cfg = { ...(chartConfig || {}) };
+    const keys = Object.keys(normalizedChartData);
+
+    // Auto-detect Ghost Checks
+    if (cfg.showGhostChecks === undefined || cfg.showGhostChecks === null) {
+      if (keys.some(k => k.startsWith('Ghost Checks-') || k.includes('Leave'))) {
+        cfg.showGhostChecks = true;
+      }
+    }
+
+    // Auto-detect Second Wave
+    if (cfg.showSecondWave === undefined || cfg.showSecondWave === null) {
+      if (keys.some(k => k.startsWith('Second Wave Permutations-'))) {
+        cfg.showSecondWave = true;
+      }
+    }
+
+    // Auto-detect firstSpawn count (8, 9, 10)
+    if (!cfg.firstSpawn) {
+      let maxLen = 0;
+      keys.forEach(k => {
+        if (k.startsWith('Main Permutations-')) {
+          const parts = k.replace('Main Permutations-', '').split('-');
+          if (parts.length > maxLen) maxLen = parts.length;
+        }
+      });
+      if (maxLen >= 8) cfg.firstSpawn = maxLen;
+    }
+
+    // Auto-detect secondSpawn count (6, 7)
+    if (!cfg.secondSpawn) {
+      let maxSecLen = 0;
+      keys.forEach(k => {
+        if (k.startsWith('Second Wave Permutations-')) {
+          const parts = k.replace('Second Wave Permutations-', '').split('-');
+          if (parts.length > maxSecLen) maxSecLen = parts.length;
+        }
+      });
+      if (maxSecLen >= 6) cfg.secondSpawn = maxSecLen;
+    }
+
+    // Auto-detect Advanced Mode
+    if (cfg.isAdvanced === undefined || cfg.isAdvanced === null) {
+      for (const count of [8, 9, 10]) {
+        const advRows = ADVANCED_PERMUTATION_DATA[count] || [];
+        if (advRows.some(row => keys.some(k => k.endsWith(row.join('-'))))) {
+          cfg.isAdvanced = true;
+          break;
+        }
+      }
+    }
+
+    return cfg;
+  }, [chartConfig, normalizedChartData]);
+
+  // Configuration strictly derived from hunt save in readOnly mode
+  const firstSpawn = chartConfig?.firstSpawn ?? inferredConfig.firstSpawn ?? 8;
+  const secondSpawn = chartConfig?.secondSpawn ?? inferredConfig.secondSpawn ?? 6;
+  const isAdvanced = Boolean(chartConfig?.isAdvanced ?? inferredConfig.isAdvanced ?? false);
+  const isSaveOrder = Boolean(chartConfig?.isSaveOrder ?? inferredConfig.isSaveOrder ?? false);
+  const showSecondWave = Boolean(chartConfig?.showSecondWave ?? inferredConfig.showSecondWave ?? false);
+  const showGhostChecks = Boolean(chartConfig?.showGhostChecks ?? inferredConfig.showGhostChecks ?? false);
 
   const setConfig = (key, val) => {
+    if (readOnly) return; // Completely prevent adjustments in read-only completed hunt mode
     if (onChartConfigUpdate) {
-      onChartConfigUpdate({ ...chartConfig, [key]: val });
+      onChartConfigUpdate({
+        ...chartConfig,
+        firstSpawn,
+        secondSpawn,
+        isAdvanced,
+        isSaveOrder,
+        showSecondWave,
+        showGhostChecks,
+        [key]: val
+      });
     }
   };
 
-  const combinedGhostData = [
+  const combinedGhostData = useMemo(() => [
     ...(GHOST_PERMUTATION_DATA[4] || [])
-  ];
+  ], []);
+
 
   return (
     <div className={`perm-wrapper${readOnly ? " perm-readonly" : ""}`}>
 
       {/* ✨ Global Legend ✨ */}
-      <div className="perm-legend" style={{ marginBottom: '2rem', justifyContent: 'center' }}>
+      <div className="perm-legend" style={{ marginBottom: '1.5rem', justifyContent: 'center' }}>
         {['KO1', 'KO2', 'KO3', 'Leave'].map((key) => {
           const defaultColor = DEFAULT_COLORS[key];
           const currentColor = legendColors[key] || defaultColor;
@@ -306,105 +426,95 @@ export default function PermutationTable({
         )}
       </div>
 
-      {/* Wave counts display and chart checks summary */}
-      {readOnly && (
-        <div className="perm-read-only-config" style={{ display: 'flex', gap: '2rem', justifyContent: 'center', marginBottom: '2rem', fontSize: '0.9rem', color: 'var(--progressbar-info)', fontWeight: 600 }}>
-          <span>First Wave: <strong style={{ color: 'var(--accent)' }}>{firstSpawn}</strong> Spawns</span>
-          {showSecondWave && (
-            <span>Second Wave: <strong style={{ color: 'var(--accent)' }}>{secondSpawn}</strong> Spawns</span>
-          )}
-          <span>Chart Checks: <strong style={{ color: 'var(--accent)' }}>{Object.values(chartData).filter(Boolean).length * secondSpawn}</strong> ({Object.values(chartData).filter(Boolean).length} runs)</span>
-        </div>
-      )}
 
-      {/* ── Unified Config Bar ─────────────────────────────────────────── */}
-      {!readOnly && (
-        <div className="perm-config-bar" style={{ marginBottom: '2rem' }}>
-          <div className="perm-config-left">
+      {/* ── Unified Config Bar (Active in both Edit and ReadOnly modes for inspection) ─────────────────────────────────────────── */}
+      <div className="perm-config-bar" style={{ marginBottom: '2rem' }}>
+        <div className="perm-config-left">
+          
+          <div style={{ display: 'flex', gap: '3rem', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
             
-            <div style={{ display: 'flex', gap: '3rem', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
-              
-              {/* First Wave Config */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
-                <span className="perm-config-title">First Wave Configuration</span>
-                <span className="perm-config-sub">Select the Number of Spawns</span>
-                <div className="flex items-center gap-2">
-                  {[8, 9, 10].map(n => (
-                    <Button
-                      key={n}
-                      variant={firstSpawn === n ? "primary" : "secondary"}
-                      size="sm"
-                      className="min-w-[44px] h-[36px] font-bold"
-                      onClick={() => setConfig('firstSpawn', n)}
-                    >
-                      {n}
-                    </Button>
-                  ))}
-                </div>
+            {/* First Wave Config */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
+              <span className="perm-config-title">First Wave Configuration</span>
+              <span className="perm-config-sub">Select the Number of Spawns</span>
+              <div className="perm-spawn-btns">
+                {[8, 9, 10].map(n => (
+                  <button
+                    key={n}
+                    type="button"
+                    disabled={readOnly}
+                    className={`perm-spawn-btn${firstSpawn === n ? " active" : ""}`}
+                    style={readOnly ? { cursor: 'default', pointerEvents: 'none' } : undefined}
+                    onClick={() => !readOnly && setConfig('firstSpawn', n)}
+                  >
+                    {n}
+                  </button>
+                ))}
               </div>
-
-              {/* Second Wave Config */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
-                <span className="perm-config-title">Second Wave Configuration</span>
-                <span className="perm-config-sub">Select the Number of Spawns</span>
-                <div className="flex items-center gap-2">
-                  {[6, 7].map(n => (
-                    <Button
-                      key={n}
-                      variant={secondSpawn === n ? "primary" : "secondary"}
-                      size="sm"
-                      className="min-w-[44px] h-[36px] font-bold"
-                      onClick={() => setConfig('secondSpawn', n)}
-                    >
-                      {n}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
             </div>
-            
-            <div style={{ display: 'flex', gap: '2rem', marginTop: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <button
-                type="button"
-                className="perm-switch-wrap bg-transparent border-0 cursor-pointer p-0 select-none text-left"
-                onClick={() => setConfig('isAdvanced', !isAdvanced)}
-              >
-                <span className={`perm-switch ${isAdvanced ? 'active' : ''}`} />
-                <span>Advanced Mode</span>
-              </button>
 
-              <button
-                type="button"
-                className="perm-switch-wrap bg-transparent border-0 cursor-pointer p-0 select-none text-left"
-                onClick={() => setConfig('isSaveOrder', !isSaveOrder)}
-              >
-                <span className={`perm-switch ${isSaveOrder ? 'active' : ''}`} />
-                <span>Save Order</span>
-              </button>
-
-              <button
-                type="button"
-                className="perm-switch-wrap bg-transparent border-0 cursor-pointer p-0 select-none text-left"
-                onClick={() => setConfig('showSecondWave', !showSecondWave)}
-              >
-                <span className={`perm-switch ${showSecondWave ? 'active' : ''}`} />
-                <span>Second Wave</span>
-              </button>
-
-              <button
-                type="button"
-                className="perm-switch-wrap bg-transparent border-0 cursor-pointer p-0 select-none text-left"
-                onClick={() => setConfig('showGhostChecks', !showGhostChecks)}
-              >
-                <span className={`perm-switch ${showGhostChecks ? 'active' : ''}`} />
-                <span>Ghost Checks</span>
-              </button>
+            {/* Second Wave Config */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
+              <span className="perm-config-title">Second Wave Configuration</span>
+              <span className="perm-config-sub">Select the Number of Spawns</span>
+              <div className="perm-spawn-btns">
+                {[6, 7].map(n => (
+                  <button
+                    key={n}
+                    type="button"
+                    disabled={readOnly}
+                    className={`perm-spawn-btn${secondSpawn === n ? " active" : ""}`}
+                    style={readOnly ? { cursor: 'default', pointerEvents: 'none' } : undefined}
+                    onClick={() => !readOnly && setConfig('secondSpawn', n)}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
             </div>
 
           </div>
+          
+          <div style={{ display: 'flex', gap: '2rem', marginTop: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <div
+              className={`perm-switch-wrap${isAdvanced ? " perm-switch-wrap--active" : ""}`}
+              style={readOnly ? { cursor: 'default', userSelect: 'none', pointerEvents: 'none' } : undefined}
+              onClick={() => !readOnly && setConfig('isAdvanced', !isAdvanced)}
+            >
+              <span className={`perm-switch ${isAdvanced ? 'active' : ''}`} />
+              <span>Advanced Mode</span>
+            </div>
+
+            <div
+              className={`perm-switch-wrap${isSaveOrder ? " perm-switch-wrap--active" : ""}`}
+              style={readOnly ? { cursor: 'default', userSelect: 'none', pointerEvents: 'none' } : undefined}
+              onClick={() => !readOnly && setConfig('isSaveOrder', !isSaveOrder)}
+            >
+              <span className={`perm-switch ${isSaveOrder ? 'active' : ''}`} />
+              <span>Save Order</span>
+            </div>
+
+            <div
+              className={`perm-switch-wrap${showSecondWave ? " perm-switch-wrap--active" : ""}`}
+              style={readOnly ? { cursor: 'default', userSelect: 'none', pointerEvents: 'none' } : undefined}
+              onClick={() => !readOnly && setConfig('showSecondWave', !showSecondWave)}
+            >
+              <span className={`perm-switch ${showSecondWave ? 'active' : ''}`} />
+              <span>Second Wave</span>
+            </div>
+
+            <div
+              className={`perm-switch-wrap${showGhostChecks ? " perm-switch-wrap--active" : ""}`}
+              style={readOnly ? { cursor: 'default', userSelect: 'none', pointerEvents: 'none' } : undefined}
+              onClick={() => !readOnly && setConfig('showGhostChecks', !showGhostChecks)}
+            >
+              <span className={`perm-switch ${showGhostChecks ? 'active' : ''}`} />
+              <span>Ghost Checks</span>
+            </div>
+          </div>
+
         </div>
-      )}
+      </div>
 
       {/* ── Grids ───────────────────────────────────────────────────────── */}
       <PermutationGrid 
@@ -415,7 +525,7 @@ export default function PermutationTable({
         dataObj={PERMUTATION_DATA}
         advancedDataObj={ADVANCED_PERMUTATION_DATA}
         supportsAdvanced={true}
-        globalChartData={chartData}
+        globalChartData={normalizedChartData}
         onChartUpdate={onChartUpdate}
         onChartCheck={onChartCheck}
         legendColors={legendColors}
@@ -431,7 +541,7 @@ export default function PermutationTable({
           dataObj={PERMUTATION_DATA}
           advancedDataObj={ADVANCED_PERMUTATION_DATA}
           supportsAdvanced={true}
-          globalChartData={chartData}
+          globalChartData={normalizedChartData}
           onChartUpdate={onChartUpdate}
           onChartCheck={onChartCheck}
           legendColors={legendColors}
@@ -447,7 +557,7 @@ export default function PermutationTable({
           isSaveOrder={isSaveOrder}
           dataObj={{ "All": combinedGhostData }}
           supportsAdvanced={false}
-          globalChartData={chartData}
+          globalChartData={normalizedChartData}
           onChartUpdate={onChartUpdate}
           onChartCheck={onChartCheck}
           legendColors={legendColors}
@@ -458,3 +568,4 @@ export default function PermutationTable({
     </div>
   );
 }
+

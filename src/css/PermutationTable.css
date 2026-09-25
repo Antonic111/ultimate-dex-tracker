@@ -122,6 +122,16 @@
   color: #fff;
 }
 
+/* ── Table outer ──────────────────────────────────────────── */
+.perm-table-outer {
+  margin-bottom: 2rem;
+}
+
+.perm-table-outer:last-of-type,
+.perm-table-outer:last-child {
+  margin-bottom: 0 !important;
+}
+
 /* ── Section header ─────────────────────────────────────────── */
 .perm-section-header {
   display: flex;

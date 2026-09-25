@@ -122,23 +122,26 @@ export default function DetailedHuntCard({
   const phaseCount = nonTargetPhasesCount + 1;
   const failCount = phases.filter(p => p.outcome === 'failed').length;
 
-  let totalOverallChecks = hunt.checks || 0;
-  let currentIntervalChecks = hunt.checks || 0;
+  let totalOverallChecks = Number(hunt.checks) || 0;
+  let currentIntervalChecks = Number(hunt.checks) || 0;
 
   if (hasPhases && lastPhase) {
     const lastTotal = lastPhase.totalChecks !== undefined && lastPhase.totalChecks !== null
-      ? lastPhase.totalChecks
+      ? Number(lastPhase.totalChecks)
       : phases.reduce((acc, p) => acc + (p.phaseChecks || p.checks || 0), 0);
 
     if (hunt.checks >= lastTotal && lastTotal > 0) {
       // Legacy un-reset continuous counter
-      totalOverallChecks = hunt.checks;
-      currentIntervalChecks = hunt.checks - lastTotal;
+      totalOverallChecks = Number(hunt.checks) || 0;
+      currentIntervalChecks = Math.max(0, (Number(hunt.checks) || 0) - lastTotal);
     } else {
       // Modern interval reset counter
-      totalOverallChecks = lastTotal + (hunt.checks || 0);
-      currentIntervalChecks = hunt.checks || 0;
+      totalOverallChecks = lastTotal + (Number(hunt.checks) || 0);
+      currentIntervalChecks = Number(hunt.checks) || 0;
     }
+  } else if ((hunt.checks === undefined || hunt.checks === null) && hunt.totalChecks) {
+    totalOverallChecks = Number(hunt.totalChecks) || 0;
+    currentIntervalChecks = totalOverallChecks;
   }
 
   const progressPercent = Math.round((currentIntervalChecks / dynamicOdds) * 100);
@@ -362,14 +365,14 @@ export default function DetailedHuntCard({
           )}
 
           <span className="hunt-metric-label">
-            {metricMode === "total"
+            {metricMode === "total" || !hasPhases
               ? "Total Checks"
               : currentIntervalLabel}
           </span>
 
           <span className="hunt-metric-value encounters">
-            {metricMode === "total"
-              ? totalOverallChecks.toLocaleString()
+            {metricMode === "total" || !hasPhases
+              ? Math.max(totalOverallChecks, currentIntervalChecks).toLocaleString()
               : currentIntervalChecks.toLocaleString()}
           </span>
 

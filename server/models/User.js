@@ -136,7 +136,10 @@ const userSchema = new mongoose.Schema({
   isStatsPublic: { type: Boolean, default: true },
   lastActiveAt: { type: Date, default: Date.now },
   // LIKES ----------------------------------------- //
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  likes: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    default: []
+  },
   // DEX PREFERENCES ----------------------------------------- //
   dexPreferences: {
     showGenderForms: { type: Boolean, default: true },
@@ -264,6 +267,8 @@ const userSchema = new mongoose.Schema({
       possiblePhases: { type: [mongoose.Schema.Types.Mixed], default: [] },
       modifiers: { type: mongoose.Schema.Types.Mixed, default: {} },
       stats: { type: mongoose.Schema.Types.Mixed, default: {} },
+      metricMode: { type: String, default: "phase" },
+      totalChecks: { type: Number },
       updatedAt: { type: Number }
     }, { _id: false, strict: false })],
     default: []
@@ -346,6 +351,7 @@ userSchema.index({ isSuspended: 1 });
 userSchema.index({ stripeCustomerId: 1 }, { sparse: true });
 userSchema.index({ hasPurchasedStripePremium: 1 });
 userSchema.index({ "birthday.month": 1, "birthday.day": 1 }, { sparse: true });
+userSchema.index({ likes: 1 });
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {

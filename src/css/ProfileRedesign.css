@@ -15,7 +15,10 @@
 
 @media (max-width: 768px) {
   .profile-page {
-    padding: 16px 16px 64px 16px;
+    padding: 16px var(--page-mobile-gutter, 16px) 64px var(--page-mobile-gutter, 16px);
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -747,6 +750,9 @@
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 20px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .profile-left-col,
@@ -754,6 +760,26 @@
   .profile-stats-grid {
     height: auto !important;
     width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .profile-stats-grid {
+    padding: 1rem !important;
+    gap: 1rem !important;
+    overflow-x: hidden !important;
+  }
+
+  .profile-info-box-container {
+    padding: 1rem !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .info-value {
+    min-width: 0;
+    word-break: break-word;
   }
 
   .top-stat-card {

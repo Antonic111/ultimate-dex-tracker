@@ -7,6 +7,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ultimate Dex Tracker</title>
 
+  <script>
+    (function () {
+      if (window.location.pathname.startsWith('/overlay/')) {
+        document.documentElement.classList.add('obs-overlay-mode');
+        document.documentElement.style.setProperty('background', 'transparent', 'important');
+        document.documentElement.style.setProperty('background-color', 'transparent', 'important');
+        document.documentElement.style.setProperty('background-image', 'none', 'important');
+      }
+    })();
+  </script>
+  <style>
+    /* Immediate zero-flash transparent background for OBS Overlays */
+    html.obs-overlay-mode,
+    html.obs-overlay-mode body,
+    html.obs-overlay-mode #root,
+    html.obs-overlay-mode main,
+    html.obs-overlay-mode .min-h-screen,
+    body.obs-overlay-mode,
+    body.obs-overlay-mode #root,
+    body.obs-overlay-mode main,
+    body.obs-overlay-mode .min-h-screen {
+      background: transparent !important;
+      background-color: transparent !important;
+      background-image: none !important;
+      overflow: hidden !important;
+      scrollbar-gutter: auto !important;
+      scrollbar-width: none !important;
+    }
+  </style>
+
   <!-- Google Fonts for Streamer Overlay & UI -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -127,6 +157,14 @@
 </head>
 
 <body>
+  <script>
+    if (window.location.pathname.startsWith('/overlay/')) {
+      document.body.classList.add('obs-overlay-mode');
+      document.body.style.setProperty('background', 'transparent', 'important');
+      document.body.style.setProperty('background-color', 'transparent', 'important');
+      document.body.style.setProperty('background-image', 'none', 'important');
+    }
+  </script>
   <noscript>
     <!-- Static content visible to search engines and crawlers when JavaScript is disabled -->
     <div
@@ -222,62 +260,169 @@
   <script type="module" src="/src/main.jsx"></script>
   <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
   <script>
-    if (!window.location.pathname.startsWith('/overlay/') && !window.location.pathname.startsWith('/hunt-popout')) {
-      kofiWidgetOverlay.draw('antonic111', {
-        'type': 'floating-chat',
-        'floating-chat.donateButton.text': 'Tip Me',
-        'floating-chat.donateButton.background-color': '#323842',
-        'floating-chat.donateButton.text-color': '#fff'
-      });
-    }
+    (function () {
+      var isClosed = false;
+      try {
+        isClosed = sessionStorage.getItem('kofi_tip_closed') === 'true';
+      } catch (e) {}
+
+      if (isClosed) {
+        document.body.classList.add('kofi-closed');
+        return;
+      }
+
+      if (window.location.pathname.startsWith('/overlay/') || window.location.pathname.startsWith('/hunt-popout')) {
+        return;
+      }
+
+      function dismissKofi(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        try {
+          sessionStorage.setItem('kofi_tip_closed', 'true');
+        } catch (err) {}
+        document.body.classList.add('kofi-closed');
+        var targets = document.querySelectorAll(
+          '[id^="kofi-widget-overlay"], iframe[src*="ko-fi"], .floatingchat-container-wrap, .floatingchat-container-wrap-mobi, .floating-chat-kofi-popup-iframe, .floating-chat-kofi-popup-iframe-mobi, .kofi-custom-close-btn'
+        );
+        targets.forEach(function (el) {
+          el.style.setProperty('display', 'none', 'important');
+        });
+      }
+
+      function attachCloseButton() {
+        var wrappers = document.querySelectorAll('.floatingchat-container-wrap, .floatingchat-container-wrap-mobi');
+        wrappers.forEach(function (wrap) {
+          if (wrap.querySelector('.kofi-custom-close-btn')) return;
+
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'kofi-custom-close-btn';
+          btn.setAttribute('aria-label', 'Close Tip Me button for this session');
+          btn.title = 'Dismiss for this session';
+          btn.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+          btn.addEventListener('click', dismissKofi);
+          wrap.appendChild(btn);
+        });
+      }
+
+      if (typeof kofiWidgetOverlay !== 'undefined') {
+        kofiWidgetOverlay.draw('antonic111', {
+          'type': 'floating-chat',
+          'floating-chat.donateButton.text': 'Tip Me',
+          'floating-chat.donateButton.background-color': '#323842',
+          'floating-chat.donateButton.text-color': '#fff'
+        });
+
+        attachCloseButton();
+        var attempts = 0;
+        var checkInterval = setInterval(function () {
+          attempts++;
+          attachCloseButton();
+          if (attempts > 25 || document.querySelector('.kofi-custom-close-btn')) {
+            clearInterval(checkInterval);
+          }
+        }, 150);
+      }
+    })();
   </script>
   <style>
     /* Force Ko-Fi widget to bottom left */
-    .floatingchat-container-wrap {
+    .floatingchat-container-wrap,
+    .floatingchat-container-wrap-mobi {
       left: 16px !important;
       right: auto !important;
     }
 
-    .floating-chat-kofi-popup-iframe {
+    .floating-chat-kofi-popup-iframe,
+    .floating-chat-kofi-popup-iframe-mobi {
       left: 16px !important;
       right: auto !important;
     }
 
+    .kofi-custom-close-btn {
+      position: absolute;
+      bottom: 34px;
+      left: 116px;
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background-color: #232730;
+      color: #9ca3af;
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10001;
+      padding: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+      outline: none;
+    }
+
+    .kofi-custom-close-btn:hover {
+      background-color: #ef4444;
+      color: #ffffff;
+      border-color: #ef4444;
+      transform: scale(1.1);
+    }
+
+    .kofi-custom-close-btn:active {
+      transform: scale(0.92);
+    }
+
+    body.kofi-closed div[id^="kofi-widget-overlay"],
+    body.kofi-closed iframe[src*="ko-fi"],
+    body.kofi-closed .floatingchat-container-wrap,
+    body.kofi-closed .floatingchat-container-wrap-mobi,
+    body.kofi-closed .floating-chat-kofi-popup-iframe,
+    body.kofi-closed .floating-chat-kofi-popup-iframe-mobi,
+    body.kofi-closed .kofi-custom-close-btn,
     body.popout-mode div[id^="kofi-widget-overlay"],
     body.popout-mode iframe[src*="ko-fi"],
     body.popout-mode .floatingchat-container-wrap,
     body.popout-mode .floatingchat-container-wrap-mobi,
     body.popout-mode .floating-chat-kofi-popup-iframe,
+    body.popout-mode .kofi-custom-close-btn,
     body.admin-page div[id^="kofi-widget-overlay"],
     body.admin-page iframe[src*="ko-fi"],
     body.admin-page .floatingchat-container-wrap,
     body.admin-page .floatingchat-container-wrap-mobi,
     body.admin-page .floating-chat-kofi-popup-iframe,
+    body.admin-page .kofi-custom-close-btn,
     body.obs-overlay-mode div[id^="kofi-widget-overlay"],
     body.obs-overlay-mode iframe[src*="ko-fi"],
     body.obs-overlay-mode .floatingchat-container-wrap,
     body.obs-overlay-mode .floatingchat-container-wrap-mobi,
     body.obs-overlay-mode .floating-chat-kofi-popup-iframe,
+    body.obs-overlay-mode .kofi-custom-close-btn,
     body.overlay-editor-active div[id^="kofi-widget-overlay"],
     body.overlay-editor-active iframe[src*="ko-fi"],
     body.overlay-editor-active .floatingchat-container-wrap,
     body.overlay-editor-active .floatingchat-container-wrap-mobi,
     body.overlay-editor-active .floating-chat-kofi-popup-iframe,
+    body.overlay-editor-active .kofi-custom-close-btn,
     body:has(.overlay-editor-studio-container) div[id^="kofi-widget-overlay"],
     body:has(.overlay-editor-studio-container) iframe[src*="ko-fi"],
     body:has(.overlay-editor-studio-container) .floatingchat-container-wrap,
     body:has(.overlay-editor-studio-container) .floatingchat-container-wrap-mobi,
     body:has(.overlay-editor-studio-container) .floating-chat-kofi-popup-iframe,
+    body:has(.overlay-editor-studio-container) .kofi-custom-close-btn,
     body:has(.obs-overlay-viewport) div[id^="kofi-widget-overlay"],
     body:has(.obs-overlay-viewport) iframe[src*="ko-fi"],
     body:has(.obs-overlay-viewport) .floatingchat-container-wrap,
     body:has(.obs-overlay-viewport) .floatingchat-container-wrap-mobi,
     body:has(.obs-overlay-viewport) .floating-chat-kofi-popup-iframe,
+    body:has(.obs-overlay-viewport) .kofi-custom-close-btn,
     body:has(.admin-fullscreen-window) div[id^="kofi-widget-overlay"],
     body:has(.admin-fullscreen-window) iframe[src*="ko-fi"],
     body:has(.admin-fullscreen-window) .floatingchat-container-wrap,
     body:has(.admin-fullscreen-window) .floatingchat-container-wrap-mobi,
-    body:has(.admin-fullscreen-window) .floating-chat-kofi-popup-iframe {
+    body:has(.admin-fullscreen-window) .floating-chat-kofi-popup-iframe,
+    body:has(.admin-fullscreen-window) .kofi-custom-close-btn {
       display: none !important;
       visibility: hidden !important;
       pointer-events: none !important;

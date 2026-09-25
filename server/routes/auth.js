@@ -1128,7 +1128,8 @@ router.get("/profile", authenticateUser, async (req, res) => {
       isLeaderboardPublic: user.isLeaderboardPublic !== false,
       isFriendCodesPublic: user.isFriendCodesPublic !== false,
       isStatsPublic: user.isStatsPublic !== false,
-      likeCount: user.likes ? user.likes.length : 0,
+      likeCount: Array.isArray(user.likes) ? new Set(user.likes.filter(Boolean).map(id => id.toString())).size : 0,
+      hasLiked: Array.isArray(user.likes) ? user.likes.some(id => id && id.toString() === String(req.userId)) : false,
       dexPreferences: user.dexPreferences,
       externalLinkPreference: user.externalLinkPreference,
       shinyCharmGames: user.shinyCharmGames,
@@ -2112,7 +2113,7 @@ router.get("/users/public", async (req, res) => {
             }
           },
           // count likes
-          likes: { $size: { $ifNull: ["$likes", []] } }
+          likes: { $size: { $setUnion: [{ $ifNull: ["$likes", []] }, []] } }
         }
       }
     ];
@@ -2141,6 +2142,28 @@ router.get("/users/public", async (req, res) => {
   }
 });
 
+// Helper to extract requester userId from header or cookie
+function getRequesterUserId(req) {
+  try {
+    let token = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+    }
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+      if (decoded && decoded.userId) {
+        return String(decoded.userId);
+      }
+    }
+  } catch (e) {
+    // Ignore invalid or expired tokens
+  }
+  return null;
+}
+
 // Helper to check if requester has valid admin credentials
 async function checkRequesterIsAdmin(req) {
   try {
@@ -2165,7 +2188,7 @@ router.get("/users/:username/public", async (req, res) => {
 
   try {
     const u = await User.findOne({
-      username: req.params.username
+      username: { $regex: new RegExp(`^${escapeRegex(req.params.username)}$`, 'i') }
     })
       .select("username bio location gender birthday favoriteGames favoritePokemon favoritePokemonShiny favoriteBalls favoriteTrainers favoriteCategoryOrder profileTrainer nameColor1 nameColor2 nameGradientColor1 nameGradientColor2 avatar createdAt switchFriendCode goFriendCode progressBars likes verified dexPreferences shinyCharmGames isAdmin bingoGrid isContentCreator youtubeUrl twitchUrl lastActiveAt isProfilePublic isGlobalFeedPublic isLeaderboardPublic isStatsPublic isSuspended suspendedReason")
       .lean();
@@ -2214,8 +2237,13 @@ router.get("/users/:username/public", async (req, res) => {
     // Remove bingoGrid from response to avoid sending the whole grid here
     delete u.bingoGrid;
 
-    // Add like count - safely handle undefined likes
-    const likeCount = Array.isArray(u.likes) ? u.likes.length : 0;
+    // Add unique like count and requester like status
+    const uniqueLikes = Array.isArray(u.likes)
+      ? Array.from(new Set(u.likes.filter(Boolean).map(id => id.toString())))
+      : [];
+    const likeCount = uniqueLikes.length;
+    const requesterUserId = getRequesterUserId(req);
+    const hasLiked = requesterUserId ? uniqueLikes.includes(requesterUserId) : false;
 
     // Determine online status (within 5 minutes)
     const isOnline = Boolean(u.lastActiveAt && (Date.now() - new Date(u.lastActiveAt).getTime() < 5 * 60 * 1000));
@@ -2226,6 +2254,7 @@ router.get("/users/:username/public", async (req, res) => {
       premiumMonths: membershipInfo.premiumMonths || 0,
       premiumSince: membershipInfo.premiumSince || null,
       likeCount,
+      hasLiked,
       hasBingoData,
       isOnline,
       ...(u.isProfilePublic === false && requesterIsAdmin ? { isPrivateAdminView: true, isPrivate: true } : {})
@@ -2471,7 +2500,7 @@ router.get("/hunts", authenticateUser, async (req, res) => {
 // PUT /api/hunts
 router.put("/hunts", authenticateUser, async (req, res) => {
   try {
-    const { activeHunts, currentHuntId, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements, mmoSettings } = req.body;
+    const { activeHunts, currentHuntId, huntTimers, lastCheckTimes, totalCheckTimes, pausedHunts, huntIncrements, mmoSettings, action } = req.body;
 
     // Build update object
     const updateData = {};
@@ -2493,8 +2522,8 @@ router.put("/hunts", authenticateUser, async (req, res) => {
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // Notify active overlay streams of the updated hunt state
-    notifyOverlayStream(req.userId, "HUNT_DATA_CHANGED", { currentHuntId: user.currentHuntId });
+    // Notify active overlay streams of the updated hunt state (including action for animation triggers)
+    notifyOverlayStream(req.userId, "HUNT_DATA_CHANGED", { currentHuntId: user.currentHuntId, action });
 
     res.json({ success: true });
   } catch (err) {
@@ -2612,7 +2641,7 @@ router.post("/assign-admin", authenticateUser, requireAdmin, async (req, res) =>
 // GET /api/admin/users - Get all users (admin only)
 router.get("/admin/users", authenticateUser, requireAdmin, async (req, res) => {
   try {
-    const rawUsers = await User.find({}, 'username email isAdmin verified createdAt bio isContentCreator avatar profileTrainer lastActiveAt isSuspended suspendedReason location favoriteGames favoritePokemon favoriteBalls favoriteTrainers')
+    const rawUsers = await User.find({}, 'username email isAdmin verified createdAt bio isContentCreator avatar profileTrainer lastActiveAt isSuspended suspendedReason')
       .sort({ createdAt: -1 })
       .lean();
 

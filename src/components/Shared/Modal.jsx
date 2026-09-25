@@ -180,14 +180,15 @@ export function Modal({
       let el = target;
       while (el && el !== document.body && el !== document.documentElement) {
         if (el.matches?.(
-          '.udt-select-options-list, .udt-select-dropdown, .custom-scrollbar, .modal-scroll-area, [role="listbox"], [role="menu"], [class*="overflow-y-auto"], [class*="overflow-auto"]'
+          '.udt-select-options-list, .udt-select-dropdown, .custom-scrollbar, .modal-scroll-area, [role="listbox"], [role="menu"], [class*="overflow-y-auto"], [class*="overflow-auto"], [class*="overflow-x-auto"], .perm-scroll-wrap'
         )) {
           return el;
         }
-        if (el.scrollHeight > el.clientHeight && el.clientHeight > 0) {
+        if ((el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth) && el.clientHeight > 0) {
           const style = window.getComputedStyle(el);
           const overflowY = style.overflowY;
-          if (overflowY === 'auto' || overflowY === 'scroll') {
+          const overflowX = style.overflowX;
+          if (overflowY === 'auto' || overflowY === 'scroll' || overflowX === 'auto' || overflowX === 'scroll') {
             return el;
           }
         }
@@ -204,10 +205,22 @@ export function Modal({
         return;
       }
 
-      const { scrollTop, scrollHeight, clientHeight } = scrollable;
-      const isScrollable = scrollHeight > clientHeight;
+      const { scrollTop, scrollHeight, clientHeight, scrollLeft, scrollWidth, clientWidth } = scrollable;
+      const isScrollableY = scrollHeight > clientHeight;
+      const isScrollableX = scrollWidth > clientWidth;
 
-      if (!isScrollable) {
+      // Handle horizontal trackpad / shift-wheel scrolling
+      if ((Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey) && isScrollableX) {
+        const delta = e.deltaX !== 0 ? e.deltaX : e.deltaY;
+        const isAtLeft = scrollLeft <= 0 && delta < 0;
+        const isAtRight = scrollLeft + clientWidth >= scrollWidth - 1 && delta > 0;
+        if (isAtLeft || isAtRight) {
+          e.preventDefault();
+        }
+        return;
+      }
+
+      if (!isScrollableY) {
         // If this element itself isn't scrollable, check its ancestors up to modal-body
         let parent = scrollable.parentElement;
         while (parent && parent !== document.body && parent !== document.documentElement) {
@@ -254,7 +267,7 @@ export function Modal({
         return;
       }
 
-      const { scrollTop, scrollHeight, clientHeight } = scrollable;
+      const { scrollTop, scrollHeight, clientHeight, scrollWidth, clientWidth } = scrollable;
       if (scrollHeight <= clientHeight) {
         let parent = scrollable.parentElement;
         while (parent && parent !== document.body && parent !== document.documentElement) {
@@ -275,6 +288,10 @@ export function Modal({
             }
           }
           parent = parent.parentElement;
+        }
+
+        if (scrollWidth > clientWidth) {
+          return;
         }
 
         e.preventDefault();

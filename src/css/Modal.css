@@ -356,11 +356,18 @@ html, body {
 ==================================*/
 
 @media (max-width: 768px) {
+  .udt-modal-overlay {
+    padding: 16px;
+    align-items: center;
+    justify-content: center;
+  }
+
   .udt-modal-panel {
     max-width: 96vw;
     width: 96vw;
-    border-radius: 16px;
-    max-height: 90vh;
+    border-radius: 18px;
+    max-height: calc(100dvh - 32px);
+    margin: auto;
   }
 
   .udt-modal-header {
@@ -435,18 +442,20 @@ html, body {
   }
 }
 
-/* Very narrow phones (320px–390px): near-fullscreen modal */
+/* Very narrow phones (320px–390px): centered modal */
 @media (max-width: 480px) {
   .udt-modal-overlay {
-    padding: 8px;
-    align-items: flex-end;
+    padding: 12px;
+    align-items: center;
+    justify-content: center;
   }
 
   .udt-modal-panel {
     max-width: calc(100% - 16px);
     width: calc(100% - 16px);
-    border-radius: 20px 20px 12px 12px;
-    max-height: 94vh;
+    border-radius: 18px;
+    max-height: calc(100dvh - 24px);
+    margin: auto;
   }
 
   .udt-modal-title {

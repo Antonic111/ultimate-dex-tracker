@@ -4,6 +4,7 @@ import { Sparkles, Plus, Trash2, ChevronLeft, ChevronRight, Calendar, ChevronUp,
 import { BALL_OPTIONS, GAME_OPTIONS, MARK_OPTIONS, METHOD_OPTIONS, genderForms } from "../../Constants";
 import EvolutionChain from "../Dex/EvolutionChain";
 import PermutationTable from "../MMO/PermutationTable";
+import { PERMUTATION_DATA, GHOST_PERMUTATION_DATA } from "../../data/permutations";
 
 import { getCaughtKey } from "../../caughtStorage";
 import { formatPokemonName, getFormDisplayName, renderTypeBadge, getRelatedForms, findPokemon } from "../../utils";
@@ -439,13 +440,277 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     });
   }, [markSearchQuery, isMighty]);
 
+  // Comprehensive resolution for Permutation Chart config with multi-tier fallback
+  const activeChartConfig = useMemo(() => {
+    let resolved = editData?.chartConfig;
+    if (typeof resolved === "string") {
+      try { resolved = JSON.parse(resolved); } catch { resolved = null; }
+    }
+    const hasConfig = (obj) => obj && typeof obj === 'object' && Object.keys(obj).length > 0;
+    if (hasConfig(resolved)) return resolved;
+
+    const currentLocalEntry = localEntries?.[selectedEntryIndex] || localEntries?.[0];
+    let localCfg = currentLocalEntry?.chartConfig;
+    if (typeof localCfg === "string") {
+      try { localCfg = JSON.parse(localCfg); } catch { localCfg = null; }
+    }
+    if (hasConfig(localCfg)) return localCfg;
+
+    let caughtCfg = caughtInfo?.chartConfig;
+    if (typeof caughtCfg === "string") {
+      try { caughtCfg = JSON.parse(caughtCfg); } catch { caughtCfg = null; }
+    }
+    if (hasConfig(caughtCfg)) return caughtCfg;
+
+    if (Array.isArray(caughtInfo?.entries)) {
+      for (const ent of caughtInfo.entries) {
+        let eCfg = ent?.chartConfig;
+        if (typeof eCfg === "string") {
+          try { eCfg = JSON.parse(eCfg); } catch { eCfg = null; }
+        }
+        if (hasConfig(eCfg)) return eCfg;
+      }
+    }
+
+    // Direct check in caughtInfoMap
+    if (pokemon && caughtInfoMap) {
+      try {
+        const cKey = getCaughtKey(pokemon, null, showShiny);
+        const direct = cKey ? caughtInfoMap[cKey] : null;
+        let dCfg = direct?.chartConfig || direct?.entries?.[selectedEntryIndex]?.chartConfig || direct?.entries?.[0]?.chartConfig;
+        if (typeof dCfg === "string") {
+          try { dCfg = JSON.parse(dCfg); } catch { dCfg = null; }
+        }
+        if (hasConfig(dCfg)) return dCfg;
+
+        // Check related forms
+        const isPermOrAlpha = editData?.method === "Permutations" || pokemon?.formType === "alpha" || (pokemon?.name && pokemon.name.includes("-alpha")) || editData?.isMMO;
+        if (isPermOrAlpha) {
+          const pokeNameLower = pokemon?.name?.toLowerCase();
+          for (const [k, val] of Object.entries(caughtInfoMap)) {
+            if (pokeNameLower && k.toLowerCase().includes(pokeNameLower)) {
+              let altCfg = val?.chartConfig || val?.entries?.[0]?.chartConfig;
+              if (typeof altCfg === "string") {
+                try { altCfg = JSON.parse(altCfg); } catch { altCfg = null; }
+              }
+              if (hasConfig(altCfg)) return altCfg;
+            }
+          }
+        }
+      } catch {}
+    }
+
+    if (pokemon) {
+      try {
+        const u = username || viewingUsername;
+        const checkStorages = [
+          ...(u ? [`completedHunts:${u}`, `activeHunts:${u}`, `huntHistory:${u}`] : []),
+          "completedHunts",
+          "activeHunts",
+          "huntHistory"
+        ];
+        const pokeNameLower = pokemon?.name?.toLowerCase();
+        const pokeStableId = pokemon?.stableId;
+        const pokeId = pokemon?.id;
+        const entryId = editData?.entryId || currentLocalEntry?.entryId;
+
+        for (const sKey of checkStorages) {
+          const raw = localStorage.getItem(sKey);
+          if (!raw) continue;
+          const huntsList = JSON.parse(raw);
+          if (!Array.isArray(huntsList)) continue;
+          const match = huntsList.find(h => {
+            if (!h) return false;
+            if (entryId && h.entryId && h.entryId === entryId) return true;
+            const hName = (h.pokemon?.name || h.pokemonName || "").toLowerCase();
+            const hId = h.pokemon?.id;
+            const hStable = h.pokemon?.stableId;
+            const matchesPoke = (pokeStableId && hStable === pokeStableId) ||
+              (pokeId && hId === pokeId) ||
+              (pokeNameLower && hName === pokeNameLower);
+            return matchesPoke && hasConfig(h.chartConfig);
+          });
+          if (match) {
+            let mCfg = match.chartConfig;
+            if (typeof mCfg === "string") {
+              try { mCfg = JSON.parse(mCfg); } catch { mCfg = null; }
+            }
+            if (hasConfig(mCfg)) return mCfg;
+          }
+        }
+      } catch {}
+    }
+
+    // Auto-synthesize default config if method is Permutations
+    const targetMethod = editData?.method || currentLocalEntry?.method || caughtInfo?.method || caughtInfo?.entries?.[0]?.method;
+    const targetChecks = Number(editData?.checks || currentLocalEntry?.checks || caughtInfo?.checks || caughtInfo?.entries?.[0]?.checks || 0);
+    const targetSaveOrder = Boolean(editData?.isSaveOrder ?? currentLocalEntry?.isSaveOrder ?? caughtInfo?.isSaveOrder ?? caughtInfo?.entries?.[0]?.isSaveOrder ?? editData?.chartConfig?.isSaveOrder ?? false);
+    const targetAdvanced = Boolean(editData?.isAdvanced ?? currentLocalEntry?.isAdvanced ?? caughtInfo?.isAdvanced ?? caughtInfo?.entries?.[0]?.isAdvanced ?? editData?.chartConfig?.isAdvanced ?? false);
+    if (targetMethod === "Permutations" || editData?.isMMO) {
+      return {
+        firstSpawn: targetChecks === 330 ? 9 : 8,
+        secondSpawn: 6,
+        isAdvanced: targetAdvanced,
+        isSaveOrder: targetSaveOrder,
+        showSecondWave: false,
+        showGhostChecks: targetChecks >= 55 * 6 || targetChecks === 330 || targetChecks > 49 * 6
+      };
+    }
+
+    return editData?.chartConfig || {};
+  }, [editData?.chartConfig, editData?.entryId, editData?.method, editData?.checks, editData?.isMMO, localEntries, selectedEntryIndex, caughtInfo, caughtInfoMap, pokemon, showShiny, username, viewingUsername]);
+
+  // Comprehensive resolution for Permutation Chart data with multi-tier fallback
+  const activeChartData = useMemo(() => {
+    let resolved = editData?.chartData;
+    if (typeof resolved === "string") {
+      try { resolved = JSON.parse(resolved); } catch { resolved = null; }
+    }
+    const hasData = (obj) => obj && typeof obj === 'object' && (Array.isArray(obj) ? obj.length > 0 : Object.keys(obj).length > 0);
+    if (hasData(resolved)) return resolved;
+
+    // Check current local entry
+    const currentLocalEntry = localEntries?.[selectedEntryIndex] || localEntries?.[0];
+    let localData = currentLocalEntry?.chartData;
+    if (typeof localData === "string") {
+      try { localData = JSON.parse(localData); } catch { localData = null; }
+    }
+    if (hasData(localData)) return localData;
+
+    // Check caughtInfo (either root or in entries)
+    let caughtData = caughtInfo?.chartData;
+    if (typeof caughtData === "string") {
+      try { caughtData = JSON.parse(caughtData); } catch { caughtData = null; }
+    }
+    if (hasData(caughtData)) return caughtData;
+
+    if (Array.isArray(caughtInfo?.entries)) {
+      for (const ent of caughtInfo.entries) {
+        let eData = ent?.chartData;
+        if (typeof eData === "string") {
+          try { eData = JSON.parse(eData); } catch { eData = null; }
+        }
+        if (hasData(eData)) return eData;
+      }
+    }
+
+    // Direct check in caughtInfoMap
+    if (pokemon && caughtInfoMap) {
+      try {
+        const cKey = getCaughtKey(pokemon, null, showShiny);
+        const direct = cKey ? caughtInfoMap[cKey] : null;
+        let dData = direct?.chartData || direct?.entries?.[selectedEntryIndex]?.chartData || direct?.entries?.[0]?.chartData;
+        if (typeof dData === "string") {
+          try { dData = JSON.parse(dData); } catch { dData = null; }
+        }
+        if (hasData(dData)) return dData;
+
+        // Check related forms
+        const isPermOrAlpha = editData?.method === "Permutations" || pokemon?.formType === "alpha" || (pokemon?.name && pokemon.name.includes("-alpha")) || editData?.isMMO;
+        if (isPermOrAlpha) {
+          const pokeNameLower = pokemon?.name?.toLowerCase();
+          for (const [k, val] of Object.entries(caughtInfoMap)) {
+            if (pokeNameLower && k.toLowerCase().includes(pokeNameLower)) {
+              let altData = val?.chartData || val?.entries?.[0]?.chartData;
+              if (typeof altData === "string") {
+                try { altData = JSON.parse(altData); } catch { altData = null; }
+              }
+              if (hasData(altData)) return altData;
+            }
+          }
+        }
+      } catch {}
+    }
+
+    // Check localStorage fallback for completed/active hunts
+    if (pokemon) {
+      try {
+        const u = username || viewingUsername;
+        const checkStorages = [
+          ...(u ? [`completedHunts:${u}`, `activeHunts:${u}`, `huntHistory:${u}`] : []),
+          "completedHunts",
+          "activeHunts",
+          "huntHistory"
+        ];
+        const pokeNameLower = pokemon?.name?.toLowerCase();
+        const pokeStableId = pokemon?.stableId;
+        const pokeId = pokemon?.id;
+        const entryId = editData?.entryId || currentLocalEntry?.entryId;
+
+        for (const sKey of checkStorages) {
+          const raw = localStorage.getItem(sKey);
+          if (!raw) continue;
+          const huntsList = JSON.parse(raw);
+          if (!Array.isArray(huntsList)) continue;
+          const match = huntsList.find(h => {
+            if (!h) return false;
+            if (entryId && h.entryId && h.entryId === entryId) return true;
+            const hName = (h.pokemon?.name || h.pokemonName || "").toLowerCase();
+            const hId = h.pokemon?.id;
+            const hStable = h.pokemon?.stableId;
+            const matchesPoke = (pokeStableId && hStable === pokeStableId) ||
+              (pokeId && hId === pokeId) ||
+              (pokeNameLower && hName === pokeNameLower);
+            const isMMOHunt = (h.game === "Legends Arceus" && (h.method === "Permutations" || h.method === "Massive Mass Outbreak" || h.method === "Massive Mass Outbreaks")) || h.method === "Permutations" || h.isMMO;
+            return matchesPoke && (isMMOHunt || hasData(h.chartData));
+          });
+          if (match) {
+            let mData = match.chartData;
+            if (typeof mData === "string") {
+              try { mData = JSON.parse(mData); } catch { mData = null; }
+            }
+            if (hasData(mData)) return mData;
+          }
+        }
+      } catch {}
+    }
+
+    // Auto-heal / synthesize fallback for hunts saved with Permutations method
+    const targetChecks = Number(editData?.checks || currentLocalEntry?.checks || caughtInfo?.checks || caughtInfo?.entries?.[0]?.checks || 0);
+    const targetMethod = editData?.method || currentLocalEntry?.method || caughtInfo?.method || caughtInfo?.entries?.[0]?.method;
+    if (targetMethod === "Permutations" && targetChecks > 0) {
+      const secondSpawn = activeChartConfig?.secondSpawn || 6;
+      const firstSpawn = activeChartConfig?.firstSpawn || (targetChecks === 330 ? 9 : 8);
+      const runsCount = Math.round(targetChecks / secondSpawn);
+      const synthetic = {};
+      const mainRows = PERMUTATION_DATA[firstSpawn] || PERMUTATION_DATA[9] || PERMUTATION_DATA[8] || [];
+      const mainToTake = Math.min(runsCount, mainRows.length);
+      for (let i = 0; i < mainToTake; i++) {
+        synthetic[`Main Permutations-${mainRows[i].join('-')}`] = true;
+      }
+      const remainingRuns = runsCount - mainToTake;
+      if (remainingRuns > 0) {
+        const ghostRows = GHOST_PERMUTATION_DATA[4] || [];
+        const ghostToTake = Math.min(remainingRuns, ghostRows.length);
+        for (let i = 0; i < ghostToTake; i++) {
+          synthetic[`Ghost Checks-${ghostRows[i].join('-')}`] = true;
+        }
+      }
+      return synthetic;
+    }
+
+    return editData?.chartData || {};
+  }, [editData?.chartData, editData?.entryId, editData?.method, editData?.checks, localEntries, selectedEntryIndex, caughtInfo, caughtInfoMap, activeChartConfig, pokemon, showShiny, username, viewingUsername]);
+
+  const hasChartData = Boolean(
+    activeChartData &&
+    typeof activeChartData === 'object' &&
+    (Array.isArray(activeChartData) ? activeChartData.length > 0 : Object.keys(activeChartData).length > 0)
+  );
+
+  // Helper to determine if this entry has a permutation / MMO chart (supports past and present pokemon)
+  const isPermutationHunt = Boolean(
+    editData.method === "Permutations" ||
+    (hasChartData && (editData.game === "Legends Arceus" || editData.isMMO || !editData.method || editData.method === "Permutations" || pokemon?.formType === "alpha"))
+  );
+
   // Helper to determine if catch/hunt data exists for current entry in view mode
-  const hasCatchData = Boolean(editData.nickname || editData.date || editData.ball || editData.game || editData.method);
+  const hasCatchData = Boolean(editData.nickname || editData.date || editData.ball || editData.game || editData.method || isPermutationHunt);
   const hasHuntData = Boolean(
     (showShiny && editData.game && editData.method) ||
     (showShiny && editData.checks !== undefined && editData.checks !== null && String(editData.checks).trim() !== "" && String(editData.checks).trim() !== "0") ||
     (editData.time !== undefined && editData.time !== null && editData.time !== "" && editData.time !== 0) ||
-    editData.chartData
+    isPermutationHunt
   );
 
   const MARKS_GAMES = ["Scarlet", "Violet", "Sword", "Shield"];
@@ -689,7 +954,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       if (!isCaught && !editing) {
         setOpenAccordion('additional');
       } else {
-        setOpenAccordion(null);
+        setOpenAccordion('catch');
       }
       prevWasCaughtRef.current = isCaught;
     }
@@ -734,12 +999,19 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
         setOpenAccordion('catch');
       } else {
         const firstEntry = caughtInfo?.entries?.[0] || caughtInfo;
-        const targetHasCatchData = Boolean(firstEntry?.nickname || firstEntry?.date || firstEntry?.ball || firstEntry?.game || firstEntry?.method);
+        const firstEntryIsMMO = Boolean(
+          firstEntry?.method === "Permutations" ||
+          firstEntry?.method === "Massive Mass Outbreak" ||
+          firstEntry?.method === "Massive Mass Outbreaks" ||
+          (firstEntry?.chartData && typeof firstEntry.chartData === 'object' && (Array.isArray(firstEntry.chartData) ? firstEntry.chartData.length > 0 : Object.keys(firstEntry.chartData).length > 0)) ||
+          (caughtInfo?.chartData && typeof caughtInfo.chartData === 'object' && (Array.isArray(caughtInfo.chartData) ? caughtInfo.chartData.length > 0 : Object.keys(caughtInfo.chartData).length > 0))
+        );
+        const targetHasCatchData = Boolean(firstEntry?.nickname || firstEntry?.date || firstEntry?.ball || firstEntry?.game || firstEntry?.method || firstEntryIsMMO);
         const targetHasHuntData = Boolean(
           (showShiny && firstEntry?.game && firstEntry?.method) ||
           (showShiny && firstEntry?.checks !== undefined && firstEntry?.checks !== null && String(firstEntry.checks).trim() !== "" && String(firstEntry.checks).trim() !== "0") ||
           (firstEntry?.time !== undefined && firstEntry?.time !== null && firstEntry?.time !== "" && firstEntry?.time !== 0) ||
-          firstEntry?.chartData
+          firstEntryIsMMO
         );
 
         setOpenAccordion(prev => {
@@ -1098,8 +1370,174 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
       notes: entry.notes || "",
       fails: entry.fails || [],
       phases: entry.phases || [],
-      chartData: entry.chartData || null,
-      chartConfig: entry.chartConfig || null,
+      chartData: (function() {
+        let resolved = entry?.chartData || caughtInfo?.chartData || caughtInfo?.entries?.[0]?.chartData;
+        if (typeof resolved === "string") {
+          try { resolved = JSON.parse(resolved); } catch { resolved = null; }
+        }
+        if (resolved && typeof resolved === 'object' && (Array.isArray(resolved) ? resolved.length > 0 : Object.keys(resolved).length > 0)) {
+          return resolved;
+        }
+
+        // Direct check in caughtInfoMap
+        if (pokemon && caughtInfoMap) {
+          try {
+            const cKey = getCaughtKey(pokemon, null, showShiny);
+            const direct = cKey ? caughtInfoMap[cKey] : null;
+            let dData = direct?.chartData || direct?.entries?.[0]?.chartData;
+            if (typeof dData === "string") {
+              try { dData = JSON.parse(dData); } catch { dData = null; }
+            }
+            if (dData && typeof dData === 'object' && (Array.isArray(dData) ? dData.length > 0 : Object.keys(dData).length > 0)) return dData;
+
+            const pokeNameLower = pokemon?.name?.toLowerCase();
+            for (const [k, val] of Object.entries(caughtInfoMap)) {
+              if (pokeNameLower && k.toLowerCase().includes(pokeNameLower)) {
+                let altData = val?.chartData || val?.entries?.[0]?.chartData;
+                if (typeof altData === "string") {
+                  try { altData = JSON.parse(altData); } catch { altData = null; }
+                }
+                if (altData && typeof altData === 'object' && (Array.isArray(altData) ? altData.length > 0 : Object.keys(altData).length > 0)) return altData;
+              }
+            }
+          } catch {}
+        }
+
+        // Auto-heal / backfill fallback from hunt history if saved from MMO Tool
+        if (pokemon) {
+          try {
+            const u = username || viewingUsername;
+            const checkStorages = [
+              ...(u ? [`completedHunts:${u}`, `activeHunts:${u}`, `huntHistory:${u}`] : []),
+              "completedHunts",
+              "activeHunts",
+              "huntHistory"
+            ];
+            const pokeNameLower = pokemon?.name?.toLowerCase();
+            const pokeStableId = pokemon?.stableId;
+            for (const sKey of checkStorages) {
+              const raw = localStorage.getItem(sKey);
+              if (!raw) continue;
+              const huntsList = JSON.parse(raw);
+              if (!Array.isArray(huntsList)) continue;
+              const match = huntsList.find(h => {
+                if (!h) return false;
+                if (h.entryId && entry.entryId && h.entryId === entry.entryId) return true;
+                const hName = (h.pokemon?.name || h.pokemonName || "").toLowerCase();
+                const hId = h.pokemon?.id;
+                const hStable = h.pokemon?.stableId;
+                const matchesPoke = (pokeStableId && hStable === pokeStableId) || (pokemon.id && hId === pokemon.id) || (pokeNameLower && hName === pokeNameLower);
+                const isMMOHunt = (h.game === "Legends Arceus" && (h.method === "Permutations" || h.method === "Massive Mass Outbreak" || h.method === "Massive Mass Outbreaks")) || h.method === "Permutations" || h.isMMO;
+                return matchesPoke && (isMMOHunt || (h.chartData && typeof h.chartData === 'object'));
+              });
+              if (match && match.chartData && typeof match.chartData === 'object') return match.chartData;
+            }
+          } catch {}
+        }
+
+        // Auto-heal / synthesize fallback for hunts saved with Permutations method
+        const targetChecks = Number(entry?.checks || caughtInfo?.checks || caughtInfo?.entries?.[0]?.checks || 0);
+        const targetMethod = entry?.method || caughtInfo?.method || caughtInfo?.entries?.[0]?.method;
+        if (targetMethod === "Permutations" && targetChecks > 0) {
+          const secondSpawn = 6;
+          const firstSpawn = targetChecks === 330 ? 9 : 8;
+          const runsCount = Math.round(targetChecks / secondSpawn);
+          const synthetic = {};
+          const mainRows = PERMUTATION_DATA[firstSpawn] || PERMUTATION_DATA[9] || PERMUTATION_DATA[8] || [];
+          const mainToTake = Math.min(runsCount, mainRows.length);
+          for (let i = 0; i < mainToTake; i++) {
+            synthetic[`Main Permutations-${mainRows[i].join('-')}`] = true;
+          }
+          const remainingRuns = runsCount - mainToTake;
+          if (remainingRuns > 0) {
+            const ghostRows = GHOST_PERMUTATION_DATA[4] || [];
+            const ghostToTake = Math.min(remainingRuns, ghostRows.length);
+            for (let i = 0; i < ghostToTake; i++) {
+              synthetic[`Ghost Checks-${ghostRows[i].join('-')}`] = true;
+            }
+          }
+          return synthetic;
+        }
+
+        return resolved || {};
+      })(),
+      chartConfig: (function() {
+        let resolved = entry?.chartConfig || caughtInfo?.chartConfig || caughtInfo?.entries?.[0]?.chartConfig;
+        if (typeof resolved === "string") {
+          try { resolved = JSON.parse(resolved); } catch { resolved = null; }
+        }
+        if (resolved && typeof resolved === 'object' && Object.keys(resolved).length > 0) return resolved;
+
+        // Direct check in caughtInfoMap
+        if (pokemon && caughtInfoMap) {
+          try {
+            const cKey = getCaughtKey(pokemon, null, showShiny);
+            const direct = cKey ? caughtInfoMap[cKey] : null;
+            let dCfg = direct?.chartConfig || direct?.entries?.[0]?.chartConfig;
+            if (typeof dCfg === "string") {
+              try { dCfg = JSON.parse(dCfg); } catch { dCfg = null; }
+            }
+            if (dCfg && typeof dCfg === 'object' && Object.keys(dCfg).length > 0) return dCfg;
+
+            const pokeNameLower = pokemon?.name?.toLowerCase();
+            for (const [k, val] of Object.entries(caughtInfoMap)) {
+              if (pokeNameLower && k.toLowerCase().includes(pokeNameLower)) {
+                let altCfg = val?.chartConfig || val?.entries?.[0]?.chartConfig;
+                if (typeof altCfg === "string") {
+                  try { altCfg = JSON.parse(altCfg); } catch { altCfg = null; }
+                }
+                if (altCfg && typeof altCfg === 'object' && Object.keys(altCfg).length > 0) return altCfg;
+              }
+            }
+          } catch {}
+        }
+
+        if (pokemon) {
+          try {
+            const u = username || viewingUsername;
+            const checkStorages = [
+              ...(u ? [`completedHunts:${u}`, `activeHunts:${u}`, `huntHistory:${u}`] : []),
+              "completedHunts",
+              "activeHunts",
+              "huntHistory"
+            ];
+            const pokeNameLower = pokemon?.name?.toLowerCase();
+            const pokeStableId = pokemon?.stableId;
+            for (const sKey of checkStorages) {
+              const raw = localStorage.getItem(sKey);
+              if (!raw) continue;
+              const huntsList = JSON.parse(raw);
+              if (!Array.isArray(huntsList)) continue;
+              const match = huntsList.find(h => {
+                if (!h) return false;
+                if (h.entryId && entry.entryId && h.entryId === entry.entryId) return true;
+                const hName = (h.pokemon?.name || h.pokemonName || "").toLowerCase();
+                const hId = h.pokemon?.id;
+                const hStable = h.pokemon?.stableId;
+                const matchesPoke = (pokeStableId && hStable === pokeStableId) || (pokemon.id && hId === pokemon.id) || (pokeNameLower && hName === pokeNameLower);
+                const isMMOHunt = (h.game === "Legends Arceus" && (h.method === "Permutations" || h.method === "Massive Mass Outbreak" || h.method === "Massive Mass Outbreaks")) || h.method === "Permutations" || h.isMMO;
+                return matchesPoke && (isMMOHunt || (h.chartData && typeof h.chartData === 'object'));
+              });
+              if (match && match.chartConfig && typeof match.chartConfig === 'object') return match.chartConfig;
+            }
+          } catch {}
+        }
+
+        const targetChecks = Number(entry?.checks || caughtInfo?.checks || caughtInfo?.entries?.[0]?.checks || 0);
+        const targetMethod = entry?.method || caughtInfo?.method || caughtInfo?.entries?.[0]?.method;
+        if (targetMethod === "Permutations") {
+          return {
+            firstSpawn: targetChecks === 330 ? 9 : 8,
+            secondSpawn: 6,
+            isAdvanced: false,
+            isSaveOrder: false,
+            showSecondWave: false,
+            showGhostChecks: targetChecks >= 55 * 6 || targetChecks === 330 || targetChecks > 49 * 6
+          };
+        }
+
+        return resolved || {};
+      })(),
       entryId: entry.entryId || Math.random().toString(36).substr(2, 9),
       modifiers: entry.modifiers || {
         ...defaultEditData.modifiers,
@@ -1107,19 +1545,25 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
         researchLv10: entryGame === "Legends Arceus" && shouldHaveCharm ? true : false
       }
     };
-  }, [isMighty, isOriginBall, defaultEditData, shinyCharmGames, readOnly, gameHasShinyCharm]);
+  }, [isMighty, isOriginBall, defaultEditData, shinyCharmGames, readOnly, gameHasShinyCharm, pokemon, showShiny, username, viewingUsername, caughtInfo, caughtInfoMap]);
 
   // Initialize state when component first mounts or when caughtInfo changes
   useEffect(() => {
-    if (caughtInfo?.entries && caughtInfo.entries.length > 0) {
-      setLocalEntries(caughtInfo.entries);
+    const rawEntries = caughtInfo?.entries && Array.isArray(caughtInfo.entries) && caughtInfo.entries.length > 0
+      ? caughtInfo.entries
+      : (caughtInfo && (caughtInfo.caught || caughtInfo.nickname || caughtInfo.game || caughtInfo.method || caughtInfo.chartData)
+          ? [caughtInfo]
+          : []);
+
+    if (rawEntries.length > 0) {
+      setLocalEntries(rawEntries);
       // Only reset to first entry if we don't have a valid selectedEntryIndex
-      if (selectedEntryIndex >= caughtInfo.entries.length) {
+      if (selectedEntryIndex >= rawEntries.length) {
         setSelectedEntryIndex(0);
-        setEditData(formatEntryToEditData(caughtInfo.entries[0]));
+        setEditData(formatEntryToEditData(rawEntries[0]));
       } else {
         // Keep current selection but update editData to show current entry
-        setEditData(formatEntryToEditData(caughtInfo.entries[selectedEntryIndex]));
+        setEditData(formatEntryToEditData(rawEntries[selectedEntryIndex]));
       }
     } else {
       setLocalEntries([]);
@@ -1163,46 +1607,6 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
     };
   }, []);
 
-  // Prevent scrolling when modals are open
-  useEffect(() => {
-    const preventScroll = (e) => {
-      // If we are in the evolve modal or chart modal, allow scrolling inside the custom-scrollbar only
-      if (evolveModal.show || showChartModal) {
-        if (e.target.closest('.custom-scrollbar')) {
-          return; // Let the modal itself scroll normally
-        }
-      }
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    };
-
-    const preventKeyScroll = (e) => {
-      if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) {
-        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && !e.target.closest('[role="dialog"]') && !e.target.closest('.custom-scrollbar')) {
-          e.preventDefault();
-        }
-      }
-    };
-
-    const isAnyModalOpen = resetModal.show || deleteEntryModal.show || evolveModal.show || showChartModal;
-
-    if (isAnyModalOpen) {
-      document.addEventListener('wheel', preventScroll, { passive: false });
-      document.addEventListener('touchmove', preventScroll, { passive: false });
-      document.addEventListener('keydown', preventKeyScroll, { passive: false });
-    } else {
-      document.removeEventListener('wheel', preventScroll);
-      document.removeEventListener('touchmove', preventScroll);
-      document.removeEventListener('keydown', preventKeyScroll);
-    }
-
-    return () => {
-      document.removeEventListener('wheel', preventScroll);
-      document.removeEventListener('touchmove', preventScroll);
-      document.removeEventListener('keydown', preventKeyScroll);
-    };
-  }, [resetModal.show, deleteEntryModal.show, evolveModal.show, showChartModal]);
 
   // Function to format date from MM-DD-YYYY or YYYY-MM-DD to MMM DD YYYY format
   function formatDate(dateString) {
@@ -1348,6 +1752,7 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
 
     if (selectedEntryIndex < currentEntries.length) {
       // Update existing entry at the current index
+      const existingEntry = currentEntries[selectedEntryIndex];
       const cleaned = {
         nickname: editData.nickname || "",
         date: finalSavedDate,
@@ -1366,8 +1771,15 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
         ),
         time: editData.time || "",
         notes: editData.notes || "",
-        entryId: currentEntries[selectedEntryIndex].entryId, // Keep the existing entryId
-        modifiers: editData.modifiers || defaultEditData.modifiers
+        entryId: existingEntry.entryId, // Keep the existing entryId
+        modifiers: editData.modifiers || defaultEditData.modifiers,
+        phases: editData.phases !== undefined ? editData.phases : (existingEntry.phases || []),
+        fails: editData.fails !== undefined ? editData.fails : (existingEntry.fails || []),
+        chartData: editData.chartData !== undefined ? editData.chartData : (existingEntry.chartData || null),
+        chartConfig: editData.chartConfig !== undefined ? editData.chartConfig : (existingEntry.chartConfig || null),
+        phaseCount: editData.phaseCount !== undefined ? editData.phaseCount : existingEntry.phaseCount,
+        totalChecks: editData.totalChecks !== undefined ? editData.totalChecks : existingEntry.totalChecks,
+        isHuntTracker: editData.isHuntTracker !== undefined ? editData.isHuntTracker : existingEntry.isHuntTracker
       };
 
       updatedEntries = currentEntries.map((entry, index) =>
@@ -1394,7 +1806,14 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
         time: editData.time || "",
         notes: editData.notes || "",
         entryId: Math.random().toString(36).substr(2, 9), // Generate new entryId for new entries
-        modifiers: editData.modifiers || defaultEditData.modifiers
+        modifiers: editData.modifiers || defaultEditData.modifiers,
+        phases: editData.phases || [],
+        fails: editData.fails || [],
+        chartData: editData.chartData || null,
+        chartConfig: editData.chartConfig || null,
+        phaseCount: editData.phaseCount || undefined,
+        totalChecks: editData.totalChecks || undefined,
+        isHuntTracker: editData.isHuntTracker || undefined
       };
 
       updatedEntries = [...currentEntries, cleaned];
@@ -1781,13 +2200,56 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
         const activeHunts = JSON.parse(rawActive);
         let changed = false;
         activeHunts.forEach(h => {
-          if (Array.isArray(h.phases)) {
+          if (Array.isArray(h.phases) && h.phases.length > 0) {
             const initialLen = h.phases.length;
-            h.phases = h.phases.filter(p => !isSameFail(p, failToDelete));
-            if (h.phases.length !== initialLen) changed = true;
+            let removedChecks = 0;
+            const remainingPhases = [];
+            h.phases.forEach(p => {
+              if (isSameFail(p, failToDelete)) {
+                removedChecks += Number(p.phaseChecks ?? p.checks ?? p.count ?? 0) || 0;
+              } else {
+                remainingPhases.push(p);
+              }
+            });
+            if (remainingPhases.length !== initialLen) {
+              changed = true;
+              let cumulative = 0;
+              const reindexedPhases = remainingPhases.map((p, idx) => {
+                const pChecks = Number(p.phaseChecks ?? p.checks ?? p.count ?? 0) || 0;
+                cumulative += pChecks;
+                return {
+                  ...p,
+                  phaseNumber: idx + 1,
+                  checks: pChecks,
+                  phaseChecks: pChecks,
+                  totalChecks: cumulative
+                };
+              });
+
+              const currentChecks = Number(h.checks ?? 0) || 0;
+              const nextChecks = currentChecks + removedChecks;
+              const nextTotalChecks = reindexedPhases.length > 0
+                ? cumulative + nextChecks
+                : Math.max(nextChecks, Number(h.totalChecks ?? 0) || 0);
+
+              h.phases = reindexedPhases;
+              h.currentPhase = reindexedPhases.length + 1;
+              h.checks = nextChecks;
+              h.totalChecks = nextTotalChecks;
+              if (reindexedPhases.length === 0) {
+                h.metricMode = "total";
+              }
+            }
           }
         });
-        if (changed) localStorage.setItem("activeHunts", JSON.stringify(activeHunts));
+        if (changed) {
+          localStorage.setItem("activeHunts", JSON.stringify(activeHunts));
+          try {
+            const channel = new BroadcastChannel("ultimate_dex_tracker_hunts_sync");
+            channel.postMessage({ type: "HUNTS_SYNC", hunts: activeHunts, broadcastTime: Date.now() });
+            channel.close();
+          } catch {}
+        }
       }
     } catch {}
 
@@ -3081,25 +3543,41 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                             <div className="sidebar-display-label">Method</div>
                             <div className="sidebar-display-value">{editData.method}</div>
                           </div>
-                          <div className="flex items-center gap-4">
-                            {editData.method === "Permutations" && editData.chartData && (
-                              <button
-                                type="button"
-                                onClick={() => setShowChartModal(true)}
-                                className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#2a2a2a] hover:bg-[#383838] border border-[#444] hover:border-[var(--accent)] text-[var(--accent)] transition-all duration-200 cursor-pointer"
-                                title="View Permutation Chart"
-                              >
-                                <ListTodo size={20} />
-                              </button>
-                            )}
+                          {isPermutationHunt ? (
+                            <button
+                              type="button"
+                              onClick={() => setShowChartModal(true)}
+                              className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#2a2a2a] hover:bg-[#383838] border border-[#444] hover:border-[var(--accent)] text-[var(--accent)] transition-all duration-200 cursor-pointer"
+                              title="View Permutation Chart"
+                            >
+                              <ListTodo size={20} />
+                            </button>
+                          ) : (
                             <div className="sidebar-display-icon">
                               <img src="/data/SidebarIcons/Method.svg" alt="Method" className="w-full h-full object-contain" />
                             </div>
-                          </div>
+                          )}
                         </div>
                       )}
 
-                      {!editData.nickname && !editData.date && !editData.ball && !editData.game && !editData.method && (
+                      {!editData.method && isPermutationHunt && (
+                        <div className="sidebar-display-card">
+                          <div className="sidebar-display-info">
+                            <div className="sidebar-display-label">Method</div>
+                            <div className="sidebar-display-value">Permutations</div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowChartModal(true)}
+                            className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#2a2a2a] hover:bg-[#383838] border border-[#444] hover:border-[var(--accent)] text-[var(--accent)] transition-all duration-200 cursor-pointer"
+                            title="View Permutation Chart"
+                          >
+                            <ListTodo size={20} />
+                          </button>
+                        </div>
+                      )}
+
+                      {!editData.nickname && !editData.date && !editData.ball && !editData.game && !editData.method && !hasChartData && (
                         <div className="text-center py-2 text-xs text-[var(--sidebar-text)] opacity-60">
                           No catch details recorded for this entry.
                         </div>
@@ -3194,6 +3672,24 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
                             <div className="sidebar-display-icon">
                               <img src="/data/SidebarIcons/Time.svg" alt="Time" className="w-full h-full object-contain" />
                             </div>
+                          </div>
+                        )}
+
+                        {/* Permutation Chart */}
+                        {isPermutationHunt && (
+                          <div className="sidebar-display-card">
+                            <div className="sidebar-display-info">
+                              <div className="sidebar-display-label">Permutations</div>
+                              <div className="sidebar-display-value">MMO Chart</div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setShowChartModal(true)}
+                              className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#2a2a2a] hover:bg-[#383838] border border-[#444] hover:border-[var(--accent)] text-[var(--accent)] transition-all duration-200 cursor-pointer"
+                              title="View Permutation Chart"
+                            >
+                              <ListTodo size={20} />
+                            </button>
                           </div>
                         )}
                       </div>
@@ -3775,88 +4271,26 @@ export default function PokemonSidebar({ open = false, readOnly = false, pokemon
         </div>
       </Modal>
 
-      {/* Chart Modal */}
-      {showChartModal && createPortal(
-        <div
-          className={`fixed inset-0 z-[20000] ${chartModalClosing ? 'animate-[fadeOut_0.3s_ease-in_forwards]' : 'animate-[fadeIn_0.3s_ease-out]'}`}
-          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-          onClick={() => {
-            setChartModalClosing(true);
-            setTimeout(() => {
-              setShowChartModal(false);
-              setChartModalClosing(false);
-            }, 300);
-          }}
-        >
-          <div className="bg-black/80 w-full h-full flex items-center justify-center p-4">
-            <div
-              className={`relative bg-[var(--progress-bg)] border border-[#444] rounded-[20px] p-6 max-w-4xl w-full max-h-[90vh] flex flex-col shadow-xl ${chartModalClosing ? 'animate-[slideOut_0.3s_ease-in_forwards]' : 'animate-[slideIn_0.3s_ease-out]'}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-6 shrink-0 border-b border-[#444] pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center bg-[var(--sidebar-pokemon-bg)] border border-[var(--accent)]">
-                    <img 
-                      src={pokeImg} 
-                      alt={pokeName} 
-                      className="w-full h-full object-contain image-render-pixelated" 
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-[var(--accent)]">Permutation Chart</h3>
-                    <p className="text-sm text-[var(--progressbar-info)]">
-                      {pokemon.formType === 'alpha' || pokemon.formType === 'alphaother' || (pokemon.name && pokemon.name.includes('-alpha')) ? `Alpha ${pokeName}` : pokeName} - Completed Hunt
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setChartModalClosing(true);
-                    setTimeout(() => {
-                      setShowChartModal(false);
-                      setChartModalClosing(false);
-                    }, 300);
-                  }}
-                  className="absolute top-4 right-4 p-1 rounded-full transition-all duration-200 z-10"
-                  style={{ background: 'none', border: 'none' }}
-                  title="Close Chart"
-                >
-                  <span className="flex items-center justify-center">
-                    <svg
-                      width="40"
-                      height="40"
-                      viewBox="0 0 40 40"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden="true"
-                      className="sidebar-close-icon"
-                    >
-                      <circle cx="20" cy="20" r="18" fill="#fff" stroke="#232323" strokeWidth="2" />
-                      <path d="M2 20a18 18 0 0 1 36 0" fill="#e62829" stroke="#232323" strokeWidth="2" />
-                      <rect x="2" y="19" width="36" height="2" fill="#232323" />
-                      <circle cx="20" cy="20" r="7" fill="#ffffffff" stroke="#232323" strokeWidth="2" />
-                      <circle cx="20" cy="20" r="3.5" fill="#fff" stroke="#232323" strokeWidth="1.5" />
-                    </svg>
-                  </span>
-                </button>
-              </div>
-
-              <div 
-                className="flex-1 overflow-y-auto pr-1 custom-scrollbar text-gray-300"
-                style={{ overscrollBehavior: 'contain' }}
-              >
-                <PermutationTable
-                  readOnly={true}
-                  chartData={editData.chartData || {}}
-                  chartConfig={editData.chartConfig || {}}
-                  legendColors={editData.chartConfig?.legendColors || {}}
-                />
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      {/* Permutation Chart Modal - Universal Modal Setup */}
+      <Modal
+        isOpen={showChartModal}
+        onClose={() => setShowChartModal(false)}
+        title="Permutation Chart"
+        subtitle={`${pokemon?.formType === 'alpha' || pokemon?.formType === 'alphaother' || (pokemon?.name && pokemon.name.includes('-alpha')) ? `Alpha ${pokeName}` : pokeName} • Completed Hunt`}
+        icon={<ListTodo size={22} />}
+        size="xl"
+        closeOnBackdrop={false}
+        closeOnEscape={true}
+      >
+        <div className="flex flex-col w-full">
+          <PermutationTable
+            readOnly={true}
+            chartData={activeChartData}
+            chartConfig={activeChartConfig}
+            legendColors={activeChartConfig?.legendColors || {}}
+          />
+        </div>
+      </Modal>
     </div>
   );
 }

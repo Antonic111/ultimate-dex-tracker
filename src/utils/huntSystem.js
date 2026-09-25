@@ -581,17 +581,40 @@ export const getModifiersForGame = (gameName) => {
 
 // Function to calculate final odds based on method and modifiers
 export const calculateOdds = (gameName, methodName, modifiers = {}) => {
-  const game = HUNT_SYSTEM[gameName];
+  let effectiveGameName = gameName;
+  const isPLAHint = (
+    methodName === "Permutations" ||
+    methodName === "Permutation" ||
+    methodName === "Massive Mass Outbreak" ||
+    methodName === "Massive Mass Outbreaks" ||
+    methodName === "MMO"
+  );
+  if (!effectiveGameName && isPLAHint) {
+    effectiveGameName = "Legends Arceus";
+  }
+
+  const game = HUNT_SYSTEM[effectiveGameName];
   if (!game) return 4096;
 
   // Determine the default base odds for this game (8192 for Gen 1-5, 4096 for Gen 6+, 512 for GO)
   const defaultBaseOdds = game.methods.find(m => m.name === "Random Encounters")?.baseOdds || game.methods[0]?.baseOdds || 4096;
 
-  const method = game.methods.find(m => m.name === methodName) || (gameName === "Legends Arceus" && methodName === "Permutations" ? { name: "Permutations", baseOdds: 316 } : null);
+  const isLegendsArceus = effectiveGameName === "Legends Arceus";
+  const isMMOMethod = isLegendsArceus && isPLAHint;
+  const isMOMethod = isLegendsArceus && (
+    methodName === "Mass Outbreaks" ||
+    methodName === "Mass Outbreak" ||
+    methodName === "MO"
+  );
+
+  const method = game.methods.find(m => m.name === methodName) ||
+    (isMMOMethod ? { name: "Massive Mass Outbreaks", baseOdds: 316 } : null) ||
+    (isMOMethod ? { name: "Mass Outbreaks", baseOdds: 158 } : null);
+
   if (methodName === "Evolved" || !method) {
     let finalOdds = defaultBaseOdds;
     if (modifiers.shinyCharm && game.modifiers && game.modifiers["Shiny Charm"] > 0) {
-      if (gameName === "Black 2" || gameName === "White 2") {
+      if (effectiveGameName === "Black 2" || effectiveGameName === "White 2") {
         finalOdds = 2731;
       } else {
         finalOdds = Math.round(finalOdds / game.modifiers["Shiny Charm"]);
@@ -661,11 +684,11 @@ export const calculateOdds = (gameName, methodName, modifiers = {}) => {
   }
 
   // Special calculation for Legends Arceus based on the chart
-  if (gameName === "Legends Arceus") {
+  if (isLegendsArceus) {
     let rolls = 1; // Base rolls
     
     // Calculate rolls based on method and modifiers
-    if (methodName === "Mass Outbreaks") {
+    if (isMOMethod || methodName === "Mass Outbreaks") {
       rolls = 26; // Base MO rolls
       if (modifiers.researchLv10) rolls += 1; // +1 for Research Lv 10
       if (modifiers.perfectResearch) rolls += 2; // +2 for Perfect Research
@@ -678,7 +701,7 @@ export const calculateOdds = (gameName, methodName, modifiers = {}) => {
           rolls += 4; // +4 for Shiny Charm alone
         }
       }
-    } else if (methodName === "Massive Mass Outbreaks" || methodName === "Permutations") {
+    } else if (isMMOMethod || methodName === "Massive Mass Outbreaks" || methodName === "Permutations") {
       rolls = 13; // Base MMO/Permutations rolls
       if (modifiers.researchLv10) rolls += 1; // +1 for Research Lv 10
       if (modifiers.perfectResearch) rolls += 2; // +2 for Perfect Research

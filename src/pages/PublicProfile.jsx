@@ -582,37 +582,6 @@ export default function PublicProfile() {
         return () => { ignore = true; };
     }, [username, currentUsername, userLoading]);
 
-    // Set initial like count from profile data
-    useEffect(() => {
-        if (data && typeof data.likeCount === 'number') {
-            setLikeCount(data.likeCount);
-        }
-    }, [data]);
-
-    // Initial load of likes
-    useEffect(() => {
-        if (!username) return;
-
-        const loadInitialLikes = async () => {
-            try {
-                if (currentUsername) {
-                    // User is logged in - get their like status and count
-                    const { hasLiked: userHasLiked, likeCount: count } = await profileAPI.getProfileLikes(username);
-                    setLikeCount(count);
-                    setHasLiked(userHasLiked);
-                } else {
-                    // User is not logged in - just get the count
-                    const { count } = await profileAPI.getPublicProfileLikes(username);
-                    setLikeCount(count);
-                    setHasLiked(false);
-                }
-            } catch (error) {
-                // Silently handle errors
-            }
-        };
-
-        loadInitialLikes();
-    }, [username, currentUsername]);
 
     // Refresh like status when tab gains focus or becomes visible
     useEffect(() => {
